@@ -35,14 +35,7 @@
                    ];
 
         $scope.showAdvancedModal = function() {
-            $scope.dialogManager.openDialog({
-                title: 'Advanced keyboard controls',
-                text: 'Full list of keyboard shortcuts to go here.',
-                allowClose: 1,
-                buttons: [
-                    $scope.dialogManager.closeButton()
-                ]
-            });
+            throw "Not implemented";
         };
 
     }]);

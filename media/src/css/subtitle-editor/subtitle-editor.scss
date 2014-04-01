@@ -267,104 +267,36 @@ header.main {
             }
         }
     }
-    section.status {
-        > * {
-            height: 38px;
-        }
-        a {
+    section.session {
+        text-align: right;
+        background: black;
+
+        button {
             -webkit-transition: color 0.03s linear;
             -moz-transition: color 0.03s linear;
             transition: color 0.03s linear;
-        }
-        div.dropdown {
-            border-right: 1px solid #2B2C2D;
-            float: right;
-            position: relative;
 
-            a {
-                color: #999999;
-                font: normal 11px $OpenSans;
-                display: block;
-                height: 38px;
-                padding: 11px 12px 0 12px;
-                text-decoration: none;
+            color: #999999;
+            background: black;
+            border: none;
+            font: normal 11px $OpenSans;
+            height: 38px;
+            padding: 0 12px;
+            cursor: pointer;
+            outline: none;
+            margin: 0;
 
-                span {
-                    display: inline-block;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    width: 100%;
-                }
-                img {
-                    float: right;
-                    margin-top: 2px;
-                    @include opacity(.5);
-                    -webkit-transition: opacity 0.03s linear;
-                    -moz-transition: opacity 0.03s linear;
-                    transition: opacity 0.03s linear;
-                }
-                &:hover {
-                    color: white;
-
-                    img {
-                        @include opacity(1);
-                    }
-                }
+            &:hover {
+                color: white;
             }
-            ul {
-                background: $dark-grey;
-                right: 0;
-                padding: 7px 15px;
-                position: absolute;
-                top: 58px;
-                min-width: 130px;
-                @include border-radius(3px);
 
-                &:before {
-                    border-bottom: 12px solid $dark-grey;
-                    border-left: 12px solid transparent;
-                    border-right: 12px solid transparent;
-                    content: "";
-                    display: block;
-                    height: 0px;
-                    position: absolute;
-                    right: 26px;
-                    top: -12px;
-                    width: 0px;
-                }
-                li {
-                    a {
-                        color: #8D8E8E;
-                        padding: 7px 0;
-
-                        &:hover {
-                            color: white;
-                        }
-                    }
-                }
+            &.save {
+                background: #126295;
+                color: white;
             }
-            &.status {
-                a {
-                    cursor: default;
-                }
-            }
-        }
-        div.exit {
-            border-right: none;
-            text-align: center;
-
-            a {
-                display: inline-block;
-
-                &.save {
-                    background: #126295;
-                    color: white;
-                }
-                &.disabled {
-                    background: $semi-dark-grey;
-                    cursor: default;
-                }
+            &[disabled] {
+                background: $semi-dark-grey;
+                cursor: default;
             }
         }
     }

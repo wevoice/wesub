@@ -22,7 +22,6 @@
 
     module.controller('CollabController', function($scope, $sce, $timeout, EditorData) {
 
-        $scope.notes = EditorData.savedNotes || "";
         // Some modules can be opened and closed. These are the default states.
         $scope.modulesOpen = {
             notes: false,
@@ -50,21 +49,9 @@
             };
         }
 
-        $scope.approve = function() {
-            $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Accepting subtitles&hellip;"));
-            $scope.$root.$emit('approve-task');
-        };
         $scope.toggleDocking = function(module) {
             $scope.modulesOpen[module] = !$scope.modulesOpen[module];
         };
-        $scope.sendBack = function() {
-            $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Sending subtitles back&hellip;"));
-            $scope.$root.$emit('send-back-task');
-        };
-        $scope.notesChanged = function() {
-            $scope.$root.$emit('notes-changed');
-        };
-
         $scope.canApprove = function() {
             return $scope.workingSubtitles.subtitleList.isComplete();
         }

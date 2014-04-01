@@ -57,129 +57,238 @@
         }
     })
 
-    function DialogManager(VideoPlayer) {
-        this.VideoPlayer = VideoPlayer;
-        this.stack = [];
-        this.generic = null;
+    // Buttons/Dialogs are dicts of button/dialog definitions that are used by
+    // dialogManager.openDialog.  See that function for more details.
+    function makeButton(text, cssClass) {
+        return {
+            text: text,
+            cssClass: cssClass || null
+        };
+    };
+    module.value('Buttons', {
+        continueEditing: makeButton('Continue editing'),
+        continueButton: makeButton('Continue'),
+        // Note: we shouldn't use "continue" as a key because it's a
+        // javascript keyword
+        cancel: makeButton('Cancel'),
+        close: makeButton('Close'),
+        closeEditor: makeButton('Close Editor'),
+        resume: makeButton('Resume Editing'),
+        regainLock: makeButton('Try to resume work'),
+        restore: makeButton('Restore'),
+        discard: makeButton('Discard'),
+        discardChangesAndOpenLegacyEditor: makeButton('Discard changes and open legacy editor'),
+        exit: makeButton('Exit'),
+        waitDontDiscard: makeButton("Wait, don't discard my changes!",
+                'link-style')
+    });
+
+    module.value('Dialogs', {
+        changesSaved: {
+            title: "Changes saved",
+            buttons: ['exit', 'resume']
+        },
+        unsavedWork: {
+            title: 'Your changes will be discarded.',
+            buttons: [ 'exit', 'waitDontDiscard' ],
+            allowClose: true
+        },
+        legacyEditorUnsavedWork: {
+            title: "You have unsaved changes.  If you switch now you will lose your work.",
+            buttons: [ 'discardChangesAndOpenLegacyEditor', 'continueEditing'],
+            allowClose: true
+        },
+        confirmCopyTiming: {
+            title: 'Confirm Copy Timing',
+            text: 'This will copy all subtitle timing from reference to working subtitles. Do you want to continue?',
+            buttons: [ 'continueButton', 'cancel' ],
+            allowClose: true
+        },
+        confirmTimingReset: {
+            title: 'Confirm Timing Reset',
+            text: 'This will remove all subtitle timing. Do you want to continue?',
+            buttons: [ 'continueButton', 'cancel' ],
+            allowClose: true
+        },
+        confirmTextReset: {
+            title: 'Confirm Text Reset',
+            text: 'This will remove all subtitle text. Do you want to continue?',
+            buttons: [ 'continueButton', 'cancel' ],
+            allowClose: true
+        },
+        confirmChangesReset: {
+            title: 'Confirm Changes Reset',
+            text: 'This will revert all changes made since the last saved revision. Do you want to continue?',
+            buttons: [ 'continueButton', 'cancel' ],
+            allowClose: true
+        },
+        sessionWillClose: {
+            title: 'Warning: Your session will close',
+            buttons: ['regainLock', 'closeEditor']
+        },
+        sessionEnded: {
+            title: 'Your session has ended. You can try to resume, or close the editor.',
+            buttons: ['regainLock', 'closeEditor']
+        },
+        restoreAutoBackup: {
+            title: 'You have an unsaved backup of your subtitling work, do you want to restore it?',
+            buttons: ['restore', 'discard'],
+            allowClose: true
+        }
+    });
+
+    module.controller('DialogController', function($scope, Buttons, Dialogs, VideoPlayer) {
+        // Stores the names of all dialogs currently open in oldest-to-newest
+        // order.  The last item in the list is the currently displayed
+        // dialog.
+        var stack = [];
         // Store generic dialogs that are open, but have been replaced with
         // others
-        this.genericStack = [];
-        this.freezeBoxText = "";
-    }
+        genericStack = [];
 
-    DialogManager.prototype = {
-        open: function(dialogName) {
-            this.VideoPlayer.pause();
-            this.stack.push(dialogName);
-        },
-        close: function() {
-            this.stack.pop();
-            if(this.current() == 'generic') {
-                this.generic = this.genericStack.pop();
-            } else {
-                this.generic = null;
-            }
-        },
-        onCloseClick: function($event) {
-            $event.stopPropagation();
-            $event.preventDefault();
-            this.close();
-        },
-        onOpenClick: function(dialogName, $event) {
-            $event.preventDefault();
-            $event.stopPropagation();
-            this.open(dialogName);
-        },
-        current: function() {
-            if(this.freezeBoxText) {
-                return 'freeze-box';
-            } else if(this.stack.length > 0) {
-                return this.stack[this.stack.length - 1];
-            } else {
-                return null;
-            }
-        },
-        dialogCSSClass: function(dialogName) {
-            if(this.current() == dialogName) {
-                return 'shown';
-            } else {
-                return '';
-            }
-        },
-        overlayCSSClass: function() {
-            if(this.current() !== null) {
-                return 'shown';
-            } else {
-                return '';
-            }
-        },
-        button: function(text, callback, cssClass) {
-            return {
-                text: text,
-                callback: callback,
-                cssClass: cssClass || null
-            };
-        },
-        closeButton: function(callback) {
-            var that = this;
-            return this.button('Close', function() {
-                that.close();
-                if(callback) {
-                    callback();
+        $scope.dialogManager = {
+            // Currently displayed generic dialog
+            generic: null,
+            // Current freeze box text
+            freezeBoxText: "",
+
+            open: function(dialogName) {
+                VideoPlayer.pause();
+                stack.push(dialogName);
+            },
+            close: function() {
+                stack.pop();
+                if(this.current() == 'generic') {
+                    this.generic = genericStack.pop();
+                } else {
+                    this.generic = null;
                 }
-            });
-        },
-        linkButton: function(text, callback) {
-            return this.button(text, callback, 'link-style');
-        },
-        /*
-         * Open a dialog that doesn't need special HTML/code
-         *
-         * dialogDef is an object that defines the dialog.  It should contain
-         * the following properties:
-         *
-         *   title: dialog heading
-         *   text: dialog description (optional)
-         *   allowClose: if present, allow closing the dialog via escape/mouse
-         *               clicks outside of the element (optional)
-         *   buttons: array defining the buttons.  Each element must be
-         *            either a simple string, or an object created by button()
-         *            or closeButton().
-         */
-        openDialog: function(dialogDef) {
-            if(this.generic != null) {
-                this.genericStack.push(this.generic);
-            }
-            this.generic = dialogDef;
-            this.open('generic');
-        },
-        showFreezeBox: function(text) {
-            /* Show the "freeze box". 
+            },
+            onCloseClick: function($event) {
+                $event.stopPropagation();
+                $event.preventDefault();
+                this.close();
+            },
+            onOpenClick: function(dialogName, $event) {
+                $event.preventDefault();
+                $event.stopPropagation();
+                this.open(dialogName);
+            },
+            current: function() {
+                if(this.freezeBoxText) {
+                    return 'freeze-box';
+                } else if(stack.length > 0) {
+                    return stack[stack.length - 1];
+                } else {
+                    return null;
+                }
+            },
+            dialogCSSClass: function(dialogName) {
+                if(this.current() == dialogName) {
+                    return 'shown';
+                } else {
+                    return '';
+                }
+            },
+            overlayCSSClass: function() {
+                if(this.current() !== null) {
+                    return 'shown';
+                } else {
+                    return '';
+                }
+            },
+            /*
+             * Open a dialog that doesn't need special HTML/code
              *
-             * The freeze box displays a simple message and the user can't
-             * close.  This to prevents any user-actions and obviously should
-             * be used very sparingly, for example while saving a copy and
-             * waiting for a response from the server.
+             * dialogName specifies which dialog to open.  It's a key from the
+             * Dialogs dict.
              *
-             * The Freeze box uses a separate system from the dialog stack.
-             * If the freeze box is active, then it will display regardless of
-             * any dialogs that are also open.
+             * callbacks is a dict that maps button key names to functions to
+             * call if that button is clicked.
+             *
+             * overrides is a dict of data to override the default title/text for
+             * the dialog.
+             *
              */
-            this.freezeBoxText = text;
-        },
-        closeFreezeBox: function() {
-            this.freezeBoxText = '';
-        },
-        freezeBoxCSSClass: function() {
-            if(this.freezeBoxText) {
-                return 'shown';
-            } else {
-                return '';
+            openDialog: function(dialogName, callbacks, overrides) {
+                var dialog = makeGenericDialog(dialogName, callbacks,
+                        overrides);
+                if(this.generic != null) {
+                    genericStack.push(this.generic);
+                }
+                this.generic = dialog;
+                this.open('generic');
+            },
+            updateDialogText: function(text) {
+                if(this.generic !== null) {
+                    this.generic.text = text;
+                } else {
+                    throw "no generic dialog displayed";
+                }
+            },
+            onButtonClicked: function(button, $event) {
+                this.close();
+                $event.preventDefault();
+                $event.stopPropagation();
+                if(button.callback) {
+                    button.callback();
+                }
+            },
+            showFreezeBox: function(text) {
+                /* Show the "freeze box". 
+                 *
+                 * The freeze box displays a simple message and the user can't
+                 * close.  This to prevents any user-actions and obviously should
+                 * be used very sparingly, for example while saving a copy and
+                 * waiting for a response from the server.
+                 *
+                 * The Freeze box uses a separate system from the dialog stack.
+                 * If the freeze box is active, then it will display regardless of
+                 * any dialogs that are also open.
+                 */
+                this.freezeBoxText = text;
+            },
+            closeFreezeBox: function() {
+                this.freezeBoxText = '';
+            },
+            freezeBoxCSSClass: function() {
+                if(this.freezeBoxText) {
+                    return 'shown';
+                } else {
+                    return '';
+                }
             }
-        }
-    }
+        };
 
-    module.value('DialogManager', DialogManager);
+        function makeGenericDialog(dialogName, callbacks, overrides) {
+            // Create a dialog object for openDialog
+            if(callbacks === undefined) {
+                callbacks = {};
+            }
+            var dialogDef = Dialogs[dialogName];
+            if(dialogDef === undefined) {
+                throw "no dialog named " + dialogName;
+            }
+            var dialog = _.clone(dialogDef);
+            if(overrides) {
+                dialog = _.extend(dialog, overrides);
+            }
+            // The buttons array contains button names.  Replace that with
+            // actual objects.  Also setup the callback function.
+            dialog.buttons = _.map(dialog.buttons, function(buttonName) {
+                var buttonDef = Buttons[buttonName];
+                if(buttonDef === undefined) {
+                    throw "no button named " + buttonName;
+                };
+                return {
+                    text: buttonDef.text,
+                    cssClass: buttonDef.cssClass,
+                    callback: callbacks[buttonName] || null
+                };
+            });
+            return dialog;
+        }
+    });
 
     module.directive('modalDialog', function($document) {
         return function link($scope, elm, attrs) {
