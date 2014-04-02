@@ -39,7 +39,7 @@ describe('The Collab Controller', function() {
                     var correctError = null;
                 } else {
                     var correctCanApprove = false;
-                    var correctError = 'Not all lines are completed.';
+                    var correctError = 'Some of the lines do not have text or timing. Please complete all the lines before accepting subtitles or send them back.';
                 }
                 if(canApprove !== correctCanApprove) {
                     this.message = function() {

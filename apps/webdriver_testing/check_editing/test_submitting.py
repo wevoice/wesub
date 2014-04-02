@@ -7,9 +7,9 @@ from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages import video_page
 from webdriver_testing.pages.site_pages import video_language_page
-from webdriver_testing.pages.editor_pages import dialogs
-from webdriver_testing.pages.editor_pages import unisubs_menu
 from webdriver_testing.pages.editor_pages import subtitle_editor 
+from webdriver_testing.pages.site_pages import editor_page
+from webdriver_testing.pages.site_pages import site_modals
 from webdriver_testing.data_factories import UserFactory
 import os
 import time
@@ -23,26 +23,24 @@ class TestCaseSubmittable(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseSubmittable, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
-
+        cls.editor_pg = editor_page.EditorPage(cls)
+        cls.modal = site_modals.SiteModals(cls)
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
 
         cls.user = UserFactory.create(username = 'user')
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
         cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
-        cls.unisubs_menu = unisubs_menu.UnisubsMenu(cls)
         td = {'url': ('http://qa.pculture.org/amara_tests/'
                      'Birds_short.mp4')
              }
         cls.test_video = cls.data_utils.create_video(**td)
         cls.video_pg.open_video_page(cls.test_video.video_id)
         cls.video_pg.log_in(cls.user.username, 'password')
-        cls.video_pg.set_skiphowto()
  
         #Open the video page and sync the first 3 subs
         cls.video_pg.add_subtitles()
-        cls.create_modal.create_original_subs('English', 'English')
-
+        cls.modal.add_language('English', 'English')
+        cls.editor_pg.legacy_editor()
         cls.logger.info('typing subs')
         cls.typed_subs = cls.sub_editor.type_subs()
         cls.sub_editor.continue_to_next_step()
@@ -137,9 +135,9 @@ class TestCaseIncomplete(WebdriverTestCase):
         self.data_utils = data_helpers.DataHelpers()
         self.video_pg = video_page.VideoPage(self)
         self.user = UserFactory.create(username = 'user')
-        self.create_modal = dialogs.CreateLanguageSelection(self)
         self.sub_editor = subtitle_editor.SubtitleEditor(self)
-        self.unisubs_menu = unisubs_menu.UnisubsMenu(self)
+        self.editor_pg = editor_page.EditorPage(self)
+        self.modal = site_modals.SiteModals(self)
         td = {'url': ('http://qa.pculture.org/amara_tests/'
                    'Birds_short.webmsd.webm')
              }
@@ -151,8 +149,9 @@ class TestCaseIncomplete(WebdriverTestCase):
  
         #Open the video page and sync the first 3 subs
         self.video_pg.add_subtitles()
-        self.create_modal.create_original_subs('English', 'English')
 
+        self.modal.add_language('English', 'English')
+        self.editor_pg.legacy_editor()
         self.logger.info('typing subs')
         self.typed_subs = self.sub_editor.type_subs()
         self.sub_editor.continue_to_next_step()

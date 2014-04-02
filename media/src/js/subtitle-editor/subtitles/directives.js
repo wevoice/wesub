@@ -330,6 +330,9 @@ var USER_IDLE_MINUTES = 15;
                 if(subtitle.startOfParagraph) {
                     classes.push('paragraph-start');
                 }
+                if($scope.currentEdit.isForSubtitle(subtitle)) {
+                    classes.push('edit');
+                }
                 elt.prop('className', classes.join(' '));
                 $('span.subtitle-text', elt).html(content);
                 $('span.timing', elt).text(displayTime(subtitle.startTime));

@@ -78,7 +78,7 @@ var angular = angular || null;
     }
 
     VisibleTimespan.prototype.fitsInBuffer = function(bufferTimespan) {
-        if(this.startTime >= 0 && this.startTime < bufferTimespan.startTime) {
+        if(this.startTime < bufferTimespan.startTime) {
             return false;
         }
         if(this.endTime > bufferTimespan.endTime) {
@@ -205,9 +205,14 @@ var angular = angular || null;
             var unsyncedSubtitle = null;
 
             function handleDragLeft(context, deltaMS) {
-                context.startTime = context.subtitle.startTime + deltaMS;
-                if(context.startTime < context.minStartTime) {
-                    context.startTime = context.minStartTime;
+                context.startTime = context.initialStartTime + deltaMS;
+                if (context.startTime < context.minStartTime) {
+                    if (context.startTime > context.minStartTimePush) {
+                        context.previousSubtitleEndTimeNew = context.startTime;
+                    } else {
+                        context.startTime = context.minStartTime;
+                        context.previousSubtitleEndTimeNew = context.minStartTime;
+                    }
                 }
                 if(context.startTime > context.endTime - MIN_DURATION) {
                     context.startTime = context.endTime - MIN_DURATION;
@@ -215,10 +220,15 @@ var angular = angular || null;
             }
 
             function handleDragRight(context, deltaMS) {
-                context.endTime = context.subtitle.endTime + deltaMS;
+                context.endTime = context.initialEndTime + deltaMS;
                 if(context.maxEndTime !== null &&
                         context.endTime > context.maxEndTime) {
-                            context.endTime = context.maxEndTime;
+                            if (context.endTime < context.maxEndTimePush) {
+                                context.nextSubtitleStartTimeNew = context.endTime;
+                            } else {
+                                context.nextSubtitleStartTimeNew = context.maxEndTime;
+                                context.endTime = context.maxEndTime;
+                            }
                         }
                 if(context.endTime < context.startTime + MIN_DURATION) {
                     context.endTime = context.startTime + MIN_DURATION;
@@ -226,8 +236,8 @@ var angular = angular || null;
             }
 
             function handleDragMiddle(context, deltaMS) {
-                context.startTime = context.subtitle.startTime + deltaMS;
-                context.endTime = context.subtitle.endTime + deltaMS;
+                context.startTime = context.initialStartTime + deltaMS;
+                context.endTime = context.initialEndTime + deltaMS;
 
                 if(context.startTime < context.minStartTime) {
                     context.startTime = context.minStartTime;
@@ -248,7 +258,6 @@ var angular = angular || null;
 
             function handleMouseDown(evt, dragHandler) {
                 if(!scope.canSync) {
-                    evt.preventDefault();
                     return false;
                 }
                 VideoPlayer.pause();
@@ -258,6 +267,8 @@ var angular = angular || null;
                     subtitle: subtitle,
                     startTime: subtitle.startTime,
                     endTime: subtitle.endTime,
+                    initialStartTime: subtitle.startTime,
+                    initialEndTime: subtitle.endTime
                 }
                 if(!subtitle.isDraft) {
                     var storedSubtitle = subtitle;
@@ -267,42 +278,77 @@ var angular = angular || null;
                     var div = unsyncedDiv;
                 }
                 if(!div) {
-                    return;
+                    return false;
                 }
+                var previousDiv = null, nextDiv = null; 
                 var nextSubtitle = subtitleList().nextSubtitle(storedSubtitle);
+                context.nextSubtitleStartTimeOr = context.nextSubtitleStartTimeNew = null;
                 if(nextSubtitle && nextSubtitle.isSynced()) {
+                    nextDiv = timelineDivs[nextSubtitle.id];
+                    context.nextSubtitleStartTimeOr = nextSubtitle.startTime;
+                    context.nextSubtitleStartTimeNew = null;
                     context.maxEndTime = nextSubtitle.startTime;
+                    context.maxEndTimePush = nextSubtitle.endTime - MIN_DURATION;
                 } else if(scope.duration !== null) {
                     context.maxEndTime = scope.duration;
+                    context.maxEndTimePush = null;
                 } else {
                     context.maxEndTime = 10000000000000;
+                    context.maxEndTimePush = null;
                 }
                 var prevSubtitle = subtitleList().prevSubtitle(storedSubtitle);
+                context.prevSubtitleEndTimeOr = context.prevSubtitleEndTimeNew = null;
                 if(prevSubtitle) {
+                    previousDiv = timelineDivs[prevSubtitle.id];
+                    context.prevSubtitleEndTimeOr = prevSubtitle.endTime;
                     context.minStartTime = prevSubtitle.endTime;
+                    context.minStartTimePush = prevSubtitle.startTime + MIN_DURATION;
                 } else {
                     context.minStartTime = 0;
+                    context.minStartTimePush = null;
                 }
 
                 var initialPageX = evt.pageX;
+
                 $(document).on('mousemove.timelinedrag', function(evt) {
                     var deltaX = evt.pageX - initialPageX;
                     var deltaMS = pixelsToDuration(deltaX, scope.scale);
                     dragHandler(context, deltaMS);
                     placeSubtitle(context.startTime, context.endTime, div);
+                    subtitleList().updateSubtitleTime(storedSubtitle,
+                        context.startTime, context.endTime);
+                    if (previousDiv && context.previousSubtitleEndTimeNew)
+                        placeSubtitle(prevSubtitle.startTime, context.previousSubtitleEndTimeNew, previousDiv);
+                    if (nextDiv && context.nextSubtitleStartTimeNew)
+                        placeSubtitle(context.nextSubtitleStartTimeNew, nextSubtitle.endTime, nextDiv);
+                    if (context.previousSubtitleEndTimeNew)
+                        subtitleList().updateSubtitleTime(prevSubtitle,
+                            prevSubtitle.startTime, context.previousSubtitleEndTimeNew);
+                    if (context.nextSubtitleStartTimeNew) 
+                        subtitleList().updateSubtitleTime(nextSubtitle,
+                            context.nextSubtitleStartTimeNew, nextSubtitle.endTime);
                 }).on('mouseup.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
                     subtitleList().updateSubtitleTime(storedSubtitle,
                         context.startTime, context.endTime);
+                    if (context.previousSubtitleEndTimeNew)
+                        subtitleList().updateSubtitleTime(prevSubtitle,
+                            prevSubtitle.startTime, context.previousSubtitleEndTimeNew);
+                    if (context.nextSubtitleStartTimeNew) 
+                        subtitleList().updateSubtitleTime(nextSubtitle,
+                            context.nextSubtitleStartTimeNew, nextSubtitle.endTime);
                     scope.$root.$emit("work-done");
                     scope.$root.$digest();
                 }).on('mouseleave.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
                     placeSubtitle(subtitle.startTime, subtitle.endTime, div);
+                    if (previousDiv && context.previousSubtitleEndTimeNew)
+                        placeSubtitle(prevSubtitle.startTime, context.previousSubtitleEndTimeNew, previousDiv);
+                    if (nextDiv && context.nextSubtitleStartTimeNew)
+                        placeSubtitle(context.nextSubtitleStartTimeNew, nextSubtitle.endTime, nextDiv);
                 });
                 // need to prevent the default event from happening so that the
                 // browser's DnD code doesn't mess with us.
-                evt.preventDefault();
                 return false;
             }
 
@@ -353,7 +399,7 @@ var angular = angular || null;
                         // mouse didn't move that much.  Interpret this as a
                         // click rather than a drag and seek to the current
                         // time.
-                        var deltaX = event.pageX - container.offset().left;
+                        var deltaX = evt.pageX - container.offset().left;
                         var deltaMS = pixelsToDuration(deltaX, scope.scale);
                         var seekTo = visibleTimespan.startTime + deltaMS;
                     } else {
@@ -378,45 +424,59 @@ var angular = angular || null;
                 div.css({left: x, width: width});
             }
 
-            function getUnsyncedSubtitle() {
+            function updateUnsyncedSubtitle() {
                 /* Sometimes we want to show the first unsynced subtitle for
                  * the timeline.
                  *
-                 * This method calculates if we want to show the subtitle, and
-                 * if so, it returns an object that mimics the SubtitleItem
-                 * API for the unsynced subtitle.
-                 *
-                 * If we shouldn't show the subtitle, it returns null.
+                 * This method calculates if we want to show the subtitle or
+                 * not and sets the unsyncedSubtitle variable accordingly.  If
+                 * we don't want to show it, we set it to none.  If we do, we
+                 * set it to a DraftSubtitle with the start/end times set
+                 * based on the current time.
                  */
                 var lastSynced = subtitleList().lastSyncedSubtitle();
                 if(lastSynced !== null &&
                     lastSynced.endTime > scope.currentTime) {
                     // Not past the end of the synced subtitles
-                    return null;
+                    unsyncedSubtitle = null;
+                    return;
                 }
                 var unsynced = subtitleList().firstUnsyncedSubtitle();
                 if(unsynced === null) {
-                    return null;
+                    // All subtitles are synced.
+                    unsyncedSubtitle = null;
+                    return;
                 }
                 if(unsynced.startTime >= 0 && unsynced.startTime >
                         bufferTimespan.endTime) {
                     // unsynced subtitle has its start time set, and it's past
                     // the end of the timeline.
-                    return null;
+                    unsyncedSubtitle = null;
+                    return;
                 }
 
-                // Okay, we have an unsynced subtitle to use.  Make a draft
-                // version since we are want to adjust the start/end times
-                // before we actuall have that data saved
-                var draft = unsynced.draftSubtitle();
+
+                if(unsyncedSubtitle === null) {
+                    unsyncedSubtitle = unsynced.draftSubtitle();
+                } else if (unsyncedSubtitle.storedSubtitle.id != unsynced.id) {
+                    // We need to keep the stored subtitle up to date as
+                    // it is used in the video overlay
+                    unsyncedSubtitle = unsynced.draftSubtitle();
+                }
+                unsyncedSubtitle.markdown = unsynced.markdown;
                 if(unsynced.startTime < 0) {
-                    draft.startTime = scope.currentTime;
-                    draft.endTime = scope.currentTime + DEFAULT_DURATION;
+                    unsyncedSubtitle.startTime = scope.currentTime;
+                    if(unsyncedSubtitle.startTime === null) {
+                        // currentTime hasn't been set yet.  Let's use time=0
+                        // for now.
+                        unsyncedSubtitle.startTime = 0;
+                    }
+                    unsyncedSubtitle.endTime = scope.currentTime + DEFAULT_DURATION;
                 } else {
-                    draft.endTime = Math.max(scope.currentTime,
+                    unsyncedSubtitle.startTime = unsynced.startTime;
+                    unsyncedSubtitle.endTime = Math.max(scope.currentTime,
                             unsynced.startTime + MIN_DURATION);
                 }
-                return draft;
             }
 
             function checkShownSubtitle() {
@@ -474,7 +534,7 @@ var angular = angular || null;
                 }
             }
             function placeUnsyncedSubtitle() {
-                unsyncedSubtitle = getUnsyncedSubtitle();
+                updateUnsyncedSubtitle();
                 if(unsyncedSubtitle !== null) {
                     if(unsyncedDiv === null) {
                         unsyncedDiv = makeDivForSubtitle(unsyncedSubtitle);
@@ -488,6 +548,10 @@ var angular = angular || null;
                     unsyncedDiv.remove();
                     unsyncedDiv = null;
                 }
+            }
+
+            scope.unsyncedShown = function() {
+                return (unsyncedDiv != null);
             }
             // Put redrawSubtitles in the scope so that the controller can
             // call it.

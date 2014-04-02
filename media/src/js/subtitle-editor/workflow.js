@@ -31,10 +31,10 @@ var angular = angular || null;
 	this.showOverlay = true;
         var self = this;
         this.subtitleList = subtitleList;
-        if(this.subtitleList.length() == 0) {
-            this.stage = 'type';
+        if(this.subtitleList.isComplete()) {
+            this.stage = 'review';
         } else {
-            this.stage = 'sync';
+            this.stage = 'type';
         }
         this.subtitleList.addChangeCallback(function() {
             if(self.stage == 'review' && !self.subtitleList.isComplete()) {
@@ -50,7 +50,6 @@ var angular = angular || null;
         switchStage: function(newStage) {
 	    if (newStage == 'title') {
                 this.showOverlay = false; 
-		window.location.hash = 'set-title-modal';
 		this.titleEdited(true);
 	    }
             this.showOverlay = true;
@@ -76,11 +75,11 @@ var angular = angular || null;
         },
         stageDone: function(stageName) {
             if(stageName == 'type') {
-                return (this.stage == 'review' || this.stage == 'sync' || this.stage == 'title');
+                return (this.stage == 'review' || this.stage == 'title' || this.stage == 'sync');
             } else if(stageName == 'sync') {
-                return (this.stage == 'review' || this.stage == 'title');
+                return this.stage == 'review';
             } else if(stageName == 'title') {
-                return this.stage == 'review'
+                return (this.stage == 'review' || this.stage == 'sync');
             } else {
                 return false;
             }
@@ -88,9 +87,9 @@ var angular = angular || null;
     }
     module.value('Workflow', Workflow);
 
-    module.controller('WorkflowProgressionController', function($scope, EditorData, VideoPlayer) {
+    module.controller('WorkflowProgressionController', function($scope, $sce, EditorData, VideoPlayer) {
 
-        $scope.$root.$on("video-playback-starts", function() {$scope.workflow.appActionDone();});
+        $scope.$root.$on("video-playback-changes", function() {$scope.workflow.appActionDone();});
         $scope.$root.$on("app-click", function() {$scope.workflow.appActionDone();});
 
         // If a blank list of subs start, we autimatically start edition
@@ -110,37 +109,32 @@ var angular = angular || null;
             VideoPlayer.seek(0);
         }
 
-        $scope.endorse = function() {
-            if(EditorData.task_id === undefined || 
-                    EditorData.task_id === null) {
-                $scope.$root.$emit('save', {
-                    allowResume: false,
-                    markComplete: true,
-                });
-            } else {
-                $scope.$root.$emit('approve-task');
-            }
-        }
-
         $scope.onNextClicked = function(evt) {
-            if($scope.workflow.stage == 'type') {
+            if ($scope.workflow.stage == 'title') {
                 $scope.workflow.switchStage('sync');
                 if(!$scope.timelineShown) {
                     $scope.toggleTimelineShown();
                 }
                 rewindPlayback();
-            } else if ($scope.workflow.stage == 'title') {
-                $scope.workflow.switchStage('review');
-                rewindPlayback();
 	    }
 	    else if ($scope.workflow.stage == 'sync') {
-		if ($scope.translating())
+                $scope.workflow.switchStage('review');
+                rewindPlayback();
+            }
+	    else if ($scope.workflow.stage == 'type') {
+		if ($scope.translating()) {
+                    $scope.dialogManager.open('metadata');
                     $scope.workflow.switchStage('title');
-		else
-                    $scope.workflow.switchStage('review');
+                } else {
+                    $scope.workflow.switchStage('sync');
+                    if(!$scope.timelineShown) {
+                        $scope.toggleTimelineShown();
+                    }
+                }
                 rewindPlayback();
             }
             evt.preventDefault();
+            evt.stopPropagation();
         }
     });
 

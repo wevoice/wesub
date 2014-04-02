@@ -189,9 +189,6 @@ class TestCaseCenter(WebdriverTestCase):
         management.call_command('flush', verbosity=0, interactive=False)
 
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
-
     def setUp(self):
         self.video_pg.open_page('auth/login/', True)
         self.video_pg.log_in(self.user.username, 'password')

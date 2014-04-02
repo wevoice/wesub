@@ -329,7 +329,7 @@
                                 <ul>
                                 {% if task.assignee == user %}
                                     <li>
-                                        {% include "teams/_perform_task_link.html" %}
+                                        {% include "teams/_perform_task_link.html" with link_text=task.tasks_page_perform_link_text %}
                                     </li>
                                 {% else %}
                                     {% if task.assignee == None %}
@@ -337,19 +337,7 @@
                                             <li class="disabled">{% trans 'You have reached the maximum number of tasks.' %}</li>
                                         {% else %}
                                             <li>
-                                                <a class="assign-and-perform"
-                                                   href="#"
-                                                   data-id="{{ task.pk }}">
-                                                    {% if task.get_subtitle_version and task.assignee == user %}
-                                                        {% trans 'Resume' %}
-                                                    {% else %}
-                                                        {% trans 'Start now' %}
-                                                    {% endif %}
-                                                </a>
-                                            </li>
-                                            <li class="hidden-perform-link"
-                                                style="display: none;">
-                                                {% include "teams/_perform_task_link.html" %}
+                                                {% include "teams/_perform_task_link.html" with link_text=task.tasks_page_perform_link_text %}
                                             </li>
                                         {% endif %}
                                     {% endif %}
@@ -370,8 +358,7 @@
                         </ul>
                         <div class="bootstrap">
                             <div class="modal upload-draft-modal"
-                                 id="upload-draft-{{ task.id }}"
-                                 style="display: none">
+                                id="upload-draft-{{ task.id }}">
                                 <form action="{% url teams:upload_draft slug=team.slug,video_id=task.team_video.video.video_id %}"
                                       method="post"
                                       enctype="multipart/form-data">
@@ -442,8 +429,7 @@
                                     {% endwith %}
                                 </form>
                             </div>
-                            <div class="modal" id="download-draft-{{ task.id }}"
-                                 style="display: none">
+                            <div class="modal" id="download-draft-{{ task.id }}">
                                 <div class="modal-header">
                                     <a href="#" class="close">x</a>
 
@@ -629,6 +615,11 @@
 
     {% if is_paginated %}{% paginator %}{% endif %}
 
+    </div>
+    <div class='no-chosen'>
+        {% if create_subtitles_form %}
+            {% include 'videos/_multi-video-create-subtitles-form.html' %}
+        {% endif %}
     </div>
     <script id="IMAGE_PRELOADER" type="text/html">
         <img class="placeholder" width="256" height1="30"

@@ -22,6 +22,11 @@
         window.SELECT_REVISIONS_TRANS = '{% trans "Select two revisions to compare, please" %}';
         window.IS_AUTHENTICATED = '{{ user.is_authenticated }}' == 'True';
         window.ROLLBACK_ALLOWED = '{{ rollback_allowed }}' == 'True';
+        {% if team.workflow_enabled %}
+        window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
+        {% else %}
+        window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
+        {% endif %}
     </script>
 {% endblock %}
 
@@ -107,6 +112,7 @@
         </ul>
         <div id="tab-container">{% block tab %}{% endblock %}</div>
     </div>
+    {% include 'videos/_create-subtitles-modal.html' %}
 {% endblock %}
 
 {% block page_controls %}
@@ -114,9 +120,6 @@
         <ul id="page_controls">
             <li>
                 <a href="{% url admin:subtitles_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit SubtitleLanguage in Django Admin' %}</a>
-            </li>
-            <li>
-                <a href="{% url subtitles:subtitle-editor video.video_id language.language_code %}">New editor</a>
             </li>
         </ul>
     {% endif %}

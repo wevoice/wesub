@@ -1,5 +1,5 @@
 /*
- * popcorn.js version e0f6a27
+ * popcorn.js version 8a40e8b
  * http://popcornjs.org
  *
  * Copyright 2011, Mozilla Foundation
@@ -85,9 +85,11 @@
     put: function( dictionary ) {
       // For each own property of src, let key be the property key
       // and desc be the property descriptor of the property.
-      Object.getOwnPropertyNames( dictionary ).forEach(function( key ) {
-        this[ key ] = dictionary[ key ];
-      }, this);
+      for ( var key in dictionary ) {
+        if ( dictionary.hasOwnProperty( key ) ) {
+          this[ key ] = dictionary[ key ];
+        }
+      }
     }
   },
 
@@ -100,7 +102,7 @@
   };
 
   //  Popcorn API version, automatically inserted via build system.
-  Popcorn.version = "e0f6a27";
+  Popcorn.version = "8a40e8b";
 
   //  Boolean flag allowing a client to determine if Popcorn can be supported
   Popcorn.isSupported = true;
@@ -350,12 +352,9 @@
         }
       };
 
-      Object.defineProperty( this, "error", {
-        get: function() {
-
-          return self.media.error;
-        }
-      });
+      self.media.addEventListener( "error", function() {
+        self.error = self.media.error;
+      }, false );
 
       // http://www.whatwg.org/specs/web-apps/current-work/#dom-media-readystate
       //
@@ -1211,11 +1210,7 @@
     this.endIndex = 0;
     this.previousUpdateTime = -1;
 
-    Object.defineProperty( this, "count", {
-      get: function() {
-        return this.byStart.length;
-      }
-    });
+    this.count = 1;
   }
 
   function isMatch( obj, key, value ) {
@@ -1286,6 +1281,8 @@
 
       this.parent.data.trackEvents.endIndex++;
     }
+
+    this.count++;
 
   };
 
@@ -1393,6 +1390,7 @@
     this.byStart = byStart;
     this.byEnd = byEnd;
     this.animating = animating;
+    this.count--;
 
     historyLen = this.parent.data.history.length;
 
@@ -2739,10 +2737,16 @@
         parseFn,
         parser = {};
 
-    parseFn = function( filename, callback ) {
+    parseFn = function( filename, callback, options ) {
 
       if ( !filename ) {
         return this;
+      }
+
+      // fixes parameters for overloaded function call
+      if ( typeof callback !== "function" && !options ) {
+        options = callback;
+        callback = null;
       }
 
       var that = this;
@@ -2752,7 +2756,7 @@
         dataType: type,
         success: function( data ) {
 
-          var tracksObject = definition( data ),
+          var tracksObject = definition( data, options ),
               tracksData,
               tracksDataLen,
               tracksDef,
@@ -2800,7 +2804,8 @@
 
     return parser;
   };
-})( Popcorn );(function( Popcorn ) {
+})( Popcorn );
+(function( Popcorn ) {
 
   // combines calls of two function calls into one
   var combineFn = function( first, second ) {
@@ -3151,7 +3156,8 @@
         // We leave HTMLVideoElement and HTMLAudioElement wrappers out
         // of the mix, since we'll default to HTML5 video if nothing
         // else works.  Waiting on #1254 before we add YouTube to this.
-        wrappers = "NetflixVideoElement HTMLFlashFallbackVideoElement HTMLVimeoVideoElement HTMLSoundCloudAudioElement HTMLNullVideoElement".split(" ");
+        wrappers = "NetflixVideoElement HTMLFlashFallbackVideoElement HTMLYouTubeVideoElement HTMLVimeoVideoElement HTMLSoundCloudAudioElement HTMLNullVideoElement".split(" ");
+
     if ( !node ) {
       Popcorn.error( "Specified target `" + target + "` was not found." );
       return;
@@ -3421,7 +3427,7 @@
   };
 
   // Make sure the browser has MediaError
-  MediaError = MediaError || (function() {
+  window.MediaError = window.MediaError || (function() {
     function MediaError(code, msg) {
       this.code = code || null;
       this.message = msg || "";
@@ -3436,11 +3442,14 @@
   }());
 
 
-  function MediaElementProto(){}
-  MediaElementProto.prototype = {
-
-    _util: {
-
+  function MediaElementProto() {
+    var protoElement = {},
+        events = {},
+        parentNode;
+    if ( !Object.prototype.__defineGetter__ ) {
+      protoElement = document.createElement( "div" );
+    }
+    protoElement._util = {
       // Each wrapper stamps a type.
       type: "HTML5",
 
@@ -3460,21 +3469,19 @@
       },
 
       parseUri: parseUri
-
-    },
-
+    };
     // Mimic DOM events with custom, namespaced events on the document.
     // Each media element using this prototype needs to provide a unique
     // namespace for all its events via _eventNamespace.
-    addEventListener: function( type, listener, useCapture ) {
+    protoElement.addEventListener = function( type, listener, useCapture ) {
       document.addEventListener( this._eventNamespace + type, listener, useCapture );
-    },
+    };
 
-    removeEventListener: function( type, listener, useCapture ) {
+    protoElement.removeEventListener = function( type, listener, useCapture ) {
       document.removeEventListener( this._eventNamespace + type, listener, useCapture );
-    },
+    };
 
-    dispatchEvent: function( name ) {
+    protoElement.dispatchEvent = function( name ) {
       var customEvent = document.createEvent( "CustomEvent" ),
         detail = {
           type: name,
@@ -3484,119 +3491,138 @@
 
       customEvent.initCustomEvent( this._eventNamespace + name, false, false, detail );
       document.dispatchEvent( customEvent );
-    },
+    };
 
-    load: Popcorn.nop,
+    protoElement.load = Popcorn.nop;
 
-    canPlayType: function( url ) {
+    protoElement.canPlayType = function( url ) {
       return "";
-    },
+    };
 
     // Popcorn expects getBoundingClientRect to exist, forward to parent node.
-    getBoundingClientRect: function() {
-      return this.parentNode.getBoundingClientRect();
-    },
+    protoElement.getBoundingClientRect = function() {
+      return parentNode.getBoundingClientRect();
+    };
 
-    NETWORK_EMPTY: 0,
-    NETWORK_IDLE: 1,
-    NETWORK_LOADING: 2,
-    NETWORK_NO_SOURCE: 3,
+    protoElement.NETWORK_EMPTY = 0;
+    protoElement.NETWORK_IDLE = 1;
+    protoElement.NETWORK_LOADING = 2;
+    protoElement.NETWORK_NO_SOURCE = 3;
 
-    HAVE_NOTHING: 0,
-    HAVE_METADATA: 1,
-    HAVE_CURRENT_DATA: 2,
-    HAVE_FUTURE_DATA: 3,
-    HAVE_ENOUGH_DATA: 4
+    protoElement.HAVE_NOTHING = 0;
+    protoElement.HAVE_METADATA = 1;
+    protoElement.HAVE_CURRENT_DATA = 2;
+    protoElement.HAVE_FUTURE_DATA = 3;
+    protoElement.HAVE_ENOUGH_DATA = 4;
+    Object.defineProperties( protoElement, {
 
-  };
-
-  MediaElementProto.prototype.constructor = MediaElementProto;
-
-  Object.defineProperties( MediaElementProto.prototype, {
-
-    currentSrc: {
-      get: function() {
-        return this.src !== undefined ? this.src : "";
-      }
-    },
-
-    // We really can't do much more than "auto" with most of these.
-    preload: {
-      get: function() {
-        return "auto";
+      currentSrc: {
+        get: function() {
+          return this.src !== undefined ? this.src : "";
+        },
+        configurable: true
       },
-      set: Popcorn.nop
-    },
 
-    controls: {
-      get: function() {
-        return true;
+      parentNode: {
+        get: function() {
+          return parentNode;
+        },
+        set: function( val ) {
+          parentNode = val;
+        },
+        configurable: true
       },
-      set: Popcorn.nop
-    },
-
-    // TODO: it would be good to overlay an <img> using this URL
-    poster: {
-      get: function() {
-        return "";
+      
+      // We really can't do much more than "auto" with most of these.
+      preload: {
+        get: function() {
+          return "auto";
+        },
+        set: Popcorn.nop,
+        configurable: true
       },
-      set: Popcorn.nop
-    },
 
-    crossorigin: {
-      get: function() {
-        return "";
+      controls: {
+        get: function() {
+          return true;
+        },
+        set: Popcorn.nop,
+        configurable: true
+      },
+
+      // TODO: it would be good to overlay an <img> using this URL
+      poster: {
+        get: function() {
+          return "";
+        },
+        set: Popcorn.nop,
+        configurable: true
+      },
+
+      crossorigin: {
+        get: function() {
+          return "";
+        },
+        configurable: true
+      },
+
+      played: {
+        get: function() {
+          return _fakeTimeRanges;
+        },
+        configurable: true
+      },
+
+      seekable: {
+        get: function() {
+          return _fakeTimeRanges;
+        },
+        configurable: true
+      },
+
+      buffered: {
+        get: function() {
+          return _fakeTimeRanges;
+        },
+        configurable: true
+      },
+
+      defaultMuted: {
+        get: function() {
+          return false;
+        },
+        configurable: true
+      },
+
+      defaultPlaybackRate: {
+        get: function() {
+          return 1.0;
+        },
+        configurable: true
+      },
+
+      style: {
+        get: function() {
+          return this.parentNode.style;
+        },
+        configurable: true
+      },
+
+      id: {
+        get: function() {
+          return this.parentNode.id;
+        },
+        configurable: true
       }
-    },
 
-    played: {
-      get: function() {
-        return _fakeTimeRanges;
-      }
-    },
+      // TODO:
+      //   initialTime
+      //   playbackRate
+      //   startOffsetTime
 
-    seekable: {
-      get: function() {
-        return _fakeTimeRanges;
-      }
-    },
-
-    buffered: {
-      get: function() {
-        return _fakeTimeRanges;
-      }
-    },
-
-    defaultMuted: {
-      get: function() {
-        return false;
-      }
-    },
-
-    defaultPlaybackRate: {
-      get: function() {
-        return 1.0;
-      }
-    },
-
-    style: {
-      get: function() {
-        return this.parentNode.style;
-      }
-    },
-
-    id: {
-      get: function() {
-        return this.parentNode.id;
-      }
-    }
-
-    // TODO:
-    //   initialTime
-    //   playbackRate
-    //   startOffsetTime
-
-  });
+     });
+    return protoElement;
+  }
 
   Popcorn._MediaElementProto = MediaElementProto;
 
@@ -3615,42 +3641,43 @@
 
   // Setup for YouTube API
   ytReady = false,
-  ytLoaded = false,
+  ytLoading = false,
   ytCallbacks = [];
 
-  function isYouTubeReady() {
-    // If the YouTube iframe API isn't injected, to it now.
-    if( !ytLoaded ) {
-      var tag = document.createElement( "script" );
-      var protocol = window.location.protocol === "file:" ? "http:" : "";
+  function onYouTubeIframeAPIReady() {
+    var callback;
+    if ( YT.loaded ) {
+      ytReady = true;
+      while( ytCallbacks.length ) {
+        callback = ytCallbacks.shift();
+        callback();
+      }
+    } else {
+      setTimeout( onYouTubeIframeAPIReady, 250 );
+    }
+  }
 
-      tag.src = protocol + "//www.youtube.com/iframe_api";
-      var firstScriptTag = document.getElementsByTagName( "script" )[ 0 ];
-      firstScriptTag.parentNode.insertBefore( tag, firstScriptTag );
-      ytLoaded = true;
+  function isYouTubeReady() {
+    var script;
+    // If we area already waiting, do nothing.
+    if( !ytLoading ) {
+      // If script is already there, check if it is loaded.
+      if ( window.YT ) {
+        onYouTubeIframeAPIReady();
+      } else {
+        script = document.createElement( "script" );
+        script.addEventListener( "load", onYouTubeIframeAPIReady, false);
+        script.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild( script );
+      }
+      ytLoading = true;
     }
     return ytReady;
   }
 
   function addYouTubeCallback( callback ) {
-    ytCallbacks.unshift( callback );
+    ytCallbacks.push( callback );
   }
-
-  // An existing YouTube references can break us.
-  // Remove it and use the one we can trust.
-  if ( window.YT ) {
-    window.quarantineYT = window.YT;
-    window.YT = null;
-  }
-
-  window.onYouTubeIframeAPIReady = function() {
-    ytReady = true;
-    var i = ytCallbacks.length;
-    while( i-- ) {
-      ytCallbacks[ i ]();
-      delete ytCallbacks[ i ];
-    }
-  };
 
   function HTMLYouTubeVideoElement( id ) {
 
@@ -3659,7 +3686,7 @@
       throw "ERROR: HTMLYouTubeVideoElement requires window.postMessage";
     }
 
-    var self = this,
+    var self = new Popcorn._MediaElementProto(),
       parent = typeof id === "string" ? document.querySelector( id ) : id,
       elem = document.createElement( "div" ),
       impl = {
@@ -3716,6 +3743,7 @@
     }
 
     function onPlayerReady( event ) {
+
       var onMuted = function() {
         if ( player.isMuted() ) {
           // force an initial play on the video, to remove autostart on initial seekTo.
@@ -3982,6 +4010,9 @@
       // Don't show annotations by default
       playerVars.iv_load_policy = playerVars.iv_load_policy || 3;
 
+      // Disable keyboard controls by default
+      playerVars.disablekb = playerVars.disablekb || 1;
+
       // Don't show video info before playing
       playerVars.showinfo = playerVars.showinfo || 0;
 
@@ -4003,6 +4034,7 @@
       var xhrURL = "https://gdata.youtube.com/feeds/api/videos/" + aSrc + "?v=2&alt=jsonc&callback=?";
       // Get duration value.
       Popcorn.getJSONP( xhrURL, function( resp ) {
+
         var warning = "failed to retreive duration data, reason: ";
         if ( resp.error ) {
           console.warn( warning + resp.error.message );
@@ -4055,11 +4087,10 @@
       }
     }
 
-    function getCurrentTime() {
-      return impl.currentTime;
-    }
-
     function changeCurrentTime( aTime ) {
+      if ( aTime === impl.currentTime ) {
+        return;
+      }
       impl.currentTime = aTime;
       if( !mediaReady ) {
         addMediaReadyCallback( function() {
@@ -4232,7 +4263,7 @@
 
       currentTime: {
         get: function() {
-          return getCurrentTime();
+          return impl.currentTime;
         },
         set: function( aValue ) {
           changeCurrentTime( aValue );
@@ -4344,30 +4375,32 @@
           });
 
           return timeRanges;
-        }
+        },
+        configurable: true
       }
     });
+
+    self._canPlaySrc = Popcorn.HTMLYouTubeVideoElement._canPlaySrc;
+    self.canPlayType = Popcorn.HTMLYouTubeVideoElement.canPlayType;
+
+    return self;
   }
 
-  HTMLYouTubeVideoElement.prototype = new Popcorn._MediaElementProto();
-  HTMLYouTubeVideoElement.prototype.constructor = HTMLYouTubeVideoElement;
+  Popcorn.HTMLYouTubeVideoElement = function( id ) {
+    return new HTMLYouTubeVideoElement( id );
+  };
 
   // Helper for identifying URLs we know how to play.
-  HTMLYouTubeVideoElement.prototype._canPlaySrc = function( url ) {
+  Popcorn.HTMLYouTubeVideoElement._canPlaySrc = function( url ) {
     return (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(youtu).*(?:\/|v=)(.{11})/).test( url ) ?
       "probably" :
       EMPTY_STRING;
   };
 
   // We'll attempt to support a mime type of video/x-youtube
-  HTMLYouTubeVideoElement.prototype.canPlayType = function( type ) {
+  Popcorn.HTMLYouTubeVideoElement.canPlayType = function( type ) {
     return type === "video/x-youtube" ? "probably" : EMPTY_STRING;
   };
-
-  Popcorn.HTMLYouTubeVideoElement = function( id ) {
-    return new HTMLYouTubeVideoElement( id );
-  };
-  Popcorn.HTMLYouTubeVideoElement._canPlaySrc = HTMLYouTubeVideoElement.prototype._canPlaySrc;
 
 }( Popcorn, window, document ));
 /**
@@ -4446,7 +4479,7 @@
 
   function HTMLNullVideoElement( id ) {
 
-    var self = this,
+    var self = new Popcorn._MediaElementProto(),
       parent = typeof id === "string" ? document.querySelector( id ) : id,
       elem = document.createElement( "div" ),
       playerReady = false,
@@ -4573,6 +4606,9 @@
     }
 
     function changeCurrentTime( aTime ) {
+      if ( aTime === getCurrentTime() ) {
+        return;
+      }
       if( !playerReady ) {
         addPlayerReadyCallback( function() { changeCurrentTime( aTime ); } );
         return;
@@ -4817,27 +4853,28 @@
         }
       }
     });
+
+    self._canPlaySrc = Popcorn.HTMLNullVideoElement._canPlaySrc;
+    self.canPlayType = Popcorn.HTMLNullVideoElement.canPlayType;
+
+    return self;
   }
 
-  HTMLNullVideoElement.prototype = new Popcorn._MediaElementProto();
-  HTMLNullVideoElement.prototype.constructor = HTMLNullVideoElement;
+  Popcorn.HTMLNullVideoElement = function( id ) {
+    return new HTMLNullVideoElement( id );
+  };
 
   // Helper for identifying URLs we know how to play.
-  HTMLNullVideoElement.prototype._canPlaySrc = function( url ) {
+  Popcorn.HTMLNullVideoElement._canPlaySrc = function( url ) {
     return ( temporalRegex ).test( url ) ?
       "probably" :
       EMPTY_STRING;
   };
 
   // We'll attempt to support a mime type of video/x-nullvideo
-  HTMLNullVideoElement.prototype.canPlayType = function( type ) {
+  Popcorn.HTMLNullVideoElement.canPlayType = function( type ) {
     return type === "video/x-nullvideo" ? "probably" : EMPTY_STRING;
   };
-
-  Popcorn.HTMLNullVideoElement = function( id ) {
-    return new HTMLNullVideoElement( id );
-  };
-  Popcorn.HTMLNullVideoElement._canPlaySrc = HTMLNullVideoElement.prototype._canPlaySrc;
 
 }( Popcorn, document ));
 (function( Popcorn, window, document ) {
@@ -4846,7 +4883,7 @@
 
   CURRENT_TIME_MONITOR_MS = 16,
   EMPTY_STRING = "",
-  VIMEO_HOST = window.location.protocol + "//player.vimeo.com";
+  VIMEO_HOST = "https://player.vimeo.com";
 
   // Utility wrapper around postMessage interface
   function VimeoPlayer( vimeoIFrame ) {
@@ -4891,7 +4928,7 @@
       throw "ERROR: HTMLVimeoVideoElement requires window.postMessage";
     }
 
-    var self = this,
+    var self = new Popcorn._MediaElementProto(),
       parent = typeof id === "string" ? Popcorn.dom.find( id ) : id,
       elem = document.createElement( "iframe" ),
       impl = {
@@ -4918,6 +4955,7 @@
       playerReady = false,
       playerUID = Popcorn.guid(),
       player,
+      playerPaused = true,
       playerReadyCallbacks = [],
       timeUpdateInterval,
       currentTimeInterval,
@@ -5006,6 +5044,7 @@
     }
 
     self.play = function() {
+      impl.paused = false;
       if( !playerReady ) {
         addPlayerReadyCallback( function() { self.play(); } );
         return;
@@ -5038,6 +5077,7 @@
     }
 
     self.pause = function() {
+      impl.paused = true;
       if( !playerReady ) {
         addPlayerReadyCallback( function() { self.pause(); } );
         return;
@@ -5048,8 +5088,11 @@
 
     function onPause() {
       impl.paused = true;
-      clearInterval( timeUpdateInterval );
-      self.dispatchEvent( "pause" );
+      if ( !playerPaused ) {
+        playerPaused = true;
+        clearInterval( timeUpdateInterval );
+        self.dispatchEvent( "pause" );
+      }
     }
 
     function onTimeUpdate() {
@@ -5074,8 +5117,9 @@
       timeUpdateInterval = setInterval( onTimeUpdate,
                                         self._util.TIMEUPDATE_MS );
 
-      if( impl.paused ) {
-        impl.paused = false;
+      impl.paused = false;
+      if( playerPaused ) {
+        playerPaused = false;
 
         // Only 1 play when video.loop=true
         if ( !impl.loop ) {
@@ -5201,10 +5245,6 @@
         case "seek":
           onCurrentTime( parseFloat( data.data.seconds ) );
           onSeeked();
-          // Deal with Vimeo playing when paused after a seek
-          if( impl.paused ) {
-            self.pause();
-          }
           break;
       }
     }
@@ -5440,26 +5480,27 @@
         }
       }
     });
+
+    self._canPlaySrc = Popcorn.HTMLVimeoVideoElement._canPlaySrc;
+    self.canPlayType = Popcorn.HTMLVimeoVideoElement.canPlayType;
+
+    return self;
   }
 
-  HTMLVimeoVideoElement.prototype = new Popcorn._MediaElementProto();
-  HTMLVimeoVideoElement.prototype.constructor = HTMLVimeoVideoElement;
+  Popcorn.HTMLVimeoVideoElement = function( id ) {
+    return new HTMLVimeoVideoElement( id );
+  };
 
   // Helper for identifying URLs we know how to play.
-  HTMLVimeoVideoElement.prototype._canPlaySrc = function( url ) {
+  Popcorn.HTMLVimeoVideoElement._canPlaySrc = function( url ) {
     return ( (/player.vimeo.com\/video\/\d+/).test( url ) ||
              (/vimeo.com\/\d+/).test( url ) ) ? "probably" : EMPTY_STRING;
   };
 
   // We'll attempt to support a mime type of video/x-vimeo
-  HTMLVimeoVideoElement.prototype.canPlayType = function( type ) {
+  Popcorn.HTMLVimeoVideoElement.canPlayType = function( type ) {
     return type === "video/x-vimeo" ? "probably" : EMPTY_STRING;
   };
-
-  Popcorn.HTMLVimeoVideoElement = function( id ) {
-    return new HTMLVimeoVideoElement( id );
-  };
-  Popcorn.HTMLVimeoVideoElement._canPlaySrc = HTMLVimeoVideoElement.prototype._canPlaySrc;
 
 }( Popcorn, window, document ));
 (function( Popcorn, window, document ) {
@@ -5477,8 +5518,8 @@
   function isSoundCloudReady() {
     // If the SoundCloud Widget API + JS SDK aren't loaded, do it now.
     if( !scLoaded ) {
-      Popcorn.getScript( "//w.soundcloud.com/player/api.js", function() {
-        Popcorn.getScript( "//connect.soundcloud.com/sdk.js", function() {
+      Popcorn.getScript( "https://w.soundcloud.com/player/api.js", function() {
+        Popcorn.getScript( "https://connect.soundcloud.com/sdk.js", function() {
           scReady = true;
 
           // XXX: SoundCloud won't let us use real URLs with the API,
@@ -5511,7 +5552,7 @@
       throw "ERROR: HTMLSoundCloudAudioElement requires window.postMessage";
     }
 
-    var self = this,
+    var self = new Popcorn._MediaElementProto(),
       parent = typeof id === "string" ? Popcorn.dom.find( id ) : id,
       elem = document.createElement( "iframe" ),
       impl = {
@@ -5901,6 +5942,20 @@
       playerReady = false;
 
       SC.get( "/resolve", { url: aSrc }, function( data ) {
+        var err;
+        if ( data.errors ) {
+          err = { name: "MediaError" };
+          // Not sure why this is in an array, and how multiple errors should be handled.
+          // For now, I'll just use the first. We just need something.
+          if ( data.errors[ 0 ] ) {
+            if ( data.errors[ 0 ].error_message === "404 - Not Found" ) {
+              err.message = "Video not found.";
+              err.code = MediaError.MEDIA_ERR_NETWORK;
+            }
+          }
+          impl.error = err;
+          self.dispatchEvent( "error" );
+        }
         elem.id = Popcorn.guid( "soundcloud-" );
         elem.width = impl.width;
         elem.height = impl.height;
@@ -6134,25 +6189,27 @@
         }
       }
     });
+
+    self._canPlaySrc = Popcorn.HTMLSoundCloudAudioElement._canPlaySrc;
+    self.canPlayType = Popcorn.HTMLSoundCloudAudioElement.canPlayType;
+
+    return self;
   }
 
-  HTMLSoundCloudAudioElement.prototype = new Popcorn._MediaElementProto();
+  Popcorn.HTMLSoundCloudAudioElement = function( id ) {
+    return new HTMLSoundCloudAudioElement( id );
+  };
 
   // Helper for identifying URLs we know how to play.
-  HTMLSoundCloudAudioElement.prototype._canPlaySrc = function( url ) {
+  Popcorn.HTMLSoundCloudAudioElement._canPlaySrc = function( url ) {
     return (/(?:https?:\/\/www\.|https?:\/\/|www\.|\.|^)(soundcloud)/).test( url ) ?
       "probably" : EMPTY_STRING;
   };
 
   // We'll attempt to support a mime type of audio/x-soundcloud
-  HTMLSoundCloudAudioElement.prototype.canPlayType = function( type ) {
+  Popcorn.HTMLSoundCloudAudioElement.canPlayType = function( type ) {
     return type === "audio/x-soundcloud" ? "probably" : EMPTY_STRING;
   };
-
-  Popcorn.HTMLSoundCloudAudioElement = function( id ) {
-    return new HTMLSoundCloudAudioElement( id );
-  };
-  Popcorn.HTMLSoundCloudAudioElement._canPlaySrc = HTMLSoundCloudAudioElement.prototype._canPlaySrc;
 
 }( Popcorn, window, document ));
 (function( Popcorn, window, document ) {
@@ -6187,9 +6244,8 @@
     if ( !jwLoaded ) {
       if ( !window.jwplayer ) {
         var tag = document.createElement( "script" );
-        var protocol = window.location.protocol === "file:" ? "http:" : "";
-
-        tag.src = protocol + "//jwpsrv.com/library/zaIF4JI9EeK2FSIACpYGxA.js";
+        
+        tag.src = "https://jwpsrv.com/library/zaIF4JI9EeK2FSIACpYGxA.js";
         var firstScriptTag = document.getElementsByTagName( "script" )[ 0 ];
         firstScriptTag.parentNode.insertBefore( tag, firstScriptTag );
       }
@@ -6209,7 +6265,7 @@
       throw "ERROR: HTMLJWPlayerVideoElement requires window.postMessage";
     }
 
-    var self = this,
+    var self = new Popcorn._MediaElementProto(),
       parent = typeof id === "string" ? document.querySelector( id ) : id,
       impl = {
         src: EMPTY_STRING,
@@ -6705,27 +6761,28 @@
         }
       }
     });
+
+    self._canPlaySrc = Popcorn.HTMLJWPlayerVideoElement._canPlaySrc;
+    self.canPlayType = Popcorn.HTMLJWPlayerVideoElement.canPlayType;
+
+    return self;
   }
 
-  HTMLJWPlayerVideoElement.prototype = new Popcorn._MediaElementProto();
-  HTMLJWPlayerVideoElement.prototype.constructor = HTMLJWPlayerVideoElement;
+  Popcorn.HTMLJWPlayerVideoElement = function( id ) {
+    return new HTMLJWPlayerVideoElement( id );
+  };
 
   // Helper for identifying URLs we know how to play.
-  HTMLJWPlayerVideoElement.prototype._canPlaySrc = function( url ) {
+  Popcorn.HTMLJWPlayerVideoElement._canPlaySrc = function( url ) {
     // Because of the nature of JWPlayer playing all media types,
     // it can potentially play all url formats.
     return "probably";
   };
 
   // This could potentially support everything. It is a bit of a catch all player.
-  HTMLJWPlayerVideoElement.prototype.canPlayType = function( type ) {
+  Popcorn.HTMLJWPlayerVideoElement.canPlayType = function( type ) {
     return "probably";
   };
-
-  Popcorn.HTMLJWPlayerVideoElement = function( id ) {
-    return new HTMLJWPlayerVideoElement( id );
-  };
-  Popcorn.HTMLJWPlayerVideoElement._canPlaySrc = HTMLJWPlayerVideoElement.prototype._canPlaySrc;
 
 }( Popcorn, window, document ));
 /**
@@ -11064,7 +11121,7 @@ var googleCallback;
 // PARSER: 0.3 SRT
 (function (Popcorn) {
   /**
-   * SRT popcorn parser plug-in 
+   * SRT popcorn parser plug-in
    * Parses subtitle files in the SRT format.
    * Times are expected in HH:MM:SS,MIL format, though HH:MM:SS.MIL also supported
    * Ignore styling, which may occur after the end time or in-text
@@ -11072,12 +11129,12 @@ var googleCallback;
    * SSA-style tags are stripped, HTML style tags are left for the browser to handle:
    *    HTML: <font>, <b>, <i>, <u>, <s>
    *    SSA:  \N or \n, {\cmdArg1}, {\cmd(arg1, arg2, ...)}
-   
+
    * Data parameter is given by Popcorn, will need a text.
    * Text is the file contents to be parsed
-   * 
+   *
    * @param {Object} data
-   * 
+   *
    * Example:
     1
     00:00:25,712 --> 00:00:30.399
@@ -11089,7 +11146,7 @@ var googleCallback;
     SSA tags with {\i1} would open and close italicize {\i0}, but are stripped
     Multiple {\pos(142,120)\b1}SSA tags are stripped
    */
-  Popcorn.parser( "parseSRT", function( data ) {
+  Popcorn.parser( "parseSRT", function( data, options ) {
 
     // declare needed variables
     var retObj = {
@@ -11115,6 +11172,7 @@ var googleCallback;
       sub = {};
       text = [];
 
+      i = nextNonEmptyLine( lines, i );
       sub.id = parseInt( lines[i++], 10 );
 
       // Split on '-->' delimiter, trimming spaces as well
@@ -11137,7 +11195,7 @@ var googleCallback;
       // Join into 1 line, SSA-style linebreaks
       // Strip out other SSA-style tags
       sub.text = text.join( "\\N" ).replace( /\{(\\[\w]+\(?([\w\d]+,?)+\)?)+\}/gi, "" );
-      
+
       // Escape HTML entities
       sub.text = sub.text.replace( /</g, "&lt;" ).replace( />/g, "&gt;" );
 
@@ -11146,6 +11204,11 @@ var googleCallback;
       // Later modified by kev: http://kevin.deldycke.com/2007/03/ultimate-regular-expression-for-html-tag-parsing-with-php/
       sub.text = sub.text.replace( /&lt;(\/?(font|b|u|i|s))((\s+(\w|\w[\w\-]*\w)(\s*=\s*(?:\".*?\"|'.*?'|[^'\">\s]+))?)+\s*|\s*)(\/?)&gt;/gi, "<$1$3$7>" );
       sub.text = sub.text.replace( /\\N/gi, "<br />" );
+      
+      if ( options && options[ "target" ] ) {
+        sub.target = options[ "target" ];
+      }
+  
       subs.push( createTrack( "subtitle", sub ) );
     }
 
@@ -11176,6 +11239,14 @@ var googleCallback;
     } catch ( e ) {
       return 0;
     }
+  }
+
+  function nextNonEmptyLine( linesArray, position ) {
+    var idx = position;
+    while ( !linesArray[idx] ) {
+      idx++;
+    }
+    return idx;
   }
 
   function lastNonEmptyLine( linesArray ) {

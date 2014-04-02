@@ -20,9 +20,8 @@
 
     var module = angular.module('amara.SubtitleEditor.collab', []);
 
-    module.controller('CollabController', function($scope, $timeout, EditorData) {
+    module.controller('CollabController', function($scope, $sce, $timeout, EditorData) {
 
-        $scope.notes = EditorData.savedNotes || "";
         // Some modules can be opened and closed. These are the default states.
         $scope.modulesOpen = {
             notes: false,
@@ -50,26 +49,16 @@
             };
         }
 
-        $scope.approve = function() {
-            $scope.$root.$emit('approve-task');
-        };
         $scope.toggleDocking = function(module) {
             $scope.modulesOpen[module] = !$scope.modulesOpen[module];
         };
-        $scope.sendBack = function() {
-            $scope.$root.$emit('send-back-task');
-        };
-        $scope.notesChanged = function() {
-            $scope.$root.$emit('notes-changed');
-        };
-
         $scope.canApprove = function() {
             return $scope.workingSubtitles.subtitleList.isComplete();
         }
 
         $scope.errorMessage = function() {
             if(!$scope.canApprove()) {
-                return 'Not all lines are completed.';
+                return 'Some of the lines do not have text or timing. Please complete all the lines before accepting subtitles or send them back.';
             }
             return null;
         }

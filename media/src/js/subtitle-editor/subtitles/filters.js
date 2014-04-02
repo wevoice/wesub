@@ -21,27 +21,9 @@ var angular = angular || null;
     var module = angular.module('amara.SubtitleEditor.subtitles.filters', []);
     var HIDES_ON = ['Deleted', 'Private']
 
-    function leftPad(number, width, character) {
-        /*
-        * Left Pad a number to the given width, with zeros.
-        * From: http://stackoverflow.com/a/1267338/22468
-        *
-        * Returns: string
-        */
-
-        character = character || '0';
-        width -= number.toString().length;
-
-        if (width > 0) {
-            return new Array(width + (/\./.test(number) ? 2 : 1))
-                                .join(character) + number;
-        }
-        return number.toString();
-    };
-
     /*
     * Display a human friendly format.
-     */
+    */
     function displayTime(milliseconds, showFraction) {
         if (milliseconds === -1 ||
             isNaN(Math.floor(milliseconds)) ||
@@ -49,29 +31,18 @@ var angular = angular || null;
             milliseconds === null) {
                 return "--";
             }
-        var time = Math.floor(milliseconds / 1000);
-        var hours = ~~(time / 3600);
-        var minutes = ~~((time % 3600) / 60);
-        var seconds = time % 60;
-
-        var components = [];
-        if(hours) {
-            components.push(hours);
-            components.push(leftPad(minutes, 2));
-        } else {
-            components.push(minutes);
-        }
-        components.push(leftPad(seconds, 2));
-        var result = components.join(":");
-
-        if(showFraction) {
-            var fraction = Math.round((milliseconds % 1000) / 10);
-            result += '.' + leftPad(fraction, 2);
-        }
-        return result
-
-    };
-
+        var date;
+        if (showFraction)
+            date = new Date(10 * Math.round(milliseconds / 10));
+        else 
+            date = new Date(1000 * Math.round(milliseconds / 1000));
+        var hours = date.getUTCHours(), minutes = date.getUTCMinutes(),
+            seconds = date.getUTCSeconds(), cents = Math.floor(date.getUTCMilliseconds() / 10);
+        var result = "" + (hours ? (hours + ":" + ("0" + minutes).slice (-2) + ":" + ("0" + seconds).slice (-2)) :
+                                   (minutes + ":" + ("0" + seconds).slice (-2)));
+        if (showFraction) result += "." + ("0" + cents).slice (-2);
+        return result;
+    }
     module.filter('displayTime', function(){
         return function(milliseconds) {
             return displayTime(milliseconds, true);

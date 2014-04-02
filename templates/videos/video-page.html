@@ -46,7 +46,7 @@ window.WIDGET_SETTINGS = {{ widget_settings|safe }};
 {% block main_content %}
     {% if saved %}
         <div id="messages">
-            <p>{% blocktrans %}Subtitles saved! You can share the video with friends, or get an embed code for your site. To add atranslation, click the button below.{% endblocktrans %}</p>
+            <p>{% blocktrans %}Subtitles saved! You can share the video with friends, or get an embed code for your site. To add a translation, click the button below.{% endblocktrans %}</p>
             <a href="#" id="closeBut">{% trans "Close" %}</a>
         </div>
     {% endif %}
@@ -90,14 +90,9 @@ window.WIDGET_SETTINGS = {{ widget_settings|safe }};
                 View <a href="{{ url }}">tasks for this video</a>.
                 {% endblocktrans %}
             </p>
-            {% elif can_create_subs or can_create_trans %}
-                {% if video.languages_count = 0 and can_create_subs %}
-                    <a href="#" class="add-subtitles icon"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
-                    <p>{% trans "This video doesn't have any subtitles yet." %} <a href="#" class="add-subtitles">{% trans 'Create subtitles now!' %}</a></p>
-                {% elif video.languages_count > 0 and can_create_trans %}
-                    <a href="#" class="add-translation icon"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
-                    <p>{% trans "Don't see one of your languages?" %}<br /><a class="add-translation" id="add_translation " href="#">{% trans 'Create a new translation!' %}</a><p/>
-                {% endif %}
+            {% elif can_create_subs %}
+                <a href="#create-subtitles-modal" class="icon open-modal"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
+                    <p><a href="#create-subtitles-modal" class="open-modal">{% trans 'Add a new language!' %}</a></p>
                 {% upload_subtitles video %}
             </p>
             {% endif %}
@@ -124,6 +119,7 @@ window.WIDGET_SETTINGS = {{ widget_settings|safe }};
         </ul>
         <div id="tab-container">{% block tab %}{% endblock %}</div>
     </div>
+    {% include 'videos/_create-subtitles-modal.html' %}
 {% endblock %}
 
 {% block page_controls %}
@@ -135,15 +131,8 @@ window.WIDGET_SETTINGS = {{ widget_settings|safe }};
             <li>
                 <a href="{% url admin:videos_video_change video.pk %}" target="blank">{% trans 'Edit video' %}</a>
             </li>
-            <li>
-                <a href="{% url subtitles:subtitle-editor video.video_id 'en' %}">New editor</a>
-            </li>
-            <li>
-            </li>
             <li>{% feature_video video %}</li>
             {% if task %}<li> <a href="">task id={{task.pk}}</a></li>{% endif %}
         </ul>
     {% endif %}
 {% endblock %}
-  
-trans

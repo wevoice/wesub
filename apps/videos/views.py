@@ -63,7 +63,7 @@ from apps.videos.decorators import get_video_revision, get_video_from_code
 from apps.videos.forms import (
     VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm,
     CreateVideoUrlForm, TranscriptionFileForm, AddFromFeedForm,
-    ChangeVideoOriginalLanguageForm
+    ChangeVideoOriginalLanguageForm, CreateSubtitlesForm,
 )
 from apps.videos.models import (
     Video, Action, SubtitleLanguage, VideoUrl, AlreadyEditingException
@@ -303,6 +303,8 @@ class VideoPageContext(dict):
     def __init__(self, request, video, video_url, tab, tab_only=False):
         dict.__init__(self)
         self['video'] = video
+        self['create_subtitles_form'] = CreateSubtitlesForm(
+            request, video, request.POST or None)
         if not tab_only:
             video.prefetch_languages(with_public_tips=True,
                                      with_private_tips=True)
@@ -332,13 +334,11 @@ class VideoPageContext(dict):
             self['team_video'] = team_video
             self['can_create_subs'] = can_create_and_edit_subtitles(
                 request.user, team_video)
-            self['can_create_trans'] = can_create_and_edit_translations(
-                request.user, team_video)
             self['user_is_team_member'] = team_video.team.user_is_member(
                 request.user)
         else:
             self['team'] = self['team_video'] = None
-            self['can_create_trans'] = self['can_create_subs'] = True
+            self['can_create_subs'] = True
             self['user_is_team_member'] = False
 
     @staticmethod
@@ -377,7 +377,8 @@ def video(request, video, video_url=None, title=None):
     if not video_url and ((video.title_for_url() and not video.title_for_url() == title) or (not video.title and title)):
         return redirect(video, permanent=True)
 
-    video.update_view_counter()
+    if request.method != 'POST':
+        video.update_view_counter()
 
     tab = request.GET.get('tab')
     if tab not in ('urls', 'comments', 'activity', 'video'):
@@ -393,6 +394,9 @@ def video(request, video, video_url=None, title=None):
         template_name = 'videos/video-%s.html' % tab
         context = VideoPageContext(request, video, video_url, tab)
     context['tab'] = tab
+
+    if context['create_subtitles_form'].is_valid():
+        return context['create_subtitles_form'].handle_post()
 
     return render(request, template_name, context)
 
@@ -546,6 +550,8 @@ class LanguagePageContext(dict):
         self['language'] = language
         self['version'] = version
         self['user'] = request.user
+        self['create_subtitles_form'] = CreateSubtitlesForm(
+            request, video, request.POST or None)
         if not tab_only:
             video.prefetch_languages(with_public_tips=True,
                                      with_private_tips=True)
@@ -597,6 +603,10 @@ class LanguagePageContext(dict):
                                                   language=language,
                                                   size=(289, 173))
         _add_share_panel_context_for_history(self, video, language)
+        if video.get_team_video() is not None:
+            self['team'] = video.get_team_video().team
+        else:
+            self['team'] = None
         if version is not None:
             self['metadata'] = version.get_metadata().convert_for_display()
         else:
@@ -706,10 +716,12 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
         template_name = 'videos/language-%s.html' % tab
         context = ContextClass(request, video, lang, lang_id, version_id)
         context['tab'] = tab
-        if 'tab' not in request.GET:
+        if 'tab' not in request.GET and request.method != 'POST':
             # we only want to update the view counter if this request wasn't
             # the result of a tab click.
             video.update_view_counter()
+    if context['create_subtitles_form'].is_valid():
+        return context['create_subtitles_form'].handle_post()
     return render(request, template_name, context)
 
 def _widget_params(request, video, version_no=None, language=None, video_url=None, size=None):

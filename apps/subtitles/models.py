@@ -1052,7 +1052,7 @@ LIMIT 1;""", (self.id, self.id))
 
     def get_widget_url(self):
         """SHIM for getting the widget URL for this language."""
-        return reverse('subtitles:old-editor', kwargs={
+        return reverse('subtitles:subtitle-editor', kwargs={
             'video_id': self.video.video_id,
             'language_code': self.language_code,
         })

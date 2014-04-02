@@ -22,6 +22,8 @@ from auth.models import CustomUser as User
 from django import forms
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
@@ -34,7 +36,9 @@ from apps.teams.permissions import (
     can_assign_task, can_delete_language, can_remove_video
 )
 from apps.teams.permissions_const import ROLE_NAMES
-from apps.videos.forms import AddFromFeedForm
+from apps.videos.forms import (AddFromFeedForm, language_choices_with_empty,
+                               CreateSubtitlesForm,
+                               MultiVideoCreateSubtitlesForm)
 from apps.videos.models import (
         VideoMetadata, VIDEO_META_TYPE_IDS, Video, VideoFeed,
 )
@@ -711,3 +715,32 @@ def make_billing_report_form():
                                  initial=BillingReport.TYPE_BILLING_RECORD)
     return BillingReportForm
 
+class TaskCreateSubtitlesForm(CreateSubtitlesForm):
+    """CreateSubtitlesForm that also sets the language for task."""
+
+    def __init__(self, request, task, data=None):
+        CreateSubtitlesForm.__init__(self, request, task.team_video.video,
+                                     data)
+        self.task = task
+
+    def handle_post(self):
+        self.task.language = self.cleaned_data['subtitle_language_code']
+        self.task.save()
+        return CreateSubtitlesForm.handle_post(self)
+
+class TeamMultiVideoCreateSubtitlesForm(MultiVideoCreateSubtitlesForm):
+    """MultiVideoCreateSubtitlesForm that is task-aware."""
+
+    def __init__(self, request, team, data=None):
+        MultiVideoCreateSubtitlesForm.__init__(self, request, team.videos,
+                                               data)
+        self.team = team
+
+    def handle_post(self):
+        if self.team.workflow_enabled:
+            # set the language for the task being performed (if needed)
+            language = self.cleaned_data['subtitle_language_code']
+            tasks = self.get_video().get_team_video().task_set
+            (tasks.incomplete_subtitle().filter(language='')
+             .update(language=language))
+        return MultiVideoCreateSubtitlesForm.handle_post(self)

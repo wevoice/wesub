@@ -111,27 +111,14 @@ def dashboard(request):
 
     tasks = user.open_tasks()
 
-    widget_settings = {}
-    from apps.widget.rpc import add_general_settings
-    add_general_settings(request, widget_settings)
-
-    # For perform links on tasks
-    video_pks = [t.team_video.video_id for t in tasks]
-    video_urls = dict([(vu.video_id, vu.effective_url) for vu in
-                       VideoUrl.objects.filter(video__in=video_pks, primary=True)])
-
-    Task.add_cached_video_urls(tasks)
-
     context = {
         'user_info': user,
         'team_activity': Action.objects.for_user_team_activity(user)[:8],
         'video_activity': Action.objects.for_user_video_activity(user)[:8],
         'tasks': tasks,
-        'widget_settings': widget_settings,
     }
 
     return direct_to_template(request, 'profiles/dashboard.html', context)
-
 
 def videos(request, user_id=None):
     if user_id:

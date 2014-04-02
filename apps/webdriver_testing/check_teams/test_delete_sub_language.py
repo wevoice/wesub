@@ -10,14 +10,10 @@ from webdriver_testing.pages.site_pages import video_page
 from webdriver_testing.pages.site_pages import watch_page
 from webdriver_testing.data_factories import TeamVideoFactory
 from webdriver_testing.data_factories import TeamMemberFactory
-
-
-
 from webdriver_testing.data_factories import WorkflowFactory
 from webdriver_testing.data_factories import TeamLangPrefFactory
 from webdriver_testing.data_factories import UserFactory
-from webdriver_testing.pages.editor_pages import subtitle_editor
-
+from webdriver_testing.pages.site_pages import editor_page
 
 class TestCaseWorkflows(WebdriverTestCase):
     """TestSuite for display of Delete Subtitle Language button. """
@@ -250,8 +246,7 @@ class TestCaseDeletion(WebdriverTestCase):
         cls.video_pg = video_page.VideoPage(cls)
         cls.tasks_tab = TasksTab(cls)
         cls.watch_pg = watch_page.WatchPage(cls)
-        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
-
+        cls.editor_pg = editor_page.EditorPage(cls)
         cls.user = UserFactory.create()
         cls.owner = UserFactory.create()
         cls.team = TeamMemberFactory.create(team__workflow_enabled=True,
@@ -573,9 +568,10 @@ class TestCaseDeletion(WebdriverTestCase):
                                  '&assignee=anyone&lang=it'.format(
                                  self.team.slug, self.tv.pk))
 
-        self.tasks_tab.perform_and_assign_task('Approve Italian Subtitles', 
+        self.tasks_tab.perform_task('Approve Italian Subtitles', 
                                                self.video.title)
-        self.assertEqual('Approve subtitles', self.sub_editor.dialog_title())
+        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual(u'Editing Italian\u2026', self.editor_pg.working_language())
 
     def test_perform_forked_review_task(self):
         """Review tasks for forked translations open in timed dialog.
@@ -586,7 +582,7 @@ class TestCaseDeletion(WebdriverTestCase):
                                  '&assignee=anyone&lang=hr'.format(
                                  self.team.slug, self.tv.pk))
 
-        self.tasks_tab.perform_and_assign_task('Review Croatian Subtitles', 
+        self.tasks_tab.perform_task('Review Croatian Subtitles', 
                                                self.video.title)
-        self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
-
+        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual(u'Editing Croatian\u2026', self.editor_pg.working_language())

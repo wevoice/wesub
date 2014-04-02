@@ -8,7 +8,7 @@ from webdriver_testing.pages.site_pages import video_language_page
 from webdriver_testing import data_helpers
 from webdriver_testing.data_factories import UserFactory
 from webdriver_testing.data_factories import VideoUrlFactory
-from webdriver_testing.pages.editor_pages import subtitle_editor 
+from webdriver_testing.pages.site_pages import editor_page 
 
 class TestCaseUploadTranslation(WebdriverTestCase):
     """TestSuite for uploading subtitles with untimed text.  """
@@ -21,7 +21,7 @@ class TestCaseUploadTranslation(WebdriverTestCase):
         cls.user = UserFactory.create(username = 'user')
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
-
+        cls.editor_pg = editor_page.EditorPage(cls)
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
         cls.video_pg.open_page('videos/create/')
@@ -75,10 +75,7 @@ class TestCaseUploadTranslation(WebdriverTestCase):
         #Open the language page for the video and click Edit Subtitles 
         self.video_language_pg.open_video_lang_page(self.tv.video_id, 'sv')
         self.video_language_pg.edit_subtitles()
-        sub_editor = subtitle_editor.SubtitleEditor(self)
-        self.assertEqual('Adding a New Translation', 
-                         sub_editor.dialog_title())
-        sub_editor.save_translation()
+        self.assertEqual(u'Editing Swedish\u2026', self.editor_pg.working_language())
 
     def test_txt(self):
         """Upload translation (de) in a txt file.

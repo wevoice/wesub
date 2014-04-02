@@ -11,7 +11,6 @@
 
 {% block css %}
     {{ block.super }}
-    {% include_bundle "widget-css"%}
 {% endblock %}
 
 {% block scripts %}
@@ -20,14 +19,9 @@
     {% include_bundle "js-teams" %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
-        window.WIDGET_SETTINGS = {{ widget_settings|to_json|safe }};
-        window.REQUEST_GET_LANG = '{{ request.GET.lang }}';
         window.ASSIGN_TASK_AJAX_URL = '{% url teams:assign_task_ajax slug=team.slug %}';
-        window.ASSIGNEE = '{% firstof request.user.id -1 %}';
         window.CURRENT_USER_ID = {% firstof request.user.id -1 %};
         window.TEAM_SLUG = '{{ team.slug }}';
-        window.USER_LANGS = {{ user.get_languages.count }};
-        unisubs.languages = [];
     </script>
 {% endblock %}
 
@@ -64,16 +58,7 @@
                             <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
                             <ul class="actions">
                                 <li>
-                                        {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
-                                            <a href="{{ task.get_perform_url}}" class="perform-task perform-task-{{ task.pk }} button reduced" id="task-{{ task.id }}">
-                                            {% trans "Create" %} {{ task.get_language_display }} {% trans "subtitles" %}
-                                        {% else %}
-                                            <a href="{{ task.get_perform_url }}" class="perform-task perform-task-{{ task.pk }} button reduced" id="task-{{ task.id }}">
-                                            {{ task.get_type_display }}
-                                            {{ task.get_language_display }} {% trans "subtitles" %}
-                                        {% endif %}
-                                    </a>
-                                    {% include "teams/_perform_task_js.html" %}
+                                    {% include "teams/_perform_task_link.html" %}
                                 </li>
                                 {% if task.expiration_date != None %}
                                     <li>
@@ -161,82 +146,39 @@
                                                 <ul>
                                                     {% for task in team_video.tasks %}
                                                         <li>
-                                                            <a class="perform-task-{{ task.pk }}" href="{{ task.get_perform_url }}" title="Get started now">
-                                                                {% if task.get_type_display == 'Subtitle' %}
-                                                                    {% trans "Create Subtitles" %}
-                                                                {% else %}
-                                                                    {{ task.get_type_display }}
-                                                                    {% if task.get_language_display %}
-                                                                        {{ task.get_language_display }}
-                                                                    {% endif %}
-                                                                {% endif %}
-                                                            </a>
+                                                            {% include "teams/_perform_task_link.html" %}
                                                         </li>
-                                                        {% include "teams/_perform_task_js.html" %}
                                                     {% endfor %}
                                                 </ul>
                                             </div>
                                         {% else %} {# there is only one task for this video #}
                                             {% with task=team_video.tasks|first %}
-                                            <a href="{{ task.get_perform_url }}" class="perform-task-{{ task.pk }}" title="Get started now">
-                                                    {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
-                                                        Create {{ task.get_language_display }} subtitles
-                                                    {% else %}
-                                                        {{ task.get_type_display }}
-                                                        {{ task.get_language_display }} subtitles
-                                                    {% endif %}
-                                                </a>
-                                                {% include "teams/_perform_task_js.html" %}
+                                                {% include "teams/_perform_task_link.html" %}
                                             {% endwith %}
                                         {% endif %}
                                     {% else %} {# this is a non-task team #}
-                                        {% if team_video.video.languages_count < 1 or not user.get_languages %}
-                                            <a href="#" class="video-{{ team_video.id }}" title="Get started now">{% trans 'Create Subtitles' %}</a>
-                                        {% else %} {# this video already has languages #}
-                                            {% if team_video.languages|length > 1 %}
-                                                <a href="#" class="dropdown">
-                                                    {{ team_video.languages|length }}
-                                                    {% trans " languages need your help" %}
-                                                </a>
-                                                <div>
-                                                    <span class="expand">{% trans "View all" %}</span>
-                                                    <ul>
-                                                        {% for lang in team_video.languages %}
-                                                            <li>
-                                                                <a href="#" data-lang="{{ lang.language }}" class="video-{{ team_video.id }}" title="Get started now">
-                                                                    {% trans "Create " %}
-                                                                    {{ lang.get_language_display }}
-                                                                    {% trans " Subtitles" %}
-                                                                </a>
-                                                            </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </div>
-                                            {% else %} {# there is only one language user can work on #}
-                                                {% for lang in team_video.languages %}
-                                                <a href="#" class="video-{{ team_video.id }}" data-lang="{{ lang.language }}" title="Get started now">
-                                                        {% trans "Create " %}
-                                                        {{ lang.get_language_display }}
-                                                        {% trans " Subtitles" %}
-                                                    </a>
-                                                {% endfor %}
-                                            {% endif %}
+                                        {% if not team_video.video.primary_audio_language_code or not team_video.languages %}
+                                        <a href="#multi-video-create-subtitles-modal" class="open-modal" {{ team_video.video|multi_video_create_subtitles_data_attrs }} title="Get started now">{% trans 'Create Subtitles' %}</a>
+                                        {% elif team_video.languages|length > 1 %}
+                                            <a href="#" class="dropdown">
+                                                {{ team_video.languages|length }}
+                                                {% trans " languages need your help" %}
+                                            </a>
+                                            <div>
+                                                <span class="expand">{% trans "View all" %}</span>
+                                                <ul>
+                                                    {% for lang in team_video.languages %}
+                                                        <li>
+                                                            <a href="{% url subtitles:subtitle-editor video_id=team_video.video.video_id language_code=lang.language %}" title="Get started now">{% blocktrans with language=lang.get_language_display %}Create {{ language }} Subtitles{% endblocktrans %}</a>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        {% else %} {# there is only one language user can work on #}
+                                            {% with lang=team_video.languages.0 %}
+                                                <a href="{% url subtitles:subtitle-editor video_id=team_video.video.video_id language_code=lang.language %}" title="Get started now">{% blocktrans with language=lang.get_language_display %}Create {{ language }} Subtitles{% endblocktrans %}</a>
+                                            {% endwith %}
                                         {% endif %}
-                                        {% with v=team_video.video %}
-                                            <script type="text/javascript">
-                                                $('.video-{{ team_video.id }}').click(function(){
-                                                    var vs = unisubs.player.MediaSource.videoSourceForURL('{{ v.get_video_url|safe }}');
-                                                    var op = new unisubs.widget.SubtitleDialogOpener('{{ v.video_id }}', '{{ v.get_video_url|safe }}');
-
-                                                    {% if v.languages_count < 1 or not user.get_languages %}
-                                                    op.showStartDialog(null);
-                                                    {% else %}
-                                                    op.showStartDialog(null, {'LANGUAGE': $(this).data("lang"), 'FORCE': true });
-                                                    {% endif %}
-                                                    return false;
-                                                });
-                                            </script>
-                                        {% endwith %}
                                     {% endif %}
                                 </div>
                             {% endif %}
@@ -273,18 +215,8 @@
             {% endif %}
         {% endif %}
     </div>
-    <script type="text/javascript">
-        unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
-        $('.add-subtitles').click(function() {
-            widget_widget_div.selectMenuItem(
-            unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
-            return false;
-        });
 
-        $('.add-translation').click(function() {
-            widget_widget_div.selectMenuItem(
-            unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
-            return false;
-        });
-    </script>
+    {% if create_subtitles_form %}
+        {% include 'videos/_multi-video-create-subtitles-form.html' %}
+    {% endif %}
 {% endblock %}

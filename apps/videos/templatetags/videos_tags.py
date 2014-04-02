@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.safestring import mark_safe
 from django import template
 
 register = template.Library()
@@ -198,3 +199,16 @@ def shortlink_for_video( video):
     return u"{0}://{1}{2}".format(unicode(protocol),
                                   unicode(domain), 
                                   unicode(path))
+
+@register.filter
+def multi_video_create_subtitles_data_attrs(video):
+    attrs = [
+        ('data-video-id', video.id),
+        ('data-video-langs', ':'.join(l.language_code for l in
+                                      video.all_subtitle_languages())),
+    ]
+    if video.primary_audio_language_code:
+        attrs.append(('data-video-primary-audio-lang-code',
+                      video.primary_audio_language_code))
+    return mark_safe(' '.join('%s="%s"' % (key, value)
+                              for (key, value) in attrs))

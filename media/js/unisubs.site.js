@@ -67,12 +67,15 @@ var Site = function(Site) {
             this.tabContainer.empty();
             if(this.tabCache.hasOwnProperty(url)) {
                 this.tabContainer.append(this.tabCache[url]);
+                if(this.onComplete) {
+                    this.onComplete(this.tabContainer);
+                }
             } else {
                 var self = this;
                 this.tabContainer.load(url, null, function() {
                     self.cacheContents(url);
                     if(self.onComplete) {
-                        self.onComplete();
+                        self.onComplete(this);
                     }
                 });
             }
@@ -299,6 +302,87 @@ var Site = function(Site) {
             });
         }
     };
+    this.setupModalDialogs = function($rootElt) {
+        $('a.open-modal', $rootElt).each(function() {
+            var $link = $(this);
+            var modalId = $link.attr('href');
+            var $modal = $(modalId);
+            $link.bind('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                that.openModalForLink($link);
+            });
+            if($modal.hasClass('start-open')) {
+                that.openModalForLink($link);
+            }
+        });
+    }
+    this.openModalDialog = function(modal_id) {
+        var $target = $(modal_id);
+        var $document = $(document);
+        $target.addClass('shown');
+        $('body').append('<div class="well"></div>');
+
+        function handleCloseEvent(evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            $target.removeClass('shown');
+            $('body div.well').remove();
+            $closeButton.unbind('click.modal');
+            $document.unbind('click.modal');
+            $document.unbind('keydown.modal');
+        }
+
+        $closeButton = $('.action-close, .close', $target);
+        $closeButton.bind('click.modal', handleCloseEvent);
+        $document.bind('click.modal', function(evt) {
+            var $target = $(evt.target);
+            if($target.closest('aside.modal').length == 0 &&
+                $target.closest('.bootstrap .modal').length == 0) {
+                handleCloseEvent(evt);
+            }
+        });
+        $document.bind('keydown.modal', function(evt) {
+            if (evt.keyCode === 27) {
+                handleCloseEvent(evt);
+            }
+        });
+    };
+    this.openModalForLink = function(link) {
+        var modalId = link.attr('href');
+        if(modalId == '#multi-video-create-subtitles-modal') {
+            that.setupMultiVideoCreateSubtitlesModal(link);
+        }
+        that.openModalDialog(modalId);
+    }
+    this.setupMultiVideoCreateSubtitlesModal = function(link) {
+        var form = ('#multi-video-create-subtitles-modal');
+        var video_id = link.data('video-id');
+        var primary_audio_lang_code = link.data('video-primary-audio-lang-code');
+        var langs = link.data('video-langs').split(':');
+        var video_input = $('input[name=video]', form);
+        var primary_audio_lang_select = $('select[name=primary_audio_language_code]', form);
+        var language_select = $('select[name=subtitle_language_code]', form);
+
+        video_input.val(video_id);
+        if(primary_audio_lang_code) {
+            primary_audio_lang_select.val(primary_audio_lang_code);
+            primary_audio_lang_select.attr('disabled', true);
+        } else {
+            primary_audio_lang_select.val('');
+            primary_audio_lang_select.attr('disabled', false);
+
+        }
+        $('option', language_select).attr('disabled', false);
+        _.each(langs, function(lang) {
+            $('option[value=' + lang + ']', language_select).attr('disabled',
+                true);
+
+        });
+        $("option:not([disabled]):first", language_select).attr('selected',
+                true);
+    }
+
     this.Views = {
         /*
          * Each of these views runs on a specific
@@ -353,31 +437,7 @@ var Site = function(Site) {
                     window.location = $(this).children('option:selected').attr('value');
                 });
             }
-            if ($('a.open-modal').length) {
-                $('a.open-modal').live('click',function(e){
-                    $target = $($(this).attr('href'));
-                    $target.show();
-
-                    $('body').append('<div class="well"></div>');
-
-                    $target.click(function(event){
-                        event.stopPropagation();
-                    });
-                    $('html').bind('click.modal', function() {
-                        closeModal($target);
-                    });
-                    e.preventDefault();
-                });
-                $('.action-close, .close', '.bootstrap').click(function(){
-                    closeModal($(this).parents('.modal'));
-                    return false;
-                });
-                function closeModal(e) {
-                    e.hide();
-                    $('body div.well').remove();
-                    $('html').unbind('click.modal');
-                }
-            }
+            that.setupModalDialogs();
             $.fn.tabs = function(options){
                 this.each(function(){
                     var $this = $(this);
@@ -573,7 +633,8 @@ var Site = function(Site) {
                 });
             }
             setupRevisions();
-            var tabLoader = new AHAHTabLoader(function() {
+            var tabLoader = new AHAHTabLoader(function($container) {
+                that.setupModalDialogs($container);
                 // We may load new pagination links, in that case make sure
                 // they're loaded.
                 tabLoader.addLinks('.pagination');
@@ -626,7 +687,9 @@ var Site = function(Site) {
             });
             unisubs.widget.WidgetController.makeGeneralSettings(
                     window.WIDGET_SETTINGS);
-            var tabLoader = new AHAHTabLoader();
+            var tabLoader = new AHAHTabLoader(function($container) {
+                that.setupModalDialogs($container);
+            });
             tabLoader.addLinks('.tabs');
             unisubs.messaging.simplemessage.displayPendingMessages();
         },
@@ -686,27 +749,6 @@ var Site = function(Site) {
             });
             $('a.action-assign-submit').click(function(e) {
                 $(e.target).closest('form').submit();
-                return false;
-            });
-            $('a.assign-and-perform').click(function(e) {
-                var $target = $(e.target);
-                $target.text('Loading...');
-
-                that.Utils.assignTask($target.attr('data-id'), function(){
-                    $target.hide();
-
-                    $li = $target.parent().siblings('li.hidden-perform-link');
-                    $li.show();
-
-                    $link = $li.children('a.perform');
-                    $link.text('Loading...');
-                    if ($link.attr('href') !== '') {
-                        window.location = $link.attr('href');
-                    } else {
-                        $link.click();
-                    }
-                });
-
                 return false;
             });
             $('div.member-ajax-chosen select', '.v1 .content').ajaxChosen({
@@ -871,7 +913,6 @@ var Site = function(Site) {
 
         // Profile
         user_dashboard: function() {
-            unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             $('a.action-decline').click(function() {
                 $(this).siblings('form').submit();
                 return false;

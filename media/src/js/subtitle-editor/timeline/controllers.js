@@ -28,12 +28,14 @@
         $scope.currentTime = $scope.duration = null;
         // Subtitle at currentTime, or null.
         $scope.subtitle = null;
+        $scope.showUpcomingUnsyncedSubtitle = false;
         /* Subtitles that we will sync when the user hits the up/down arrows.
          *
          * Contains the following properties:
          *    start - subtitle whose startTime will be synced
          *    end - subtitle whose endTime will be synced
          */
+
         var willSync = { start: null, end: null};
         var lastTimeReturned = null;
         var lastTimeReturnedAt = null;
@@ -160,9 +162,28 @@
             }
         }
 
+        function updateUpcomingSubtitleSticker() {
+            if ($scope.unsyncedShown())
+                var s =
+                $scope.workingSubtitles.subtitleList.secondUnsyncedSubtitle();
+            else
+                var s =
+                $scope.workingSubtitles.subtitleList.firstUnsyncedSubtitle();
+            if (s) {
+                // This is not good data binding but is kept consistent
+                // with placement of subs on the timeline.
+                // Using bind-html, we would keep the formatting.
+                var span = $('span.upcomingUnsyncedSubtitleText');
+                span.html(s.content());
+                $scope.showUpcomingUnsyncedSubtitle = true; 
+            }
+            else $scope.showUpcomingUnsyncedSubtitle = false;
+        }
+
         function updateTimeline() {
             updateTime();
             updateWillSync();
+            updateUpcomingSubtitleSticker();
             $scope.redrawCanvas();
             $scope.redrawSubtitles();
         }
@@ -227,10 +248,13 @@
             scrollToSubtitle(subtitle);
             $scope.$root.$emit("work-done");
         });
-        $scope.$root.$on('sync-next-end-time', function($event) {
+        // Sets the end of a subtitle at current position. If onlyUnsync is true
+        // it only does it if the current endTime is unsynced, ie partially 
+        // synced subtitle
+        var setEndSubtitle = function($event, onlyUnsync) {
             var subtitleList = $scope.workingSubtitles.subtitleList;
             var subtitle = willSync.end;
-            if(subtitle === null) {
+            if ((subtitle === null) || (onlyUnsync && (subtitle.endTime != -1))) {
                 return;
             }
             var syncTime = Math.max($scope.currentTime, subtitle.startTime +
@@ -239,6 +263,16 @@
                 syncTime);
             scrollToSubtitle(subtitle);
             $scope.$root.$emit("work-done");
-        });
+        };
+        var setEndSubtitleOnlyUnsync = function($event) {
+            setEndSubtitle($event, true);
+        };
+        var setEndSubtitleAll = function($event) {
+            setEndSubtitle($event, false);
+        };
+        // If playback is paused, currently partially synced subtitled gets
+        // entirely synced to avoid having half-synced subs in the timeline
+        $scope.$root.$on('video-playback-changes', setEndSubtitleOnlyUnsync);
+        $scope.$root.$on('sync-next-end-time', setEndSubtitleAll);
     });
 }).call(this);

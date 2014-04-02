@@ -26,6 +26,7 @@ var angular = angular || null;
         'amara.SubtitleEditor.modal',
         'amara.SubtitleEditor.dom',
         'amara.SubtitleEditor.lock',
+        'amara.SubtitleEditor.session',
         'amara.SubtitleEditor.workflow',
         'amara.SubtitleEditor.subtitles.controllers',
         'amara.SubtitleEditor.subtitles.directives',
@@ -53,17 +54,21 @@ var angular = angular || null;
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
 
     module.controller("AppController", ['$scope', '$sce', '$controller', 
-                      'EditorData', 'Workflow', function($scope, $sce, $controller,
-            EditorData, Workflow) {
-
+                      '$window', 'EditorData', 'VideoPlayer', 'Workflow',
+                      function($scope, $sce, $controller, $window, EditorData,
+                          VideoPlayer, Workflow) {
         $controller('AppControllerSubtitles', {$scope: $scope});
         $controller('AppControllerLocking', {$scope: $scope});
         $controller('AppControllerEvents', {$scope: $scope});
+        $controller('DialogController', {$scope: $scope});
+        $controller('SessionBackend', {$scope: $scope});
+        $controller('SessionController', {$scope: $scope});
 
         $scope.videoId = EditorData.video.id;
         $scope.canSync = EditorData.canSync;
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
         $scope.scrollingSynced = true;
+        $scope.loadingFinished = false;
 	$scope.currentTitle = {};
 	$scope.currentTitle.Edited = false;
 	$scope.titleEdited = function(newValue) {
@@ -98,7 +103,8 @@ var angular = angular || null;
             return false; 
         }
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating, $scope.titleEdited);
-        $scope.timelineShown = !($scope.workflow.stage == 'type');
+        $scope.timelineShown = ($scope.workflow.stage != 'type' ||
+                EditorData.task_needs_pane);
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
         }
@@ -123,10 +129,10 @@ var angular = angular || null;
             }
         }
 	/*
-	 * Might not be the right location
-	 * TODO: move this to the proper place (probably the SubtitleList
-	 * model.
-	 */
+         * Might not be the right location
+         * TODO: move this to the proper place (probably the SubtitleList
+         * model).
+         */
         $scope.copyTimingOver = function() {
             var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
             var nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.firstSubtitle();
@@ -152,6 +158,68 @@ var angular = angular || null;
             return ($scope.workingSubtitles.subtitleList.length() > 0 &&
                      $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
+
+        $scope.showCopyTimingModal = function($event) {
+            $scope.dialogManager.openDialog('confirmCopyTiming', {
+                continueButton: $scope.copyTimingOver
+            });
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
+
+        $scope.showClearTimingModal = function($event) {
+            $scope.dialogManager.openDialog('confirmTimingReset', {
+                continueButton: $scope.clearTiming
+            });
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
+
+        $scope.clearTiming = function() {
+            var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
+            while (nextWorkingSubtitle) {
+                $scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, -1, -1);
+                nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
+             }
+            $scope.$root.$emit('work-done');
+        };
+
+        $scope.showClearTextModal = function($event) {
+            $scope.dialogManager.openDialog('confirmTextReset', {
+                continueButton: $scope.clearText
+            });
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
+
+        $scope.clearText = function() {
+            var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
+            while (nextWorkingSubtitle) {
+                $scope.workingSubtitles.subtitleList.updateSubtitleContent(nextWorkingSubtitle, "");
+                nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
+             }
+            $scope.$root.$emit('work-done');
+        };
+
+        $scope.showResetModal = function($event) {
+            $scope.dialogManager.openDialog('confirmChangesReset', {
+                continueButton: $scope.resetToLastSavedVersion
+            });
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
+
+        $scope.resetToLastSavedVersion = function() {
+            if($scope.workingSubtitles.versionNumber) {
+                $scope.workingSubtitles.getSubtitles(EditorData.editingVersion.languageCode,
+                    $scope.workingSubtitles.versionNumber);
+            } else {
+                $scope.workingSubtitles.initEmptySubtitles(
+                    EditorData.editingVersion.languageCode, EditorData.baseLanguage);
+            }
+            $scope.$root.$emit('work-done');
+        }
+
         $scope.displayedTitle = function() {
             return ($scope.workingSubtitles.getTitle() || 
                      $scope.referenceSubtitles.getTitle());
@@ -161,16 +229,40 @@ var angular = angular || null;
             currentTime: null,
             duration: null,
         };
+        $scope.collab = {
+            notes: EditorData.savedNotes
+        };
+        $scope.exitToVideoPage = function() {
+            $window.location = '/videos/' + $scope.videoId + '/';
+        }
+        $scope.exitToLegacyEditor = function() {
+            $window.location = EditorData.oldEditorURL;
+        }
         $scope.showDebugModal = function(evt) {
-            $scope.$root.$emit('show-debug-modal');
+            $scope.dialogManager.open('debug');
             evt.preventDefault();
             evt.stopPropagation();
             return false;
         };
+        $scope.onGuidelinesClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dialogManager.open('guidelines');
+        }
+        $scope.onMoreControlsClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dialogManager.open('more-controls');
+        }
+        $scope.onTitleClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dialogManager.open('metadata');
+        }
         // Hide the loading modal after we are done with bootstrapping
         // everything
         $scope.$evalAsync(function() {
-            $scope.$root.$emit('hide-modal');
+            $scope.loadingFinished = true;
         });
         // Overrides for debugging
         $scope.overrides = {
@@ -187,9 +279,7 @@ var angular = angular || null;
      * FIXME: this can probably be moved to a service to keep the app module
      * lean and mean.
      */
-    module.controller("AppControllerLocking", function($scope, $timeout,
-                EditorData, LockService) {
-        var secondsUntilClosing = 120;
+    module.controller("AppControllerLocking", function($sce, $scope, $timeout, $window, EditorData, LockService) {
         var regainLockTimer;
 
         $scope.minutesIdle = 0;
@@ -208,7 +298,7 @@ var angular = angular || null;
             $scope.minutesIdle++;
 
             if ($scope.minutesIdle >= USER_IDLE_MINUTES) {
-                showIdleModal();
+                $scope.showIdleModal();
                 $timeout.cancel(regainLockTimer);
             } else {
                 startUserIdleTimer();
@@ -234,84 +324,69 @@ var angular = angular || null;
         }
 
         function regainLockAfterIdle() {
+            $scope.dialogManager.showFreezeBox(
+                    $sce.trustAsHtml('Regaining lock&hellip;'));
             regainLock().then(function onSuccess(response) {
+                $scope.dialogManager.closeFreezeBox();
                 if (response.data.ok) {
                     $scope.minutesIdle = 0;
-                    $scope.$root.$emit('hide-modal');
                     startRegainLockTimer();
                     startUserIdleTimer();
                 } else {
-                    window.alert("Sorry, could not restart your session.");
-                    window.location = '/videos/' + $scope.videoId + "/";
+                    $scope.showResumeSessionErrorModal();
                 }
             }, function onError() {
-                window.alert("Sorry, could not restart your session.");
-                window.location = '/videos/' + $scope.videoId + "/";
+                $scope.showResumeSessionErrorModal();
             });
         }
-        function showIdleModal() {
+        $scope.showIdleModal = function () {
+            var secondsUntilClosing = 120;
+            
+            function makeText() {
+                return "You've been idle for more than " + USER_IDLE_MINUTES + " minutes. " + "To ensure no work is lost we will close your session in " + secondsUntilClosing + " seconds.";
+            }
 
-            var heading = "Warning: you've been idle for more than " + USER_IDLE_MINUTES + " minutes. " +
-                "To ensure no work is lost we will close your session in ";
-
-            var closeSessionTimeout;
-
-            var closeSession = function() {
-
-                secondsUntilClosing--;
-
-                if (secondsUntilClosing <= 0) {
-
-                    releaseLock();
-
-                    $scope.$root.$emit("show-modal", {
-                        heading: 'Your session has ended. You can try to resume, close the editor, or download your subtitles',
-                        buttons: [
-                            {'text': 'Try to resume work', 'class': 'yes', 'fn': function() {
-                                // TODO: Remove this duplication from below.
-                                if (closeSessionTimeout) {
-                                    $timeout.cancel(closeSessionTimeout);
-                                }
-
-                                regainLockAfterIdle();
-                            }},
-                            {'text': 'Download subtitles', 'class': 'no', 'fn': function() {
-                                $scope.$root.$emit('show-modal-download');
-                            }},
-                            {'text': 'Close editor', 'class': 'no', 'fn': function() {
-                                window.location = '/videos/' + $scope.videoId + "/";
-                            }}
-                        ]
-                    });
-
+            function closeSessionTick() {
+                if (--secondsUntilClosing <= 0) {
+                    $scope.dialogManager.close();
+                    $scope.showCloseSessionModal();
                 } else {
-
-                    $scope.$root.$emit('change-modal-heading', heading + secondsUntilClosing + " seconds.");
-                    closeSessionTimeout = $timeout(closeSession, 1000);
-
+                    $scope.dialogManager.updateDialogText(makeText());
+                    closeSessionTimeout = $timeout(closeSessionTick, 1000);
                 }
-            };
+            }
 
-            $scope.$root.$emit("show-modal", {
-                heading: heading + secondsUntilClosing + " seconds.",
-                buttons: [
-                    {'text': 'Try to resume work', 'class': 'yes', 'fn': function() {
-                        if (closeSessionTimeout) {
-                            $timeout.cancel(closeSessionTimeout);
-                        }
+            var closeSessionTimeout = $timeout(closeSessionTick, 1000);
 
-                        regainLockAfterIdle();
-                    }}
-                ]
+            $scope.dialogManager.openDialog('sessionWillClose', {
+                resume: function() {
+                    if (closeSessionTimeout) {
+                        $timeout.cancel(closeSessionTimeout);
+                    }
+                    regainLockAfterIdle();
+                },
+                closeEditor: $scope.exitToVideoPage
+            }, { text: makeText() });
+        }
+
+        $scope.showCloseSessionModal = function() {
+            releaseLock();
+            var dialogManager = $scope.dialogManager;
+
+            dialogManager.openDialog('sessionEnded', {
+                resume: regainLockAfterIdle,
+                closeEditor: $scope.exitToVideoPage
             });
+        }
 
-            closeSessionTimeout = $timeout(closeSession, 1000);
+        $scope.showResumeSessionErrorModal = function() {
+            $scope.dialogManager.open('resume-error');
         }
 
         startUserIdleTimer();
         startRegainLockTimer();
 
-        window.onunload = function() {
+        $window.onunload = function() {
             releaseLock();
         }
     });
@@ -346,13 +421,12 @@ var angular = angular || null;
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
             $scope.minutesIdle = 0;
-            // Shortcuts that should work while editing a subtitle
-            if ((evt.keyCode === 32 && evt.shiftKey) || 
-                (evt.keyCode == 9 && !evt.shiftKey)) {
-                // Shift+Space or Tab: toggle play / pause.
-                evt.preventDefault();
-                evt.stopPropagation();
+
+            if (evt.keyCode == 9 && !evt.shiftKey) {
                 VideoPlayer.togglePlay();
+            } else if (evt.keyCode === 32 && evt.shiftKey) {
+                VideoPlayer.togglePlay();
+                // Shift+Space or Tab: toggle play / pause.
             } else if (evt.keyCode === 9 && evt.shiftKey) {
                 // Shift+Tab, go back 2 seconds
                 VideoPlayer.seek(VideoPlayer.currentTime() - 2000);
@@ -362,33 +436,21 @@ var angular = angular || null;
             } else if (evt.keyCode === 190 && evt.shiftKey && evt.ctrlKey) {
                 // Control+Shift+Period, go forward 4 seconds
                 VideoPlayer.seek(VideoPlayer.currentTime() + 4000);
-            } else if(evt.target.type == 'textarea') {
+            } else if (evt.target.type == 'textarea') {
                 return;
             }
             // Shortcuts that should be disabled while editing a subtitle
-            else if(evt.keyCode == 40) {
-                // Down arrow, set the start time of the first
-                // unsynced sub
-                if($scope.timelineShown) {
-                    $scope.$root.$emit("sync-next-start-time");
-                    evt.preventDefault();
-                    evt.stopPropagation();
-                }
-            } else if(evt.keyCode == 38) {
-                // Up arrow, set the end time of the first
-                // unsynced sub
-                if($scope.timelineShown) {
-                    $scope.$root.$emit("sync-next-end-time");
-                    evt.preventDefault();
-                    evt.stopPropagation();
-                }
-            } else if(evt.keyCode == 13) {
-                if(!$scope.timelineShown) {
-                    insertAndEditSubtitle();
-                    evt.preventDefault();
-                }
-
+            else if ((evt.keyCode == 40) && ($scope.timelineShown)) {
+                $scope.$root.$emit("sync-next-start-time");
+            } else if ((evt.keyCode == 38) && ($scope.timelineShown)) {
+                $scope.$root.$emit("sync-next-end-time");
+            } else if ((evt.keyCode == 13) && (!$scope.timelineShown)) {
+                insertAndEditSubtitle();
+            } else {
+                return;
             }
+            evt.preventDefault();
+            evt.stopPropagation();
         };
 
         $scope.handleAppMouseMove = function(evt) {
@@ -428,54 +490,43 @@ var angular = angular || null;
                     $scope.workingSubtitles.versionNumber,
                     $scope.workingSubtitles.subtitleList.toXMLString());
         }
+
         $scope.restoreAutoBackup = function() {
             var savedData = SubtitleBackupStorage.getBackup(video.id,
                     $scope.workingSubtitles.language.code,
                     editingVersion.versionNumber);
             $scope.workingSubtitles.subtitleList.loadXML(savedData);
+            $scope.$root.$emit('work-done');
         }
 
         $scope.promptToRestoreAutoBackup = function() {
-            var dialog = {}
-            dialog.heading = 'You have an unsaved backup of your subtitling work, do you want to restore it?';
-            dialog.buttons = [
-                    {
-                        'text': 'Restore',
-                        'class': 'yes',
-                        'fn': function() {
-                            $scope.restoreAutoBackup();
-                            $scope.$emit('hide-modal');
-                        }
-                    },
-                    {
-                        'text': 'Discard',
-                        'class': 'no',
-                        'fn': function() {
-                            SubtitleBackupStorage.clearBackup();
-                            $scope.$emit('hide-modal');
-                        }
-                    },
-            ];
-            $scope.$root.$emit("show-modal", dialog);
+            $scope.dialogManager.openDialog('restoreAutoBackup', {
+                restore: $scope.restoreAutoBackup,
+                discard: SubtitleBackupStorage.clearBackup
+            });
         }
 
+        $scope.autoBackupNeeded = false;
+
+        // Check if we have an auto-backup to restore
         if(SubtitleBackupStorage.hasBackup(video.id,
                 $scope.workingSubtitles.language.code,
                 editingVersion.versionNumber)) {
             $timeout($scope.promptToRestoreAutoBackup);
         }
 
+        $scope.$on('work-done', function() {
+            $socpe.autoBackupNeeded = true;
+        });
 
-        $scope.saveSubtitles = function(markComplete) {
-            return SubtitleStorage.saveSubtitles(
-                    video.id,
-                    $scope.workingSubtitles.language.code,
-                    $scope.workingSubtitles.subtitleList.toXMLString(),
-                    $scope.workingSubtitles.title,
-                    $scope.workingSubtitles.description,
-                    $scope.workingSubtitles.metadata,
-                    markComplete);
-        };
+        function handleAutoBackup() {
+            if($scope.autoBackupNeeded) {
+                $scope.saveAutoBackup();
+                $scope.autoBackupNeeded = false;
+            }
+        }
+        $timeout(handleAutoBackup, 60 * 1000);
+
         function watchSubtitleAttributes(newValue, oldValue) {
             if(newValue != oldValue) {
                 $scope.$root.$emit('work-done');
@@ -485,6 +536,7 @@ var angular = angular || null;
         $scope.$watch('workingSubtitles.description', watchSubtitleAttributes);
         $scope.$watch('workingSubtitles.metadata', watchSubtitleAttributes,
                 true);
+
     });
 
 }).call(this);

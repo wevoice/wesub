@@ -42,14 +42,12 @@ class DataHelpers(object):
         s = requests.session()
         s.config['keep_alive'] = False
         url = self.api_url(url_part)
-        self.logger.info(url)
         headers = { 'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'X-apikey': api_user.get_api_key(),
                     'X-api-username': api_user.username,
                   }
         r = getattr(s, request_type)(url, headers=headers, data=simplejson.dumps(kwargs))
-        self.logger.info('RESP: %s - %s' %(r.status_code, r.content))
         return r
 
     def create_video(self, **kwargs):
@@ -72,14 +70,12 @@ class DataHelpers(object):
                     'complete': 1
                     }
         defaults.update(kwargs)
-        self.logger.info(defaults)
         c = Client()
         try:
             c.login(username=user.username, password='password')
         except:
             c.login(**self.super_user())
         response = c.post(reverse('videos:upload_subtitles'), defaults)
-        self.logger.info('UPLOAD RESPONSE %s' % response)
 
     def add_subs(self, **kwargs):
         defaults = {

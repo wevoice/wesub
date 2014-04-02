@@ -2129,33 +2129,19 @@ class Task(models.Model):
         """Return a URL for whatever dialog is used to perform this task."""
         return reverse('teams:perform_task', args=(self.team.slug, self.id))
 
-    def get_widget_url(self):
-
-        mode = Task.TYPE_NAMES[self.type].lower()
-
-        if self.get_subtitle_version():
-            sl = self.get_subtitle_version().subtitle_language
-            base_url = shims.get_widget_url(sl, mode=mode, task_id=self.pk)
+    def tasks_page_perform_link_text(self):
+        """Get the link text for perform link on the tasks page."""
+        if self.assignee:
+            return _('Resume')
         else:
-            video = self.team_video.video
+            return _('Start now')
 
-            if self.language:
-                sl = video.subtitle_language(language_code=self.language)
-
-                if sl:
-                    base_url = reverse("videos:translation_history", kwargs={
-                        "video_id": video.video_id,
-                        "lang": sl.language_code,
-                        "lang_id": sl.pk,
+    def get_widget_url(self):
+        """Get the URL to edit the video for this task.  """
+        return reverse("subtitles:subtitle-editor", kwargs={
+                        "video_id": self.team_video.video.video_id,
+                        "language_code": self.language
                     })
-                else:
-                    # The subtitleLanguage may not exist (yet).
-                    base_url = video.get_absolute_url()
-            else:
-                # Subtitle tasks might not have a language.
-                base_url = video.get_absolute_url()
-
-        return base_url + "?t=%s" % self.pk
 
     def needs_start_dialog(self):
         """Check if this task needs the start dialog.
@@ -2164,14 +2150,11 @@ class Task(models.Model):
         transcribe/translate task.  We don't need it for review/approval, or
         if the task is being resumed.
         """
-        # We use the start dialog for select several things:
+        # We use the start dialog for select two things:
         #   - primary audio language
         #   - language of the subtitles
-        #   - language to translate from
-        # If we have a SubtitleVersion to use, then we have all the info we
-        # need and can skip the dialog.
-        return (self.new_review_base_version is None and
-                self.get_subtitle_version() is None)
+        return (self.language == '' or
+                self.team_video.video.primary_audio_language_code == '')
 
     def get_reviewer(self):
         """For Approve tasks, return the last user to Review these subtitles.

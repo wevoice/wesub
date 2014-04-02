@@ -250,6 +250,7 @@ var angular = angular || null;
             that.subtitles.push(that.makeItem(node));
             that.syncedCount++;
         });
+        this.emitChange('reload', null);
     }
 
     SubtitleList.prototype.addChangeCallback = function(callback) {
@@ -641,7 +642,7 @@ var angular = angular || null;
             this.description = '';
             this.subtitleList.loadXML(null);
             this.state = 'loaded';
-            this.initMetadataFromVideo()
+            this.initMetadataFromVideo();
             if(baseLanguage) {
                 this.addSubtitlesFromBaseLanguage(baseLanguage);
             }
@@ -667,8 +668,23 @@ var angular = angular || null;
             return this.title || this.video.title;
         },
         getDescription: function() {
-            return this.description || this.video.description;
+            if(this.language.isPrimaryAudioLanguage) {
+                return this.description || this.video.description;
+            } else {
+                return this.description;
+            }
         },
+        getMetadata: function() {
+            var metadata = _.clone(this.metadata);
+            if(this.language.isPrimaryAudioLanguage) {
+                for(key in metadata) {
+                    if(!metadata[key]) {
+                        metadata[key] = this.video.metadata[key];
+                    }
+                }
+            }
+            return metadata;
+        }
     };
 
     /* Export modal classes as values.  This makes testing and dependency

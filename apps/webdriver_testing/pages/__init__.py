@@ -101,14 +101,18 @@ class Page(object):
         if el.is_selected():
             el.click()
 
+    def select_option_by_value(self, element, text):
+        """Select an option based on text of the css selector.
+
+        """
+        select = Select(self._safe_find(element))
+        select.select_by_value(text)
+
     def select_option_by_text(self, element, text):
         """Select an option based on text of the css selector.
 
         """
         select = Select(self._safe_find(element))
-        #els = self.browser.find_elements_by_css_selector('option')
-        #for el in els:
-        #    self.logger.info(el.text)
         select.select_by_visible_text(text)
 
     def hover_by_css(self, page_element):

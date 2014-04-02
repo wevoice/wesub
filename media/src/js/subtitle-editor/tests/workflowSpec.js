@@ -94,11 +94,13 @@ describe('The Workflow class', function() {
         expect(workflow.stageDone('sync')).toBeTruthy();
     });
 
-    it('starts in the sync stage if we already have subs',
+    it('starts in the review stage if we already have subs',
             inject(function(Workflow) {
-        subtitleList.insertSubtitleBefore(null);
+        var sub = subtitleList.insertSubtitleBefore(null);
+        subtitleList.updateSubtitleContent(sub, 'sub text');
+        subtitleList.updateSubtitleTime(sub, 100, 200);
         workflow = makeWorkflow(Workflow, subtitleList);
-        expect(workflow.stage).toBe('sync');
+        expect(workflow.stage).toBe('review');
     }));
 });
 
@@ -118,6 +120,12 @@ describe('WorkflowProgressionController', function() {
         $scope.translating = function() { return false; }
         $scope.timelineShown = false;
         $scope.toggleTimelineShown = jasmine.createSpy();
+        $scope.currentEdit = {
+            'start': jasmine.createSpy()
+        };
+        $scope.dialogManager = {
+            'showFreezeBox': jasmine.createSpy()
+        };
         subtitleList.loadXML(null);
         $scope.workingSubtitles = { subtitleList: subtitleList };
         $scope.workflow = makeWorkflow(Workflow, subtitleList);
@@ -127,35 +135,16 @@ describe('WorkflowProgressionController', function() {
         });
     }));
 
-    describe('The endorse() method', function() {
-        it('normally marks the work complete and saves', function() {
-            expect($scope.$emit).not.toHaveBeenCalled();
-            $scope.endorse();
-            // should send the false paramater to not allow resuming after an
-            // endoresment
-            expect($scope.$emit).toHaveBeenCalledWith('save', {
-                'markComplete': true,
-                'allowResume': false
-            });
-        });
-
-        it('approves a task if we have one', inject(function(EditorData) {
-            EditorData.task_id = 123
-
-            expect($scope.$emit).not.toHaveBeenCalled();
-            $scope.endorse();
-            expect($scope.$emit).toHaveBeenCalledWith('approve-task');
-        }));
-    });
-
     describe('The click handling', function() {
         it('changes the workflow stage', function() {
             var evt = {
                 preventDefault: jasmine.createSpy(),
+                stopPropagation: jasmine.createSpy(),
             };
             $scope.onNextClicked(evt);
             expect($scope.workflow.stage).toBe('sync')
             expect(evt.preventDefault).toHaveBeenCalled();
+            expect(evt.stopPropagation).toHaveBeenCalled();
             insertSyncedAndCompletedSubtitle(subtitleList);
             $scope.onNextClicked(evt);
             expect($scope.workflow.stage).toBe('review')

@@ -28,7 +28,10 @@ describe('Test the subtitle-repeat directive', function() {
             subtitles.push(sub);
         }
         $rootScope.timeline = { shownSubtitle: null };
-        $rootScope.currentEdit = { draft: null };
+        $rootScope.currentEdit = {
+            draft: null,
+            isForSubtitle: jasmine.createSpy().andReturn(false)
+        };
 
         scope = $rootScope.$new();
         scope.subtitleList = subtitleList;

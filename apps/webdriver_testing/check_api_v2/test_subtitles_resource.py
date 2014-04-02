@@ -10,7 +10,7 @@ from webdriver_testing.data_factories import TeamMemberFactory
 from webdriver_testing.data_factories import TeamVideoFactory
 from webdriver_testing.data_factories import WorkflowFactory
 from webdriver_testing.data_factories import TaskFactory
-from webdriver_testing.pages.editor_pages import subtitle_editor 
+from webdriver_testing.pages.site_pages import editor_page
 from webdriver_testing.pages.site_pages.teams import tasks_tab
 
 class TestCaseSubtitlesUpload(WebdriverTestCase):
@@ -32,7 +32,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
             'webdriver_testing', 'subtitle_data')
 
         cls.video_pg = video_page.VideoPage(cls)
-
+        cls.editor_pg = editor_page.EditorPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
         cls.video_language_pg.set_skiphowto()
 
@@ -287,19 +287,21 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         self.video_language_pg.open_video_lang_page(
             self.test_video.video_id, 'en')
         self.video_language_pg.edit_subtitles()
-        sub_editor = subtitle_editor.SubtitleEditor(self)
-        editor_sub_list = sub_editor.subtitles_list()
+
+
+        editor_sub_list = self.editor_pg.working_text() 
 
         #Verify uploaded subs are displayed and editable
         self.assertLess(0, len(editor_sub_list))
-        typed_subs = sub_editor.edit_subs()
-        sub_editor.save_and_exit()
+        typed_line = "I'd like to be"
+        self.editor_pg.edit_sub_line(typed_line, 1) 
+        self.editor_pg.save('Exit') 
         self.video_language_pg.open_video_lang_page(
             self.test_video.video_id, 'en')
         displayed_list = self.video_language_pg.displayed_lines()
 
         #Verify the edited text is in the sub list
-        self.assertIn("I'd like to be", displayed_list[0])
+        self.assertIn(typed_line, displayed_list[0])
 
         #Verify the origal unedited text is still present in the sub list.
         self.assertEqual(expected_list[-1], displayed_list[-1])

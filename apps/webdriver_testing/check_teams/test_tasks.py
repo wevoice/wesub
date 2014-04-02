@@ -15,13 +15,12 @@ from webdriver_testing.data_factories import UserLangFactory
 from webdriver_testing.data_factories import UserFactory
 from webdriver_testing.data_factories import VideoFactory
 from webdriver_testing.data_factories import WorkflowFactory
-from webdriver_testing.pages.editor_pages import unisubs_menu
-from webdriver_testing.pages.editor_pages import dialogs
 from webdriver_testing.pages.editor_pages import subtitle_editor
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages import video_page
 from webdriver_testing.pages.site_pages import video_language_page
 from webdriver_testing.pages.site_pages import editor_page
+from webdriver_testing.pages.site_pages import site_modals
 
 
 class TestCaseManualTasks(WebdriverTestCase):    
@@ -33,9 +32,7 @@ class TestCaseManualTasks(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.tasks_tab = TasksTab(cls)
         cls.videos_tab = VideosTab(cls)
-        cls.menu = unisubs_menu.UnisubsMenu(cls)
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
-
+        cls.editor_pg = editor_page.EditorPage(cls)
         #Create a partner user to own the team.
         cls.user = UserFactory.create(is_partner = True)
 
@@ -83,8 +80,126 @@ class TestCaseManualTasks(WebdriverTestCase):
 
         self.videos_tab.open_video_tasks(self.test_video.title)
         self.tasks_tab.add_task(task_type = 'Transcribe')
-#        self.assertTrue(self.tasks_tab.task_present('Transcribe Subtitles', 
-#                        self.test_video.title))
+
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.assertTrue(self.tasks_tab.task_present('Transcribe Subtitles', 
+                        self.test_video.title))
+
+
+
+
+
+class TestCaseAutoTranscriptionTasks(WebdriverTestCase):    
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseAutoTranscriptionTasks, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.tasks_tab = TasksTab(cls)
+        cls.videos_tab = VideosTab(cls)
+        cls.modal = site_modals.SiteModals(cls)
+        cls.video_pg = video_page.VideoPage(cls)
+        cls.editor_pg = editor_page.EditorPage(cls)
+        #Create a partner user to own the team.
+        cls.owner = UserFactory.create(is_partner=True)
+
+        #CREATE AN OPEN TEAM WITH WORKFLOWS and AUTOTASKS
+        cls.team = TeamMemberFactory.create(
+            team__workflow_enabled = True,
+            user = cls.owner,
+            ).team
+
+        WorkflowFactory.create(
+            team = cls.team,
+            autocreate_subtitle = True,
+            autocreate_translate = True)
+        lang_list = ['en', 'ru', 'pt-br', 'fr', 'de', 'es']
+        for language in lang_list:
+            TeamLangPrefFactory.create(
+                team = cls.team,
+                language_code = language,
+                preferred = True)
+        #Create a member of the team
+        cls.contributor = TeamMemberFactory.create(role="ROLE_CONTRIBUTOR",
+                team = cls.team,
+                user = UserFactory.create()
+                ).user
+        cls.manager = TeamMemberFactory(role="ROLE_MANAGER",
+                team = cls.team,
+                user = UserFactory.create()
+                ).user
+
+        user_langs = ['en', 'ru', 'pt-br']
+        for lang in user_langs:
+            UserLangFactory(user=cls.contributor, language=lang)
+        cls.subs_file = os.path.join(os.path.dirname(os.path.abspath(__file__)
+                                     ), 'oneline.txt')
+        cls.tasks_tab.open_team_page(cls.team.slug)
+
+    def tearDown(self):
+        self.tasks_tab.open_team_page(self.team.slug)
+        self.tasks_tab.handle_js_alert('accept')
+
+
+    def test_transcription_perform(self):
+        """Starting a Transcription task opens the subtitling dialog."""
+        tv = self.data_utils.create_video()
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+        self.tasks_tab.log_in(self.contributor, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_task('Transcribe Subtitles', tv.title)
+        self.modal.add_language('English', 'English')
+        self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
+        self.assertEqual('English', self.editor_pg.selected_ref_language())
+
+
+    def test_transcription_save(self):
+        """Incomplete transcription task exists, is assigned to the same user.
+
+        """
+        tv = self.data_utils.create_video()
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+        self.tasks_tab.log_in(self.contributor, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_task('Transcribe Subtitles', tv.title)
+
+        self.modal.add_language('English', 'English')
+        self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
+        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.editor_pg.add_subs_to_the_end()
+        self.editor_pg.save('Exit')
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&/' 
+                                 % self.team.slug)
+        task = self.tasks_tab.task_present('Transcribe English Subtitles',
+                                           tv.title)
+        self.assertEqual(task['assignee'], 'Assigned to me')
+
+
+    def test_transcription_resume(self):
+        """Saved transcription task can be resumed. """
+        tv = self.data_utils.create_video()
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+        self.tasks_tab.log_in(self.contributor, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_task('Transcribe Subtitles', tv.title)
+        self.modal.add_language('English', 'English')
+        self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
+        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.editor_pg.add_subs_to_the_end()
+        self.editor_pg.save('Exit')
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me'
+                                 % self.team.slug)
+        self.tasks_tab.perform_task('Transcribe English Subtitles', 
+                                             tv.title)
+        self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
+        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.video_pg.open_video_page(tv.video_id)
+        self.tasks_tab.handle_js_alert(action='accept')
+        en_tag, _ = self.video_pg.language_status('English')
+        self.assertEqual('original | incomplete', en_tag) 
+
+
 
 class TestCaseAutomaticTasks(WebdriverTestCase):    
     NEW_BROWSER_PER_TEST_CASE = False
@@ -95,15 +210,11 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.tasks_tab = TasksTab(cls)
         cls.videos_tab = VideosTab(cls)
-        cls.menu = unisubs_menu.UnisubsMenu(cls)
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
-        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
+        cls.modal = site_modals.SiteModals(cls)
         cls.video_pg = video_page.VideoPage(cls)
-
-
+        cls.editor_pg = editor_page.EditorPage(cls)
         #Create a partner user to own the team.
         cls.owner = UserFactory.create(is_partner=True)
-        
 
         #CREATE AN OPEN TEAM WITH WORKFLOWS and AUTOTASKS
         cls.team = TeamMemberFactory.create(
@@ -149,18 +260,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.tasks_tab.handle_js_alert('accept')
 
 
-    def test_transcription_perform(self):
-        """Starting a Transcription task opens the subtitling dialog."""
-        tv = self.data_utils.create_video()
-        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
-        self.tasks_tab.log_in(self.contributor, 'password')
-        self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Transcribe Subtitles', tv.title)
-        self.create_modal.lang_selection(video_language='English')
-        self.assertEqual('Typing', self.sub_editor.dialog_title())
-
-
-
     def test_task_search_speaker_metadata(self):
         tv = self.data_utils.create_video()
         #Update the video title and description (via api)
@@ -180,7 +279,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         #Open team tasks page and search for metadata.
         self.tasks_tab.log_in(self.contributor, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-
         self.tasks_tab.search('Ronaldo')
         self.assertTrue(self.tasks_tab.task_present('Transcribe Subtitles', tv.title))
 
@@ -208,44 +306,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.assertTrue(self.tasks_tab.task_present('Transcribe Subtitles', tv.title))
 
 
-    def test_transcription_save(self):
-        """Incomplete transcription task exists, is assigned to the same user.
-
-        """
-        tv = self.data_utils.create_video()
-        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
-        self.tasks_tab.log_in(self.contributor, 'password')
-        self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Transcribe Subtitles', tv.title)
-        self.create_modal.lang_selection(video_language='English')
-        self.sub_editor.type_subs(self.subs_file)
-        self.sub_editor.save_and_exit()
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&/' 
-                                 % self.team.slug)
-        task = self.tasks_tab.task_present('Transcribe English Subtitles',
-                                           tv.title)
-        self.assertEqual(task['assignee'], 'Assigned to me')
-
-
-    def test_transcription_resume(self):
-        """Saved transcription task can be resumed. """
-        tv = self.data_utils.create_video()
-        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
-        self.tasks_tab.log_in(self.contributor, 'password')
-        self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Transcribe Subtitles', tv.title)
-        self.create_modal.lang_selection(video_language='English')
-        self.sub_editor.type_subs(self.subs_file)
-        self.sub_editor.save_and_exit()
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me'
-                                 % self.team.slug)
-        self.tasks_tab.perform_assigned_task('Transcribe English Subtitles', 
-                                             tv.title)
-        self.assertEqual('Typing', self.sub_editor.dialog_title())
-        self.video_pg.open_video_page(tv.video_id)
-        self.tasks_tab.handle_js_alert(action='accept')
-        en_tag, _ = self.video_pg.language_status('English')
-        self.assertEqual('original | incomplete', en_tag) 
 
     def test_transcription_permissions(self):
         """User must have permission to start a transcription task. 
@@ -281,18 +341,12 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
 
-        self.tasks_tab.perform_assigned_task('Transcribe English Subtitles', tv.title)
-        sub_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
-                                'oneline.txt')
-        self.sub_editor.edit_subs(sub_file)
-        self.sub_editor.continue_to_next_step() #to syncing
-        self.sub_editor.continue_to_next_step() #to description
-        self.sub_editor.continue_to_next_step() #to review
-        self.sub_editor.submit(complete=True)
+        self.tasks_tab.perform_task('Transcribe English Subtitles', tv.title)
+        self.editor_pg.start_next_step()
+        self.editor_pg.endorse_subs()
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
-
         self.assertTrue(self.tasks_tab.task_present(
                         'Translate Subtitles into Russian', tv.title))
 
@@ -306,13 +360,9 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.tasks_tab.log_in(self.contributor, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=ru'
                                  % self.team.slug)
-        #self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Translate Subtitles into ' 
+        self.tasks_tab.perform_task('Translate Subtitles into ' 
                                                'Russian', tv.title)
-        self.create_modal.lang_selection()
-        self.assertEqual('Adding a New Translation', 
-                         self.sub_editor.dialog_title())
-
+        self.assertEqual(u'Editing Russian\u2026', self.editor_pg.working_language())
 
     def test_translation_save(self):
         """Incomplete translation task exists, is assigned to the same user.
@@ -326,11 +376,9 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.tasks_tab.log_in(self.contributor, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=ru' 
                                  % self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Translate Subtitles into ' 
+        self.tasks_tab.perform_task('Translate Subtitles into ' 
                                                'Russian', tv.title)
-        self.create_modal.lang_selection()
-        self.sub_editor.type_translation()
-        self.sub_editor.save_translation()
+        self.editor_pg.start_next_step()
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=ru' 
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Translate Subtitles into '
@@ -437,9 +485,8 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         cls.videos_tab = VideosTab(cls)
         cls.video_pg = video_page.VideoPage(cls)
 
-        cls.menu = unisubs_menu.UnisubsMenu(cls)
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
-        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
+        cls.modal = site_modals.SiteModals(cls)
+        cls.editor_pg = editor_page.EditorPage(cls)
         cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
 
         #Create a partner user to own the team.
@@ -538,12 +585,10 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.data_utils.upload_subs(self.contributor, **data)
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Review Original English ' 
+        self.tasks_tab.perform_task('Review Original English ' 
                                                'Subtitles', video.title)
-        self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.complete_review(result='Accept')
-        self.sub_editor.mark_subs_complete()
-        self.sub_editor.click_saved_ok()
+        self.editor_pg.approve_task()
+        self.tasks_tab.open_tasks_tab(self.team.slug)
         self.assertTrue(self.tasks_tab.task_present(
                         'Approve Original English Subtitles', video.title))
         task = list(tv.task_set.all_approve().all())[0]
@@ -611,11 +656,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.data_utils.upload_subs(self.contributor, **data)
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Review Original English ' 
+        self.tasks_tab.perform_task('Review Original English ' 
                                                'Subtitles', video.title)
-        self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.complete_review(result='Send Back')
-        self.sub_editor.click_saved_ok()
+        self.editor_pg.send_back_task()
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Transcribe English Subtitles',
@@ -664,12 +707,10 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.complete_review_task(tv, 20)
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Approve Original English ' 
-                                               'Subtitles', video.title)
-        self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.complete_approve(result='Approve')
-        self.sub_editor.mark_subs_complete()
-        self.sub_editor.click_saved_ok()
+        self.tasks_tab.perform_task('Approve Original English ' 
+                                    'Subtitles', video.title)
+        self.editor_pg.approve_task()
+        self.tasks_tab.open_tasks_tab(self.team.slug)
         self.assertTrue(self.tasks_tab.task_present(
                         'Translate Subtitles into German', video.title))
 
@@ -792,11 +833,11 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.complete_review_task(tv, 20)
         self.tasks_tab.log_in(self.owner, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Approve Original English ' 
+        self.tasks_tab.perform_task('Approve Original English ' 
                                                'Subtitles', video.title)
-        self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.complete_approve(result='Send Back')
-        self.sub_editor.click_saved_ok()
+
+
+        self.editor_pg.send_back_task()
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         t = self.tasks_tab.task_present('Review Original English Subtitles',
@@ -825,18 +866,13 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.complete_review_task(tv, 20)
         self.tasks_tab.log_in(self.owner, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        
-        self.tasks_tab.perform_and_assign_task('Approve Original English ' 
+        self.tasks_tab.perform_task('Approve Original English ' 
                                                'Subtitles', video.title)
-        self.sub_editor.continue_to_next_step() #to subtitle info 
         mail.outbox = []
-
-        self.sub_editor.complete_approve(result='Send Back')
-        self.sub_editor.click_saved_ok()
+        self.editor_pg.send_back_task()
         self.logger.info(mail.outbox)
         email_to = mail.outbox[-1].to     
         msg = str(mail.outbox[-1].message())
-
         self.assertIn(self.manager.email, email_to)
         self.assertIn(self.rejected_text, msg)
 
@@ -861,11 +897,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.complete_review_task(tv, 20)
         self.tasks_tab.log_in(self.owner, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Approve Original English ' 
+        self.tasks_tab.perform_task('Approve Original English ' 
                                                'Subtitles', video.title)
-        self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.complete_approve(result='Send Back')
-        self.sub_editor.click_saved_ok()
+        self.editor_pg.send_back_task()
         email_to = mail.outbox[-1].to     
         msg = str(mail.outbox[-1].message())
         self.logger.info("MESSAGE: %s" % msg)
@@ -1064,61 +1098,40 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.assertFalse(self.tasks_tab.task_present(
                 'Approve Swedish Subtitles', video.title))
 
-    def test_draft_guest_translate(self):
-        """Translate policy: members, guest has no new translation in menu."""
-
-        """Guest can not translate published subtitles."""
-        video = self.data_utils.create_video()
-        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
-                         video=video)
-        data = {'language_code': 'en',
-                'video': video.pk,
-                'primary_audio_language_code': 'en',
-                'draft': open('apps/webdriver_testing/subtitle_data/'
-                              'Timed_text.en.srt'),
-                'is_complete': True,
-                'complete': 1
-               }
-
-        self.data_utils.upload_subs(self.contributor, **data)
-        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
-        self.assertFalse(self.video_lang_pg.displays_add_subtitles())
-
     def test_transcription_resume_original_lang(self):
         """Resuming task does not reset originl language. """
         tv = self.data_utils.create_video()
         TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
         self.tasks_tab.log_in(self.contributor, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Transcribe Subtitles', tv.title)
-        self.create_modal.lang_selection(video_language='English')
-        self.sub_editor.type_subs(self.subs_file)
-        self.sub_editor.save_and_exit()
+        self.tasks_tab.perform_task('Transcribe Subtitles', tv.title)
+        self.modal.add_language('English', 'English')
+        self.editor_pg.add_subs_to_the_end()
+        self.editor_pg.save('Exit')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me'
                                  % self.team.slug)
-        self.tasks_tab.perform_assigned_task('Transcribe English Subtitles', 
+        self.tasks_tab.perform_task('Transcribe English Subtitles', 
                                              tv.title)
-        self.assertEqual('Typing', self.sub_editor.dialog_title())
+        self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
+        self.assertEqual('English', self.editor_pg.selected_ref_language())
         self.video_pg.open_video_page(tv.video_id)
         self.tasks_tab.handle_js_alert(action='accept')
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original | incomplete', en_tag) 
 
 
-
-class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase): 
-    """Automatic task tests the require actions from the New editor."""
+class TestCaseAutomaticTasksLegacyEditor(WebdriverTestCase): 
+    """Automatic task tests the require actions from the Legacy editor."""
    
     NEW_BROWSER_PER_TEST_CASE = False
 
     @classmethod
     def setUpClass(cls):
-        super(TestCaseAutomaticTasksBetaEditor, cls).setUpClass()
+        super(TestCaseAutomaticTasksLegacyEditor, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
         cls.tasks_tab = TasksTab(cls)
         cls.videos_tab = VideosTab(cls)
-        cls.menu = unisubs_menu.UnisubsMenu(cls)
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
+        cls.modal = site_modals.SiteModals(cls)
         cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
         cls.video_pg = video_page.VideoPage(cls)
         cls.editor_pg = editor_page.EditorPage(cls)
@@ -1164,24 +1177,21 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
     def setUp(self):
         self.tasks_tab.open_page('teams/%s' % self.team.slug, True)
 
-
-    def test_transcription_save(self):
-        """Beta editor save, incomplete task exists, assigned to same user.
+    def test_legacy_subtitles_save(self):
+        """Legacy subtitles save, incomplete task exists, assigned to same user.
 
         """
         tv = self.data_utils.create_video()
-        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+        TeamVideoFactory.create(team=self.team, added_by=self.owner, video=tv)
         self.tasks_tab.log_in(self.contributor, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Transcribe Subtitles',
+        self.tasks_tab.perform_task('Transcribe Subtitles',
                                                tv.title)
-        self.create_modal.lang_selection(video_language='English')
-        self.sub_editor.open_in_beta_editor(mark_complete=False)
-        subs = ['line 1', 'line 2', 'THE END']
-        self.editor_pg.edit_sub_line(subs, 0)
+        self.modal.add_language('English', 'English')
+        self.editor_pg.legacy_editor()
 
-
-        self.editor_pg.save('Exit')
+        self.sub_editor.type_subs()
+        self.sub_editor.save_and_exit()
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me' 
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Transcribe English Subtitles',
@@ -1190,10 +1200,10 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
 
 
 
-    def test_transcription_complete(self):
-        """Beta editor, complete taks, preferred translation tasks created. """
+    def test_legacy_subtitles_complete(self):
+        """Legacy editor, complete subtitle task, preferred translation tasks created. """
         tv = self.data_utils.create_video()
-        t = TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+        TeamVideoFactory.create(team=self.team, added_by=self.owner, video=tv)
         data = {'language_code': 'en',
                 'video': tv.pk,
                 'primary_audio_language_code': 'en',
@@ -1207,77 +1217,35 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
 
-        self.tasks_tab.perform_assigned_task('Transcribe English Subtitles',
+        self.tasks_tab.perform_task('Transcribe English Subtitles',
                                              tv.title)
         sub_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
                                 'oneline.txt')
+        self.editor_pg.legacy_editor()
         self.sub_editor.edit_subs(sub_file)
-        self.sub_editor.open_in_beta_editor()
-        self.editor_pg.edit_sub_line('TEST EDITED TEXT', 1)
-        self.assertEqual('Start reviewing', self.editor_pg.next_step())
-        self.editor_pg.start_next_step()
-        self.editor_pg.start_next_step()
-        self.editor_pg.endorse_subs()
+        self.sub_editor.continue_to_next_step() #to syncing
+        self.sub_editor.continue_to_next_step() #to description
+        self.sub_editor.continue_to_next_step() #to review
+        self.sub_editor.submit(complete=True) 
+
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         self.assertTrue(self.tasks_tab.task_present(
                         'Translate Subtitles into Russian', tv.title))
 
-
-    def test_translation_save(self):
-        """Beta editor, save incomplete translation task.
-
-        Verify the task is assigned to the same user.
-
-        """
-        tv = self.data_utils.create_video()
-        self.data_utils.add_subs(video=tv)
-        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
-        self.tasks_tab.log_in(self.contributor, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=ru'
-                                 % self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Translate Subtitles into ' 
-                                               'Russian', tv.title)
-        self.create_modal.lang_selection(video_language='English')
-        self.sub_editor.type_translation()
-        self.sub_editor.open_in_beta_editor(mark_complete=False)
-        self.editor_pg.edit_sub_line('TEST EDITED TEXT', 1, enter=False)
-        self.editor_pg.save('Exit')
-
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=ru'
-                                 % self.team.slug)
-        task = self.tasks_tab.task_present('Translate Subtitles into '
-                                           'Russian', tv.title)
-        self.assertEqual(task['assignee'], 'Assigned to me')
-
-
-    def test_translation_permission(self):
-        """Open Beta editor, user must have permission to start a task. 
-        """
-        self.team.translate_policy = 30
-        self.team.save()
-        tv = self.data_utils.create_video()
-        self.data_utils.add_subs(video=tv)
-        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
-        self.tasks_tab.log_in(self.contributor, 'password')
-        self.editor_pg.open_editor_page(tv.video_id, 'ru')
-        self.assertIn('Another user is currently performing', 
-                      self.video_pg.get_message())
-
-
-class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):    
+class TestCaseModeratedTasksLegacyEditor(WebdriverTestCase):    
     NEW_BROWSER_PER_TEST_CASE = False
 
     @classmethod
     def setUpClass(cls):
-        super(TestCaseModeratedTasksBetaEditor, cls).setUpClass()
+        super(TestCaseModeratedTasksLegacyEditor, cls).setUpClass()
+        management.call_command('flush', interactive=False) 
         cls.data_utils = data_helpers.DataHelpers()
         cls.tasks_tab = TasksTab(cls)
         cls.videos_tab = VideosTab(cls)
         cls.video_pg = video_page.VideoPage(cls)
 
-        cls.menu = unisubs_menu.UnisubsMenu(cls)
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
+        cls.modal = site_modals.SiteModals(cls)
         cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
         cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
         cls.editor_pg = editor_page.EditorPage(cls)
@@ -1335,7 +1303,7 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
 
 
     def test_review_accept_creates_approve_task(self):
-        """Beta editor approve task is created when transcription accepted.
+        """Legacy editor approve task is created when transcription accepted.
 
         """
         video = self.data_utils.create_video()
@@ -1353,45 +1321,21 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.data_utils.upload_subs(self.contributor, **data)
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Review Original English ' 
+        self.tasks_tab.perform_task('Review Original English ' 
                                                'Subtitles', video.title)
+        self.editor_pg.legacy_editor()
         self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.open_in_beta_editor()
-        self.editor_pg.approve_task()
+        self.sub_editor.complete_review(result='Accept')
+        self.sub_editor.mark_subs_complete()
+        self.sub_editor.click_saved_ok()
+        self.video_pg.open_video_page(video.video_id)
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original | needs approval', en_tag) 
-        self.tasks_tab.open_tasks_tab(self.team.slug)
-
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
+                                  % self.team.slug)
         self.assertTrue(self.tasks_tab.task_present(
                         'Approve Original English Subtitles', video.title))
         task = list(tv.task_set.all_approve().all())[0]
-
-    def test_review_notes_are_saved(self):
-        """Notes added are saved. 
-
-        """
-        video = self.data_utils.create_video()
-        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
-                         video=video)
-        data = {'language_code': 'en',
-                'video': video.pk,
-                'primary_audio_language_code': 'en',
-                'draft': open('apps/webdriver_testing/subtitle_data/'
-                              'Timed_text.en.srt'),
-                'is_complete': True,
-                'complete': 1
-               }
-
-        self.data_utils.upload_subs(self.manager, **data)
-        self.tasks_tab.log_in(self.contributor, 'password')
-        self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.open_page('/subtitles/editor/%s/en/' % video.video_id)
-        note_text = 'This is a note'
-        self.editor_pg.add_note(note_text)
-        self.editor_pg.save('Exit')
-        task = list(tv.task_set.all_review().all())[0]
-        self.logger.info(dir(task))
-        self.assertEqual(note_text, task.body)
 
 
     def test_review_accept_email(self):
@@ -1414,22 +1358,21 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.tasks_tab.log_in(self.manager, 'password')
         mail.outbox = []
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Review Original English ' 
+        self.tasks_tab.perform_task('Review Original English ' 
                                                'Subtitles', video.title)
+        self.editor_pg.legacy_editor()
         self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.open_in_beta_editor()
-        self.editor_pg.approve_task()
+        self.sub_editor.complete_review(result='Accept')
+        self.sub_editor.mark_subs_complete()
+        self.sub_editor.click_saved_ok()
         self.logger.info(mail.outbox)
         email_to = mail.outbox[-1].to     
         msg = str(mail.outbox[-1].message())
-
         self.assertIn(self.contributor.email, email_to)
         self.assertIn(self.accepted_review, msg)
 
-
-
-    def test_review_reject_transcription_reassigned(self):
-        """Beta editor transcription task is reassigned when sent back """
+    def test_reject_transcription_reassigned(self):
+        """Legacy editor transcription task is reassigned when sent back """
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
@@ -1445,11 +1388,13 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.data_utils.upload_subs(self.contributor, **data)
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Review Original English ' 
+        self.tasks_tab.perform_task('Review Original English ' 
                                                'Subtitles', video.title)
+        self.editor_pg.legacy_editor()
+        mail.outbox = []
         self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.open_in_beta_editor()
-        self.editor_pg.send_back_task()
+        self.sub_editor.complete_review(result='Send Back')
+        self.sub_editor.click_saved_ok()
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original | needs editing', en_tag) 
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
@@ -1459,38 +1404,11 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.assertEqual(task['assignee'], 
                          'Assigned to %s' %self.contributor.username)
 
-    def test_review_send_back_email(self):
-        """Beta editor transcription task is reassigned when sent back """
-        video = self.data_utils.create_video()
-        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
-                         video=video)
-        data = {'language_code': 'en',
-                'video': video.pk,
-                'primary_audio_language_code': 'en',
-                'draft': open('apps/webdriver_testing/subtitle_data/'
-                              'Timed_text.en.srt'),
-                'is_complete': True,
-                'complete': 1
-               }
-
-        self.data_utils.upload_subs(self.contributor, **data)
-        self.tasks_tab.log_in(self.manager, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?type=Review'
-                                 % self.team.slug)
-
-        self.tasks_tab.perform_and_assign_task('Review Original English ' 
-                                               'Subtitles', video.title)
-        self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.open_in_beta_editor()
-        mail.outbox = []
-        self.editor_pg.send_back_task()
-        self.logger.info(mail.outbox)
         email_to = mail.outbox[-1].to     
         msg = str(mail.outbox[-1].message())
 
         self.assertIn(self.contributor.email, email_to)
         self.assertIn(self.rejected_text, msg)
-
     
 
 
@@ -1513,16 +1431,17 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.complete_review_task(tv, 20)
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Approve Original English ' 
+        self.tasks_tab.perform_task('Approve Original English ' 
                                                'Subtitles', video.title)
+
+        self.editor_pg.legacy_editor()
         self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.open_in_beta_editor()
-        self.editor_pg.approve_task()
+        self.sub_editor.complete_approve(result='Approve')
+        self.sub_editor.mark_subs_complete()
+        self.sub_editor.click_saved_ok()
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.assertTrue(self.tasks_tab.task_present(
                         'Translate Subtitles into German', video.title))
-
-
 
     def test_approve_reject_reassigns_review(self):
         """Review task reassigned when, approver rejects transcription.
@@ -1543,11 +1462,12 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.complete_review_task(tv, 20)
         self.tasks_tab.log_in(self.owner, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Approve Original English ' 
+        self.tasks_tab.perform_task('Approve Original English ' 
                                                'Subtitles', video.title)
+        self.editor_pg.legacy_editor()
         self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.open_in_beta_editor()
-        self.editor_pg.send_back_task()
+        self.sub_editor.complete_approve(result='Send Back')
+        self.sub_editor.click_saved_ok()
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original | needs review', en_tag) 
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'

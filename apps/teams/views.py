@@ -50,7 +50,8 @@ from teams.forms import (
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
-    make_billing_report_form,
+    make_billing_report_form, TaskCreateSubtitlesForm,
+    TeamMultiVideoCreateSubtitlesForm,
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -1182,6 +1183,14 @@ def dashboard(request, slug):
     except TeamMember.DoesNotExist:
         member = None
 
+    if member:
+        create_subtitles_form = TeamMultiVideoCreateSubtitlesForm(
+            request, team, data=request.POST or None)
+        if create_subtitles_form.is_valid():
+            return create_subtitles_form.handle_post()
+    else:
+        create_subtitles_form = None
+
     if user:
         user_languages = set([ul for ul in user.get_languages()])
         user_filter = {'assignee':str(user.id), 'language': 'all'}
@@ -1193,10 +1202,6 @@ def dashboard(request, slug):
         user_tasks = None
 
     filters = {'assignee': 'none'}
-
-    widget_settings = {}
-    from apps.widget.rpc import add_general_settings
-    add_general_settings(request, widget_settings)
 
     videos = []
 
@@ -1273,7 +1278,7 @@ def dashboard(request, slug):
         'user_tasks': user_tasks,
         'videos': videos,
         'can_add_video': can_add_video(team, request.user),
-        'widget_settings': widget_settings
+        'create_subtitles_form': create_subtitles_form,
     }
 
     return context
@@ -1295,6 +1300,14 @@ def team_tasks(request, slug, project_slug=None):
     languages = get_language_choices_as_dicts()
     filters = _get_task_filters(request)
     filtered = 0
+
+    if member:
+        create_subtitles_form = TeamMultiVideoCreateSubtitlesForm(
+            request, team, data=request.POST or None)
+        if create_subtitles_form.is_valid():
+            return create_subtitles_form.handle_post()
+    else:
+        create_subtitles_form = None
 
     if project_slug != '' and project_slug != None:
         if project_slug == 'any':
@@ -1380,6 +1393,7 @@ def team_tasks(request, slug, project_slug=None):
         'filtered': filtered,
         'member': member,
         'project_choices': team.project_set.exclude(name='_root'),
+        'create_subtitles_form': create_subtitles_form,
     }
 
     context.update(pagination_info)
@@ -1446,10 +1460,25 @@ def perform_task(request, slug=None, task_pk=None):
 
     if task.assignee_id != request.user.id:
         task.assignee = request.user
+        task.set_expiration()
         task.save()
 
-    # ... perform task ...
-    return HttpResponseRedirect(task.get_widget_url())
+    if not task.needs_start_dialog():
+        # ... perform task ...
+        return HttpResponseRedirect(task.get_widget_url())
+    else:
+        # need to set the language first
+        return start_subtitle_task(request, team, task)
+
+@render_to('teams/start-subtitle-task.html')
+def start_subtitle_task(request, team, task):
+    form = TaskCreateSubtitlesForm(request, task, request.POST or None)
+    if form.is_valid():
+        return form.handle_post()
+    return {
+        'team': team,
+        'form': form,
+    }
 
 def _delete_subtitle_version(version):
     sl = version.subtitle_language

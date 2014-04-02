@@ -115,10 +115,7 @@ unisubs.widget.DropDown.prototype.updateSubtitleStats_ = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     this.getDomHelper().removeChildren(this.languageList_);
 
-    goog.dom.setTextContent(
-        this.addTranslationAnchor_,
-        this.subtitleCount_ === 0 ?
-            'Add New Subtitles' : 'Add New Translation');
+    goog.dom.setTextContent(this.addTranslationAnchor_, 'Add New Subtitles');
 
     goog.dom.setTextContent(
         this.subCountSpan_, '(' + this.subtitleCount_ + ' lines)');
@@ -367,6 +364,7 @@ unisubs.widget.DropDown.prototype.onDocClick_ = function(e) {
 
 unisubs.widget.DropDown.prototype.menuItemClicked_ = function(type, e) {
     e.preventDefault();
+    e.stopPropagation();
 
     var s = unisubs.widget.DropDown.Selection;
     if (type == s.CREATE_ACCOUNT)

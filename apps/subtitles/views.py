@@ -34,6 +34,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from django.shortcuts import render_to_response, get_object_or_404, redirect
@@ -130,6 +131,7 @@ def assign_task_for_editor(video, language_code, user):
         task = tasks[0]
         if task.assignee is None and can_assign_task(task, user):
             task.assignee = user
+            task.set_expiration()
             task.save()
 
         if task.assignee != user:
@@ -195,7 +197,14 @@ def subtitle_editor(request, video_id, language_code):
     '''
     # FIXME: permissions
     video = get_object_or_404(Video, video_id=video_id)
-    base_language = request.GET.get('base-language')
+
+    if (video.primary_audio_language_code and 
+        SubtitleVersion.objects.extant().filter(
+            video=video, language_code=video.primary_audio_language_code)
+        .exists()):
+        base_language = video.primary_audio_language_code
+    else:
+        base_language = None
 
     try:
         editing_language = video.newsubtitlelanguage_set.get(language_code=language_code)
@@ -232,6 +241,7 @@ def subtitle_editor(request, video_id, language_code):
     for v in video.get_video_urls():
         video_urls.append(v.url)
 
+
     editor_data = {
         'canSync': bool(request.GET.get('canSync', True)),
         'canAddAndRemove': bool(request.GET.get('canAddAndRemove', True)),
@@ -259,7 +269,10 @@ def subtitle_editor(request, video_id, language_code):
                                      translated_from_version, base_language)
                       for lang in languages],
         'languageCode': request.LANGUAGE_CODE,
-        'oldEditorURL': editing_language.get_widget_url(),
+        'oldEditorURL': reverse('subtitles:old-editor', kwargs={
+            'video_id': video.video_id,
+            'language_code': editing_language.language_code,
+        }),
         'staticURL': settings.STATIC_URL,
     }
 
@@ -268,9 +281,15 @@ def subtitle_editor(request, video_id, language_code):
         editor_data['savedNotes'] = task.body
         editor_data['task_needs_pane'] = task.get_type_display() in ('Review', 'Approve')
         editor_data['team_slug'] = task.team.slug
+        editor_data['oldEditorURL'] += '?' + urlencode({
+            'mode': Task.TYPE_NAMES[task.type].lower(),
+            'task_id': task.id,
+        })
+
     team_attributes = get_team_attributes_for_editor(video)
     if team_attributes:
         editor_data['teamAttributes'] = team_attributes
+
     return render_to_response("subtitles/subtitle-editor.html", {
         'video': video,
         'DEBUG': settings.DEBUG,
