@@ -367,10 +367,10 @@ var Site = function(Site) {
         video_input.val(video_id);
         if(primary_audio_lang_code) {
             primary_audio_lang_select.val(primary_audio_lang_code);
-            primary_audio_lang_select.attr('disabled', true);
+            primary_audio_lang_select.attr('readonly', true);
         } else {
             primary_audio_lang_select.val('');
-            primary_audio_lang_select.attr('disabled', false);
+            primary_audio_lang_select.attr('readonly', false);
 
         }
         $('option', language_select).attr('disabled', false);
