@@ -26,7 +26,7 @@ from videos.models import Video
 from teams.models import Task
 from subtitles import shims
 from subtitles.models import SubtitleLanguage, SubtitleVersion
-from subtitles.templatetags.new_subtitles_tags import visibility_display
+from subtitles.templatetags.new_subtitles_tags import visibility
 
 from django.http import HttpResponse
 from django.db.models import Count
@@ -69,7 +69,7 @@ def _language_data(language, editing_version, translated_from_version,
     for i, version in enumerate(versions):
         version_data = {
             'version_no':version.version_number,
-            'visibility': visibility_display(version),
+            'visibility': visibility(version),
         }
         if editing_version == version:
             version_data.update(_version_data(version))

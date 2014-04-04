@@ -31,7 +31,7 @@ register = template.Library()
 def visibility_display(subtitle_version):
     '''
     Returns a human readable representation of the interaction between
-    visibility and visibility_override for display purpouses.
+    visibility and visibility_override for display purposes.
     '''
     visibility = subtitle_version.visibility_override or subtitle_version.visibility
     return force_unicode({
@@ -39,6 +39,14 @@ def visibility_display(subtitle_version):
         'private': _("Private"),
         'deleted': _("Deleted")
     }[visibility])
+
+@register.filter
+def visibility(subtitle_version):
+    '''
+    Returns a programmatic representation of the interaction between
+    visibility and visibility_override.
+    '''
+    return (subtitle_version.visibility_override or subtitle_version.visibility)
 
 def format_time(milliseconds):
     if milliseconds is None:

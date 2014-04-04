@@ -65,7 +65,7 @@ var angular = angular || null;
 
         function getLastPublicVersion() {
             for(var i=0; i < $scope.versions.length; i++) {
-                if($scope.versions[i].visibility == 'Public') {
+                if($scope.versions[i].visibility == 'public') {
                     return $scope.versions[i].version_no.toString();
                 }
             }
@@ -94,7 +94,7 @@ var angular = angular || null;
                     return;
                 }
 
-                if(newVersion.visibility == 'Public') {
+                if(newVersion.visibility == 'public') {
                     $scope.currentVersion = newVersion;
                     $scope.referenceSubtitles.getSubtitles(
                         $scope.language.code, newVersion.version_no);
