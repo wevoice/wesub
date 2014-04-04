@@ -18,6 +18,27 @@
         ]);
     });
 
+    module.factory('SubtitleStorage', function($q) {
+        var methodNames = [
+            'approveTask',
+            'updateTaskNotes',
+            'getLanguages',
+            'getLanguage',
+            'getSubtitles',
+            'sendBackTask',
+            'saveSubtitles',
+        ];
+        var SubtitleStorage = {
+            deferreds: {},
+        };
+        _.each(methodNames, function(methodName) {
+            var deferred = $q.defer();
+            SubtitleStorage[methodName] = jasmine.createSpy(methodName).andReturn(deferred.promise);
+            SubtitleStorage.deferreds[methodName] = deferred;
+        });
+        return SubtitleStorage;
+    });
+
     module.factory('DomWindow', function() {
         var mockObject = jasmine.createSpyObj('DomWindow', [
             'onDocumentEvent',
@@ -60,33 +81,36 @@
         }
     });
 
-    module.value('EditorData', {
-        "canSync": true,
-        "canAddAndRemove": true,
-        "languageCode": "en",
-        "editingVersion": {
+    module.factory('EditorData', function() {
+        return {
+            "canSync": true,
+            "canAddAndRemove": true,
             "languageCode": "en",
-            "versionNumber": null,
-        },
-        "video": {
-            "id": "4oqOXzpPk5rU",
-            "videoURLs": [
-                "http://vimeo.com/25082970"
-            ],
-            "primaryVideoURL": "http://vimeo.com/25082970"
-        },
-        "languages": [
-            {
-                "is_rtl": false,
-                "numVersions": 0,
-                "editingLanguage": true,
-                "language_code": "en",
-                "pk": 23,
-                "versions": [],
-                "is_primary_audio_language": true,
-                "name": "English"
+            "editingVersion": {
+                "languageCode": "en",
+                "versionNumber": null,
             },
-        ],
-        'staticURL': 'http://example.com/'
+            "video": {
+                "id": "4oqOXzpPk5rU",
+                "videoURLs": [
+                    "http://vimeo.com/25082970"
+                ],
+                "primaryVideoURL": "http://vimeo.com/25082970"
+            },
+            "oldEditorURL": '/old-editor/test-url/',
+            "languages": [
+                {
+                    "is_rtl": false,
+                    "numVersions": 0,
+                    "editingLanguage": true,
+                    "language_code": "en",
+                    "pk": 23,
+                    "versions": [],
+                    "is_primary_audio_language": true,
+                    "name": "English"
+                },
+            ],
+            'staticURL': 'http://example.com/'
+        };
     });
 }).call(this);

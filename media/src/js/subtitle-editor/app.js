@@ -26,6 +26,7 @@ var angular = angular || null;
         'amara.SubtitleEditor.modal',
         'amara.SubtitleEditor.dom',
         'amara.SubtitleEditor.lock',
+        'amara.SubtitleEditor.session',
         'amara.SubtitleEditor.workflow',
         'amara.SubtitleEditor.subtitles.controllers',
         'amara.SubtitleEditor.subtitles.directives',
@@ -53,12 +54,15 @@ var angular = angular || null;
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
 
     module.controller("AppController", ['$scope', '$sce', '$controller', 
-                      '$window', 'DialogManager', 'EditorData', 'VideoPlayer',
-                      'Workflow', function($scope, $sce, $controller,
-            $window, DialogManager, EditorData, VideoPlayer, Workflow) {
+                      '$window', 'EditorData', 'VideoPlayer', 'Workflow',
+                      function($scope, $sce, $controller, $window, EditorData,
+                          VideoPlayer, Workflow) {
         $controller('AppControllerSubtitles', {$scope: $scope});
         $controller('AppControllerLocking', {$scope: $scope});
         $controller('AppControllerEvents', {$scope: $scope});
+        $controller('DialogController', {$scope: $scope});
+        $controller('SessionBackend', {$scope: $scope});
+        $controller('SessionController', {$scope: $scope});
 
         $scope.videoId = EditorData.video.id;
         $scope.canSync = EditorData.canSync;
@@ -67,7 +71,6 @@ var angular = angular || null;
         $scope.loadingFinished = false;
 	$scope.currentTitle = {};
 	$scope.currentTitle.Edited = false;
-	$scope.dialogManager = new DialogManager(VideoPlayer);
 	$scope.titleEdited = function(newValue) {
 	    if (newValue != undefined) $scope.currentTitle.Edited = newValue;
 	    return $scope.currentTitle.Edited;
@@ -157,40 +160,16 @@ var angular = angular || null;
         }
 
         $scope.showCopyTimingModal = function($event) {
-            var dialogManager = $scope.dialogManager;
-            dialogManager.openDialog({
-                title: 'Confirm Copy Timing',
-                text: 'This will copy all subtitle timing from reference to working subtitles. Do you want to continue?',
-                allowClose: 1,
-                buttons: [
-                    dialogManager.button('Continue', function() {
-                        $scope.copyTimingOver();
-                        dialogManager.close();
-                    }),
-                    dialogManager.button('Cancel', function() {
-                        dialogManager.close();
-                    })
-                ]
+            $scope.dialogManager.openDialog('confirmCopyTiming', {
+                continueButton: $scope.copyTimingOver
             });
             $event.stopPropagation();
             $event.preventDefault();
         };
 
         $scope.showClearTimingModal = function($event) {
-            var dialogManager = $scope.dialogManager;
-            dialogManager.openDialog({
-                title: 'Confirm Timing Reset',
-                text: 'This will remove all subtitle timing. Do you want to continue?',
-                allowClose: 1,
-                buttons: [
-                    dialogManager.button('Continue', function() {
-                        $scope.clearTiming();
-                        dialogManager.close();
-                    }),
-                    dialogManager.button('Cancel', function() {
-                        dialogManager.close();
-                    })
-                ]
+            $scope.dialogManager.openDialog('confirmTimingReset', {
+                continueButton: $scope.clearTiming
             });
             $event.stopPropagation();
             $event.preventDefault();
@@ -206,20 +185,8 @@ var angular = angular || null;
         };
 
         $scope.showClearTextModal = function($event) {
-            var dialogManager = $scope.dialogManager;
-            dialogManager.openDialog({
-                title: 'Confirm Text Reset',
-                text: 'This will remove all subtitle text. Do you want to continue?',
-                allowClose: 1,
-                buttons: [
-                    dialogManager.button('Continue', function() {
-                        $scope.clearText();
-                        dialogManager.close();
-                    }),
-                    dialogManager.button('Cancel', function() {
-                        dialogManager.close();
-                    })
-                ]
+            $scope.dialogManager.openDialog('confirmTextReset', {
+                continueButton: $scope.clearText
             });
             $event.stopPropagation();
             $event.preventDefault();
@@ -235,20 +202,8 @@ var angular = angular || null;
         };
 
         $scope.showResetModal = function($event) {
-            var dialogManager = $scope.dialogManager;
-            dialogManager.openDialog({
-                title: 'Confirm Changes Reset',
-                text: 'This will revert all changes made since the last saved revision. Do you want to continue?',
-                allowClose: 1,
-                buttons: [
-                    dialogManager.button('Continue', function() {
-                        $scope.resetToLastSavedVersion();
-                        dialogManager.close();
-                    }),
-                    dialogManager.button('Cancel', function() {
-                        dialogManager.close();
-                    })
-                ]
+            $scope.dialogManager.openDialog('confirmChangesReset', {
+                continueButton: $scope.resetToLastSavedVersion
             });
             $event.stopPropagation();
             $event.preventDefault();
@@ -273,6 +228,9 @@ var angular = angular || null;
             shownSubtitle: null,
             currentTime: null,
             duration: null,
+        };
+        $scope.collab = {
+            notes: EditorData.savedNotes
         };
         $scope.exitToVideoPage = function() {
             $window.location = '/videos/' + $scope.videoId + '/';
@@ -321,7 +279,7 @@ var angular = angular || null;
      * FIXME: this can probably be moved to a service to keep the app module
      * lean and mean.
      */
-    module.controller("AppControllerLocking", function($scope, $timeout, $window, EditorData, LockService) {
+    module.controller("AppControllerLocking", function($sce, $scope, $timeout, $window, EditorData, LockService) {
         var regainLockTimer;
 
         $scope.minutesIdle = 0;
@@ -366,9 +324,11 @@ var angular = angular || null;
         }
 
         function regainLockAfterIdle() {
+            $scope.dialogManager.showFreezeBox(
+                    $sce.trustAsHtml('Regaining lock&hellip;'));
             regainLock().then(function onSuccess(response) {
+                $scope.dialogManager.closeFreezeBox();
                 if (response.data.ok) {
-                    $scope.dialogManager.close();
                     $scope.minutesIdle = 0;
                     startRegainLockTimer();
                     startUserIdleTimer();
@@ -391,46 +351,31 @@ var angular = angular || null;
                     $scope.dialogManager.close();
                     $scope.showCloseSessionModal();
                 } else {
-                    $scope.dialogManager.generic.text = makeText();
+                    $scope.dialogManager.updateDialogText(makeText());
                     closeSessionTimeout = $timeout(closeSessionTick, 1000);
                 }
             }
 
             var closeSessionTimeout = $timeout(closeSessionTick, 1000);
 
-            $scope.dialogManager.openDialog({
-                title: 'Warning: Your session will close',
-                text: makeText(),
-                buttons: [
-                    $scope.dialogManager.button('Try to resume work',
-                        function() {
-                            if (closeSessionTimeout) {
-                                $timeout.cancel(closeSessionTimeout);
-                            }
-                            regainLockAfterIdle();
-                    }),
-                    $scope.dialogManager.button('Close Editor', function() {
-                        $scope.exitToVideoPage();
-                    })
-                ]
-            });
+            $scope.dialogManager.openDialog('sessionWillClose', {
+                resume: function() {
+                    if (closeSessionTimeout) {
+                        $timeout.cancel(closeSessionTimeout);
+                    }
+                    regainLockAfterIdle();
+                },
+                closeEditor: $scope.exitToVideoPage
+            }, { text: makeText() });
         }
 
         $scope.showCloseSessionModal = function() {
             releaseLock();
             var dialogManager = $scope.dialogManager;
 
-            dialogManager.openDialog({
-                title: 'Your session has ended. You can try to resume, or close the editor.',
-                buttons: [
-                    dialogManager.button('Try to resume work', function() {
-                        regainLockAfterIdle();
-                    }),
-                    dialogManager.button('Close editor', function() {
-                        dialogManager.close();
-                        $scope.exitToVideoPage();
-                    })
-                ]
+            dialogManager.openDialog('sessionEnded', {
+                resume: regainLockAfterIdle,
+                closeEditor: $scope.exitToVideoPage
             });
         }
 
@@ -545,6 +490,7 @@ var angular = angular || null;
                     $scope.workingSubtitles.versionNumber,
                     $scope.workingSubtitles.subtitleList.toXMLString());
         }
+
         $scope.restoreAutoBackup = function() {
             var savedData = SubtitleBackupStorage.getBackup(video.id,
                     $scope.workingSubtitles.language.code,
@@ -554,38 +500,33 @@ var angular = angular || null;
         }
 
         $scope.promptToRestoreAutoBackup = function() {
-            $scope.dialogManager.openDialog({
-                title: 'You have an unsaved backup of your subtitling work, do you want to restore it?',
-                buttons: [
-                    $scope.dialogManager.button('Restore', function() {
-                        $scope.restoreAutoBackup();
-                        $scope.dialogManager.close();
-                    }),
-                    $scope.dialogManager.button('Discard', function() {
-                        SubtitleBackupStorage.clearBackup();
-                        $scope.dialogManager.close();
-                    })
-                ]
+            $scope.dialogManager.openDialog('restoreAutoBackup', {
+                restore: $scope.restoreAutoBackup,
+                discard: SubtitleBackupStorage.clearBackup
             });
         }
 
+        $scope.autoBackupNeeded = false;
+
+        // Check if we have an auto-backup to restore
         if(SubtitleBackupStorage.hasBackup(video.id,
                 $scope.workingSubtitles.language.code,
                 editingVersion.versionNumber)) {
             $timeout($scope.promptToRestoreAutoBackup);
         }
 
+        $scope.$on('work-done', function() {
+            $socpe.autoBackupNeeded = true;
+        });
 
-        $scope.saveSubtitles = function(markComplete) {
-            return SubtitleStorage.saveSubtitles(
-                    video.id,
-                    $scope.workingSubtitles.language.code,
-                    $scope.workingSubtitles.subtitleList.toXMLString(),
-                    $scope.workingSubtitles.title,
-                    $scope.workingSubtitles.description,
-                    $scope.workingSubtitles.metadata,
-                    markComplete);
-        };
+        function handleAutoBackup() {
+            if($scope.autoBackupNeeded) {
+                $scope.saveAutoBackup();
+                $scope.autoBackupNeeded = false;
+            }
+        }
+        $timeout(handleAutoBackup, 60 * 1000);
+
         function watchSubtitleAttributes(newValue, oldValue) {
             if(newValue != oldValue) {
                 $scope.$root.$emit('work-done');
@@ -595,6 +536,7 @@ var angular = angular || null;
         $scope.$watch('workingSubtitles.description', watchSubtitleAttributes);
         $scope.$watch('workingSubtitles.metadata', watchSubtitleAttributes,
                 true);
+
     });
 
 }).call(this);

@@ -109,20 +109,6 @@ var angular = angular || null;
             VideoPlayer.seek(0);
         }
 
-        $scope.endorse = function() {
-            if(EditorData.task_id === undefined || 
-                    EditorData.task_id === null) {
-                $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Completing subtitles&hellip;"));
-                $scope.$root.$emit('save', {
-                    markComplete: true,
-                    exitAfter: true
-                });
-            } else {
-                $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Endorsing&hellip;"));
-                $scope.$root.$emit('approve-task');
-            }
-        }
-
         $scope.onNextClicked = function(evt) {
             if ($scope.workflow.stage == 'title') {
                 $scope.workflow.switchStage('sync');

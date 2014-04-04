@@ -88,7 +88,7 @@ aside.modal {
         border: 1px solid #ccc;
         width: 210px;
 
-        &[disabled] {
+        &[disabled], &[readonly] {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;

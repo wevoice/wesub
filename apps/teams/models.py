@@ -2046,6 +2046,8 @@ class Task(models.Model):
         """Handle the messy details of completing a review task."""
         approval = self.approved == Task.APPROVED_IDS['Approved']
         sv = self.get_subtitle_version()
+        if approval:
+            self._ensure_language_complete(sv.subtitle_language)
 
         self._add_comment()
 
@@ -2098,6 +2100,8 @@ class Task(models.Model):
         """Handle the messy details of completing an approve task."""
         approval = self.approved == Task.APPROVED_IDS['Approved']
         sv = self.get_subtitle_version()
+        if approval:
+            self._ensure_language_complete(sv.subtitle_language)
 
         self._add_comment()
 
@@ -2124,6 +2128,11 @@ class Task(models.Model):
         # Notify the appropriate users.
         notifier.approved_notification.delay(self.pk, approval)
         return task
+
+    def _ensure_language_complete(self, subtitle_language):
+        if not subtitle_language.subtitles_complete:
+            subtitle_language.subtitles_complete = True
+            subtitle_language.save()
 
     def get_perform_url(self):
         """Return a URL for whatever dialog is used to perform this task."""

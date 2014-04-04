@@ -52,39 +52,13 @@
         </section>
         <section class="video center column ng-cloak">
         </section>
-        <section class="status right column group">
-            <div ng-cloak class="ng-cloak" ng-controller="SaveSessionController">
-                <div class="exit dropdown">
-                    {% if DEBUG %}
-                        <a href="#" ng-click="dialogManager.onOpenClick('debug', $event)">
-                            Debug
-                        </a>
-                    {% endif %}
-                    <a class="discard" href="#" ng-click="onExitClicked($event)">
-                        Exit
-                    </a>
-                    <a href="#" ng-click="onLegacyEditorClicked($event)">
-                        Legacy Editor
-                    </a>
-                    <a class="save" href="#" ng-class="{ disabled: saveDisabled() }" ng-click="onSaveClicked($event)">
-                        Save
-                    </a>
-                </div>
-                <div class="status dropdown">
-                    <a href="#">
-                        <ng-switch on="status">
-                            <span ng-switch-when="saving">Saving&hellip;</span>
-                            <span ng-switch-when="saved">Saved.</span>
-                            <span ng-switch-when="error">Error.</span>
-                            <span ng-switch-when="idle">Idle.</span>
-                            <span ng-switch-when="loading">Loading&hellip;</span>
-                            <span ng-switch-when="ready">Ready.</span>
-                            <span ng-switch-when="approving">Approving&hellip;</span>
-                            <span ng-switch-when="sending-back">Sending back&hellip;</span>
-                        </ng-switch>
-                    </a>
-                </div>
-            </div>
+        <section ng-cloak class="ng-cloak session right column group">
+            {% if DEBUG %}
+                <button href="#" ng-click="dialogManager.onOpenClick('debug', $event)">Debug</button>
+            {% endif %}
+            <button class="discard" ng-click="onExitClicked($event)">Exit</button>
+            <button ng-click="onLegacyEditorClicked($event)">Legacy Editor</button>
+            <button class="save" ng-disabled="!session.unsavedChanges()" ng-click="onSaveClicked($event)">Save</button>
         </section>
     </header>
     <section class="main ng-cloak" ng-cloak>
@@ -368,13 +342,13 @@
                      ng-class="{open: modulesOpen.notes}">
                     <a class="title" ng-click="toggleDocking('notes')">Notes</a>
                     <div class="content" ng-show="modulesOpen.notes">
-                        <textarea ng-model="notes" ng-change="notesChanged()"></textarea>
+                        <textarea ng-model="notes" ng-change="session.notesChanged()"></textarea>
                     </div>
                 </div>
                 <div class="approval module" ng-show="modulesEnabled.approval">
                     <div class="content">
-                        <button class="send-back" ng-click="sendBack()">Send Back</button>
-                        <button ng-disabled="!canApprove()" class="approve" ng-click="approve()">Accept</button>
+                        <button class="send-back" ng-click="session.rejectTask()">Send Back</button>
+                        <button ng-disabled="!canApprove()" class="approve" ng-click="session.approveTask()">Accept</button>
                     </div>
                 </div>
                 <p ng-show="errorMessage()" class="error">[[ errorMessage() ]]</p>
@@ -440,7 +414,7 @@
                         <div class="substeps"
                             ng-show="workflow.stage == 'review'">
                             <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}</p>
-                            <button class="endorse" ng-click="endorse()">
+                            <button class="endorse" ng-click="session.endorse()">
                                 {% trans "Complete" %}
                             </button>
                         </div>
@@ -787,7 +761,7 @@
         <h3>[[ dialogManager.generic.title ]]</h3>
         <p ng-show="dialogManager.generic.text">[[ dialogManager.generic.text ]]</p>
         <footer class="buttons">
-            <button ng-repeat="button in dialogManager.generic.buttons" ng-click="button.callback()" ng-class="button.cssClass">[[ button.text ]]</button>
+            <button ng-repeat="button in dialogManager.generic.buttons" ng-click="dialogManager.onButtonClicked(button, $event)" ng-class="button.cssClass">[[ button.text ]]</button>
         </footer>
     </aside>
     {% if DEBUG %}

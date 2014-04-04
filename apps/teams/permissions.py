@@ -673,7 +673,7 @@ def can_add_version(user, video, language_code):
             if task.assignee != user:
                 return TeamsPermissionsCheck(False, task.assignee,
                                              default_message)
-    elif language and language.is_complete_and_synced(True):
+    elif language:
         # there are no tasks because the language is complete
         if not can_post_edit_subtitles(team_video, user, language_code):
             # we use a different message here, probably because this code is
