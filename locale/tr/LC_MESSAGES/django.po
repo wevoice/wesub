@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-04 10:31-0500\n"
+"POT-Creation-Date: 2014-04-04 18:06-0500\n"
 "PO-Revision-Date: 2014-03-21 23:01+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/"
@@ -853,11 +853,11 @@ msgstr ""
 msgid "Hourly"
 msgstr ""
 
-#: apps/teams/models.py:163 apps/teams/models.py:3025
+#: apps/teams/models.py:163 apps/teams/models.py:3034
 msgid "name"
 msgstr "isim"
 
-#: apps/teams/models.py:164 apps/teams/models.py:3026
+#: apps/teams/models.py:164 apps/teams/models.py:3035
 msgid "slug"
 msgstr "kısa isim"
 
@@ -988,11 +988,11 @@ msgstr "Yönetici"
 msgid "Contributor"
 msgstr ""
 
-#: apps/teams/models.py:2135
+#: apps/teams/models.py:2144
 msgid "Resume"
 msgstr "Devam et"
 
-#: apps/teams/models.py:2137
+#: apps/teams/models.py:2146
 msgid "Start now"
 msgstr "Şimdi başla"
 

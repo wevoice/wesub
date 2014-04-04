@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-04 10:35-0500\n"
+"POT-Creation-Date: 2014-04-04 18:10-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -837,11 +837,11 @@ msgstr ""
 msgid "Hourly"
 msgstr ""
 
-#: apps/teams/models.py:163 apps/teams/models.py:3025
+#: apps/teams/models.py:163 apps/teams/models.py:3034
 msgid "name"
 msgstr ""
 
-#: apps/teams/models.py:164 apps/teams/models.py:3026
+#: apps/teams/models.py:164 apps/teams/models.py:3035
 msgid "slug"
 msgstr ""
 
@@ -969,11 +969,11 @@ msgstr ""
 msgid "Contributor"
 msgstr ""
 
-#: apps/teams/models.py:2135
+#: apps/teams/models.py:2144
 msgid "Resume"
 msgstr ""
 
-#: apps/teams/models.py:2137
+#: apps/teams/models.py:2146
 msgid "Start now"
 msgstr ""
 
