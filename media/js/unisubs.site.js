@@ -367,20 +367,20 @@ var Site = function(Site) {
         video_input.val(video_id);
         if(primary_audio_lang_code) {
             primary_audio_lang_select.val(primary_audio_lang_code);
-            primary_audio_lang_select.attr('readonly', true);
+            primary_audio_lang_select.attr('readonly', "1");
         } else {
             primary_audio_lang_select.val('');
-            primary_audio_lang_select.attr('readonly', false);
+            primary_audio_lang_select.removeAttr('readonly');
 
         }
-        $('option', language_select).attr('disabled', false);
+        $('option', language_select).removeAttr('disabled');
         _.each(langs, function(lang) {
             $('option[value=' + lang + ']', language_select).attr('disabled',
-                true);
+                "1");
 
         });
         $("option:not([disabled]):first", language_select).attr('selected',
-                true);
+                "1");
     }
 
     this.Views = {
