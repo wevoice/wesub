@@ -33,6 +33,7 @@ from apps.teams.permissions import (
     can_create_and_edit_translations
 )
 from apps.videos.tasks import video_changed_tasks
+from utils.text import fmt
 from utils.translation import get_language_choices, get_language_label
 
 
@@ -105,8 +106,10 @@ class SubtitlesUploadForm(forms.Form):
             # allow that until our UI can handle showing different reference
             # languages
             elif existing_from_language_code and existing_from_language_code != from_language_code:
-                raise forms.ValidationError(_(
-                    u"The language already exists as a translation from %s." % existing_from_language.get_language_code_display()))
+                raise forms.ValidationError(fmt(
+                    _(u"The language already exists as a "
+                      u"translation from %(source_lang)s."),
+                    source_lang=existing_from_language.get_language_code_display()))
 
     def _verify_no_blocking_subtitle_translate_tasks(self, team_video,
                                                      language_code):
@@ -193,17 +196,18 @@ class SubtitlesUploadForm(forms.Form):
         data = self.cleaned_data['draft']
 
         if data.size > SUBTITLE_FILESIZE_LIMIT_KB * 1024:
-            raise forms.ValidationError(_(
-                u'File size must be less than %d kb.'
-                % SUBTITLE_FILESIZE_LIMIT_KB))
+            raise forms.ValidationError(fmt(
+                _(u'File size must be less than %(size)s kb.'),
+                size=SUBTITLE_FILESIZE_LIMIT_KB))
 
         parts = data.name.rsplit('.', 1)
         self.extension = parts[-1].lower()
 
         if self.extension not in SUBTITLE_FILE_FORMATS:
-            raise forms.ValidationError(_(
-                u'Unsupported format. Please upload one of the following: %s'
-                % ", ".join(SUBTITLE_FILE_FORMATS)))
+            raise forms.ValidationError(fmt(_(
+                u'Unsupported format. Please upload one of '
+                u'the following: %(formats)s'),
+                formats=", ".join(SUBTITLE_FILE_FORMATS)))
 
         text = data.read()
         encoding = chardet.detect(text)['encoding']
@@ -243,16 +247,14 @@ class SubtitlesUploadForm(forms.Form):
             # language/version here so we can use it later.
             self.from_sl = self.video.subtitle_language(from_language_code)
             if self.from_sl is None:
-                raise forms.ValidationError(
-                    _(u'Invalid from language: %(language)s') % {
-                        'language': get_language_label(from_language_code),
-                    })
+                raise forms.ValidationError(fmt(
+                    _(u'Invalid from language: %(language)s'),
+                    language=get_language_label(from_language_code)))
             self.from_sv = self.from_sl.get_tip(public=True)
             if self.from_sv is None:
-                raise forms.ValidationError(
-                    _(u'%(language)s has no public versions') % {
-                        'language': get_language_label(from_language_code),
-                    })
+                raise forms.ValidationError(fmt(
+                    _(u'%(language)s has no public versions'),
+                    language=get_language_label(from_language_code)))
         else:
             self.from_sl = None
             self.from_sv = None

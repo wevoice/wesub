@@ -46,8 +46,8 @@ from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
 from messages.models import Message
 from utils import send_templated_email
 from utils.metrics import Meter
+from utils.text import fmt
 from utils.translation import get_language_label
-
 
 def get_url_base():
     return "http://" + Site.objects.get_current().domain
@@ -75,10 +75,7 @@ def send_new_message_notification(message_id):
         subject = _(u"New message from %(author)s on Amara: %(subject)s")
     else:
         subject = _("New message on Amara: %(subject)s")
-    subject = subject % {
-        'author': message.author,
-        'subject': message.subject
-    }
+    subject = fmt(subject, author=message.author, subject=message.subject)
 
     context = {
         "message": message,
@@ -120,7 +117,9 @@ def team_invitation_sent(invite_pk):
         'custom_message': team_default_message,
         'url_base': get_url_base(),
     }
-    title = ugettext(u"You've been invited to team %s on Amara" % invite.team.name)
+    title = fmt(
+        ugettext(u"You've been invited to team %(team)s on Amara"),
+        team=invite.team.name)
 
     if invite.user.notify_by_message:
         body = render_to_string("messages/team-you-have-been-invited.txt", context)
@@ -158,7 +157,9 @@ def application_sent(application_pk):
             "user":m.user,
         }
         body = render_to_string(template_name,context)
-        subject  = ugettext(u'%(user)s is applying for team %(team)s') % dict(user=application.user, team=application.team.name)
+        subject  = fmt(
+            ugettext(u'%(user)s is applying for team %(team)s'),
+            user=application.user, team=application.team.name)
         if m.user.notify_by_message:
             msg = Message()
             msg.subject = subject
@@ -189,7 +190,10 @@ def team_application_denied(application_pk):
         "url_base": get_url_base(),
         "note": application.note,
     }
-    subject = ugettext(u'Your application to join the %s team has been declined' % application.team.name)
+    subject = fmt(
+        ugettext(u'Your application to join the %(team)s '
+                 u'team has been declined'),
+        team=application.team.name)
     if application.user.notify_by_message:
         msg = Message()
         msg.subject = subject
@@ -227,7 +231,9 @@ def team_member_new(member_pk):
             "url_base":get_url_base(),
         }
         body = render_to_string("messages/team-new-member.txt",context)
-        subject = ugettext("%s team has a new member" % (member.team))
+        subject = fmt(
+            ugettext("%(team)s team has a new member"),
+            team=member.team)
         if m.user.notify_by_message:
             msg = Message()
             msg.subject = subject
@@ -251,7 +257,9 @@ def team_member_new(member_pk):
     body = render_to_string(template_name,context)
 
     msg = Message()
-    msg.subject = ugettext("You've joined the %s team!" % (member.team))
+    msg.subject = fmt(
+        ugettext("You've joined the %(team)s team!"),
+        team=member.team)
     msg.content = body
     msg.user = member.user
     msg.object = member.team
@@ -278,7 +286,9 @@ def team_member_leave(team_pk, user_pk):
     # notify  admins and owners through messages
     notifiable = TeamMember.objects.filter( team=team,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
-    subject = ugettext(u"%(user)s has left the %(team)s team" % dict(user=user, team=team))
+    subject = fmt(
+        ugettext(u"%(user)s has left the %(team)s team"),
+        user=user, team=team)
     for m in notifiable:
         context = {
             "parting_member": user,
@@ -303,7 +313,7 @@ def team_member_leave(team_pk, user_pk):
         "user":user,
         "url_base":get_url_base(),
     }
-    subject = ugettext("You've left the %s team!" % (team))
+    subject = fmt(ugettext("You've left the %(team)s team!"), team)
     if user.notify_by_message:
         template_name = "messages/team-member-you-have-left.txt"
         msg = Message()
@@ -636,7 +646,6 @@ def send_reject_notification(task_pk, sent_back):
     return msg, email_res
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
-SUBJECT_EMAIL_VIDEO_COMMENTED = _(u"%(user)s left a comment on the video %(title)s")
 @task
 def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     """
@@ -697,7 +706,9 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     else:
         version_url = None
 
-    subject = SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=unicode(comment.user), title=video.title_display())
+    subject = fmt(
+        ugettext(u'%(user)s left a comment on the video %(title)s'),
+        user=unicode(comment.user), title=video.title_display())
 
     followers = set(video.notification_list(comment.user))
 

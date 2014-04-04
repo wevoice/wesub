@@ -40,6 +40,7 @@ from apps.videos.types import video_type_registrar, VideoTypeError
 from apps.videos.types.youtube import yt_service
 from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexField, FeedURLField, ReCaptchaField
 from utils.http import url_exists
+from utils.text import fmt
 from utils.translation import get_language_choices, get_user_languages_from_request
 
 KB_SIZELIMIT = 512
@@ -87,7 +88,10 @@ class TranscriptionFileForm(forms.Form, AjaxForm):
         parts = subtitles.name.split('.')
         extension = parts[-1].lower()
         if extension not in babelsubs.get_available_formats():
-            raise forms.ValidationError(_(u'Incorrect format. Upload .%s ' % ", ".join(babelsubs.get_available_formats())))
+            raise forms.ValidationError(
+                fmt(_(u'Incorrect format. '
+                      u'Upload one of the following: %(formats)s.'),
+                    formats=", ".join(babelsubs.get_available_formats())))
         text = subtitles.read()
         encoding = chardet.detect(text)['encoding']
         if not encoding:
@@ -126,10 +130,14 @@ class CreateVideoUrlForm(forms.ModelForm):
             raise forms.ValidationError(e)
 
         if not video_type:
-            raise forms.ValidationError(mark_safe(_(u"""Amara does not support that website or video format.
+            contact_link = fmt(
+                _('<a href="mailto:%(email)s">contact us</a>'),
+                email=settings.FEEDBACK_EMAIL)
+            raise forms.ValidationError(mark_safe(fmt(
+                _(u"""Amara does not support that website or video format.
 If you'd like to us to add support for a new site or format, or if you
-think there's been some mistake, <a
-href="mailto:%s">contact us</a>!""") % settings.FEEDBACK_EMAIL))
+think there's been some mistake, %(contact_link)s!"""),
+                contact_link=contact_link)))
         self._video_type = video_type
         return video_type.convert_to_video_url()
 
@@ -187,14 +195,24 @@ class VideoForm(forms.Form):
             except VideoTypeError, e:
                 raise forms.ValidationError(e)
             if not video_type:
+                contact_link = fmt(
+                    _('<a href="mailto:%(email)s">Contact us</a>'),
+                    email=settings.FEEDBACK_EMAIL)
                 for d in video_type_registrar.domains:
                     if d in video_url:
-                        raise forms.ValidationError(mark_safe(_(u"""Please try again with a link to a video page.
-                        <a href="mailto:%s">Contact us</a> if there's a problem.""") % settings.FEEDBACK_EMAIL))
+                        raise forms.ValidationError(mark_safe(fmt(
+                            _(u"Please try again with a link to a video page.  "
+                              "%(contact_link)s if there's a problem."),
+                            contact_link=contact_link)))
 
-                raise forms.ValidationError(mark_safe(_(u"""You must link to a video on a compatible site (like YouTube) or directly to a
-                    video file that works with HTML5 browsers. For example: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v
-                    <a href="mailto:%s">Contact us</a> if there's a problem.""") % settings.FEEDBACK_EMAIL))
+                raise forms.ValidationError(mark_safe(fmt(
+                    _(u"You must link to a video on a compatible site "
+                      "(like YouTube) or directly to a video file that works "
+                      "with HTML5 browsers. For example: "
+                      "http://mysite.com/myvideo.ogg or "
+                      "http://mysite.com/myipadvideo.m4v "
+                      "%(contact_link)s if there's a problem"),
+                    contact_link=contact_link)))
 
             else:
                 self._video_type = video_type

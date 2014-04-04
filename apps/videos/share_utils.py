@@ -3,9 +3,11 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-import widget
 from django.utils.simplejson import dumps as json
 from django.utils.translation import ugettext_lazy as _
+
+from utils.text import fmt
+import widget
 
 def domain():
     return Site.objects.get_current().domain
@@ -55,10 +57,9 @@ def _add_share_panel_context_for_video(context, video):
         msg = _("Check out this video and help make subtitles")
         
     email_message = _(u"Hey-- check out this video %(video_title)s and help make subtitles: %(url)s")
-    email_message = email_message % {
-        "video_title": _share_video_title(video),
-        "url": abs_page_url
-    }
+    email_message = fmt(email_message,
+                        video_title=_share_video_title(video),
+                        url=abs_page_url)
         
     _add_share_panel_context(
         context, 
@@ -79,12 +80,11 @@ def _add_share_panel_context_for_history(context, video, language=None):
     }
     
     email_message = _(u"Hey-- just found %(language)s subtitles for %(video_title)s: %(url)s")
-    email_message = email_message % {
-        "video_title":_share_video_title(video),
-        "language": language,
-        "url": abs_page_url
-    }
-    
+    email_message = fmt(email_message,
+                        video_title=_share_video_title(video),
+                        language=language,
+                        url=abs_page_url)
+
     if language:
         base_state = {'language': language.language_code}
     else:
@@ -108,11 +108,10 @@ def _add_share_panel_context_for_translation_history(context, video, language_co
     msg = msg % dict(language_name=language_name)
     
     email_message = u"Hey-- just found a version of this video %(video_title)swith %(language_name)s subtitles: %(url)s"
-    email_message = email_message % {
-        "video_title": _share_video_title(video),
-        "language_name": language_name,
-        "url": abs_page_url
-    }
+    email_message = fmt(email_message,
+                        video_title=_share_video_title(video),
+                        language_name=language_name,
+                        url=abs_page_url)
     
     _add_share_panel_context(
         context,

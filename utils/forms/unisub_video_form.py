@@ -17,19 +17,22 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from utils.forms import UniSubURLField
 from urlparse import urlparse
-from django.contrib.sites.models import Site
-from localeurl.utils import strip_path
-from django.core.urlresolvers import resolve
-from django import forms
-from videos.models import Video
-from django.http import Http404
-from videos.types import VideoTypeError
-from django.utils.safestring import mark_safe
+
 from django.conf import settings
-from videos.types import video_type_registrar
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import resolve
+from django.http import Http404
+from django import forms
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+
+from localeurl.utils import strip_path
+from utils.forms import UniSubURLField
+from utils.text import fmt
+from videos.models import Video
+from videos.types import VideoTypeError
+from videos.types import video_type_registrar
 
 class UniSubBoundVideoField(UniSubURLField):
     def format_url(self, url):
@@ -85,9 +88,13 @@ class UniSubBoundVideoField(UniSubURLField):
                 raise forms.ValidationError(e)
 
             if not self.video:
-                raise forms.ValidationError(mark_safe(_(u"""Amara does not support that website or video format.
+                contact_link = fmt(
+                    _('<a href="mailto:%(email)s">contact us</a>'),
+                    email=settings.FEEDBACK_EMAIL)
+                raise forms.ValidationError(mark_safe(fmt(_(
+u"""Amara does not support that website or video format.
 If you'd like to us to add support for a new site or format, or if you
-think there's been some mistake, <a
-href="mailto:%s">contact us</a>!""") % settings.FEEDBACK_EMAIL))
+think there's been some mistake, %(contact_link)s!"""),
+                    contact_link=contact_link)))
 
         return video_url

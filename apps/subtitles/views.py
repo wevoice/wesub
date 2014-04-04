@@ -21,13 +21,6 @@ import simplejson as json
 import babelsubs
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-
-from videos.models import Video
-from teams.models import Task
-from subtitles import shims
-from subtitles.models import SubtitleLanguage, SubtitleVersion
-from subtitles.templatetags.new_subtitles_tags import visibility
-
 from django.http import HttpResponse
 from django.db.models import Count
 from django.conf import settings
@@ -40,8 +33,13 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template.defaultfilters import urlize, linebreaks, force_escape
 
+from subtitles import shims
+from subtitles.models import SubtitleLanguage, SubtitleVersion
+from subtitles.templatetags.new_subtitles_tags import visibility
+from teams.models import Task
 from teams.permissions import can_add_version, can_assign_task
-
+from utils.text import fmt
+from videos.models import Video
 
 def _version_data(version):
     '''
@@ -135,10 +133,9 @@ def assign_task_for_editor(video, language_code, user):
             task.save()
 
         if task.assignee != user:
-            return _("Another user is currently performing "
-                     "the %s task for these subtitles" %
-                     task.get_type_display())
-
+            return fmt(_("Another user is currently performing "
+                         "the %(task_type)s task for these subtitles"),
+                       task_type=task.get_type_display())
 
 def get_team_attributes_for_editor(video):
     team_video = video.get_team_video()
