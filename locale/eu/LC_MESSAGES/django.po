@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # zikoinak <zikoinak@gmail.com>, 2013-2014
 # Theklan <galder158@hotmail.com>, 2011
@@ -9,20 +9,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-04 18:04-0500\n"
-"PO-Revision-Date: 2014-03-21 23:01+0000\n"
-"Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
-"Language-Team: Basque (http://www.transifex.com/projects/p/"
-"universalsubtitles/language/eu/)\n"
-"Language: eu\n"
+"POT-Creation-Date: 2014-04-07 16:02-0500\n"
+"PO-Revision-Date: 2014-04-07 10:24+0000\n"
+"Last-Translator: zikoinak <zikoinak@gmail.com>\n"
+"Language-Team: Basque (http://www.transifex.com/projects/p/universalsubtitles/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: eu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: apps/accountlinker/models.py:41
 msgid "Subtitles by the Amara.org community"
-msgstr ""
+msgstr "Amara.org komunitateak egindako azpitituluak"
 
 #: apps/accountlinker/models.py:43
 msgid "Help us caption and translate this video on Amara.org"
@@ -38,9 +37,9 @@ msgstr ""
 
 #: apps/accountlinker/views.py:151
 msgid ""
-"We couldn't link your account. Have you <a href='https://accounts.google.com/"
-"ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/"
-"create_channel'>set up a channel</a>?"
+"We couldn't link your account. Have you <a "
+"href='https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel'>set"
+" up a channel</a>?"
 msgstr ""
 
 #: apps/accountlinker/views.py:171
@@ -61,9 +60,7 @@ msgstr "Erabiltzaile izena"
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
-msgstr ""
-"Beharrezkoa. 30 hizki edo gutxiago. Bakarrik karaktere alfanumerikoak "
-"(hizkiak, zenbakiak edo beheko marrak)"
+msgstr "Beharrezkoa. 30 hizki edo gutxiago. Bakarrik karaktere alfanumerikoak (hizkiak, zenbakiak edo beheko marrak)"
 
 #: apps/auth/admin.py:35
 msgid "This value must contain only letters, numbers and underscores."
@@ -110,11 +107,11 @@ msgstr "Hasi itzultzen"
 
 #: apps/auth/models.py:346
 msgid "Edit subtitles"
-msgstr "Aldatu azpitituluak"
+msgstr "Editatu azpitituluak"
 
 #: apps/auth/models.py:347
 msgid "Edit translation"
-msgstr "Aldatu itzulpena"
+msgstr "Editatu itzulpena"
 
 #: apps/auth/models.py:404
 msgid "understand enough"
@@ -130,14 +127,13 @@ msgstr "jatorriko hiztun baten moduan idatzi"
 
 #: apps/auth/models.py:411
 msgid "follow requests in language"
-msgstr ""
+msgstr "hizkuntza honetako eskaerak jarraitu:"
 
 #: apps/auth/models.py:426
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
-msgstr ""
-"Hau da iragarkia erakusten hasiko den data. Azkena bakarrik azalduko da."
+msgstr "Hau da iragarkia erakusten hasiko den data. Azkena bakarrik azalduko da."
 
 #: apps/auth/models.py:525
 msgid "e-mail confirmation"
@@ -227,15 +223,15 @@ msgstr "Mezu hau webgunearen administratzailearena da"
 
 #: apps/messages/forms.py:95
 msgid "You cannot send a message to a user and a team at the same time."
-msgstr ""
+msgstr "Ezin diezu mezu bat batera bidali erabiltzaile bati eta talde bati."
 
 #: apps/messages/forms.py:98
 msgid "You must choose a recipient."
-msgstr ""
+msgstr "Hartzaile bat aukeratu behar duzu."
 
 #: apps/messages/forms.py:105
 msgid "This field is required."
-msgstr ""
+msgstr "Beharrezko eremua."
 
 #: apps/messages/models.py:70
 msgid "[no subject]"
@@ -273,32 +269,32 @@ msgstr ""
 #: apps/messages/tasks.py:161
 #, python-format
 msgid "%(user)s is applying for team %(team)s"
-msgstr ""
+msgstr "%(user)s erabiltzailea %(team)s taldean sartzea eskatzen ari da"
 
 #: apps/messages/tasks.py:192
 #, python-format
 msgid "Your application to join the %s team has been declined"
-msgstr ""
+msgstr " %s team taldean sartzeko zure eskabidea ukatu dute"
 
 #: apps/messages/tasks.py:230
 #, python-format
 msgid "%s team has a new member"
-msgstr ""
+msgstr "%s team taldeak kide berri bat du"
 
 #: apps/messages/tasks.py:254
 #, python-format
 msgid "You've joined the %s team!"
-msgstr ""
+msgstr " %s team taldean sartu zara!"
 
 #: apps/messages/tasks.py:281
 #, python-format
 msgid "%(user)s has left the %(team)s team"
-msgstr ""
+msgstr "%(user)s erabiltzaileak %(team)s taldea utzi du"
 
 #: apps/messages/tasks.py:306
 #, python-format
 msgid "You've left the %s team!"
-msgstr ""
+msgstr "%s team taldea utzi duzu!"
 
 #: apps/messages/tasks.py:372
 msgid "You have a new task assignment on Amara!"
@@ -306,15 +302,15 @@ msgstr ""
 
 #: apps/messages/tasks.py:421
 msgid "Your subtitles have been reviewed"
-msgstr ""
+msgstr "Zure azpitituluak berrikusi dira"
 
 #: apps/messages/tasks.py:423
 msgid " and published"
-msgstr ""
+msgstr "eta argitaratu"
 
 #: apps/messages/tasks.py:526
 msgid "Your subtitles have been approved and published!"
-msgstr ""
+msgstr "Zure azpitituluak onartu egin dira eta argitaratu!"
 
 #: apps/messages/tasks.py:532
 msgid "Your subtitles have been returned for further editing"
@@ -331,7 +327,7 @@ msgstr ""
 
 #: apps/messages/views.py:125
 msgid "Message sent."
-msgstr ""
+msgstr "Mezua bidali da."
 
 #: apps/openid_consumer/views.py:94
 msgid "i-names are not supported"
@@ -360,14 +356,14 @@ msgstr "OpenID-ak huts egin du"
 #: apps/openid_consumer/templates/openid_consumer/signin.html:27
 #: templates/openid_consumer/signin.html:17
 msgid "Sign in with your OpenID"
-msgstr "Izena eman zure OpenID-aren bitartez"
+msgstr "Sartu zure OpenID-aren bitartez"
 
 #: apps/openid_consumer/templates/openid_consumer/signin.html:15
 #: templates/auth/login.html:10
 #: templates/registration/password_reset_complete.html:16
 #: templates/teams/_join.html:61
 msgid "Sign in"
-msgstr "Izena eman"
+msgstr "Sartu"
 
 #: apps/profiles/forms.py:98
 msgid "This user has not email"
@@ -380,7 +376,7 @@ msgstr "Ez zaude autentifikaturik."
 #: apps/profiles/forms.py:110
 #, python-format
 msgid "Personal message from %(sender)s on amara.org"
-msgstr ""
+msgstr " %(sender)s erabiltzailearen mezua amara.org-en"
 
 #: apps/profiles/forms.py:155
 msgid "Confirm new password:"
@@ -416,8 +412,8 @@ msgstr "Zure argazkia ezabatu da."
 
 #: apps/profiles/views.py:337
 msgid ""
-"We're tying up loose ends - your account will be removed shortly. Check back "
-"after 10 minutes"
+"We're tying up loose ends - your account will be removed shortly. Check back"
+" after 10 minutes"
 msgstr ""
 
 #: apps/profiles/views.py:341
@@ -426,11 +422,11 @@ msgstr "Kontua ezabatu da."
 
 #: apps/search/forms.py:27
 msgid "Relevance"
-msgstr ""
+msgstr "Garrantzia"
 
 #: apps/search/forms.py:28
 msgid "Most languages"
-msgstr "Hizkuntza gehienak"
+msgstr "Hizkuntza gehien"
 
 #: apps/search/forms.py:29
 msgid "Views Today"
@@ -492,17 +488,13 @@ msgstr ""
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
-msgstr ""
-"Sentitzen dugu, ezin ditugu zure azpitituluak kargatu beste batek hartu "
-"duelako hizkuntza honetan egin beharreko lana."
+msgstr "Sentitzen dugu, ezin ditugu zure azpitituluak kargatu beste batek hartu duelako hizkuntza honetan egin beharreko lana."
 
 #: apps/subtitles/forms.py:132
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
-msgstr ""
-"Sentitzen dugu, ezin ditugu zure azpitituluak kargatu ez daukazulako "
-"hizkuntza hau hartzeko baimenik."
+msgstr "Sentitzen dugu, ezin ditugu zure azpitituluak kargatu ez daukazulako hizkuntza hau hartzeko baimenik."
 
 #: apps/subtitles/forms.py:143 unisubs-integration/api/1_0/forms.py:92
 msgid ""
@@ -512,21 +504,15 @@ msgstr ""
 
 #: apps/subtitles/forms.py:167
 msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated and "
-"you don't have permission to transcribe subtitles."
-msgstr ""
-"Sentitzen dugu, ezin ditugu zure azpitituluak kargatu hizkuntza honek "
-"moderatzailea duelako eta zuk ez daukazulako azpitituluak transkribatzeko "
-"baimenik."
+"Sorry, we can't upload your subtitles because this language is moderated and"
+" you don't have permission to transcribe subtitles."
+msgstr "Sentitzen dugu, ezin ditugu zure azpitituluak kargatu hizkuntza honek moderatzailea duelako eta zuk ez daukazulako azpitituluak transkribatzeko baimenik."
 
 #: apps/subtitles/forms.py:175
 msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated and "
-"you don't have permission to translate subtitles."
-msgstr ""
-"Sentitzen dugu, ezin ditugu zure azpitituluak kargatu hizkuntza honek "
-"moderatzailea duelako eta zuk ez daukazulako azpitituluak itzultzeko "
-"baimenik."
+"Sorry, we can't upload your subtitles because this language is moderated and"
+" you don't have permission to translate subtitles."
+msgstr "Sentitzen dugu, ezin ditugu zure azpitituluak kargatu hizkuntza honek moderatzailea duelako eta zuk ez daukazulako azpitituluak itzultzeko baimenik."
 
 #: apps/subtitles/forms.py:186
 msgid ""
@@ -551,9 +537,7 @@ msgstr "Ezin da detektatu fitxategiaren kodeketa"
 
 #: apps/subtitles/forms.py:235 unisubs-integration/api/1_0/forms.py:41
 msgid "Somebody is subtitling this video right now. Try later."
-msgstr ""
-"Norbait bideo honi azpitituluak jartzen ari da momentu honetan. Saia zaitez "
-"beranduago."
+msgstr "Norbait bideo honi azpitituluak jartzen ari da momentu honetan. Saia zaitez beranduago."
 
 #: apps/subtitles/forms.py:247
 #, python-format
@@ -616,13 +600,13 @@ msgstr ""
 #: apps/subtitles/templatetags/new_subtitles_tags.py:39
 #: templates/teams/teams-list.html:67
 msgid "Private"
-msgstr ""
+msgstr "Pribatua"
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:40
 msgid "Deleted"
 msgstr ""
 
-#: apps/subtitles/templatetags/new_subtitles_tags.py:70
+#: apps/subtitles/templatetags/new_subtitles_tags.py:78
 #: templates/videos/_diffing-subtitle.html:17
 msgid "Not Synced"
 msgstr "Sinkronizatu gabe"
@@ -665,7 +649,7 @@ msgstr "Proiektu"
 
 #: apps/teams/forms.py:63 apps/teams/forms.py:171
 msgid "Let's keep things tidy, shall we?"
-msgstr ""
+msgstr "Dena txukun mantentzen saiatuko gara, ezta?"
 
 #: apps/teams/forms.py:153 templates/videos/language-sync-history-tab.html:11
 msgid "Video URL"
@@ -673,12 +657,9 @@ msgstr "Bideo URL"
 
 #: apps/teams/forms.py:154
 msgid ""
-"Enter the URL of any compatible video or any video on our site. You can also "
-"browse the site and use the 'Add Video to Team' menu."
-msgstr ""
-"Idatzi bateragarri den edozein bideoaren URLa edo gure webguneko edozein "
-"bideoarena. Webgunea arakatu dezakezu ere eta orduan 'Bideoa taldera gehitu' "
-"menua erabili."
+"Enter the URL of any compatible video or any video on our site. You can also"
+" browse the site and use the 'Add Video to Team' menu."
+msgstr "Idatzi bateragarri den edozein bideoaren URLa edo gure webguneko edozein bideoarena. Webgunea arakatu dezakezu ere eta orduan 'Bideoa taldera gehitu' menua erabili."
 
 #: apps/teams/forms.py:162
 msgid "Video language"
@@ -690,11 +671,11 @@ msgstr "Gure datu basean ez badago baino ez gordeko da bideoa."
 
 #: apps/teams/forms.py:218
 msgid "This video already belongs to a team."
-msgstr ""
+msgstr "Bideo hau talde batena da jada."
 
 #: apps/teams/forms.py:224
 msgid "Set original language for this video."
-msgstr ""
+msgstr "Bideo honen jatorrizko hizkuntza ezarri."
 
 #: apps/teams/forms.py:266
 msgid "Team intro video URL"
@@ -703,10 +684,9 @@ msgstr "Taldearen aurkezpen-- bideoaren URLa"
 #: apps/teams/forms.py:268
 msgid ""
 "You can put an optional video\n"
-"on your team homepage that explains what your team is about, to attract "
-"volunteers.\n"
+"on your team homepage that explains what your team is about, to attract volunteers.\n"
 "Enter a link to any compatible video, or to any video page on our site."
-msgstr ""
+msgstr "Zure taldearen hasierako orrian\nbideo bat jarri dezakezu zure taldea zertan datzan azaltzeko eta boluntarioak erakartzeko.\nIdatzi bateragarri den bideoaren esteka, edo zure webgunearen bideo orriaren esteka."
 
 #: apps/teams/forms.py:273
 msgid "Team URL: http://universalsubtitles.org/teams/"
@@ -714,15 +694,15 @@ msgstr "Taldearen URLa: http://universalsubtitles.org/teams/"
 
 #: apps/teams/forms.py:318
 msgid "This video has already been transcribed."
-msgstr ""
+msgstr "Bideo hau transkribatu da jadanik."
 
 #: apps/teams/forms.py:324
 msgid "No one has transcribed this video yet, so it can't be translated."
-msgstr ""
+msgstr "Inork ez du oraindik bideo hau transkribatu, beraz ezin da itzulpenik egin."
 
 #: apps/teams/forms.py:331
 msgid "This language already has a complete set of subtitles."
-msgstr ""
+msgstr "Hizkuntza honek badu azpititulu multzo osoa."
 
 #: apps/teams/forms.py:344
 msgid "This language for this video does not exist or doesn't have a version."
@@ -730,7 +710,7 @@ msgstr ""
 
 #: apps/teams/forms.py:361
 msgid "There is already a task in progress for that video/language."
-msgstr ""
+msgstr "Hizkuntza/bideo honentzako badago zeregin bat aribidean."
 
 #: apps/teams/forms.py:367
 #, python-format
@@ -739,31 +719,31 @@ msgstr ""
 
 #: apps/teams/forms.py:402
 msgid "That user has already been assigned the maximum number of tasks."
-msgstr ""
+msgstr "Erabiltzaile honi gehienezko zeregin kopurua eman zaio jada."
 
 #: apps/teams/forms.py:424
 msgid "You do not have permission to assign this task."
-msgstr ""
+msgstr "Ez daukazu zeregin hau emateko baimena."
 
 #: apps/teams/forms.py:431
 msgid "This user cannot perform that task."
-msgstr ""
+msgstr "Erabiltzaile honek ezin du zeregin hori egin."
 
 #: apps/teams/forms.py:452
 msgid "You do not have permission to delete this task."
-msgstr ""
+msgstr "Ez daukazu zeregin hau ezabatzeko baimenik."
 
 #: apps/teams/forms.py:519
 msgid "You cannot blacklist a preferred language."
-msgstr ""
+msgstr "Ezin duzu gogoko hizkuntza bat gaitzetsi."
 
 #: apps/teams/forms.py:541 apps/teams/forms.py:543
 msgid "User does not exist!"
-msgstr ""
+msgstr "Erabiltzailea ez da existitzen!"
 
 #: apps/teams/forms.py:550
 msgid "User is already a member of this team!"
-msgstr ""
+msgstr "Erabiltzailea bada talde honen kide."
 
 #: apps/teams/forms.py:555
 msgid "User has already been invited and has not replied yet."
@@ -789,7 +769,7 @@ msgstr ""
 
 #: apps/teams/forms.py:612
 msgid "These subtitles are not under a team's control."
-msgstr ""
+msgstr "Azpititulu egile hauek ez daude talde baten kontrolpean."
 
 #: apps/teams/forms.py:616
 msgid "You do not have permission to delete this language."
@@ -828,11 +808,11 @@ msgstr "Eskaera"
 
 #: apps/teams/models.py:125
 msgid "Invitation by any team member"
-msgstr ""
+msgstr "Edozein taldekideren gonbidapena."
 
 #: apps/teams/models.py:126
 msgid "Invitation by manager"
-msgstr "Administratzailearen gonbidapena"
+msgstr "Kudeatzailearen gonbidapena"
 
 #: apps/teams/models.py:127
 msgid "Invitation by admin"
@@ -840,15 +820,15 @@ msgstr "kudeatzailearen gonbidapena"
 
 #: apps/teams/models.py:134
 msgid "Any team member"
-msgstr ""
+msgstr "Edozein taldekide"
 
 #: apps/teams/models.py:135
 msgid "Managers and admins"
-msgstr ""
+msgstr "Kudeatzaile eta administratzaileak"
 
 #: apps/teams/models.py:136
 msgid "Admins only"
-msgstr ""
+msgstr "Administratzaileak bakarrik"
 
 #: apps/teams/models.py:159
 msgid "Daily"
@@ -873,7 +853,7 @@ msgstr "deskripzio"
 #: apps/teams/models.py:165
 msgid ""
 "All urls will be converted to links. Line breaks and HTML not supported."
-msgstr ""
+msgstr "URL guztiak estekak bihurtuko dira. Ez dira onartzen lerro jauziak eta HTML."
 
 #: apps/teams/models.py:167
 msgid "logo"
@@ -920,7 +900,7 @@ msgstr "Taldeen orriaren goiburuan agertzen den HTLM-a"
 
 #: apps/teams/models.py:197
 msgid "authentication provider code"
-msgstr ""
+msgstr "autentifikazio hornitzailearen kodea"
 
 #: apps/teams/models.py:205
 msgid "membership policy"
@@ -932,23 +912,23 @@ msgstr "bideoen politika"
 
 #: apps/teams/models.py:211
 msgid "task assignment policy"
-msgstr ""
+msgstr "zereginak emateko politika"
 
 #: apps/teams/models.py:214
 msgid "subtitling policy"
-msgstr ""
+msgstr "azpitituluak egiteko politika"
 
 #: apps/teams/models.py:217
 msgid "translation policy"
-msgstr ""
+msgstr "itzulpenak egiteko politika"
 
 #: apps/teams/models.py:220
 msgid "maximum tasks per member"
-msgstr ""
+msgstr "kide bakoitzeko gehienezko zereginak"
 
 #: apps/teams/models.py:222
 msgid "task expiration (days)"
-msgstr ""
+msgstr "zereginaren iraungitze-data (egunak)"
 
 #: apps/teams/models.py:235 templates/profiles/base.html:59
 #: templates/teams/teams-list.html:6
@@ -959,15 +939,11 @@ msgstr "Taldeak"
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
-msgstr ""
-"Tarte honetan idatzi zergatik behar duzu bideo honi azpitituluak jartzea. "
-"Ohartxo bat idazteak boluntarioek laguntzea eragin dezake."
+msgstr "Tarte honetan idatzi zergatik behar duzu bideo honi azpitituluak jartzea. Ohartxo bat idazteak boluntarioek laguntzea eragin dezake."
 
 #: apps/teams/models.py:704
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
-msgstr ""
-"Automatikoki hartzen ditugu zenbait web orrien koadro txikiak, Youtuberena "
-"adibidez."
+msgstr "Automatikoki hartzen ditugu zenbait web orrien koadro txikiak, Youtuberena adibidez."
 
 #: apps/teams/models.py:706
 msgid "Need help with all languages"
@@ -992,7 +968,7 @@ msgstr "Admin"
 
 #: apps/teams/models.py:1038 apps/teams/permissions_const.py:47
 msgid "Contributor"
-msgstr ""
+msgstr "Kolaboratzaile"
 
 #: apps/teams/models.py:2144
 msgid "Resume"
@@ -1004,7 +980,7 @@ msgstr ""
 
 #: apps/teams/notifications.py:196
 msgid "New activity on your team video"
-msgstr ""
+msgstr "Jarduera berriak zure taldearen bideoan"
 
 #: apps/teams/permissions.py:650
 #, python-format
@@ -1059,7 +1035,7 @@ msgstr ""
 msgid ""
 "Your application has been submitted. You will be notified of the team "
 "administrator's response"
-msgstr ""
+msgstr "Zure eskaria bidali da. Taldearren administratzailearen erantzuna helduko zaizu."
 
 #: apps/teams/rpc.py:78
 msgid "You can't join this team by application."
@@ -1087,11 +1063,11 @@ msgstr "Ezin duzu zeure burua sustatu."
 
 #: apps/teams/rpc.py:102
 msgid "Team member role changed."
-msgstr ""
+msgstr "Taldekidearen rola aldatu da."
 
 #: apps/teams/rpc.py:176
 msgid "You cannot assign that role to that member."
-msgstr ""
+msgstr "Ezin diozu rol hori kide horri eman."
 
 #: apps/teams/tasks.py:120
 #, python-format
@@ -1101,7 +1077,7 @@ msgstr " %(team)s taldearen bideo berriak azpitituluak jartzeko prest!"
 #: apps/teams/views.py:128 apps/teams/views.py:375 apps/teams/views.py:1748
 #: apps/teams/views.py:1764
 msgid "You do not have permission to edit this team."
-msgstr ""
+msgstr "Ez daukazu talde hau editatzeko baimenik."
 
 #: apps/teams/views.py:153 templates/profiles/edit.html:20
 #: templates/teams/settings-projects-add.html:28
@@ -1124,31 +1100,26 @@ msgid ""
 "\n"
 "                Your team has been created. Here are some next steps:\n"
 "                <ul>\n"
-"                    <li><a href=\"%(edit)s\">Edit team members' permissions</"
-"a></li>\n"
-"                    <li><a href=\"%(activate)s\">Activate and customize "
-"workflows for your team</a></li>\n"
-"                    <li><a href=\"%(create)s\">Create and customize "
-"projects</a></li>\n"
-"                    <li><a href=\"%(lang)s\">Edit language preferences</a></"
-"li>\n"
-"                    <li><a href=\"%(custom)s\">Customize instructions to "
-"caption makers and translators</a></li>\n"
+"                    <li><a href=\"%(edit)s\">Edit team members' permissions</a></li>\n"
+"                    <li><a href=\"%(activate)s\">Activate and customize workflows for your team</a></li>\n"
+"                    <li><a href=\"%(create)s\">Create and customize projects</a></li>\n"
+"                    <li><a href=\"%(lang)s\">Edit language preferences</a></li>\n"
+"                    <li><a href=\"%(custom)s\">Customize instructions to caption makers and translators</a></li>\n"
 "                </ul>\n"
 "                "
-msgstr ""
+msgstr "\n                Sortu da zure taldea. Hona hemen hurrengo zenbait urrats:\n                <ul>\n                    <li><a href=\"%(edit)s\">Editatu taldekideen baimenak</a></li>\n                    <li><a href=\"%(activate)s\">Zure taldeko lan-jarioak aktibatu eta pertsonalizatu</a></li>\n                    <li><a href=\"%(create)s\">Proiektuak sortu eta pertsonalizatu</a></li>\n                    <li><a href=\"%(lang)s\">Hizkuntza ezarpenak editatu</a></li>\n                    <li><a href=\"%(custom)s\">Itzultzaile eta azpititulu-egileentzako jarraibideak pertsonalizatu</a></li>\n                </ul>\n                "
 
 #: apps/teams/views.py:224
 msgid "You do not have permission to delete this team."
-msgstr ""
+msgstr "Ez daukazu talde hau ezabatzeko baimenik."
 
 #: apps/teams/views.py:261 apps/teams/views.py:310 apps/teams/views.py:390
 msgid "Settings saved."
-msgstr ""
+msgstr "Ezarpenak gorde dira."
 
 #: apps/teams/views.py:281
 msgid "Guidelines and messages updated."
-msgstr ""
+msgstr "Gidalerroak eta mezuak eguneratu dira."
 
 #: apps/teams/views.py:569
 msgid "You can't add that video to this team/project."
@@ -1172,7 +1143,7 @@ msgstr "Bideoa eguneratu da."
 
 #: apps/teams/views.py:674
 msgid "Request must be a POST request."
-msgstr ""
+msgstr "Eskaera lanpostu baterako izan behar du."
 
 #: apps/teams/views.py:682
 msgid "You can't delete that video."
@@ -1216,7 +1187,7 @@ msgstr ""
 
 #: apps/teams/views.py:885
 msgid "You can't approve applications."
-msgstr ""
+msgstr "Ezin duzu eskaerarik onartu."
 
 #: apps/teams/views.py:900
 msgid "Application denied."
@@ -1224,19 +1195,19 @@ msgstr "Eskabidea ezetsi da."
 
 #: apps/teams/views.py:906
 msgid "You can't deny applications."
-msgstr ""
+msgstr "Ezin dituzu eskaerak atzera bota."
 
 #: apps/teams/views.py:916
 msgid "You cannot invite people to this team."
-msgstr ""
+msgstr "Ezin duzu inor talde honetara gonbidatu."
 
 #: apps/teams/views.py:947
 msgid "This invite is no longer valid"
-msgstr ""
+msgstr "Gonbidapen honek ez du jada balio"
 
 #: apps/teams/views.py:956
 msgid "You cannot join this team."
-msgstr ""
+msgstr "Ezin zara talde honen kidea izan."
 
 #: apps/teams/views.py:1010
 msgid "You have left this team."
@@ -1244,7 +1215,7 @@ msgstr "Talde hau utzi duzu."
 
 #: apps/teams/views.py:1066
 msgid "Member saved."
-msgstr ""
+msgstr "Kidea gorde da."
 
 #: apps/teams/views.py:1292
 msgid "You cannot view this team's tasks."
@@ -1252,7 +1223,7 @@ msgstr "Ezin dituzu ikusi talde honen zereginak."
 
 #: apps/teams/views.py:1456 apps/teams/views.py:1459
 msgid "You are not allowed to perform this task."
-msgstr ""
+msgstr "Ez daukazu zeregin hau betetzeko baimenik."
 
 #: apps/teams/views.py:1534
 msgid "Task deleted."
@@ -1322,8 +1293,8 @@ msgstr ""
 #: templates/videos/video-page.html:115
 msgid "Video"
 msgid_plural "Videos"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bideoa"
+msgstr[1] "Bideoak"
 
 #: apps/teams/templatetags/teams_tags.py:176
 msgid "Member"
@@ -1344,7 +1315,7 @@ msgstr "Inork lagundu al dit bideo hauei azpitituluak jartzen? %(url)s"
 
 #: apps/videos/forms.py:52
 msgid "--Select language--"
-msgstr ""
+msgstr "--Aukeratu hizkuntza--"
 
 #: apps/videos/forms.py:64
 msgid "File should have txt format"
@@ -1389,27 +1360,16 @@ msgstr "Bideo honentzako bideo-URLa gehitzeko baimenik ez daukazu"
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
-"                        <a href=\"mailto:%s\">Contact us</a> if there's a "
-"problem."
-msgstr ""
+"                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
+msgstr "Saiatu berriz bideo-orri baten estekarekin.\n                        <a href=\"mailto:%s\">Jarri gurekin harremanetan</a> arazoren bat balego."
 
 #: apps/videos/forms.py:195 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
-"You must link to a video on a compatible site (like YouTube) or directly to "
-"a\n"
-"                    video file that works with HTML5 browsers. For example: "
-"http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n"
-"                    <a href=\"mailto:%s\">Contact us</a> if there's a "
-"problem."
-msgstr ""
-"Webgune bateragarri bateko (YouTube antzeko) bideo bati estekatu behar duzu, "
-"edo zuzenean\n"
-"                    HTML5 arakatzaileekin dabilen bideo fitxategi bati. "
-"Adibidez: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo."
-"m4v\n"
-"                    <a href=\"mailto:%s\">Jarri gurekin harremanetan</a> "
-"arazoren bat balego."
+"You must link to a video on a compatible site (like YouTube) or directly to a\n"
+"                    video file that works with HTML5 browsers. For example: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n"
+"                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
+msgstr "Webgune bateragarri bateko (YouTube antzeko) bideo bati estekatu behar duzu, edo zuzenean\n                    HTML5 arakatzaileekin dabilen bideo fitxategi bati. Adibidez: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n                    <a href=\"mailto:%s\">Jarri gurekin harremanetan</a> arazoren bat balego."
 
 #: apps/videos/forms.py:223
 msgid "Youtube usernames"
@@ -1417,7 +1377,7 @@ msgstr "Youtubeko erabiltzaile-izenak"
 
 #: apps/videos/forms.py:223
 msgid "Enter usernames separated by comma."
-msgstr ""
+msgstr "Idatzi erabiltzaile-izenak komaz bereizita."
 
 #: apps/videos/forms.py:224
 msgid "Youtube page link."
@@ -1425,7 +1385,7 @@ msgstr "Youtube orri-esteka."
 
 #: apps/videos/forms.py:225
 msgid "For example: http://www.youtube.com/user/username"
-msgstr ""
+msgstr "Adibidez: http://www.youtube.com/user/username"
 
 #: apps/videos/forms.py:226
 msgid ""
@@ -1437,7 +1397,7 @@ msgstr ""
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
-msgstr ""
+msgstr "Barkatu, eman duzun URLean ez dugu ezer aurkitu. Egiaztatu URLa eta saiatu berriro."
 
 #: apps/videos/forms.py:272
 msgid "Duplicate feed URL in form: {url}"
@@ -1449,8 +1409,8 @@ msgstr ""
 
 #: apps/videos/forms.py:280
 msgid ""
-"The videos are being added in the background. If you are logged in, you will "
-"receive a message when it's done"
+"The videos are being added in the background. If you are logged in, you will"
+" receive a message when it's done"
 msgstr ""
 
 #: apps/videos/forms.py:295
@@ -1459,11 +1419,11 @@ msgstr "captcha"
 
 #: apps/videos/forms.py:361 apps/videos/forms.py:428 apps/videos/forms.py:477
 msgid "Subtitle into:"
-msgstr ""
+msgstr "Azpitituluak egin hizkuntza honetan:"
 
 #: apps/videos/forms.py:363 apps/videos/forms.py:472
 msgid "This video is in:"
-msgstr ""
+msgstr "Bideo honen hizkuntza:"
 
 #: apps/videos/forms.py:364 apps/videos/forms.py:473
 #: templates/teams/tasks.html:380 templates/videos/_upload_subtitles.html:36
@@ -1525,12 +1485,11 @@ msgstr ""
 #: apps/videos/models.py:1405
 #, python-format
 msgid "  deleted a video: \"%(title)s\""
-msgstr ""
+msgstr " bideoa ezabatu da: \"%(title)s\""
 
 #: apps/videos/models.py:1410
 #, python-format
-msgid ""
-"added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
+msgid "added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
 msgstr ""
 
 #: apps/videos/models.py:1412
@@ -1541,40 +1500,36 @@ msgstr ""
 #: apps/videos/models.py:1418
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"titulua aldatu egin da honela  <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "titulua aldatu egin da honela  <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:1420
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"Titulua aldatu egin da honela <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "Titulua aldatu egin da honela <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:1434
 #, python-format
 msgid ""
-"commented on <a href=\"%(comments_url)s\">%(new_language)s subtitles</a> for "
-"<a href=\"%(video_url)s\">%(video_name)s</a>"
+"commented on <a href=\"%(comments_url)s\">%(new_language)s subtitles</a> for"
+" <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
 #: apps/videos/models.py:1436
 #, python-format
 msgid ""
-"Comment added for <a href=\"%(comments_url)s\">%(new_language)s subtitles</"
-"a> for <a href=\"%(video_url)s\">%(video_name)s</a>"
+"Comment added for <a href=\"%(comments_url)s\">%(new_language)s "
+"subtitles</a> for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
 #: apps/videos/models.py:1439
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"honi buruz oharrak egin ditu <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "honi buruz oharrak egin ditu <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:1441
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"Oharra gehitu da honentzako <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "Oharra gehitu da honentzako <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:1449
 #, python-format
@@ -1595,7 +1550,7 @@ msgstr ""
 msgid ""
 "edited <a href=\"%(language_url)s\">%(new_language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
+msgstr "(e)k editatu ditu <a href=\"%(language_url)s\">%(new_language)s azpitituluak </a> <a href=\"%(video_url)s\">%(video_name)s</a> bideoarentzako"
 
 #: apps/videos/models.py:1461
 #, python-format
@@ -1607,24 +1562,22 @@ msgstr ""
 #: apps/videos/models.py:1467
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"URL berria gehitu da honentzako <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "URL berria gehitu da honentzako <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:1469
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"URL berria gehitu da honentzako <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "URL berria gehitu da honentzako <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:1474
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
-msgstr ""
+msgstr " %(team)s taldean sartu zen %(role)s gisa"
 
 #: apps/videos/models.py:1479
 #, python-format
 msgid "left the %s team"
-msgstr ""
+msgstr "%s taldea utzi zuen"
 
 #: apps/videos/models.py:1493
 #, python-format
@@ -1664,11 +1617,11 @@ msgstr "gehitu bideo url-a"
 
 #: apps/videos/models.py:1564
 msgid "request subtitles"
-msgstr ""
+msgstr "azpitituluak eskatu"
 
 #: apps/videos/models.py:1565
 msgid "approve version"
-msgstr ""
+msgstr "bertsioa onartu"
 
 #: apps/videos/models.py:1566
 msgid "add contributor"
@@ -1676,7 +1629,7 @@ msgstr "kolaboratzailea gehitu"
 
 #: apps/videos/models.py:1567
 msgid "remove contributor"
-msgstr ""
+msgstr "kolaboratzailea ezabatu"
 
 #: apps/videos/models.py:1568
 msgid "reject version"
@@ -1684,7 +1637,7 @@ msgstr "bertsioa atzera bota"
 
 #: apps/videos/models.py:1569
 msgid "review version"
-msgstr ""
+msgstr "bertsioa berrikusi"
 
 #: apps/videos/models.py:1570
 msgid "accept version"
@@ -1711,9 +1664,7 @@ msgstr "url-a ezabatu"
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
 "system. You can't add it as a secondary URL."
-msgstr ""
-"URL hau dagoeneko <a href=\"%(url)s\">existitzen da</a> gure sisteman "
-"bertako bideo gisa. Ezin duzu URL sekundario gisa gehitu."
+msgstr "URL hau dagoeneko <a href=\"%(url)s\">existitzen da</a> gure sisteman bertako bideo gisa. Ezin duzu URL sekundario gisa gehitu."
 
 #: apps/videos/rpc.py:51 apps/videos/rpc.py:67
 msgid "You have not permission"
@@ -1765,7 +1716,7 @@ msgstr "Azpititulu hauek jarraitzeari utzi diozu orain."
 
 #: apps/videos/share_utils.py:53
 msgid "Just found a version of this video with subtitles"
-msgstr ""
+msgstr "Azpitituludun bideo honen bertsioa aurkitu dugu"
 
 #: apps/videos/share_utils.py:55
 msgid "Check out this video and help make subtitles"
@@ -1775,19 +1726,17 @@ msgstr "Berraztertu bideoa eta lagundu azpitituluak sortzen"
 #, python-format
 msgid ""
 "Hey-- check out this video %(video_title)s and help make subtitles: %(url)s"
-msgstr ""
-"Kaixo -- berraztertu bideo hau %(video_title)s eta lagundu azpitituluak "
-"sortzen: %(url)s"
+msgstr "Kaixo -- berraztertu bideo hau %(video_title)s eta lagundu azpitituluak sortzen: %(url)s"
 
 #: apps/videos/share_utils.py:76
 #, python-format
 msgid "%(language)s subtitles for %(video)s:"
-msgstr ""
+msgstr "%(language)s azpitituluak %(video)s bideo(ar)entzako:"
 
 #: apps/videos/share_utils.py:81
 #, python-format
 msgid "Hey-- just found %(language)s subtitles for %(video_title)s: %(url)s"
-msgstr ""
+msgstr "Kaixo-- aurkitu ditugu %(language)s azpitituluak %(video_title)s: %(url)s bideoarentzako"
 
 #: apps/videos/share_utils.py:107
 #, python-format
@@ -1812,15 +1761,14 @@ msgstr ""
 
 #: apps/videos/views.py:158
 msgid "needs editing"
-msgstr ""
+msgstr "editatu behar da"
 
 #: apps/videos/views.py:260
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
-"share the video with friends, or get an embed code for your site.  To add "
-"or\n"
+"share the video with friends, or get an embed code for your site.  To add or\n"
 "improve subtitles, click the button below the video."
-msgstr ""
+msgstr "Hemen dago zure bideoari azpitituluak egiteko laneko area.\nLagunekin partekatu dezakezu bideoa, edo zure gunerako kapsulatze-kodea lortu.\nAzpitituluak gehitu edo zuzentzeko, klik egin bideoaren azpiko botoian."
 
 #: apps/videos/views.py:268
 msgid ""
@@ -1831,7 +1779,7 @@ msgstr ""
 
 #: apps/videos/views.py:273
 msgid "Existing subtitles will be imported in a few minutes."
-msgstr ""
+msgstr "Minutu gutxi barru inportatuko dira dauden azpitituluak."
 
 #: apps/videos/views.py:346 apps/videos/views.py:631
 msgid "$title with subtitles | Amara"
@@ -1841,9 +1789,7 @@ msgstr ""
 msgid ""
 "Thank you for uploading. It may take a minute or so for your subtitles to "
 "appear."
-msgstr ""
-"Eskerrik asko gora-kargatzeagatik. Minutu bat barru gutxienez agertuko dira "
-"azpitituluak."
+msgstr "Eskerrik asko gora-kargatzeagatik. Minutu bat barru gutxienez agertuko dira azpitituluak."
 
 #: apps/videos/views.py:753
 msgid "You don't have permission to rollback this language"
@@ -1882,12 +1828,8 @@ msgstr "Bideoa ez dago erabilgarri"
 #, python-format
 msgid ""
 "Please try again with a link to a video page. \n"
-"                        <a href=\"mailto:%s\">Contact us</a> if there's a "
-"problem."
-msgstr ""
-"Saia zaitez berriz bideo-orri baterako esteka batekin. \n"
-"                        <a href=\"mailto:%s\">Jarri gurekin harremanetan</a> "
-"arazoren bat balego."
+"                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
+msgstr "Saia zaitez berriz bideo-orri baterako esteka batekin. \n                        <a href=\"mailto:%s\">Jarri gurekin harremanetan</a> arazoren bat balego."
 
 #: apps/videos/types/youtube.py:51
 msgid "Private video"
@@ -1899,7 +1841,7 @@ msgstr "Zehaztugabeko errorea"
 
 #: apps/widget/rpc.py:117
 msgid "Video embedding disabled by owner"
-msgstr "Jabeak ez du bideoak txertatzeko baimena ematen"
+msgstr "Jabeak ez du bideoak kapsulatzeko baimena ematen"
 
 #: apps/widget/rpc.py:1037 apps/widget/rpc.py:1079
 msgid "\n"
@@ -1907,7 +1849,7 @@ msgstr "\n"
 
 #: apps/widget/views.py:143
 msgid "That task has already been completed."
-msgstr ""
+msgstr "Zeregin hau bete da jada."
 
 #: libs/rosetta/templates/rosetta/languages.html:4
 #: libs/rosetta/templates/rosetta/languages.html:6
@@ -1976,15 +1918,14 @@ msgstr "Ez dago itzultzeko ezer!"
 msgid ""
 "You haven't specified any languages in your settings file, or haven't yet "
 "generated a batch of translation catalogs."
-msgstr ""
-"Ez duzu hizkuntzarik zehaztu zure ezarpenen fitxategian, edo oraindik ez "
-"duzu sortu itzulpen-katalogoen batch-ik."
+msgstr "Ez duzu hizkuntzarik zehaztu zure ezarpenen fitxategian, edo oraindik ez duzu sortu itzulpen-katalogoen batch-ik."
 
 #: libs/rosetta/templates/rosetta/languages.html:57
 #, python-format
 msgid ""
-"Please refer to <a href=\"%(i18n_doc_link)s\">Django's I18N documentation</"
-"a> for a guide on how to set up internationalization for your project."
+"Please refer to <a href=\"%(i18n_doc_link)s\">Django's I18N "
+"documentation</a> for a guide on how to set up internationalization for your"
+" project."
 msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:8
@@ -2002,8 +1943,7 @@ msgstr "Aurrerapena: %(percent_translated)s%%"
 
 #: libs/rosetta/templates/rosetta/pofile.html:23
 msgid "File is read-only: download the file when done editing!"
-msgstr ""
-"Fitxategia irakurtzeko da soilik: editatzen amaitu duzunean deskargatu!"
+msgstr "Fitxategia irakurtzeko da soilik: editatzen amaitu duzunean deskargatu!"
 
 #: libs/rosetta/templates/rosetta/pofile.html:24
 msgid ""
@@ -2093,7 +2033,7 @@ msgstr[1] "%(hits)s/%(message_number)s mezu"
 
 #: templates/_embed_link.html:2
 msgid "Get Embed Code"
-msgstr "Lortu txertatzeko kodea"
+msgstr "Lortu kapsulatze-kodea"
 
 #: templates/_paginator.html:4 templates/_paginator.html.py:6
 msgid "Previous"
@@ -2132,7 +2072,7 @@ msgstr "Bidali e-posta lagunei"
 
 #: templates/_share_widget.html:16
 msgid "Embed Code"
-msgstr "Txertatze kodea"
+msgstr "Kapsulatze-kodea"
 
 #: templates/_share_widget.html:24
 msgid "Permalink"
@@ -2148,24 +2088,19 @@ msgstr "Laguntza behar dugu&#8217; azpitituluak egiteko gure widgeta saiatzeko"
 
 #: templates/_testing_widget.html:5
 msgid "Just launch our feedback form and try captioning a video"
-msgstr ""
-"Zabaldu iruzkinen inprimakia eta saiatu bideoaren azpitituluak sortzen."
+msgstr "Zabaldu iruzkinen inprimakia eta saiatu bideoaren azpitituluak sortzen."
 
 #: templates/_testing_widget.html:11
 msgid ""
 "Warning: These videos should not be embeded--there is a good possibility "
 "they will break at some point!"
-msgstr ""
-"Oharra: bideo hauek ezin dira txertatu. Aukera asko dago halako batean "
-"hondatu egingo direla."
+msgstr "Oharra: bideo hauek ezin dira kapsulatu. Aukera asko dago halako batean hondatu egingo direla."
 
 #: templates/_testing_widget.html:15
 msgid ""
-"Warning #2: These subtitles are non-permanent and should not be relied on -- "
-"someone could change them."
-msgstr ""
-"#2 oharra: azpititulu hauek behin-behinekoak dira, ez dira fidagarriak. "
-"Norbaitek alda ditzake."
+"Warning #2: These subtitles are non-permanent and should not be relied on --"
+" someone could change them."
+msgstr "#2 oharra: azpititulu hauek behin-behinekoak dira, ez dira fidagarriak. Norbaitek alda ditzake."
 
 #: templates/_testing_widget.html:16
 msgid "This alpha site is for purely testing purposes."
@@ -2176,75 +2111,50 @@ msgid ""
 "\n"
 "            <h2>About Amara</h2>\n"
 "            <p>\n"
-"                Amara gives individuals, communities, and larger "
-"organizations the power \n"
-"                to overcome accessibility and language barriers for online "
-"video. The tools are free \n"
-"                and open source and make the work of subtitling and "
-"translating video simpler, more \n"
+"                Amara gives individuals, communities, and larger organizations the power \n"
+"                to overcome accessibility and language barriers for online video. The tools are free \n"
+"                and open source and make the work of subtitling and translating video simpler, more \n"
 "                appealing, and, most of all, more collaborative.\n"
 "            </p>\n"
 "            <p>\n"
 "                The benefits of captioning and subtitling are immense:\n"
 "                <ul>\n"
-"                    <li>Captions make videos accessible for viewers who are "
-"deaf or hard of hearing</li>\n"
-"                    <li>Translations make it possible for all of us to watch "
-"video in languages that we don't speak</li>\n"
-"                    <li>Video creators get: better SEO, more views, access "
-"to a far bigger (potentially multilingual and global) audience, "
-"accessibility for deaf and hard of hearing viewers, and more</li>\n"
+"                    <li>Captions make videos accessible for viewers who are deaf or hard of hearing</li>\n"
+"                    <li>Translations make it possible for all of us to watch video in languages that we don't speak</li>\n"
+"                    <li>Video creators get: better SEO, more views, access to a far bigger (potentially multilingual and global) audience, accessibility for deaf and hard of hearing viewers, and more</li>\n"
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
 "                Amara is composed of three main parts:\n"
 "                <ul>\n"
-"                    <li>A subtitle creation and viewing tool (aka the widget)"
-"</li>\n"
+"                    <li>A subtitle creation and viewing tool (aka the widget)</li>\n"
 "                    <li>A collaborative subtitling website</li>\n"
 "                    <li>An open protocol for subtitle search/delivery</li>\n"
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
-"                Everything we do is available under the open source <a href="
-"\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a> license.\n"
+"                Everything we do is available under the open source <a href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a> license.\n"
 "            </p>\n"
 "            <h2>Our Organization</h2>\n"
 "            <p>\n"
-"                <a href=\"http://www.pculture.org/\">Participatory Culture "
-"Foundation</a> \n"
-"                is a non-profit organization building free and open tools "
-"for more a democratic and \n"
-"                decentralized media. Other projects of ours include <a href="
-"\"http://www.getmiro.com/\">Miro</a>, \n"
-"                <a href=\"http://www.mirovideoconverter.com/\">Miro Video "
-"Converter</a>, \n"
-"                <a href=\"http://www.mirocommunity.org/\">Miro Community</"
-"a>, and \n"
-"                <a href=\"http://www.openvideoalliance.org/\">Open Video "
-"Alliance</a>.\n"
+"                <a href=\"http://www.pculture.org/\">Participatory Culture Foundation</a> \n"
+"                is a non-profit organization building free and open tools for more a democratic and \n"
+"                decentralized media. Other projects of ours include <a href=\"http://www.getmiro.com/\">Miro</a>, \n"
+"                <a href=\"http://www.mirovideoconverter.com/\">Miro Video Converter</a>, \n"
+"                <a href=\"http://www.mirocommunity.org/\">Miro Community</a>, and \n"
+"                <a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.\n"
 "            </p>\n"
 "            <p>\n"
-"                Amara is a featured project of <a href=\"http://www.drumbeat."
-"org/\">Mozilla Drumbeat</a>, \n"
-"                and the Mozilla Foundation has provided development "
-"support.  \n"
-"                Open Society Institute and the MacArthur Foundation are also "
-"financial supporters.\n"
+"                Amara is a featured project of <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \n"
+"                and the Mozilla Foundation has provided development support.  \n"
+"                Open Society Institute and the MacArthur Foundation are also financial supporters.\n"
 "            </p>\n"
 "            <h2>Publisher and Enterprise Services</h2>\n"
 "            <p>\n"
-"                Amara offers a set of professional tools and services that "
-"enable publishers and video platforms to create and manage high quality "
-"subtitles.  With Amara, you can build a community of volunteers to subtitle "
-"your content, integrate with professional services, and use a powerful "
-"quality control system to ensure world-class quality.  To learn more, see "
-"our <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise "
-"services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org"
-"\">dean@pculture.org</a>.\n"
+"                Amara offers a set of professional tools and services that enable publishers and video platforms to create and manage high quality subtitles.  With Amara, you can build a community of volunteers to subtitle your content, integrate with professional services, and use a powerful quality control system to ensure world-class quality.  To learn more, see our <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
 "            </p>\n"
 "        "
-msgstr ""
+msgstr "\n            <h2>Amarari buruz</h2>\n            <p>\n                Amarak lineako bideoren hizkuntza-mugak eta erabilgarritasuna \n                errazteko bidea ematen die gizabanako, komunitate eta erakunde handiagoei ere. \n                Tresnak doanekoak eta kode-irekikoak dira eta bideoak itzuli eta azpititulatzeko lana \n                errazago, atseginago bihurtzen du eta elkarlanean egiteko modukoa.\n            </p>\n            <p>\n                <Bideoak azpititulatzeak onura ikaragarriak dakartza:\n                <ul>\n                    <li>Azpitituluek gor edo entzuteko arazoak dituztenentzako erabilgarri egiten ditu bideoak.</li>\n                    <li>Itzulpenei esker, ezagutzen ez ditugun hizkuntzetako bideoak ikus ditzakegu.</li>\n                    <li>Bideo egileek lortzen dutena: SEO hobea, ikustaldi gehiago, ikusleri zabalagora heltzea (eleaniztun eta globala), gor edo entzuteko arazoak dituztenei heltzea eta abar.</li>\n                </ul>\n            </p>\n            <p>\n                Amarak hiru zati nagusi ditu:\n                <ul>\n                    <li>Azpitituluak ikusi eta egiteko tresna (widget izenekoa)</li>\n                    <li>Azpitituluak elkarlanean egiteko webgunea</li>\n                    <li>Azpitituluak bilatu/bidaltzeko protokolo irekia</li>\n                </ul>\n            </p>\n            <p>\n                Egiten dugun guztia kode-irekiko <a href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a> lizentziari esker eskuragarria da.\n            </p>\n            <h2>Gure erakundea</h2>\n            <p>\n                <a href=\"http://www.pculture.org/\">Participatory Culture Foundation</a>  irabazi-asmorik \n               gabeko erakundea da, hedabide demokratiko eta deszentralizatuagoak lortzeko doaneko \n               eta kode-irekiko tresnak egiten dituena. Gure beste zenbait proiektu dira <a href=\"http://www.getmiro.com/\">Miro</a>, \n                <a href=\"http://www.mirovideoconverter.com/\">Miro Video Converter</a>, \n                <a href=\"http://www.mirocommunity.org/\">Miro Community</a>, and \n                <a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.\n            </p>\n            <p>\n                Amara <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>en proiektu nabarmena da, \n                eta Mozilla Fundazioak garapenean lagundu du.  \n                Open Society Institute eta MacArthur Foundation erakundeek diruz laguntzen digute.\n            </p>\n            <h2>Argitalpen eta Enpresa zerbitzuak</h2>\n            <p>\n                Amarak lanerako tresna eta zerbitzuak eskaintzen ditu, argitaratzaile eta bideo plataformek kalitate handiko bideoak sortu eta kudeatu ditzaten. Amarari esker, boluntarioen komunitateak sor ditzakezu zure edukiak azpititulatzeko, zerbitzu profesionalekin integratzeko eta kalitatea kontrolatzeko sistema indartsua erabiltzeko. Gehiago jakin nahi izanez gero, joan <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enpresentzako zerbitzuetara</a> eta jarri harremanetan Dean Jansen jaunarekin, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n            </p>\n        "
 
 #: templates/base.html:9
 msgid "Caption, translate, subtitle and transcribe video."
@@ -2252,7 +2162,7 @@ msgstr ""
 
 #: templates/base.html:70
 msgid "Subtitle Videos"
-msgstr "Bideoei azpitituluak jarri"
+msgstr "Bideoak azpititulatu"
 
 #: templates/base.html:71
 msgid "Watch"
@@ -2260,7 +2170,7 @@ msgstr "Ikusi"
 
 #: templates/base.html:72 templates/videos/create.html:62
 msgid "Volunteer"
-msgstr "Har ezazu parte"
+msgstr "Parte hartu"
 
 #: templates/base.html:73 templates/index.html:88
 msgid "Pro Services"
@@ -2272,20 +2182,21 @@ msgstr "Laguntza"
 
 #: templates/base.html:78
 msgid "Sign in / Sign up"
-msgstr ""
+msgstr "Sartu / Erregistratu"
 
 #: templates/base.html:93
 msgid "Got a YouTube account?<"
-msgstr "Ba al duzu YouTube konturik?"
+msgstr "Ba al duzu YouTube konturik?<"
 
 #: templates/base.html:94
 msgid ""
-"New: enable viewer-created translations and captions on your YouTube channel!"
+"New: enable viewer-created translations and captions on your YouTube "
+"channel!"
 msgstr ""
 
 #: templates/base.html:96
 msgid "Connect to YouTube"
-msgstr "YouTubera konektatu"
+msgstr "YouTubekin konektatu"
 
 #: templates/base.html:97
 msgid "No thanks"
@@ -2294,7 +2205,7 @@ msgstr "Ez, eskerrik asko"
 #: templates/base.html:113
 msgid ""
 "Amara is a project of <a href=\"http://participatoryculture.org/\">PCF</a>."
-msgstr ""
+msgstr "Amara  <a href=\"http://participatoryculture.org/\">PCF</a>ren proiektu bat da."
 
 #: templates/base.html:116 templates/profiles/base.html:15
 msgid "About"
@@ -2338,29 +2249,21 @@ msgstr ""
 
 #: templates/demo.html:23
 msgid "Amara Editor Demo"
-msgstr ""
+msgstr "Amara editorearen demoa"
 
 #: templates/demo.html:27
 msgid ""
 "\n"
 "        <strong>What's this?</strong> The video below is for \n"
-"        demonstration purposes &mdash; try clicking the 'Subtitle Me' "
-"button!\n"
+"        demonstration purposes &mdash; try clicking the 'Subtitle Me' button!\n"
 "        Don't worry, nothing you do will be saved.\n"
 "        "
-msgstr ""
-"\n"
-"        <strong>Zer da hau?</strong> Azpian agertzen den bideoa  \n"
-"        adibide gisa jarri da &mdash; saia zaitez 'Azpitituluak egin' "
-"botoian klik egiten!\n"
-"        Ez kezkatu, ez da zuk egindako ezer gordeko.\n"
-"        "
+msgstr "\n        <strong>Zer da hau?</strong> Azpian agertzen den bideoa  \n        adibide gisa jarri da &mdash; saia zaitez 'Azpitituluak egin' botoian klik egiten!\n        Ez kezkatu, ez da zuk egindako ezer gordeko.\n        "
 
 #: templates/demo.html:45
 msgid ""
 "\n"
-"        <strong>Feedback is welcome.</strong> Choose \"Help\" from the main "
-"menu to report bugs or to leave comments for the team.\n"
+"        <strong>Feedback is welcome.</strong> Choose \"Help\" from the main menu to report bugs or to leave comments for the team.\n"
 "        "
 msgstr ""
 
@@ -2371,10 +2274,8 @@ msgstr "Copyright arau-haustearen jakinarazpena"
 #: templates/dmca.html:9
 msgid ""
 "\n"
-"To file a copyright infringement notification with us, you will need to send "
-"a\n"
-"written communication that includes substantially the following (please "
-"consult\n"
+"To file a copyright infringement notification with us, you will need to send a\n"
+"written communication that includes substantially the following (please consult\n"
 "your legal counsel or see Section 512(c)(3) of the Copyright Act to confirm\n"
 "these requirements):\n"
 msgstr ""
@@ -2382,34 +2283,24 @@ msgstr ""
 #: templates/dmca.html:18
 msgid ""
 "\n"
-"A physical or electronic signature of a person authorized to act on behalf "
-"of\n"
+"A physical or electronic signature of a person authorized to act on behalf of\n"
 "the owner of an exclusive right that is allegedly infringed.\n"
-"Identification of the copyrighted work claimed to have been infringed, or, "
-"if\n"
+"Identification of the copyrighted work claimed to have been infringed, or, if\n"
 "multiple copyrighted works at a single online site are covered by a single\n"
 "notification, a representative list of such works at that site.\n"
-"Identification of the material that is claimed to be infringing or to be "
-"the\n"
-"subject of infringing activity and that is to be removed or access to which "
-"is\n"
+"Identification of the material that is claimed to be infringing or to be the\n"
+"subject of infringing activity and that is to be removed or access to which is\n"
 "to be disabled, and information reasonably sufficient to permit the service\n"
-"provider to locate the material. Providing URLs in the body of an email is "
-"the\n"
+"provider to locate the material. Providing URLs in the body of an email is the\n"
 "best way to help us locate content quickly.\n"
-"Information reasonably sufficient to permit the service provider to contact "
-"the\n"
-"complaining party, such as an address, telephone number, and, if available, "
-"an\n"
+"Information reasonably sufficient to permit the service provider to contact the\n"
+"complaining party, such as an address, telephone number, and, if available, an\n"
 "electronic mail address at which the complaining party may be contacted.\n"
-"A statement that the complaining party has a good faith belief that use of "
-"the\n"
-"material in the manner complained of is not authorized by the copyright "
-"owner,\n"
+"A statement that the complaining party has a good faith belief that use of the\n"
+"material in the manner complained of is not authorized by the copyright owner,\n"
 "its agent, or the law.\n"
 "A statement that the information in the notification is accurate, and under\n"
-"penalty of perjury, that the complaining party is authorized to act on "
-"behalf\n"
+"penalty of perjury, that the complaining party is authorized to act on behalf\n"
 "of the owner of an exclusive right that is allegedly infringed.\n"
 "Such written notice should be sent to our designated agent as follows:\n"
 msgstr ""
@@ -2417,8 +2308,7 @@ msgstr ""
 #: templates/dmca.html:55
 msgid ""
 "\n"
-"Please also note that under Section 512(f) any person who knowingly "
-"materially\n"
+"Please also note that under Section 512(f) any person who knowingly materially\n"
 "misrepresents that material or activity is infringing may be subject to\n"
 "liability.\n"
 msgstr ""
@@ -2432,25 +2322,20 @@ msgid ""
 "\n"
 "Please note that under Section 512(f) of the Copyright Act, any person who\n"
 "knowingly materially misrepresents that material or activity was removed or\n"
-"disabled by mistake or misidentification may be subject to liability. "
-"Please\n"
-"also be advised that we enforce a policy that provides for the termination "
-"in\n"
+"disabled by mistake or misidentification may be subject to liability. Please\n"
+"also be advised that we enforce a policy that provides for the termination in\n"
 "appropriate circumstances of subscribers who are repeat infringers.\n"
 msgstr ""
 
 #: templates/dmca.html:75
 msgid "How do I file a DMCA counter notice?"
-msgstr ""
-"Nola aukez dezaket DMCAri, AEBetako egileen eskubideak bermatzeko legeari, "
-"buruzko aurkako jakinarazpen bat?"
+msgstr "Nola aukez dezaket DMCAri, AEBetako egileen eskubideak bermatzeko legeari, buruzko aurkako jakinarazpen bat?"
 
 #: templates/dmca.html:77
 msgid ""
 "\n"
 "The process for counter-notifications is governed by Section 512(g) of the\n"
-"Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca."
-"pdf\n"
+"Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca.pdf\n"
 msgstr ""
 
 #: templates/dmca.html:82
@@ -2465,10 +2350,8 @@ msgid ""
 "\n"
 "Please note that under Section 512(f) of the Copyright Act, any person who\n"
 "knowingly materially misrepresents that material or activity was removed or\n"
-"disabled by mistake or misidentification may be subject to liability. "
-"Please\n"
-"also be advised that we enforce a policy that provides for the termination "
-"in\n"
+"disabled by mistake or misidentification may be subject to liability. Please\n"
+"also be advised that we enforce a policy that provides for the termination in\n"
 "appropriate circumstances of subscribers who are repeat infringers.\n"
 "Accordingly, if you are not sure whether certain material infringes the\n"
 "copyrights of others, we suggest that you first contact an attorney.\n"
@@ -2482,41 +2365,26 @@ msgstr "Aurkako jakinarazpenaren elementuak"
 msgid ""
 "\n"
 "A sample counter notification may be found at:\n"
-"http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability "
-"to\n"
-"process your counter notification, please use the following format "
-"(including\n"
+"http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability to\n"
+"process your counter notification, please use the following format (including\n"
 "section numbers):\n"
-msgstr ""
-"\n"
-"Aurkako jakinarazpenaren eredua hemen aurki dezakezu:\n"
-"http://www.chillingeffects.org/dmca/counter512.pdf. Aurkako zure "
-"jakinarazpena\n"
-"arinago bideratu ahal dezagun, mesedez erabili ondorengo formatua\n"
-" (atalen zenbakiak barne):\n"
+msgstr "\nAurkako jakinarazpenaren eredua hemen aurki dezakezu:\nhttp://www.chillingeffects.org/dmca/counter512.pdf. Aurkako zure jakinarazpena\narinago bideratu ahal dezagun, mesedez erabili ondorengo formatua\n (atalen zenbakiak barne):\n"
 
 #: templates/dmca.html:109
 msgid ""
 "\n"
-"Identify the specific URLs of material that Miro Guide has removed or to "
-"which\n"
+"Identify the specific URLs of material that Miro Guide has removed or to which\n"
 "Miro Guide has disabled access.\n"
-"Provide your full name, address, telephone number, and email address, and "
-"the\n"
+"Provide your full name, address, telephone number, and email address, and the\n"
 "username of your Miro Guide account.\n"
-"Provide a statement that you consent to the jurisdiction of Federal "
-"District\n"
+"Provide a statement that you consent to the jurisdiction of Federal District\n"
 "Court for the judicial district in which your address is located (or San\n"
-"Francisco County, California if your address is outside of the United "
-"States),\n"
+"Francisco County, California if your address is outside of the United States),\n"
 "and that you will accept service of process from the person who provided\n"
 "notification under subsection (c)(1)(C) or an agent of such person.\n"
-"Include the following statement: \"I swear, under penalty of perjury, that "
-"I\n"
-"have a good faith belief that the material was removed or disabled as a "
-"result\n"
-"of a mistake or misidentification of the material to be removed or disabled."
-"\"\n"
+"Include the following statement: \"I swear, under penalty of perjury, that I\n"
+"have a good faith belief that the material was removed or disabled as a result\n"
+"of a mistake or misidentification of the material to be removed or disabled.\"\n"
 "Sign the notice. If you are providing notice by e-mail, a scanned physical\n"
 "signature or a valid electronic signature will be accepted.\n"
 "Send the written communication to the following address:\n"
@@ -2529,28 +2397,21 @@ msgstr "Zer gertatzen da gero?"
 #: templates/dmca.html:143
 msgid ""
 "\n"
-"After we receive your counter-notification, we will forward it to the party "
-"who\n"
-"submitted the original claim of copyright infringement. Please note that "
-"when\n"
-"we forward the counter-notification, it includes your personal information. "
-"By\n"
+"After we receive your counter-notification, we will forward it to the party who\n"
+"submitted the original claim of copyright infringement. Please note that when\n"
+"we forward the counter-notification, it includes your personal information. By\n"
 "submitting a counter-notification, you consent to having your information\n"
-"revealed in this way. We will not forward the counter-notification to any "
-"party\n"
+"revealed in this way. We will not forward the counter-notification to any party\n"
 "other than the original claimant.\n"
 msgstr ""
 
 #: templates/dmca.html:153
 msgid ""
 "\n"
-"After we send out the counter-notification, the claimant must then notify "
-"us\n"
+"After we send out the counter-notification, the claimant must then notify us\n"
 "within 10 days that he or she has filed an action seeking a court order to\n"
-"restrain you from engaging in infringing activity relating to the material "
-"on\n"
-"the Miro Guide. If we receive such notification we will be unable to "
-"restore\n"
+"restrain you from engaging in infringing activity relating to the material on\n"
+"the Miro Guide. If we receive such notification we will be unable to restore\n"
 "the material. If we do not receive such notification, we may reinstate the\n"
 "material.\n"
 msgstr ""
@@ -2558,14 +2419,9 @@ msgstr ""
 #: templates/dmca.html:163
 msgid ""
 "\n"
-"DISCLAIMER: WE ARE NOT YOUR ATTORNEYS, AND THE INFORMATION WE PRESENT HERE "
-"IS\n"
-"NOT LEGAL ADVICE. WE PRESENT THIS INFORMATION FOR INFORMATIONAL PURPOSES "
-"ONLY.\n"
-msgstr ""
-"\n"
-"SALBUESPENA: GU EZ GARA ZURE ABOKATUAK, ETA HEMEN AGERTZEN DEN INFORMAZIOA\n"
-"EZ DA LEGE-AHOLKUA. JAKINAREN GAINEAN EGOTEKO BAINO EZ DUGU EMATEN.\n"
+"DISCLAIMER: WE ARE NOT YOUR ATTORNEYS, AND THE INFORMATION WE PRESENT HERE IS\n"
+"NOT LEGAL ADVICE. WE PRESENT THIS INFORMATION FOR INFORMATIONAL PURPOSES ONLY.\n"
+msgstr "\nSALBUESPENA: GU EZ GARA ZURE ABOKATUAK, ETA HEMEN AGERTZEN DEN INFORMAZIOA\nEZ DA LEGE-AHOLKUA. JAKINAREN GAINEAN EGOTEKO BAINO EZ DUGU EMATEN.\n"
 
 #: templates/embed_page.html:24
 msgid "Add collaborative subtitling to every video on your site"
@@ -2578,11 +2434,9 @@ msgstr "Zure orrira kode lerro bat jeitsi soilik:"
 #: templates/embed_page.html:32
 msgid ""
 "\n"
-"            You can add it just before the <code>&lt;/head&gt;</code> or "
-"<code>&lt;/body&gt;</code> tag (<a href=\"https://github.com/pculture/"
-"unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n"
+"            You can add it just before the <code>&lt;/head&gt;</code> or <code>&lt;/body&gt;</code> tag (<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n"
 "        "
-msgstr ""
+msgstr "\n            <code>&lt;/head&gt;</code> edoo <code>&lt;/body&gt;</code> etiketaren aurrean gehitu dezakezu (<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-guide\">begiratu erabilera-oharrak</a>).\n        "
 
 #: templates/embed_page.html:37
 msgid "This lets you and visitors to your site"
@@ -2619,8 +2473,7 @@ msgstr ""
 #: templates/embed_page.html:66
 msgid ""
 "\n"
-"        A \"subtitle me\" or \"choose language\" button will appear across "
-"all compatible videos. \n"
+"        A \"subtitle me\" or \"choose language\" button will appear across all compatible videos. \n"
 "        Users can click to activate (or create) subtitles.\n"
 "        "
 msgstr ""
@@ -2639,11 +2492,11 @@ msgstr "Maiz Egindako Galderak (FAQ)"
 
 #: templates/faq.html:19 templates/faq.html.py:43
 msgid "What is Amara?"
-msgstr ""
+msgstr "Zer da Amara?"
 
 #: templates/faq.html:20 templates/faq.html.py:54
 msgid "How can I use Amara?"
-msgstr ""
+msgstr "Nola erabili dezaket Amara?"
 
 #: templates/faq.html:21 templates/faq.html.py:63
 msgid "What are the benefits of subtitles?"
@@ -2656,7 +2509,7 @@ msgstr ""
 
 #: templates/faq.html:23 templates/faq.html.py:76
 msgid "Will Amara support closed captions for the deaf and hard of hearing?"
-msgstr ""
+msgstr "Amarak onartuko al ditu gorrentzako edo entzuteko arazoak dituztenentzako azpitituluak?"
 
 #: templates/faq.html:24 templates/faq.html.py:80
 msgid "Will your subtitles support my language or characterset?"
@@ -2696,8 +2549,8 @@ msgstr "Non deskargatu ditzaket .srt edo beste formatuetako azpitituluak?"
 
 #: templates/faq.html:33 templates/faq.html.py:147
 msgid ""
-"It says \"Someone else is currently editing these subtitles\" and I can't do "
-"anything.  How long will this last for?  Why does it happen?"
+"It says \"Someone else is currently editing these subtitles\" and I can't do"
+" anything.  How long will this last for?  Why does it happen?"
 msgstr ""
 
 #: templates/faq.html:34 templates/faq.html.py:157
@@ -2706,8 +2559,8 @@ msgstr "Zergatik ezin ditut itzulpenean iraupenak aldatu?"
 
 #: templates/faq.html:35 templates/faq.html.py:168
 msgid ""
-"How do old revisions work? What if somebody makes a change to my work that I "
-"don't approve of?"
+"How do old revisions work? What if somebody makes a change to my work that I"
+" don't approve of?"
 msgstr ""
 
 #: templates/faq.html:36 templates/faq.html.py:184
@@ -2722,20 +2575,16 @@ msgstr "Aizu, ez duzue nire hizkuntza zerrendatu!"
 msgid ""
 "\n"
 "      \t\tAmara is an easy way for anyone to add subtitles, captions, \n"
-"\t\t\tor translate nearly any video on the web. It works in a "
-"collaborative \n"
-"\t\t\tWikipedia-like fashion. The software is free and open source and can "
-"be used and \n"
-"\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center"
-"\">improved by anyone</a>.\n"
+"\t\t\tor translate nearly any video on the web. It works in a collaborative \n"
+"\t\t\tWikipedia-like fashion. The software is free and open source and can be used and \n"
+"\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center\">improved by anyone</a>.\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:56
 msgid ""
 "\n"
-"\t\t\tYou can <a href=\"http://universalsubtitles.org/videos/create\">begin "
-"subtitling</a>\n"
+"\t\t\tYou can <a href=\"http://universalsubtitles.org/videos/create\">begin subtitling</a>\n"
 "\t\t\ta video you have already posted on the web.\t\n"
 "\t\t"
 msgstr ""
@@ -2747,12 +2596,12 @@ msgstr ""
 #: templates/faq.html:66
 msgid ""
 "Captions make videos accessible for viewers who are deaf or hard of hearing "
-msgstr ""
+msgstr "Azpitituluei esker, gorrek edo entzuteko arazoak dituzten ikusleek bideoak ikus ditzakete."
 
 #: templates/faq.html:67
 msgid ""
-"Translations make it possible for all of us to watch video in languages that "
-"we don't speak"
+"Translations make it possible for all of us to watch video in languages that"
+" we don't speak"
 msgstr ""
 
 #: templates/faq.html:68
@@ -2764,8 +2613,8 @@ msgstr ""
 
 #: templates/faq.html:73
 msgid ""
-"he Participatory Culture Foundation is a 501c3 non-profit organization whose "
-"mission is to build a fairer, more open, and more democratic media space. "
+"he Participatory Culture Foundation is a 501c3 non-profit organization whose"
+" mission is to build a fairer, more open, and more democratic media space. "
 "PCF saw a gap in the marketplace for more open and collaborative subtitling "
 "&mdash; Amara is helping to fill that need."
 msgstr ""
@@ -2774,25 +2623,19 @@ msgstr ""
 msgid ""
 "Yes, we are working on a solution for making closed captions [including "
 "information about sounds and music], as well as subtitles/translations."
-msgstr ""
-"Bai, bide bat bilatzen ari gara azpitituluen [soinu eta musikari buruzko "
-"informazioa barne] itzulpenak egiteko."
+msgstr "Bai, bide bat bilatzen ari gara azpitituluen [soinu eta musikari buruzko informazioa barne] itzulpenak egiteko."
 
 #: templates/faq.html:81
 msgid ""
 "We will be working to support as many languages/charactersets as possible."
-msgstr ""
-"Lanean arituko gara ahal diren hizkuntza eta idazkera gehien onartzeko."
+msgstr "Lanean arituko gara ahal diren hizkuntza eta idazkera gehien onartzeko."
 
 #: templates/faq.html:86
 msgid ""
 "\n"
-"      \tThe site and tools are available in a number of languages (set your "
-"language \n"
-"\t\tin your browser preferences and we’ll take care of the rest). We’re "
-"always looking for \n"
-"\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-"
-"translateable-looking-for-translators/\">volunteer translators</a> \n"
+"      \tThe site and tools are available in a number of languages (set your language \n"
+"\t\tin your browser preferences and we’ll take care of the rest). We’re always looking for \n"
+"\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-translateable-looking-for-translators/\">volunteer translators</a> \n"
 "\t\tto help improve and add more languages.\n"
 "\t  "
 msgstr ""
@@ -2800,69 +2643,58 @@ msgstr ""
 #: templates/faq.html:97
 msgid ""
 "\n"
-"\t      For a single video, use our site. For multiple videos on your "
-"website, use \n"
-"\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">this code</a> "
-"in your \n"
+"\t      For a single video, use our site. For multiple videos on your website, use \n"
+"\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">this code</a> in your \n"
 "\t\t  website’s template inside the &lt;head&gt; tags.\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:106
 msgid ""
-"For our subtitling widget and community website, we're using the <a href="
-"\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
-msgstr ""
-"Gure azpitituluen widget eta gizarte-weborrirako, AGPL lizentzia ari gara "
-"erabiltzen <a href=\"http://es.wikipedia.org/wiki/AGPL\">AGPL</a>."
+"For our subtitling widget and community website, we're using the <a "
+"href=\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
+msgstr "Gure azpitituluen widget eta gizarte-weborrirako, AGPL lizentzia ari gara erabiltzen <a href=\"http://es.wikipedia.org/wiki/AGPL\">AGPL</a>."
 
 #: templates/faq.html:110
 msgid ""
 "Please do! If you're interested in coding and development, please visit our "
 "<a href=\"http://wiki.github.com/8planes/unisubs/dev-center\">developer "
 "center</a>."
-msgstr ""
+msgstr "Egin mesedez! Kodetzea eta garapena interesatzen bazaizkizu, ikusi gure <a href=\"http://wiki.github.com/8planes/unisubs/dev-center\">garapen gunea</a>."
 
 #: templates/faq.html:115
 msgid ""
 "\n"
 "\t\tIf you're interested in general involvement, please see our \n"
-"\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla "
-"Drumbeat page</a>. \n"
+"\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla Drumbeat page</a>. \n"
 "\t\tIf you have a specific idea, please get in touch: \n"
-"\t\t<a href=\"mailto:universalsubtitles@pculture.org"
-"\">universalsubtitles@pculture.org</a> \n"
-"\t\tAnd as a 501c3 non-profit org, we do accept donations (see the next "
-"question for details).\n"
+"\t\t<a href=\"mailto:universalsubtitles@pculture.org\">universalsubtitles@pculture.org</a> \n"
+"\t\tAnd as a 501c3 non-profit org, we do accept donations (see the next question for details).\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:126
 msgid ""
 "\n"
-"      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/"
-"contribute/universalsubtitles\">donate here</a> (through the Mozilla "
-"Drumbeat project).\n"
+"      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/contribute/universalsubtitles\">donate here</a> (through the Mozilla Drumbeat project).\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:133
 msgid ""
 "The Mozilla Foundation has provided Amara with seed funding, community "
-"support, and fundraising support through <a href=\"http://www.drumbeat.org/"
-"about\">Drumbeat</a>. Drumbeat is a movement to keep the web open for the "
-"next 100 years, and Amara is a featured project!"
+"support, and fundraising support through <a "
+"href=\"http://www.drumbeat.org/about\">Drumbeat</a>. Drumbeat is a movement "
+"to keep the web open for the next 100 years, and Amara is a featured "
+"project!"
 msgstr ""
 
 #: templates/faq.html:138
 msgid ""
 "\n"
-"     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, ."
-"TXT, and DFXP.\n"
-"     \t formats on the page for that language (<a href=\"http://"
-"universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
-"\t\t Click \"Download Subtitles\" button in the lower right to the left from "
-"\"Edit Subtitles\" \n"
+"     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, .TXT, and DFXP.\n"
+"     \t formats on the page for that language (<a href=\"http://universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
+"\t\t Click \"Download Subtitles\" button in the lower right to the left from \"Edit Subtitles\" \n"
 "\t\t button and choose the desired file format from the drop-down list.\n"
 "       "
 msgstr ""
@@ -2870,10 +2702,8 @@ msgstr ""
 #: templates/faq.html:149
 msgid ""
 "\n"
-"        The system currently only allows one user to edit subtitles for any "
-"given video \n"
-"        at a time. So, if someone else is already editing subtitles for the "
-"video when \n"
+"        The system currently only allows one user to edit subtitles for any given video \n"
+"        at a time. So, if someone else is already editing subtitles for the video when \n"
 "        you try to edit the subtitles, you'll get this message.\n"
 "        "
 msgstr ""
@@ -2881,12 +2711,9 @@ msgstr ""
 #: templates/faq.html:159
 msgid ""
 "\n"
-"        You can. Go to the translation editor and click “Change subtitle "
-"timing”. \n"
-"\t\tOnly do this if the timing on the original language really cannot "
-"match \n"
-"\t\tthe language you’re translating into. Otherwise, improvements in the "
-"original \n"
+"        You can. Go to the translation editor and click “Change subtitle timing”. \n"
+"\t\tOnly do this if the timing on the original language really cannot match \n"
+"\t\tthe language you’re translating into. Otherwise, improvements in the original \n"
 "\t\twill automatically cascade.\n"
 "        "
 msgstr ""
@@ -2895,17 +2722,13 @@ msgstr ""
 msgid ""
 "\n"
 "        Each set of subtitles or translation has a full revision history. \n"
-"\t\tJust click on the tab on the subtitle page in you will see a list of "
-"revisions. \n"
-"\t\tYou can use the checkboxes on the left and the \"compare revisions\" "
-"button \n"
-"\t\tto see the difference between two revisions. Or you can click on any one "
-"revision, \n"
+"\t\tJust click on the tab on the subtitle page in you will see a list of revisions. \n"
+"\t\tYou can use the checkboxes on the left and the \"compare revisions\" button \n"
+"\t\tto see the difference between two revisions. Or you can click on any one revision, \n"
 "\t\tand edit based on that revision or roll back to that revision.\n"
 "        <br/><br/>\n"
 "        If the current version is blank, but there are older revisions, \n"
-"\t\tit make sense to check those older revisions before starting from "
-"scratch, \n"
+"\t\tit make sense to check those older revisions before starting from scratch, \n"
 "\t\tbecause there could be useful work in an older revision.\n"
 "        "
 msgstr ""
@@ -2913,14 +2736,11 @@ msgstr ""
 #: templates/faq.html:186
 msgid ""
 "\n"
-"          Go to <a href=\"http://universalsubtitles.org/get-code/\">this "
-"page</a> \n"
+"          Go to <a href=\"http://universalsubtitles.org/get-code/\">this page</a> \n"
 "\t\t  and double click on the code in the white box to select it all.  \n"
-"\t\t  Go to Edit > Copy in your browser's menu to copy the code to your "
-"clipboard.  \n"
+"\t\t  Go to Edit > Copy in your browser's menu to copy the code to your clipboard.  \n"
 "\t\t  Then start editing the headers in your site or blog theme, \n"
-"\t\t  and paste the script somewhere between the &lt;head&gt; and &lt;/"
-"head&gt; \n"
+"\t\t  and paste the script somewhere between the &lt;head&gt; and &lt;/head&gt; \n"
 "\t\t  tags in your blog theme.  \n"
 "        "
 msgstr ""
@@ -2936,9 +2756,7 @@ msgstr ""
 msgid ""
 "Thanks for getting in touch! We love hearing your ideas, bugs, feedback, "
 "opinions and such."
-msgstr ""
-"Eskerrik asko gurekin harremanetan jartzeagatik! Zure ideiak, hutsegiteak, "
-"iritziak eta abar ezagutzea gustatzen zaigu."
+msgstr "Eskerrik asko gurekin harremanetan jartzeagatik! Zure ideiak, hutsegiteak, iritziak eta abar ezagutzea gustatzen zaigu."
 
 #: templates/feedback_response.html:6
 msgid "Stay tuned as the project evolves!"
@@ -2956,29 +2774,27 @@ msgstr "Adeitasunez"
 msgid ""
 "PS. We do our best to respond to all questions, but please be patient -- we "
 "get a lot of email"
-msgstr ""
-"IO. Ahaleginak egiten ditugu galdera guztiei erantzuteko, baina pazientzia "
-"izan mesedez:  posta asko jasotzen dugu."
+msgstr "IO. Ahaleginak egiten ditugu galdera guztiei erantzuteko, baina pazientzia izan mesedez:  posta asko jasotzen dugu."
 
 #: templates/generic-error.html:7
 msgid "Sorry!"
-msgstr ""
+msgstr "Barkatu!"
 
 #: templates/generic-error.html:8
 msgid "If you need assistance, please visit our support site at "
-msgstr ""
+msgstr "Laguntza behar baduzu, joan gune honetara:"
 
 #: templates/generic-error.html:8
 msgid "Get help"
-msgstr ""
+msgstr "Lortu laguntza"
 
 #: templates/index.html:18
 msgid "The easiest way to caption and translate any video."
-msgstr ""
+msgstr "Edozein bideo itzuli eta azpititulatzeko modu errazena"
 
 #: templates/index.html:19
 msgid "The most powerful and flexible subtitling platform in the world."
-msgstr ""
+msgstr "Munduko azpititulu-plataforma indartsu eta malguena"
 
 #: templates/index.html:24
 msgid "Add a Video"
@@ -2990,7 +2806,7 @@ msgstr "Azpitituluak egin"
 
 #: templates/index.html:28
 msgid "Works with YouTube, Vimeo, HTML5, and more."
-msgstr ""
+msgstr "YouTube, Vimeo, HTML5 eta beste hainbatekin funtzionatzen du."
 
 #: templates/index.html:31
 msgid "Using YouTube?"
@@ -3006,23 +2822,22 @@ msgstr "Ezaugarriak"
 
 #: templates/index.html:37
 msgid "Embed the video anywhere"
-msgstr ""
+msgstr "Kapsulatu bideoa edonon"
 
 #: templates/index.html:38
 msgid "Add subtitles yourself or ask viewers to help."
-msgstr ""
+msgstr "Zuk zeuk jarri azpitituluak edo eskatu laguntza ikusleei."
 
 #: templates/index.html:43
 msgid "Help Create Captions and Subtitles"
-msgstr ""
+msgstr "Azpitituluak egiten lagundu"
 
 #: templates/index.html:45
 msgid ""
 "\n"
-"            Help organizations and deaf and hard of hearing viewers make "
-"videos accessible around the world.\n"
+"            Help organizations and deaf and hard of hearing viewers make videos accessible around the world.\n"
 "        "
-msgstr ""
+msgstr "\n            Lagundu mundu zabaleko zenbait erakunderi eta gorrei edo entzuteko arazoak dituzten ikusleei bideoak ikusten.\n        "
 
 #: templates/index.html:48
 msgid "Take a Look."
@@ -3030,20 +2845,18 @@ msgstr "Egin begirada bat."
 
 #: templates/index.html:52
 msgid "Groundbreaking Crowdsource Platform"
-msgstr ""
+msgstr "Lankidetza irekiko plataforma berritzailea"
 
 #: templates/index.html:54
 msgid ""
 "\n"
-"            Revolutionize how you create subtitles and reach viewers. "
-"Increase viewership with transcription, captioning, and translation "
-"services, and flexible API and integration options.\n"
+"            Revolutionize how you create subtitles and reach viewers. Increase viewership with transcription, captioning, and translation services, and flexible API and integration options.\n"
 "        "
-msgstr ""
+msgstr "\n            Goitik behera aldatu azpitituluak egiteko eta ikusleengana heltzeko zure modua. Handitu zure entzuleria itzulpen, transkripzio  eta azpititulugintza zerbitzuen bidez, eta API eta integrazio-aukera malguei esker.\n        "
 
 #: templates/index.html:57
 msgid "See our pro services."
-msgstr ""
+msgstr "Ikusi profesionalentzako zerbitzuak"
 
 #: templates/index.html:61
 msgid "Order Captions"
@@ -3062,13 +2875,11 @@ msgstr "Gehiago jakiteko."
 #: templates/index.html:89
 msgid ""
 "See how these companies use Amara to caption and subtitle more effectively."
-msgstr ""
-"Ikas ezazu nola erabiltzen duten Amara erakunde hauek azpitituluak modu "
-"eraginkorrean egiteko."
+msgstr "Ikasi nola darabilten Amara erakunde hauek azpitituluak eraginkorki egiteko."
 
 #: templates/index.html:95
 msgid "TED"
-msgstr ""
+msgstr "TED"
 
 #: templates/index.html:97
 msgid "TED Community"
@@ -3076,7 +2887,7 @@ msgstr "TED Komunitatea"
 
 #: templates/index.html:101
 msgid "Mozilla"
-msgstr ""
+msgstr "Mozilla"
 
 #: templates/index.html:103
 msgid "Mozilla Community"
@@ -3084,7 +2895,7 @@ msgstr "Mozilla Komunitatea"
 
 #: templates/index.html:107
 msgid "Netflix"
-msgstr ""
+msgstr "Netflix"
 
 #: templates/index.html:109
 msgid "Netflix Community"
@@ -3116,19 +2927,19 @@ msgstr ""
 
 #: templates/index.html:139
 msgid "PBS Newshour"
-msgstr ""
+msgstr "PBS Newshour"
 
 #: templates/index.html:141
 msgid "PBS Newshour Community"
-msgstr "PBS Newshour Komunitatea"
+msgstr "PBS Newshour Community"
 
 #: templates/index.html:146
 msgid "More Popular"
-msgstr "Hedatuena"
+msgstr "Estimatuena"
 
 #: templates/index.html:147
 msgid "Most Popular Today"
-msgstr "Hedatuena gaur"
+msgstr "Estimatuena gaur"
 
 #: templates/index.html:149
 msgid "Top this month"
@@ -3140,16 +2951,16 @@ msgstr "Egundoko apartena"
 
 #: templates/index.html:157
 msgid "More Featured"
-msgstr ""
+msgstr "Nabarmenenak"
 
 #: templates/index.html:158 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
-msgstr ""
+msgstr "Bideo nabarmenak"
 
 #: templates/index.html:186
 msgid "Awards for Amara"
-msgstr ""
+msgstr "Amararen sariak"
 
 #: templates/opensubtitles2010.html:8 templates/opensubtitles2010.html:26
 msgid "Open Subtitles Design Summit"
@@ -3171,28 +2982,20 @@ msgstr "Bileraren helburuak"
 msgid ""
 "<strong>Connect</strong> major stakeholders from projects, organizations, "
 "and movements that have open subtitling needs or focus."
-msgstr ""
-"<strong>Konektatu</strong> azpititulu irekiak egin behar edo egin nahi "
-"dituzten egitasmo, erakunde eta mugimenduetako interes-talde "
-"garrantzitsuenak ."
+msgstr "<strong>Konektatu</strong> azpititulu irekiak egin behar edo egin nahi dituzten egitasmo, erakunde eta mugimenduetako interes-talde garrantzitsuenak ."
 
 #: templates/opensubtitles2010.html:41
 msgid ""
 "<strong>Identify ways</strong> to solve stakeholder subtitling needs and be "
 "aware of existing technology that can be leveraged. Find logical places for "
 "collaboration/cooperation."
-msgstr ""
-"<strong>Hauteman bideak</strong> interesdunen azpitituluen beharrei "
-"erantzuteko eta aprobetxagarri den teknologiaren jakitun izan. "
-"Lankidetzarako leku logikoak aurkitu."
+msgstr "<strong>Hauteman bideak</strong> interesdunen azpitituluen beharrei erantzuteko eta aprobetxagarri den teknologiaren jakitun izan. Lankidetzarako leku logikoak aurkitu."
 
 #: templates/opensubtitles2010.html:44
 msgid ""
 "<strong>Move towards</strong> standardizing solutions and pushing forward "
 "the state of the art in open subtiting."
-msgstr ""
-"<strong>Bideari ekin</strong> jardunbideak estandarizatzeko eta "
-"azpititulugintza irekirako puntako teknologian aurrera egiten."
+msgstr "<strong>Bideari ekin</strong> jardunbideak estandarizatzeko eta azpititulugintza irekirako puntako teknologian aurrera egiten."
 
 #: templates/opensubtitles2010.html:53
 msgid "Participants"
@@ -3205,20 +3008,13 @@ msgid ""
 "accessibility advocates, open source developers, educational leaders, and "
 "other individuals and organizations with a stake in the subtitling world. "
 "We'll make a roster available when the event draws closer."
-msgstr ""
-"Parte hartuko dutenak: bideo egile eta ekoizleak, azken erabiltzaileak, "
-"bideo-ostalari  zerbitzu nagusien ordezkariak, estandarizazio ingeniariak, "
-"erabilerraztasun aldezkariak, hezkuntza liderrak, eta azpitituluetan "
-"interesatuak egon daitezkeen pertsona eta erakundeak. Zerrenda eskura "
-"jarriko dugu gertaera heltzera doanean."
+msgstr "Parte hartuko dutenak: bideo egile eta ekoizleak, azken erabiltzaileak, bideo-ostalari  zerbitzu nagusien ordezkariak, estandarizazio ingeniariak, erabilerraztasun aldezkariak, hezkuntza liderrak, eta azpitituluetan interesatuak egon daitezkeen pertsona eta erakundeak. Zerrenda eskura jarriko dugu gertaera heltzera doanean."
 
 #: templates/opensubtitles2010.html:57
 msgid ""
 "Attendees are selected by invitation; however, if you or your organization "
 "would like to participate, please contact:"
-msgstr ""
-"Parte hartzeko gonbidapena jaso behar duzu; zu edo zure erakundeak parte "
-"hartu nahi baduzue, mesedez  jarri harremanetan honela:"
+msgstr "Parte hartzeko gonbidapena jaso behar duzu; zu edo zure erakundeak parte hartu nahi baduzue, mesedez  jarri harremanetan honela:"
 
 #: templates/opensubtitles2010.html:62
 msgid "When"
@@ -3234,20 +3030,10 @@ msgstr "Non"
 
 #: templates/opensubtitles2010.html:68
 msgid ""
-"The summit will be held at the beautiful Open Plans penthouse in Soho, which "
-"is located at 148 Lafayette St, Floor 12, New York City. (<a href=\"http://"
-"maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor"
-"+12,+New+York"
-"+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette"
-"+St,+New+York,"
-"+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
-msgstr ""
-"Bilera Sohoko Open Plans atikoan izango da, helbide honetan: 148 Lafayette "
-"St, Floor 12, New York City. (<a href=\"http://maps.google.com/maps?"
-"f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York"
-"+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette"
-"+St,+New+York,"
-"+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
+"The summit will be held at the beautiful Open Plans penthouse in Soho, which"
+" is located at 148 Lafayette St, Floor 12, New York City. (<a "
+"href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
+msgstr "Bilera Sohoko Open Plans atikoan izango da, helbide honetan: 148 Lafayette St, Floor 12, New York City. (<a href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
 
 #: templates/opensubtitles2010.html:73
 msgid "Why"
@@ -3256,17 +3042,12 @@ msgstr "Zergatik"
 #: templates/opensubtitles2010.html:75
 msgid ""
 "\n"
-"            The focus of this summit is increased availability and better "
-"usability for captions and subtitles, \n"
+"            The focus of this summit is increased availability and better usability for captions and subtitles, \n"
 "            which are both sorely needed. It comes at a critical time, \n"
-"            as internet video usage is skyrocketing&mdash;people who rely on "
-"captions are threatened to be left behind. \n"
+"            as internet video usage is skyrocketing&mdash;people who rely on captions are threatened to be left behind. \n"
 "            New users from every culture are coming online en masse; \n"
-"            standardizing and ubiquitizing the technology can make potential "
-"audiences exponentially larger and messages can cross cultural boundaries "
-"more easily. \n"
-"            More captions will also make it simpler for computers to "
-"process, index, \n"
+"            standardizing and ubiquitizing the technology can make potential audiences exponentially larger and messages can cross cultural boundaries more easily. \n"
+"            More captions will also make it simpler for computers to process, index, \n"
 "            and make sense of the ever growing sea of online video.\n"
 "           "
 msgstr ""
@@ -3282,8 +3063,8 @@ msgstr "Antolatzaileak"
 #: templates/opensubtitles2010.html:95
 msgid ""
 "The <a href=\"http://www.participatoryculture.org/\">Participatory Culture "
-"Foundation</a> is organizing the summit. Their most recent project, <a href="
-"\"http://universalsubtitles.org/\">Amara</a>, makes open source and "
+"Foundation</a> is organizing the summit. Their most recent project, <a "
+"href=\"http://universalsubtitles.org/\">Amara</a>, makes open source and "
 "collaborative subtitling and translation easy."
 msgstr ""
 
@@ -3294,14 +3075,10 @@ msgstr "Laguntzaileak"
 #: templates/opensubtitles2010.html:100
 msgid ""
 "<a href=\"http://www.aspirationtech.org/\">Aspiration</a> is providing "
-"facilitation and agenda design. Aspiration believes that face-to-face events "
-"are the most powerful way to facilitate interaction, build networks, and "
+"facilitation and agenda design. Aspiration believes that face-to-face events"
+" are the most powerful way to facilitate interaction, build networks, and "
 "collaborate."
-msgstr ""
-"<a href=\"http://www.aspirationtech.org/\">Aspirationek</a> aholkularitza "
-"eta egitarauaren antolaketa ari da egiten. Aspirationek uste du aurrez-"
-"aurreko bilerak direla biderik indartsuena interakzioa bultzatzeko, sareak "
-"eraikitzeko eta elkarrekin jarduteko."
+msgstr "<a href=\"http://www.aspirationtech.org/\">Aspirationek</a> aholkularitza eta egitarauaren antolaketa ari da egiten. Aspirationek uste du aurrez-aurreko bilerak direla biderik indartsuena interakzioa bultzatzeko, sareak eraikitzeko eta elkarrekin jarduteko."
 
 #: templates/opensubtitles2010.html:103
 msgid "Sponsors"
@@ -3309,19 +3086,15 @@ msgstr "Babesleak"
 
 #: templates/opensubtitles2010.html:104
 msgid ""
-"The summit has been generously funded by the <a href=\"http://www.soros.org/"
-"\">Open Society Institute</a>."
-msgstr ""
-"Bilera hau <a href=\"http://www.soros.org/\">Open Society Institute</a> "
-"erakundeak finantzatu du."
+"The summit has been generously funded by the <a "
+"href=\"http://www.soros.org/\">Open Society Institute</a>."
+msgstr "Bilera hau <a href=\"http://www.soros.org/\">Open Society Institute</a> erakundeak finantzatu du."
 
 #: templates/opensubtitles2010.html:113
 msgid ""
 "Special thanks to <a href=\"http://openplans.org/\">Open Plans</a> for "
 "providing meeting space!"
-msgstr ""
-"Eskerrak bereziki <a href=\"http://openplans.org/\">Open Plans</a> "
-"erakundeari bilerarako lekua emateagatik!"
+msgstr "Eskerrak bereziki <a href=\"http://openplans.org/\">Open Plans</a> erakundeari bilerarako lekua emateagatik!"
 
 #: templates/admin/base_site.html:4 templates/admin/base_site.html.py:7
 msgid "Amara"
@@ -3337,7 +3110,7 @@ msgstr "Bidali"
 
 #: templates/auth/_email_confirmation_notification.html:6
 msgid "Resend confirmation email"
-msgstr ""
+msgstr "Birbidali baieztapen-mezua"
 
 #: templates/auth/delete_user.html:9
 msgid "Are you sure that you want to permanently delete your profile?"
@@ -3374,7 +3147,7 @@ msgstr ""
 #: templates/auth/login.html:30 templates/auth/login_trap.html:15
 #: templates/openid_consumer/signin.html:22
 msgid "Sign In"
-msgstr "Izena eman"
+msgstr "Sartu"
 
 #: templates/auth/login.html:34
 msgid "Create an Amara account"
@@ -3390,7 +3163,7 @@ msgstr "Kontua sortu"
 
 #: templates/auth/login_trap.html:10
 msgid "Sign in as a different user"
-msgstr ""
+msgstr "Sartu beste erabiltzaile bat gisa"
 
 #: templates/comments/_item.html:3 templates/messages/inbox.html:59
 #: templates/messages/sent.html:46 templates/videos/_action_tpl.html:9
@@ -3398,7 +3171,7 @@ msgstr ""
 #: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:101
 #: templates/videos/diffing.html.py:136
 msgid "ago"
-msgstr "orain dela"
+msgstr "-"
 
 #: templates/externalsites/team-settings-tab.html:5
 #: templates/teams/_tabs.html:36 templates/teams/_tabs_projects.html:19
@@ -3409,7 +3182,7 @@ msgstr "orain dela"
 #: templates/teams/settings-projects-edit.html:5
 #: templates/teams/settings-projects.html:5 templates/teams/settings.html:5
 msgid "Settings"
-msgstr ""
+msgstr "Ezarpenak"
 
 #: templates/externalsites/team-settings-tab.html:40
 #: templates/profiles/account.html:63 templates/profiles/account.html.py:74
@@ -3437,9 +3210,7 @@ msgstr "Arazoa"
 msgid ""
 "Web video is beginning to rival television, but there isn't a good open "
 "resource for subtitling."
-msgstr ""
-"Web bideoa telebistarekin ari da lehian, baina ez dago azpitituluak egiteko "
-"tresna ireki egokirik."
+msgstr "Web bideoa telebistarekin ari da lehian, baina ez dago azpitituluak egiteko tresna ireki egokirik."
 
 #: templates/jsdemo/home.html:21
 msgid "Our Mission"
@@ -3449,9 +3220,7 @@ msgstr "Gure egitekoa"
 msgid ""
 "We're trying to make captioning, subtitling, and translating video publicly "
 "accessible in a way that's free and open, just like the Web."
-msgstr ""
-"Azpitituluak sortzea denen eskura jarri nahi dugu, modu aske eta irekian, "
-"Weba bera den antzera."
+msgstr "Azpitituluak sortzea denen eskura jarri nahi dugu, modu aske eta irekian, Weba bera den antzera."
 
 #: templates/jsdemo/home.html:21
 msgid "Learn More"
@@ -3481,9 +3250,7 @@ msgstr "Azpitituluentzako widgeta"
 msgid ""
 "A simple way to create and add captions to almost any video on the web "
 "(without having to transcode or re-upload videos)."
-msgstr ""
-"Webeko ia edozein bideoari azpitituluak jartzeko modu erraza (transkodetu "
-"edo bideoak berriz kargatu behar izan barik)"
+msgstr "Webeko ia edozein bideoari azpitituluak jartzeko modu erraza (transkodetu edo bideoak berriz kargatu behar izan barik)"
 
 #: templates/jsdemo/home.html:35
 msgid "Community Site"
@@ -3493,9 +3260,7 @@ msgstr "Gizarte-sarea"
 msgid ""
 "An online community for collaboratively subtitling and translating the "
 "world's videos (like a Wikipedia for subtitles)."
-msgstr ""
-"Mundu zabaleko bideoei elkarlanean azpitituluak jartzeko lineako komunitatea "
-"(azpitituluen Wikipedia baten antzera)"
+msgstr "Mundu zabaleko bideoei elkarlanean azpitituluak jartzeko lineako komunitatea (azpitituluen Wikipedia baten antzera)"
 
 #: templates/jsdemo/home.html:39
 msgid "Subtitle Lookup Protocol"
@@ -3503,12 +3268,9 @@ msgstr "Azpitituluak aurkitzeko protokoloa"
 
 #: templates/jsdemo/home.html:40
 msgid ""
-"An open standard to let Firefox extensions, desktop video players, websites, "
-"browsers--any client--find and retrieve subtitles for any video."
-msgstr ""
-"Firefox luzapenek, mahaigaineko bideo erreduzitzaileek, webguneek, "
-"bilatzaileek -edozein bezerok- edozein bideorentzako azpitituluak aurkitu "
-"eta eskuratu ahal ditzaten estandar irekia."
+"An open standard to let Firefox extensions, desktop video players, websites,"
+" browsers--any client--find and retrieve subtitles for any video."
+msgstr "Firefox luzapenek, mahaigaineko bideo erreduzitzaileek, webguneek, bilatzaileek -edozein bezerok- edozein bideorentzako azpitituluak aurkitu eta eskuratu ahal ditzaten estandar irekia."
 
 #: templates/jsdemo/home.html:50
 msgid "Get updates and find out first when we launch"
@@ -3556,7 +3318,7 @@ msgid ""
 "\n"
 "        You have %(msg_count)s new messages.\n"
 "    "
-msgstr ""
+msgstr "\n        %(msg_count)s mezu berri dituzu.\n    "
 
 #: templates/messages/_messages.html:7 templates/teams/dashboard.html:145
 #: templates/teams/dashboard.html.py:168
@@ -3628,7 +3390,7 @@ msgstr "Avatar"
 
 #: templates/messages/sent.html:58
 msgid "You have no sent messages."
-msgstr ""
+msgstr "Ez daukazu bidalitako mezurik."
 
 #: templates/messages/email/comment-notification.html:28
 #: templates/videos/email_notification.html:29
@@ -3643,15 +3405,11 @@ msgid ""
 "\n"
 "Thanks for joining Amara!<br/>\n"
 "\n"
-"<p>If you created the \"%(user)s\" user account on universalsubtitles.org, "
-"please click the following link to confirm your email address (%(email)s):"
-"<br/></p>\n"
+"<p>If you created the \"%(user)s\" user account on universalsubtitles.org, please click the following link to confirm your email address (%(email)s):<br/></p>\n"
 "\n"
 "<p><a href=\"%(activate_url)s\">confirm email</a></p>\n"
 "\n"
-"<p>If you believe you've received this message in error, we apologize—feel "
-"free to ignore it. If you have any concerns, please contact us at "
-"feedback@universalsubtitles.org.</p>\n"
+"<p>If you believe you've received this message in error, we apologize—feel free to ignore it. If you have any concerns, please contact us at feedback@universalsubtitles.org.</p>\n"
 "\n"
 "Thanks, <br/>\n"
 "The Amara team\n"
@@ -3674,7 +3432,7 @@ msgstr "Sartu"
 
 #: templates/messages/email/team-you-have-been-invited.html:16
 msgid "Reject"
-msgstr ""
+msgstr "Atzera bota"
 
 #: templates/messages/email/videos-imported.html:6
 #, python-format
@@ -3683,12 +3441,9 @@ msgid ""
 "\n"
 "%(imported_videos)s your videos were successfull imported!<br/>\n"
 "\n"
-"<p>Too see them, you can go to <a href=\"%(my_videos_url)s\">your user page</"
-"a></p>\n"
+"<p>Too see them, you can go to <a href=\"%(my_videos_url)s\">your user page</a></p>\n"
 "\n"
-"<p>If you believe you've received this message in error, we apologize—feel "
-"free to ignore it. If you have any concerns, please contact us at "
-"feedback@universalsubtitles.org.</p>\n"
+"<p>If you believe you've received this message in error, we apologize—feel free to ignore it. If you have any concerns, please contact us at feedback@universalsubtitles.org.</p>\n"
 "\n"
 "Thanks, <br/>\n"
 "The Amara team\n"
@@ -3721,7 +3476,7 @@ msgstr "Kargatzen..."
 
 #: templates/profiles/_select_language_dialog.html:5
 msgid "Select your Languages"
-msgstr "Aukeratu zure hizkuntzak"
+msgstr "Aukeratu hizkuntzak"
 
 #: templates/profiles/_select_language_dialog.html:10
 msgid "Select at least one language."
@@ -3768,7 +3523,7 @@ msgstr "Panela"
 
 #: templates/profiles/_top_user_panel.html:15
 msgid "Profile"
-msgstr ""
+msgstr "Profila"
 
 #: templates/profiles/_top_user_panel.html:36
 msgid "Logout"
@@ -3777,7 +3532,7 @@ msgstr "Irten"
 #: templates/profiles/_top_user_panel.html:42
 #: templates/teams/teams-list.html:6 templates/teams/teams-list.html.py:29
 msgid "Your Teams"
-msgstr ""
+msgstr "Zure taldeak"
 
 #: templates/profiles/_user_videos_activity.html:4
 msgid "Edits to my videos"
@@ -3794,11 +3549,11 @@ msgstr "hizkuntza"
 
 #: templates/profiles/_video_detail.html:10
 msgid "No subtitles yet"
-msgstr ""
+msgstr "Oraindik azpititulurik ez"
 
 #: templates/profiles/account.html:17
 msgid "User Details"
-msgstr ""
+msgstr "Erabiltzailearen zehaztasunak."
 
 #: templates/profiles/account.html:28
 msgid "YouTube Sync"
@@ -3818,7 +3573,7 @@ msgstr "Beste kontuak"
 
 #: templates/profiles/account.html:54
 msgid "Sign in to Amara with Twitter, Facebook, and other accounts"
-msgstr ""
+msgstr "Sartu Amaran Twitter, Facebook edo beste konturen bat erabiliz"
 
 #: templates/profiles/account.html:55
 msgid "Add an account"
@@ -3842,7 +3597,7 @@ msgstr "Jasotako mezu bakoitzeko bidali notifikazio-emaila."
 
 #: templates/profiles/account.html:101
 msgid "API Access"
-msgstr ""
+msgstr "API atzipena"
 
 #: templates/profiles/account.html:103
 msgid "Your API key"
@@ -3892,24 +3647,21 @@ msgstr ""
 #: templates/profiles/account.html:171
 msgid ""
 "\n"
-"                                        We automatically <strong>add your "
-"YouTube videos to Amara</strong> (and import their subtitles).\n"
+"                                        We automatically <strong>add your YouTube videos to Amara</strong> (and import their subtitles).\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:176
 msgid ""
 "\n"
-"                                        We <strong>invite your viewers to "
-"subtitle</strong> by adding a link to your video descriptions.\n"
+"                                        We <strong>invite your viewers to subtitle</strong> by adding a link to your video descriptions.\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:181
 msgid ""
 "\n"
-"                                        We <strong>send subtitles to "
-"YouTube</strong> whenever they're completed on Amara.\n"
+"                                        We <strong>send subtitles to YouTube</strong> whenever they're completed on Amara.\n"
 "                                    "
 msgstr ""
 
@@ -3920,17 +3672,14 @@ msgstr ""
 #: templates/profiles/account.html:190
 msgid ""
 "\n"
-"                                        The link is <strong>one-way only</"
-"strong>. Changes made on YouTube won't be reflected on Amara and may be "
-"overwritten. Use Amara to edit subtitles.\n"
+"                                        The link is <strong>one-way only</strong>. Changes made on YouTube won't be reflected on Amara and may be overwritten. Use Amara to edit subtitles.\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:195
 msgid ""
 "\n"
-"                                        Amara will <strong>append a credit</"
-"strong> to the subtitles if space allows.\n"
+"                                        Amara will <strong>append a credit</strong> to the subtitles if space allows.\n"
 "                                    "
 msgstr ""
 
@@ -3974,7 +3723,7 @@ msgstr "Mezua"
 
 #: templates/profiles/base.html:33 templates/teams/_subnav_settings.html:17
 msgid "Languages"
-msgstr ""
+msgstr "Hizkuntzak"
 
 #: templates/profiles/base.html:54
 msgid "hasn't selected languages yet."
@@ -3998,19 +3747,19 @@ msgstr "Irakurri gabeko mezua"
 
 #: templates/profiles/dashboard.html:44 templates/teams/dashboard.html:48
 msgid "Videos you're working on"
-msgstr ""
+msgstr "Jorratzen ari zaren bideoak"
 
 #: templates/profiles/dashboard.html:59
 #: templates/teams/_perform_task_link.html:11
 #, python-format
 msgid "Create %(language)s subtitles"
-msgstr ""
+msgstr "Egin %(language)s azpitituluak"
 
 #: templates/profiles/dashboard.html:61
 #: templates/teams/_perform_task_link.html:13
 #, python-format
 msgid "%(task_action)s %(language)s subtitles"
-msgstr ""
+msgstr "%(task_action)s %(language)s azpitituluak"
 
 #: templates/profiles/dashboard.html:68
 msgid "I can't do this"
@@ -4058,11 +3807,11 @@ msgstr "Editatu profila"
 
 #: templates/profiles/edit.html:30 templates/teams/_application_form.html:36
 msgid "About you"
-msgstr ""
+msgstr "Zuri buruz"
 
 #: templates/profiles/edit.html:44
 msgid "Photo"
-msgstr "Argazki"
+msgstr "Argazkia"
 
 #: templates/profiles/edit.html:48
 msgid "Remove current photo"
@@ -4084,8 +3833,7 @@ msgstr "Kendu hirugarren baten kontua"
 #, python-format
 msgid ""
 "\n"
-"                            Are you sure you want to remove the %(type)s "
-"account\n"
+"                            Are you sure you want to remove the %(type)s account\n"
 "                        "
 msgstr ""
 
@@ -4099,11 +3847,11 @@ msgid ""
 "\n"
 "        %(user_info)s's videos | Amara\n"
 "    "
-msgstr ""
+msgstr "\n        %(user_info)s(r)en bideoak | Amara\n    "
 
 #: templates/profiles/videos.html:29
 msgid "hasn't shared any videos on Amara."
-msgstr ""
+msgstr "oraindik ez du Amaran bideorik partekatu."
 
 #: templates/profiles/view.html:25
 msgid "doesn't have any activity yet."
@@ -4153,9 +3901,7 @@ msgstr "Pasahitz berria idatzi"
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr ""
-"Mesedez, idatz ezazu pasahitz berria birritan, zuzen idatzi duzula egiazta "
-"dezagun."
+msgstr "Mesedez, idatz ezazu pasahitz berria birritan, zuzen idatzi duzula egiazta dezagun."
 
 #: templates/registration/password_reset_confirm.html:21
 msgid "New password:"
@@ -4177,9 +3923,7 @@ msgstr "Pasahitza berrezartzeak huts egin du"
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr ""
-"Pasahitza berrezartzeko estekak ez du balio. Behar bada erabilita izan da "
-"dagoeneko. Mesedez, eskatu pasahitza berri bat berrezartzea."
+msgstr "Pasahitza berrezartzeko estekak ez du balio. Behar bada erabilita izan da dagoeneko. Mesedez, eskatu pasahitza berri bat berrezartzea."
 
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:12
@@ -4190,9 +3934,7 @@ msgstr "Pasahitza ondo berrezarri da."
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr ""
-"Mezua bidali dizugu zuk emandako helbide elektronikora  pasahitza "
-"berrezartzeko jarraibideekin. Laster jaso beharko zenuke."
+msgstr "Mezua bidali dizugu zuk emandako helbide elektronikora  pasahitza berrezartzeko jarraibideekin. Laster jaso beharko zenuke."
 
 #: templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -4224,9 +3966,7 @@ msgstr "%(site_name)s taldea"
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr ""
-"Ahaztu al duzu pasahitza? Idatz ezazu zure e-posta hemen eta pasahitz berri "
-"bat ezartzeko jarraibideak bidaliko dizkizugu."
+msgstr "Ahaztu al duzu pasahitza? Idatz ezazu zure e-posta hemen eta pasahitz berri bat ezartzeko jarraibideak bidaliko dizkizugu."
 
 #: templates/registration/password_reset_form.html:18
 msgid "E-mail address:"
@@ -4259,14 +3999,8 @@ msgid_plural ""
 "\n"
 "              %(number)s languages\n"
 "          "
-msgstr[0] ""
-"\n"
-"              %(number)s hizkuntza\n"
-"          "
-msgstr[1] ""
-"\n"
-"              %(number)s hizkuntza\n"
-"          "
+msgstr[0] "\n           hizkuntza %(number)s\n          "
+msgstr[1] "\n              %(number)s hizkuntza\n          "
 
 #: templates/search/_video_item.html:24
 msgid "lines"
@@ -4286,10 +4020,7 @@ msgid ""
 "\n"
 "                Search Results for %(query)s\n"
 "            "
-msgstr ""
-"\n"
-"                Bilaketa honen emaitzak aukitu %(query)s\n"
-"            "
+msgstr "\n                Bilaketa honen emaitzak aukitu %(query)s\n            "
 
 #: templates/search/search.html:136 templates/videos/featured_videos.html:50
 #: templates/videos/popular_videos.html:85
@@ -4373,8 +4104,7 @@ msgstr "Balioa"
 #, python-format
 msgid ""
 "\n"
-"            Editing %(language)s subtitles for &ldquo;%(video)s&rdquo; - "
-"Amara\n"
+"            Editing %(language)s subtitles for &ldquo;%(video)s&rdquo; - Amara\n"
 "        "
 msgstr ""
 
@@ -4386,11 +4116,11 @@ msgstr ""
 #: templates/subtitles/subtitle-editor.html:49
 #: templates/subtitles/subtitle-editor.html:730
 msgid "Edit title and description"
-msgstr ""
+msgstr "Editatu titulua eta deskribapena"
 
 #: templates/subtitles/subtitle-editor.html:71
 msgid "Keyboard controls"
-msgstr ""
+msgstr "Teklatuko kontrolak"
 
 #: templates/subtitles/subtitle-editor.html:71
 msgid "more commands"
@@ -4400,85 +4130,85 @@ msgstr ""
 #: templates/subtitles/subtitle-editor.html:93
 #: templates/subtitles/subtitle-editor.html:118
 msgid "Play / Pause"
-msgstr ""
+msgstr "Hasi / Gelditu"
 
 #: templates/subtitles/subtitle-editor.html:81
 #: templates/subtitles/subtitle-editor.html:99
 #: templates/subtitles/subtitle-editor.html:124
 msgid "Skip back"
-msgstr ""
+msgstr "Saltatu atzera"
 
 #: templates/subtitles/subtitle-editor.html:87
 #: templates/subtitles/subtitle-editor.html:130
 msgid "Insert a line break"
-msgstr ""
+msgstr "Txertatu lerro-jauzia"
 
 #: templates/subtitles/subtitle-editor.html:105
 msgid "Start subtitle"
-msgstr ""
+msgstr "Hasi azpititulua"
 
 #: templates/subtitles/subtitle-editor.html:111
 msgid "End subtitle"
-msgstr ""
+msgstr "Amaitu azpititulua"
 
 #: templates/subtitles/subtitle-editor.html:135
 #: templates/subtitles/subtitle-editor.html:549
 msgid "Subtitling Guidelines"
-msgstr ""
+msgstr "Azpititulatzeko gidalerroak"
 
 #: templates/subtitles/subtitle-editor.html:204
 msgid "How to start making subtitles."
-msgstr ""
+msgstr "Nola hasi azpitituluak egiten."
 
 #: templates/subtitles/subtitle-editor.html:206
 msgid "Play the video and type what you hear."
-msgstr ""
+msgstr "Jarri bideoa martxan eta idatzi entzuten duzuna."
 
 #: templates/subtitles/subtitle-editor.html:207
 msgid "Press Enter to complete a subtitle."
-msgstr ""
+msgstr "Sakatu 'Sartu' azpititulua amaitzean."
 
 #: templates/subtitles/subtitle-editor.html:208
 msgid "Use the guide on the right to move to the next step."
-msgstr ""
+msgstr "Erabili eskuineko gida hurrengo urratsera joateko."
 
 #: templates/subtitles/subtitle-editor.html:210
 #: templates/subtitles/subtitle-editor.html:219
 #: templates/subtitles/subtitle-editor.html:229
 msgid "Press the TAB key to start!"
-msgstr ""
+msgstr "Hasteko, sakatu TAB tekla!"
 
 #: templates/subtitles/subtitle-editor.html:213
 msgid "Subtitle Syncing"
-msgstr ""
+msgstr "Azpitituluak sinkronizatu"
 
 #: templates/subtitles/subtitle-editor.html:215
 msgid "Tap the DOWN arrow to start a subtitle."
-msgstr ""
+msgstr "Sakatu 'behera gezia' azpititulua hasteko."
 
 #: templates/subtitles/subtitle-editor.html:216
 msgid "Tap the UP arrow to set the end time (optional)."
-msgstr ""
+msgstr "Sakatu 'gora gezia' amaiera ezartzeko (aukerakoa)."
 
 #: templates/subtitles/subtitle-editor.html:217
 msgid "Use the Tools menu to hide the timeline for typing mode."
-msgstr ""
+msgstr "Erabili tresnen menua denbora-lerroa ezkutatzeko idazterakoan. "
 
 #: templates/subtitles/subtitle-editor.html:223
 msgid "Review your work"
-msgstr ""
+msgstr "Zure lana berrikusi"
 
 #: templates/subtitles/subtitle-editor.html:225
 msgid "Watch the video and make corrections."
-msgstr ""
+msgstr "Bideoa ikusi eta zuzenketak egin."
 
 #: templates/subtitles/subtitle-editor.html:226
 msgid "Click Complete to sign off on your work."
-msgstr ""
+msgstr "Sakatu 'Eginda' zure lana bukatzeko."
 
 #: templates/subtitles/subtitle-editor.html:227
 msgid "Use the Save button to save and finish later."
-msgstr ""
+msgstr "Erabili Gorde botoia lana gorde eta geroago amaitzeko."
 
 #: templates/subtitles/subtitle-editor.html:235
 #, python-format
@@ -4494,11 +4224,11 @@ msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:246
 msgid "Show"
-msgstr ""
+msgstr "Erakutsi"
 
 #: templates/subtitles/subtitle-editor.html:247
 msgid "Timeline"
-msgstr ""
+msgstr "Denbora lerroa"
 
 #: templates/subtitles/subtitle-editor.html:249
 msgid "Clear timing"
@@ -4506,43 +4236,43 @@ msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:250
 msgid "Clear text"
-msgstr ""
+msgstr "Ezabatu testua"
 
 #: templates/subtitles/subtitle-editor.html:251
 msgid "Revert to last saved version"
-msgstr ""
+msgstr "Joan azkenez gordetako bertsiora"
 
 #: templates/subtitles/subtitle-editor.html:362
 msgid "1. Type what you hear"
-msgstr ""
+msgstr "1. Entzuten duzuna idatzi"
 
 #: templates/subtitles/subtitle-editor.html:364
 msgid "Is all the content subtitled?"
-msgstr ""
+msgstr "Dena dago jada azpitituluetan sartuta?"
 
 #: templates/subtitles/subtitle-editor.html:367
 msgid "Yes, translate the title"
-msgstr ""
+msgstr "Bai, itzuli titulua"
 
 #: templates/subtitles/subtitle-editor.html:368
 msgid "Yes, start syncing"
-msgstr ""
+msgstr "Bai, hasi sinkronizatzen"
 
 #: templates/subtitles/subtitle-editor.html:374
 msgid "2. Translate title"
-msgstr ""
+msgstr "2. Itzuli titulua"
 
 #: templates/subtitles/subtitle-editor.html:379
 msgid "Title and description were not edited yet."
-msgstr ""
+msgstr "Titulua eta deskripzioa editatu gabe daude."
 
 #: templates/subtitles/subtitle-editor.html:382
 msgid "Title and description have been edited."
-msgstr ""
+msgstr "Titulua eta deskripzioa editatu dira."
 
 #: templates/subtitles/subtitle-editor.html:384
 msgid "Start syncing"
-msgstr ""
+msgstr "Hasi sinkronizatzen"
 
 #: templates/subtitles/subtitle-editor.html:392
 msgid "2. Sync Timing"
@@ -4554,237 +4284,238 @@ msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:398
 msgid "Not all lines are completed."
-msgstr ""
+msgstr "Ez daude lerro guztiak eginda."
 
 #: templates/subtitles/subtitle-editor.html:401
 msgid "All lines are completed."
-msgstr ""
+msgstr "Lerro guztiak eginda daude."
 
 #: templates/subtitles/subtitle-editor.html:403
 msgid "Start reviewing"
-msgstr ""
+msgstr "Hasi berrikusten"
 
 #: templates/subtitles/subtitle-editor.html:411
 msgid "3. Review and complete"
-msgstr ""
+msgstr "3. Berrikusi eta amaitu"
 
 #: templates/subtitles/subtitle-editor.html:412
 msgid "4. Review and complete"
-msgstr ""
+msgstr "4. Berrikusi eta amaitu"
 
 #: templates/subtitles/subtitle-editor.html:416
 msgid ""
-"Watch the video again and verify that the subtitles are complete and correct."
-msgstr ""
+"Watch the video again and verify that the subtitles are complete and "
+"correct."
+msgstr "Ikusi berriro bideoa eta egiaztatu azpitituluak ondo daudela."
 
 #: templates/subtitles/subtitle-editor.html:418
 msgid "Complete"
-msgstr ""
+msgstr "Eginda"
 
 #: templates/subtitles/subtitle-editor.html:443
 msgid "Amara Style Guidelines"
-msgstr ""
+msgstr "Amararen estilo-arauak"
 
 #: templates/subtitles/subtitle-editor.html:448
 msgid "Subtitle line length"
-msgstr ""
+msgstr "Azpitituluen lerro-luzera"
 
 #: templates/subtitles/subtitle-editor.html:449
 msgid "Keep subtitle length to about 42 characters;"
-msgstr ""
+msgstr "Azpitituluen gehienezko lerro-luzera: 42 karaktere;"
 
 #: templates/subtitles/subtitle-editor.html:450
 msgid "avoid more than 2 lines per subtitle."
-msgstr ""
+msgstr "azpititulu batek gehienez 2 lerro izango ditu ."
 
 #: templates/subtitles/subtitle-editor.html:453
 msgid "Minimum duration"
-msgstr ""
+msgstr "Iraupen minimoa"
 
 #: templates/subtitles/subtitle-editor.html:454
 msgid "Subtitles should not be less than 1 second."
-msgstr ""
+msgstr "Azpitituluak segundo 1 bat iraungo du gutxienez."
 
 #: templates/subtitles/subtitle-editor.html:457
 msgid "Maximum duration"
-msgstr ""
+msgstr "Iraupen maximoa"
 
 #: templates/subtitles/subtitle-editor.html:458
 msgid "Split subtitles lasting more than 7 seconds."
-msgstr ""
+msgstr "Ez egin 7 segundo baino gehiagoko azpititulurik."
 
 #: templates/subtitles/subtitle-editor.html:461
 msgid "Reading speed"
-msgstr ""
+msgstr "Irakurketa-abiadura"
 
 #: templates/subtitles/subtitle-editor.html:462
 msgid "8-25 characters/second is recommended;"
-msgstr ""
+msgstr "8-25 karaktere/segundoro da gomendagarria;"
 
 #: templates/subtitles/subtitle-editor.html:463
 msgid "8-16 characters/second for children."
-msgstr ""
+msgstr "8-16 karaktere/segundoro umeentzako denean."
 
 #: templates/subtitles/subtitle-editor.html:466
 msgid "Sounds"
-msgstr ""
+msgstr "Hotsak"
 
 #: templates/subtitles/subtitle-editor.html:467
 msgid "Describe meaningful sounds that are relevant to the plot."
-msgstr ""
+msgstr "Istorioan garrantzia duten hots eta zaratak deskribatu."
 
 #: templates/subtitles/subtitle-editor.html:468
 msgid "ex: (water dripping)"
-msgstr ""
+msgstr "adib.: (ur tanten hotsa)"
 
 #: templates/subtitles/subtitle-editor.html:471
 msgid "Music"
-msgstr ""
+msgstr "Musika"
 
 #: templates/subtitles/subtitle-editor.html:472
 msgid "Describe relevant music which does not have relevant lyrics."
-msgstr ""
+msgstr "Deskribatu garrantzia duen musika, letra nabarmenik ez badu."
 
 #: templates/subtitles/subtitle-editor.html:473
 msgid "ex: ♪ (jazz music) ♪"
-msgstr ""
+msgstr "adib.: ♪ (jazz musika) ♪"
 
 #: templates/subtitles/subtitle-editor.html:476
 msgid "Speaker Identification"
-msgstr ""
+msgstr "Hizlaria identifikatu"
 
 #: templates/subtitles/subtitle-editor.html:477
 msgid "Use parenthesis to indicate when someone is speaking off-screen."
-msgstr ""
+msgstr "Parentesiak erabili hizlaria pantailan agertzen ez denean. "
 
 #: templates/subtitles/subtitle-editor.html:478
 #: templates/subtitles/subtitle-editor.html:516
 msgid "ex: (Michael) Wait for me!"
-msgstr ""
+msgstr "adib.: (Mikel) Itxaron!"
 
 #: templates/subtitles/subtitle-editor.html:481
 msgid "Show Advanced Guidelines"
-msgstr ""
+msgstr "Erakutsi gidalerro gehiago"
 
 #: templates/subtitles/subtitle-editor.html:482
 msgid "Hide Advanced Guidelines"
-msgstr ""
+msgstr "Ezkutatu gidalerroak"
 
 #: templates/subtitles/subtitle-editor.html:486
 msgid "Translate the whole idea"
-msgstr ""
+msgstr "Ideia osoak itzuli"
 
 #: templates/subtitles/subtitle-editor.html:487
 msgid "Translations don't need to be word for word. Look at the context."
-msgstr ""
+msgstr "Itzulpenak ez dira hitzez-hitzekoak izan behar. Testuingurua hartu kontuan."
 
 #: templates/subtitles/subtitle-editor.html:488
 msgid ""
 "Make sure you are using the correct punctuation for the whole unit of text."
-msgstr ""
+msgstr "Testu unitate osoarentzako puntuazio egokia erabili."
 
 #: templates/subtitles/subtitle-editor.html:492
 msgid "Maximum timing offset"
-msgstr ""
+msgstr "Sinkronizazio egokia"
 
 #: templates/subtitles/subtitle-editor.html:493
 msgid ""
 "Subtitles shouldn't start more than 0.5 seconds before or after the audio "
 "begins."
-msgstr ""
+msgstr "Azpititulua hasi beharko litzateke audioa hasi edo amaitu  baino 0,5 segundo baino gutxiago."
 
 #: templates/subtitles/subtitle-editor.html:496
 msgid "On-screen texts"
-msgstr ""
+msgstr "Pantailako testuak"
 
 #: templates/subtitles/subtitle-editor.html:497
 msgid "Translate the texts on the video that are relevant to the plot."
-msgstr ""
+msgstr "Bideoan agertzen diren testuak itzuli istorioan garrantzia badute."
 
 #: templates/subtitles/subtitle-editor.html:500
 msgid "Use meaningful speech"
-msgstr ""
+msgstr "Hitz esanguratsuak erabili"
 
 #: templates/subtitles/subtitle-editor.html:501
 msgid "Exclude things like “um” “ah” and other disfluencies."
-msgstr ""
+msgstr "Ez ipini \"eh\", \"ah\", eta antzerako esaerak."
 
 #: templates/subtitles/subtitle-editor.html:504
 msgid "Indicate inaudible parts"
-msgstr ""
+msgstr "Entzungaitza dena adierazi"
 
 #: templates/subtitles/subtitle-editor.html:505
 msgid "If the audio is inaudible, it should be marked as [inaudible]."
-msgstr ""
+msgstr "Entzutea ezinezkoa denean, idatzi [entzungaitza]."
 
 #: templates/subtitles/subtitle-editor.html:508
 msgid "Lyrics"
-msgstr ""
+msgstr "Letrak"
 
 #: templates/subtitles/subtitle-editor.html:509
 msgid "Wrap relevant lyrics in musical notes."
-msgstr ""
+msgstr "Letra nabarmenak musika-noten artean idatzi."
 
 #: templates/subtitles/subtitle-editor.html:510
 msgid "ex ♪ Tell me dear Billy, ♪"
-msgstr ""
+msgstr "adib. ♪ Itsasoa laino dago, ♪"
 
 #: templates/subtitles/subtitle-editor.html:514
 msgid "Speaker identification"
-msgstr ""
+msgstr "Hizlaria identifikatu"
 
 #: templates/subtitles/subtitle-editor.html:515
 msgid "Identify off-screen and unclear speakers in parentheses."
-msgstr ""
+msgstr "Idatzi parentesi artean pantailan agertzen ez diren hizlariak edo argi azaltzen ez direnak."
 
 #: templates/subtitles/subtitle-editor.html:520
 msgid "Foreign language"
-msgstr ""
+msgstr "Beste hizkuntzak"
 
 #: templates/subtitles/subtitle-editor.html:521
 msgid "Identify relevant speech in foreign language. "
-msgstr ""
+msgstr "Beste hizkuntzetan esandakoa identifikatu beharrezkoa denean."
 
 #: templates/subtitles/subtitle-editor.html:522
 msgid "ex: (Russian): Thank you."
-msgstr ""
+msgstr "adib.: (errusiera): Eskerrik asko."
 
 #: templates/subtitles/subtitle-editor.html:526
 msgid "Simultaneous dialogue"
-msgstr ""
+msgstr "Aldibereko elkarrizketa"
 
 #: templates/subtitles/subtitle-editor.html:527
 msgid "Used exclusively when two speakers talk in the same subtitle. "
-msgstr ""
+msgstr "Azpititulu berean hizlari bi daudenean bakarrik erabili."
 
 #: templates/subtitles/subtitle-editor.html:528
 msgid ""
 "Each speaker should have one line, and both lines should have an hyphen. "
-msgstr ""
+msgstr "Hizlari bakoitza lerro batean doa, eta lerro biek marratxoa izan behar dute."
 
 #: templates/subtitles/subtitle-editor.html:529
 msgid "- Sir, you are no gentleman."
-msgstr ""
+msgstr "- Egun on, non da herriko udaletxea?"
 
 #: templates/subtitles/subtitle-editor.html:530
 msgid "- Rhett Butler: And you, Miss, are no lady."
-msgstr ""
+msgstr "-  Jone Garate: Jarraitu kalean gora."
 
 #: templates/subtitles/subtitle-editor.html:542
 msgid "Show All Guidelines"
-msgstr ""
+msgstr "Erakutsi gidalerro guztiak"
 
 #: templates/subtitles/subtitle-editor.html:546
 msgid "Hide All Guidelines"
-msgstr ""
+msgstr "Ezkutatu gidalerro guztiak"
 
 #: templates/subtitles/subtitle-editor.html:551
 msgid "Translating Guidelines"
-msgstr ""
+msgstr "Itzultzeko gidalerroak"
 
 #: templates/subtitles/subtitle-editor.html:553
 msgid "Reviewing Guidelines"
-msgstr ""
+msgstr "Berraztertzeko gidalerroak"
 
 #: templates/subtitles/subtitle-editor.html:559
 #: templates/subtitles/subtitle-editor.html:724
@@ -4797,7 +4528,7 @@ msgstr "Itxi"
 
 #: templates/subtitles/subtitle-editor.html:564
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Teklatuko lasterbideak"
 
 #: templates/subtitles/subtitle-editor.html:569
 #: templates/subtitles/subtitle-editor.html:624
@@ -4810,96 +4541,96 @@ msgstr ""
 #: templates/subtitles/subtitle-editor.html:625
 #: templates/subtitles/subtitle-editor.html:663
 msgid "Windows / Linux"
-msgstr ""
+msgstr "Windows / Linux"
 
 #: templates/subtitles/subtitle-editor.html:571
 #: templates/subtitles/subtitle-editor.html:626
 #: templates/subtitles/subtitle-editor.html:664
 msgid "OS X"
-msgstr ""
+msgstr "OS X"
 
 #: templates/subtitles/subtitle-editor.html:576
 msgid "Play / Pause video"
-msgstr ""
+msgstr "Hasi / Gelditu bideoa"
 
 #: templates/subtitles/subtitle-editor.html:577
 #: templates/subtitles/subtitle-editor.html:578
 msgid "Tab"
-msgstr ""
+msgstr "Tab"
 
 #: templates/subtitles/subtitle-editor.html:581
 msgid "Skip back 2 seconds"
-msgstr ""
+msgstr "Atzera 2 segundo"
 
 #: templates/subtitles/subtitle-editor.html:582
 #: templates/subtitles/subtitle-editor.html:583
 msgid "Shift + Tab"
-msgstr ""
+msgstr "Maius + Tab"
 
 #: templates/subtitles/subtitle-editor.html:586
 msgid "Skip back 4 seconds"
-msgstr ""
+msgstr "Atzera 4 segundo"
 
 #: templates/subtitles/subtitle-editor.html:587
 msgid "Ctrl + Shift + ,"
-msgstr ""
+msgstr "Ktrl + Maius + ,"
 
 #: templates/subtitles/subtitle-editor.html:588
 msgid "CMD + Shift + ,"
-msgstr ""
+msgstr "CMD + Maius + ,"
 
 #: templates/subtitles/subtitle-editor.html:591
 msgid "Skip forward 4 seconds"
-msgstr ""
+msgstr "Aurrera 4 segundo"
 
 #: templates/subtitles/subtitle-editor.html:592
 msgid "Ctrl + Shift + ."
-msgstr ""
+msgstr "Ktrl + Maius + ."
 
 #: templates/subtitles/subtitle-editor.html:593
 msgid "CMD + Shift + ."
-msgstr ""
+msgstr "CMD + Maius + ."
 
 #: templates/subtitles/subtitle-editor.html:596
 msgid "Navigate to the next subtitle"
-msgstr ""
+msgstr "Joan hurrengo azpititulura"
 
 #: templates/subtitles/subtitle-editor.html:597
 #: templates/subtitles/subtitle-editor.html:598
 msgid "ENTER"
-msgstr ""
+msgstr "SARTU"
 
 #: templates/subtitles/subtitle-editor.html:601
 msgid "Insert line break"
-msgstr ""
+msgstr "Txertatu lerro jauzia"
 
 #: templates/subtitles/subtitle-editor.html:602
 #: templates/subtitles/subtitle-editor.html:603
 msgid "Shift + ENTER"
-msgstr ""
+msgstr "Maius + SARTU"
 
 #: templates/subtitles/subtitle-editor.html:606
 msgid "Delete empty subtitle"
-msgstr ""
+msgstr "Ezabatu azpititulu hutsak"
 
 #: templates/subtitles/subtitle-editor.html:607
 #: templates/subtitles/subtitle-editor.html:608
 #: templates/subtitles/subtitle-editor.html:612
 #: templates/subtitles/subtitle-editor.html:613
 msgid "ESC"
-msgstr ""
+msgstr "ESC"
 
 #: templates/subtitles/subtitle-editor.html:611
 msgid "Exit edit mode of current subtitle"
-msgstr ""
+msgstr "Azpitiulua editatzetik irten"
 
 #: templates/subtitles/subtitle-editor.html:617
 msgid "Show Browser Shortcuts"
-msgstr ""
+msgstr "Erakutsi arakatzailearen lasterbideak"
 
 #: templates/subtitles/subtitle-editor.html:618
 msgid "Hide Browser Shortcuts"
-msgstr ""
+msgstr "Ezkutatu arakatzailearen lasterbideak"
 
 #: templates/subtitles/subtitle-editor.html:620
 msgid "Browser Defaults that should work"
@@ -4907,163 +4638,163 @@ msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:631
 msgid "Jump to the next whole word"
-msgstr ""
+msgstr "Joan hurreng hitz osora"
 
 #: templates/subtitles/subtitle-editor.html:632
 msgid "CTRL + RIGHT Arrow"
-msgstr ""
+msgstr "KTRL + Eskuin-gezia"
 
 #: templates/subtitles/subtitle-editor.html:633
 msgid "ALT + RIGHT Arrow"
-msgstr ""
+msgstr "ALT + Eskuin-gezia"
 
 #: templates/subtitles/subtitle-editor.html:636
 msgid "Jump to the previous whole word"
-msgstr ""
+msgstr "Joan aurreko hitz osora"
 
 #: templates/subtitles/subtitle-editor.html:637
 msgid "CTRL + LEFT Arrow"
-msgstr ""
+msgstr "KTRL + Ezker-gezia"
 
 #: templates/subtitles/subtitle-editor.html:638
 msgid "ALT + LEFT Arrow"
-msgstr ""
+msgstr "ALT + Ezker-gezia"
 
 #: templates/subtitles/subtitle-editor.html:641
 msgid "Jump to the start of the subtitle"
-msgstr ""
+msgstr "Joan azpitituluaren hasierara"
 
 #: templates/subtitles/subtitle-editor.html:642
 msgid "Fn + RIGHT Arrow"
-msgstr ""
+msgstr "Fn + Eskuin-gezia"
 
 #: templates/subtitles/subtitle-editor.html:643
 msgid "CMD + RIGHT Arrow"
-msgstr ""
+msgstr "CMD + Eskuin-gezia"
 
 #: templates/subtitles/subtitle-editor.html:646
 msgid "Jump to the end of the subtitle"
-msgstr ""
+msgstr "Joan azpitituluaren amaierara"
 
 #: templates/subtitles/subtitle-editor.html:647
 msgid "Fn + LEFT Arrow"
-msgstr ""
+msgstr "Fn + Ezker-gezia"
 
 #: templates/subtitles/subtitle-editor.html:648
 msgid "CMD + LEFT Arrow"
-msgstr ""
+msgstr "CMD + Ezker-gezia"
 
 #: templates/subtitles/subtitle-editor.html:651
 msgid "Delete last complete word"
-msgstr ""
+msgstr "Ezabatu azken hitz osoa"
 
 #: templates/subtitles/subtitle-editor.html:652
 msgid "CTRL + Backspace"
-msgstr ""
+msgstr "KTRL + atzera-tekla"
 
 #: templates/subtitles/subtitle-editor.html:653
 msgid "CMD + Backspace"
-msgstr ""
+msgstr "CMD + atzera-tekla"
 
 #: templates/subtitles/subtitle-editor.html:657
 msgid "Proposed Shortcuts (not yet implemented)"
-msgstr ""
+msgstr "Proposatutako lasterbideak (ez dira oraindik erabilgarri) "
 
 #: templates/subtitles/subtitle-editor.html:669
 msgid "Insert subtitle (above)"
-msgstr ""
+msgstr "Txertatu azpititulua (aurretik)"
 
 #: templates/subtitles/subtitle-editor.html:670
 #: templates/subtitles/subtitle-editor.html:671
 msgid "Alt + i"
-msgstr ""
+msgstr "Alt + i"
 
 #: templates/subtitles/subtitle-editor.html:674
 msgid "Insert subtitle (below)"
-msgstr ""
+msgstr "Txertatu azpititulua (ondoren)"
 
 #: templates/subtitles/subtitle-editor.html:675
 #: templates/subtitles/subtitle-editor.html:676
 msgid "Alt + Shift + i"
-msgstr ""
+msgstr "Alt + Maius + i"
 
 #: templates/subtitles/subtitle-editor.html:679
 msgid "Delete current subtitle"
-msgstr ""
+msgstr "Ezabatu azpititulua"
 
 #: templates/subtitles/subtitle-editor.html:680
 #: templates/subtitles/subtitle-editor.html:681
 msgid "Alt + Delete (or Backspace)"
-msgstr ""
+msgstr "Alt + ezabatu (edo atzera-tekla)"
 
 #: templates/subtitles/subtitle-editor.html:684
 msgid "Navigate to the previous line"
-msgstr ""
+msgstr "Saltatu aurreko lerrora"
 
 #: templates/subtitles/subtitle-editor.html:685
 #: templates/subtitles/subtitle-editor.html:686
 msgid "Alt + UP Arrow"
-msgstr ""
+msgstr "Alt + gora-gezia"
 
 #: templates/subtitles/subtitle-editor.html:689
 msgid "Undo last action"
-msgstr ""
+msgstr "Desegin azken ekintza"
 
 #: templates/subtitles/subtitle-editor.html:690
 msgid "CTRL + z"
-msgstr ""
+msgstr "KTRL + z"
 
 #: templates/subtitles/subtitle-editor.html:691
 msgid "CMD + z"
-msgstr ""
+msgstr "CMD + z"
 
 #: templates/subtitles/subtitle-editor.html:694
 msgid "Redo last action"
-msgstr ""
+msgstr "Berregin azken ekintza"
 
 #: templates/subtitles/subtitle-editor.html:695
 msgid "CTRL + Shift + z"
-msgstr ""
+msgstr "KTRL + Maius + z"
 
 #: templates/subtitles/subtitle-editor.html:696
 msgid "CMD + Shift + z"
-msgstr ""
+msgstr "CMD + Maius + z"
 
 #: templates/subtitles/subtitle-editor.html:699
 msgid "Save a version"
-msgstr ""
+msgstr "Bertsioa gorde"
 
 #: templates/subtitles/subtitle-editor.html:700
 msgid "CTRL + s"
-msgstr ""
+msgstr "KTRL + s"
 
 #: templates/subtitles/subtitle-editor.html:701
 msgid "CMD + s"
-msgstr ""
+msgstr "CMD + s"
 
 #: templates/subtitles/subtitle-editor.html:704
 msgid "Italics formatting"
-msgstr ""
+msgstr "formatu etzana"
 
 #: templates/subtitles/subtitle-editor.html:705
 msgid "CTRL + i"
-msgstr ""
+msgstr "KTRL + i"
 
 #: templates/subtitles/subtitle-editor.html:706
 msgid "CMD + i"
-msgstr ""
+msgstr "CMD + i"
 
 #: templates/subtitles/subtitle-editor.html:709
 msgid "Bold formatting"
-msgstr ""
+msgstr "Formatu lodia"
 
 #: templates/subtitles/subtitle-editor.html:710
 msgid "CTRL + b"
-msgstr ""
+msgstr "KTRL + b"
 
 #: templates/subtitles/subtitle-editor.html:711
 msgid "CMD + b"
-msgstr ""
+msgstr "CMD + b"
 
 #: templates/subtitles/subtitle-editor.html:714
 msgid "Timeline toggle"
@@ -5079,11 +4810,11 @@ msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:731
 msgid "Title"
-msgstr ""
+msgstr "Titulua"
 
 #: templates/subtitles/subtitle-editor.html:733
 msgid "Enter Title"
-msgstr ""
+msgstr "Idatzi titulua"
 
 #: templates/subtitles/subtitle-editor.html:739
 #: templates/teams/settings-projects-add.html:32
@@ -5093,15 +4824,15 @@ msgstr "Azalpena"
 
 #: templates/subtitles/subtitle-editor.html:741
 msgid "Enter Description"
-msgstr ""
+msgstr "Idatzi deskripzioa"
 
 #: templates/subtitles/subtitle-editor.html:769
 msgid "Debugging Tools"
-msgstr ""
+msgstr "Arazketa tresnak"
 
 #: templates/subtitles/subtitle-editor.html:787
 msgid "Error saving subtitles"
-msgstr ""
+msgstr "Errorea azpitituluak gordetzean"
 
 #: templates/subtitles/subtitle-editor.html:790
 msgid ""
@@ -5118,19 +4849,19 @@ msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:794
 msgid ""
-"There was an error saving your subtitles.  Copy the subtitles above and save "
-"them to your computer as subtitle_backup.dfxp. You can upload them later."
+"There was an error saving your subtitles.  Copy the subtitles above and save"
+" them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:799
 #: templates/subtitles/subtitle-editor.html:817
 msgid "Download Subtitles"
-msgstr ""
+msgstr "Azpitituluak deskargatu"
 
 #: templates/subtitles/subtitle-editor.html:800
 #: templates/subtitles/subtitle-editor.html:818
 msgid "Close Editor"
-msgstr ""
+msgstr "Itxi editorea"
 
 #: templates/subtitles/subtitle-editor.html:805
 msgid "Error resuming session"
@@ -5144,13 +4875,13 @@ msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:812
 msgid ""
-"There was an error resuming your session.  Copy the subtitles above and save "
-"them to your computer as subtitle_backup.dfxp. You can upload them later."
+"There was an error resuming your session.  Copy the subtitles above and save"
+" them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr ""
 
 #: templates/teams/_application_form.html:4
 msgid "Apply to Join"
-msgstr ""
+msgstr "Sartzeko eskatu"
 
 #: templates/teams/_application_form.html:11
 msgid "Apply to"
@@ -5164,19 +4895,14 @@ msgstr "Hizkuntza maila"
 #, python-format
 msgid ""
 "\n"
-"                                No formal language training is required to "
-"translate for %(team)s. But we do ask that all translators are confident in "
-"their translation abilities. Please make sure your language selections are "
-"accurate (click \"Select your Languages\" in the blue bar on any page).\n"
+"                                No formal language training is required to translate for %(team)s. But we do ask that all translators are confident in their translation abilities. Please make sure your language selections are accurate (click \"Select your Languages\" in the blue bar on any page).\n"
 "                            "
 msgstr ""
 
 #: templates/teams/_application_form.html:28
 msgid ""
 "\n"
-"                                We request that each new applicant does at "
-"least one full set of subtitles within the first week of joining. Aside from "
-"that, it’s up to you!\n"
+"                                We request that each new applicant does at least one full set of subtitles within the first week of joining. Aside from that, it’s up to you!\n"
 "                            "
 msgstr ""
 
@@ -5184,9 +4910,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        Tell us a little bit about yourself and why you’re "
-"interested in translating with %(team)s. This should be 3-5 sentences, no "
-"longer!\n"
+"                        Tell us a little bit about yourself and why you’re interested in translating with %(team)s. This should be 3-5 sentences, no longer!\n"
 "                    "
 msgstr ""
 
@@ -5242,11 +4966,11 @@ msgstr "eta"
 
 #: templates/teams/_context_team.html:68 templates/teams/members-list.html:112
 msgid "project"
-msgstr ""
+msgstr "proiektua"
 
 #: templates/teams/_context_team.html:74
 msgid "Your tasks"
-msgstr ""
+msgstr "Zure zereginak"
 
 #: templates/teams/_context_team.html:78
 msgid "All available tasks"
@@ -5278,13 +5002,11 @@ msgstr "ez dirudi zuk itzuli ditzakezun bideoak direnik"
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "But check back soon! There may soon be translations for you to review."
-msgstr ""
-"Egiaztatu berriz hemendik gutxira, zuk berrikusteko itzulpenak egon daitezke."
+msgstr "Egiaztatu berriz hemendik gutxira, zuk berrikusteko itzulpenak egon daitezke."
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "You can also invite friends who speak other languages to help out."
-msgstr ""
-"Beste hizkuntzak ezagutzen dituzten lagunak gonbidatu ditzakezu laguntzeko."
+msgstr "Beste hizkuntzak ezagutzen dituzten lagunak gonbidatu ditzakezu laguntzeko."
 
 #: templates/teams/_join.html:9 templates/teams/_join.html.py:50
 msgid "Join via"
@@ -5308,7 +5030,7 @@ msgstr "Honen bidez sartu:"
 
 #: templates/teams/_join.html:33
 msgid "to apply"
-msgstr ""
+msgstr "eskatzeko"
 
 #: templates/teams/_join.html:43
 msgid "Your application is pending"
@@ -5332,7 +5054,7 @@ msgstr "Lan-jarioak"
 
 #: templates/teams/_subnav_settings.html:25
 msgid "External Sites"
-msgstr ""
+msgstr "Kanpoko webguneak"
 
 #: templates/teams/_tabs.html:16 templates/teams/members-list.html:6
 msgid "Members"
@@ -5342,7 +5064,7 @@ msgstr "Kideak"
 #: templates/teams/_team_video_detail.html:42
 #: templates/teams/settings-permissions.html:73 templates/teams/tasks.html:34
 msgid "Tasks"
-msgstr ""
+msgstr "Zereginak"
 
 #: templates/teams/_team_add_video_select.html:4
 msgid "Add this video to one of your teams"
@@ -5359,11 +5081,7 @@ msgid ""
 "            You received this notification because you are a member of the \n"
 "            <a href=\"%(team_page)s\">%(team)s</a> team. \n"
 "        "
-msgstr ""
-"\n"
-"            Jakinarazpen hau jasi duzu talde honen kidea zarelako: \n"
-"            <a href=\"%(team_page)s\">%(team)s</a> taldea. \n"
-"        "
+msgstr "\n            Jakinarazpen hau jasi duzu talde honen kidea zarelako: \n            <a href=\"%(team_page)s\">%(team)s</a> taldea. \n        "
 
 #: templates/teams/_team_move_video_select.html:6
 msgid "Move video to one of your other teams?"
@@ -5376,8 +5094,8 @@ msgstr ""
 
 #: templates/teams/_team_move_video_select.html:32
 msgid ""
-"You are about to move this video to a new team.<br /><strong>If you proceed, "
-"all open tasks will be deleted.</strong>"
+"You are about to move this video to a new team.<br /><strong>If you proceed,"
+" all open tasks will be deleted.</strong>"
 msgstr ""
 
 #: templates/teams/_team_select.html:6
@@ -5398,8 +5116,8 @@ msgid_plural ""
 "\n"
 "                        %(num)s languages needed\n"
 "                    "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                      hizkuntza %(num)s behar da\n                    "
+msgstr[1] "\n                        %(num)s hizkuntza behar dira\n                    "
 
 #: templates/teams/_team_video_detail.html:20
 #, python-format
@@ -5411,8 +5129,8 @@ msgid_plural ""
 "\n"
 "                        %(num)s languages\n"
 "                    "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                      hizkuntza %(num)s\n                    "
+msgstr[1] "\n                        %(num)s hizkuntza\n                    "
 
 #: templates/teams/_third-party-accounts.html:42
 msgid "You haven't linked any accounts yet."
@@ -5420,7 +5138,7 @@ msgstr ""
 
 #: templates/teams/activity.html:28
 msgid "Sorry, no activity yet"
-msgstr ""
+msgstr "Barkatu, oraindik ez dago jarduketarik"
 
 #: templates/teams/add_video.html:6 templates/teams/add_videos.html:6
 msgid "Team video"
@@ -5432,7 +5150,7 @@ msgstr "Gehitu bideoa"
 
 #: templates/teams/add_videos.html:21
 msgid "Add multiple videos"
-msgstr ""
+msgstr "Gehitu hainbat bideo"
 
 #: templates/teams/applications.html:6
 msgid "Team Aplications"
@@ -5452,7 +5170,7 @@ msgstr ""
 
 #: templates/teams/applications.html:66
 msgid "There are no applications right now"
-msgstr ""
+msgstr "Orain ez dago eskaririk"
 
 #: templates/teams/base.html:37
 msgid "Edit team"
@@ -5464,11 +5182,11 @@ msgstr "Taldea sortu"
 
 #: templates/teams/create.html:23 templates/teams/create.html.py:65
 msgid "Create a team"
-msgstr ""
+msgstr "Taldea sortu"
 
 #: templates/teams/create.html:28 templates/teams/teams-list.html:23
 msgid "All Teams"
-msgstr ""
+msgstr "Talde guztiak"
 
 #: templates/teams/create.html:33
 msgid "My Teams"
@@ -5484,19 +5202,19 @@ msgstr "Taldea sortu"
 
 #: templates/teams/create.html:69
 msgid "Back to teams"
-msgstr ""
+msgstr "Itzuli taldeetara"
 
 #: templates/teams/create.html:71
 msgid "Back to my teams"
-msgstr ""
+msgstr "Itzuli nire taldeetara"
 
 #: templates/teams/create_task.html:8
 msgid "Create a Task"
-msgstr ""
+msgstr "Zeregina sortu"
 
 #: templates/teams/create_task.html:44
 msgid "New Task"
-msgstr ""
+msgstr "Zeregin berria"
 
 #: templates/teams/create_task.html:45
 msgid ""
@@ -5504,12 +5222,7 @@ msgid ""
 "Translate) will always require original subtitles to be completed and "
 "published first. Others (like Review and Approve) must be enabled and can "
 "only follow a completed Transcribe/Translate task."
-msgstr ""
-"Ezarpenen eta lan-jarioaren arabera zehazten dira zereginak. Zeregin batzuk "
-"(adib.: Itzuli) beti eskatzen dute jatorrizko azpitituluak bukatu eta "
-"argiratuta egotea. Beste zeregin batzuk (Berraztertu eta Onartu gisa) "
-"gaituta egon behar dute eta Transkribatu/Itzuli zeregina bukatu ondoren "
-"baino ezin dira egin."
+msgstr "Ezarpenen eta lan-jarioaren arabera zehazten dira zereginak. Zeregin batzuk (adib.: Itzuli) beti eskatzen dute jatorrizko azpitituluak bukatu eta argiratuta egotea. Beste zeregin batzuk (Berraztertu eta Onartu gisa) gaituta egon behar dute eta Transkribatu/Itzuli zeregina bukatu ondoren baino ezin dira egin."
 
 #: templates/teams/create_task.html:49
 msgid "What needs to be done?"
@@ -5517,41 +5230,41 @@ msgstr "Zer da egin behar dena?"
 
 #: templates/teams/create_task.html:53
 msgid "Grayed-out tasks are not available for this video at this time."
-msgstr ""
+msgstr "Grisean agertzen diren zereginak ez dira oraingoz bideo honentzako erabilgarriak."
 
 #: templates/teams/create_task.html:57
 msgid "What language is needed?"
-msgstr ""
+msgstr "Ze hizkuntza behar da?"
 
 #: templates/teams/create_task.html:63
 msgid "Who should do it?"
-msgstr ""
+msgstr "Nork egin beharko luke?"
 
 #: templates/teams/create_task.html:68 templates/teams/tasks.html:599
 msgid "Begin typing to search"
-msgstr ""
+msgstr "Hasi idazten bilatzeko"
 
 #: templates/teams/create_task.html:71
 msgid ""
 "Tasks left unassigned can be claimed by members with the appropriate "
 "permissions."
-msgstr ""
+msgstr "Esleitu barik gelditzen diren zereginak baimena duen edonork har ditzake."
 
 #: templates/teams/create_task.html:77
 msgid "You do not have permission to create any valid tasks for this video."
-msgstr ""
+msgstr "Ez daukazu baimenik bideo honentzako baliozko zereginik onartzeko."
 
 #: templates/teams/create_task.html:83
 msgid "Selected Video"
-msgstr ""
+msgstr "Aukeratutako bideoa"
 
 #: templates/teams/create_task.html:100
 msgid "New task form"
-msgstr ""
+msgstr "Zeregin berria inprimakia"
 
 #: templates/teams/create_task.html:103
 msgid "Back to tasks list"
-msgstr ""
+msgstr "Itzuli zereginen zerrendara"
 
 #: templates/teams/dashboard.html:66
 msgid "Due in"
@@ -5568,8 +5281,7 @@ msgstr "Erraza da laguntzea!"
 #: templates/teams/dashboard.html:80
 msgid ""
 "\n"
-"                            Just find a video that interests you and click "
-"the button below it to get started!\n"
+"                            Just find a video that interests you and click the button below it to get started!\n"
 "                        "
 msgstr ""
 
@@ -5586,7 +5298,7 @@ msgid ""
 "\n"
 "                            We need your help subtitling our videos!\n"
 "                        "
-msgstr ""
+msgstr "\n                            Zure laguntza behar dugu gure bideoak azpititulatzeko!\n                        "
 
 #: templates/teams/dashboard.html:106 templates/teams/dashboard.html.py:200
 msgid "Videos that need your help"
@@ -5598,7 +5310,7 @@ msgstr ""
 
 #: templates/teams/dashboard.html:114 templates/teams/tasks.html:175
 msgid "Tell us what languages you speak"
-msgstr ""
+msgstr "Adierazi ezagutzen dituzun hizkuntzak"
 
 #: templates/teams/dashboard.html:114
 msgid "and we'll personalize this list for you"
@@ -5636,21 +5348,21 @@ msgstr "Gehitu bideoak taldera"
 #: templates/teams/delete-language.html:5
 #: templates/teams/delete-language.html:37
 msgid "Delete Language"
-msgstr ""
+msgstr "Ezabatu hizkuntza"
 
 #: templates/teams/delete-language.html:11
 #, python-format
 msgid "Deleting %(language)s Language"
-msgstr ""
+msgstr "Hizkuntza hau ezabatzen: %(language)s "
 
 #: templates/teams/delete-language.html:12
 #, python-format
 msgid "Video: %(video)s"
-msgstr ""
+msgstr "Bideoa: %(video)s"
 
 #: templates/teams/delete-language.html:14
 msgid "WARNING!"
-msgstr ""
+msgstr "ABISUA!"
 
 #: templates/teams/delete-language.html:16
 msgid "All subtitles for this language will be deleted"
@@ -5678,14 +5390,9 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"            %(team_name)s needs your help subtitling and translating the "
-"following new videos:\n"
+"            %(team_name)s needs your help subtitling and translating the following new videos:\n"
 "        "
-msgstr ""
-"\n"
-"            %(team_name)s taldeak zure laguntza behar du ondorengo bideo "
-"berriei azpitituluak jartzeko:\n"
-"        "
+msgstr "\n            %(team_name)s taldeak zure laguntza behar du ondorengo bideo berriei azpitituluak jartzeko:\n        "
 
 #: templates/teams/email_new_video.html:13
 msgid "Or you can visit the team page to see the latest work"
@@ -5699,15 +5406,10 @@ msgstr "Ez jaso jakinarazpen gehiago bideo berri bat gehitzen denean."
 #, python-format
 msgid ""
 "\n"
-"            The <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</"
-"a> \n"
+"            The <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n"
 "            team has added new videos, and they need your help:\n"
 "        "
-msgstr ""
-"\n"
-"            <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n"
-"           taldeak bideo berriak gehitu ditu eta zure laguntza behar dute:\n"
-"        "
+msgstr "\n            <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n           taldeak bideo berriak gehitu ditu eta zure laguntza behar dute:\n        "
 
 #: templates/teams/email_new_videos.html:20
 msgid "Thank you!"
@@ -5715,15 +5417,15 @@ msgstr "Eskerrik asko!"
 
 #: templates/teams/invite_members.html:6 templates/teams/members-list.html:45
 msgid "Invite Members"
-msgstr ""
+msgstr "Kideak gonbidatu"
 
 #: templates/teams/invite_members.html:23
 msgid "Recipient"
-msgstr ""
+msgstr "Hartzailea"
 
 #: templates/teams/invite_members.html:29
 msgid "Begin typing to search."
-msgstr ""
+msgstr "Hasi idazten bilatzeko."
 
 #: templates/teams/invite_members.html:32
 msgid "Amara username of the user you want to invite."
@@ -5731,56 +5433,56 @@ msgstr ""
 
 #: templates/teams/invite_members.html:36
 msgid "Invite Details"
-msgstr ""
+msgstr "Gonbidapenaren xehetasunak"
 
 #: templates/teams/invite_members.html:39
 msgid "Include a message"
-msgstr ""
+msgstr "Sartu mezua"
 
 #: templates/teams/invite_members.html:43
 msgid "Assign a role"
-msgstr ""
+msgstr "Rola esleitu"
 
 #: templates/teams/invite_members.html:45
 msgid "Role to be assigned to the user if they accept your invitation."
-msgstr ""
+msgstr "Erabiltzaileari esleitzeko rola, zure gonbidapena onartzen badu."
 
 #: templates/teams/invite_members.html:49
 msgid "Send Invites"
-msgstr ""
+msgstr "Gonbidapenak bidali"
 
 #: templates/teams/members-list.html:47 templates/teams/tasks.html:53
 #: templates/teams/videos-list.html:62
 msgid "Filter and Sort"
-msgstr ""
+msgstr "Iragazi eta sailkatu"
 
 #: templates/teams/members-list.html:53
 msgid "Showing"
-msgstr ""
+msgstr "Agertzen dira"
 
 #: templates/teams/members-list.html:55
 msgid "all members"
-msgstr ""
+msgstr "kide guztiak"
 
 #: templates/teams/members-list.html:56
 msgid "admins"
-msgstr ""
+msgstr "administratzaileak"
 
 #: templates/teams/members-list.html:57
 msgid "managers"
-msgstr ""
+msgstr "kudeatzaileak"
 
 #: templates/teams/members-list.html:58
 msgid "contributor"
-msgstr ""
+msgstr "kolaboratzailea"
 
 #: templates/teams/members-list.html:62
 msgid "speaking"
-msgstr ""
+msgstr "hitz egiten"
 
 #: templates/teams/members-list.html:64 templates/teams/tasks.html:93
 msgid "all languages"
-msgstr ""
+msgstr "hizkuntza guztiak"
 
 #: templates/teams/members-list.html:71 templates/teams/tasks.html:121
 msgid "sorted by"
@@ -5797,23 +5499,23 @@ msgstr ""
 #: templates/teams/members-list.html:83 templates/teams/tasks.html:146
 #: templates/teams/tasks.html.py:154 templates/teams/tasks.html:162
 msgid "Clear"
-msgstr ""
+msgstr "Garbitu"
 
 #: templates/teams/members-list.html:88
 msgid "This team has"
-msgstr ""
+msgstr "Talde honek d(it)u"
 
 #: templates/teams/members-list.html:88
 msgid "open applications"
-msgstr ""
+msgstr "ireki aplikazioak"
 
 #: templates/teams/members-list.html:93
 msgid "Sorry, no members found."
-msgstr ""
+msgstr "Barkatu, ez da kiderik aurkitu."
 
 #: templates/teams/members-list.html:103
 msgid "Me"
-msgstr ""
+msgstr "Ni"
 
 #: templates/teams/members-list.html:124
 msgid "Assignments"
@@ -5821,126 +5523,126 @@ msgstr ""
 
 #: templates/teams/members-list.html:133
 msgid "Are you sure you want to remove this member from the team?"
-msgstr ""
+msgstr "Ziur zaude kide hau taldetik atera nahi duzula?"
 
 #: templates/teams/settings-guidelines.html:5
 #: templates/teams/settings-guidelines.html:48
 msgid "Guidelines"
-msgstr ""
+msgstr "Gidalerroak"
 
 #: templates/teams/settings-guidelines.html:25
 msgid "Custom messages"
-msgstr ""
+msgstr "Mezu pertsonalizatuak"
 
 #: templates/teams/settings-guidelines.html:28
 msgid ""
-"Customize the messages sent to your users. The text you enter will accompany "
-"the default system message."
+"Customize the messages sent to your users. The text you enter will accompany"
+" the default system message."
 msgstr ""
 
 #: templates/teams/settings-guidelines.html:31
 msgid "When a member is invited to join the team"
-msgstr ""
+msgstr "Kide bat taldean sartzera gonbidatzen denean"
 
 #: templates/teams/settings-guidelines.html:35
 msgid "When a member applies to join the team"
-msgstr ""
+msgstr "Kide batek taldean sartzea eskatzen duenean"
 
 #: templates/teams/settings-guidelines.html:39
 msgid "When a member is given the Manager role"
-msgstr ""
+msgstr "Kide batek kudeatzaile rola hartzen duenean"
 
 #: templates/teams/settings-guidelines.html:43
 msgid "When a member is given the Admin role"
-msgstr ""
+msgstr "Kide batek administratzaile rola jasotzen duenean"
 
 #: templates/teams/settings-guidelines.html:51
 msgid "Add guidelines to be displayed to your users when completing tasks."
-msgstr ""
+msgstr "Gehitu gidalerroak, erabiltzaileek zereginak betetzean agertuko direnak."
 
 #: templates/teams/settings-guidelines.html:54
 msgid "When transcribing"
-msgstr ""
+msgstr "Transkribatzean"
 
 #: templates/teams/settings-guidelines.html:58
 msgid "When translating"
-msgstr ""
+msgstr "Itzultzean"
 
 #: templates/teams/settings-guidelines.html:62
 msgid "When reviewing"
-msgstr ""
+msgstr "Berrikustean"
 
 #: templates/teams/settings-languages.html:27
 msgid "Preferred Languages"
-msgstr ""
+msgstr "Googoko hizkuntzak"
 
 #: templates/teams/settings-languages.html:28
 msgid "Translation tasks will be auto-created for these languages"
-msgstr ""
+msgstr "Hizkuntza hauentzako itzulpen-zereginak  automatikoki sortuko dira"
 
 #: templates/teams/settings-languages.html:33
 msgid "Blacklisted Languages"
-msgstr ""
+msgstr "Hizkuntza gaitzetsiak"
 
 #: templates/teams/settings-languages.html:34
 msgid "Will not be shown when creating or performing tasks"
-msgstr ""
+msgstr "Ez dira agertuko zeregina sortu edo betetzerakoan"
 
 #: templates/teams/settings-permissions.html:27
 msgid "Team Management"
-msgstr ""
+msgstr "Talde-kudeaketa"
 
 #: templates/teams/settings-permissions.html:28
 msgid "How can users join your team?"
-msgstr ""
+msgstr "Nola sar daitezke erabiltzaileak zure taldean?"
 
 #: templates/teams/settings-permissions.html:31
 msgid "Who can add/remove videos?"
-msgstr ""
+msgstr "Nork gehitu/ezabatu ditzake bideoak?"
 
 #: templates/teams/settings-permissions.html:36
 msgid "Subtitling"
-msgstr ""
+msgstr "Azpititulatzea"
 
 #: templates/teams/settings-permissions.html:38
 msgid "Who can transcribe subtitles?"
-msgstr ""
+msgstr "Nork transkribatu dezake?"
 
 #: templates/teams/settings-permissions.html:39
 msgid "i.e. transcribe from video and perform time-alignment"
-msgstr ""
+msgstr "adib.: bideoa transkribatu eta sinkronizazioa egin"
 
 #: templates/teams/settings-permissions.html:42
 msgid "Who can translate subtitles?"
-msgstr ""
+msgstr "Nork egin ditzake azpitituluak?"
 
 #: templates/teams/settings-permissions.html:43
 msgid "i.e. translate text from an original subtitle into a new language"
-msgstr ""
+msgstr "adib.: jatorrizko azpitituluetako testua beste hizkuntza batera itzuli"
 
 #: templates/teams/settings-permissions.html:48
 msgid "How your subtitles will get published <em>(configure below)</em>"
-msgstr ""
+msgstr "Nola argitaratuko dira azpitituluak<em>(behean konfiguratu)</em>"
 
 #: templates/teams/settings-permissions.html:50
 msgid "Transcribed"
-msgstr ""
+msgstr "Transkribatuta"
 
 #: templates/teams/settings-permissions.html:52
 msgid "or ..."
-msgstr ""
+msgstr "edo ..."
 
 #: templates/teams/settings-permissions.html:58
 msgid "Reviewed"
-msgstr ""
+msgstr "Berrikusita"
 
 #: templates/teams/settings-permissions.html:63
 msgid "Approved"
-msgstr ""
+msgstr "Onartuta"
 
 #: templates/teams/settings-permissions.html:68
 msgid "Published"
-msgstr ""
+msgstr "Argitaratuta"
 
 #: templates/teams/settings-permissions.html:74
 msgid ""
@@ -5958,7 +5660,7 @@ msgstr "Baimenak eta mugak"
 
 #: templates/teams/settings-permissions.html:82
 msgid "Who can create and assign tasks?"
-msgstr ""
+msgstr "Nork sortu eta esleitu ditzake zereginak?"
 
 #: templates/teams/settings-permissions.html:84
 msgid ""
@@ -5968,19 +5670,19 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:86
 msgid "How many tasks can a user have at once?"
-msgstr ""
+msgstr "Zenbat zeregin izan ditzake erabiltzaile batek aldi berean?"
 
 #: templates/teams/settings-permissions.html:89
 msgid "If left blank there will be no limit."
-msgstr ""
+msgstr "Betetzen ez bada ez da mugarik egongo."
 
 #: templates/teams/settings-permissions.html:91
 msgid "How many days should an assignee get to complete a task?"
-msgstr ""
+msgstr "Zenbat egun izango ditu erabiltzaileak zeregina betetzeko?"
 
 #: templates/teams/settings-permissions.html:94
 msgid "If left blank tasks will not expire."
-msgstr ""
+msgstr "Betetzen ez bada, zereginak ez du epe-mugarik izango."
 
 #: templates/teams/settings-permissions.html:97
 msgid "Workflow"
@@ -5988,12 +5690,12 @@ msgstr "Lan-korrontea"
 
 #: templates/teams/settings-permissions.html:100
 msgid "Automatically create transcription tasks"
-msgstr ""
+msgstr "Transkribatzeko zeregina automatikoki sortu"
 
 #: templates/teams/settings-permissions.html:105
 #: templates/teams/settings-projects-add.html:54
 msgid "Automatically create translation tasks for preferred languages"
-msgstr ""
+msgstr "Gogoko hizkuntzetarako itzulpen-zereginak automatikoki sortu"
 
 #: templates/teams/settings-permissions.html:105
 #: templates/teams/settings-projects-add.html:54
@@ -6008,7 +5710,7 @@ msgstr "Aztertu"
 #: templates/teams/settings-permissions.html:111
 #: templates/teams/settings-projects-add.html:60
 msgid "Approval"
-msgstr ""
+msgstr "Onartu"
 
 #: templates/teams/settings-projects-add.html:18
 #: templates/teams/settings-projects-edit.html:24
@@ -6018,33 +5720,33 @@ msgstr "Proiektua gehitu"
 
 #: templates/teams/settings-projects-add.html:26
 msgid "Add new project"
-msgstr ""
+msgstr "Proiektu berria gehitu"
 
 #: templates/teams/settings-projects-add.html:40
 msgid ""
 "Moderate this project's subtitles. Will override the team's workflow if "
 "exists."
-msgstr ""
+msgstr "Moderatu proiektu honen azpitituluak. Taldearen lan-jariorik balego, indargabetuko du."
 
 #: templates/teams/settings-projects-add.html:42
 msgid "Enable workflows"
-msgstr ""
+msgstr "Gaitu lan-jarioak"
 
 #: templates/teams/settings-projects-add.html:49
 msgid "Automatically create subtitle tasks"
-msgstr ""
+msgstr "Azpititulatzeko zeregina automatikoki sortu"
 
 #: templates/teams/settings-projects-edit.html:34
 msgid "Edit Project"
-msgstr ""
+msgstr "Editatu proiektua"
 
 #: templates/teams/settings-projects-edit.html:76
 msgid "Are you sure you want to delete this project?"
-msgstr ""
+msgstr "Ziur zaude proiektu hau ezabatu nahi duzula?"
 
 #: templates/teams/settings-projects.html:36
 msgid "This team does not have any projects yet"
-msgstr ""
+msgstr "Talde honek ez du oraindik proiekturik"
 
 #: templates/teams/settings.html:49
 msgid "Logo/Banner"
@@ -6072,11 +5774,11 @@ msgstr "Burutu zeregina"
 
 #: templates/teams/start-subtitle-task.html:30
 msgid "Start Subtitling"
-msgstr ""
+msgstr "Hasi azpititulatzen"
 
 #: templates/teams/tasks.html:49
 msgid "Add Task"
-msgstr ""
+msgstr "Gehitu zeregina"
 
 #: templates/teams/tasks.html:66 templates/teams/tasks.html.py:228
 msgid "Transcribe"
@@ -6093,15 +5795,15 @@ msgstr "hemen dauden zereginak"
 
 #: templates/teams/tasks.html:83
 msgid "any project"
-msgstr ""
+msgstr "edozein proiektu"
 
 #: templates/teams/tasks.html:95
 msgid "my languages"
-msgstr ""
+msgstr "nire hizkuntzak"
 
 #: templates/teams/tasks.html:103
 msgid "assigned to"
-msgstr ""
+msgstr "honi esleituta"
 
 #: templates/teams/tasks.html:107
 msgid "no one"
@@ -6113,7 +5815,7 @@ msgstr "ni"
 
 #: templates/teams/tasks.html:111
 msgid "anyone"
-msgstr ""
+msgstr "edonor"
 
 #: templates/teams/tasks.html:125
 msgid "date, newest"
@@ -6125,11 +5827,11 @@ msgstr "data, zaharrena"
 
 #: templates/teams/tasks.html:134
 msgid "time left, least"
-msgstr ""
+msgstr "gelditzen den denbora, gutxienez"
 
 #: templates/teams/tasks.html:138
 msgid "time left, most"
-msgstr ""
+msgstr "gelditzen den denbora, gehienez"
 
 #: templates/teams/tasks.html:146 templates/teams/tasks.html.py:154
 #: templates/teams/tasks.html:162
@@ -6155,15 +5857,15 @@ msgstr ""
 
 #: templates/teams/tasks.html:182
 msgid "Showing unassigned tasks in languages you speak. "
-msgstr ""
+msgstr "Ezagutzen dituzun hizkuntzetako egitekoak ageri dira"
 
 #: templates/teams/tasks.html:184
 msgid "Want to view "
-msgstr ""
+msgstr "Ikusi nahi"
 
 #: templates/teams/tasks.html:185
 msgid "your tasks"
-msgstr ""
+msgstr "zure zereginak"
 
 #: templates/teams/tasks.html:186
 msgid " instead?"
@@ -6200,12 +5902,12 @@ msgstr ""
 
 #: templates/teams/tasks.html:281
 msgid "and edited"
-msgstr ""
+msgstr "eta editatuta"
 
 #: templates/teams/tasks.html:283
 #: templates/videos/language-revisions-tab.html:31
 msgid "by"
-msgstr ""
+msgstr "honek egina "
 
 #: templates/teams/tasks.html:301
 msgid "Assigned to"
@@ -6242,8 +5944,8 @@ msgstr ""
 #: templates/teams/tasks.html:399
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
-"\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title "
-"and video description in the onsite editor and to submit the final version."
+"\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title"
+" and video description in the onsite editor and to submit the final version."
 msgstr ""
 
 #: templates/teams/tasks.html:404 templates/videos/_upload_subtitles.html:26
@@ -6257,8 +5959,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:420
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for DFXP)"
-msgstr ""
-"Formatu onargarriak: .srt, .ssa, .sbv, .dfxp, .txt edo .xml (DFXPerako)"
+msgstr "Formatu onargarriak: .srt, .ssa, .sbv, .dfxp, .txt edo .xml (DFXPerako)"
 
 #: templates/teams/tasks.html:436
 msgid "Download a draft"
@@ -6300,7 +6001,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:603
 msgid "Assign to User"
-msgstr ""
+msgstr "Erabiltzaile honi esleitu"
 
 #: templates/teams/tasks.html:613
 msgid "Sorry, no tasks here."
@@ -6312,7 +6013,7 @@ msgstr "Editatu taldeko bideoa"
 
 #: templates/teams/team_video.html:27 templates/videos/video-page.html:132
 msgid "Edit video"
-msgstr ""
+msgstr "Editatu bideoa"
 
 #: templates/teams/team_video.html:40
 msgid "This video is being moderated by team"
@@ -6328,7 +6029,7 @@ msgstr "Sailkatu honen arabera"
 
 #: templates/teams/teams-list.html:64
 msgid "Your team"
-msgstr ""
+msgstr "Zure taldea"
 
 #: templates/teams/teams-list.html:78
 msgid "Role:"
@@ -6348,8 +6049,8 @@ msgid_plural ""
 "\n"
 "                                        %(count)s members\n"
 "                                    "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                                        kide %(count)s\n                                    "
+msgstr[1] "\n                                        %(count)s kide\n                                    "
 
 #: templates/teams/teams-list.html:105
 #, python-format
@@ -6361,8 +6062,8 @@ msgid_plural ""
 "\n"
 "                                %(count)s videos\n"
 "                            "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                                bideo %(count)s                            "
+msgstr[1] "\n                                %(count)s bideo\n                            "
 
 #: templates/teams/teams-list.html:115
 msgid "Sorry, no teams found."
@@ -6379,14 +6080,13 @@ msgstr "Talde bat sortu"
 #: templates/teams/teams-list.html:132
 msgid ""
 "\n"
-"                Want to create your own subtitling team? Contact <a href="
-"\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n"
+"                Want to create your own subtitling team? Contact <a href=\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n"
 "            "
 msgstr ""
 
 #: templates/teams/videos-list.html:59
 msgid "Add Video"
-msgstr ""
+msgstr "Bideo bat gehitu"
 
 #: templates/teams/videos-list.html:74
 msgid "Project:"
@@ -6398,7 +6098,7 @@ msgstr "edozein"
 
 #: templates/teams/videos-list.html:83
 msgid "Language:"
-msgstr ""
+msgstr "Hikzuntza:"
 
 #: templates/teams/videos-list.html:85
 msgid "has"
@@ -6442,7 +6142,7 @@ msgstr ""
 
 #: templates/teams/videos-list.html:135
 msgid "Sorry, no videos here"
-msgstr ""
+msgstr "Ez dago bideorik hemen"
 
 #: templates/teams/videos-list.html:146
 msgid "Remove video"
@@ -6457,10 +6157,7 @@ msgstr ""
 #, python-format
 msgid ""
 "You are removing this video from the %(team)s team.<br /><br />\n"
-"                                It will remain on Amara but will no longer "
-"be subject to the team's permissions and worfklows. Any outstanding tasks "
-"will be deleted. Private videos will become available for viewing and "
-"editing to the general public. Are you sure you want to proceed?"
+"                                It will remain on Amara but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted. Private videos will become available for viewing and editing to the general public. Are you sure you want to proceed?"
 msgstr ""
 
 #: templates/teams/videos-list.html:157
@@ -6498,15 +6195,16 @@ msgstr ""
 #: templates/videos/_create-subtitles-modal.html:12
 #, python-format
 msgid "This video is in %(language)s"
-msgstr ""
+msgstr "Bideo honen hizkuntza %(language)s da"
 
 #: templates/videos/_create-subtitles-modal.html:19
 #: templates/videos/_multi-video-create-subtitles-form.html:13
 msgid "Continue"
-msgstr ""
+msgstr "Jarraitu"
 
 #: templates/videos/_error_feedback_form.html:7
-msgid "Please let us know what you were doing when you encountered this error."
+msgid ""
+"Please let us know what you were doing when you encountered this error."
 msgstr "Mesedez, esaguzu zertan ari zinen errore hau aurkitu duzunean. "
 
 #: templates/videos/_error_feedback_form.html:9
@@ -6526,15 +6224,15 @@ msgid "How are you using Amara?  What would make it better?"
 msgstr ""
 
 #: templates/videos/_feedback_form.html:8
-msgid "Please let us know if you have any comments, questions, or suggestions!"
+msgid ""
+"Please let us know if you have any comments, questions, or suggestions!"
 msgstr "Mesedez, jakinarazi iezazkiguzu zure ohar, galdera edo iradokizunak."
 
 #: templates/videos/_feedback_form.html:9
 msgid ""
-"Note: we read/speak English best, but try to read/respond to anything we can."
-msgstr ""
-"Oharra: Ingelesez idatzi eta hitz egiten dugu, baina edozein hizkuntzatan "
-"idatzitakoa irakurri eta erantzuten saiatuko gara."
+"Note: we read/speak English best, but try to read/respond to anything we "
+"can."
+msgstr "Oharra: Ingelesez idatzi eta hitz egiten dugu, baina edozein hizkuntzatan idatzitakoa irakurri eta erantzuten saiatuko gara."
 
 #: templates/videos/_feedback_form.html:13
 msgid "Your email:"
@@ -6583,7 +6281,7 @@ msgstr "Mesedez, idatzi iruzkina."
 #: templates/videos/_follow_video_button.html:38
 #: templates/videos/_follow_video_button.html:219
 msgid "x Stop Following"
-msgstr ""
+msgstr "x Utzi jarraitzeari"
 
 #: templates/videos/_follow_video_button.html:40
 #: templates/videos/_follow_video_button.html:221
@@ -6592,11 +6290,11 @@ msgstr ""
 
 #: templates/videos/_follow_video_button.html:55
 msgid "✓ Following"
-msgstr ""
+msgstr "✓ Jarraitzen"
 
 #: templates/videos/_follow_video_button.html:58
 msgid " Not Following"
-msgstr ""
+msgstr " Ez duzu jarraitzen"
 
 #: templates/videos/_follow_video_button.html:103
 msgid ""
@@ -6606,7 +6304,7 @@ msgstr ""
 
 #: templates/videos/_follow_video_button.html:104
 msgid "Stop following this video"
-msgstr ""
+msgstr "Utzi bideoa jarraitzeari"
 
 #: templates/videos/_follow_video_button.html:107
 msgid "You will stop receiving notification when "
@@ -6616,13 +6314,11 @@ msgstr ""
 msgid ""
 " subtitles for this video are edited. You can choose to follow again at any "
 "time."
-msgstr ""
-"bideo honentzako azpitituluak editatuta daude. Berriz jarraitzea aukera "
-"dezakezu edozein momentutan."
+msgstr "bideo honentzako azpitituluak editatuta daude. Berriz jarraitzea aukera dezakezu edozein momentutan."
 
 #: templates/videos/_follow_video_button.html:110
 msgid "Stop following "
-msgstr ""
+msgstr "Utzi jarraitzeari"
 
 #: templates/videos/_follow_video_button.html:112
 #: templates/videos/_follow_video_button.html:166
@@ -6639,9 +6335,7 @@ msgstr ""
 
 #: templates/videos/_follow_video_button.html:163
 msgid " subtitles for this video. You can stop these emails at any time."
-msgstr ""
-"bideo honentzako azpitituluak. Edozein momentutan geldi ditzakezu mezu "
-"elektroniko hauek."
+msgstr "bideo honentzako azpitituluak. Edozein momentutan geldi ditzakezu mezu elektroniko hauek."
 
 #: templates/videos/_follow_video_button.html:164
 msgid "Follow "
@@ -6683,8 +6377,8 @@ msgid_plural ""
 "\n"
 "            %(count)s Languages\n"
 "        "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n            Hizkuntza %(count)s\n        "
+msgstr[1] "\n            %(count)s Hizkuntza\n        "
 
 #: templates/videos/_upload_subtitles.html:6
 msgid "Upload them directly."
@@ -6698,15 +6392,14 @@ msgstr "Azpitituluak gora kargatu"
 msgid ""
 "\n"
 "                    Our site accepts SRT, SSA, SBV, DFXP, and TXT format.\n"
-"                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt or ."
-"xml\n"
+"                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt or .xml\n"
 "                    (for dfxp) are accepted.\n"
 "                "
 msgstr ""
 
 #: templates/videos/_upload_subtitles.html:41
 msgid "Translated from"
-msgstr ""
+msgstr "Jatorrizko hizkuntza"
 
 #: templates/videos/_upload_subtitles.html:51
 #, python-format
@@ -6724,11 +6417,9 @@ msgstr "Sartu azpitituluak kargatzeko"
 
 #: templates/videos/_upload_subtitles.html:68
 msgid ""
-"If you believe your subtitle file is compatible, <a href='mailto:"
-"feedback@universalsubtitles.org'>send it to us</a>"
-msgstr ""
-"Zure azpitituluen fitxategia bateragarria dela uste baduzu, <a href='mailto:"
-"feedback@universalsubtitles.org'>guri budali</a>"
+"If you believe your subtitle file is compatible, <a "
+"href='mailto:feedback@universalsubtitles.org'>send it to us</a>"
+msgstr "Zure azpitituluen fitxategia bateragarria dela uste baduzu, <a href='mailto:feedback@universalsubtitles.org'>guri budali</a>"
 
 #: templates/videos/_upload_subtitles.html:70
 msgid "Processing, please be patient..."
@@ -6748,8 +6439,8 @@ msgid_plural ""
 "\n"
 "                    %(number)s Languages\n"
 "                "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                    HIzkuntza %(number)s\n                "
+msgstr[1] "\n                    %(number)s Hizkuntza\n                "
 
 #: templates/videos/_video_url_panel.html:6
 msgid "Add new URL"
@@ -6768,24 +6459,20 @@ msgstr ""
 msgid ""
 "Multiple video URLs let you link multiple videos to a single set of "
 "subtitles. Some example uses:"
-msgstr ""
-"Bideo anitzeko URL-en bidez hainbat bideo azpititulu multzo bakar batera "
-"estekatu ditzakezu. Hona hemen adibide batzuk:"
+msgstr "Bideo anitzeko URL-en bidez hainbat bideo azpititulu multzo bakar batera estekatu ditzakezu. Hona hemen adibide batzuk:"
 
 #: templates/videos/_video_url_panel.html:48
 msgid ""
 "Two versions of the same video exist on Youtube.  You do not want subtitle "
-"volunteers to duplicate their work, so you add both versions to the multiple "
-"URLs pane."
+"volunteers to duplicate their work, so you add both versions to the multiple"
+" URLs pane."
 msgstr ""
 
 #: templates/videos/_video_url_panel.html:49
 msgid ""
-"You put your video on Youtube, Vimeo, Blip, and Dailymotion and you want the "
-"subtitles you make to work on all of those versions."
-msgstr ""
-"Zure bideoa Youtuben, Vimeon, Blipen eta Dailymotionen jarri duzu eta egiten "
-"dituzun azpitituluak bertsio guzti hauetan aritzea nahi duzu."
+"You put your video on Youtube, Vimeo, Blip, and Dailymotion and you want the"
+" subtitles you make to work on all of those versions."
+msgstr "Zure bideoa Youtuben, Vimeon, Blipen eta Dailymotionen jarri duzu eta egiten dituzun azpitituluak bertsio guzti hauetan aritzea nahi duzu."
 
 #: templates/videos/_video_url_panel.html:50
 msgid ""
@@ -6793,12 +6480,7 @@ msgid ""
 "(HTML5/Ogg for free software users, or HTML5/h264 to iPad users).  If you "
 "add these URLs, our embed code will automatically fall back to whatever "
 "format is necessary for the browser."
-msgstr ""
-"Bideo baten hainbat bertsio bidali nahi dituzu hainbat arakatzaileentzako "
-"(HTML5/Ogg software librearen erabiltzaileentzako, edo HTML5/h264 iPad "
-"erabiltzaileentzako). URL hauek gehitzen badituzu, kapsulatzeko kodea "
-"arakatzailearentzako beharrezkoa den edozein formatuz baliatuko da "
-"automatikoki."
+msgstr "Bideo baten hainbat bertsio bidali nahi dituzu hainbat arakatzaileentzako (HTML5/Ogg software librearen erabiltzaileentzako, edo HTML5/h264 iPad erabiltzaileentzako). URL hauek gehitzen badituzu, kapsulatzeko kodea arakatzailearentzako beharrezkoa den edozein formatuz baliatuko da automatikoki."
 
 #: templates/videos/_video_url_panel.html:52
 msgid "Tip: double check that there are no timing problems."
@@ -6836,10 +6518,7 @@ msgstr "Ez zaude autentifikaturik."
 msgid ""
 "Delete this URL?  Warning: this cannot be undone. Only delete URLs for non-"
 "matching videos or videos where subtitles fail to display correctly."
-msgstr ""
-"URL hau ezabatu? Oharra: hau ezin da desegin. Ondorengo URL-ak baino ez "
-"ezabatu: bat ez datozen bideoenak edo bideoan azpitituluak zuzen azaltzea "
-"ezinezkoa direnenak."
+msgstr "URL hau ezabatu? Oharra: hau ezin da desegin. Ondorengo URL-ak baino ez ezabatu: bat ez datozen bideoenak edo bideoan azpitituluak zuzen azaltzea ezinezkoa direnenak."
 
 #: templates/videos/_watch_page.html:13
 msgid "Rebuilding video index. Please try again a bit later"
@@ -6847,7 +6526,7 @@ msgstr ""
 
 #: templates/videos/_watch_page.html:15
 msgid "No videos found"
-msgstr ""
+msgstr "Ez da bideorik aurkitu"
 
 #: templates/videos/actions_list.html:21
 msgid "There are no activities."
@@ -6856,24 +6535,13 @@ msgstr "Ez dago jarduketarik."
 #: templates/videos/create.html:10
 msgid ""
 "\n"
-"        \"Sorry, we couldn't identify the video at the link you sent.  "
-"Perhaps\n"
+"        \"Sorry, we couldn't identify the video at the link you sent.  Perhaps\n"
 "        it's a link we don't recognize, or perhaps you've linked to a page\n"
-"        that has multiple videos.  Try entering a different link to the "
-"video\n"
+"        that has multiple videos.  Try entering a different link to the video\n"
 "        you want to submit.  If you think there's been some mistake,\n"
-"        <a href=\"mailto:feedback@universalsubtitles.org\">contact us</a>!"
-"\"\n"
+"        <a href=\"mailto:feedback@universalsubtitles.org\">contact us</a>!\"\n"
 "        "
-msgstr ""
-"\n"
-"        \"Barkatu, ezin  izan dugu bideorik ikusi zuk bidalitako estekan. "
-"Beharbada ezagutzen ez dugun esteka bat da, edo bideo ugari dituen orri "
-"batera doan esteka. Saia zaitez bidali nahi duzun bideoaren beste esteka bat "
-"idazten. Akats bat dagoela uste ba duzu,\n"
-"        <a href=\"mailto:feedback@universalsubtitles.org\">jarri gurekin "
-"harremanetan</a>!\"\n"
-"        "
+msgstr "\n        \"Barkatu, ezin  izan dugu bideorik ikusi zuk bidalitako estekan. Beharbada ezagutzen ez dugun esteka bat da, edo bideo ugari dituen orri batera doan esteka. Saia zaitez bidali nahi duzun bideoaren beste esteka bat idazten. Akats bat dagoela uste ba duzu,\n        <a href=\"mailto:feedback@universalsubtitles.org\">jarri gurekin harremanetan</a>!\"\n        "
 
 #: templates/videos/create.html:22
 msgid "Subtitle a Video"
@@ -6887,11 +6555,11 @@ msgstr "Hasi"
 msgid ""
 "Enter the URL of an Ogg, WebM, flv, mp4, Youtube, Vimeo or Dailymotion "
 "video. You can also use our"
-msgstr ""
+msgstr "Idatzi Ogg, WebM, flv, mp4, Youtube, Vimeo edo Dailymotion bideo baten URLa. Erabili dezakezu ere gure"
 
 #: templates/videos/create.html:30
 msgid "to subtitle all the videos on your site."
-msgstr ""
+msgstr "zure webguneko bideo guztiak azpititulatzeko."
 
 #: templates/videos/create.html:36
 msgid "for example"
@@ -6912,10 +6580,9 @@ msgstr "Edo bidali hainbat bideo"
 #: templates/videos/create.html:58
 msgid ""
 "\n"
-"        Help organizations and deaf and hard of hearing viewers make videos "
-"accessible around the world.\n"
+"        Help organizations and deaf and hard of hearing viewers make videos accessible around the world.\n"
 "    "
-msgstr ""
+msgstr "\n       Lagundu mundu zabaleko zenbait erakunderi eta gorrei edo entzuteko arazoak dituzten ikusleei bideoak ikusten.\n    "
 
 #: templates/videos/diffing.html:41
 msgid "Subtitles will be rolled back to a previous version"
@@ -6955,9 +6622,7 @@ msgstr "Ez bidali bideo honi buruzko e-posta gehiago."
 msgid ""
 "To stop receiving these emails, go to your preferences page and uncheck "
 "\"notify me by email\":"
-msgstr ""
-"Mezu hauek gehiago ez jasotzeko, joan zure hobespenen orrira eta kendu marka "
-"hau: \"Jakinarazi mezu bat bidaliz\":"
+msgstr "Mezu hauek gehiago ez jasotzeko, joan zure hobespenen orrira eta kendu marka hau: \"Jakinarazi mezu bat bidaliz\":"
 
 #: templates/videos/email_base.html:106
 msgid "My profile / preferences"
@@ -6975,31 +6640,24 @@ msgstr "Bidali lagun bati!"
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                you contributed to <b><a href=\"http://%(domain)s"
-"%(video_url)s\">%(v)s</a></b> \n"
-"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">"
-"%(u)s</a></b>. \n"
-"                These changes went live immediately.  %(text_change)s of the "
-"text and\n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. \n"
+"                These changes went live immediately.  %(text_change)s of the text and\n"
 "                %(time_change)s of the timing was changed.\n"
 "                "
-msgstr ""
+msgstr "\n                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s azpitituluak,</a></b> \n                honentzako zuk egindakoak <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n                honek aldatu ditu: <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. \n                Aldaketa hauek berehala argitaratu ziren.  Testuaren %(text_change)s eta tenporizazioaren\n                %(time_change)s aldatu du.\n                "
 
 #: templates/videos/email_notification.html:17
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                you contributed to <b><a href=\"http://%(domain)s"
-"%(video_url)s\">%(v)s</a></b> \n"
-"                were changed. These changes went live immediately. "
-"%(text_change)s of the text and \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
+"                were changed. These changes went live immediately. %(text_change)s of the text and \n"
 "                %(time_change)s of the timing was changed.\n"
 "                "
-msgstr ""
+msgstr "\n                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s azpitituluak,</a></b> \n                honentzako zuk egindakoak <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n                aldatu egin dira. Aldaketak berehala argitaratu dira. Testuaren %(text_change)s eta tenporizazioaren  \n                %(time_change)s aldatu dira.\n                "
 
 #: templates/videos/email_notification.html:27
 #: templates/videos/email_notification_non_editors.html:23
@@ -7047,13 +6705,9 @@ msgstr "Azpitituluen testuaren aldaketak"
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                to video <b><a href=\"http://%(domain)s%(video_url)s\">"
-"%(v)s</a></b>\n"
-"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">"
-"%(u)s</a></b>. These changes went live immediately. %(time_change)s of the "
-"timing was changed.  \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. These changes went live immediately. %(time_change)s of the timing was changed.  \n"
 "                "
 msgstr ""
 
@@ -7061,12 +6715,9 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                to video <b><a href=\"http://%(domain)s%(video_url)s\">"
-"%(v)s</a></b>\n"
-"                were changed. These changes went live immediately. "
-"%(time_change)s of the timing was changed.             \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
+"                were changed. These changes went live immediately. %(time_change)s of the timing was changed.             \n"
 "                "
 msgstr ""
 
@@ -7078,19 +6729,16 @@ msgstr "Kaixo"
 #, python-format
 msgid ""
 "\n"
-"    Great news! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> has "
-"just started a %(language)s \n"
+"    Great news! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> has just started a %(language)s \n"
 "    translation of your video <a href=\"%(video_url)s\">%(video)s</a>\n"
 "\t"
 msgstr ""
 
 #: templates/videos/email_start_notification.html:13
 msgid ""
-"You can review the translation and thank them for their contribution on this "
-"page:"
-msgstr ""
-"Orri honetan itzulpena berrikus dezakezu eta eurei eskerrak eman egindako "
-"lanarengatik:"
+"You can review the translation and thank them for their contribution on this"
+" page:"
+msgstr "Orri honetan itzulpena berrikus dezakezu eta eurei eskerrak eman egindako lanarengatik:"
 
 #: templates/videos/email_start_notification.html:14
 msgid "Translation homepage"
@@ -7106,7 +6754,7 @@ msgstr "Adeitasunez"
 
 #: templates/videos/email_start_notification.html:20
 msgid "The Amara Community"
-msgstr ""
+msgstr "Amara Komunitatea"
 
 #: templates/videos/email_title_changed.html:7
 msgid "The title of the video"
@@ -7135,10 +6783,9 @@ msgstr "Bideo orria"
 #: templates/videos/email_title_changed.html:20
 msgid ""
 "\n"
-"    and click 'edit title' to update it. If you're unable to edit the title, "
-"click 'Help' in the main menu to submit a support request.\n"
+"    and click 'edit title' to update it. If you're unable to edit the title, click 'Help' in the main menu to submit a support request.\n"
 "    "
-msgstr ""
+msgstr "\n    eta klikatu 'titulua editatu' eguneratzeko. Ezin baduzu titulua edutatu, klikatu 'Laguntza' menu nagusian laguntza-eskaria bidaltzeko.\n    "
 
 #: templates/videos/email_video_url_add.html:7
 msgid "A new video URL for"
@@ -7156,9 +6803,7 @@ msgstr "Anonimoa"
 msgid ""
 "Please check to make sure the new URL features the exact same video, and "
 "that subtitle timing is correct:"
-msgstr ""
-"Mesedez egiazta ezazu URL berria bideo berari dagokiola, eta azpitituluen "
-"denbora-banaketa zuzena dela:"
+msgstr "Mesedez egiazta ezazu URL berria bideo berari dagokiola, eta azpitituluen denbora-banaketa zuzena dela:"
 
 #: templates/videos/email_video_url_add.html:21
 msgid "View the new video URL"
@@ -7195,7 +6840,7 @@ msgstr "azpitituluak"
 
 #: templates/videos/language-page.html:73 templates/videos/video-page.html:68
 msgid "Follower"
-msgstr ""
+msgstr "Jarraitzaile"
 
 #: templates/videos/language-page.html:79
 msgid "Line"
@@ -7203,7 +6848,7 @@ msgstr ""
 
 #: templates/videos/language-page.html:108
 msgid "Revisions"
-msgstr ""
+msgstr "Berrikuspenak"
 
 #: templates/videos/language-page.html:110
 #: templates/videos/language-sync-history-tab.html:38
@@ -7229,7 +6874,7 @@ msgstr ""
 
 #: templates/videos/language-revisions-tab.html:43
 msgid "Legacy Subtitle Editor"
-msgstr ""
+msgstr "Legacy azpititulu editorea"
 
 #: templates/videos/language-revisions-tab.html:54
 #: templates/videos/language-subtitles-tab.html:62
@@ -7272,23 +6917,20 @@ msgid ""
 "\n"
 "                        Subtitles translated from %(language)s\n"
 "                    "
-msgstr ""
+msgstr "\n                        %(language)s(e)tik itzulitako azpitituluak\n                    "
 
 #: templates/videos/language-subtitles-tab.html:58
 #, python-format
 msgid ""
 "\n"
-"                Showing <strong>Revision %(version_number)s</strong> created "
-"<strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title="
-"\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n"
+"                Showing <strong>Revision %(version_number)s</strong> created <strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n"
 "                "
-msgstr ""
+msgstr "\n                Hau da <strong>%(version_number)s berrikuspena</strong>, <strong>%(revision_time)s</strong>ean egin duena<a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a> erabiltzaileak.\n                "
 
 #: templates/videos/language-subtitles-tab.html:88
 msgid ""
 "\n"
-"                    The most recent revision for this language is blank, but "
-"there are older\n"
+"                    The most recent revision for this language is blank, but there are older\n"
 "                    revisions that contain subtitles.\n"
 "                    "
 msgstr ""
@@ -7316,16 +6958,14 @@ msgstr "Egin batzuk!"
 #: templates/videos/language-subtitles-tab.html:109
 msgid ""
 "\n"
-"                    This language contains subtitles that are still waiting "
-"to be moderated.  Check back later.\n"
+"                    This language contains subtitles that are still waiting to be moderated.  Check back later.\n"
 "                "
 msgstr ""
 
 #: templates/videos/language-subtitles-tab.html:115
 msgid ""
 "\n"
-"                    Sorry, this language has been removed by Amara staff "
-"members or authorized users.\n"
+"                    Sorry, this language has been removed by Amara staff members or authorized users.\n"
 "                "
 msgstr ""
 
@@ -7373,7 +7013,7 @@ msgstr ""
 
 #: templates/videos/language-sync-history-tab.html:29
 msgid "delete subtitles"
-msgstr ""
+msgstr "ezabatu azpitituluak"
 
 #: templates/videos/language-sync-history-tab.html:45
 #: unisubs-integration/services/templates/services/translation_request_list.html:6
@@ -7396,7 +7036,7 @@ msgstr "Azken bideoak"
 #: templates/videos/popular_videos.html:59 templates/videos/volunteer.html:59
 #: templates/videos/watch.html:41
 msgid "Popular Videos"
-msgstr "Bideo estimatuenak"
+msgstr "Estimatuenak"
 
 #: templates/videos/popular_videos.html:61
 #: templates/videos/popular_videos.html:65 templates/videos/volunteer.html:61
@@ -7463,9 +7103,7 @@ msgstr ""
 #: templates/videos/test_form_page.html:37
 #: templates/videos/test_form_page.html:57
 msgid "how was it? were the instructions clear? what would improve it?"
-msgstr ""
-"Zer moduz? Argiak izan al dira jarraibideri buruzko azalpenak? Nola hobetuko "
-"zenuke?"
+msgstr "Zer moduz? Argiak izan al dira jarraibideri buruzko azalpenak? Nola hobetuko zenuke?"
 
 #: templates/videos/test_form_page.html:29
 msgid "Task 2"
@@ -7515,14 +7153,13 @@ msgstr ""
 
 #: templates/videos/video-page.html:73
 msgid "Contribute"
-msgstr ""
+msgstr "Lagundu"
 
 #: templates/videos/video-page.html:81
 #, python-format
 msgid ""
 "\n"
-"                    <span class=\"team-link\">This video is part of the <a "
-"href=\"%(url)s\">%(team)s</a> team.</span>\n"
+"                    <span class=\"team-link\">This video is part of the <a href=\"%(url)s\">%(team)s</a> team.</span>\n"
 "                    "
 msgstr ""
 
@@ -7532,7 +7169,7 @@ msgid ""
 "\n"
 "                View <a href=\"%(url)s\">tasks for this video</a>.\n"
 "                "
-msgstr ""
+msgstr "\n                Ikusi zereginak <a href=\"%(url)s\"> bideo honentzako</a>.\n                "
 
 #: templates/videos/video-page.html:118
 msgid "URLs"
@@ -7544,20 +7181,20 @@ msgstr "Azpitituluak gehitu"
 
 #: templates/videos/volunteer.html:23 templates/videos/watch.html:23
 msgid "More Featured Videos"
-msgstr ""
+msgstr "Nabarmenenak"
 
 #: templates/videos/volunteer.html:38
 msgid "More Requested Videos"
-msgstr ""
+msgstr "Gehien eskatu diren bideoak"
 
 #: templates/videos/volunteer.html:40
 #: templates/videos/volunteer_requested.html:22
 msgid "Requested Videos"
-msgstr ""
+msgstr "Eskatu diren bideoak"
 
 #: templates/videos/volunteer.html:56 templates/videos/watch.html:38
 msgid "More Popular Videos"
-msgstr ""
+msgstr "Estimatuena"
 
 #: templates/videos/volunteer.html:112 templates/videos/watch.html:105
 msgid "More Recent Videos"
@@ -7576,8 +7213,8 @@ msgstr ""
 #: unisubs-integration/api/1_0/forms.py:98
 #: unisubs-integration/api/1_0/forms.py:101
 msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated and "
-"you don't have sufficient permission."
+"Sorry, we can't upload your subtitles because this language is moderated and"
+" you don't have sufficient permission."
 msgstr ""
 
 #: unisubs-integration/api/1_0/forms.py:334
@@ -7632,7 +7269,7 @@ msgstr ""
 #: utils/ajaxmiddleware.py:27
 #, python-format
 msgid "Required parameter missing: %s"
-msgstr ""
+msgstr "Beharrezkoa da falta den parametroa: %s"
 
 #: utils/ajaxmiddleware.py:70
 msgid "Internal error"
@@ -7651,11 +7288,9 @@ msgstr "Sartu e-posta helbideak komarekin bereiziak."
 
 #: utils/forms/__init__.py:83
 msgid ""
-"Enter valid usernames separated by commas. Username can contain only a-z, A-"
-"Z and 0-9."
-msgstr ""
-"Idatzi baliozko erabiltzaile-izenak, komaz banatuta. Erabiltzaile izenek "
-"karaktere hauek izan behar dituzte: a-z, A-Z eta 0-9."
+"Enter valid usernames separated by commas. Username can contain only a-z, "
+"A-Z and 0-9."
+msgstr "Idatzi baliozko erabiltzaile-izenak, komaz banatuta. Erabiltzaile izenek karaktere hauek izan behar dituzte: a-z, A-Z eta 0-9."
 
 #: utils/forms/unisub_video_form.py:62
 msgid "This URL does not contain video id."
