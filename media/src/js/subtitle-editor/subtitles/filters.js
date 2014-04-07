@@ -19,7 +19,7 @@
 var angular = angular || null;
 (function(){
     var module = angular.module('amara.SubtitleEditor.subtitles.filters', []);
-    var HIDES_ON = ['Deleted', 'Private']
+    var HIDES_ON = ['deleted', 'private']
 
     /*
     * Display a human friendly format.
