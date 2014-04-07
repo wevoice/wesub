@@ -601,15 +601,16 @@ section.main {
                 textarea, span.subtitle-text {
                     $line-height: 18px;
                     $number-lines: 3;
-                    $padding-top: 2px;
+                    $padding-top: 8px;
+                    $padding-bottom: 3px;
                     border: 0;
                     border-top: 1px solid #EBECED;
                     border-left: 0;
                     border-right: 0;
-                    height: $padding-top + $number-lines * $line-height;
+                    height: $padding-top + $padding-bottom + $number-lines * $line-height;
                     line-height: $line-height;
                     overflow: hidden;
-                    padding: $padding-top 60px 0px 40px;
+                    padding: $padding-top 60px $padding-bottom 40px;
                     word-wrap: break-word;
                 }
 
@@ -816,7 +817,7 @@ section.main {
                 border-right: 1px solid #DADBDC;
                 float: left;
                 overflow: hidden;
-                padding-top: 10px;
+                padding: 10px 0 0 10px;
                 position: relative;
                 width: 42%;
 
@@ -1173,7 +1174,7 @@ section.main {
                     color: #313233;
                     font-size: 14px;
                     padding: 12px 0 12px 10px;
-                    width: 200px;
+                    max-width: 250px;
 
                     div.substeps {
                         margin: 10px 0 0 16px;

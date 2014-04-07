@@ -1,12 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # ClankStar <yourikersten@gmail.com>, 2011
 # Dick Stada <dickstada@gmail.com>, 2013
 # Andrea_Pio <ivan.schepens@wynns.be>, 2012
 # Johan Uytterhoeven <johan_uytterhoeven@yahoo.com>, 2012
+# Kaj Raatjes <kajraatjes@gmail.com>, 2014
 # Rodolfo_Jadon, 2014
 # Ruben Dijkstra <ruben_dijkstra123@hotmail.com>, 2011
 # tkfanmail <tkfanmail@gmail.com>, 2011, 2012
@@ -16,20 +17,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-04 10:39-0500\n"
-"PO-Revision-Date: 2014-03-21 23:01+0000\n"
-"Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
-"Language-Team: Dutch (http://www.transifex.com/projects/p/universalsubtitles/"
-"language/nl/)\n"
-"Language: nl\n"
+"POT-Creation-Date: 2014-04-07 16:02-0500\n"
+"PO-Revision-Date: 2014-03-25 23:31+0000\n"
+"Last-Translator: Kaj Raatjes <kajraatjes@gmail.com>\n"
+"Language-Team: Dutch (http://www.transifex.com/projects/p/universalsubtitles/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: apps/accountlinker/models.py:41
 msgid "Subtitles by the Amara.org community"
-msgstr ""
+msgstr "Ondertitels ingediend door de Amara.org gemeenschap"
 
 #: apps/accountlinker/models.py:43
 msgid "Help us caption and translate this video on Amara.org"
@@ -41,17 +41,14 @@ msgstr ""
 
 #: apps/accountlinker/views.py:103
 msgid "The user who requested this action doesn't match the current user."
-msgstr ""
+msgstr "De gebruiker die deze actie heeft aangevraagd komt niet overeen met de huidige gebruiker."
 
 #: apps/accountlinker/views.py:151
 msgid ""
-"We couldn't link your account. Have you <a href='https://accounts.google.com/"
-"ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/"
-"create_channel'>set up a channel</a>?"
-msgstr ""
-"We konden uw account niet koppelen. Hebt u <a href='https://accounts.google."
-"com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/"
-"create_channel'>een kanaal ingesteld</a>?"
+"We couldn't link your account. Have you <a "
+"href='https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel'>set"
+" up a channel</a>?"
+msgstr "We konden uw account niet koppelen. Hebt u <a href='https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel'>een kanaal ingesteld</a>?"
 
 #: apps/accountlinker/views.py:171
 msgid "Account already linked."
@@ -71,14 +68,11 @@ msgstr "Gebruikersnaam"
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
-msgstr ""
-"Vereist. 30 of minder tekens. Alleen alfanumerieke tekens (letters, cijfers "
-"en liggende streepjes)."
+msgstr "Vereist. 30 of minder tekens. Alleen alfanumerieke tekens (letters, cijfers en liggende streepjes)."
 
 #: apps/auth/admin.py:35
 msgid "This value must contain only letters, numbers and underscores."
-msgstr ""
-"Deze waarde mag alleen letters, cijfers en liggende streepjes bevatten."
+msgstr "Deze waarde mag alleen letters, cijfers en liggende streepjes bevatten."
 
 #: apps/auth/admin.py:36 unisubs-integration/apiv2/forms.py:181
 msgid "Password"
@@ -147,9 +141,7 @@ msgstr "volg verzoeken in het "
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
-msgstr ""
-"Dit is de datum waarop de aankondiging verschijnt. Alleen de laatste zal "
-"getoond worden."
+msgstr "Dit is de datum waarop de aankondiging verschijnt. Alleen de laatste zal getoond worden."
 
 #: apps/auth/models.py:525
 msgid "e-mail confirmation"
@@ -239,9 +231,7 @@ msgstr "Deze boodschap komt van de site admin"
 
 #: apps/messages/forms.py:95
 msgid "You cannot send a message to a user and a team at the same time."
-msgstr ""
-"Je kan een boodschap niet gelijktijdig verzenden naar een gebruiker en een "
-"team."
+msgstr "Je kan een boodschap niet gelijktijdig verzenden naar een gebruiker en een team."
 
 #: apps/messages/forms.py:98
 msgid "You must choose a recipient."
@@ -341,7 +331,7 @@ msgstr "Je ondertitels zijn niet aanvaard."
 #: apps/messages/tasks.py:639
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
-msgstr ""
+msgstr "%(user)s heeft een reactie achtergelaten op de video %(title)s"
 
 #: apps/messages/views.py:125
 msgid "Message sent."
@@ -394,7 +384,7 @@ msgstr "U bent niet geverifieerd."
 #: apps/profiles/forms.py:110
 #, python-format
 msgid "Personal message from %(sender)s on amara.org"
-msgstr ""
+msgstr "Persoonlijk bericht van %(sender)s op amara.org"
 
 #: apps/profiles/forms.py:155
 msgid "Confirm new password:"
@@ -422,7 +412,7 @@ msgstr "Uw account is bijgewerkt."
 
 #: apps/profiles/views.py:239
 msgid "Your photo has been updated."
-msgstr ""
+msgstr "Uw foto is geüpdatet."
 
 #: apps/profiles/views.py:259
 msgid "Your photo has been removed."
@@ -430,8 +420,8 @@ msgstr "Je foto is verwijderd."
 
 #: apps/profiles/views.py:337
 msgid ""
-"We're tying up loose ends - your account will be removed shortly. Check back "
-"after 10 minutes"
+"We're tying up loose ends - your account will be removed shortly. Check back"
+" after 10 minutes"
 msgstr ""
 
 #: apps/profiles/views.py:341
@@ -491,9 +481,7 @@ msgstr "Alle talen"
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
-msgstr ""
-"Sorry, we kunnen uw ondertitels niet uploaden, omdat er al aan deze taal "
-"wordt gewerkt."
+msgstr "Sorry, we kunnen uw ondertitels niet uploaden, omdat er al aan deze taal wordt gewerkt."
 
 #: apps/subtitles/forms.py:103
 msgid "The language already exists and is not a translation."
@@ -508,9 +496,7 @@ msgstr ""
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
-msgstr ""
-"Sorry, we kunnen uw ondertitels niet uploaden, omdat een andere gebruiker al "
-"aan deze taal is toegewezen."
+msgstr "Sorry, we kunnen uw ondertitels niet uploaden, omdat een andere gebruiker al aan deze taal is toegewezen."
 
 #: apps/subtitles/forms.py:132
 msgid ""
@@ -522,29 +508,25 @@ msgstr ""
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
-msgstr ""
-"Sorry, we kunnen uw ondertitels niet uploaden, omdat er al een concept voor "
-"deze taal op moderatie wacht."
+msgstr "Sorry, we kunnen uw ondertitels niet uploaden, omdat er al een concept voor deze taal op moderatie wacht."
 
 #: apps/subtitles/forms.py:167
 msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated and "
-"you don't have permission to transcribe subtitles."
+"Sorry, we can't upload your subtitles because this language is moderated and"
+" you don't have permission to transcribe subtitles."
 msgstr ""
 
 #: apps/subtitles/forms.py:175
 msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated and "
-"you don't have permission to translate subtitles."
+"Sorry, we can't upload your subtitles because this language is moderated and"
+" you don't have permission to translate subtitles."
 msgstr ""
 
 #: apps/subtitles/forms.py:186
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
-msgstr ""
-"Sorry, we kunnen je bestand niet uploaden omdat het aantal lijnen in je "
-"vertaling ({0}) niet overeenstemt met het origineel ({1})."
+msgstr "Sorry, we kunnen je bestand niet uploaden omdat het aantal lijnen in je vertaling ({0}) niet overeenstemt met het origineel ({1})."
 
 #: apps/subtitles/forms.py:197
 #, python-format
@@ -563,9 +545,7 @@ msgstr "Kan niet detecteren hoe de inhoud van het bestand gecodeerd is."
 
 #: apps/subtitles/forms.py:235 unisubs-integration/api/1_0/forms.py:41
 msgid "Somebody is subtitling this video right now. Try later."
-msgstr ""
-"Iemand anders is bezig met het ondertitelen van deze video. Probeer het "
-"later nogmaals."
+msgstr "Iemand anders is bezig met het ondertitelen van deze video. Probeer het later nogmaals."
 
 #: apps/subtitles/forms.py:247
 #, python-format
@@ -634,7 +614,7 @@ msgstr "Privé"
 msgid "Deleted"
 msgstr ""
 
-#: apps/subtitles/templatetags/new_subtitles_tags.py:70
+#: apps/subtitles/templatetags/new_subtitles_tags.py:78
 #: templates/videos/_diffing-subtitle.html:17
 msgid "Not Synced"
 msgstr "Niet gesynchroniseerd"
@@ -685,12 +665,9 @@ msgstr "URL van de video"
 
 #: apps/teams/forms.py:154
 msgid ""
-"Enter the URL of any compatible video or any video on our site. You can also "
-"browse the site and use the 'Add Video to Team' menu."
-msgstr ""
-"Voeg de URL in van een compatibele video of om het even welke video op je "
-"site. Je kan ook deze site bezoeken en de menu \"Video aan team toekennen\" "
-"gebruiken."
+"Enter the URL of any compatible video or any video on our site. You can also"
+" browse the site and use the 'Add Video to Team' menu."
+msgstr "Voeg de URL in van een compatibele video of om het even welke video op je site. Je kan ook deze site bezoeken en de menu \"Video aan team toekennen\" gebruiken."
 
 #: apps/teams/forms.py:162
 msgid "Video language"
@@ -698,8 +675,7 @@ msgstr "Taal van de video"
 
 #: apps/teams/forms.py:164
 msgid "It will be saved only if video does not exist in our database."
-msgstr ""
-"Het zal alleen worden opgeslagen als de video niet in onze database staat."
+msgstr "Het zal alleen worden opgeslagen als de video niet in onze database staat."
 
 #: apps/teams/forms.py:218
 msgid "This video already belongs to a team."
@@ -716,8 +692,7 @@ msgstr "URL met de introductievideo van het team"
 #: apps/teams/forms.py:268
 msgid ""
 "You can put an optional video\n"
-"on your team homepage that explains what your team is about, to attract "
-"volunteers.\n"
+"on your team homepage that explains what your team is about, to attract volunteers.\n"
 "Enter a link to any compatible video, or to any video page on our site."
 msgstr ""
 
@@ -731,9 +706,7 @@ msgstr "Deze video heeft al een transscript."
 
 #: apps/teams/forms.py:324
 msgid "No one has transcribed this video yet, so it can't be translated."
-msgstr ""
-"Er is nog geen transscript voor deze video, waardoor hij niet vertaald kan "
-"worden."
+msgstr "Er is nog geen transscript voor deze video, waardoor hij niet vertaald kan worden."
 
 #: apps/teams/forms.py:331
 msgid "This language already has a complete set of subtitles."
@@ -873,13 +846,13 @@ msgstr ""
 msgid "Hourly"
 msgstr ""
 
-#: apps/teams/models.py:163 apps/teams/models.py:3025
+#: apps/teams/models.py:163 apps/teams/models.py:3034
 msgid "name"
 msgstr "naam"
 
-#: apps/teams/models.py:164 apps/teams/models.py:3026
+#: apps/teams/models.py:164 apps/teams/models.py:3035
 msgid "slug"
-msgstr ""
+msgstr "Slak"
 
 #: apps/teams/models.py:165
 msgid "description"
@@ -888,9 +861,7 @@ msgstr "beschrijven"
 #: apps/teams/models.py:165
 msgid ""
 "All urls will be converted to links. Line breaks and HTML not supported."
-msgstr ""
-"Alle URL's zullen omgezet worden naar links. Regeleinde en HTML worden niet "
-"ondersteund."
+msgstr "Alle URL's zullen omgezet worden naar links. Regeleinde en HTML worden niet ondersteund."
 
 #: apps/teams/models.py:167
 msgid "logo"
@@ -976,15 +947,11 @@ msgstr "Teams"
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
-msgstr ""
-"Gebruik deze ruimte om uit te leggen waarom jij of jouw team deze video moet "
-"ondertitelen. Het toevoegen van een notitie zorgt er voor dat vrijwilligers "
-"sneller helpen."
+msgstr "Gebruik deze ruimte om uit te leggen waarom jij of jouw team deze video moet ondertitelen. Het toevoegen van een notitie zorgt er voor dat vrijwilligers sneller helpen."
 
 #: apps/teams/models.py:704
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
-msgstr ""
-"We halen automatisch thumbnails op voor bepaalde sites, bijvoorbeeld YouTube."
+msgstr "We halen automatisch thumbnails op voor bepaalde sites, bijvoorbeeld YouTube."
 
 #: apps/teams/models.py:706
 msgid "Need help with all languages"
@@ -1011,11 +978,11 @@ msgstr "Beheer"
 msgid "Contributor"
 msgstr "<b>Medewerker</b>"
 
-#: apps/teams/models.py:2135
+#: apps/teams/models.py:2144
 msgid "Resume"
 msgstr "Hervat"
 
-#: apps/teams/models.py:2137
+#: apps/teams/models.py:2146
 msgid "Start now"
 msgstr "Nu beginnen"
 
@@ -1028,9 +995,7 @@ msgstr "Nieuwe activiteit op je teamvideo"
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
-msgstr ""
-"Deze ondertitels zijn gemodereerd. Bekijk de teampagina voor %s voor "
-"informatie over hoe u kunt bijdragen."
+msgstr "Deze ondertitels zijn gemodereerd. Bekijk de teampagina voor %s voor informatie over hoe u kunt bijdragen."
 
 #: apps/teams/permissions.py:652
 msgid "Sorry, these subtitles are privately moderated."
@@ -1040,7 +1005,7 @@ msgstr "Sorry, deze ondertitels zijn privé gemodereerd."
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
-msgstr ""
+msgstr "Excuses, u heeft geen toestemming om deze ondertitels aan te passen. Als u toch denk dat ze aangepast moeten worden, contacteer dan de team administrator."
 
 #: apps/teams/rpc.py:40
 msgid "Team does not exist"
@@ -1078,9 +1043,7 @@ msgstr "Je aanvraag is goedgekeurd. Je maakt nu deel uit van dit team"
 msgid ""
 "Your application has been submitted. You will be notified of the team "
 "administrator's response"
-msgstr ""
-"Uw aanvraag is doorgestuurd. U zal een melding krijgen met de reactie van de "
-"team administrator"
+msgstr "Uw aanvraag is doorgestuurd. U zal een melding krijgen met de reactie van de team administrator"
 
 #: apps/teams/rpc.py:78
 msgid "You can't join this team by application."
@@ -1145,16 +1108,11 @@ msgid ""
 "\n"
 "                Your team has been created. Here are some next steps:\n"
 "                <ul>\n"
-"                    <li><a href=\"%(edit)s\">Edit team members' permissions</"
-"a></li>\n"
-"                    <li><a href=\"%(activate)s\">Activate and customize "
-"workflows for your team</a></li>\n"
-"                    <li><a href=\"%(create)s\">Create and customize "
-"projects</a></li>\n"
-"                    <li><a href=\"%(lang)s\">Edit language preferences</a></"
-"li>\n"
-"                    <li><a href=\"%(custom)s\">Customize instructions to "
-"caption makers and translators</a></li>\n"
+"                    <li><a href=\"%(edit)s\">Edit team members' permissions</a></li>\n"
+"                    <li><a href=\"%(activate)s\">Activate and customize workflows for your team</a></li>\n"
+"                    <li><a href=\"%(create)s\">Create and customize projects</a></li>\n"
+"                    <li><a href=\"%(lang)s\">Edit language preferences</a></li>\n"
+"                    <li><a href=\"%(custom)s\">Customize instructions to caption makers and translators</a></li>\n"
 "                </ul>\n"
 "                "
 msgstr ""
@@ -1217,8 +1175,7 @@ msgstr "Het lid werd uit het team verwijderd."
 
 #: apps/teams/views.py:842
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
-msgstr ""
-"Gebruik de knop \"Dit team verlaten\" om uzelf uit dit team uit te schrijven."
+msgstr "Gebruik de knop \"Dit team verlaten\" om uzelf uit dit team uit te schrijven."
 
 #: apps/teams/views.py:845
 msgid "You don't have permission to remove this member from the team."
@@ -1298,7 +1255,7 @@ msgstr "Je kan deze taak niet toewijzen."
 
 #: apps/teams/views.py:1607
 msgid "Draft uploaded successfully."
-msgstr ""
+msgstr "Klad succesvol geüpload."
 
 #: apps/teams/views.py:1624
 msgid "You are not allowed to download this transcript."
@@ -1326,7 +1283,7 @@ msgstr "Project opgeslagen."
 
 #: apps/teams/views.py:1774
 msgid "Successfully synced subtitles."
-msgstr ""
+msgstr "Succesvol gesynchroniseerde ondertitels."
 
 #: apps/teams/views.py:2085
 #, python-format
@@ -1366,7 +1323,7 @@ msgstr "Kan iemand me helpen deze video's te ondertitelen? %(url)s"
 
 #: apps/videos/forms.py:52
 msgid "--Select language--"
-msgstr ""
+msgstr "--Selecteer taal--"
 
 #: apps/videos/forms.py:64
 msgid "File should have txt format"
@@ -1378,8 +1335,7 @@ msgstr "Bestandsgroote moet kleiner zijn dan {0} kb"
 
 #: apps/videos/forms.py:77
 msgid "Can't encode file. It should have utf8 encoding."
-msgstr ""
-"Kan het bestand niet coderen. De karaktercode moet in utf8-formaat zijn."
+msgstr "Kan het bestand niet coderen. De karaktercode moet in utf8-formaat zijn."
 
 #: apps/videos/forms.py:90
 #, python-format
@@ -1402,7 +1358,7 @@ msgid ""
 "If you'd like to us to add support for a new site or format, or if you\n"
 "think there's been some mistake, <a\n"
 "href=\"mailto:%s\">contact us</a>!"
-msgstr ""
+msgstr "Amara ondersteund die website of video extensie niet.\nAls u wil dat wij een nieuwe website of extensie ondersteunen of als u denkt dat er iets fout is gegaan, <ahref=\"mailto:%s\">contacteer ons</a>!"
 
 #: apps/videos/forms.py:140
 msgid "You have not permission add video URL for this video"
@@ -1412,26 +1368,16 @@ msgstr "Je bent niet bevoegd om voor deze video een video-URL toe te voegen."
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
-"                        <a href=\"mailto:%s\">Contact us</a> if there's a "
-"problem."
+"                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr ""
 
 #: apps/videos/forms.py:195 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
-"You must link to a video on a compatible site (like YouTube) or directly to "
-"a\n"
-"                    video file that works with HTML5 browsers. For example: "
-"http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n"
-"                    <a href=\"mailto:%s\">Contact us</a> if there's a "
-"problem."
-msgstr ""
-"Je moet linken naar  een video op een compatibele site (zoals YouTube) of "
-"rechtstreeks naar een videobestand dat leesbaar is door een HTML5 browsers. "
-"Bijvoorbeeld: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo."
-"m4v\n"
-"                    <a href=\"mailto:%s\">Contact us</a> if there's a "
-"problem."
+"You must link to a video on a compatible site (like YouTube) or directly to a\n"
+"                    video file that works with HTML5 browsers. For example: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n"
+"                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
+msgstr "Je moet linken naar  een video op een compatibele site (zoals YouTube) of rechtstreeks naar een videobestand dat leesbaar is door een HTML5 browsers. Bijvoorbeeld: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 
 #: apps/videos/forms.py:223
 msgid "Youtube usernames"
@@ -1459,9 +1405,7 @@ msgstr ""
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
-msgstr ""
-"Sorry, met de URL die u ingaf vinden we geen valide feed. Controleer de URL "
-"en probeer het opnieuw. "
+msgstr "Sorry, met de URL die u ingaf vinden we geen valide feed. Controleer de URL en probeer het opnieuw. "
 
 #: apps/videos/forms.py:272
 msgid "Duplicate feed URL in form: {url}"
@@ -1473,9 +1417,9 @@ msgstr ""
 
 #: apps/videos/forms.py:280
 msgid ""
-"The videos are being added in the background. If you are logged in, you will "
-"receive a message when it's done"
-msgstr ""
+"The videos are being added in the background. If you are logged in, you will"
+" receive a message when it's done"
+msgstr "De video's worden toegevoegd op de achtergrond. Als u ingelogd bent zal u een melding ontvangen wanneer het klaar is."
 
 #: apps/videos/forms.py:295
 msgid "captcha"
@@ -1483,17 +1427,17 @@ msgstr "captcha"
 
 #: apps/videos/forms.py:361 apps/videos/forms.py:428 apps/videos/forms.py:477
 msgid "Subtitle into:"
-msgstr ""
+msgstr "Ondertitel in het:"
 
 #: apps/videos/forms.py:363 apps/videos/forms.py:472
 msgid "This video is in:"
-msgstr ""
+msgstr "Deze video is in het:"
 
 #: apps/videos/forms.py:364 apps/videos/forms.py:473
 #: templates/teams/tasks.html:380 templates/videos/_upload_subtitles.html:36
 msgid ""
 "Please double check the primary spoken language. This step cannot be undone."
-msgstr ""
+msgstr "Controleer alstublieft de primair gesproken taal nogmaals. Deze stap kan niet ongedaan gemaakt worden."
 
 #: apps/videos/metadata.py:57
 msgid "Speaker Name"
@@ -1553,11 +1497,8 @@ msgstr "  verwijderde een video: \"%(title)s\""
 
 #: apps/videos/models.py:1410
 #, python-format
-msgid ""
-"added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
-msgstr ""
-"heeft <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> toegevoegd "
-"aan Amara"
+msgid "added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
+msgstr "heeft <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> toegevoegd aan Amara"
 
 #: apps/videos/models.py:1412
 #, python-format
@@ -1577,15 +1518,15 @@ msgstr "De titel van <a href=\"%(video_url)s\">%(video_name)s</a> is gewijzigd"
 #: apps/videos/models.py:1434
 #, python-format
 msgid ""
-"commented on <a href=\"%(comments_url)s\">%(new_language)s subtitles</a> for "
-"<a href=\"%(video_url)s\">%(video_name)s</a>"
+"commented on <a href=\"%(comments_url)s\">%(new_language)s subtitles</a> for"
+" <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
 #: apps/videos/models.py:1436
 #, python-format
 msgid ""
-"Comment added for <a href=\"%(comments_url)s\">%(new_language)s subtitles</"
-"a> for <a href=\"%(video_url)s\">%(video_name)s</a>"
+"Comment added for <a href=\"%(comments_url)s\">%(new_language)s "
+"subtitles</a> for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
 #: apps/videos/models.py:1439
@@ -1596,8 +1537,7 @@ msgstr "gaf commentaar op <a href=\"%(video_url)s\">%(video_name)s</a>"
 #: apps/videos/models.py:1441
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"Commentaar toegevoegd voor <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "Commentaar toegevoegd voor <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:1449
 #, python-format
@@ -1630,14 +1570,12 @@ msgstr ""
 #: apps/videos/models.py:1467
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"voegde een nieuwe URL toe voor <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "voegde een nieuwe URL toe voor <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:1469
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"Nieuwe URL toegevoegd voor <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "Nieuwe URL toegevoegd voor <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:1474
 #, python-format
@@ -1654,9 +1592,7 @@ msgstr "verlet het team %s "
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
-msgstr ""
-"wijzig primaraire url van <a href=\"%(old_url)s\">%(old_url)s</a> naar <a "
-"href=\"%(new_url)s\">%(new_url)s</a>"
+msgstr "wijzig primaraire url van <a href=\"%(old_url)s\">%(old_url)s</a> naar <a href=\"%(new_url)s\">%(new_url)s</a>"
 
 #: apps/videos/models.py:1499
 #, python-format
@@ -1736,9 +1672,7 @@ msgstr "verwijder url"
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
 "system. You can't add it as a secondary URL."
-msgstr ""
-"Deze URL <a href=\"%(url)s\">verwijst</a> al naar een video op ons systeem. "
-"Je kan hem niet toevoegen als bijkomende URL."
+msgstr "Deze URL <a href=\"%(url)s\">verwijst</a> al naar een video op ons systeem. Je kan hem niet toevoegen als bijkomende URL."
 
 #: apps/videos/rpc.py:51 apps/videos/rpc.py:67
 msgid "You have not permission"
@@ -1800,8 +1734,7 @@ msgstr "Bekijk deze video's en help ondertitels te maken"
 #, python-format
 msgid ""
 "Hey-- check out this video %(video_title)s and help make subtitles: %(url)s"
-msgstr ""
-"Hey-- bekijk deze video %(video_title)s en help ondertitels te maken: %(url)s"
+msgstr "Hey-- bekijk deze video %(video_title)s en help ondertitels te maken: %(url)s"
 
 #: apps/videos/share_utils.py:76
 #, python-format
@@ -1816,48 +1749,41 @@ msgstr ""
 #: apps/videos/share_utils.py:107
 #, python-format
 msgid "Just found a version of this video with %(language_name)s subtitles"
-msgstr ""
-"Net gevonden: een versie van deze video met ondertitels in het "
-"%(language_name)s"
+msgstr "Net gevonden: een versie van deze video met ondertitels in het %(language_name)s"
 
 #: apps/videos/views.py:137
 msgid "original"
-msgstr ""
+msgstr "Origineel"
 
 #: apps/videos/views.py:142
 msgid "incomplete"
-msgstr ""
+msgstr "Onvoltooid"
 
 #: apps/videos/views.py:150
 msgid "needs review"
-msgstr ""
+msgstr "Beoordeling nodig"
 
 #: apps/videos/views.py:153
 msgid "needs approval"
-msgstr ""
+msgstr "Goedkeuring nodig"
 
 #: apps/videos/views.py:158
 msgid "needs editing"
-msgstr ""
+msgstr "Bewerking nodig"
 
 #: apps/videos/views.py:260
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
-"share the video with friends, or get an embed code for your site.  To add "
-"or\n"
+"share the video with friends, or get an embed code for your site.  To add or\n"
 "improve subtitles, click the button below the video."
-msgstr ""
-"Ziehier de werkruimte om uw video te ondertitelen. U kan de video delen met "
-"vrienden of de invoegcode (<i>embed code</i>) voor uw site opvragen. Om de "
-"ondertiteling toe te voegen of te verbeteren, klikt u op de knop onder de "
-"video."
+msgstr "Ziehier de werkruimte om uw video te ondertitelen. U kan de video delen met vrienden of de invoegcode (<i>embed code</i>) voor uw site opvragen. Om de ondertiteling toe te voegen of te verbeteren, klikt u op de knop onder de video."
 
 #: apps/videos/views.py:268
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
-msgstr ""
+msgstr "U heeft een video ingediend over http. Uw browser kan gemixte inhouds-waarschuwingen geven."
 
 #: apps/videos/views.py:273
 msgid "Existing subtitles will be imported in a few minutes."
@@ -1865,7 +1791,7 @@ msgstr "Bestaande ondertitels worden binnen een paar minuten geïmporteerd. "
 
 #: apps/videos/views.py:346 apps/videos/views.py:631
 msgid "$title with subtitles | Amara"
-msgstr ""
+msgstr "$title met ondertitels | Amara"
 
 #: apps/videos/views.py:449
 msgid ""
@@ -1875,7 +1801,7 @@ msgstr ""
 
 #: apps/videos/views.py:753
 msgid "You don't have permission to rollback this language"
-msgstr ""
+msgstr "U hebt geen toestemming om deze taal terug te zetten"
 
 #: apps/videos/views.py:860
 msgid "You have not permission change this URL"
@@ -1910,11 +1836,8 @@ msgstr "Video niet beschikbaar"
 #, python-format
 msgid ""
 "Please try again with a link to a video page. \n"
-"                        <a href=\"mailto:%s\">Contact us</a> if there's a "
-"problem."
-msgstr ""
-"Probeer het aub opnieuw met een link naar een video-pagina. <a href=\"mailto:"
-"%s\">Neem contact met ons op</a> als er een probleem is."
+"                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
+msgstr "Probeer het aub opnieuw met een link naar een video-pagina. <a href=\"mailto:%s\">Neem contact met ons op</a> als er een probleem is."
 
 #: apps/videos/types/youtube.py:51
 msgid "Private video"
@@ -2003,19 +1926,15 @@ msgstr "Niks te vertalen!"
 msgid ""
 "You haven't specified any languages in your settings file, or haven't yet "
 "generated a batch of translation catalogs."
-msgstr ""
-"U hebt nog geen talen gespecificeerd in uw instellingenbestand, of u hebt "
-"nog geen vertaalcatalogi aangemaakt. "
+msgstr "U hebt nog geen talen gespecificeerd in uw instellingenbestand, of u hebt nog geen vertaalcatalogi aangemaakt. "
 
 #: libs/rosetta/templates/rosetta/languages.html:57
 #, python-format
 msgid ""
-"Please refer to <a href=\"%(i18n_doc_link)s\">Django's I18N documentation</"
-"a> for a guide on how to set up internationalization for your project."
-msgstr ""
-"Een gids die u uitlegt hoe u een internationalisatie kunt opzetten voor uw "
-"project, vindt u op <a href=\"%(i18n_doc_link)s\">Django's I18N "
-"documentation</a> ."
+"Please refer to <a href=\"%(i18n_doc_link)s\">Django's I18N "
+"documentation</a> for a guide on how to set up internationalization for your"
+" project."
+msgstr "Een gids die u uitlegt hoe u een internationalisatie kunt opzetten voor uw project, vindt u op <a href=\"%(i18n_doc_link)s\">Django's I18N documentation</a> ."
 
 #: libs/rosetta/templates/rosetta/pofile.html:8
 msgid "Pick another file"
@@ -2032,18 +1951,13 @@ msgstr "Voortgang:  %(percent_translated)s%%"
 
 #: libs/rosetta/templates/rosetta/pofile.html:23
 msgid "File is read-only: download the file when done editing!"
-msgstr ""
-"Bestand is een alleen - lezen bestand: download het bestand alleen als je "
-"klaar bent met bewerken!"
+msgstr "Bestand is een alleen - lezen bestand: download het bestand alleen als je klaar bent met bewerken!"
 
 #: libs/rosetta/templates/rosetta/pofile.html:24
 msgid ""
 "Some items in your last translation block couldn't be saved: this usually "
 "happens when the catalog file changes on disk after you last loaded it."
-msgstr ""
-"Een aantal ondertitels uit uw laatste vertaalblok konden niet opgeslagen "
-"worden. Dit probleem doet zich meestal voor wanneer het catalogusbestand op "
-"de schijf gewijzigd is na uw laatste upload."
+msgstr "Een aantal ondertitels uit uw laatste vertaalblok konden niet opgeslagen worden. Dit probleem doet zich meestal voor wanneer het catalogusbestand op de schijf gewijzigd is na uw laatste upload."
 
 #: libs/rosetta/templates/rosetta/pofile.html:28
 #, python-format
@@ -2093,7 +2007,7 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:90
 msgid "Contextual hint"
-msgstr ""
+msgstr "Contextuele hint"
 
 #: libs/rosetta/templates/rosetta/pofile.html:100
 msgid "suggest"
@@ -2147,9 +2061,7 @@ msgstr "Nu kan iedereen de video met ondertiteling bekijken-- probeer het uit!"
 
 #: templates/_share_widget.html:7
 msgid "Then tell the world and invite your friends to help translate:"
-msgstr ""
-"Maak bekend dat u een video hebt ondertiteld en vraag uw vrienden te helpen "
-"met vertalen:"
+msgstr "Maak bekend dat u een video hebt ondertiteld en vraag uw vrienden te helpen met vertalen:"
 
 #: templates/_share_widget.html:10 templates/_sharing_widget.html:7
 #: templates/teams/_context_team.html:90
@@ -2190,18 +2102,13 @@ msgstr "Toon het feedbackformulier en probeer een video te ondertitelen"
 msgid ""
 "Warning: These videos should not be embeded--there is a good possibility "
 "they will break at some point!"
-msgstr ""
-"Waarschuwing: deze video’s kunnen beter niet in een pagina worden "
-"ingesloten–- de kans is groot dat de invoegcode over een tijdje niet meer "
-"werkt!"
+msgstr "Waarschuwing: deze video’s kunnen beter niet in een pagina worden ingesloten–- de kans is groot dat de invoegcode over een tijdje niet meer werkt!"
 
 #: templates/_testing_widget.html:15
 msgid ""
-"Warning #2: These subtitles are non-permanent and should not be relied on -- "
-"someone could change them."
-msgstr ""
-"Waarschuwing 2: Deze ondertitels zijn niet permanent en kunnen nog veranderd "
-"worden door iemand anders."
+"Warning #2: These subtitles are non-permanent and should not be relied on --"
+" someone could change them."
+msgstr "Waarschuwing 2: Deze ondertitels zijn niet permanent en kunnen nog veranderd worden door iemand anders."
 
 #: templates/_testing_widget.html:16
 msgid "This alpha site is for purely testing purposes."
@@ -2212,136 +2119,50 @@ msgid ""
 "\n"
 "            <h2>About Amara</h2>\n"
 "            <p>\n"
-"                Amara gives individuals, communities, and larger "
-"organizations the power \n"
-"                to overcome accessibility and language barriers for online "
-"video. The tools are free \n"
-"                and open source and make the work of subtitling and "
-"translating video simpler, more \n"
+"                Amara gives individuals, communities, and larger organizations the power \n"
+"                to overcome accessibility and language barriers for online video. The tools are free \n"
+"                and open source and make the work of subtitling and translating video simpler, more \n"
 "                appealing, and, most of all, more collaborative.\n"
 "            </p>\n"
 "            <p>\n"
 "                The benefits of captioning and subtitling are immense:\n"
 "                <ul>\n"
-"                    <li>Captions make videos accessible for viewers who are "
-"deaf or hard of hearing</li>\n"
-"                    <li>Translations make it possible for all of us to watch "
-"video in languages that we don't speak</li>\n"
-"                    <li>Video creators get: better SEO, more views, access "
-"to a far bigger (potentially multilingual and global) audience, "
-"accessibility for deaf and hard of hearing viewers, and more</li>\n"
+"                    <li>Captions make videos accessible for viewers who are deaf or hard of hearing</li>\n"
+"                    <li>Translations make it possible for all of us to watch video in languages that we don't speak</li>\n"
+"                    <li>Video creators get: better SEO, more views, access to a far bigger (potentially multilingual and global) audience, accessibility for deaf and hard of hearing viewers, and more</li>\n"
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
 "                Amara is composed of three main parts:\n"
 "                <ul>\n"
-"                    <li>A subtitle creation and viewing tool (aka the widget)"
-"</li>\n"
+"                    <li>A subtitle creation and viewing tool (aka the widget)</li>\n"
 "                    <li>A collaborative subtitling website</li>\n"
 "                    <li>An open protocol for subtitle search/delivery</li>\n"
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
-"                Everything we do is available under the open source <a href="
-"\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a> license.\n"
+"                Everything we do is available under the open source <a href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a> license.\n"
 "            </p>\n"
 "            <h2>Our Organization</h2>\n"
 "            <p>\n"
-"                <a href=\"http://www.pculture.org/\">Participatory Culture "
-"Foundation</a> \n"
-"                is a non-profit organization building free and open tools "
-"for more a democratic and \n"
-"                decentralized media. Other projects of ours include <a href="
-"\"http://www.getmiro.com/\">Miro</a>, \n"
-"                <a href=\"http://www.mirovideoconverter.com/\">Miro Video "
-"Converter</a>, \n"
-"                <a href=\"http://www.mirocommunity.org/\">Miro Community</"
-"a>, and \n"
-"                <a href=\"http://www.openvideoalliance.org/\">Open Video "
-"Alliance</a>.\n"
+"                <a href=\"http://www.pculture.org/\">Participatory Culture Foundation</a> \n"
+"                is a non-profit organization building free and open tools for more a democratic and \n"
+"                decentralized media. Other projects of ours include <a href=\"http://www.getmiro.com/\">Miro</a>, \n"
+"                <a href=\"http://www.mirovideoconverter.com/\">Miro Video Converter</a>, \n"
+"                <a href=\"http://www.mirocommunity.org/\">Miro Community</a>, and \n"
+"                <a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.\n"
 "            </p>\n"
 "            <p>\n"
-"                Amara is a featured project of <a href=\"http://www.drumbeat."
-"org/\">Mozilla Drumbeat</a>, \n"
-"                and the Mozilla Foundation has provided development "
-"support.  \n"
-"                Open Society Institute and the MacArthur Foundation are also "
-"financial supporters.\n"
+"                Amara is a featured project of <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \n"
+"                and the Mozilla Foundation has provided development support.  \n"
+"                Open Society Institute and the MacArthur Foundation are also financial supporters.\n"
 "            </p>\n"
 "            <h2>Publisher and Enterprise Services</h2>\n"
 "            <p>\n"
-"                Amara offers a set of professional tools and services that "
-"enable publishers and video platforms to create and manage high quality "
-"subtitles.  With Amara, you can build a community of volunteers to subtitle "
-"your content, integrate with professional services, and use a powerful "
-"quality control system to ensure world-class quality.  To learn more, see "
-"our <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise "
-"services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org"
-"\">dean@pculture.org</a>.\n"
+"                Amara offers a set of professional tools and services that enable publishers and video platforms to create and manage high quality subtitles.  With Amara, you can build a community of volunteers to subtitle your content, integrate with professional services, and use a powerful quality control system to ensure world-class quality.  To learn more, see our <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
 "            </p>\n"
 "        "
-msgstr ""
-"\n"
-"<h2>Over Amara</h2>\n"
-"<p>Amara laat individuen, gemeenschappen en grotere organisaties de grenzen "
-"overstijgen die online video stelt op het vlak van toegankelijkheid en taal. "
-"De aangeboden tools zijn vrij en open source en ze maken het ondertitelen en "
-"vertalen eenvoudiger, aantrekkelijker en bovenal een middel voor "
-"samenwerking.</p>\n"
-"<p>De voordelen van ondertitels en vertalingen zijn enorm:\n"
-"                <ul>\n"
-"                    <li>Ondertiteling maakt video toegankelijk voor dove en "
-"hardhorige bezoekers</li>\n"
-"                    <li>Vertalingen zorgen ervoor dat we allemaal kunnen "
-"kijken naar video's in een taal die we niet spreken</li>\n"
-"                    <li>De makers van video krijgen: een betere plaats in "
-"zoekresultaten, meer views,  toegang tot een veel ruimer publiek (mogelijks "
-"meertalig en van over de hele wereld), toegang voor doven en slechthorenden, "
-"en nog veel meer</li>\n"
-"                </ul>\n"
-"            </p>\n"
-"            <p>\n"
-"                Amara bestaat uit drie delen:\n"
-"                <ul>\n"
-"                    <li>Een tool voor het maken en weergeven van ondertitels "
-"(gekend als \"de widget\")</li>\n"
-"                    <li>Een website om samen te werken aan ondertiteling </"
-"li>\n"
-"                    <li>Een open protocol voor het opzoeken en aanleveren "
-"van ondertitels</li>\n"
-"                </ul>\n"
-"            </p>\n"
-"            <p>\n"
-"                Alles wat we doen is beschikbaar onder de open source <a "
-"href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a>-licentie.\n"
-"            </p>\n"
-"            <h2>Onze organisatie</h2>\n"
-"            <p><a href=\"http://www.pculture.org/\">Participatory Culture "
-"Foundation</a> is een non-profitorganisatie die vrije en open tools bouwt "
-"met het oog op meer democratische en decentrale media. Andere projecten van "
-"ons zijn ondermeer <a href=\"http://www.getmiro.com/\">Miro</a>,  <a href="
-"\"http://www.mirovideoconverter.com/\">Miro Video Converter</a>, <a href="
-"\"http://www.mirocommunity.org/\">Miro Community</a> en <a href=\"http://www."
-"openvideoalliance.org/\">Open Video Alliance</a>.</p>\n"
-"            <p>\n"
-"                Amara is een projectrealisatie van \n"
-"<a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>,  en de Mozilla "
-"Foundation zorgde voor ondersteuning bij de ontwikkeling.   Open Society "
-"Institute en the MacArthur Foundation ondersteunden het project financieel. "
-"</p>\n"
-"            <h2>Diensten voor publicisten en ondernemingen</h2>\n"
-"            <p>Amara biedt een set professionele tools en diensten die het "
-"voor publicisten en video platformen mogelijk maakt om kwaliteitsvolle "
-"ondertiteling te maken en te beheren. Met Amara kan u een gemeenschap van "
-"vrijwilligers opbouwen die uw content ondertitelt, deze samen brengen met "
-"een professionele dienstverlening en gebruik maken van een krachtig systeem "
-"van kwaliteitscontrole om op die manier kwaliteit van wereldklasse te "
-"leveren. Wilt u hierover meer weten? Lees <a href=\"http://www."
-"universalsubtitles.org/en/enterprise/\">enterprise services</a> en "
-"contacteer Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture."
-"org</a>.\n"
-"            </p>\n"
-"       "
+msgstr "\n<h2>Over Amara</h2>\n<p>Amara laat individuen, gemeenschappen en grotere organisaties de grenzen overstijgen die online video stelt op het vlak van toegankelijkheid en taal. De aangeboden tools zijn vrij en open source en ze maken het ondertitelen en vertalen eenvoudiger, aantrekkelijker en bovenal een middel voor samenwerking.</p>\n<p>De voordelen van ondertitels en vertalingen zijn enorm:\n                <ul>\n                    <li>Ondertiteling maakt video toegankelijk voor dove en hardhorige bezoekers</li>\n                    <li>Vertalingen zorgen ervoor dat we allemaal kunnen kijken naar video's in een taal die we niet spreken</li>\n                    <li>De makers van video krijgen: een betere plaats in zoekresultaten, meer views,  toegang tot een veel ruimer publiek (mogelijks meertalig en van over de hele wereld), toegang voor doven en slechthorenden, en nog veel meer</li>\n                </ul>\n            </p>\n            <p>\n                Amara bestaat uit drie delen:\n                <ul>\n                    <li>Een tool voor het maken en weergeven van ondertitels (gekend als \"de widget\")</li>\n                    <li>Een website om samen te werken aan ondertiteling </li>\n                    <li>Een open protocol voor het opzoeken en aanleveren van ondertitels</li>\n                </ul>\n            </p>\n            <p>\n                Alles wat we doen is beschikbaar onder de open source <a href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a>-licentie.\n            </p>\n            <h2>Onze organisatie</h2>\n            <p><a href=\"http://www.pculture.org/\">Participatory Culture Foundation</a> is een non-profitorganisatie die vrije en open tools bouwt met het oog op meer democratische en decentrale media. Andere projecten van ons zijn ondermeer <a href=\"http://www.getmiro.com/\">Miro</a>,  <a href=\"http://www.mirovideoconverter.com/\">Miro Video Converter</a>, <a href=\"http://www.mirocommunity.org/\">Miro Community</a> en <a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.</p>\n            <p>\n                Amara is een projectrealisatie van \n<a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>,  en de Mozilla Foundation zorgde voor ondersteuning bij de ontwikkeling.   Open Society Institute en the MacArthur Foundation ondersteunden het project financieel. </p>\n            <h2>Diensten voor publicisten en ondernemingen</h2>\n            <p>Amara biedt een set professionele tools en diensten die het voor publicisten en video platformen mogelijk maakt om kwaliteitsvolle ondertiteling te maken en te beheren. Met Amara kan u een gemeenschap van vrijwilligers opbouwen die uw content ondertitelt, deze samen brengen met een professionele dienstverlening en gebruik maken van een krachtig systeem van kwaliteitscontrole om op die manier kwaliteit van wereldklasse te leveren. Wilt u hierover meer weten? Lees <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise services</a> en contacteer Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n            </p>\n       "
 
 #: templates/base.html:9
 msgid "Caption, translate, subtitle and transcribe video."
@@ -2361,7 +2182,7 @@ msgstr "Vrijwilliger"
 
 #: templates/base.html:73 templates/index.html:88
 msgid "Pro Services"
-msgstr ""
+msgstr "Proffesionele diensten"
 
 #: templates/base.html:74
 msgid "Help"
@@ -2377,7 +2198,8 @@ msgstr "Hebt u een YouTube account?<"
 
 #: templates/base.html:94
 msgid ""
-"New: enable viewer-created translations and captions on your YouTube channel!"
+"New: enable viewer-created translations and captions on your YouTube "
+"channel!"
 msgstr ""
 
 #: templates/base.html:96
@@ -2391,9 +2213,7 @@ msgstr "Nee, bedankt"
 #: templates/base.html:113
 msgid ""
 "Amara is a project of <a href=\"http://participatoryculture.org/\">PCF</a>."
-msgstr ""
-"Amara is een project van <a href=\"http://participatoryculture.org/\">PCF</"
-"a>."
+msgstr "Amara is een project van <a href=\"http://participatoryculture.org/\">PCF</a>."
 
 #: templates/base.html:116 templates/profiles/base.html:15
 msgid "About"
@@ -2429,7 +2249,7 @@ msgstr "Rosetta"
 
 #: templates/base.html:139
 msgid "Impersonate"
-msgstr ""
+msgstr "Vertolk"
 
 #: templates/base.html:142
 msgid "Billing"
@@ -2443,28 +2263,17 @@ msgstr "Amara Editor Demo"
 msgid ""
 "\n"
 "        <strong>What's this?</strong> The video below is for \n"
-"        demonstration purposes &mdash; try clicking the 'Subtitle Me' "
-"button!\n"
+"        demonstration purposes &mdash; try clicking the 'Subtitle Me' button!\n"
 "        Don't worry, nothing you do will be saved.\n"
 "        "
-msgstr ""
-"\n"
-"        <strong>Wat is dit?</strong> De video hieronder is voor demo-"
-"doeleinden &mdash; probeer het door te klikken op de 'Subtitle Me' knop!\n"
-"        Don't worry, nothing you do will be saved.\n"
-"        "
+msgstr "\n        <strong>Wat is dit?</strong> De video hieronder is voor demo-doeleinden &mdash; probeer het door te klikken op de 'Subtitle Me' knop!\n        Don't worry, nothing you do will be saved.\n        "
 
 #: templates/demo.html:45
 msgid ""
 "\n"
-"        <strong>Feedback is welcome.</strong> Choose \"Help\" from the main "
-"menu to report bugs or to leave comments for the team.\n"
+"        <strong>Feedback is welcome.</strong> Choose \"Help\" from the main menu to report bugs or to leave comments for the team.\n"
 "        "
-msgstr ""
-"\n"
-"<strong>Feedback is welkom.</strong> Kies \"Help\" in het hoofdmenu om bugs "
-"te melden of een bericht voor het team achter te laten.\n"
-"        "
+msgstr "\n<strong>Feedback is welkom.</strong> Kies \"Help\" in het hoofdmenu om bugs te melden of een bericht voor het team achter te laten.\n        "
 
 #: templates/dmca.html:6
 msgid "Copyright Infringement Notification"
@@ -2473,45 +2282,33 @@ msgstr "Melding van inbreuk op auteursrecht"
 #: templates/dmca.html:9
 msgid ""
 "\n"
-"To file a copyright infringement notification with us, you will need to send "
-"a\n"
-"written communication that includes substantially the following (please "
-"consult\n"
+"To file a copyright infringement notification with us, you will need to send a\n"
+"written communication that includes substantially the following (please consult\n"
 "your legal counsel or see Section 512(c)(3) of the Copyright Act to confirm\n"
 "these requirements):\n"
-msgstr ""
+msgstr "\nOm een auteursrecht schending te melden zal u een schriftelijk bericht hiervan moeten indienen dat in ieder geval het volgende bevat (Raadpleeg uw juridish adviseur of zie sectie 512(c)(3) van de \"Copyright Act\" om aan deze voorwaarden te voldoen):\n"
 
 #: templates/dmca.html:18
 msgid ""
 "\n"
-"A physical or electronic signature of a person authorized to act on behalf "
-"of\n"
+"A physical or electronic signature of a person authorized to act on behalf of\n"
 "the owner of an exclusive right that is allegedly infringed.\n"
-"Identification of the copyrighted work claimed to have been infringed, or, "
-"if\n"
+"Identification of the copyrighted work claimed to have been infringed, or, if\n"
 "multiple copyrighted works at a single online site are covered by a single\n"
 "notification, a representative list of such works at that site.\n"
-"Identification of the material that is claimed to be infringing or to be "
-"the\n"
-"subject of infringing activity and that is to be removed or access to which "
-"is\n"
+"Identification of the material that is claimed to be infringing or to be the\n"
+"subject of infringing activity and that is to be removed or access to which is\n"
 "to be disabled, and information reasonably sufficient to permit the service\n"
-"provider to locate the material. Providing URLs in the body of an email is "
-"the\n"
+"provider to locate the material. Providing URLs in the body of an email is the\n"
 "best way to help us locate content quickly.\n"
-"Information reasonably sufficient to permit the service provider to contact "
-"the\n"
-"complaining party, such as an address, telephone number, and, if available, "
-"an\n"
+"Information reasonably sufficient to permit the service provider to contact the\n"
+"complaining party, such as an address, telephone number, and, if available, an\n"
 "electronic mail address at which the complaining party may be contacted.\n"
-"A statement that the complaining party has a good faith belief that use of "
-"the\n"
-"material in the manner complained of is not authorized by the copyright "
-"owner,\n"
+"A statement that the complaining party has a good faith belief that use of the\n"
+"material in the manner complained of is not authorized by the copyright owner,\n"
 "its agent, or the law.\n"
 "A statement that the information in the notification is accurate, and under\n"
-"penalty of perjury, that the complaining party is authorized to act on "
-"behalf\n"
+"penalty of perjury, that the complaining party is authorized to act on behalf\n"
 "of the owner of an exclusive right that is allegedly infringed.\n"
 "Such written notice should be sent to our designated agent as follows:\n"
 msgstr ""
@@ -2519,8 +2316,7 @@ msgstr ""
 #: templates/dmca.html:55
 msgid ""
 "\n"
-"Please also note that under Section 512(f) any person who knowingly "
-"materially\n"
+"Please also note that under Section 512(f) any person who knowingly materially\n"
 "misrepresents that material or activity is infringing may be subject to\n"
 "liability.\n"
 msgstr ""
@@ -2534,10 +2330,8 @@ msgid ""
 "\n"
 "Please note that under Section 512(f) of the Copyright Act, any person who\n"
 "knowingly materially misrepresents that material or activity was removed or\n"
-"disabled by mistake or misidentification may be subject to liability. "
-"Please\n"
-"also be advised that we enforce a policy that provides for the termination "
-"in\n"
+"disabled by mistake or misidentification may be subject to liability. Please\n"
+"also be advised that we enforce a policy that provides for the termination in\n"
 "appropriate circumstances of subscribers who are repeat infringers.\n"
 msgstr ""
 
@@ -2549,8 +2343,7 @@ msgstr "Hoe dien ik een DMCA tegenmelding in?"
 msgid ""
 "\n"
 "The process for counter-notifications is governed by Section 512(g) of the\n"
-"Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca."
-"pdf\n"
+"Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca.pdf\n"
 msgstr ""
 
 #: templates/dmca.html:82
@@ -2565,10 +2358,8 @@ msgid ""
 "\n"
 "Please note that under Section 512(f) of the Copyright Act, any person who\n"
 "knowingly materially misrepresents that material or activity was removed or\n"
-"disabled by mistake or misidentification may be subject to liability. "
-"Please\n"
-"also be advised that we enforce a policy that provides for the termination "
-"in\n"
+"disabled by mistake or misidentification may be subject to liability. Please\n"
+"also be advised that we enforce a policy that provides for the termination in\n"
 "appropriate circumstances of subscribers who are repeat infringers.\n"
 "Accordingly, if you are not sure whether certain material infringes the\n"
 "copyrights of others, we suggest that you first contact an attorney.\n"
@@ -2582,40 +2373,26 @@ msgstr "Elementen van verweer"
 msgid ""
 "\n"
 "A sample counter notification may be found at:\n"
-"http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability "
-"to\n"
-"process your counter notification, please use the following format "
-"(including\n"
+"http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability to\n"
+"process your counter notification, please use the following format (including\n"
 "section numbers):\n"
-msgstr ""
-"\n"
-"Een voorbeeld van een verweer kan u vinden op: http://www.chillingeffects."
-"org/dmca/counter512.pdf. Opdat we uw verweer snel zouden kunnen verwerken, "
-"vragen we u het volgende formaat te gebruiken (met inbegrip van de "
-"sectienummers):\n"
+msgstr "\nEen voorbeeld van een verweer kan u vinden op: http://www.chillingeffects.org/dmca/counter512.pdf. Opdat we uw verweer snel zouden kunnen verwerken, vragen we u het volgende formaat te gebruiken (met inbegrip van de sectienummers):\n"
 
 #: templates/dmca.html:109
 msgid ""
 "\n"
-"Identify the specific URLs of material that Miro Guide has removed or to "
-"which\n"
+"Identify the specific URLs of material that Miro Guide has removed or to which\n"
 "Miro Guide has disabled access.\n"
-"Provide your full name, address, telephone number, and email address, and "
-"the\n"
+"Provide your full name, address, telephone number, and email address, and the\n"
 "username of your Miro Guide account.\n"
-"Provide a statement that you consent to the jurisdiction of Federal "
-"District\n"
+"Provide a statement that you consent to the jurisdiction of Federal District\n"
 "Court for the judicial district in which your address is located (or San\n"
-"Francisco County, California if your address is outside of the United "
-"States),\n"
+"Francisco County, California if your address is outside of the United States),\n"
 "and that you will accept service of process from the person who provided\n"
 "notification under subsection (c)(1)(C) or an agent of such person.\n"
-"Include the following statement: \"I swear, under penalty of perjury, that "
-"I\n"
-"have a good faith belief that the material was removed or disabled as a "
-"result\n"
-"of a mistake or misidentification of the material to be removed or disabled."
-"\"\n"
+"Include the following statement: \"I swear, under penalty of perjury, that I\n"
+"have a good faith belief that the material was removed or disabled as a result\n"
+"of a mistake or misidentification of the material to be removed or disabled.\"\n"
 "Sign the notice. If you are providing notice by e-mail, a scanned physical\n"
 "signature or a valid electronic signature will be accepted.\n"
 "Send the written communication to the following address:\n"
@@ -2628,35 +2405,21 @@ msgstr "Wat gebeurt er dan?"
 #: templates/dmca.html:143
 msgid ""
 "\n"
-"After we receive your counter-notification, we will forward it to the party "
-"who\n"
-"submitted the original claim of copyright infringement. Please note that "
-"when\n"
-"we forward the counter-notification, it includes your personal information. "
-"By\n"
+"After we receive your counter-notification, we will forward it to the party who\n"
+"submitted the original claim of copyright infringement. Please note that when\n"
+"we forward the counter-notification, it includes your personal information. By\n"
 "submitting a counter-notification, you consent to having your information\n"
-"revealed in this way. We will not forward the counter-notification to any "
-"party\n"
+"revealed in this way. We will not forward the counter-notification to any party\n"
 "other than the original claimant.\n"
-msgstr ""
-"\n"
-"Zodra we uw verweer ontvangen, sturen we het door naar de partij die in "
-"eerste instantie melding maakte van een inbreuk op het copyright. Hou er "
-"rekening mee dat uw persoonlijke informatie meegestuurd wordt met uw "
-"verweer. Door een verweer in te sturen, stemt u ermee in dat uw informatie "
-"op deze manier prijsgegeven wordt. We sturen de melding van verweer naar "
-"geen enkele andere partij dan de originele claimer van het copyright.\n"
+msgstr "\nZodra we uw verweer ontvangen, sturen we het door naar de partij die in eerste instantie melding maakte van een inbreuk op het copyright. Hou er rekening mee dat uw persoonlijke informatie meegestuurd wordt met uw verweer. Door een verweer in te sturen, stemt u ermee in dat uw informatie op deze manier prijsgegeven wordt. We sturen de melding van verweer naar geen enkele andere partij dan de originele claimer van het copyright.\n"
 
 #: templates/dmca.html:153
 msgid ""
 "\n"
-"After we send out the counter-notification, the claimant must then notify "
-"us\n"
+"After we send out the counter-notification, the claimant must then notify us\n"
 "within 10 days that he or she has filed an action seeking a court order to\n"
-"restrain you from engaging in infringing activity relating to the material "
-"on\n"
-"the Miro Guide. If we receive such notification we will be unable to "
-"restore\n"
+"restrain you from engaging in infringing activity relating to the material on\n"
+"the Miro Guide. If we receive such notification we will be unable to restore\n"
 "the material. If we do not receive such notification, we may reinstate the\n"
 "material.\n"
 msgstr ""
@@ -2664,15 +2427,9 @@ msgstr ""
 #: templates/dmca.html:163
 msgid ""
 "\n"
-"DISCLAIMER: WE ARE NOT YOUR ATTORNEYS, AND THE INFORMATION WE PRESENT HERE "
-"IS\n"
-"NOT LEGAL ADVICE. WE PRESENT THIS INFORMATION FOR INFORMATIONAL PURPOSES "
-"ONLY.\n"
-msgstr ""
-"\n"
-"DISCLAIMER - Afwijzing van aansprakelijkheid: wij zijn geen raadsman en de "
-"informatie die we hier bieden is geen juridisch advies. We geven deze "
-"informatie enkel ten informatieve titel.\n"
+"DISCLAIMER: WE ARE NOT YOUR ATTORNEYS, AND THE INFORMATION WE PRESENT HERE IS\n"
+"NOT LEGAL ADVICE. WE PRESENT THIS INFORMATION FOR INFORMATIONAL PURPOSES ONLY.\n"
+msgstr "\nDISCLAIMER - Afwijzing van aansprakelijkheid: wij zijn geen raadsman en de informatie die we hier bieden is geen juridisch advies. We geven deze informatie enkel ten informatieve titel.\n"
 
 #: templates/embed_page.html:24
 msgid "Add collaborative subtitling to every video on your site"
@@ -2685,16 +2442,9 @@ msgstr "Zet eenvoudigweg één lijn code in je pagina:"
 #: templates/embed_page.html:32
 msgid ""
 "\n"
-"            You can add it just before the <code>&lt;/head&gt;</code> or "
-"<code>&lt;/body&gt;</code> tag (<a href=\"https://github.com/pculture/"
-"unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n"
+"            You can add it just before the <code>&lt;/head&gt;</code> or <code>&lt;/body&gt;</code> tag (<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n"
 "        "
-msgstr ""
-"\n"
-"U kan het invoegen net voor de tag <code>&lt;/head&gt;</code> of voor de tag "
-"<code>&lt;/body&gt;</code>  (<a href=\"https://github.com/pculture/unisubs/"
-"wiki/Widgetizer-script-usage-guide\">zie usage notes</a>).\n"
-"        "
+msgstr "\nU kan het invoegen net voor de tag <code>&lt;/head&gt;</code> of voor de tag <code>&lt;/body&gt;</code>  (<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-guide\">zie usage notes</a>).\n        "
 
 #: templates/embed_page.html:37
 msgid "This lets you and visitors to your site"
@@ -2731,15 +2481,10 @@ msgstr ""
 #: templates/embed_page.html:66
 msgid ""
 "\n"
-"        A \"subtitle me\" or \"choose language\" button will appear across "
-"all compatible videos. \n"
+"        A \"subtitle me\" or \"choose language\" button will appear across all compatible videos. \n"
 "        Users can click to activate (or create) subtitles.\n"
 "        "
-msgstr ""
-"\n"
-"Een knop \"ondertitel mij\" of \"taal kiezen\" zal verschijnen bij alle "
-"compatibele video's. Gebruikers kunnen hierop klikken om de ondertiteling te "
-"activeren (of aan te maken)."
+msgstr "\nEen knop \"ondertitel mij\" of \"taal kiezen\" zal verschijnen bij alle compatibele video's. Gebruikers kunnen hierop klikken om de ondertiteling te activeren (of aan te maken)."
 
 #: templates/embed_page.html:77
 msgid "This code is experimental. If you run into problems, please"
@@ -2768,14 +2513,11 @@ msgstr "Wat zijn de voordelen van ondertitels?"
 #: templates/faq.html:22 templates/faq.html.py:72
 msgid ""
 "Who is the Participatory Culture Foundation and why are they making Amara?"
-msgstr ""
-"Wie is de \"Participatory Culture Foundation\" en waarom maakt zij Amara?"
+msgstr "Wie is de \"Participatory Culture Foundation\" en waarom maakt zij Amara?"
 
 #: templates/faq.html:23 templates/faq.html.py:76
 msgid "Will Amara support closed captions for the deaf and hard of hearing?"
-msgstr ""
-"Gaat Amara ondertiteling voor Doven en hardhorenden ondersteunen, de "
-"zogeheten \"closed captions\"?"
+msgstr "Gaat Amara ondertiteling voor Doven en hardhorenden ondersteunen, de zogeheten \"closed captions\"?"
 
 #: templates/faq.html:24 templates/faq.html.py:80
 msgid "Will your subtitles support my language or characterset?"
@@ -2783,9 +2525,7 @@ msgstr "Zullen jullie ondertitels mijn taal of tekenset ondersteunen?"
 
 #: templates/faq.html:25 templates/faq.html.py:84
 msgid "When will the tools, including this site, be available in my language?"
-msgstr ""
-"Wanneer zullen de hulpprogramma’s, inclusief deze website, in mijn taal "
-"beschikbaar zijn?"
+msgstr "Wanneer zullen de hulpprogramma’s, inclusief deze website, in mijn taal beschikbaar zijn?"
 
 #: templates/faq.html:26 templates/faq.html.py:95
 msgid "How can I add subtitles to my video?"
@@ -2817,11 +2557,9 @@ msgstr "Waar kan ik ondertitels in .SRT- of andere indelingen downloaden?"
 
 #: templates/faq.html:33 templates/faq.html.py:147
 msgid ""
-"It says \"Someone else is currently editing these subtitles\" and I can't do "
-"anything.  How long will this last for?  Why does it happen?"
-msgstr ""
-"Er staat \"Iemand anders is deze ondertitels aan het bewerken\" en ik kan "
-"niks doen.  Hoe lang gaat dit duren?  Waarom gebeurt dit?"
+"It says \"Someone else is currently editing these subtitles\" and I can't do"
+" anything.  How long will this last for?  Why does it happen?"
+msgstr "Er staat \"Iemand anders is deze ondertitels aan het bewerken\" en ik kan niks doen.  Hoe lang gaat dit duren?  Waarom gebeurt dit?"
 
 #: templates/faq.html:34 templates/faq.html.py:157
 msgid "Why can't I change the timing on a translation?"
@@ -2829,15 +2567,13 @@ msgstr "Waarom kan ik de timing van een vertaling niet aanpassen?"
 
 #: templates/faq.html:35 templates/faq.html.py:168
 msgid ""
-"How do old revisions work? What if somebody makes a change to my work that I "
-"don't approve of?"
-msgstr ""
-"Hoe werken oudere revisies? Wat gebeurt er wanneer iemand mijn werk wijzigt "
-"en ik daar niet mee akkoord ben?"
+"How do old revisions work? What if somebody makes a change to my work that I"
+" don't approve of?"
+msgstr "Hoe werken oudere revisies? Wat gebeurt er wanneer iemand mijn werk wijzigt en ik daar niet mee akkoord ben?"
 
 #: templates/faq.html:36 templates/faq.html.py:184
 msgid "How do I add the Amara &quot;embed all videos&quot; code to my site?"
-msgstr ""
+msgstr "Hoe voeg ik Amara's \"embed alle video's\" code toe aan mijn site?"
 
 #: templates/faq.html:37 templates/faq.html.py:197
 msgid "Hey, you don’t list my language!"
@@ -2847,20 +2583,16 @@ msgstr "Hey, mijn taal staat er niet bij!"
 msgid ""
 "\n"
 "      \t\tAmara is an easy way for anyone to add subtitles, captions, \n"
-"\t\t\tor translate nearly any video on the web. It works in a "
-"collaborative \n"
-"\t\t\tWikipedia-like fashion. The software is free and open source and can "
-"be used and \n"
-"\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center"
-"\">improved by anyone</a>.\n"
+"\t\t\tor translate nearly any video on the web. It works in a collaborative \n"
+"\t\t\tWikipedia-like fashion. The software is free and open source and can be used and \n"
+"\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center\">improved by anyone</a>.\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:56
 msgid ""
 "\n"
-"\t\t\tYou can <a href=\"http://universalsubtitles.org/videos/create\">begin "
-"subtitling</a>\n"
+"\t\t\tYou can <a href=\"http://universalsubtitles.org/videos/create\">begin subtitling</a>\n"
 "\t\t\ta video you have already posted on the web.\t\n"
 "\t\t"
 msgstr ""
@@ -2872,31 +2604,25 @@ msgstr "Video-ondertiteling vormt een goudmijn met ongekend potentieel."
 #: templates/faq.html:66
 msgid ""
 "Captions make videos accessible for viewers who are deaf or hard of hearing "
-msgstr ""
-"Ondertiteling maakt video toegankelijk voor dove of hardhorende kijkers."
+msgstr "Ondertiteling maakt video toegankelijk voor dove of hardhorende kijkers."
 
 #: templates/faq.html:67
 msgid ""
-"Translations make it possible for all of us to watch video in languages that "
-"we don't speak"
-msgstr ""
-"Vertalingen maken het voor iedereen mogelijk video te bekijken in talen die "
-"we niet spreken"
+"Translations make it possible for all of us to watch video in languages that"
+" we don't speak"
+msgstr "Vertalingen maken het voor iedereen mogelijk video te bekijken in talen die we niet spreken"
 
 #: templates/faq.html:68
 msgid ""
 "Video creators get: better SEO, more views, access to a far bigger "
 "(potentially multilingual and global) audience, accessibility for deaf and "
 "hard of hearing viewers, and more"
-msgstr ""
-"Video makers krijgen: Betere SEO, meer views, toegang tot een veel groter "
-"(potentieel meertalig en wereldwijd) publiek, toegankelijkheid voor dove of "
-"hardhorende kijkers en meer"
+msgstr "Video makers krijgen: Betere SEO, meer views, toegang tot een veel groter (potentieel meertalig en wereldwijd) publiek, toegankelijkheid voor dove of hardhorende kijkers en meer"
 
 #: templates/faq.html:73
 msgid ""
-"he Participatory Culture Foundation is a 501c3 non-profit organization whose "
-"mission is to build a fairer, more open, and more democratic media space. "
+"he Participatory Culture Foundation is a 501c3 non-profit organization whose"
+" mission is to build a fairer, more open, and more democratic media space. "
 "PCF saw a gap in the marketplace for more open and collaborative subtitling "
 "&mdash; Amara is helping to fill that need."
 msgstr ""
@@ -2905,26 +2631,19 @@ msgstr ""
 msgid ""
 "Yes, we are working on a solution for making closed captions [including "
 "information about sounds and music], as well as subtitles/translations."
-msgstr ""
-"Ja, we werken aan een oplossing voor het maken van ondertiteling voor doven "
-"[met inbegrip van informatie over geluiden en muziek], evenals ondertitels / "
-"vertalingen."
+msgstr "Ja, we werken aan een oplossing voor het maken van ondertiteling voor doven [met inbegrip van informatie over geluiden en muziek], evenals ondertitels / vertalingen."
 
 #: templates/faq.html:81
 msgid ""
 "We will be working to support as many languages/charactersets as possible."
-msgstr ""
-"We zullen aan ondersteuning voor zo veel mogelijk talen/tekensets werken."
+msgstr "We zullen aan ondersteuning voor zo veel mogelijk talen/tekensets werken."
 
 #: templates/faq.html:86
 msgid ""
 "\n"
-"      \tThe site and tools are available in a number of languages (set your "
-"language \n"
-"\t\tin your browser preferences and we’ll take care of the rest). We’re "
-"always looking for \n"
-"\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-"
-"translateable-looking-for-translators/\">volunteer translators</a> \n"
+"      \tThe site and tools are available in a number of languages (set your language \n"
+"\t\tin your browser preferences and we’ll take care of the rest). We’re always looking for \n"
+"\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-translateable-looking-for-translators/\">volunteer translators</a> \n"
 "\t\tto help improve and add more languages.\n"
 "\t  "
 msgstr ""
@@ -2932,21 +2651,17 @@ msgstr ""
 #: templates/faq.html:97
 msgid ""
 "\n"
-"\t      For a single video, use our site. For multiple videos on your "
-"website, use \n"
-"\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">this code</a> "
-"in your \n"
+"\t      For a single video, use our site. For multiple videos on your website, use \n"
+"\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">this code</a> in your \n"
 "\t\t  website’s template inside the &lt;head&gt; tags.\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:106
 msgid ""
-"For our subtitling widget and community website, we're using the <a href="
-"\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
-msgstr ""
-"Voor onze ondertitelwidget en communitywebsite gebruiken we de <a href="
-"\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
+"For our subtitling widget and community website, we're using the <a "
+"href=\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
+msgstr "Voor onze ondertitelwidget en communitywebsite gebruiken we de <a href=\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
 
 #: templates/faq.html:110
 msgid ""
@@ -2959,46 +2674,35 @@ msgstr ""
 msgid ""
 "\n"
 "\t\tIf you're interested in general involvement, please see our \n"
-"\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla "
-"Drumbeat page</a>. \n"
+"\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla Drumbeat page</a>. \n"
 "\t\tIf you have a specific idea, please get in touch: \n"
-"\t\t<a href=\"mailto:universalsubtitles@pculture.org"
-"\">universalsubtitles@pculture.org</a> \n"
-"\t\tAnd as a 501c3 non-profit org, we do accept donations (see the next "
-"question for details).\n"
+"\t\t<a href=\"mailto:universalsubtitles@pculture.org\">universalsubtitles@pculture.org</a> \n"
+"\t\tAnd as a 501c3 non-profit org, we do accept donations (see the next question for details).\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:126
 msgid ""
 "\n"
-"      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/"
-"contribute/universalsubtitles\">donate here</a> (through the Mozilla "
-"Drumbeat project).\n"
+"      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/contribute/universalsubtitles\">donate here</a> (through the Mozilla Drumbeat project).\n"
 "\t\t"
-msgstr ""
-"\n"
-"»» Ja, ja! Je kan <a href=\"https://donate.mozilla.org/page/contribute/"
-"universalsubtitles\">hier doneren</a> (via the Mozilla Drumbeat project).\n"
-"\t\t"
+msgstr "\n»» Ja, ja! Je kan <a href=\"https://donate.mozilla.org/page/contribute/universalsubtitles\">hier doneren</a> (via the Mozilla Drumbeat project).\n\t\t"
 
 #: templates/faq.html:133
 msgid ""
 "The Mozilla Foundation has provided Amara with seed funding, community "
-"support, and fundraising support through <a href=\"http://www.drumbeat.org/"
-"about\">Drumbeat</a>. Drumbeat is a movement to keep the web open for the "
-"next 100 years, and Amara is a featured project!"
+"support, and fundraising support through <a "
+"href=\"http://www.drumbeat.org/about\">Drumbeat</a>. Drumbeat is a movement "
+"to keep the web open for the next 100 years, and Amara is a featured "
+"project!"
 msgstr ""
 
 #: templates/faq.html:138
 msgid ""
 "\n"
-"     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, ."
-"TXT, and DFXP.\n"
-"     \t formats on the page for that language (<a href=\"http://"
-"universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
-"\t\t Click \"Download Subtitles\" button in the lower right to the left from "
-"\"Edit Subtitles\" \n"
+"     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, .TXT, and DFXP.\n"
+"     \t formats on the page for that language (<a href=\"http://universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
+"\t\t Click \"Download Subtitles\" button in the lower right to the left from \"Edit Subtitles\" \n"
 "\t\t button and choose the desired file format from the drop-down list.\n"
 "       "
 msgstr ""
@@ -3006,79 +2710,45 @@ msgstr ""
 #: templates/faq.html:149
 msgid ""
 "\n"
-"        The system currently only allows one user to edit subtitles for any "
-"given video \n"
-"        at a time. So, if someone else is already editing subtitles for the "
-"video when \n"
+"        The system currently only allows one user to edit subtitles for any given video \n"
+"        at a time. So, if someone else is already editing subtitles for the video when \n"
 "        you try to edit the subtitles, you'll get this message.\n"
 "        "
-msgstr ""
-"\n"
-"Momenteel laat het systeem maar één gebruiker toe om op de ondertitels van "
-"een welbepaalde video te wijzigen. Zolang iemand anders bezig is met het "
-"wijzigen van de ondertitels, krijg je deze boodschap zodra jij hetzelfde "
-"wilt doen.\n"
-"        "
+msgstr "\nMomenteel laat het systeem maar één gebruiker toe om op de ondertitels van een welbepaalde video te wijzigen. Zolang iemand anders bezig is met het wijzigen van de ondertitels, krijg je deze boodschap zodra jij hetzelfde wilt doen.\n        "
 
 #: templates/faq.html:159
 msgid ""
 "\n"
-"        You can. Go to the translation editor and click “Change subtitle "
-"timing”. \n"
-"\t\tOnly do this if the timing on the original language really cannot "
-"match \n"
-"\t\tthe language you’re translating into. Otherwise, improvements in the "
-"original \n"
+"        You can. Go to the translation editor and click “Change subtitle timing”. \n"
+"\t\tOnly do this if the timing on the original language really cannot match \n"
+"\t\tthe language you’re translating into. Otherwise, improvements in the original \n"
 "\t\twill automatically cascade.\n"
 "        "
-msgstr ""
-"\n"
-"Dat kan. Ga naar de vertaal-editor en klik op \"Timing van de ondertitels "
-"wijzigen\". Doe dit alleen wanneer de timing in de originele taal echt niet "
-"overeenstemt met de taal waarin je vertaalt. Immers: wanneer je de timing "
-"niet wijzigt, worden verbeteringen aan het origineel automatisch overgenomen "
-"in uw vertaling."
+msgstr "\nDat kan. Ga naar de vertaal-editor en klik op \"Timing van de ondertitels wijzigen\". Doe dit alleen wanneer de timing in de originele taal echt niet overeenstemt met de taal waarin je vertaalt. Immers: wanneer je de timing niet wijzigt, worden verbeteringen aan het origineel automatisch overgenomen in uw vertaling."
 
 #: templates/faq.html:170
 msgid ""
 "\n"
 "        Each set of subtitles or translation has a full revision history. \n"
-"\t\tJust click on the tab on the subtitle page in you will see a list of "
-"revisions. \n"
-"\t\tYou can use the checkboxes on the left and the \"compare revisions\" "
-"button \n"
-"\t\tto see the difference between two revisions. Or you can click on any one "
-"revision, \n"
+"\t\tJust click on the tab on the subtitle page in you will see a list of revisions. \n"
+"\t\tYou can use the checkboxes on the left and the \"compare revisions\" button \n"
+"\t\tto see the difference between two revisions. Or you can click on any one revision, \n"
 "\t\tand edit based on that revision or roll back to that revision.\n"
 "        <br/><br/>\n"
 "        If the current version is blank, but there are older revisions, \n"
-"\t\tit make sense to check those older revisions before starting from "
-"scratch, \n"
+"\t\tit make sense to check those older revisions before starting from scratch, \n"
 "\t\tbecause there could be useful work in an older revision.\n"
 "        "
-msgstr ""
-"\n"
-"Elk set ondertitels heeft een lijst met alle revisies. Klik op de tab op de "
-"ondertitelingspagina en je krijgt een lijst met revisies te zien. Je kan de "
-"keuzevakjes  aan de linkerkant en de knop \"vergelijk revisies\" gebruiken "
-"om het verschil tussen twee revisies te zien. Je kan ook klikken op een "
-"willekeurige revisie en op basis daarvan wijzigingen aanbrengen, of gewoon "
-"ernaar terugkeren. \n"
-"Als de huidige revisie leeg is, maar er nog oudere versies zijn, kan het "
-"nuttig zijn van deze te controleren in plaats van meteen volledig opnieuw te "
-"beginnen: de oudere versie kan heel wat nuttig werk bevatten."
+msgstr "\nElk set ondertitels heeft een lijst met alle revisies. Klik op de tab op de ondertitelingspagina en je krijgt een lijst met revisies te zien. Je kan de keuzevakjes  aan de linkerkant en de knop \"vergelijk revisies\" gebruiken om het verschil tussen twee revisies te zien. Je kan ook klikken op een willekeurige revisie en op basis daarvan wijzigingen aanbrengen, of gewoon ernaar terugkeren. \nAls de huidige revisie leeg is, maar er nog oudere versies zijn, kan het nuttig zijn van deze te controleren in plaats van meteen volledig opnieuw te beginnen: de oudere versie kan heel wat nuttig werk bevatten."
 
 #: templates/faq.html:186
 msgid ""
 "\n"
-"          Go to <a href=\"http://universalsubtitles.org/get-code/\">this "
-"page</a> \n"
+"          Go to <a href=\"http://universalsubtitles.org/get-code/\">this page</a> \n"
 "\t\t  and double click on the code in the white box to select it all.  \n"
-"\t\t  Go to Edit > Copy in your browser's menu to copy the code to your "
-"clipboard.  \n"
+"\t\t  Go to Edit > Copy in your browser's menu to copy the code to your clipboard.  \n"
 "\t\t  Then start editing the headers in your site or blog theme, \n"
-"\t\t  and paste the script somewhere between the &lt;head&gt; and &lt;/"
-"head&gt; \n"
+"\t\t  and paste the script somewhere between the &lt;head&gt; and &lt;/head&gt; \n"
 "\t\t  tags in your blog theme.  \n"
 "        "
 msgstr ""
@@ -3088,19 +2758,13 @@ msgid ""
 "\n"
 "          Sorry about that.  Just contact us and we’ll be happy to add it.\n"
 "        "
-msgstr ""
-"\n"
-"          Sorry hiervoor. Neem contact met ons op en we voegen het met "
-"plezier toe.\n"
-"        "
+msgstr "\n          Sorry hiervoor. Neem contact met ons op en we voegen het met plezier toe.\n        "
 
 #: templates/feedback_response.html:3
 msgid ""
 "Thanks for getting in touch! We love hearing your ideas, bugs, feedback, "
 "opinions and such."
-msgstr ""
-"Bedankt voor je bericht! We horen graag je ideeën, bugs, feedback, adviezen "
-"en dergelijke."
+msgstr "Bedankt voor je bericht! We horen graag je ideeën, bugs, feedback, adviezen en dergelijke."
 
 #: templates/feedback_response.html:6
 msgid "Stay tuned as the project evolves!"
@@ -3118,9 +2782,7 @@ msgstr "Beste"
 msgid ""
 "PS. We do our best to respond to all questions, but please be patient -- we "
 "get a lot of email"
-msgstr ""
-"PS We doen ons best om op alle vragen te reageren, maar heb geduld - we "
-"krijgen veel e-mail"
+msgstr "PS We doen ons best om op alle vragen te reageren, maar heb geduld - we krijgen veel e-mail"
 
 #: templates/generic-error.html:7
 msgid "Sorry!"
@@ -3156,11 +2818,11 @@ msgstr "Werkt met YouTube, Vimeo, HTML5 en andere."
 
 #: templates/index.html:31
 msgid "Using YouTube?"
-msgstr ""
+msgstr "Youtube gebruiker?"
 
 #: templates/index.html:31
 msgid "Sync automatically"
-msgstr ""
+msgstr "Synchroniseer automatisch"
 
 #: templates/index.html:35
 msgid "Features"
@@ -3181,14 +2843,13 @@ msgstr "Help ondertitels maken"
 #: templates/index.html:45
 msgid ""
 "\n"
-"            Help organizations and deaf and hard of hearing viewers make "
-"videos accessible around the world.\n"
+"            Help organizations and deaf and hard of hearing viewers make videos accessible around the world.\n"
 "        "
-msgstr ""
+msgstr "\nHelp organisaties, slecht-horenden en dove kijkers door video's overal toegankelijk te maken"
 
 #: templates/index.html:48
 msgid "Take a Look."
-msgstr ""
+msgstr "Neem een kijkje."
 
 #: templates/index.html:52
 msgid "Groundbreaking Crowdsource Platform"
@@ -3197,9 +2858,7 @@ msgstr ""
 #: templates/index.html:54
 msgid ""
 "\n"
-"            Revolutionize how you create subtitles and reach viewers. "
-"Increase viewership with transcription, captioning, and translation "
-"services, and flexible API and integration options.\n"
+"            Revolutionize how you create subtitles and reach viewers. Increase viewership with transcription, captioning, and translation services, and flexible API and integration options.\n"
 "        "
 msgstr ""
 
@@ -3224,9 +2883,7 @@ msgstr "Meer weten."
 #: templates/index.html:89
 msgid ""
 "See how these companies use Amara to caption and subtitle more effectively."
-msgstr ""
-"Kom te weten hoe deze bedrijven Amara gebruiken om efficiënter te "
-"ondertitelen."
+msgstr "Kom te weten hoe deze bedrijven Amara gebruiken om efficiënter te ondertitelen."
 
 #: templates/index.html:95
 msgid "TED"
@@ -3254,7 +2911,7 @@ msgstr "Netflix-gemeenschap"
 
 #: templates/index.html:115
 msgid "ERB Community"
-msgstr ""
+msgstr "ERB gemeenschap"
 
 #: templates/index.html:121
 msgid "Twitter"
@@ -3274,7 +2931,7 @@ msgstr "Udacity-gemeenschap"
 
 #: templates/index.html:133 templates/index.html.py:135
 msgid "Roco Films"
-msgstr ""
+msgstr "Roco Films"
 
 #: templates/index.html:139
 msgid "PBS Newshour"
@@ -3333,28 +2990,20 @@ msgstr "Doel van de bijeenkomst"
 msgid ""
 "<strong>Connect</strong> major stakeholders from projects, organizations, "
 "and movements that have open subtitling needs or focus."
-msgstr ""
-"<strong>Verbind</strong> belanghebbenden uit projecten, organisaties en "
-"bewegingen die behoefte hebben aan, of zich toeleggen op, open ondertiteling."
+msgstr "<strong>Verbind</strong> belanghebbenden uit projecten, organisaties en bewegingen die behoefte hebben aan, of zich toeleggen op, open ondertiteling."
 
 #: templates/opensubtitles2010.html:41
 msgid ""
 "<strong>Identify ways</strong> to solve stakeholder subtitling needs and be "
 "aware of existing technology that can be leveraged. Find logical places for "
 "collaboration/cooperation."
-msgstr ""
-"<strong>Methoden vinden</strong> om de behoeften van de belanghebbenden aan "
-"ondertiteling en zich bewust zijn van de manier waarop de bestaande "
-"technologie ingezet kan worden. Werkomgevingen vinden die zich lenen voor "
-"samenwerking."
+msgstr "<strong>Methoden vinden</strong> om de behoeften van de belanghebbenden aan ondertiteling en zich bewust zijn van de manier waarop de bestaande technologie ingezet kan worden. Werkomgevingen vinden die zich lenen voor samenwerking."
 
 #: templates/opensubtitles2010.html:44
 msgid ""
 "<strong>Move towards</strong> standardizing solutions and pushing forward "
 "the state of the art in open subtiting."
-msgstr ""
-"<strong>Werken aan</strong> oplossingen gebaseerd op standaarden en aan de "
-"huidige techniek met betrekking tot open ondertiteling."
+msgstr "<strong>Werken aan</strong> oplossingen gebaseerd op standaarden en aan de huidige techniek met betrekking tot open ondertiteling."
 
 #: templates/opensubtitles2010.html:53
 msgid "Participants"
@@ -3367,21 +3016,13 @@ msgid ""
 "accessibility advocates, open source developers, educational leaders, and "
 "other individuals and organizations with a stake in the subtitling world. "
 "We'll make a roster available when the event draws closer."
-msgstr ""
-"Tot de deelnemers behoren: makers van video en hun producers, "
-"eindgebruikers, vertegenwoordigers van diensten die video hosten, gewone "
-"technici, pleitbezorgers van toegankelijke informatie, open source "
-"ontwikkelaars, instructeurs en andere individuen en organisaties die een "
-"belang zien in de wereld van ondertiteling. We voorzien een tijdschema zodra "
-"het evenement nadert."
+msgstr "Tot de deelnemers behoren: makers van video en hun producers, eindgebruikers, vertegenwoordigers van diensten die video hosten, gewone technici, pleitbezorgers van toegankelijke informatie, open source ontwikkelaars, instructeurs en andere individuen en organisaties die een belang zien in de wereld van ondertiteling. We voorzien een tijdschema zodra het evenement nadert."
 
 #: templates/opensubtitles2010.html:57
 msgid ""
 "Attendees are selected by invitation; however, if you or your organization "
 "would like to participate, please contact:"
-msgstr ""
-"Deelnemers worden gekozen door middel van uitnodigingen; maar als jij of "
-"jouw organisatie mee zou willen doen, neem dan contact op met:"
+msgstr "Deelnemers worden gekozen door middel van uitnodigingen; maar als jij of jouw organisatie mee zou willen doen, neem dan contact op met:"
 
 #: templates/opensubtitles2010.html:62
 msgid "When"
@@ -3397,21 +3038,10 @@ msgstr "Waar"
 
 #: templates/opensubtitles2010.html:68
 msgid ""
-"The summit will be held at the beautiful Open Plans penthouse in Soho, which "
-"is located at 148 Lafayette St, Floor 12, New York City. (<a href=\"http://"
-"maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor"
-"+12,+New+York"
-"+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette"
-"+St,+New+York,"
-"+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
-msgstr ""
-"De bijeenkomst zal plaatsvinden in het mooie \"Open Plans penthouse\" in "
-"Soho. Het adres: 148 Lafayette Street 148, Floor 12, New York City. (<a href="
-"\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette"
-"+St,+Floor+12,+New+York"
-"+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette"
-"+St,+New+York,"
-"+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
+"The summit will be held at the beautiful Open Plans penthouse in Soho, which"
+" is located at 148 Lafayette St, Floor 12, New York City. (<a "
+"href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
+msgstr "De bijeenkomst zal plaatsvinden in het mooie \"Open Plans penthouse\" in Soho. Het adres: 148 Lafayette Street 148, Floor 12, New York City. (<a href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
 
 #: templates/opensubtitles2010.html:73
 msgid "Why"
@@ -3420,20 +3050,15 @@ msgstr "Waarom"
 #: templates/opensubtitles2010.html:75
 msgid ""
 "\n"
-"            The focus of this summit is increased availability and better "
-"usability for captions and subtitles, \n"
+"            The focus of this summit is increased availability and better usability for captions and subtitles, \n"
 "            which are both sorely needed. It comes at a critical time, \n"
-"            as internet video usage is skyrocketing&mdash;people who rely on "
-"captions are threatened to be left behind. \n"
+"            as internet video usage is skyrocketing&mdash;people who rely on captions are threatened to be left behind. \n"
 "            New users from every culture are coming online en masse; \n"
-"            standardizing and ubiquitizing the technology can make potential "
-"audiences exponentially larger and messages can cross cultural boundaries "
-"more easily. \n"
-"            More captions will also make it simpler for computers to "
-"process, index, \n"
+"            standardizing and ubiquitizing the technology can make potential audiences exponentially larger and messages can cross cultural boundaries more easily. \n"
+"            More captions will also make it simpler for computers to process, index, \n"
 "            and make sense of the ever growing sea of online video.\n"
 "           "
-msgstr ""
+msgstr "\nDe focus van deze conferentie is verbeterde toegankelijkheid en bruikbaarheid van onderschriften en ondertitelingen. Welke beide erg nodig zijn. Dit komt op een kritiek moment nu het gebruik van internetvideo's de pan uit rijst en de mensen die afhankelijk zijn van onderschriften dreigen achter gelaten te worden.\nNieuwe gebruikers van alle culturele afkomsten komen massaal online. Het standaardiseren en universaliseren van deze technologie kan het potentiële publiek exponentieel doen laten groeien en kan boodschappen culturele barrières doen overkomen. Meer onderschriften zal het ook gemakkelijker maken voor computers om het constant groeiende aanbod van video's te verwerken, indexeren en snappen."
 
 #: templates/opensubtitles2010.html:91
 msgid "Organizers, Facilitators, Sponsors"
@@ -3446,8 +3071,8 @@ msgstr "Organisatoren"
 #: templates/opensubtitles2010.html:95
 msgid ""
 "The <a href=\"http://www.participatoryculture.org/\">Participatory Culture "
-"Foundation</a> is organizing the summit. Their most recent project, <a href="
-"\"http://universalsubtitles.org/\">Amara</a>, makes open source and "
+"Foundation</a> is organizing the summit. Their most recent project, <a "
+"href=\"http://universalsubtitles.org/\">Amara</a>, makes open source and "
 "collaborative subtitling and translation easy."
 msgstr ""
 
@@ -3458,14 +3083,10 @@ msgstr "Begeleiders"
 #: templates/opensubtitles2010.html:100
 msgid ""
 "<a href=\"http://www.aspirationtech.org/\">Aspiration</a> is providing "
-"facilitation and agenda design. Aspiration believes that face-to-face events "
-"are the most powerful way to facilitate interaction, build networks, and "
+"facilitation and agenda design. Aspiration believes that face-to-face events"
+" are the most powerful way to facilitate interaction, build networks, and "
 "collaborate."
-msgstr ""
-"<a href=\"http://www.aspirationtech.org/\">Aspiration</a> biedt "
-"ondersteuning en bij het maken van de agenda. Zij gelooft dat live events de "
-"krachtigste manier zijn om interactie te stimuleren, en om netwerken op te "
-"bouwen en samen te werken."
+msgstr "<a href=\"http://www.aspirationtech.org/\">Aspiration</a> biedt ondersteuning en bij het maken van de agenda. Zij gelooft dat live events de krachtigste manier zijn om interactie te stimuleren, en om netwerken op te bouwen en samen te werken."
 
 #: templates/opensubtitles2010.html:103
 msgid "Sponsors"
@@ -3473,19 +3094,15 @@ msgstr "Sponsoren"
 
 #: templates/opensubtitles2010.html:104
 msgid ""
-"The summit has been generously funded by the <a href=\"http://www.soros.org/"
-"\">Open Society Institute</a>."
-msgstr ""
-"De top is rijkelijk ondersteund door de <a href=\"http://www.soros.org/"
-"\">Open Society Institute</a>."
+"The summit has been generously funded by the <a "
+"href=\"http://www.soros.org/\">Open Society Institute</a>."
+msgstr "De top is rijkelijk ondersteund door de <a href=\"http://www.soros.org/\">Open Society Institute</a>."
 
 #: templates/opensubtitles2010.html:113
 msgid ""
 "Special thanks to <a href=\"http://openplans.org/\">Open Plans</a> for "
 "providing meeting space!"
-msgstr ""
-"Met speciale dank aan <a href=\"http://openplans.org/\">Open Plans</a> voor "
-"het leveren van een ontmoetingsruimte!"
+msgstr "Met speciale dank aan <a href=\"http://openplans.org/\">Open Plans</a> voor het leveren van een ontmoetingsruimte!"
 
 #: templates/admin/base_site.html:4 templates/admin/base_site.html.py:7
 msgid "Amara"
@@ -3601,9 +3218,7 @@ msgstr "Het Probleem"
 msgid ""
 "Web video is beginning to rival television, but there isn't a good open "
 "resource for subtitling."
-msgstr ""
-"Webvideo begint televisie te verslaan, maar er is nergens een goede open "
-"bron voor ondertiteling."
+msgstr "Webvideo begint televisie te verslaan, maar er is nergens een goede open bron voor ondertiteling."
 
 #: templates/jsdemo/home.html:21
 msgid "Our Mission"
@@ -3613,9 +3228,7 @@ msgstr "Onze missie"
 msgid ""
 "We're trying to make captioning, subtitling, and translating video publicly "
 "accessible in a way that's free and open, just like the Web."
-msgstr ""
-"We proberen onderschriften, ondertiteling en vertalingen van video’s op een "
-"gratis en open manier toegankelijk te maken, net zoals het op internet."
+msgstr "We proberen onderschriften, ondertiteling en vertalingen van video’s op een gratis en open manier toegankelijk te maken, net zoals het op internet."
 
 #: templates/jsdemo/home.html:21
 msgid "Learn More"
@@ -3645,9 +3258,7 @@ msgstr "Ondertitelwidget"
 msgid ""
 "A simple way to create and add captions to almost any video on the web "
 "(without having to transcode or re-upload videos)."
-msgstr ""
-"Een eenvoudige manier om bijschriften voor bijna elke video op het internet "
-"te maken en toe te voegen (zonder transcoderen of opnieuw video’s uploaden)."
+msgstr "Een eenvoudige manier om bijschriften voor bijna elke video op het internet te maken en toe te voegen (zonder transcoderen of opnieuw video’s uploaden)."
 
 #: templates/jsdemo/home.html:35
 msgid "Community Site"
@@ -3657,9 +3268,7 @@ msgstr "Communitywebsite"
 msgid ""
 "An online community for collaboratively subtitling and translating the "
 "world's videos (like a Wikipedia for subtitles)."
-msgstr ""
-"Een online community voor gezamenlijk ondertitelen en vertalen van alle "
-"video's op de wereld (zoals een Wikipedia voor ondertitels)."
+msgstr "Een online community voor gezamenlijk ondertitelen en vertalen van alle video's op de wereld (zoals een Wikipedia voor ondertitels)."
 
 #: templates/jsdemo/home.html:39
 msgid "Subtitle Lookup Protocol"
@@ -3667,12 +3276,9 @@ msgstr "Ondertiteling Lookup Protocol"
 
 #: templates/jsdemo/home.html:40
 msgid ""
-"An open standard to let Firefox extensions, desktop video players, websites, "
-"browsers--any client--find and retrieve subtitles for any video."
-msgstr ""
-"Een open standaard voor Firefox-extensies, desktop video-spelers, websites, "
-"browsers --elke applicatie-- voor het zoeken en ophalen van ondertitels voor "
-"een video."
+"An open standard to let Firefox extensions, desktop video players, websites,"
+" browsers--any client--find and retrieve subtitles for any video."
+msgstr "Een open standaard voor Firefox-extensies, desktop video-spelers, websites, browsers --elke applicatie-- voor het zoeken en ophalen van ondertitels voor een video."
 
 #: templates/jsdemo/home.html:50
 msgid "Get updates and find out first when we launch"
@@ -3720,10 +3326,7 @@ msgid ""
 "\n"
 "        You have %(msg_count)s new messages.\n"
 "    "
-msgstr ""
-"\n"
-"       Je hebt %(msg_count)s nieuwe berichten.\n"
-"    "
+msgstr "\n       Je hebt %(msg_count)s nieuwe berichten.\n    "
 
 #: templates/messages/_messages.html:7 templates/teams/dashboard.html:145
 #: templates/teams/dashboard.html.py:168
@@ -3745,7 +3348,7 @@ msgstr "Verzonden"
 
 #: templates/messages/inbox.html:6
 msgid "Messages - Inbox"
-msgstr ""
+msgstr "Berichten - Inbox"
 
 #: templates/messages/inbox.html:20 templates/messages/sent.html:17
 msgid "Do you really wish to delete this message?"
@@ -3774,20 +3377,20 @@ msgstr "Stuur bericht"
 #: templates/messages/new-comment.html:1
 #, python-format
 msgid "%(commenter)s commented on the %(lang_name)s Language of \"%(title)s\"."
-msgstr ""
+msgstr "%(commenter)s reageerde op de %(lang_name)s taal van \"%(title)s\"."
 
 #: templates/messages/new-comment.html:4
 #, python-format
 msgid "%(commenter)s commented on \"%(title)s\"."
-msgstr ""
+msgstr "%(commenter)s reageerde op \"%(title)s\"."
 
 #: templates/messages/new.html:9
 msgid "Messages - New"
-msgstr ""
+msgstr "Berichten - Nieuw"
 
 #: templates/messages/sent.html:6
 msgid "Messages - Sent"
-msgstr ""
+msgstr "Berichten - Verstuurd"
 
 #: templates/messages/sent.html:40 templates/messages/sent.html.py:42
 msgid "Avatar"
@@ -3810,44 +3413,22 @@ msgid ""
 "\n"
 "Thanks for joining Amara!<br/>\n"
 "\n"
-"<p>If you created the \"%(user)s\" user account on universalsubtitles.org, "
-"please click the following link to confirm your email address (%(email)s):"
-"<br/></p>\n"
+"<p>If you created the \"%(user)s\" user account on universalsubtitles.org, please click the following link to confirm your email address (%(email)s):<br/></p>\n"
 "\n"
 "<p><a href=\"%(activate_url)s\">confirm email</a></p>\n"
 "\n"
-"<p>If you believe you've received this message in error, we apologize—feel "
-"free to ignore it. If you have any concerns, please contact us at "
-"feedback@universalsubtitles.org.</p>\n"
+"<p>If you believe you've received this message in error, we apologize—feel free to ignore it. If you have any concerns, please contact us at feedback@universalsubtitles.org.</p>\n"
 "\n"
 "Thanks, <br/>\n"
 "The Amara team\n"
-msgstr ""
-"Hallo,\n"
-"\n"
-"Bedankt voor uw toetreding tot Amara!<br/>\n"
-"\n"
-"<p>Als u de gebruikersaccount \"%(user)s\" via universalsubtitles.org hebt "
-"aangemaakt, klik dan op de volgende koppeling om uw e-mailadres (%(email)s) "
-"te bevestigen:<br/></p>\n"
-"\n"
-"<p><a href=\"%(activate_url)s\">e-mailadres bevestigen</a></p>\n"
-"\n"
-"<p>Als u denkt dat u dit bericht ten onrechte hebt ontvangen, dan hierbij "
-"onze excuses - u kunt het gewoon negeren. Als u vragen hebt, neem dan "
-"contact met ons op via feedback@universalsubtitles.org.</p>\n"
-"\n"
-"Bedankt, <br/>\n"
-"Het Amara-team\n"
+msgstr "Hallo,\n\nBedankt voor uw toetreding tot Amara!<br/>\n\n<p>Als u de gebruikersaccount \"%(user)s\" via universalsubtitles.org hebt aangemaakt, klik dan op de volgende koppeling om uw e-mailadres (%(email)s) te bevestigen:<br/></p>\n\n<p><a href=\"%(activate_url)s\">e-mailadres bevestigen</a></p>\n\n<p>Als u denkt dat u dit bericht ten onrechte hebt ontvangen, dan hierbij onze excuses - u kunt het gewoon negeren. Als u vragen hebt, neem dan contact met ons op via feedback@universalsubtitles.org.</p>\n\nBedankt, <br/>\nHet Amara-team\n"
 
 #: templates/messages/email/message_received.html:7
 #, python-format
 msgid ""
 "\n"
 "%(author)s has just sent you a message on Amara:\n"
-msgstr ""
-"\n"
-"%(author)s heeft u zojuist een bericht gestuurd op Amara:\n"
+msgstr "\n%(author)s heeft u zojuist een bericht gestuurd op Amara:\n"
 
 #: templates/messages/email/message_received.html:14
 msgid "Reply to this message"
@@ -3868,12 +3449,9 @@ msgid ""
 "\n"
 "%(imported_videos)s your videos were successfull imported!<br/>\n"
 "\n"
-"<p>Too see them, you can go to <a href=\"%(my_videos_url)s\">your user page</"
-"a></p>\n"
+"<p>Too see them, you can go to <a href=\"%(my_videos_url)s\">your user page</a></p>\n"
 "\n"
-"<p>If you believe you've received this message in error, we apologize—feel "
-"free to ignore it. If you have any concerns, please contact us at "
-"feedback@universalsubtitles.org.</p>\n"
+"<p>If you believe you've received this message in error, we apologize—feel free to ignore it. If you have any concerns, please contact us at feedback@universalsubtitles.org.</p>\n"
 "\n"
 "Thanks, <br/>\n"
 "The Amara team\n"
@@ -3888,10 +3466,7 @@ msgstr "Terug naar Inschrijving"
 msgid ""
 "It looks like you logged in without submitting an email. We need an email "
 "address to notify you (for example, when others edit your work)."
-msgstr ""
-"Het lijkt erop dat u inlogde zonder een e-mailadres mee te geven. We hebben "
-"een e-mailadres nodig om u te kunnen waarschuwen (bijvoorbeeld wanneer "
-"anderen uw werk wijzigen)."
+msgstr "Het lijkt erop dat u inlogde zonder een e-mailadres mee te geven. We hebben een e-mailadres nodig om u te kunnen waarschuwen (bijvoorbeeld wanneer anderen uw werk wijzigen)."
 
 #: templates/profiles/_require_email_dialog.html:8
 msgid "Please enter a valid e-mail address"
@@ -3994,7 +3569,7 @@ msgstr ""
 
 #: templates/profiles/account.html:37
 msgid "Link is active"
-msgstr ""
+msgstr "Verbinding is actief"
 
 #: templates/profiles/account.html:46
 msgid "Enable Amara crowd subtitles on your personal YouTube channel (beta)"
@@ -4022,7 +3597,7 @@ msgstr "Meldingen"
 
 #: templates/profiles/account.html:96
 msgid "Send notifications to my UniversalSubtitles.org inbox"
-msgstr ""
+msgstr "Stuur notificaties naar mijn UniversalSubtitles.org inbox"
 
 #: templates/profiles/account.html:98
 msgid "Send an email notification for each message received"
@@ -4030,19 +3605,19 @@ msgstr "Stuur een melding per email voor elke ontvangen boodschap"
 
 #: templates/profiles/account.html:101
 msgid "API Access"
-msgstr ""
+msgstr "API-toegang"
 
 #: templates/profiles/account.html:103
 msgid "Your API key"
-msgstr ""
+msgstr "Uw API sleutel"
 
 #: templates/profiles/account.html:109
 msgid "Reset your API key"
-msgstr ""
+msgstr "Vernieuw uw API-sleutel"
 
 #: templates/profiles/account.html:111
 msgid "Get an API key"
-msgstr ""
+msgstr "Krijg een API-sleutel"
 
 #: templates/profiles/account.html:118 templates/profiles/edit.html:63
 #: templates/profiles/view.html:45
@@ -4063,13 +3638,11 @@ msgid ""
 "\n"
 "                                What kind of account do you want to add?\n"
 "                                "
-msgstr ""
-"\n"
-"Wat voor account wilt u toevoegen?"
+msgstr "\nWat voor account wilt u toevoegen?"
 
 #: templates/profiles/account.html:151
 msgid "Link"
-msgstr ""
+msgstr "Verbinding"
 
 #: templates/profiles/account.html:158
 msgid "Enable Crowd Subtitles on your Personal YouTube Channel (beta)"
@@ -4077,29 +3650,26 @@ msgstr ""
 
 #: templates/profiles/account.html:168
 msgid "How We Enable Crowd Subtitles"
-msgstr ""
+msgstr "Hoe wij publieke ondertitels mogelijk maken"
 
 #: templates/profiles/account.html:171
 msgid ""
 "\n"
-"                                        We automatically <strong>add your "
-"YouTube videos to Amara</strong> (and import their subtitles).\n"
+"                                        We automatically <strong>add your YouTube videos to Amara</strong> (and import their subtitles).\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:176
 msgid ""
 "\n"
-"                                        We <strong>invite your viewers to "
-"subtitle</strong> by adding a link to your video descriptions.\n"
+"                                        We <strong>invite your viewers to subtitle</strong> by adding a link to your video descriptions.\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:181
 msgid ""
 "\n"
-"                                        We <strong>send subtitles to "
-"YouTube</strong> whenever they're completed on Amara.\n"
+"                                        We <strong>send subtitles to YouTube</strong> whenever they're completed on Amara.\n"
 "                                    "
 msgstr ""
 
@@ -4110,17 +3680,14 @@ msgstr ""
 #: templates/profiles/account.html:190
 msgid ""
 "\n"
-"                                        The link is <strong>one-way only</"
-"strong>. Changes made on YouTube won't be reflected on Amara and may be "
-"overwritten. Use Amara to edit subtitles.\n"
+"                                        The link is <strong>one-way only</strong>. Changes made on YouTube won't be reflected on Amara and may be overwritten. Use Amara to edit subtitles.\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:195
 msgid ""
 "\n"
-"                                        Amara will <strong>append a credit</"
-"strong> to the subtitles if space allows.\n"
+"                                        Amara will <strong>append a credit</strong> to the subtitles if space allows.\n"
 "                                    "
 msgstr ""
 
@@ -4168,7 +3735,7 @@ msgstr "Talen"
 
 #: templates/profiles/base.html:54
 msgid "hasn't selected languages yet."
-msgstr ""
+msgstr "heeft nog geen talen geselecteerd."
 
 #: templates/profiles/base.html:70
 msgid "hasn't joined any teams yet."
@@ -4194,17 +3761,17 @@ msgstr "Video’s waarmee u bezig bent"
 #: templates/teams/_perform_task_link.html:11
 #, python-format
 msgid "Create %(language)s subtitles"
-msgstr ""
+msgstr "Creëer %(language)s ondertitels"
 
 #: templates/profiles/dashboard.html:61
 #: templates/teams/_perform_task_link.html:13
 #, python-format
 msgid "%(task_action)s %(language)s subtitles"
-msgstr ""
+msgstr "%(task_action)s %(language)s ondertitels"
 
 #: templates/profiles/dashboard.html:68
 msgid "I can't do this"
-msgstr ""
+msgstr "Ik kan dit niet doen"
 
 #: templates/profiles/dashboard.html:87
 msgid "Activity on your videos"
@@ -4215,32 +3782,32 @@ msgid ""
 "\n"
 "                                Nothing happening yet.\n"
 "                            "
-msgstr ""
+msgstr "\n                                Er is nog niets gebeurd.\n                            "
 
 #: templates/profiles/dashboard.html:102
 msgid ""
 "\n"
 "                                You haven't shared any videos yet.\n"
 "                            "
-msgstr ""
+msgstr "\n                                U heeft nog geen video's gedeeld.\n                            "
 
 #: templates/profiles/dashboard.html:113
 msgid "Activity in your teams"
-msgstr ""
+msgstr "Activiteit in uw teams"
 
 #: templates/profiles/dashboard.html:124
 msgid ""
 "\n"
 "                                All's quiet in your teams so far.\n"
 "                            "
-msgstr ""
+msgstr "\n                               Het blijft vooralsnog stil in je dromen.\n                            "
 
 #: templates/profiles/dashboard.html:128
 msgid ""
 "\n"
 "                                You haven't joined any teams yet.\n"
 "                            "
-msgstr ""
+msgstr "\n                                U heeft zich nog niet bij een team aangesloten.\n                            "
 
 #: templates/profiles/edit.html:5
 msgid "Edit Profile"
@@ -4274,12 +3841,9 @@ msgstr "Een account van derden verwijderen"
 #, python-format
 msgid ""
 "\n"
-"                            Are you sure you want to remove the %(type)s "
-"account\n"
+"                            Are you sure you want to remove the %(type)s account\n"
 "                        "
-msgstr ""
-"\n"
-"Weet u zeker dat u de account %(type)s wilt verwijderen"
+msgstr "\nWeet u zeker dat u de account %(type)s wilt verwijderen"
 
 #: templates/profiles/remove-third-party.html:28
 msgid "Remove account"
@@ -4291,9 +3855,7 @@ msgid ""
 "\n"
 "        %(user_info)s's videos | Amara\n"
 "    "
-msgstr ""
-"\n"
-"video’s van %(user_info)s | Amara"
+msgstr "\nvideo’s van %(user_info)s | Amara"
 
 #: templates/profiles/videos.html:29
 msgid "hasn't shared any videos on Amara."
@@ -4333,9 +3895,7 @@ msgstr "Wachtwoord terugzetten voltooid"
 
 #: templates/registration/password_reset_complete.html:14
 msgid "Your password has been set.  You may go ahead and sign in now."
-msgstr ""
-"Je wachtwoord is  ingesteld. Je kan onmiddellijk verder gaan en meteen "
-"inloggen."
+msgstr "Je wachtwoord is  ingesteld. Je kan onmiddellijk verder gaan en meteen inloggen."
 
 #: templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
@@ -4349,9 +3909,7 @@ msgstr "Nieuw wachtwoord intypen"
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr ""
-"Voer je nieuwe wachtwoord tweemaal in, zodat we kunnen controleren of je het "
-"correct getypt hebt."
+msgstr "Voer je nieuwe wachtwoord tweemaal in, zodat we kunnen controleren of je het correct getypt hebt."
 
 #: templates/registration/password_reset_confirm.html:21
 msgid "New password:"
@@ -4373,9 +3931,7 @@ msgstr "Wachtwoord terugzetten mislukt"
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr ""
-"De link om het wachtwoord te resetten is ongeldig, mogelijk omdat het al is "
-"gebruikt. Vraag een nieuw wachtwoord-reset aan."
+msgstr "De link om het wachtwoord te resetten is ongeldig, mogelijk omdat het al is gebruikt. Vraag een nieuw wachtwoord-reset aan."
 
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:12
@@ -4386,9 +3942,7 @@ msgstr "Wachtwoord terugzetten geslaagd"
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr ""
-"We hebben per e-mail instructies verstuurd voor het instellen van uw "
-"wachtwoord. U kunt binnen enkele minuten de e-mail verwachten."
+msgstr "We hebben per e-mail instructies verstuurd voor het instellen van uw wachtwoord. U kunt binnen enkele minuten de e-mail verwachten."
 
 #: templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -4420,9 +3974,7 @@ msgstr "Het %(site_name)s team"
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr ""
-"Wachtwoord vergeten? Vul je e-mail adres hieronder in en u ontvang per e-"
-"mail instructies voor het instellen van een nieuw wachtwoord."
+msgstr "Wachtwoord vergeten? Vul je e-mail adres hieronder in en u ontvang per e-mail instructies voor het instellen van een nieuw wachtwoord."
 
 #: templates/registration/password_reset_form.html:18
 msgid "E-mail address:"
@@ -4455,14 +4007,8 @@ msgid_plural ""
 "\n"
 "              %(number)s languages\n"
 "          "
-msgstr[0] ""
-"\n"
-"              %(number)s taal\n"
-"          "
-msgstr[1] ""
-"\n"
-"              %(number)s talen\n"
-"          "
+msgstr[0] "\n              %(number)s taal\n          "
+msgstr[1] "\n              %(number)s talen\n          "
 
 #: templates/search/_video_item.html:24
 msgid "lines"
@@ -4482,9 +4028,7 @@ msgid ""
 "\n"
 "                Search Results for %(query)s\n"
 "            "
-msgstr ""
-"\n"
-"Zoekresultaten voor %(query)s"
+msgstr "\nZoekresultaten voor %(query)s"
 
 #: templates/search/search.html:136 templates/videos/featured_videos.html:50
 #: templates/videos/popular_videos.html:85
@@ -4568,112 +4112,111 @@ msgstr "Waarde"
 #, python-format
 msgid ""
 "\n"
-"            Editing %(language)s subtitles for &ldquo;%(video)s&rdquo; - "
-"Amara\n"
+"            Editing %(language)s subtitles for &ldquo;%(video)s&rdquo; - Amara\n"
 "        "
 msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:43
 msgid "Loading subtitle editor&hellip;"
-msgstr ""
+msgstr "Ondertitel bewerker aan het laden r&hellip;"
 
 #: templates/subtitles/subtitle-editor.html:48
 #: templates/subtitles/subtitle-editor.html:49
 #: templates/subtitles/subtitle-editor.html:730
 msgid "Edit title and description"
-msgstr ""
+msgstr "Pas titel en beschrijving aan"
 
 #: templates/subtitles/subtitle-editor.html:71
 msgid "Keyboard controls"
-msgstr ""
+msgstr "Toetsenbordbesturing"
 
 #: templates/subtitles/subtitle-editor.html:71
 msgid "more commands"
-msgstr ""
+msgstr "meer commando's"
 
 #: templates/subtitles/subtitle-editor.html:75
 #: templates/subtitles/subtitle-editor.html:93
 #: templates/subtitles/subtitle-editor.html:118
 msgid "Play / Pause"
-msgstr ""
+msgstr "Speel / Pauzeer"
 
 #: templates/subtitles/subtitle-editor.html:81
 #: templates/subtitles/subtitle-editor.html:99
 #: templates/subtitles/subtitle-editor.html:124
 msgid "Skip back"
-msgstr ""
+msgstr "Spring terug"
 
 #: templates/subtitles/subtitle-editor.html:87
 #: templates/subtitles/subtitle-editor.html:130
 msgid "Insert a line break"
-msgstr ""
+msgstr "Voeg een regeleinde in"
 
 #: templates/subtitles/subtitle-editor.html:105
 msgid "Start subtitle"
-msgstr ""
+msgstr "Begin ondertitel"
 
 #: templates/subtitles/subtitle-editor.html:111
 msgid "End subtitle"
-msgstr ""
+msgstr "Beëindig ondertitel"
 
 #: templates/subtitles/subtitle-editor.html:135
 #: templates/subtitles/subtitle-editor.html:549
 msgid "Subtitling Guidelines"
-msgstr ""
+msgstr "Ondertitel richtlijnen"
 
 #: templates/subtitles/subtitle-editor.html:204
 msgid "How to start making subtitles."
-msgstr ""
+msgstr "Hoe ondertitels beginnen te maken."
 
 #: templates/subtitles/subtitle-editor.html:206
 msgid "Play the video and type what you hear."
-msgstr ""
+msgstr "Speel de video en typ wat u hoort."
 
 #: templates/subtitles/subtitle-editor.html:207
 msgid "Press Enter to complete a subtitle."
-msgstr ""
+msgstr "Druk op ENTER om een ondertitel af te ronden."
 
 #: templates/subtitles/subtitle-editor.html:208
 msgid "Use the guide on the right to move to the next step."
-msgstr ""
+msgstr "Gebruik de gids rechts om naar de volgende stap te gaan."
 
 #: templates/subtitles/subtitle-editor.html:210
 #: templates/subtitles/subtitle-editor.html:219
 #: templates/subtitles/subtitle-editor.html:229
 msgid "Press the TAB key to start!"
-msgstr ""
+msgstr "Druk op de TAB toets om te starten!"
 
 #: templates/subtitles/subtitle-editor.html:213
 msgid "Subtitle Syncing"
-msgstr ""
+msgstr "Ondertitel synchroniseren"
 
 #: templates/subtitles/subtitle-editor.html:215
 msgid "Tap the DOWN arrow to start a subtitle."
-msgstr ""
+msgstr "Druk op de pijl naar beneden om een ondertitel te beginnen."
 
 #: templates/subtitles/subtitle-editor.html:216
 msgid "Tap the UP arrow to set the end time (optional)."
-msgstr ""
+msgstr "Druk op de pijl naar boven om een eindtijd in de stelen(optioneel)."
 
 #: templates/subtitles/subtitle-editor.html:217
 msgid "Use the Tools menu to hide the timeline for typing mode."
-msgstr ""
+msgstr "Gebruik de hulpmiddelen in het menu om de tijdslijn te verbergen."
 
 #: templates/subtitles/subtitle-editor.html:223
 msgid "Review your work"
-msgstr ""
+msgstr "Beoordeel uw werk"
 
 #: templates/subtitles/subtitle-editor.html:225
 msgid "Watch the video and make corrections."
-msgstr ""
+msgstr "Bekijk de video en maak aanpassingen."
 
 #: templates/subtitles/subtitle-editor.html:226
 msgid "Click Complete to sign off on your work."
-msgstr ""
+msgstr "Klik Voltooid om uw werk af te ronden."
 
 #: templates/subtitles/subtitle-editor.html:227
 msgid "Use the Save button to save and finish later."
-msgstr ""
+msgstr "Gebruik de Bewaar knop om op te slaan en later verder te gaan."
 
 #: templates/subtitles/subtitle-editor.html:235
 #, python-format
@@ -4681,305 +4224,306 @@ msgid ""
 "\n"
 "              Editing %(language)s&hellip;\n"
 "              "
-msgstr ""
+msgstr "\n              Bewerken %(language)s&hellip;\n              "
 
 #: templates/subtitles/subtitle-editor.html:243
 msgid "Copy Timing"
-msgstr ""
+msgstr "Kopieer timing"
 
 #: templates/subtitles/subtitle-editor.html:246
 msgid "Show"
-msgstr ""
+msgstr "Laat zien"
 
 #: templates/subtitles/subtitle-editor.html:247
 msgid "Timeline"
-msgstr ""
+msgstr "Tijdlijn"
 
 #: templates/subtitles/subtitle-editor.html:249
 msgid "Clear timing"
-msgstr ""
+msgstr "Verwijder timing"
 
 #: templates/subtitles/subtitle-editor.html:250
 msgid "Clear text"
-msgstr ""
+msgstr "Verwijder tekst"
 
 #: templates/subtitles/subtitle-editor.html:251
 msgid "Revert to last saved version"
-msgstr ""
+msgstr "Zet terug naar laatst opgeslagen versie"
 
 #: templates/subtitles/subtitle-editor.html:362
 msgid "1. Type what you hear"
-msgstr ""
+msgstr "1. Typ wat u hoort."
 
 #: templates/subtitles/subtitle-editor.html:364
 msgid "Is all the content subtitled?"
-msgstr ""
+msgstr "Is alle inhoud ondertiteld?"
 
 #: templates/subtitles/subtitle-editor.html:367
 msgid "Yes, translate the title"
-msgstr ""
+msgstr "Ja, vertaal de titel"
 
 #: templates/subtitles/subtitle-editor.html:368
 msgid "Yes, start syncing"
-msgstr ""
+msgstr "Ja, start synchroniseren"
 
 #: templates/subtitles/subtitle-editor.html:374
 msgid "2. Translate title"
-msgstr ""
+msgstr "2. Vertaal de titel"
 
 #: templates/subtitles/subtitle-editor.html:379
 msgid "Title and description were not edited yet."
-msgstr ""
+msgstr "Titel en beschrijving zijn nog niet bewerkt."
 
 #: templates/subtitles/subtitle-editor.html:382
 msgid "Title and description have been edited."
-msgstr ""
+msgstr "Titel en beschrijving zijn bewerkt."
 
 #: templates/subtitles/subtitle-editor.html:384
 msgid "Start syncing"
-msgstr ""
+msgstr "Start synchroniseren"
 
 #: templates/subtitles/subtitle-editor.html:392
 msgid "2. Sync Timing"
-msgstr ""
+msgstr "2. Start Timen"
 
 #: templates/subtitles/subtitle-editor.html:393
 msgid "3. Sync Timing"
-msgstr ""
+msgstr "3. Synchroniseer timing"
 
 #: templates/subtitles/subtitle-editor.html:398
 msgid "Not all lines are completed."
-msgstr ""
+msgstr "Niet alle regels zijn voltooid."
 
 #: templates/subtitles/subtitle-editor.html:401
 msgid "All lines are completed."
-msgstr ""
+msgstr "Alle regels zijn voltooid."
 
 #: templates/subtitles/subtitle-editor.html:403
 msgid "Start reviewing"
-msgstr ""
+msgstr "Begin beoordelen"
 
 #: templates/subtitles/subtitle-editor.html:411
 msgid "3. Review and complete"
-msgstr ""
+msgstr "3. Beoordeel en voltooi"
 
 #: templates/subtitles/subtitle-editor.html:412
 msgid "4. Review and complete"
-msgstr ""
+msgstr "4. Beoordeel en voltooi"
 
 #: templates/subtitles/subtitle-editor.html:416
 msgid ""
-"Watch the video again and verify that the subtitles are complete and correct."
-msgstr ""
+"Watch the video again and verify that the subtitles are complete and "
+"correct."
+msgstr "Bekijk de video opnieuw om te verifiëren dat alle ondertitels compleet en correct zijn."
 
 #: templates/subtitles/subtitle-editor.html:418
 msgid "Complete"
-msgstr ""
+msgstr "Compleet"
 
 #: templates/subtitles/subtitle-editor.html:443
 msgid "Amara Style Guidelines"
-msgstr ""
+msgstr "Amara stijl richtlijnen"
 
 #: templates/subtitles/subtitle-editor.html:448
 msgid "Subtitle line length"
-msgstr ""
+msgstr "Ondertitel regel lengte"
 
 #: templates/subtitles/subtitle-editor.html:449
 msgid "Keep subtitle length to about 42 characters;"
-msgstr ""
+msgstr "Houd de ondertitel lengte bij ongeveer 42 tekens;"
 
 #: templates/subtitles/subtitle-editor.html:450
 msgid "avoid more than 2 lines per subtitle."
-msgstr ""
+msgstr "vermijd meer dan 2 regels per ondertitel"
 
 #: templates/subtitles/subtitle-editor.html:453
 msgid "Minimum duration"
-msgstr ""
+msgstr "Minimale duur"
 
 #: templates/subtitles/subtitle-editor.html:454
 msgid "Subtitles should not be less than 1 second."
-msgstr ""
+msgstr "Ondertitels moeten niet korter zijn dan 1 seconde."
 
 #: templates/subtitles/subtitle-editor.html:457
 msgid "Maximum duration"
-msgstr ""
+msgstr "Maximale duur"
 
 #: templates/subtitles/subtitle-editor.html:458
 msgid "Split subtitles lasting more than 7 seconds."
-msgstr ""
+msgstr "Deel ondertitels langer dan 7 seconden op."
 
 #: templates/subtitles/subtitle-editor.html:461
 msgid "Reading speed"
-msgstr ""
+msgstr "Leessnelheid"
 
 #: templates/subtitles/subtitle-editor.html:462
 msgid "8-25 characters/second is recommended;"
-msgstr ""
+msgstr "8-25 tekens per seconde is aanbevolen;"
 
 #: templates/subtitles/subtitle-editor.html:463
 msgid "8-16 characters/second for children."
-msgstr ""
+msgstr "8-16 tekens per seconde voor kinderen."
 
 #: templates/subtitles/subtitle-editor.html:466
 msgid "Sounds"
-msgstr ""
+msgstr "Geluiden"
 
 #: templates/subtitles/subtitle-editor.html:467
 msgid "Describe meaningful sounds that are relevant to the plot."
-msgstr ""
+msgstr "Beschrijf geluiden die van belang zijn voor het verhaal."
 
 #: templates/subtitles/subtitle-editor.html:468
 msgid "ex: (water dripping)"
-msgstr ""
+msgstr "bv: (water druppelt)"
 
 #: templates/subtitles/subtitle-editor.html:471
 msgid "Music"
-msgstr ""
+msgstr "Muziek"
 
 #: templates/subtitles/subtitle-editor.html:472
 msgid "Describe relevant music which does not have relevant lyrics."
-msgstr ""
+msgstr "Beschrijf muziek zonder tekst die van belang is."
 
 #: templates/subtitles/subtitle-editor.html:473
 msgid "ex: ♪ (jazz music) ♪"
-msgstr ""
+msgstr "bv: ♪ (jazz muziek ♪"
 
 #: templates/subtitles/subtitle-editor.html:476
 msgid "Speaker Identification"
-msgstr ""
+msgstr "Spreker identificering"
 
 #: templates/subtitles/subtitle-editor.html:477
 msgid "Use parenthesis to indicate when someone is speaking off-screen."
-msgstr ""
+msgstr "Gebruik haakjes om aan te geven dat iemand buiten aan het woord is."
 
 #: templates/subtitles/subtitle-editor.html:478
 #: templates/subtitles/subtitle-editor.html:516
 msgid "ex: (Michael) Wait for me!"
-msgstr ""
+msgstr "bv: (Kaj) Wacht op mij!"
 
 #: templates/subtitles/subtitle-editor.html:481
 msgid "Show Advanced Guidelines"
-msgstr ""
+msgstr "Toon geadvanceerde richtlijnen"
 
 #: templates/subtitles/subtitle-editor.html:482
 msgid "Hide Advanced Guidelines"
-msgstr ""
+msgstr "Verberg geavanceerde richtlijnen"
 
 #: templates/subtitles/subtitle-editor.html:486
 msgid "Translate the whole idea"
-msgstr ""
+msgstr "Vertaal het hele idee"
 
 #: templates/subtitles/subtitle-editor.html:487
 msgid "Translations don't need to be word for word. Look at the context."
-msgstr ""
+msgstr "Vertalingen hoeven niet woord voor woord te zijn. Kijk naar de context."
 
 #: templates/subtitles/subtitle-editor.html:488
 msgid ""
 "Make sure you are using the correct punctuation for the whole unit of text."
-msgstr ""
+msgstr "Wees zeker dat je de juiste interpunctie gebruikt voor het stuk tekst."
 
 #: templates/subtitles/subtitle-editor.html:492
 msgid "Maximum timing offset"
-msgstr ""
+msgstr "Maximale timing uitloper"
 
 #: templates/subtitles/subtitle-editor.html:493
 msgid ""
 "Subtitles shouldn't start more than 0.5 seconds before or after the audio "
 "begins."
-msgstr ""
+msgstr "Ondertitels zouden niet eerder of later dan 0.5 seconde moeten beginnen na de audio."
 
 #: templates/subtitles/subtitle-editor.html:496
 msgid "On-screen texts"
-msgstr ""
+msgstr "Tekst in beeld"
 
 #: templates/subtitles/subtitle-editor.html:497
 msgid "Translate the texts on the video that are relevant to the plot."
-msgstr ""
+msgstr "Vertaal de tekst in de video die van belang zijn voor het verhaal."
 
 #: templates/subtitles/subtitle-editor.html:500
 msgid "Use meaningful speech"
-msgstr ""
+msgstr "Gebruik betekenisvolle spraak"
 
 #: templates/subtitles/subtitle-editor.html:501
 msgid "Exclude things like “um” “ah” and other disfluencies."
-msgstr ""
+msgstr "Laat dingen als \"um\" \"uh\" en andere onderbrekingen achterwege."
 
 #: templates/subtitles/subtitle-editor.html:504
 msgid "Indicate inaudible parts"
-msgstr ""
+msgstr "Geef onverstaanbare delen aan"
 
 #: templates/subtitles/subtitle-editor.html:505
 msgid "If the audio is inaudible, it should be marked as [inaudible]."
-msgstr ""
+msgstr "Als de audio niet te verstaan is, moet het gemarkeerd worden als [onverstaanbaar]."
 
 #: templates/subtitles/subtitle-editor.html:508
 msgid "Lyrics"
-msgstr ""
+msgstr "Songtekst"
 
 #: templates/subtitles/subtitle-editor.html:509
 msgid "Wrap relevant lyrics in musical notes."
-msgstr ""
+msgstr "Omhul relevante songteksten in muziekoten."
 
 #: templates/subtitles/subtitle-editor.html:510
 msgid "ex ♪ Tell me dear Billy, ♪"
-msgstr ""
+msgstr "bv ♪ Ik geloof, ik geloof, in jou en mij ♪"
 
 #: templates/subtitles/subtitle-editor.html:514
 msgid "Speaker identification"
-msgstr ""
+msgstr "Spreker identificering"
 
 #: templates/subtitles/subtitle-editor.html:515
 msgid "Identify off-screen and unclear speakers in parentheses."
-msgstr ""
+msgstr "identificeer onduidelijke en niet-zichtbare sprekers tussen haakjes."
 
 #: templates/subtitles/subtitle-editor.html:520
 msgid "Foreign language"
-msgstr ""
+msgstr "Buitenlandse taal"
 
 #: templates/subtitles/subtitle-editor.html:521
 msgid "Identify relevant speech in foreign language. "
-msgstr ""
+msgstr "Identificeer buitenlandse spraak die van belang is."
 
 #: templates/subtitles/subtitle-editor.html:522
 msgid "ex: (Russian): Thank you."
-msgstr ""
+msgstr "bv: (Gronings): Tis nait oal dag koffie mit kouk."
 
 #: templates/subtitles/subtitle-editor.html:526
 msgid "Simultaneous dialogue"
-msgstr ""
+msgstr "Gelijktijdige dialoog"
 
 #: templates/subtitles/subtitle-editor.html:527
 msgid "Used exclusively when two speakers talk in the same subtitle. "
-msgstr ""
+msgstr "Alleen gebruiken wanneer twee sprekers praten in dezelfde ondertitel."
 
 #: templates/subtitles/subtitle-editor.html:528
 msgid ""
 "Each speaker should have one line, and both lines should have an hyphen. "
-msgstr ""
+msgstr "Elke spreker zou één regel moeten hebben en beide regels moeten een koppelteken hebben."
 
 #: templates/subtitles/subtitle-editor.html:529
 msgid "- Sir, you are no gentleman."
-msgstr ""
+msgstr "- Meneer, u bent geen heer."
 
 #: templates/subtitles/subtitle-editor.html:530
 msgid "- Rhett Butler: And you, Miss, are no lady."
-msgstr ""
+msgstr "- Rhett Butler: En u, mevrouw, bent geen dame."
 
 #: templates/subtitles/subtitle-editor.html:542
 msgid "Show All Guidelines"
-msgstr ""
+msgstr "Toon alle richtlijnen"
 
 #: templates/subtitles/subtitle-editor.html:546
 msgid "Hide All Guidelines"
-msgstr ""
+msgstr "Verberg alle richtlijnen"
 
 #: templates/subtitles/subtitle-editor.html:551
 msgid "Translating Guidelines"
-msgstr ""
+msgstr "Vertaal richtlijnen"
 
 #: templates/subtitles/subtitle-editor.html:553
 msgid "Reviewing Guidelines"
-msgstr ""
+msgstr "Beoordeel richtlijnen"
 
 #: templates/subtitles/subtitle-editor.html:559
 #: templates/subtitles/subtitle-editor.html:724
@@ -4992,293 +4536,293 @@ msgstr "Sluit"
 
 #: templates/subtitles/subtitle-editor.html:564
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Toetsenbord snelkoppelingen"
 
 #: templates/subtitles/subtitle-editor.html:569
 #: templates/subtitles/subtitle-editor.html:624
 #: templates/subtitles/subtitle-editor.html:662
 #: templates/videos/language-sync-history-tab.html:43
 msgid "Action"
-msgstr ""
+msgstr "Actie"
 
 #: templates/subtitles/subtitle-editor.html:570
 #: templates/subtitles/subtitle-editor.html:625
 #: templates/subtitles/subtitle-editor.html:663
 msgid "Windows / Linux"
-msgstr ""
+msgstr "Windows / Linux"
 
 #: templates/subtitles/subtitle-editor.html:571
 #: templates/subtitles/subtitle-editor.html:626
 #: templates/subtitles/subtitle-editor.html:664
 msgid "OS X"
-msgstr ""
+msgstr "OS X"
 
 #: templates/subtitles/subtitle-editor.html:576
 msgid "Play / Pause video"
-msgstr ""
+msgstr "Pauzeer / Speel video"
 
 #: templates/subtitles/subtitle-editor.html:577
 #: templates/subtitles/subtitle-editor.html:578
 msgid "Tab"
-msgstr ""
+msgstr "Label"
 
 #: templates/subtitles/subtitle-editor.html:581
 msgid "Skip back 2 seconds"
-msgstr ""
+msgstr "Spring 2 seconden terug"
 
 #: templates/subtitles/subtitle-editor.html:582
 #: templates/subtitles/subtitle-editor.html:583
 msgid "Shift + Tab"
-msgstr ""
+msgstr "Shift + Tab"
 
 #: templates/subtitles/subtitle-editor.html:586
 msgid "Skip back 4 seconds"
-msgstr ""
+msgstr "Spring 4 seconden terug"
 
 #: templates/subtitles/subtitle-editor.html:587
 msgid "Ctrl + Shift + ,"
-msgstr ""
+msgstr "Ctrl + Shift + ,"
 
 #: templates/subtitles/subtitle-editor.html:588
 msgid "CMD + Shift + ,"
-msgstr ""
+msgstr "CMD + Shift + ,"
 
 #: templates/subtitles/subtitle-editor.html:591
 msgid "Skip forward 4 seconds"
-msgstr ""
+msgstr "Spring 4 seconden vooruit"
 
 #: templates/subtitles/subtitle-editor.html:592
 msgid "Ctrl + Shift + ."
-msgstr ""
+msgstr "Ctrl + Shift + ."
 
 #: templates/subtitles/subtitle-editor.html:593
 msgid "CMD + Shift + ."
-msgstr ""
+msgstr "CMD + Shift + ."
 
 #: templates/subtitles/subtitle-editor.html:596
 msgid "Navigate to the next subtitle"
-msgstr ""
+msgstr "Navigeer naar de volgende ondertitel"
 
 #: templates/subtitles/subtitle-editor.html:597
 #: templates/subtitles/subtitle-editor.html:598
 msgid "ENTER"
-msgstr ""
+msgstr "ENTER"
 
 #: templates/subtitles/subtitle-editor.html:601
 msgid "Insert line break"
-msgstr ""
+msgstr "Voeg regeleinde in"
 
 #: templates/subtitles/subtitle-editor.html:602
 #: templates/subtitles/subtitle-editor.html:603
 msgid "Shift + ENTER"
-msgstr ""
+msgstr "Shift + ENTER"
 
 #: templates/subtitles/subtitle-editor.html:606
 msgid "Delete empty subtitle"
-msgstr ""
+msgstr "Verwijder lege ondertitel"
 
 #: templates/subtitles/subtitle-editor.html:607
 #: templates/subtitles/subtitle-editor.html:608
 #: templates/subtitles/subtitle-editor.html:612
 #: templates/subtitles/subtitle-editor.html:613
 msgid "ESC"
-msgstr ""
+msgstr "ESC"
 
 #: templates/subtitles/subtitle-editor.html:611
 msgid "Exit edit mode of current subtitle"
-msgstr ""
+msgstr "Verlaat bewerker van huidige ondertitel"
 
 #: templates/subtitles/subtitle-editor.html:617
 msgid "Show Browser Shortcuts"
-msgstr ""
+msgstr "Toon browser snelkoppelingen"
 
 #: templates/subtitles/subtitle-editor.html:618
 msgid "Hide Browser Shortcuts"
-msgstr ""
+msgstr "Verberg browser snelkoppelingen"
 
 #: templates/subtitles/subtitle-editor.html:620
 msgid "Browser Defaults that should work"
-msgstr ""
+msgstr "Browser standaarden die horen te werken"
 
 #: templates/subtitles/subtitle-editor.html:631
 msgid "Jump to the next whole word"
-msgstr ""
+msgstr "Spring naar het volgende hele woord"
 
 #: templates/subtitles/subtitle-editor.html:632
 msgid "CTRL + RIGHT Arrow"
-msgstr ""
+msgstr "CTRL + RECHTER pijltoets"
 
 #: templates/subtitles/subtitle-editor.html:633
 msgid "ALT + RIGHT Arrow"
-msgstr ""
+msgstr "ALT + RECHTER pijltoets"
 
 #: templates/subtitles/subtitle-editor.html:636
 msgid "Jump to the previous whole word"
-msgstr ""
+msgstr "Spring naar het vorige hele woord"
 
 #: templates/subtitles/subtitle-editor.html:637
 msgid "CTRL + LEFT Arrow"
-msgstr ""
+msgstr "CTRL + LINKER pijltoets"
 
 #: templates/subtitles/subtitle-editor.html:638
 msgid "ALT + LEFT Arrow"
-msgstr ""
+msgstr "ALT + LINKER pijltoets"
 
 #: templates/subtitles/subtitle-editor.html:641
 msgid "Jump to the start of the subtitle"
-msgstr ""
+msgstr "Spring naar het begin van de ondertitel"
 
 #: templates/subtitles/subtitle-editor.html:642
 msgid "Fn + RIGHT Arrow"
-msgstr ""
+msgstr "Fn-toets + RECHTER pijltoets"
 
 #: templates/subtitles/subtitle-editor.html:643
 msgid "CMD + RIGHT Arrow"
-msgstr ""
+msgstr "CMD + RECHTER pijltoets"
 
 #: templates/subtitles/subtitle-editor.html:646
 msgid "Jump to the end of the subtitle"
-msgstr ""
+msgstr "Spring naar het eind van de ondertitel"
 
 #: templates/subtitles/subtitle-editor.html:647
 msgid "Fn + LEFT Arrow"
-msgstr ""
+msgstr "Fn-toets + LINKER pijltoets"
 
 #: templates/subtitles/subtitle-editor.html:648
 msgid "CMD + LEFT Arrow"
-msgstr ""
+msgstr "CMD + LINKER pijltoets"
 
 #: templates/subtitles/subtitle-editor.html:651
 msgid "Delete last complete word"
-msgstr ""
+msgstr "Verwijder laaste hele woord"
 
 #: templates/subtitles/subtitle-editor.html:652
 msgid "CTRL + Backspace"
-msgstr ""
+msgstr "CTRL + Backspace"
 
 #: templates/subtitles/subtitle-editor.html:653
 msgid "CMD + Backspace"
-msgstr ""
+msgstr "CMD + Backspace"
 
 #: templates/subtitles/subtitle-editor.html:657
 msgid "Proposed Shortcuts (not yet implemented)"
-msgstr ""
+msgstr "Voorgestelde snelkoppelingen (nog niet geïmplementeerd)"
 
 #: templates/subtitles/subtitle-editor.html:669
 msgid "Insert subtitle (above)"
-msgstr ""
+msgstr "Voeg ondertitel toe (boven)"
 
 #: templates/subtitles/subtitle-editor.html:670
 #: templates/subtitles/subtitle-editor.html:671
 msgid "Alt + i"
-msgstr ""
+msgstr "Alt + i"
 
 #: templates/subtitles/subtitle-editor.html:674
 msgid "Insert subtitle (below)"
-msgstr ""
+msgstr "Voeg ondertitel toe (onder)"
 
 #: templates/subtitles/subtitle-editor.html:675
 #: templates/subtitles/subtitle-editor.html:676
 msgid "Alt + Shift + i"
-msgstr ""
+msgstr "Alt + Shift + i"
 
 #: templates/subtitles/subtitle-editor.html:679
 msgid "Delete current subtitle"
-msgstr ""
+msgstr "Verwijder huidige ondertitel"
 
 #: templates/subtitles/subtitle-editor.html:680
 #: templates/subtitles/subtitle-editor.html:681
 msgid "Alt + Delete (or Backspace)"
-msgstr ""
+msgstr "Alt + Delete (or Backspace)"
 
 #: templates/subtitles/subtitle-editor.html:684
 msgid "Navigate to the previous line"
-msgstr ""
+msgstr "Navigeer naar de vorige regel"
 
 #: templates/subtitles/subtitle-editor.html:685
 #: templates/subtitles/subtitle-editor.html:686
 msgid "Alt + UP Arrow"
-msgstr ""
+msgstr "Alt + pijl omhoog"
 
 #: templates/subtitles/subtitle-editor.html:689
 msgid "Undo last action"
-msgstr ""
+msgstr "Maak laaste actie ongedaan"
 
 #: templates/subtitles/subtitle-editor.html:690
 msgid "CTRL + z"
-msgstr ""
+msgstr "CTRL + z"
 
 #: templates/subtitles/subtitle-editor.html:691
 msgid "CMD + z"
-msgstr ""
+msgstr "CMD + z"
 
 #: templates/subtitles/subtitle-editor.html:694
 msgid "Redo last action"
-msgstr ""
+msgstr "Doe laatste actie opnieuw"
 
 #: templates/subtitles/subtitle-editor.html:695
 msgid "CTRL + Shift + z"
-msgstr ""
+msgstr "CTRL + Shift + z"
 
 #: templates/subtitles/subtitle-editor.html:696
 msgid "CMD + Shift + z"
-msgstr ""
+msgstr "CMD + Shift + z"
 
 #: templates/subtitles/subtitle-editor.html:699
 msgid "Save a version"
-msgstr ""
+msgstr "Bewaar een versie"
 
 #: templates/subtitles/subtitle-editor.html:700
 msgid "CTRL + s"
-msgstr ""
+msgstr "CTRL + s"
 
 #: templates/subtitles/subtitle-editor.html:701
 msgid "CMD + s"
-msgstr ""
+msgstr "CMD + s"
 
 #: templates/subtitles/subtitle-editor.html:704
 msgid "Italics formatting"
-msgstr ""
+msgstr "Cursief maken"
 
 #: templates/subtitles/subtitle-editor.html:705
 msgid "CTRL + i"
-msgstr ""
+msgstr "CTRL + i"
 
 #: templates/subtitles/subtitle-editor.html:706
 msgid "CMD + i"
-msgstr ""
+msgstr "CMD + i"
 
 #: templates/subtitles/subtitle-editor.html:709
 msgid "Bold formatting"
-msgstr ""
+msgstr "Vet maken"
 
 #: templates/subtitles/subtitle-editor.html:710
 msgid "CTRL + b"
-msgstr ""
+msgstr "CTRL + b"
 
 #: templates/subtitles/subtitle-editor.html:711
 msgid "CMD + b"
-msgstr ""
+msgstr "CMD + b"
 
 #: templates/subtitles/subtitle-editor.html:714
 msgid "Timeline toggle"
-msgstr ""
+msgstr "Schakel tussen tijdslijn"
 
 #: templates/subtitles/subtitle-editor.html:715
 msgid "CTRL + t"
-msgstr ""
+msgstr "CTRL + t"
 
 #: templates/subtitles/subtitle-editor.html:716
 msgid "CMD + t"
-msgstr ""
+msgstr "CMD + t"
 
 #: templates/subtitles/subtitle-editor.html:731
 msgid "Title"
-msgstr ""
+msgstr "Titel"
 
 #: templates/subtitles/subtitle-editor.html:733
 msgid "Enter Title"
-msgstr ""
+msgstr "Voer de titel in"
 
 #: templates/subtitles/subtitle-editor.html:739
 #: templates/teams/settings-projects-add.html:32
@@ -5288,60 +4832,60 @@ msgstr "Beschrijving"
 
 #: templates/subtitles/subtitle-editor.html:741
 msgid "Enter Description"
-msgstr ""
+msgstr "Voor de beschrijving in"
 
 #: templates/subtitles/subtitle-editor.html:769
 msgid "Debugging Tools"
-msgstr ""
+msgstr "Debug gereedschap"
 
 #: templates/subtitles/subtitle-editor.html:787
 msgid "Error saving subtitles"
-msgstr ""
+msgstr "Fout bij bewaren ondertitels"
 
 #: templates/subtitles/subtitle-editor.html:790
 msgid ""
 "There was an error saving your subtitles. Save your subtitles using the "
 "download button below and upload them to the system later."
-msgstr ""
+msgstr "Er was een fout bij het bewaren van u ondertitels. Bewaar uw subtitels met behulp van de download knop hieronder en upload ze later nog een keer."
 
 #: templates/subtitles/subtitle-editor.html:791
 #: templates/subtitles/subtitle-editor.html:809
 msgid ""
 "To avoid data corruption, please do not open the or edit the subtitles in "
 "any text editor."
-msgstr ""
+msgstr "Open de ondertitels niet in een tekstverwerken om data verderf te vermijden."
 
 #: templates/subtitles/subtitle-editor.html:794
 msgid ""
-"There was an error saving your subtitles.  Copy the subtitles above and save "
-"them to your computer as subtitle_backup.dfxp. You can upload them later."
-msgstr ""
+"There was an error saving your subtitles.  Copy the subtitles above and save"
+" them to your computer as subtitle_backup.dfxp. You can upload them later."
+msgstr "Er was een fout bij het bewaren van uw ondertitels. Kopieer de ondertitels hierboven en bewaar ze op uw computer als ondertitel_backup.dfxp. U kunt ze later nogmaals uploaden."
 
 #: templates/subtitles/subtitle-editor.html:799
 #: templates/subtitles/subtitle-editor.html:817
 msgid "Download Subtitles"
-msgstr ""
+msgstr "Download ondertitels"
 
 #: templates/subtitles/subtitle-editor.html:800
 #: templates/subtitles/subtitle-editor.html:818
 msgid "Close Editor"
-msgstr ""
+msgstr "Sluit bewerker"
 
 #: templates/subtitles/subtitle-editor.html:805
 msgid "Error resuming session"
-msgstr ""
+msgstr "Fout bij het vervolgen van sessie"
 
 #: templates/subtitles/subtitle-editor.html:808
 msgid ""
 "There was an error resuming your session. Save your subtitles using the "
 "download button below and upload them to the system later."
-msgstr ""
+msgstr "Er ging iets fout bij het vervolgen van uw sessie. Bewaar uw ondertitels met behulp van de download knop hieronder en probeer ze later nogmaals te uploaden."
 
 #: templates/subtitles/subtitle-editor.html:812
 msgid ""
-"There was an error resuming your session.  Copy the subtitles above and save "
-"them to your computer as subtitle_backup.dfxp. You can upload them later."
-msgstr ""
+"There was an error resuming your session.  Copy the subtitles above and save"
+" them to your computer as subtitle_backup.dfxp. You can upload them later."
+msgstr "Er ging iets fout bij het vervolgen van uw sessie. Kopieer de ondertitels hierboven naar uw computer als ondertitel_backup.dfxp en upload ze later nog een keer."
 
 #: templates/teams/_application_form.html:4
 msgid "Apply to Join"
@@ -5359,38 +4903,24 @@ msgstr "Taalvaardigheid"
 #, python-format
 msgid ""
 "\n"
-"                                No formal language training is required to "
-"translate for %(team)s. But we do ask that all translators are confident in "
-"their translation abilities. Please make sure your language selections are "
-"accurate (click \"Select your Languages\" in the blue bar on any page).\n"
+"                                No formal language training is required to translate for %(team)s. But we do ask that all translators are confident in their translation abilities. Please make sure your language selections are accurate (click \"Select your Languages\" in the blue bar on any page).\n"
 "                            "
 msgstr ""
 
 #: templates/teams/_application_form.html:28
 msgid ""
 "\n"
-"                                We request that each new applicant does at "
-"least one full set of subtitles within the first week of joining. Aside from "
-"that, it’s up to you!\n"
+"                                We request that each new applicant does at least one full set of subtitles within the first week of joining. Aside from that, it’s up to you!\n"
 "                            "
-msgstr ""
-"\n"
-"We verwachten dat elke nieuwe kandidaat minstens één volledige set "
-"ondertitels maakt binnen de week dat hij/zij toegevoegd werd. Afgezien "
-"daarvan bepaal jij wanneer je aan zet bent!"
+msgstr "\nWe verwachten dat elke nieuwe kandidaat minstens één volledige set ondertitels maakt binnen de week dat hij/zij toegevoegd werd. Afgezien daarvan bepaal jij wanneer je aan zet bent!"
 
 #: templates/teams/_application_form.html:38
 #, python-format
 msgid ""
 "\n"
-"                        Tell us a little bit about yourself and why you’re "
-"interested in translating with %(team)s. This should be 3-5 sentences, no "
-"longer!\n"
+"                        Tell us a little bit about yourself and why you’re interested in translating with %(team)s. This should be 3-5 sentences, no longer!\n"
 "                    "
-msgstr ""
-"\n"
-"Vertel ons iets over jezelf en waarom je geïnteresseerd bent in vertaalwerk "
-"bij %(team)s. 3 tot 5 zinnen volstaan!"
+msgstr "\nVertel ons iets over jezelf en waarom je geïnteresseerd bent in vertaalwerk bij %(team)s. 3 tot 5 zinnen volstaan!"
 
 #: templates/teams/_application_form.html:46
 msgid "Submit Application"
@@ -5428,7 +4958,7 @@ msgstr "Minder tonen"
 
 #: templates/teams/_context_team.html:65
 msgid "Your role:"
-msgstr ""
+msgstr "Uw rol:"
 
 #: templates/teams/_context_team.html:68 templates/teams/_context_team.html:69
 #: templates/teams/members-list.html:112 templates/teams/members-list.html:113
@@ -5480,9 +5010,7 @@ msgstr "lijken er geen video's te zijn die je kan vertalen."
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "But check back soon! There may soon be translations for you to review."
-msgstr ""
-"Maar kom snel terug! Er zijn misschien binnenkort vertalingen om te "
-"beoordelen."
+msgstr "Maar kom snel terug! Er zijn misschien binnenkort vertalingen om te beoordelen."
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "You can also invite friends who speak other languages to help out."
@@ -5534,7 +5062,7 @@ msgstr "Workflows"
 
 #: templates/teams/_subnav_settings.html:25
 msgid "External Sites"
-msgstr ""
+msgstr "Externe sites"
 
 #: templates/teams/_tabs.html:16 templates/teams/members-list.html:6
 msgid "Members"
@@ -5561,11 +5089,7 @@ msgid ""
 "            You received this notification because you are a member of the \n"
 "            <a href=\"%(team_page)s\">%(team)s</a> team. \n"
 "        "
-msgstr ""
-"\n"
-"Je kreeg deze melding omdat je lid bent van het <a href=\"%(team_page)s\">"
-"%(team)s</a> team. \n"
-"        "
+msgstr "\nJe kreeg deze melding omdat je lid bent van het <a href=\"%(team_page)s\">%(team)s</a> team. \n        "
 
 #: templates/teams/_team_move_video_select.html:6
 msgid "Move video to one of your other teams?"
@@ -5578,8 +5102,8 @@ msgstr "Verplaats video"
 
 #: templates/teams/_team_move_video_select.html:32
 msgid ""
-"You are about to move this video to a new team.<br /><strong>If you proceed, "
-"all open tasks will be deleted.</strong>"
+"You are about to move this video to a new team.<br /><strong>If you proceed,"
+" all open tasks will be deleted.</strong>"
 msgstr "Je staat op het punt om deze video v"
 
 #: templates/teams/_team_select.html:6
@@ -5706,12 +5230,7 @@ msgid ""
 "Translate) will always require original subtitles to be completed and "
 "published first. Others (like Review and Approve) must be enabled and can "
 "only follow a completed Transcribe/Translate task."
-msgstr ""
-"Welke taken beschikbaar zijn, hangt af van de instellingen en van de "
-"workflow. Sommige taken (bv. Vertalen) zijn pas mogelijk nadat de originele "
-"ondertiteling klaar is en gepubliceerd. Andere (zoals Reviewen en "
-"Goedkeuren) moeten enabled zijn en kunnen alleen nadat een taak Ondertitelen/"
-"Vertalen voltooid is."
+msgstr "Welke taken beschikbaar zijn, hangt af van de instellingen en van de workflow. Sommige taken (bv. Vertalen) zijn pas mogelijk nadat de originele ondertiteling klaar is en gepubliceerd. Andere (zoals Reviewen en Goedkeuren) moeten enabled zijn en kunnen alleen nadat een taak Ondertitelen/Vertalen voltooid is."
 
 #: templates/teams/create_task.html:49
 msgid "What needs to be done?"
@@ -5731,15 +5250,13 @@ msgstr "Wie moet het doen?"
 
 #: templates/teams/create_task.html:68 templates/teams/tasks.html:599
 msgid "Begin typing to search"
-msgstr ""
+msgstr "Begin met typen"
 
 #: templates/teams/create_task.html:71
 msgid ""
 "Tasks left unassigned can be claimed by members with the appropriate "
 "permissions."
-msgstr ""
-"Taken die niet toegewezen blijven kunnen door leden met de juiste rechten "
-"worden opgeëist."
+msgstr "Taken die niet toegewezen blijven kunnen door leden met de juiste rechten worden opgeëist."
 
 #: templates/teams/create_task.html:77
 msgid "You do not have permission to create any valid tasks for this video."
@@ -5759,11 +5276,11 @@ msgstr "Terug naar takenlijst"
 
 #: templates/teams/dashboard.html:66
 msgid "Due in"
-msgstr ""
+msgstr "Verwacht over"
 
 #: templates/teams/dashboard.html:68
 msgid "Overdue by"
-msgstr ""
+msgstr "Te laat:"
 
 #: templates/teams/dashboard.html:78
 msgid "Helping out is easy!"
@@ -5772,14 +5289,13 @@ msgstr "Meewerken is eenvoudig!"
 #: templates/teams/dashboard.html:80
 msgid ""
 "\n"
-"                            Just find a video that interests you and click "
-"the button below it to get started!\n"
+"                            Just find a video that interests you and click the button below it to get started!\n"
 "                        "
 msgstr ""
 
 #: templates/teams/dashboard.html:84
 msgid " about subtitling in Amara."
-msgstr ""
+msgstr "Over ondertiteling bij Amara."
 
 #: templates/teams/dashboard.html:89
 msgid "Welcome!"
@@ -5790,15 +5306,15 @@ msgid ""
 "\n"
 "                            We need your help subtitling our videos!\n"
 "                        "
-msgstr ""
+msgstr "\n                            We hebben jullie help nodig bij het ondertitelen van videos!\n                        "
 
 #: templates/teams/dashboard.html:106 templates/teams/dashboard.html.py:200
 msgid "Videos that need your help"
-msgstr ""
+msgstr "Videos die uw help nodig hebben."
 
 #: templates/teams/dashboard.html:108
 msgid "Some of the videos we're working on now"
-msgstr ""
+msgstr "Enkele video's waar wij nu aan werken"
 
 #: templates/teams/dashboard.html:114 templates/teams/tasks.html:175
 msgid "Tell us what languages you speak"
@@ -5806,11 +5322,11 @@ msgstr "Vertel ons welke talen je spreekt"
 
 #: templates/teams/dashboard.html:114
 msgid "and we'll personalize this list for you"
-msgstr ""
+msgstr "en wij zullen deze lijst voor u personaliseren"
 
 #: templates/teams/dashboard.html:142 templates/teams/dashboard.html.py:165
 msgid " languages need your help"
-msgstr ""
+msgstr "talen hebben uw hulp nodig"
 
 #: templates/teams/dashboard.html:161
 msgid "Create Subtitles"
@@ -5819,77 +5335,72 @@ msgstr "Maak ondertitels aan"
 #: templates/teams/dashboard.html:172 templates/teams/dashboard.html.py:179
 #, python-format
 msgid "Create %(language)s Subtitles"
-msgstr ""
+msgstr "Creëer %(language)s ondertitels"
 
 #: templates/teams/dashboard.html:190
 msgid "Sorry, you've reached the maximum number of tasks for this team."
-msgstr ""
+msgstr "Excuses, u heeft het maximale aantal taken voor dit team bereikt."
 
 #: templates/teams/dashboard.html:202
 msgid "Sorry, we couldn't find any videos for you."
-msgstr ""
+msgstr "Excuses, we hebben geen video's voor u kunnen vinden."
 
 #: templates/teams/dashboard.html:206
 msgid "Update your language preferences"
-msgstr ""
+msgstr "Vernieuw u talen voorkeur."
 
 #: templates/teams/dashboard.html:212
 msgid "Add videos to the team"
-msgstr ""
+msgstr "Voeg video's toe aan het team"
 
 #: templates/teams/delete-language.html:5
 #: templates/teams/delete-language.html:37
 msgid "Delete Language"
-msgstr ""
+msgstr "Verwijder taal"
 
 #: templates/teams/delete-language.html:11
 #, python-format
 msgid "Deleting %(language)s Language"
-msgstr ""
+msgstr "Bezig %(language)s te verwijderen"
 
 #: templates/teams/delete-language.html:12
 #, python-format
 msgid "Video: %(video)s"
-msgstr ""
+msgstr "Video: %(video)s"
 
 #: templates/teams/delete-language.html:14
 msgid "WARNING!"
-msgstr ""
+msgstr "WAARSCHUWING!"
 
 #: templates/teams/delete-language.html:16
 msgid "All subtitles for this language will be deleted"
-msgstr ""
+msgstr "Alle ondertitels voor deze taal zullen verwijderd worden"
 
 #: templates/teams/delete-language.html:17
 msgid "Any tasks for this language will be deleted"
-msgstr ""
+msgstr "Een taak voor deze taal zal verwijderd worden"
 
 #: templates/teams/delete-language.html:18
 msgid "The language can no longer be used for translations"
-msgstr ""
+msgstr "Deze taal kan niet langer gebruikt worden voor vertalingen"
 
 #: templates/teams/delete-language.html:19
 msgid ""
 "Translation tasks will be deleted, unless there are other public subtitles "
 "that can be used"
-msgstr ""
+msgstr "Vertalingstaken zullen verwijderd worden tenzij er andere ondertitels zijn die gebruikt kunnen worden"
 
 #: templates/teams/delete-language.html:26
 msgid "Delete Dependent Languages"
-msgstr ""
+msgstr "Verwijder afhankelijke talen"
 
 #: templates/teams/email_new_video.html:7
 #, python-format
 msgid ""
 "\n"
-"            %(team_name)s needs your help subtitling and translating the "
-"following new videos:\n"
+"            %(team_name)s needs your help subtitling and translating the following new videos:\n"
 "        "
-msgstr ""
-"\n"
-"            %(team_name)s heeft je hulp nodig bij het ondertitelen en "
-"vertalen van de volgende nieuwe video's:\n"
-"        "
+msgstr "\n            %(team_name)s heeft je hulp nodig bij het ondertitelen en vertalen van de volgende nieuwe video's:\n        "
 
 #: templates/teams/email_new_video.html:13
 msgid "Or you can visit the team page to see the latest work"
@@ -5897,24 +5408,16 @@ msgstr "Of je kan de teampagina bezoeken om het meest recente werk te zien"
 
 #: templates/teams/email_new_video.html:17
 msgid "Stop receiving new notifications when a new video is added."
-msgstr ""
-"Ontvang geen nieuwe waarschuwingen meer wanneer een nieuwe video toegevoegd "
-"is."
+msgstr "Ontvang geen nieuwe waarschuwingen meer wanneer een nieuwe video toegevoegd is."
 
 #: templates/teams/email_new_videos.html:7
 #, python-format
 msgid ""
 "\n"
-"            The <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</"
-"a> \n"
+"            The <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n"
 "            team has added new videos, and they need your help:\n"
 "        "
-msgstr ""
-"\n"
-"            De <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n"
-"            ploeg heeft nieuwe video's toegevoegd, en ze hebben jouw hulp "
-"nodig:\n"
-"        "
+msgstr "\n            De <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n            ploeg heeft nieuwe video's toegevoegd, en ze hebben jouw hulp nodig:\n        "
 
 #: templates/teams/email_new_videos.html:20
 msgid "Thank you!"
@@ -5930,7 +5433,7 @@ msgstr "Ontvanger"
 
 #: templates/teams/invite_members.html:29
 msgid "Begin typing to search."
-msgstr ""
+msgstr "Begin met typen."
 
 #: templates/teams/invite_members.html:32
 msgid "Amara username of the user you want to invite."
@@ -5938,7 +5441,7 @@ msgstr "Amara-gebruikersnaam van de gebruiker die je wilt uitnodigen."
 
 #: templates/teams/invite_members.html:36
 msgid "Invite Details"
-msgstr ""
+msgstr "Uitnodiging details"
 
 #: templates/teams/invite_members.html:39
 msgid "Include a message"
@@ -5963,7 +5466,7 @@ msgstr "Filteren en sorteren"
 
 #: templates/teams/members-list.html:53
 msgid "Showing"
-msgstr ""
+msgstr "Tonend"
 
 #: templates/teams/members-list.html:55
 msgid "all members"
@@ -5983,7 +5486,7 @@ msgstr "mederwerker"
 
 #: templates/teams/members-list.html:62
 msgid "speaking"
-msgstr ""
+msgstr "Spreken"
 
 #: templates/teams/members-list.html:64 templates/teams/tasks.html:93
 msgid "all languages"
@@ -5995,11 +5498,11 @@ msgstr "gesorteerd volgens"
 
 #: templates/teams/members-list.html:74
 msgid "date joined, oldest"
-msgstr ""
+msgstr "ingetreden op, oudste"
 
 #: templates/teams/members-list.html:77
 msgid "date joined, most recent"
-msgstr ""
+msgstr "ingetreden op, meest recent"
 
 #: templates/teams/members-list.html:83 templates/teams/tasks.html:146
 #: templates/teams/tasks.html.py:154 templates/teams/tasks.html:162
@@ -6037,13 +5540,13 @@ msgstr "Richtlijnen"
 
 #: templates/teams/settings-guidelines.html:25
 msgid "Custom messages"
-msgstr ""
+msgstr "Aangepaste berichten"
 
 #: templates/teams/settings-guidelines.html:28
 msgid ""
-"Customize the messages sent to your users. The text you enter will accompany "
-"the default system message."
-msgstr ""
+"Customize the messages sent to your users. The text you enter will accompany"
+" the default system message."
+msgstr "Pas de berichten naar uw gebruiker aan. De tekst die u invult zal aan de standaardtekst worden toegevoegd."
 
 #: templates/teams/settings-guidelines.html:31
 msgid "When a member is invited to join the team"
@@ -6063,7 +5566,7 @@ msgstr "Wanneer een lid de rol van Admin toegewezen kreeg"
 
 #: templates/teams/settings-guidelines.html:51
 msgid "Add guidelines to be displayed to your users when completing tasks."
-msgstr ""
+msgstr "Voeg richtlijnen toe die getoond worden als gebruikers taken voltooien."
 
 #: templates/teams/settings-guidelines.html:54
 msgid "When transcribing"
@@ -6091,7 +5594,7 @@ msgstr "Talen op de zware lijst"
 
 #: templates/teams/settings-languages.html:34
 msgid "Will not be shown when creating or performing tasks"
-msgstr ""
+msgstr "Zal niet getoond worden tijden het maken of uitvoeren van taken"
 
 #: templates/teams/settings-permissions.html:27
 msgid "Team Management"
@@ -6123,17 +5626,15 @@ msgstr "Wie kan ondertitels vertalen?"
 
 #: templates/teams/settings-permissions.html:43
 msgid "i.e. translate text from an original subtitle into a new language"
-msgstr ""
-"dwz de tekst aan de hand van de originele ondertiteling vertalen naar een "
-"nieuwe taal"
+msgstr "dwz de tekst aan de hand van de originele ondertiteling vertalen naar een nieuwe taal"
 
 #: templates/teams/settings-permissions.html:48
 msgid "How your subtitles will get published <em>(configure below)</em>"
-msgstr ""
+msgstr "Hoe uw ondertitels gepubliceerd worden <em>(configureer hieronder)</em>"
 
 #: templates/teams/settings-permissions.html:50
 msgid "Transcribed"
-msgstr ""
+msgstr "Overgeschreven"
 
 #: templates/teams/settings-permissions.html:52
 msgid "or ..."
@@ -6155,17 +5656,15 @@ msgstr "Gepubliceerd"
 msgid ""
 "Tasks enable you to manage and assign subtitling and translation work for "
 "your videos"
-msgstr ""
-"Via taken kunt u ondertitel- en vertaalwerkzaamheden voor uw video’s beheren "
-"en toewijzen"
+msgstr "Via taken kunt u ondertitel- en vertaalwerkzaamheden voor uw video’s beheren en toewijzen"
 
 #: templates/teams/settings-permissions.html:75
 msgid "Enable tasks"
-msgstr ""
+msgstr "Maak taken mogelijk"
 
 #: templates/teams/settings-permissions.html:80
 msgid "Permissions and Limits"
-msgstr ""
+msgstr "Toegangen en limieten"
 
 #: templates/teams/settings-permissions.html:82
 msgid "Who can create and assign tasks?"
@@ -6175,9 +5674,7 @@ msgstr "Wie kan taken aanmaken en toewijzen?"
 msgid ""
 "Specified members will only be able to create/assign tasks they are "
 "permitted to complete themselves"
-msgstr ""
-"Gespecificeerde leden zullen uitsluitend taken kunnen aanmaken/toewijzen die "
-"ze zelf mogen voltooien"
+msgstr "Gespecificeerde leden zullen uitsluitend taken kunnen aanmaken/toewijzen die ze zelf mogen voltooien"
 
 #: templates/teams/settings-permissions.html:86
 msgid "How many tasks can a user have at once?"
@@ -6189,8 +5686,7 @@ msgstr "Laat dit veld leeg als u geen limiet wilt."
 
 #: templates/teams/settings-permissions.html:91
 msgid "How many days should an assignee get to complete a task?"
-msgstr ""
-"Hoeveel dagen zou een opdrachthouder moeten krijgen om een taak te voltooien?"
+msgstr "Hoeveel dagen zou een opdrachthouder moeten krijgen om een taak te voltooien?"
 
 #: templates/teams/settings-permissions.html:94
 msgid "If left blank tasks will not expire."
@@ -6202,12 +5698,12 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:100
 msgid "Automatically create transcription tasks"
-msgstr ""
+msgstr "Creëer overschrijf taken automatisch"
 
 #: templates/teams/settings-permissions.html:105
 #: templates/teams/settings-projects-add.html:54
 msgid "Automatically create translation tasks for preferred languages"
-msgstr ""
+msgstr "Creëer verstalings-taken voor gekozen talen automatisch"
 
 #: templates/teams/settings-permissions.html:105
 #: templates/teams/settings-projects-add.html:54
@@ -6238,9 +5734,7 @@ msgstr "Voeg een nieuw project toe"
 msgid ""
 "Moderate this project's subtitles. Will override the team's workflow if "
 "exists."
-msgstr ""
-"Modereer de ondertiteling van dit project. Dit commando overschrijft, als "
-"het al bestaat, de huidige workflow van het team."
+msgstr "Modereer de ondertiteling van dit project. Dit commando overschrijft, als het al bestaat, de huidige workflow van het team."
 
 #: templates/teams/settings-projects-add.html:42
 msgid "Enable workflows"
@@ -6248,7 +5742,7 @@ msgstr "Workflows inschakelen"
 
 #: templates/teams/settings-projects-add.html:49
 msgid "Automatically create subtitle tasks"
-msgstr ""
+msgstr "Creëer ondertitelings-taken automatisch"
 
 #: templates/teams/settings-projects-edit.html:34
 msgid "Edit Project"
@@ -6264,23 +5758,23 @@ msgstr "Dit team heeft nog geen projecten"
 
 #: templates/teams/settings.html:49
 msgid "Logo/Banner"
-msgstr ""
+msgstr "Logo/Banier"
 
 #: templates/teams/settings.html:54
 msgid "Max 940 x 235"
-msgstr ""
+msgstr "Maximaal 940 x 235"
 
 #: templates/teams/settings.html:58
 msgid "Square Logo"
-msgstr ""
+msgstr "Vierkant logo"
 
 #: templates/teams/settings.html:63
 msgid "Recommended size: 100 x 100"
-msgstr ""
+msgstr "Aanbevolen grootte: 100 x 100"
 
 #: templates/teams/start-subtitle-task.html:8
 msgid "Starting Task"
-msgstr ""
+msgstr "Begin taak"
 
 #: templates/teams/start-subtitle-task.html:21 templates/teams/tasks.html:328
 msgid "Perform Task"
@@ -6288,7 +5782,7 @@ msgstr "Taak uitvoeren"
 
 #: templates/teams/start-subtitle-task.html:30
 msgid "Start Subtitling"
-msgstr ""
+msgstr "Begin met ondertitelen"
 
 #: templates/teams/tasks.html:49
 msgid "Add Task"
@@ -6375,7 +5869,7 @@ msgstr "Niet-toegewezen taken in de talen die u spreekt."
 
 #: templates/teams/tasks.html:184
 msgid "Want to view "
-msgstr ""
+msgstr "Wil bekijken"
 
 #: templates/teams/tasks.html:185
 msgid "your tasks"
@@ -6383,12 +5877,11 @@ msgstr "uw taken"
 
 #: templates/teams/tasks.html:186
 msgid " instead?"
-msgstr ""
+msgstr "in plaats van?"
 
 #: templates/teams/tasks.html:192
 msgid "Try changing your selection using the filters above to find tasks"
-msgstr ""
-"Wijzig om taken te vinden uw selectie. Gebruik hiervoor de filters hierboven."
+msgstr "Wijzig om taken te vinden uw selectie. Gebruik hiervoor de filters hierboven."
 
 #: templates/teams/tasks.html:219
 msgid "You don't have permission to perform this task."
@@ -6405,7 +5898,7 @@ msgstr "recentste klad"
 
 #: templates/teams/tasks.html:268
 msgid "transcribed"
-msgstr ""
+msgstr "overgeschreven"
 
 #: templates/teams/tasks.html:270
 msgid "translated"
@@ -6438,7 +5931,7 @@ msgstr "Je hebt het maximum aantal taken bereikt."
 
 #: templates/teams/tasks.html:348
 msgid "Download draft"
-msgstr ""
+msgstr "Download klad"
 
 #: templates/teams/tasks.html:369
 msgid "Upload a draft"
@@ -6459,9 +5952,9 @@ msgstr "Belangrijk:"
 #: templates/teams/tasks.html:399
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
-"\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title "
-"and video description in the onsite editor and to submit the final version."
-msgstr ""
+"\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title"
+" and video description in the onsite editor and to submit the final version."
+msgstr "Het uploaden van een klad zal een taak niet voltooien. Selecteer na het uploaden \"Vervolg\" van de \"Doe taak\" vervolgkeuzelijst om de timing, video titel en video beschrijving te verifiëren in de bewerker en om de eindversie in te dienen."
 
 #: templates/teams/tasks.html:404 templates/videos/_upload_subtitles.html:26
 #: templates/videos/video-page.html:62
@@ -6482,9 +5975,7 @@ msgstr "Een klad downloaden"
 
 #: templates/teams/tasks.html:441
 msgid "Download a draft of these subtitles so you can work offline."
-msgstr ""
-"Download een voorlopige versie van deze ondertitels, zodat je offline kan "
-"werken."
+msgstr "Download een voorlopige versie van deze ondertitels, zodat je offline kan werken."
 
 #: templates/teams/tasks.html:478
 msgid "Decline"
@@ -6504,7 +5995,7 @@ msgstr "Taak verwijderen"
 
 #: templates/teams/tasks.html:533
 msgid "What would you like to do with the subtitles for this task?"
-msgstr ""
+msgstr "Wat wilt u doen met de ondertiteling van deze taak?"
 
 #: templates/teams/tasks.html:541
 msgid "Publish these subtitles immediately"
@@ -6514,9 +6005,7 @@ msgstr "Publiceer deze ondertiteling meteen"
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
-msgstr ""
-"Verwijder deze ondertitels blijvend (verwijder ook alle voorlopige versies "
-"van na de laatst gepubliceerde versies)"
+msgstr "Verwijder deze ondertitels blijvend (verwijder ook alle voorlopige versies van na de laatst gepubliceerde versies)"
 
 #: templates/teams/tasks.html:603
 msgid "Assign to User"
@@ -6552,7 +6041,7 @@ msgstr "Je team"
 
 #: templates/teams/teams-list.html:78
 msgid "Role:"
-msgstr ""
+msgstr "Rol:"
 
 #: templates/teams/teams-list.html:82
 msgid "leave team"
@@ -6581,12 +6070,8 @@ msgid_plural ""
 "\n"
 "                                %(count)s videos\n"
 "                            "
-msgstr[0] ""
-"\n"
-"%(count)s video⏎ "
-msgstr[1] ""
-"\n"
-"%(count)s video’s⏎ "
+msgstr[0] "\n%(count)s video⏎ "
+msgstr[1] "\n%(count)s video’s⏎ "
 
 #: templates/teams/teams-list.html:115
 msgid "Sorry, no teams found."
@@ -6603,10 +6088,9 @@ msgstr "Een ploeg beginnen"
 #: templates/teams/teams-list.html:132
 msgid ""
 "\n"
-"                Want to create your own subtitling team? Contact <a href="
-"\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n"
+"                Want to create your own subtitling team? Contact <a href=\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n"
 "            "
-msgstr ""
+msgstr "\n                Wilt u een eigen ondertitel team? Contacteer <a href=\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n            "
 
 #: templates/teams/videos-list.html:59
 msgid "Add Video"
@@ -6614,27 +6098,27 @@ msgstr "Een video aanmaken"
 
 #: templates/teams/videos-list.html:74
 msgid "Project:"
-msgstr ""
+msgstr "Project:"
 
 #: templates/teams/videos-list.html:76 templates/teams/videos-list.html:89
 msgid "any"
-msgstr ""
+msgstr "een"
 
 #: templates/teams/videos-list.html:83
 msgid "Language:"
-msgstr ""
+msgstr "Taal:"
 
 #: templates/teams/videos-list.html:85
 msgid "has"
-msgstr ""
+msgstr "heeft"
 
 #: templates/teams/videos-list.html:86
 msgid "doesn't have"
-msgstr ""
+msgstr "heeft geen"
 
 #: templates/teams/videos-list.html:97
 msgid "Sort:"
-msgstr ""
+msgstr "Sorteer:"
 
 #: templates/teams/videos-list.html:100
 msgid "name, a-z"
@@ -6654,17 +6138,15 @@ msgstr "oudste"
 
 #: templates/teams/videos-list.html:112
 msgid "most completed languages"
-msgstr ""
+msgstr "Meest voltooide talen"
 
 #: templates/teams/videos-list.html:115
 msgid "least completed languages"
-msgstr ""
+msgstr "minst voltooide talen"
 
 #: templates/teams/videos-list.html:133
 msgid "Rebuilding video index. Please try again in a few minutes"
-msgstr ""
-"Bezig met het heropbouwen van de video-index. Probeer het over enkele "
-"minuten opnieuw "
+msgstr "Bezig met het heropbouwen van de video-index. Probeer het over enkele minuten opnieuw "
 
 #: templates/teams/videos-list.html:135
 msgid "Sorry, no videos here"
@@ -6683,16 +6165,8 @@ msgstr "Je haalt deze video bij het %(team)s team weg."
 #, python-format
 msgid ""
 "You are removing this video from the %(team)s team.<br /><br />\n"
-"                                It will remain on Amara but will no longer "
-"be subject to the team's permissions and worfklows. Any outstanding tasks "
-"will be deleted. Private videos will become available for viewing and "
-"editing to the general public. Are you sure you want to proceed?"
-msgstr ""
-"Je haalt deze video weg bij het %(team)s team.<br /><br />\n"
-"De video blijft op Amara, maar zal niet langer onder controle staan van een "
-"team of deel uitmaken van een workflow. Alle openstaande taken worden "
-"verwijderd. Video's met de instelling privé krijgen de status \"publiek\" - "
-"iedereen zal ze kunnen zien en wijzigen. Wil je hiermee doorgaan? "
+"                                It will remain on Amara but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted. Private videos will become available for viewing and editing to the general public. Are you sure you want to proceed?"
+msgstr "Je haalt deze video weg bij het %(team)s team.<br /><br />\nDe video blijft op Amara, maar zal niet langer onder controle staan van een team of deel uitmaken van een workflow. Alle openstaande taken worden verwijderd. Video's met de instelling privé krijgen de status \"publiek\" - iedereen zal ze kunnen zien en wijzigen. Wil je hiermee doorgaan? "
 
 #: templates/teams/videos-list.html:157
 #, python-format
@@ -6700,10 +6174,7 @@ msgid ""
 "You can choose to remove the video from the %(team)s team or to delete the "
 "video (and all of its subtitles) from the system entirely. What would you "
 "like to do?"
-msgstr ""
-"Je kan ervoor kiezen de video bij het %(team)s team weg te halen of om de "
-"video (en zijn volledige ondertiteling) volledig uit het systeem te "
-"verwijderen. Wat wil je doen?"
+msgstr "Je kan ervoor kiezen de video bij het %(team)s team weg te halen of om de video (en zijn volledige ondertiteling) volledig uit het systeem te verwijderen. Wat wil je doen?"
 
 #: templates/teams/videos-list.html:160
 msgid "Just remove the video from the team."
@@ -6721,26 +6192,27 @@ msgstr "Verwijder deze video volledig"
 
 #: templates/teams/billing/reports.html:8
 msgid "Generate Billing Report"
-msgstr ""
+msgstr "genereer factureringsrapport"
 
 #: templates/videos/_create-subtitles-modal.html:5
 #: templates/videos/_multi-video-create-subtitles-form.html:6
 #: templates/videos/video-page.html:95
 msgid "Add a new language!"
-msgstr ""
+msgstr "Voeg een nieuwe taal toe!"
 
 #: templates/videos/_create-subtitles-modal.html:12
 #, python-format
 msgid "This video is in %(language)s"
-msgstr ""
+msgstr "Deze video is in het %(language)s"
 
 #: templates/videos/_create-subtitles-modal.html:19
 #: templates/videos/_multi-video-create-subtitles-form.html:13
 msgid "Continue"
-msgstr ""
+msgstr "Vervolg"
 
 #: templates/videos/_error_feedback_form.html:7
-msgid "Please let us know what you were doing when you encountered this error."
+msgid ""
+"Please let us know what you were doing when you encountered this error."
 msgstr "Laat ons weten wat u deed toen u deze fout tegen kwam."
 
 #: templates/videos/_error_feedback_form.html:9
@@ -6760,15 +6232,15 @@ msgid "How are you using Amara?  What would make it better?"
 msgstr "Hoe gebruik je momenteel Amara? Wat zou Amara beter maken?"
 
 #: templates/videos/_feedback_form.html:8
-msgid "Please let us know if you have any comments, questions, or suggestions!"
+msgid ""
+"Please let us know if you have any comments, questions, or suggestions!"
 msgstr "Laat het ons weten als u opmerkingen, vragen of suggesties heeft!"
 
 #: templates/videos/_feedback_form.html:9
 msgid ""
-"Note: we read/speak English best, but try to read/respond to anything we can."
-msgstr ""
-"Opmerking: we verstaan / spreken Engels het best, maar we doen ons best om "
-"zoveel mogelijk te lezen /  beantwoorden."
+"Note: we read/speak English best, but try to read/respond to anything we "
+"can."
+msgstr "Opmerking: we verstaan / spreken Engels het best, maar we doen ons best om zoveel mogelijk te lezen /  beantwoorden."
 
 #: templates/videos/_feedback_form.html:13
 msgid "Your email:"
@@ -6836,10 +6308,7 @@ msgstr "Niet volgend"
 msgid ""
 "You will stop receiving notifications when any subtitles for this video are "
 "edited.  You can choose to follow again at any time."
-msgstr ""
-"Je zal geen meldingen meer ontvangen voor de wijzigingen aan de "
-"ondertiteling van deze video. Je kan op elk ogenblik beslissen om de "
-"ondertiteling opnieuw op te volgen."
+msgstr "Je zal geen meldingen meer ontvangen voor de wijzigingen aan de ondertiteling van deze video. Je kan op elk ogenblik beslissen om de ondertiteling opnieuw op te volgen."
 
 #: templates/videos/_follow_video_button.html:104
 msgid "Stop following this video"
@@ -6853,9 +6322,7 @@ msgstr "Je zal geen meldingen meer ontvangen voor"
 msgid ""
 " subtitles for this video are edited. You can choose to follow again at any "
 "time."
-msgstr ""
-"de ondertiteling voor deze video is gewijzigd. U kan op elk ogenblik ervoor "
-"kiezen om ze opnieuw te volgen."
+msgstr "de ondertiteling voor deze video is gewijzigd. U kan op elk ogenblik ervoor kiezen om ze opnieuw te volgen."
 
 #: templates/videos/_follow_video_button.html:110
 msgid "Stop following "
@@ -6886,7 +6353,7 @@ msgstr "Volgen"
 msgid ""
 "You will receive notifications when anyone edits any subtitles for this "
 "video. You can stop these emails at any time."
-msgstr ""
+msgstr "U zal notificaties ontvangen wanneer iemand een ondertitel voor deze video aanpast. U kunt deze e-mails ten alle tijden stoppen."
 
 #: templates/videos/_follow_video_button.html:169
 msgid "Follow this video"
@@ -6918,12 +6385,12 @@ msgid_plural ""
 "\n"
 "            %(count)s Languages\n"
 "        "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n            %(count)s Taal\n        "
+msgstr[1] "\n            %(count)s Talen\n        "
 
 #: templates/videos/_upload_subtitles.html:6
 msgid "Upload them directly."
-msgstr ""
+msgstr "Upload ze meteen."
 
 #: templates/videos/_upload_subtitles.html:11
 msgid "Upload Subtitles"
@@ -6933,8 +6400,7 @@ msgstr "Ondertitels uploaden"
 msgid ""
 "\n"
 "                    Our site accepts SRT, SSA, SBV, DFXP, and TXT format.\n"
-"                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt or ."
-"xml\n"
+"                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt or .xml\n"
 "                    (for dfxp) are accepted.\n"
 "                "
 msgstr ""
@@ -6959,11 +6425,9 @@ msgstr "Meld je aan om ondertitels te uploaden"
 
 #: templates/videos/_upload_subtitles.html:68
 msgid ""
-"If you believe your subtitle file is compatible, <a href='mailto:"
-"feedback@universalsubtitles.org'>send it to us</a>"
-msgstr ""
-"Als je denkt dat je ondertitelbestand compatibel is, <a href='mailto:"
-"feedback@universalsubtitles.org'>stuur hem dan naar ons.</a>"
+"If you believe your subtitle file is compatible, <a "
+"href='mailto:feedback@universalsubtitles.org'>send it to us</a>"
+msgstr "Als je denkt dat je ondertitelbestand compatibel is, <a href='mailto:feedback@universalsubtitles.org'>stuur hem dan naar ons.</a>"
 
 #: templates/videos/_upload_subtitles.html:70
 msgid "Processing, please be patient..."
@@ -6983,12 +6447,8 @@ msgid_plural ""
 "\n"
 "                    %(number)s Languages\n"
 "                "
-msgstr[0] ""
-"\n"
-"%(number)s taal"
-msgstr[1] ""
-"\n"
-"%(number)s talen"
+msgstr[0] "\n%(number)s taal"
+msgstr[1] "\n%(number)s talen"
 
 #: templates/videos/_video_url_panel.html:6
 msgid "Add new URL"
@@ -6997,34 +6457,30 @@ msgstr "Een nieuwe URL toevoegen"
 #: templates/videos/_video_url_panel.html:16
 #: templates/videos/_video_url_panel.html:109
 msgid "Primary"
-msgstr ""
+msgstr "Primair"
 
 #: templates/videos/_video_url_panel.html:32
 msgid "Make primary"
-msgstr ""
+msgstr "Maak primair"
 
 #: templates/videos/_video_url_panel.html:46
 msgid ""
 "Multiple video URLs let you link multiple videos to a single set of "
 "subtitles. Some example uses:"
-msgstr ""
-"Aan een enkele set ondertitels kan je met behulp van verschillende URL's "
-"meerdere video's koppelen:"
+msgstr "Aan een enkele set ondertitels kan je met behulp van verschillende URL's meerdere video's koppelen:"
 
 #: templates/videos/_video_url_panel.html:48
 msgid ""
 "Two versions of the same video exist on Youtube.  You do not want subtitle "
-"volunteers to duplicate their work, so you add both versions to the multiple "
-"URLs pane."
-msgstr ""
+"volunteers to duplicate their work, so you add both versions to the multiple"
+" URLs pane."
+msgstr "Twee versies van dezelfde video bestaan op Youtube. U wil niet dat ondertitel vrijwilligers hun werk dubbel doen, dus voeg je beide versies toe aan het URL paneel."
 
 #: templates/videos/_video_url_panel.html:49
 msgid ""
-"You put your video on Youtube, Vimeo, Blip, and Dailymotion and you want the "
-"subtitles you make to work on all of those versions."
-msgstr ""
-"je zet je video op Youtube, Vimeo, Blip of Dailymotion en je wilt de "
-"ondertiteling die je maakt beschikbaar stellen op al deze versies."
+"You put your video on Youtube, Vimeo, Blip, and Dailymotion and you want the"
+" subtitles you make to work on all of those versions."
+msgstr "je zet je video op Youtube, Vimeo, Blip of Dailymotion en je wilt de ondertiteling die je maakt beschikbaar stellen op al deze versies."
 
 #: templates/videos/_video_url_panel.html:50
 msgid ""
@@ -7032,12 +6488,7 @@ msgid ""
 "(HTML5/Ogg for free software users, or HTML5/h264 to iPad users).  If you "
 "add these URLs, our embed code will automatically fall back to whatever "
 "format is necessary for the browser."
-msgstr ""
-"je wilt verschillende versie van eenzelfde video beschikbaar stellen voor "
-"verschillende browsers (HTML5/Ogg voor de gebruikers van vrije software, "
-"HTML5/h264 voor iPad-gebruikers). Als je deze URL's toevoegt, zal onze "
-"<i>embed code</i> automatisch verwijzen naar het formaat dat de browser "
-"nodig heeft."
+msgstr "je wilt verschillende versie van eenzelfde video beschikbaar stellen voor verschillende browsers (HTML5/Ogg voor de gebruikers van vrije software, HTML5/h264 voor iPad-gebruikers). Als je deze URL's toevoegt, zal onze <i>embed code</i> automatisch verwijzen naar het formaat dat de browser nodig heeft."
 
 #: templates/videos/_video_url_panel.html:52
 msgid "Tip: double check that there are no timing problems."
@@ -7052,10 +6503,7 @@ msgid ""
 "Add a URL for another version of the exact same video. Useful when many "
 "versions of the same video exist, or when there are different formats (like "
 "HTML5)"
-msgstr ""
-"Voeg een URL toe voor een andere versie van identiek dezelfde video. Nuttig "
-"wanneer er meerdere versies van dezelfde video bestaan, of wanneer er "
-"verschillende formaten zijn (zoals HTLM5)"
+msgstr "Voeg een URL toe voor een andere versie van identiek dezelfde video. Nuttig wanneer er meerdere versies van dezelfde video bestaan, of wanneer er verschillende formaten zijn (zoals HTLM5)"
 
 #: templates/videos/_video_url_panel.html:74
 msgid "Add"
@@ -7078,15 +6526,11 @@ msgstr "Je bent niet aangemeld"
 msgid ""
 "Delete this URL?  Warning: this cannot be undone. Only delete URLs for non-"
 "matching videos or videos where subtitles fail to display correctly."
-msgstr ""
-"Deze URL verwijderen? Waarschuwing:  dit kan ongedaan gemaakt worden. "
-"Verwijder enkel URL's voor video's die niet overeenkomen of waarvan de "
-"ondertiteling niet correct weergeven wordt."
+msgstr "Deze URL verwijderen? Waarschuwing:  dit kan ongedaan gemaakt worden. Verwijder enkel URL's voor video's die niet overeenkomen of waarvan de ondertiteling niet correct weergeven wordt."
 
 #: templates/videos/_watch_page.html:13
 msgid "Rebuilding video index. Please try again a bit later"
-msgstr ""
-"Bezig met het heropbouwen van de video-index. Probeer het even later opnieuw"
+msgstr "Bezig met het heropbouwen van de video-index. Probeer het even later opnieuw"
 
 #: templates/videos/_watch_page.html:15
 msgid "No videos found"
@@ -7099,23 +6543,13 @@ msgstr "Er zijn geen activiteiten."
 #: templates/videos/create.html:10
 msgid ""
 "\n"
-"        \"Sorry, we couldn't identify the video at the link you sent.  "
-"Perhaps\n"
+"        \"Sorry, we couldn't identify the video at the link you sent.  Perhaps\n"
 "        it's a link we don't recognize, or perhaps you've linked to a page\n"
-"        that has multiple videos.  Try entering a different link to the "
-"video\n"
+"        that has multiple videos.  Try entering a different link to the video\n"
 "        you want to submit.  If you think there's been some mistake,\n"
-"        <a href=\"mailto:feedback@universalsubtitles.org\">contact us</a>!"
-"\"\n"
+"        <a href=\"mailto:feedback@universalsubtitles.org\">contact us</a>!\"\n"
 "        "
-msgstr ""
-"\n"
-"\"Sorry, we konden de video in de door u gestuurde koppeling niet\n"
-"herkennen. Mogelijk is het een koppeling die we niet herkennen, of\n"
-"misschien hebt u naar een pagina met meerdere video’s verwezen.\n"
-"Probeer een andere koppeling naar de video die u wilt indienen in\n"
-"te voeren. Als u denkt dat er iets mis is,\n"
-"<a href=\"mailto:feedback@universalsubtitles.org\">neem dan contact op</a>!\""
+msgstr "\n\"Sorry, we konden de video in de door u gestuurde koppeling niet\nherkennen. Mogelijk is het een koppeling die we niet herkennen, of\nmisschien hebt u naar een pagina met meerdere video’s verwezen.\nProbeer een andere koppeling naar de video die u wilt indienen in\nte voeren. Als u denkt dat er iets mis is,\n<a href=\"mailto:feedback@universalsubtitles.org\">neem dan contact op</a>!\""
 
 #: templates/videos/create.html:22
 msgid "Subtitle a Video"
@@ -7129,9 +6563,7 @@ msgstr "Beginnen"
 msgid ""
 "Enter the URL of an Ogg, WebM, flv, mp4, Youtube, Vimeo or Dailymotion "
 "video. You can also use our"
-msgstr ""
-"Voer de URL van een Ogg-, WebM-, flv-, mp4-, Youtube-, Vimeo- of Dailymotion-"
-"video in. U kunt ook gebruikmaken van onze"
+msgstr "Voer de URL van een Ogg-, WebM-, flv-, mp4-, Youtube-, Vimeo- of Dailymotion-video in. U kunt ook gebruikmaken van onze"
 
 #: templates/videos/create.html:30
 msgid "to subtitle all the videos on your site."
@@ -7156,8 +6588,7 @@ msgstr "Of voeg meerdere video's toe"
 #: templates/videos/create.html:58
 msgid ""
 "\n"
-"        Help organizations and deaf and hard of hearing viewers make videos "
-"accessible around the world.\n"
+"        Help organizations and deaf and hard of hearing viewers make videos accessible around the world.\n"
 "    "
 msgstr ""
 
@@ -7199,9 +6630,7 @@ msgstr "Stuur geen e-mails meer over deze specifieke video."
 msgid ""
 "To stop receiving these emails, go to your preferences page and uncheck "
 "\"notify me by email\":"
-msgstr ""
-"Om deze mails niet meer te ontvangen ga je pagina met voorkeuren en "
-"verwijder je de optie \"hou me per e-mail op de hoogte\":"
+msgstr "Om deze mails niet meer te ontvangen ga je pagina met voorkeuren en verwijder je de optie \"hou me per e-mail op de hoogte\":"
 
 #: templates/videos/email_base.html:106
 msgid "My profile / preferences"
@@ -7219,39 +6648,21 @@ msgstr "Stuur naar een vriend!"
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                you contributed to <b><a href=\"http://%(domain)s"
-"%(video_url)s\">%(v)s</a></b> \n"
-"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">"
-"%(u)s</a></b>. \n"
-"                These changes went live immediately.  %(text_change)s of the "
-"text and\n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. \n"
+"                These changes went live immediately.  %(text_change)s of the text and\n"
 "                %(time_change)s of the timing was changed.\n"
 "                "
-msgstr ""
-"\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"ondertitels</a></b> \n"
-"                die je aanbracht voor <b><a href=\"http://%(domain)s"
-"%(video_url)s\">%(v)s</a></b> \n"
-"                werden aangepast door <b><a href=\"http://%(domain)s"
-"%(user_url)s\">%(u)s</a></b>. \n"
-"                De wijzigingen werden onmiddellijk van toepassing.  "
-"%(text_change)s van de tekst en\n"
-"                %(time_change)s van de timing werd gewijzigd.\n"
-"                "
+msgstr "\n                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s ondertitels</a></b> \n                die je aanbracht voor <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n                werden aangepast door <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. \n                De wijzigingen werden onmiddellijk van toepassing.  %(text_change)s van de tekst en\n                %(time_change)s van de timing werd gewijzigd.\n                "
 
 #: templates/videos/email_notification.html:17
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                you contributed to <b><a href=\"http://%(domain)s"
-"%(video_url)s\">%(v)s</a></b> \n"
-"                were changed. These changes went live immediately. "
-"%(text_change)s of the text and \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
+"                were changed. These changes went live immediately. %(text_change)s of the text and \n"
 "                %(time_change)s of the timing was changed.\n"
 "                "
 msgstr ""
@@ -7302,28 +6713,21 @@ msgstr "Veranderingen aan ondertitels"
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                to video <b><a href=\"http://%(domain)s%(video_url)s\">"
-"%(v)s</a></b>\n"
-"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">"
-"%(u)s</a></b>. These changes went live immediately. %(time_change)s of the "
-"timing was changed.  \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. These changes went live immediately. %(time_change)s of the timing was changed.  \n"
 "                "
-msgstr ""
+msgstr "\n                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s ondertitels</a></b> \n                voor video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n                zijn aangepast door <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. Deze veranderingen zijn meteen doorgevoerd. %(time_change)s van de timing is gewijzigd.  \n                "
 
 #: templates/videos/email_notification_non_editors.html:15
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                to video <b><a href=\"http://%(domain)s%(video_url)s\">"
-"%(v)s</a></b>\n"
-"                were changed. These changes went live immediately. "
-"%(time_change)s of the timing was changed.             \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
+"                were changed. These changes went live immediately. %(time_change)s of the timing was changed.             \n"
 "                "
-msgstr ""
+msgstr "\n                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s ondertitels</a></b> \n                voor video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n                zijn aangepast. Deze veranderingen zijn meteen doorgevoerd. %(time_change)s van de timing is gewijzigd.  \n                "
 
 #: templates/videos/email_start_notification.html:7
 msgid "Dear"
@@ -7333,18 +6737,16 @@ msgstr "Beste"
 #, python-format
 msgid ""
 "\n"
-"    Great news! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> has "
-"just started a %(language)s \n"
+"    Great news! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> has just started a %(language)s \n"
 "    translation of your video <a href=\"%(video_url)s\">%(video)s</a>\n"
 "\t"
-msgstr ""
+msgstr "\n    Goed nieuws! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> heeft zojuist een %(language)s \n   vertaling van uw video <a href=\"%(video_url)s\">%(video)s</a> begonnen.\n\t"
 
 #: templates/videos/email_start_notification.html:13
 msgid ""
-"You can review the translation and thank them for their contribution on this "
-"page:"
-msgstr ""
-"Je kan de vertaling bekijken en ze bedanken voor hun bijdrage op deze pagina:"
+"You can review the translation and thank them for their contribution on this"
+" page:"
+msgstr "Je kan de vertaling bekijken en ze bedanken voor hun bijdrage op deze pagina:"
 
 #: templates/videos/email_start_notification.html:14
 msgid "Translation homepage"
@@ -7389,8 +6791,7 @@ msgstr "de videopagina"
 #: templates/videos/email_title_changed.html:20
 msgid ""
 "\n"
-"    and click 'edit title' to update it. If you're unable to edit the title, "
-"click 'Help' in the main menu to submit a support request.\n"
+"    and click 'edit title' to update it. If you're unable to edit the title, click 'Help' in the main menu to submit a support request.\n"
 "    "
 msgstr ""
 
@@ -7410,9 +6811,7 @@ msgstr "Anoniem"
 msgid ""
 "Please check to make sure the new URL features the exact same video, and "
 "that subtitle timing is correct:"
-msgstr ""
-"Controleer of de nieuwe URL wel degelijk verwijst naar precies dezelfde "
-"video en of de weergave van de ondertitels synchroon verloopt."
+msgstr "Controleer of de nieuwe URL wel degelijk verwijst naar precies dezelfde video en of de weergave van de ondertitels synchroon verloopt."
 
 #: templates/videos/email_video_url_add.html:21
 msgid "View the new video URL"
@@ -7462,11 +6861,11 @@ msgstr "Revisies"
 #: templates/videos/language-page.html:110
 #: templates/videos/language-sync-history-tab.html:38
 msgid "Sync History"
-msgstr ""
+msgstr "Synchroniseer geschiedenis"
 
 #: templates/videos/language-page.html:122
 msgid "Edit SubtitleLanguage in Django Admin"
-msgstr ""
+msgstr "Bewerk Ondertitel taal in Django Admin"
 
 #: templates/videos/language-revisions-tab.html:6
 msgid "Compare Revisions"
@@ -7483,12 +6882,12 @@ msgstr ""
 
 #: templates/videos/language-revisions-tab.html:43
 msgid "Legacy Subtitle Editor"
-msgstr ""
+msgstr "Legacy ondertitel bewerker"
 
 #: templates/videos/language-revisions-tab.html:54
 #: templates/videos/language-subtitles-tab.html:62
 msgid "Edit in Django Admin"
-msgstr ""
+msgstr "Bewerk in Django Admin"
 
 #: templates/videos/language-revisions-tab.html:62
 msgid "No subtitles for this language."
@@ -7496,11 +6895,11 @@ msgstr "Geen ondertitels beschikbaar voor deze taal."
 
 #: templates/videos/language-subtitles-tab.html:5
 msgid "Delete Subtitle Language"
-msgstr ""
+msgstr "Verwijder ondertitel taal"
 
 #: templates/videos/language-subtitles-tab.html:13
 msgid "You must use the tasks panel to work with this version."
-msgstr ""
+msgstr "U moet het takenpaneel gebruiken om met deze versie te werken."
 
 #: templates/videos/language-subtitles-tab.html:14
 #: templates/videos/language-subtitles-tab.html:20
@@ -7510,7 +6909,7 @@ msgstr "Ondertitels bewerken"
 
 #: templates/videos/language-subtitles-tab.html:19
 msgid "You do not have permission to edit this version."
-msgstr ""
+msgstr "U heeft geen toestemming om deze deze versie te wijzigen."
 
 #: templates/videos/language-subtitles-tab.html:37
 msgid "Download"
@@ -7526,26 +6925,23 @@ msgid ""
 "\n"
 "                        Subtitles translated from %(language)s\n"
 "                    "
-msgstr ""
+msgstr "\n                        Ondertitels vertaald vanuit %(language)s\n                    "
 
 #: templates/videos/language-subtitles-tab.html:58
 #, python-format
 msgid ""
 "\n"
-"                Showing <strong>Revision %(version_number)s</strong> created "
-"<strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title="
-"\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n"
+"                Showing <strong>Revision %(version_number)s</strong> created <strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n"
 "                "
-msgstr ""
+msgstr "\n                Toont <strong>Revisie, %(version_number)s</strong> gecreëerd <strong>%(revision_time)s</strong> door <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n                "
 
 #: templates/videos/language-subtitles-tab.html:88
 msgid ""
 "\n"
-"                    The most recent revision for this language is blank, but "
-"there are older\n"
+"                    The most recent revision for this language is blank, but there are older\n"
 "                    revisions that contain subtitles.\n"
 "                    "
-msgstr ""
+msgstr "\n                    De meest recente herziening hiervan is leeg maar er zijn oudere\n                    versies die ondertitels bevatten.\n                    "
 
 #: templates/videos/language-subtitles-tab.html:92
 msgid "View revision history"
@@ -7553,7 +6949,7 @@ msgstr "Taal"
 
 #: templates/videos/language-subtitles-tab.html:97
 msgid "These subtitles are in progress."
-msgstr ""
+msgstr "Deze ondertitelingen zijn in aanmaak."
 
 #: templates/videos/language-subtitles-tab.html:98
 msgid "Make more?"
@@ -7570,25 +6966,23 @@ msgstr "Maak ze!"
 #: templates/videos/language-subtitles-tab.html:109
 msgid ""
 "\n"
-"                    This language contains subtitles that are still waiting "
-"to be moderated.  Check back later.\n"
+"                    This language contains subtitles that are still waiting to be moderated.  Check back later.\n"
 "                "
-msgstr ""
+msgstr "\n                    Deze taal bevat ondertitels die nog aangepast moeten worden. Kom later terug.\n                "
 
 #: templates/videos/language-subtitles-tab.html:115
 msgid ""
 "\n"
-"                    Sorry, this language has been removed by Amara staff "
-"members or authorized users.\n"
+"                    Sorry, this language has been removed by Amara staff members or authorized users.\n"
 "                "
-msgstr ""
+msgstr "\n                    Excuses, deze taal is verwijderd door Amara personeel of gemachtigde gebruikers.\n                "
 
 #: templates/videos/language-subtitles-tab.html:121
 msgid ""
 "\n"
 "                    No subtitles have been added for this language yet.\n"
 "                "
-msgstr ""
+msgstr "\n                    Er zijn voor deze taal nog geen ondertitels toegevoegd.\n                "
 
 #: templates/videos/language-subtitles-tab.html:132
 msgid "Roll back to this version"
@@ -7597,37 +6991,37 @@ msgstr "Terugzetten naar deze versie"
 #: templates/videos/language-sync-history-tab.html:4
 #, python-format
 msgid "Current public tip is version #%(version)s"
-msgstr ""
+msgstr "Huidige openbare tip versie is #%(version)s"
 
 #: templates/videos/language-sync-history-tab.html:6
 msgid "No current public tip"
-msgstr ""
+msgstr "Geen huidige openbare tip"
 
 #: templates/videos/language-sync-history-tab.html:8
 msgid "Synced Versions"
-msgstr ""
+msgstr "Gesynchroniseerde versies"
 
 #: templates/videos/language-sync-history-tab.html:12
 #: templates/videos/language-sync-history-tab.html:44
 msgid "Version"
-msgstr ""
+msgstr "Versie"
 
 #: templates/videos/language-sync-history-tab.html:13
 msgid "Actions"
-msgstr ""
+msgstr "Acties"
 
 #: templates/videos/language-sync-history-tab.html:21
 msgid "None"
-msgstr ""
+msgstr "Geen"
 
 #: templates/videos/language-sync-history-tab.html:27
 #, python-format
 msgid "resync version #%(version)s"
-msgstr ""
+msgstr "Synchroniseer versie #%(version)s opnieuw"
 
 #: templates/videos/language-sync-history-tab.html:29
 msgid "delete subtitles"
-msgstr ""
+msgstr "Verwijder ondertitels"
 
 #: templates/videos/language-sync-history-tab.html:45
 #: unisubs-integration/services/templates/services/translation_request_list.html:6
@@ -7636,11 +7030,11 @@ msgstr "Resultaat"
 
 #: templates/videos/language-sync-history-tab.html:46
 msgid "Details"
-msgstr ""
+msgstr "Details"
 
 #: templates/videos/language-sync-history-tab.html:60
 msgid "No Sync History"
-msgstr ""
+msgstr "Geen synchronisatie geschiedenis"
 
 #: templates/videos/latest_videos.html:20 templates/videos/volunteer.html:114
 #: templates/videos/volunteer_latest.html:21 templates/videos/watch.html:107
@@ -7681,19 +7075,19 @@ msgstr "Ooit"
 
 #: templates/videos/set-original-language.html:10
 msgid "Change video language"
-msgstr ""
+msgstr "Verander video taal"
 
 #: templates/videos/set-original-language.html:28
 msgid "Choose a language"
-msgstr ""
+msgstr "Kies een taal"
 
 #: templates/videos/set-original-language.html:30
 msgid "Current language is"
-msgstr ""
+msgstr "Huidige taal is"
 
 #: templates/videos/set-original-language.html:35
 msgid "not set"
-msgstr ""
+msgstr "Niet bepaald"
 
 #: templates/videos/stop_notification.html:9
 #, python-format
@@ -7717,8 +7111,7 @@ msgstr "Probeer ondertitels te maken voor de volgende"
 #: templates/videos/test_form_page.html:37
 #: templates/videos/test_form_page.html:57
 msgid "how was it? were the instructions clear? what would improve it?"
-msgstr ""
-"Hoe was het? Waren de instructies duidelijk? Wat zou het kunnen verbeteren?"
+msgstr "Hoe was het? Waren de instructies duidelijk? Wat zou het kunnen verbeteren?"
 
 #: templates/videos/test_form_page.html:29
 msgid "Task 2"
@@ -7750,8 +7143,7 @@ msgstr "Eenvoudige instructies"
 
 #: templates/videos/test_form_page.html:73
 msgid "All tasks 2 & 3 are optional (but we recommend trying them all)."
-msgstr ""
-"Alle taken 2 & 3 zijn optioneel (maar we raden aan ze allemaal te proberen)."
+msgstr "Alle taken 2 & 3 zijn optioneel (maar we raden aan ze allemaal te proberen)."
 
 #: templates/videos/test_form_page.html:74
 msgid "That’s it!"
@@ -7765,7 +7157,7 @@ msgstr "Toon alle activiteiten"
 msgid ""
 "Subtitles saved! You can share the video with friends, or get an embed code "
 "for your site. To add a translation, click the button below."
-msgstr ""
+msgstr "Ondertitels opgeslagen! Je kan de video nu delen met je vrienden, of de <i>embed code</i> opvragen voor je eigen site. Om een vertaling toe te voegen klik je op de knop hieronder."
 
 #: templates/videos/video-page.html:73
 msgid "Contribute"
@@ -7775,10 +7167,9 @@ msgstr "Doe mee"
 #, python-format
 msgid ""
 "\n"
-"                    <span class=\"team-link\">This video is part of the <a "
-"href=\"%(url)s\">%(team)s</a> team.</span>\n"
+"                    <span class=\"team-link\">This video is part of the <a href=\"%(url)s\">%(team)s</a> team.</span>\n"
 "                    "
-msgstr ""
+msgstr "\n                    <span class=\"team-link\">Deze video is deel van het <a href=\"%(url)s\">%(team)s</a> team.</span>\n                    "
 
 #: templates/videos/video-page.html:89
 #, python-format
@@ -7786,7 +7177,7 @@ msgid ""
 "\n"
 "                View <a href=\"%(url)s\">tasks for this video</a>.\n"
 "                "
-msgstr ""
+msgstr "\n                Bekijk <a href=\"%(url)s\">taken voor deze video</a>.\n                "
 
 #: templates/videos/video-page.html:118
 msgid "URLs"
@@ -7830,8 +7221,8 @@ msgstr ""
 #: unisubs-integration/api/1_0/forms.py:98
 #: unisubs-integration/api/1_0/forms.py:101
 msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated and "
-"you don't have sufficient permission."
+"Sorry, we can't upload your subtitles because this language is moderated and"
+" you don't have sufficient permission."
 msgstr ""
 
 #: unisubs-integration/api/1_0/forms.py:334
@@ -7905,11 +7296,9 @@ msgstr "Voer geldige e-mailadressen in, gescheiden door komma’s."
 
 #: utils/forms/__init__.py:83
 msgid ""
-"Enter valid usernames separated by commas. Username can contain only a-z, A-"
-"Z and 0-9."
-msgstr ""
-"Voer geldige gebruikersnamen in, gescheiden door komma's. Een gebruikersnaam "
-"kan maar bestaan uit a-z, A-Z en 0-9."
+"Enter valid usernames separated by commas. Username can contain only a-z, "
+"A-Z and 0-9."
+msgstr "Voer geldige gebruikersnamen in, gescheiden door komma's. Een gebruikersnaam kan maar bestaan uit a-z, A-Z en 0-9."
 
 #: utils/forms/unisub_video_form.py:62
 msgid "This URL does not contain video id."

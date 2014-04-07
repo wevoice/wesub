@@ -14,7 +14,7 @@ echo "Uploading to transifex"
 tx push --source
 
 echo "Pulling from transifex"
-tx pull -a
+tx pull -a -f
 
 echo "Compiling messages"
 $VE_DIR/bin/python manage.py compilemessages

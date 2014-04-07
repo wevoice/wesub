@@ -58,15 +58,15 @@ describe('Drop down shows the right labels', function() {
         };
         it('Are we showing the right thing?',
             inject(function(versionDropDownDisplayFilter) {
-                versionData.visibility = 'Public';
+                versionData.visibility = 'public';
                 expect(versionDropDownDisplayFilter(versionData)).
                     toBe('Version 1');
-                versionData.visibility = 'Private';
+                versionData.visibility = 'private';
                 expect(versionDropDownDisplayFilter(versionData)).
-                    toBe('Version 1 (Private)');
-                versionData.visibility = 'Deleted';
+                    toBe('Version 1 (private)');
+                versionData.visibility = 'deleted';
                 expect(versionDropDownDisplayFilter(versionData)).
-                    toBe('Version 1 (Deleted)');
+                    toBe('Version 1 (deleted)');
             }));
     });
 });
