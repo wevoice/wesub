@@ -2206,8 +2206,8 @@ msgid "Sign in / Sign up"
 msgstr "Entrar / Registrar"
 
 #: templates/base.html:93
-msgid "Got a YouTube account?<"
-msgstr "Tem uma conta do YouTube?<"
+msgid "Got a YouTube account?"
+msgstr "Tem uma conta do YouTube?"
 
 #: templates/base.html:94
 msgid ""

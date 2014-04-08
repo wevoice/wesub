@@ -2185,8 +2185,8 @@ msgid "Sign in / Sign up"
 msgstr "Sartu / Erregistratu"
 
 #: templates/base.html:93
-msgid "Got a YouTube account?<"
-msgstr "Ba al duzu YouTube konturik?<"
+msgid "Got a YouTube account?"
+msgstr "Ba al duzu YouTube konturik?"
 
 #: templates/base.html:94
 msgid ""

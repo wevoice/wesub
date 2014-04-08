@@ -2190,7 +2190,7 @@ msgid "Sign in / Sign up"
 msgstr ""
 
 #: templates/base.html:93
-msgid "Got a YouTube account?<"
+msgid "Got a YouTube account?"
 msgstr "יש לך חשבון ביוטיוב?"
 
 #: templates/base.html:94
