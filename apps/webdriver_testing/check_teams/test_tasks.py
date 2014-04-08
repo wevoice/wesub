@@ -899,6 +899,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.perform_task('Approve Original English ' 
                                                'Subtitles', video.title)
+        self.editor_pg.add_note('This is horrible!\n  What were you thinking?')
         self.editor_pg.send_back_task()
         email_to = mail.outbox[-1].to     
         msg = str(mail.outbox[-1].message())
@@ -1176,6 +1177,9 @@ class TestCaseAutomaticTasksLegacyEditor(WebdriverTestCase):
 
     def setUp(self):
         self.tasks_tab.open_page('teams/%s' % self.team.slug, True)
+
+    def tearDown(self):
+        self.browser.get_screenshot_as_file("%s.png" % self.id())
 
     def test_legacy_subtitles_save(self):
         """Legacy subtitles save, incomplete task exists, assigned to same user.

@@ -128,7 +128,7 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
 
         """
         self.a_team_pg.log_out()
-        test_joiner = UserFactory()
+        test_joiner = UserFactory.create()
         self.a_team_pg.log_in(test_joiner.username, 'password')
         self.a_team_pg.open_team_page(self.team.slug)
         self.a_team_pg.apply()
