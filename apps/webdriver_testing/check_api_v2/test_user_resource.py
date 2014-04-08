@@ -1,7 +1,7 @@
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.pages.site_pages.profiles import profile_personal_page 
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.pages.site_pages.profiles import profile_personal_page 
 import os
 
 class TestCaseUserResource(WebdriverTestCase):
@@ -36,6 +36,7 @@ class TestCaseUserResource(WebdriverTestCase):
         return response 
 
 
+
     def test_create(self):
         """Create a user via the api.
 
@@ -48,12 +49,12 @@ class TestCaseUserResource(WebdriverTestCase):
         user_data = self.api_create_user(**new_user)
         self.assertEqual('newuser', user_data['username'])
 
-    def test_create__login_token(self):
+    def test_create_login_token(self):
         """Create a user and login token, verify login.
 
         """
         new_user = {'username': 'newuser',
-                    'email': 'newuser@example.com',
+                    'email': 'enriqueumaran@uribekostabhi.com',
                     'first_name': 'New', 
                     'last_name': 'User_1',
                     'create_login_token': True

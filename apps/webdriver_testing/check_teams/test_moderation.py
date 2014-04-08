@@ -93,7 +93,7 @@ class TestCasePublishedVideos(WebdriverTestCase):
         """No Add Translation in the video view for moderated videos"""
 
         self.video_pg.open_video_page(self.published.video_id)
-        self.assertFalse(self.video_pg.displays_add_translation())
+        self.assertFalse(self.video_pg.displays_add_subtitles())
 
     def test_playback(self):
         """Published version can be played on the video page."""
@@ -249,7 +249,7 @@ class TestCaseDraftVideos(WebdriverTestCase):
     def test_video__add_translation(self):
         """No Add Translation in the video view for moderated videos"""
 
-        self.assertFalse(self.video_pg.displays_add_translation())
+        self.assertFalse(self.video_pg.displays_add_subtitles())
 
     def test_draft__guest_display(self):
         """Draft is not visible to guests in subtitle view."""

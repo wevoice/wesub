@@ -202,6 +202,29 @@ class TestCaseVideoResource(WebdriverTestCase):
         self.assertTrue(self.video_pg.video_embed_present())
 
 
+    def test_team_video_create(self):
+        """Add a new team video.
+
+        POST /api2/partners/videos/
+        """
+
+        data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
+                                   'Birds_short.webmsd.webm'),
+                     'title': 'Test video created via api',
+                     'duration': 37,
+                     'team': self.open_team.slug  }
+        url_part = 'videos/'
+        r = self.data_utils.make_request(self.user, 'post', url_part, **data)
+        response = r.json
+        self.video_pg.open_video_page(response['id'])
+        #Check response metadata
+        for k, v in data.iteritems():
+            self.assertEqual(v, response[k])
+
+        #Check video displays on the site
+        self.assertTrue(self.video_pg.video_embed_present())
+
+
     def test_video_details(self):
         """Get video details.
 
