@@ -36,8 +36,6 @@ class TestCaseUserResource(WebdriverTestCase):
         return response 
 
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
 
     def test_create(self):
         """Create a user via the api.
