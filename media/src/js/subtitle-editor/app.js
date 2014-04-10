@@ -524,6 +524,7 @@ var angular = angular || null;
                 $scope.saveAutoBackup();
                 $scope.autoBackupNeeded = false;
             }
+            $timeout(handleAutoBackup, 60 * 1000);
         }
         $timeout(handleAutoBackup, 60 * 1000);
 
