@@ -185,12 +185,13 @@ class SubtitlesUploadForm(forms.Form):
             current_count = len(self._parsed_subtitles.get_subtitles())
 
             if current_count > from_count:
-                raise forms.ValidationError(_(
-                    u"Sorry, we couldn't upload your file because the number "
-                    u"of lines in your translation ({0}) doesn't match the "
-                    u"original ({1})."
-                    .format(current_count, from_count)
-                ))
+                raise forms.ValidationError(fmt(
+                    _(u"Sorry, we couldn't upload your file because "
+                      u"the number of lines in your translation "
+                      u"(%(translation_lines)s) doesn't match the "
+                      u"original (%(source_lines)s)."),
+                    translation_lines=current_count,
+                    source_lines=from_count))
 
     def clean_draft(self):
         data = self.cleaned_data['draft']

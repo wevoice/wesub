@@ -65,8 +65,9 @@ class TranscriptionFileForm(forms.Form, AjaxForm):
             raise forms.ValidationError(_('File should have txt format'))
 
         if f.size > KB_SIZELIMIT * 1024:
-            raise forms.ValidationError(_(
-                    u'File size should be less {0} kb'.format(KB_SIZELIMIT)))
+            raise forms.ValidationError(fmt(
+                _(u'File size should be less %(size)s kb'),
+                size=KB_SIZELIMIT))
 
         text = f.read()
         encoding = chardet.detect(text)['encoding']
@@ -83,8 +84,9 @@ class TranscriptionFileForm(forms.Form, AjaxForm):
     def clean_subtitles(self):
         subtitles = self.cleaned_data['subtitles']
         if subtitles.size > KB_SIZELIMIT * 1024:
-            raise forms.ValidationError(_(
-                    u'File size should be less {0} kb'.format(KB_SIZELIMIT)))
+            raise forms.ValidationError(fmt(
+                _(u'File size should be less %(size)s kb'),
+                size=KB_SIZELIMIT))
         parts = subtitles.name.split('.')
         extension = parts[-1].lower()
         if extension not in babelsubs.get_available_formats():
@@ -286,11 +288,13 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         if not hasattr(feed_parser.feed, 'version') or not feed_parser.feed.version:
             raise forms.ValidationError(_(u'Sorry, we could not find a valid feed at the URL you provided. Please check the URL and try again.'))
         if url in self.urls:
-            raise forms.ValidationError(
-                _(u"Duplicate feed URL in form: {url}").format(url=url))
+            raise forms.ValidationError(fmt(
+                _(u"Duplicate feed URL in form: %(url)s"),
+                url=url))
         if VideoFeed.objects.filter(url=url).exists():
-            raise forms.ValidationError(
-                _(u'Feed for {url} already exists').format(url=url))
+            raise forms.ValidationError(fmt(
+                _(u'Feed for %(url)s already exists'),
+                url=url))
 
         self.urls.append(url)
 
