@@ -516,7 +516,7 @@ var angular = angular || null;
         }
 
         $scope.$on('work-done', function() {
-            $socpe.autoBackupNeeded = true;
+            $scope.autoBackupNeeded = true;
         });
 
         function handleAutoBackup() {
