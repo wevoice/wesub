@@ -354,7 +354,11 @@ class EmailFriendForm(MathCaptchaForm):
         send_mail(subject, message, from_email, to_emails)
 
 class ChangeVideoOriginalLanguageForm(forms.Form):
-    language_code = forms.ChoiceField(choices=language_choices_with_empty())
+    language_code = forms.ChoiceField()
+
+    def __init__(self, *args, **kwargs):
+        forms.Form.__init__(self, *args, **kwargs)
+        self.fields['language_code'].choices = language_choices_with_empty()
 
 class CreateSubtitlesFormBase(forms.Form):
     """Base class for forms to create new subtitle languages."""
@@ -362,14 +366,14 @@ class CreateSubtitlesFormBase(forms.Form):
     primary_audio_language_code = forms.ChoiceField(
                 label=_('This video is in:'),
                 help_text=_('Please double check the primary spoken '
-                            'language. This step cannot be undone.'),
-                choices=language_choices_with_empty())
+                            'language. This step cannot be undone.'))
 
     def __init__(self, request, data=None):
         super(CreateSubtitlesFormBase, self).__init__(data=data)
         self.request = request
         self.user = request.user
         self.setup_subtitle_language_code()
+        self.fields['primary_audio_language_code'].choices = language_choices_with_empty()
 
     def setup_subtitle_language_code(self):
         if self.user.is_authenticated():
@@ -468,13 +472,6 @@ class MultiVideoCreateSubtitlesForm(CreateSubtitlesFormBase):
     """
     video = forms.ModelChoiceField(queryset=Video.objects.none(),
                                    widget=forms.HiddenInput)
-    primary_audio_language_code = forms.ChoiceField(
-                label=_('This video is in:'),
-                help_text=_('Please double check the primary spoken '
-                            'language. This step cannot be undone.'),
-                choices=language_choices_with_empty())
-    subtitle_language_code = forms.ChoiceField(
-        label=_('Subtitle into:'), choices=language_choices_with_empty())
 
     def __init__(self, request, video_queryset, data=None):
         super(MultiVideoCreateSubtitlesForm, self).__init__(request, data=data)
