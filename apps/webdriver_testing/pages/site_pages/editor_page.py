@@ -75,7 +75,7 @@ class EditorPage(UnisubsPage):
     _COLLAB_PANEL = 'section.collab'
     _SEND_BACK = 'button.send-back'
     _APPROVE = 'button.approve'
-    _NOTES = 'textarea[ng-model="notes"]'
+    _NOTES = 'textarea[ng-model="collab.notes"]'
 
     def open_editor_page(self, video_id, lang, restore=False):
         self.open_page(self._URL.format(video_id, lang))
