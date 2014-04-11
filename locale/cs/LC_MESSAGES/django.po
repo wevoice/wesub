@@ -2193,8 +2193,8 @@ msgid "Sign in / Sign up"
 msgstr "Přihlášení / Registrace"
 
 #: templates/base.html:93
-msgid "Got a YouTube account?<"
-msgstr "Máte účet na YouTube?<"
+msgid "Got a YouTube account?"
+msgstr "Máte účet na YouTube?"
 
 #: templates/base.html:94
 msgid ""

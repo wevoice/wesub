@@ -2181,8 +2181,8 @@ msgid "Sign in / Sign up"
 msgstr "Đăng nhập / Đăng kí"
 
 #: templates/base.html:93
-msgid "Got a YouTube account?<"
-msgstr "Có tài khoản YouTube chưa?<"
+msgid "Got a YouTube account?"
+msgstr "Có tài khoản YouTube chưa?"
 
 #: templates/base.html:94
 msgid ""

@@ -2179,8 +2179,8 @@ msgid "Sign in / Sign up"
 msgstr "تىزىمغا كىرىڭ/خەتلىتىڭ"
 
 #: templates/base.html:93
-msgid "Got a YouTube account?<"
-msgstr "بىر YouTube ھېساباتىڭىز بارمۇ؟<"
+msgid "Got a YouTube account?"
+msgstr "بىر YouTube ھېساباتىڭىز بارمۇ؟"
 
 #: templates/base.html:94
 msgid ""
