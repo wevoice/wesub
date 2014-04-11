@@ -24,6 +24,7 @@ from django.contrib.sites.models import Site
 from auth.models import CustomUser as User, Awards
 from django.conf import settings
 from django.db.models.signals import post_save
+from django.utils.html import escape, urlize
 
 from localeurl.utils import universal_url
 
@@ -45,6 +46,13 @@ class Comment(models.Model):
 
     def __unicode__(self):
         return "%s: %s..." % (self.user.__unicode__(), self.content[:50])
+
+    def get_content(self):
+        content = []
+        if self.content:
+            content.append(urlize(escape(self.content)).replace('\n', '<br />'))
+            content.append('\n')
+        return ''.join(content)
 
     @classmethod
     def get_for_object(self, obj):
