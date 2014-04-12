@@ -51,9 +51,6 @@ class TestCaseComments(WebdriverTestCase):
                 rmlocale(self.video.get_absolute_url())), msg)
 
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
-
     def test_video_lang_comment_message(self):
         """Message sent on video comment to followers has link to comments tab.
 
@@ -64,6 +61,7 @@ class TestCaseComments(WebdriverTestCase):
         self.video_pg.open_comments()
         self.video_pg.add_comment('These are great English subtitles')
         tasks.send_video_comment_notification.apply()
+        time.sleep(4)
         self.video_pg.log_in(self.user2.username, 'password')
         self.video_language_pg.open_video_lang_page(self.video.video_id, 'en')
         msg = str(mail.outbox[-1].message())

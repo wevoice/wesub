@@ -13,22 +13,16 @@ class EditorPage(UnisubsPage):
 
     _URL = "subtitles/editor/{0}/{1}/"  # (video_id, lang_code)
     EXIT_BUTTON = 'div.exit'
-    _EXIT = 'a.discard'
+    _EXIT = 'button.discard'
+    _SESSION_BUTTONS = 'section.session button'
 
-    
-    #EXIT MODAL
-    _BACK_TO_FULL = 'button.yes'
-    _EXIT_BUTTON = 'button.no'
-    _WAIT = 'button.last-chance'
-
-    _SAVE = 'a.save'
+    _SAVE = 'button.save'
     _SAVE_OPTIONS = 'div button'
     #SAVE ERROR MODAL
     
-    _SAVE_ERROR = 'div.modal div h1'
-    _EDITOR_MODAL = 'div.modal div h1'
-    _MODAL_NO = 'button.no'
-    _MODAL_YES = 'button.yes'
+    _ACTIVE_MODAL = 'aside.shown'
+    _MODAL_TITLE = 'aside.shown.h3'
+    _MODAL_BUTTONS = 'footer.buttons button'
     _SAVE_ERROR_TEXT = ("There was an error saving your subtitles. You'll "
                         "need to copy and save your subtitles below, and "
                         "upload them to the system later.")
@@ -56,7 +50,7 @@ class EditorPage(UnisubsPage):
     _ADD_SUB_TO_END = 'a.end'
     _TIMELINE_DISPLAY = 'a.show-timeline span'
     _WORKING_METADATA_EXPANDER = 'div.working div.metadata a'
-    _COPY_TIMING = 'a.copyover'
+    _COPY_TIMING = 'li a.copyover'
     _TOOLS_MENU = 'div.toolbox-inside a'
     _PARAGRAPH_MARKER = '.new-paragraph'
     _REMOVE_SUBTITLE = '.remove-subtitle'
@@ -74,38 +68,33 @@ class EditorPage(UnisubsPage):
 
     #RIGHT COLUMN
 
-    _NEXT_STEP = 'div.substeps div button.next-step'
+    _NEXT_STEP = 'div.substeps button'
     _ENDORSE = 'div.substeps button.endorse' #when completing subtitling.
 
     # COLLAB PANEL
     _COLLAB_PANEL = 'section.collab'
     _SEND_BACK = 'button.send-back'
     _APPROVE = 'button.approve'
-    _NOTES = 'textarea[ng-model="notes"]'
+    _NOTES = 'textarea[ng-model="collab.notes"]'
 
     def open_editor_page(self, video_id, lang, restore=False):
         self.open_page(self._URL.format(video_id, lang))
-        self.restore_autobackup(restore)
+        if self.is_element_present(self._ACTIVE_MODAL):
+            self.restore_autobackup(restore)
         
     def restore_autobackup(self, restore=False):
-        if self.is_element_visible(self._EDITOR_MODAL):
-            modal = self.get_text_by_css(self._EDITOR_MODAL)
-            self.logger.info(modal)
-            if restore:
-                self.click_by_css(self._MODAL_YES)
-            else:
-                self.click_by_css(self._MODAL_NO)
- 
-
+        active_modal = self.wait_for_element_present(self._ACTIVE_MODAL)
+        buttons = active_modal.find_elements_by_css_selector(self._MODAL_BUTTONS)
+        if restore:
+            button[-1].click() 
+        else:
+            button[0].click()
 
     def open_ed_with_base(self, video_id, lang, base_lang='en'):
         url = self._URL + '?base-language={2}'
         self.open_page(url.format(video_id, lang, base_lang))
 
     def keyboard_controls_help(self):
-        pass
-
-    def feedback_link(self):
         pass
 
     def default_ref_language(self):
@@ -151,8 +140,12 @@ class EditorPage(UnisubsPage):
 
 
     def legacy_editor(self):
-        self.click_link_text("Legacy Editor")
-        time.sleep(2)
+        buttons = self.browser.find_elements_by_css_selector(self._SESSION_BUTTONS)
+        for el in buttons:
+            if 'Legacy Editor' in el.text:
+                el.click()
+                time.sleep(2)
+                return
 
     def save(self, save_option):
         """Click the save button and the choose one of the save options.
@@ -161,11 +154,11 @@ class EditorPage(UnisubsPage):
 
         """
         self.click_by_css(self._SAVE)
-        self.wait_for_element_visible('div.modal')
         time.sleep(2)
-        els = self.get_elements_list(self._SAVE_OPTIONS)
-        for el in els:
-            if el.text == save_option:
+        active_modal = self.wait_for_element_present(self._ACTIVE_MODAL)
+        buttons = active_modal.find_elements_by_css_selector(self._MODAL_BUTTONS)
+        for el in buttons:
+            if save_option in el.text:
                 el.click()
                 return
         else:
@@ -276,16 +269,28 @@ class EditorPage(UnisubsPage):
     def hover_tools_menu(self):
         self.hover_by_css(self._TOOLS_MENU)
 
-    def copy_timings(self):
-        copy_el = self.browser.find_element_by_css_selector(self._COPY_TIMING)
-        li = copy_el.parent
-        self.logger.info(dir(li))
-        hidden = li.get_attribute("class")
-        self.logger.info(hidden)
-        if hidden == 'ng-hide':
-           return "Element not displayed"
+    def tools_menu_items(self):
         self.hover_tools_menu()
-        copy_el.click()
+        els = self.get_elements_list("ul.toolbox-menu li")
+        menu_list = {}
+        for el in els:
+            self.logger.info(el.get_attribute("class"))
+            item = el.find_element_by_css_selector("a")
+            menu_item = item.get_attribute("class")
+            item_properties = { 
+                     'element': item,
+                     'title': item.get_attribute("title"),
+                     'display': el.get_attribute("class"),
+                 } 
+            menu_list[menu_item] = item_properties          
+        return menu_list
+
+    def copy_timings(self):
+        menu_items = self.tools_menu_items()
+        if menu_items['copyover']['display'] == 'ng-show':
+            return 'Element not displayed'
+        else:
+           menu_items['copyover']['element'].click()
  
     def toggle_paragraph(self, position):
         """Toggles the paragraph marker on or off. """
@@ -344,11 +349,14 @@ class EditorPage(UnisubsPage):
         else:
             return e
 
-    def exit(self):
+    def exit(self, option='Exit'):
         """Exit out of editor. """
 
         self.click_by_css(self._EXIT)
-        self.click_by_css(self._EXIT_BUTTON)
+        active_modal = self.is_element_present(self._ACTIVE_MODAL)
+        if active_modal:
+            buttons = active_modal.find_elements_by_css_selector(self._MODAL_BUTTONS)
+            [x.click() for x in buttons if 'Exit' in x.text]
         self.handle_js_alert('accept')
 
     def collab_panel_displayed(self):
@@ -367,13 +375,6 @@ class EditorPage(UnisubsPage):
     
     def current_notes(self):
         return self.get_text_by_css(self._NOTES)
-
-
-    def exit_to_full_editor(self):
-        """Click exit and return to the full editor. """
-
-        self.click_by_css(self._EXIT)
-        self.click_by_css(self._BACK_TO_FULL)
 
     def subtitle_info(self, position, active=False):
         """Return the info tray values of the selected subtitle. """
@@ -408,9 +409,9 @@ class EditorPage(UnisubsPage):
                 return
 
     def endorse_subs(self):
-        self.click_by_css(self._ENDORSE, self._EXIT_BUTTON)
-        self.click_by_css(self._EXIT_BUTTON)
-        self.handle_js_alert('accept')
+        self.click_by_css(self._ENDORSE, self._ACTIVE_MODAL)
+       # self.click_by_css(self._ACTIVE_MODAL + " button")
+       # self.handle_js_alert('accept')
 
 
     def next_step(self):

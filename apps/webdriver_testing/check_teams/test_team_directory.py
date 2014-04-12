@@ -28,8 +28,6 @@ class TestCaseTeamsPage(WebdriverTestCase):
             TeamMemberFactory.create(
                 team__name='my team ' + str(x),
                 team__slug='my-team-' + str(x),
-                user__username='open team owner' + str(x),
-                user__password='password'
                 )
 
         #create an open team with description text and 2 members
@@ -37,8 +35,6 @@ class TestCaseTeamsPage(WebdriverTestCase):
             team__name="A1 Waay Cool team",
             team__slug='a1-waay-cool-team',
             team__description='this is the coolest, most creative team ever',
-            user__username='cool guy',
-            user__password='password'
             ).team
         TeamMemberFactory.create(team=cls.team, user=cls.cool_user)
         TeamVideoFactory.create(team=cls.team, added_by=cls.cool_user)
@@ -48,8 +44,6 @@ class TestCaseTeamsPage(WebdriverTestCase):
             team__name='the application-only team',
             team__slug='the-application-only-team',
             team__membership_policy=1,
-            user__username='application owner',
-            user__password='password'
             ).team
         TeamMemberFactory.create(team=cls.app_team, user=UserFactory.create())
         TeamMemberFactory.create(team=cls.app_team, user=cls.cool_user)
@@ -62,8 +56,7 @@ class TestCaseTeamsPage(WebdriverTestCase):
             team__slug='private-idaho',
             team__membership_policy=2,
             team__is_visible=False,
-            user__username='Id A Read',
-            user__password='password').team
+            ).team
 
 
         #create 1 private application team
@@ -72,8 +65,7 @@ class TestCaseTeamsPage(WebdriverTestCase):
             team__slug='private-application',
             team__membership_policy=1,
             team__is_visible=False,
-            user__username='Id A Read',
-            user__password='password').team
+            ).team
 
         cls.teams_dir_pg = TeamsDirPage(cls)
         cls.a_team_pg = ATeamPage(cls)

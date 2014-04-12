@@ -23,7 +23,7 @@ class TestCaseEditUploaded(WebdriverTestCase):
             'webdriver_testing', 'subtitle_data')
 
 
-    def test_edit__large(self):
+    def test_edit_large(self):
         """Upload a large set of subtitles then open for editing. """
         video =  self.data_utils.create_video()
         data = {'language_code': 'en',

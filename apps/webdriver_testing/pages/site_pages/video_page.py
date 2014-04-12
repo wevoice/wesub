@@ -39,9 +39,10 @@ class VideoPage(UnisubsPage):
     _CONTRIBUTE = "div.contribute"
     _ADD_SUBTITLES = "a.open-modal"
     _ADD_SUBS_TEXT = "Add a new langauge!"
+    _ADD_LANGUAGE_SELECT = "select#id_subtitle_language_code"
+
     #VIDEO SIDE SECTION
     _INFO = "ul#video-menu.left_nav li:nth-child(1) > a"
-    _ADD_TRANSLATION = "li.contribute a#add_translation"
     _UPLOAD_SUBTITLES = "a#upload-subtitles-link"
 
     #SUBTITLES_SIDE_SECTION
@@ -87,8 +88,6 @@ class VideoPage(UnisubsPage):
     def video_title(self):
         return self.get_text_by_css(self._VIDEO_TITLE)
 
-    def add_translation(self):
-        self.click_by_css(self._ADD_TRANSLATION)
 
     def upload_subtitles(self, 
                          sub_lang, 
@@ -155,7 +154,7 @@ class VideoPage(UnisubsPage):
         if self.is_element_present(self._EMBEDDED_VIDEO):
             return True
 
-    def add_subtitles(self):
+    def add_subtitles(self, lang='en'):
         self.click_by_css(self._ADD_SUBTITLES)
 
     def team_slug(self, slug):
@@ -179,9 +178,6 @@ class VideoPage(UnisubsPage):
 
     def displays_add_subtitles(self):
         return self.is_text_present(self._CONTRIBUTE, self._ADD_SUBS_TEXT)
-
-    def displays_add_translation(self):
-        return self.is_element_visible(self._ADD_TRANSLATION)
 
     def displays_upload_subtitles(self):
         return self.is_element_visible(self._UPLOAD_SUBTITLES)

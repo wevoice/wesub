@@ -90,7 +90,7 @@
         {% if request|show_youtube_prompt and not hide_prompt %}
             <div id="youtube-prompt">
                 <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
-                <h2>{% trans "Got a YouTube account?<" %}/h2>
+                <h2>{% trans "Got a YouTube account?" %}</h2>
                 <p>{% trans "New: enable viewer-created translations and captions on your YouTube channel!" %}</p>
                 <ul>
                     <li><a href="{% url profiles:account %}?prompt=true" class="proceed">{% trans "Connect to YouTube" %}</a></li>

@@ -66,8 +66,6 @@ class TestCaseFollowing(WebdriverTestCase):
         self.video_pg.open_video_page(tv.video_id)
         self.assertEqual(self.NOT_FOLLOWING, self.video_pg.follow_text())
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
 
     def test_default_not_following_video(self):
         """Non-contributor is not following video by default.
