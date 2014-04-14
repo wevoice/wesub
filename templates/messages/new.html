@@ -44,9 +44,13 @@
                         {{ form.errors.team }}
                         {{ form.team }}
                     </div>
+                    <div class="language">
+                        <label for="id_language">Speaking</label>
+                        {{ form.errors.language }}
+                        {{ form.language }}
+                    </div>
                 {% endif %}
             </div>
-
             <label for="id_subject">Subject</label>
             {{ form.errors.subject }}
             {{ form.subject }}
