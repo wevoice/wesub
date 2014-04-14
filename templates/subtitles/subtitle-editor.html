@@ -342,7 +342,7 @@
                      ng-class="{open: modulesOpen.notes}">
                     <a class="title" ng-click="toggleDocking('notes')">Notes</a>
                     <div class="content" ng-show="modulesOpen.notes">
-                        <textarea ng-model="notes" ng-change="session.notesChanged()"></textarea>
+                        <textarea ng-model="collab.notes" ng-change="session.notesChanged()"></textarea>
                     </div>
                 </div>
                 <div class="approval module" ng-show="modulesEnabled.approval">
@@ -546,7 +546,7 @@
 	  {% trans "Hide All Guidelines" %} &#x25BC;
 	</a>
 	<div class="team-all-guidelines" ng-show="showAllTeamGuidelines" id="all-team-guidelines">
-	  <h1>{% trans "Subtitling Guidelines" %}</h1>
+	  <h1>{% trans "Transcribing Guidelines" %}</h1>
 	  <div ng-bind-html="teamGuidelines['subtitle']"></div>
 	  <h1>{% trans "Translating Guidelines" %}</h1>
 	  <div ng-bind-html="teamGuidelines['translate']"></div>

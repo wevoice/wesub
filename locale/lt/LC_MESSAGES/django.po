@@ -2193,7 +2193,7 @@ msgid "Sign in / Sign up"
 msgstr "prisijunk"
 
 #: templates/base.html:93
-msgid "Got a YouTube account?<"
+msgid "Got a YouTube account?"
 msgstr "Turi YouTube anketą?"
 
 #: templates/base.html:94

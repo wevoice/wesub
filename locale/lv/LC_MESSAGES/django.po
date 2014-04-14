@@ -2193,8 +2193,8 @@ msgid "Sign in / Sign up"
 msgstr "Ierakstīties / Pierakstīties"
 
 #: templates/base.html:93
-msgid "Got a YouTube account?<"
-msgstr "Ir YouTube konts?<"
+msgid "Got a YouTube account?"
+msgstr "Ir YouTube konts?"
 
 #: templates/base.html:94
 msgid ""
