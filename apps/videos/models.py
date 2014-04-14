@@ -512,7 +512,9 @@ class Video(models.Model):
         if not video:
             try:
                 video_url_obj = VideoUrl.objects.get(
-                    type=vt.abbreviation, **vt.create_kwars())
+                    type=vt.abbreviation,
+                    videoid=vt.video_id,
+                    url=vt.convert_to_video_url())
                 if user:
                     Action.create_video_handler(video_url_obj.video, user)
                 return video_url_obj.video, False
@@ -1874,7 +1876,7 @@ class VideoUrl(models.Model):
 
     @property
     def effective_url(self):
-        return self.get_video_type_class().video_url(self)
+        return self.url
 
     def kaltura_id(self):
         if self.type == 'K':

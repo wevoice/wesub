@@ -51,9 +51,6 @@ class VideoType(object):
             'allow_community_edits': True
         }
     
-    def create_kwars(self):
-        return { 'url': self.convert_to_video_url() } 
-    
     def set_values(self, video_obj):
         return video_obj
     

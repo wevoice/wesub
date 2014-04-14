@@ -1,19 +1,19 @@
 # Amara, universalsubtitles.org
-# 
+#
 # Copyright (C) 2013 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import re
@@ -38,10 +38,10 @@ BRIGHTCOVE_REGEXES = [re.compile(x) for x in BRIGHTCOVE_REGEXES]
 class BrightcoveVideoType(VideoType):
 
     abbreviation = 'C'
-    name = 'Brightcove'   
+    name = 'Brightcove'
     site = 'brightcove.com'
     js_url = "http://admin.brightcove.com/js/BrightcoveExperiences_all.js"
-    
+
     def __init__(self, url):
         self.url = self._resolve_url_redirects(url)
         self.id = self._get_brightcove_id(self.url)
@@ -49,9 +49,6 @@ class BrightcoveVideoType(VideoType):
             self.shortmem = {}
         except VidscraperError, e:
             raise VideoTypeError(e[0])
-        
-    def get_video_data(self):
-        return {}
 
     def _resolve_url_redirects(self, url):
         # brighcove service  does not redirect HEAD requests as it should
@@ -62,14 +59,10 @@ class BrightcoveVideoType(VideoType):
     @property
     def video_id(self):
         return self.id
-    
-    def convert_to_video_url(self):
-        return self.url 
 
-    @classmethod    
-    def video_url(cls, obj):
-        return str(obj.url)
-    
+    def convert_to_video_url(self):
+        return self.url
+
     @classmethod
     def matches_video_url(cls, url):
         if bool(url):
@@ -78,15 +71,12 @@ class BrightcoveVideoType(VideoType):
                     return True
         return False
 
-    def create_kwars(self):
-        return { 'videoid': self.id }
-    
     def set_values(self, video_obj):
         # FIXME:
         # brighcove api is not available until you spend at least 499 / month. ?!
         # maybe we can grab this over the client and send it to the backend?
         return video_obj
-    
+
     def _get_brightcove_id(self, video_url):
         try:
             return urlparse.parse_qs(getattr(

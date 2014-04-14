@@ -52,9 +52,6 @@ class BlipTvVideoType(VideoType):
     def matches_video_url(cls, url):
         return cls.pattern.match(url)
 
-    def create_kwars(self):
-        return {'videoid': self.video_id}
-
     def set_values(self, video_obj):
         json = self.json
 

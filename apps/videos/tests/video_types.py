@@ -31,7 +31,7 @@ from apps.videos.models import Video, VIDEO_TYPE_BRIGHTCOVE
 from apps.videos.types import video_type_registrar, VideoTypeError
 from apps.videos.types.base import VideoType, VideoTypeRegistrar
 from apps.videos.types.bliptv import BlipTvVideoType
-from apps.videos.types.brigthcove  import BrightcoveVideoType
+from apps.videos.types.brightcove  import BrightcoveVideoType
 from apps.videos.types.dailymotion import DailymotionVideoType
 from apps.videos.types.flv import FLVVideoType
 from apps.videos.types.htmlfive import HtmlFiveVideoType
@@ -63,11 +63,6 @@ class YoutubeVideoTypeTest(TestCase):
             'video_id': 'woobL2yAxD4'
         }]
         self.shorter_url = "http://youtu.be/HaAVZ2yXDBo"
-
-    def test_create_kwars(self):
-        vt = self.vt('http://www.youtube.com/watch?v=woobL2yAxD4')
-        kwargs = vt.create_kwars()
-        self.assertEqual(kwargs, {'videoid': 'woobL2yAxD4'})
 
     def test_set_values(self):
         youtbe_url = 'http://www.youtube.com/watch?v=_ShmidkrcY0'
@@ -125,7 +120,6 @@ class HtmlFiveVideoTypeTest(TestCase):
         vu = video.videourl_set.all()[:1].get()
 
         self.assertEqual(vu.url, clean_url)
-        self.assertEqual(self.vt.video_url(vu), vu.url)
 
         self.assertTrue(self.vt.matches_video_url(url))
         self.assertTrue(self.vt.matches_video_url('http://someurl.com/video.ogg'))
@@ -151,7 +145,6 @@ class Mp3VideoTypeTest(TestCase):
         vu = video.videourl_set.all()[:1].get()
 
         self.assertEqual(vu.url, clean_url)
-        self.assertEqual(self.vt.video_url(vu), vu.url)
 
         self.assertTrue(self.vt.matches_video_url(url))
 
@@ -203,7 +196,6 @@ class DailymotionVideoTypeTest(TestCase):
         self.assertTrue(video.title)
         self.assertTrue(video.thumbnail)
         self.assertEqual(vu.url, 'http://dailymotion.com/video/x7u2ww')
-        self.assertTrue(self.vt.video_url(vu))
 
         self.assertTrue(self.vt.matches_video_url(url))
         self.assertFalse(self.vt.matches_video_url(''))
@@ -230,7 +222,6 @@ class FLVVideoTypeTest(TestCase):
         vu = video.videourl_set.all()[:1].get()
 
         self.assertEqual(vu.url, clean_url)
-        self.assertEqual(self.vt.video_url(vu), vu.url)
 
         self.assertTrue(self.vt.matches_video_url(url))
 
@@ -255,7 +246,6 @@ class VimeoVideoTypeTest(TestCase):
         vu = video.videourl_set.all()[:1].get()
 
         self.assertEqual(vu.videoid, '15786066')
-        self.assertTrue(self.vt.video_url(vu))
 
         self.assertTrue(self.vt.matches_video_url(url))
 
@@ -276,7 +266,6 @@ class VimeoVideoTypeTest(TestCase):
         vu = video.videourl_set.all()[:1].get()
 
         self.assertEqual(vu.videoid, '22070806')
-        self.assertTrue(self.vt.video_url(vu))
 
 class VideoTypeRegistrarTest(TestCase):
     def test_base(self):
@@ -307,8 +296,8 @@ class BrightcoveVideoTypeTest(TestCase):
         url  = 'http://link.brightcove.com/services/player/bcpid955357260001?bckey=AQ~~,AAAA3ijeRPk~,jc2SmUL6QMyqTwfTFhUbWr3dg6Oi980j&bctid=956115196001'
         video, created = Video.get_or_create_for_url(url)
         vu = video.videourl_set.all()[:1].get()
-        self.assertTrue(vu.type ==  VIDEO_TYPE_BRIGHTCOVE == BrightcoveVideoType.abbreviation)
-        self.assertTrue(self.vt.video_url(vu))
+        self.assertEqual(vu.type, VIDEO_TYPE_BRIGHTCOVE)
+        self.assertEqual(vu.type, BrightcoveVideoType.abbreviation)
         self.assertTrue(self.vt.matches_video_url(url))
 
     def test_redirection(self):
@@ -445,3 +434,4 @@ class KalturaVideoTypeTest(TestCase):
         vu = video.videourl_set.get()
         self.assertEquals(vu.type, 'K')
         self.assertEquals(vu.kaltura_id(), '1_zr7niumr')
+
