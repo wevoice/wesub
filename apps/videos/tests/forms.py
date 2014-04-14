@@ -32,7 +32,11 @@ from utils import test_factories, test_utils
 from utils.translation import get_language_choices
 
 class TestVideoForm(TestCase):
-    def setUp(self):
+    @test_utils.patch_for_test('videos.forms.url_exists')
+    def setUp(self, mock_url_exists):
+        self.mock_url_exists = mock_url_exists
+        mock_url_exists.return_value = True
+
         self.vimeo_urls = ("http://vimeo.com/17853047",)
         self.youtube_urls = ("http://youtu.be/HaAVZ2yXDBo",
                              "http://www.youtube.com/watch?v=HaAVZ2yXDBo")
@@ -42,7 +46,7 @@ class TestVideoForm(TestCase):
     def _test_urls(self, urls):
         for url in urls:
             form = VideoForm(data={"video_url":url})
-            self.assertTrue(form.is_valid())
+            self.assertTrue(form.is_valid(), msg=form.errors.as_text())
             video = form.save()
             video_type = video_type_registrar.video_type_for_url(url)
             # double check we never confuse video_id with video.id with videoid, sigh
@@ -67,6 +71,19 @@ class TestVideoForm(TestCase):
 
     def test_dailymotion_urls(self):
         self._test_urls(self.daily_motion_urls)
+
+    def test_file_not_found_urls(self):
+        self.mock_url_exists.return_value = False
+        urls_to_test = [
+            self.youtube_urls[0],
+            self.vimeo_urls[0],
+            self.html5_urls[0],
+            self.daily_motion_urls[0],
+        ]
+
+        for url in urls_to_test:
+            form = VideoForm(data={"video_url":url})
+            self.assertFalse(form.is_valid())
 
 
 class AddFromFeedFormTestCase(TestCase):
