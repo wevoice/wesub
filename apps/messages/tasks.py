@@ -313,7 +313,7 @@ def team_member_leave(team_pk, user_pk):
         "user":user,
         "url_base":get_url_base(),
     }
-    subject = fmt(ugettext("You've left the %(team)s team!"), team)
+    subject = fmt(ugettext("You've left the %(team)s team!"), team=team)
     if user.notify_by_message:
         template_name = "messages/team-member-you-have-left.txt"
         msg = Message()
