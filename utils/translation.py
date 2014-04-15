@@ -24,7 +24,7 @@ def _only_supported_languages(language_codes):
     return [code for code in language_codes if code in SUPPORTED_LANGUAGE_CODES]
 
 
-def get_language_choices(with_empty=False):
+def get_language_choices(with_empty=False, with_any=False):
     """Return a list of language code choices labeled appropriately."""
 
     cache_key = 'simple-langs-cache-%s' % get_language()
@@ -38,6 +38,9 @@ def get_language_choices(with_empty=False):
 
         languages.sort(key=lambda item: item[1])
         cache.set(cache_key, languages, 60*60)
+
+    if with_any:
+        languages = [('', _('--- Any Language ---'))] + languages
 
     if with_empty:
         languages = [('', '---------')] + languages

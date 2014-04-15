@@ -22,7 +22,11 @@ from auth.models import CustomUser as User
 from messages.models import Message
 from teams.models import Team
 from utils.forms import AjaxForm
+from utils.translation import get_language_choices
 
+from utils.translation import (
+    get_language_choices, get_language_choices_as_dicts, languages_with_labels, get_user_languages_from_request
+)
 
 class SendMessageForm(forms.ModelForm, AjaxForm):
     class Meta:
@@ -70,10 +74,11 @@ class NewMessageForm(forms.Form):
     user = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
     content = forms.CharField(widget=forms.Textarea)
     subject = forms.CharField(required=False)
+    language = forms.ChoiceField(choices=[], required=False)
 
     class Meta:
         model = Message
-        fields = ('user', 'content', 'subject', 'team')
+        fields = ('user', 'content', 'subject', 'team', 'language')
 
 
     def __init__(self, author, *args, **kwargs):
@@ -86,6 +91,15 @@ class NewMessageForm(forms.Form):
         # This isn't the fastest way to do this, but it's the simplest, and
         # performance probably won't be an issue here.
         self.fields['team'].queryset = author.messageable_teams()
+        self.fields['language'].choices = get_language_choices(with_any=True)
+        # For now we'll add all languages in the dropdown, if users
+        # want to limit them, we can re-add this:
+        # team_languages = set([('','--- Any language ---')])
+        # for team in author.messageable_teams():
+        #    users = team.members.values_list('user', flat=True)
+        #    user_langs = set(UserLanguage.objects.filter(user__in=users).exclude(user=author).values_list('language', flat=True))
+        #    team_languages ^= set(languages_with_labels(user_langs).items())
+        # self.fields['language'].choices = sorted(list(team_languages), key=lambda pair: pair[1])
 
     def clean(self):
         cd = self.cleaned_data
