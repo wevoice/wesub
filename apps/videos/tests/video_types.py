@@ -23,22 +23,22 @@ from django.test import TestCase
 
 from babelsubs.storage import SubtitleLine, SubtitleSet
 
-from apps.auth.models import CustomUser as User
-from apps.teams.models import Team, TeamVideo
-from apps.subtitles import pipeline
-from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
-from apps.videos.models import Video, VIDEO_TYPE_BRIGHTCOVE
-from apps.videos.types import video_type_registrar, VideoTypeError
-from apps.videos.types.base import VideoType, VideoTypeRegistrar
-from apps.videos.types.bliptv import BlipTvVideoType
-from apps.videos.types.brightcove  import BrightcoveVideoType
-from apps.videos.types.dailymotion import DailymotionVideoType
-from apps.videos.types.flv import FLVVideoType
-from apps.videos.types.htmlfive import HtmlFiveVideoType
-from apps.videos.types.kaltura import KalturaVideoType
-from apps.videos.types.mp3 import Mp3VideoType
-from apps.videos.types.vimeo import VimeoVideoType
-from apps.videos.types.youtube import (
+from auth.models import CustomUser as User
+from teams.models import Team, TeamVideo
+from subtitles import pipeline
+from subtitles.models import SubtitleLanguage, SubtitleVersion
+from videos.models import Video, VIDEO_TYPE_BRIGHTCOVE
+from videos.types import video_type_registrar, VideoTypeError
+from videos.types.base import VideoType, VideoTypeRegistrar
+from videos.types.bliptv import BlipTvVideoType
+from videos.types.brightcove  import BrightcoveVideoType
+from videos.types.dailymotion import DailymotionVideoType
+from videos.types.flv import FLVVideoType
+from videos.types.htmlfive import HtmlFiveVideoType
+from videos.types.kaltura import KalturaVideoType
+from videos.types.mp3 import Mp3VideoType
+from videos.types.vimeo import VimeoVideoType
+from videos.types.youtube import (
     YoutubeVideoType,
     _prepare_subtitle_data_for_version, add_credit, should_add_credit
 )
@@ -289,23 +289,51 @@ class VideoTypeRegistrarTest(TestCase):
                           'http://youtube.com/v=100500')
 
 class BrightcoveVideoTypeTest(TestCase):
-    def setUp(self):
-        self.vt = BrightcoveVideoType
+    player_id = '1234'
+    video_id = '5678'
+
+    @test_utils.patch_for_test('videos.types.brightcove.BrightcoveVideoType._resolve_url_redirects')
+    def setUp(self, resolve_url_redirects):
+        TestCase.setUp(self)
+        self.resolve_url_redirects = resolve_url_redirects
+        resolve_url_redirects.side_effect = lambda url: url
+
+    def check_url(self):
+            self.assertEquals(vu.type, 'R')
+            self.assertEquals(vu.brightcove_id(), self.video_id)
 
     def test_type(self):
-        url  = 'http://link.brightcove.com/services/player/bcpid955357260001?bckey=AQ~~,AAAA3ijeRPk~,jc2SmUL6QMyqTwfTFhUbWr3dg6Oi980j&bctid=956115196001'
-        video, created = Video.get_or_create_for_url(url)
-        vu = video.videourl_set.all()[:1].get()
-        self.assertEqual(vu.type, VIDEO_TYPE_BRIGHTCOVE)
-        self.assertEqual(vu.type, BrightcoveVideoType.abbreviation)
-        self.assertTrue(self.vt.matches_video_url(url))
+        self.assertEqual(BrightcoveVideoType.abbreviation,
+                         VIDEO_TYPE_BRIGHTCOVE)
+
+    def make_url(self, url):
+        return url.format(video_id=self.video_id, player_id=self.player_id)
+
+    def check_url(self, url):
+        self.assertTrue(BrightcoveVideoType.matches_video_url(url))
+        vt = BrightcoveVideoType(url)
+        self.assertEquals(vt.video_id, self.video_id)
+
+    def test_urls(self):
+        # test URLs with the video_id in the path
+        self.check_url(self.make_url(
+            'http://link.brightcove.com'
+            '/services/link/bcpid{player_id}/bctid{video_id}'))
+        self.check_url(self.make_url(
+            'http://bcove.me'
+            '/services/link/bcpid{player_id}/bctid{video_id}'))
+        # test URLs with the video_id in the query
+        self.check_url(self.make_url(
+            'http://link.brightcove.com'
+            '/services/link/bcpid{player_id}'
+            '?bckey=foo&bctid={video_id}'))
 
     def test_redirection(self):
-        url  = 'http://bcove.me/7fa5828z'
-        vt = video_type_registrar.video_type_for_url(url)
-        self.assertTrue(vt)
-        self.assertEqual(vt.video_id, '956115196001')
-
+        # test URLs in bcove.me that redirect to another brightcove URL
+        self.resolve_url_redirects.side_effect = lambda url: self.make_url(
+            'http://link.brightcove.com/'
+            'services/link/bcpid{player_id}/bctid{video_id}')
+        self.check_url('http://bcove.me/shortpath')
 
 class CreditTest(TestCase):
 
