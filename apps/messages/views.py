@@ -118,13 +118,12 @@ def new(request):
                 language = form.cleaned_data['language']
                 for member in form.cleaned_data['team'].members.all():
                     if member.user != request.user:
-                        if language != "":
-                            if language in set(UserLanguage.objects.filter(user__exact=member.user).values_list('language', flat=True)):
-                                m = Message(user=member.user, author=request.user,
-                                            content=form.cleaned_data['content'],
-                                            subject=form.cleaned_data['subject'])
-                                m.save()
-                                send_new_message_notification.delay(m.pk)
+                        if (len(language) == 0) or (language in set(UserLanguage.objects.filter(user__exact=member.user).values_list('language', flat=True))):
+                            m = Message(user=member.user, author=request.user,
+                                        content=form.cleaned_data['content'],
+                                        subject=form.cleaned_data['subject'])
+                            m.save()
+                            send_new_message_notification.delay(m.pk)
 
             messages.success(request, _(u'Message sent.'))
             return HttpResponseRedirect(reverse('messages:inbox'))

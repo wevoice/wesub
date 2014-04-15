@@ -91,7 +91,7 @@ class NewMessageForm(forms.Form):
         # This isn't the fastest way to do this, but it's the simplest, and
         # performance probably won't be an issue here.
         self.fields['team'].queryset = author.messageable_teams()
-        self.fields['language'].choices = [('','--- Any language ---')] + get_language_choices(True)
+        self.fields['language'].choices = [('','--- Any language ---')] + get_language_choices(False)
         # For now we'll add all languages in the dropdown, if users
         # want to limit them, we can re-add this:
         # team_languages = set([('','--- Any language ---')])
