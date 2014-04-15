@@ -95,7 +95,7 @@ class NewMessageForm(forms.Form):
         team_languages = set([('','--- Any language ---')])
         for team in author.messageable_teams():
             users = team.members.values_list('user', flat=True)
-            user_langs = set(UserLanguage.objects.filter(user__in=users).values_list('language', flat=True))
+            user_langs = set(UserLanguage.objects.filter(user__in=users).exclude(user=author).values_list('language', flat=True))
             team_languages ^= set(languages_with_labels(user_langs).items())
         self.fields['language'].choices = sorted(list(team_languages), key=lambda pair: pair[1])
 
