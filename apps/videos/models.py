@@ -51,6 +51,7 @@ from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
+from utils.text import fmt
 
 from apps.teams.moderation_const import MODERATION_STATUSES, UNMODERATED
 from raven.contrib.django.models import client
@@ -1376,33 +1377,33 @@ class ActionRenderer(object):
 
     def render_REVIEW_VERSION(self, item):
         kwargs = self._base_kwargs(item)
-        msg = _('  reviewed <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        msg = fmt(_('  reviewed <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s"> %(video_name)s</a>'), **kwargs)
         return msg
 
     def render_ACCEPT_VERSION(self, item):
         kwargs = self._base_kwargs(item)
-        msg = _('  accepted <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        msg = fmt(_('  accepted <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>'), **kwargs)
         return msg
 
     def render_REJECT_VERSION(self, item):
         kwargs = self._base_kwargs(item)
-        msg = _('  rejected <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        msg = fmt(_('  rejected <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>'), **kwargs)
         return msg
 
     def render_APPROVE_VERSION(self, item):
         kwargs = self._base_kwargs(item)
-        msg = _('  approved <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        msg = fmt(_('  approved <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>'), **kwargs)
         return msg
 
     def render_DECLINE_VERSION(self, item):
         kwargs = self._base_kwargs(item)
-        msg = _('  declined <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        msg = fmt(_('  declined <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>'), **kwargs)
         return msg
 
     def render_DELETE_VIDEO(self, item):
         kwargs = self._base_kwargs(item)
         kwargs['title'] = item.new_video_title
-        msg = _('  deleted a video: "%(title)s"') % kwargs
+        msg = fmt(_('  deleted a video: "%(title)s"'), **kwargs)
         return msg
 
     def render_ADD_VIDEO(self, item):
@@ -1411,7 +1412,7 @@ class ActionRenderer(object):
         else:
             msg = _(u'<a href="%(video_url)s">%(video_name)s</a> added to Amara')
 
-        return msg % self._base_kwargs(item)
+        return fmt(msg, **self._base_kwargs(item))
 
     def render_CHANGE_TITLE(self, item):
         if item.user:
@@ -1419,7 +1420,7 @@ class ActionRenderer(object):
         else:
             msg = _(u'Title was changed for <a href="%(video_url)s">%(video_name)s</a>')
 
-        return msg % self._base_kwargs(item)
+        return fmt(msg, **self._base_kwargs(item))
 
     def render_COMMENT(self, item):
         kwargs = self._base_kwargs(item)
@@ -1440,7 +1441,7 @@ class ActionRenderer(object):
             else:
                 msg = _(u'Comment added for <a href="%(video_url)s">%(video_name)s</a>')
 
-        return msg % kwargs
+        return fmt(msg, **kwargs)
 
     def render_ADD_TRANSLATION(self, item):
         kwargs = self._base_kwargs(item)
@@ -1450,7 +1451,7 @@ class ActionRenderer(object):
         else:
             msg = _(u'<a href="%(language_url)s">%(new_language)s subtitles</a> started for <a href="%(video_url)s">%(video_name)s</a>')
 
-        return msg % kwargs
+        return fmt(msg, **kwargs)
 
     def render_ADD_VERSION(self, item):
         kwargs = self._base_kwargs(item)
@@ -1460,7 +1461,7 @@ class ActionRenderer(object):
         else:
             msg = _(u'<a href="%(language_url)s">%(new_language)s subtitles</a> edited for <a href="%(video_url)s">%(video_name)s</a>')
 
-        return msg % kwargs
+        return fmt(msg, **kwargs)
 
     def render_ADD_VIDEO_URL(self, item):
         if item.user:
@@ -1468,17 +1469,14 @@ class ActionRenderer(object):
         else:
             msg = _(u'New URL added for <a href="%(video_url)s">%(video_name)s</a>')
 
-        return msg % self._base_kwargs(item)
+        return fmt(msg, **self._base_kwargs(item))
 
     def render_MEMBER_JOINED(self, item):
-        msg = _("joined the %(team)s team as a %(role)s" % dict(
-             team=item.team, role=item.member.role))
-        return msg
+        return fmt(_("joined the %(team)s team as a %(role)s"),
+                   team=item.team, role=item.member.role)
 
     def render_MEMBER_LEFT(self, item):
-        msg = _("left the %s team" % (
-            item.team))
-        return msg
+        return fmt(_("left the %(team)s team"), team=item.team)
 
     def render_EDIT_URL(self, item):
         kwargs = self._base_kwargs(item)
@@ -1490,14 +1488,14 @@ class ActionRenderer(object):
             logging.error('Unable to parse urls: {0}'.format(e))
         kwargs['old_url'] = data.get('old_url', 'unknown')
         kwargs['new_url'] = data.get('new_url', 'unknown')
-        msg = _('  changed primary url from <a href="%(old_url)s">%(old_url)s</a> to <a href="%(new_url)s">%(new_url)s</a>') % kwargs
-        return msg
+        msg = _('  changed primary url from <a href="%(old_url)s">%(old_url)s</a> to <a href="%(new_url)s">%(new_url)s</a>')
+        return fmt(msg, **kwargs)
 
     def render_DELETE_URL(self, item):
         kwargs = self._base_kwargs(item)
         kwargs['title'] = item.new_video_title
-        msg = _('  deleted url <a href="%(title)s">%(title)s</a>') % kwargs
-        return msg
+        msg = _('  deleted url <a href="%(title)s">%(title)s</a>')
+        return fmt(msg, **kwargs)
 
 class ActionManager(models.Manager):
     def for_team(self, team, ids=False):
@@ -1829,7 +1827,9 @@ class VideoUrl(models.Model):
     def unique_error_message(self, model_class, unique_check):
         if unique_check[0] == 'url':
             vu_obj = VideoUrl.objects.get(url=self.url)
-            return mark_safe(_('This URL already <a href="%(url)s">exists</a> as its own video in our system. You can\'t add it as a secondary URL.') % {'url': vu_obj.get_absolute_url()})
+            return mark_safe(fmt(
+                _('This URL already <a href="%(url)s">exists</a> as its own video in our system. You can\'t add it as a secondary URL.'),
+                url=vu_obj.get_absolute_url()))
         return super(VideoUrl, self).unique_error_message(model_class, unique_check)
 
     def created_as_time(self):

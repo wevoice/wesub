@@ -47,8 +47,8 @@ from apps.videos.tasks import import_videos_from_feed
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.translation import get_language_choices
+from utils.text import fmt
 from utils.validators import MaxFileSizeValidator
-
 
 class EditTeamVideoForm(forms.ModelForm):
     author = forms.CharField(max_length=255, required=False)
@@ -364,7 +364,9 @@ class TaskCreateForm(ErrorableModelForm):
 
         # TODO: Move into _check_task_creation_translate()?
         if type_name != 'Subtitle' and not lang:
-            self.add_error(_(u"You must select a language for a %s task." % type_name))
+            self.add_error(fmt(_(u"You must select a language for a "
+                                 "%(task_type)s task."),
+                               task_type=type_name))
 
         {'Subtitle': self._check_task_creation_subtitle,
          'Translate': self._check_task_creation_translate,
@@ -672,15 +674,13 @@ class TaskUploadForm(SubtitlesUploadForm):
             current_sl = current_version.subtitle_language
             current_source_lc = current_sl.get_translation_source_language_code()
             if current_source_lc and current_source_lc != from_language_code:
-                raise forms.ValidationError(_(
-                    "The selected source language %(from_code)s does not match the "
-                    "existing source language %(cur_code)s for that task."
-                    % {
-                      'from_code': from_language_code,
-                      'cur_code': current_source_lc
-                      }
+                raise forms.ValidationError(fmt(_(
+                    "The selected source language %(from_code)s "
+                    "does not match the existing source language "
+                    "%(cur_code)s for that task."),
+                      from_code=from_language_code,
+                      cur_code=current_source_lc,
                 ))
-
         return self.cleaned_data
 
     def save(self, *args, **kwargs):

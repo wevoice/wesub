@@ -21,6 +21,7 @@ import string
 from django.utils.translation import gettext as _
 
 from utils.behaviors import DONT_OVERRIDE
+from utils.text import fmt
 from videos.behaviors import make_video_title
 
 @make_video_title.override
@@ -30,7 +31,6 @@ def amara_make_video_title(video, title, metadata):
     tv = video.get_team_video()
     if tv is None or tv.team.slug != 'ted':
         return DONT_OVERRIDE
-    return string.Template(_('$speaker_name: $title')).substitute({
-        'speaker_name': metadata['speaker-name'],
-        'title': title,
-    })
+    return fmt(_('%(speaker_name)s: %(title)s'),
+               speaker_name=metadata['speaker-name'],
+               title=title)

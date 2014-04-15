@@ -79,6 +79,7 @@ from utils.basexconverter import base62
 from utils.decorators import never_in_prod
 from utils.metrics import Meter
 from utils.rpc import RpcRouter
+from utils.text import fmt
 from utils.translation import get_user_languages_from_request
 
 from teams.permissions import can_edit_video, can_add_version, can_rollback_language
@@ -343,9 +344,8 @@ class VideoPageContext(dict):
 
     @staticmethod
     def page_title(video):
-        template = string.Template(ugettext("$title with subtitles | Amara"))
-        return template.substitute(title=video.title_display())
-
+        return fmt(ugettext('%(title)s with subtitles | Amara'),
+                   title=video.title_display())
 
     def setup_tab(self, request, video, video_url, tab):
         setup_tab_method = getattr(self, 'setup_tab_%s' % tab, None)
@@ -628,8 +628,8 @@ class LanguagePageContext(dict):
 
     @staticmethod
     def page_title(language):
-        template = string.Template(ugettext("$title with subtitles | Amara"))
-        return template.substitute(title=language.title_display())
+        return fmt(ugettext('%(title)s with subtitles | Amara'),
+                   title=language.title_display())
 
 class LanguagePageContextSubtitles(LanguagePageContext):
     def setup_tab(self, request, video, language, version):
@@ -1023,7 +1023,9 @@ def set_original_language(request, video_id):
     if request.method == "POST" and form.is_valid():
         video.primary_audio_language_code = form.cleaned_data['language_code']
         video.save()
-        messages.success(request, _(u'The language for %s has been changed' % (video)))
+        messages.success(request, fmt(
+            _(u'The language for %(video)s has been changed'),
+            video=video))
         return HttpResponseRedirect(reverse("videos:set_original_language", args=(video_id,)))
     return render_to_response("videos/set-original-language.html", {
         "video": video,
