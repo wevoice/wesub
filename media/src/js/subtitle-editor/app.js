@@ -515,7 +515,7 @@ var angular = angular || null;
             $timeout($scope.promptToRestoreAutoBackup);
         }
 
-        $scope.$on('work-done', function() {
+        $scope.$root.$on('work-done', function() {
             $scope.autoBackupNeeded = true;
         });
 
