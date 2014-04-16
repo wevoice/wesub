@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import time
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib import messages
@@ -105,8 +106,10 @@ def new(request):
         form = NewMessageForm(request.user, request.POST)
 
         if form.is_valid():
+            now = datetime.now()
             if form.cleaned_data['user']:
                 m = Message(user=form.cleaned_data['user'], author=request.user,
+                        created=now,
                         content=form.cleaned_data['content'],
                         subject=form.cleaned_data['subject'])
                 m.save()
@@ -118,15 +121,15 @@ def new(request):
                 # But that means that we need to sort out the pk of newly created messages to
                 # be able to send the notifications
                 message_list = []
-                message_ids = Message.objects.values_list('pk', flat=True)
                 for member in form.cleaned_data['team'].members.all():
                     if member.user != request.user:
                         if (len(language) == 0) or (language in set(UserLanguage.objects.filter(user__exact=member.user).values_list('language', flat=True))):
                             message_list.append(Message(user=member.user, author=request.user,
+                                        created=now,
                                         content=form.cleaned_data['content'],
                                         subject=form.cleaned_data['subject']))
                 Message.objects.bulk_create(message_list);
-                new_messages_ids = Message.objects.exclude(pk__in=message_ids).values_list('pk', flat=True)
+                new_messages_ids = Message.objects.filter(created__gt=now).values_list('pk', flat=True)
                 for pk in new_messages_ids:
                     send_new_message_notification.delay(pk)
             messages.success(request, _(u'Message sent.'))

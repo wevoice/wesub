@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+from datetime import datetime
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _, ugettext
 
@@ -61,11 +63,14 @@ class TeamAdminPageMessageForm(forms.ModelForm):
         content = self.cleaned_data['content']
         content = u''.join([content, '\n\n', ugettext('This message is from site administrator.')])
         users = User.objects.filter(teams__in=team_ids).exclude(pk=author.pk)
+        message_list = []
+        now = datetime.now()
         for user in users:
-            m = Message(author=author, user=user)
+            m = Message(author=author, user=user, created=now)
             m.subject = subject
             m.content = content
-            m.save()
+            message_list.append(m)
+        Message.objects.bulk_create(message_list);
         return users.count()
 
 
