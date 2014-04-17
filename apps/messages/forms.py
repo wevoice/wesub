@@ -61,11 +61,13 @@ class TeamAdminPageMessageForm(forms.ModelForm):
         content = self.cleaned_data['content']
         content = u''.join([content, '\n\n', ugettext('This message is from site administrator.')])
         users = User.objects.filter(teams__in=team_ids).exclude(pk=author.pk)
+        message_list = []
         for user in users:
             m = Message(author=author, user=user)
             m.subject = subject
             m.content = content
-            m.save()
+            message_list.append(m)
+        Message.objects.bulk_create(message_list);
         return users.count()
 
 

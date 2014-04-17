@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import time
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib import messages
@@ -112,19 +113,23 @@ def new(request):
                 m.save()
                 send_new_message_notification.delay(m.pk)
             elif form.cleaned_data['team']:
+                now = datetime.now()
                 # TODO: Move this into a task for performance?
-                # Once we switch to Django 1.4, this should be replaced with
-                # `bulk_create`.
                 language = form.cleaned_data['language']
+                # We create messages using bulk_create, so that only one transaction is needed
+                # But that means that we need to sort out the pk of newly created messages to
+                # be able to send the notifications
+                message_list = []
                 for member in form.cleaned_data['team'].members.all():
                     if member.user != request.user:
                         if (len(language) == 0) or (language in set(UserLanguage.objects.filter(user__exact=member.user).values_list('language', flat=True))):
-                            m = Message(user=member.user, author=request.user,
+                            message_list.append(Message(user=member.user, author=request.user,
                                         content=form.cleaned_data['content'],
-                                        subject=form.cleaned_data['subject'])
-                            m.save()
-                            send_new_message_notification.delay(m.pk)
-
+                                        subject=form.cleaned_data['subject']))
+                Message.objects.bulk_create(message_list);
+                new_messages_ids = Message.objects.filter(created__gt=now).values_list('pk', flat=True)
+                for pk in new_messages_ids:
+                    send_new_message_notification.delay(pk)
             messages.success(request, _(u'Message sent.'))
             return HttpResponseRedirect(reverse('messages:inbox'))
         else:
