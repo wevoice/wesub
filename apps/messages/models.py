@@ -48,7 +48,7 @@ class Message(models.Model):
     content = models.TextField(blank=True, max_length=MESSAGE_MAX_LENGTH)
     author = models.ForeignKey(User, blank=True, null=True, related_name='sent_messages')
     read = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=False)
+    created = models.DateTimeField(auto_now_add=True)
     deleted_for_user = models.BooleanField(default=False)
     deleted_for_author = models.BooleanField(default=False)
 

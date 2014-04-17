@@ -106,15 +106,14 @@ def new(request):
         form = NewMessageForm(request.user, request.POST)
 
         if form.is_valid():
-            now = datetime.now()
             if form.cleaned_data['user']:
                 m = Message(user=form.cleaned_data['user'], author=request.user,
-                        created=now,
                         content=form.cleaned_data['content'],
                         subject=form.cleaned_data['subject'])
                 m.save()
                 send_new_message_notification.delay(m.pk)
             elif form.cleaned_data['team']:
+                now = datetime.now()
                 # TODO: Move this into a task for performance?
                 language = form.cleaned_data['language']
                 # We create messages using bulk_create, so that only one transaction is needed
@@ -125,7 +124,6 @@ def new(request):
                     if member.user != request.user:
                         if (len(language) == 0) or (language in set(UserLanguage.objects.filter(user__exact=member.user).values_list('language', flat=True))):
                             message_list.append(Message(user=member.user, author=request.user,
-                                        created=now,
                                         content=form.cleaned_data['content'],
                                         subject=form.cleaned_data['subject']))
                 Message.objects.bulk_create(message_list);
