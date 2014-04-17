@@ -443,6 +443,7 @@ class KalturaApiMocker(test_utils.RequestsMocker):
                 'captionAsset:partnerData': kaltura.PARTNER_DATA_TAG,
                 'captionAsset:language': language,
                 'captionAsset:format': 1, # SRT
+                'captionAsset:fileExt': 'srt',
             },
             self.caption_response(caption_id, language, 0,
                                   kaltura.PARTNER_DATA_TAG))
@@ -455,6 +456,7 @@ class KalturaApiMocker(test_utils.RequestsMocker):
                 'captionAsset:partnerData': kaltura.PARTNER_DATA_TAG,
                 'captionAsset:language': language,
                 'captionAsset:format': 1, # SRT
+                'captionAsset:fileExt': 'srt',
             },
             self.entry_not_found_response())
 
