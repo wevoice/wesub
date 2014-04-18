@@ -24,6 +24,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from auth.models import CustomUser as User, UserLanguage
 from utils.forms import AjaxForm
+from utils.text import fmt
 from utils.translation import get_language_choices, set_user_languages_to_cookie
 from utils.validators import MaxFileSizeValidator
 
@@ -107,7 +108,8 @@ class SendMessageForm(forms.Form):
         user = self.cleaned_data.get('user')
         email = self.cleaned_data.get('email')
         headers = {'Reply-To': email}
-        subject = _('Personal message from %(sender)s on amara.org') % {'sender': self.sender.username}
+        subject = fmt(_('Personal message from %(sender)s on amara.org'),
+                      sender=self.sender.username)
         EmailMessage(subject, self.cleaned_data.get('message'), email, \
                      [user.email], headers=headers).send()
 

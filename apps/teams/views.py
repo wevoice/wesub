@@ -78,6 +78,7 @@ from utils.forms import flatten_errorlists
 from utils.metrics import time as timefn
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
+from utils.text import fmt
 from utils.translation import (
     get_language_choices, get_language_choices_as_dicts, languages_with_labels, get_user_languages_from_request
 )
@@ -195,22 +196,21 @@ def create(request):
         form = CreateTeamForm(request.user, request.POST, request.FILES)
         if form.is_valid():
             team = form.save(user)
-            messages.success(request, _("""
-                Your team has been created. Here are some next steps:
+            messages.success(request, fmt(_(
+                """Your team has been created. Here are some next steps:
                 <ul>
                     <li><a href="%(edit)s">Edit team members' permissions</a></li>
                     <li><a href="%(activate)s">Activate and customize workflows for your team</a></li>
                     <li><a href="%(create)s">Create and customize projects</a></li>
                     <li><a href="%(lang)s">Edit language preferences</a></li>
                     <li><a href="%(custom)s">Customize instructions to caption makers and translators</a></li>
-                </ul>
-                """ % dict(
-                    edit=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
-                    activate=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
-                    create=reverse("teams:settings_projects", kwargs={"slug": team.slug}),
-                    lang=reverse("teams:settings_languages", kwargs={"slug": team.slug}),
-                    custom=reverse("teams:settings_guidelines", kwargs={"slug": team.slug}),
-                )))
+                </ul>"""),
+                edit=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
+                activate=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
+                create=reverse("teams:settings_projects", kwargs={"slug": team.slug}),
+                lang=reverse("teams:settings_languages", kwargs={"slug": team.slug}),
+                custom=reverse("teams:settings_guidelines", kwargs={"slug": team.slug}),
+            ))
             return redirect(reverse("teams:settings_basic", kwargs={"slug":team.slug}))
     else:
         form = CreateTeamForm(request.user)
@@ -2081,10 +2081,10 @@ def _writelock_languages_for_delete(request, subtitle_language):
             sl.writelock(request.user, request.browser_id)
             locked.append(sl)
         else:
-            messages.error(request,
-                _(u'Someone else is currently editing %s. '
-                  u'Please try again later.')
-                % sl.get_language_code_display())
+            messages.error(request, fmt(
+                _(u'Someone else is currently editing %(language)s. '
+                  u'Please try again later.'),
+                language=sl.get_language_code_display()))
             return False, locked
 
     return True, locked

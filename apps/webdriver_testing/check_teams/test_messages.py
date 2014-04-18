@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core import mail
+import time
 
 from teams import tasks
 from webdriver_testing.webdriver_base import WebdriverTestCase
@@ -7,11 +8,176 @@ from webdriver_testing.pages.site_pages.teams import ATeamPage
 from webdriver_testing.pages.site_pages.teams import messages_tab
 from webdriver_testing.pages.site_pages.teams import members_tab
 from webdriver_testing.pages.site_pages import user_messages_page
+from webdriver_testing.pages.site_pages import new_message_page
 from webdriver_testing.data_factories import TeamMemberFactory
 from webdriver_testing.data_factories import TeamVideoFactory
 from webdriver_testing import data_helpers
 from webdriver_testing.data_factories import TeamProjectFactory
 from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import UserLangFactory
+
+class TestCaseMessageUsers(WebdriverTestCase):
+    """Team admin can send bulk messages to members.  """
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseMessageUsers, cls).setUpClass()
+
+        cls.user_message_pg = user_messages_page.UserMessagesPage(cls)
+        cls.new_message_pg = new_message_page.NewMessagePage(cls)
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.team_owner1 = UserFactory(username='owner1')
+        cls.team_owner2 = UserFactory(username='owner2')
+        cls.team1 = TeamMemberFactory.create(user=cls.team_owner1).team
+        cls.team2 = TeamMemberFactory.create(user=cls.team_owner2).team
+        cls.logger.info('setup: Create users')
+        cls.users = {
+                      #username, langauges-spoken
+                      'en_only': ['en'],
+                      'en_fr': ['en', 'fr'],
+                      'pt_br_fr_de': ['pt-br', 'fr', 'de'],
+                      'fil': ['fil'],
+                      'de_en': ['de', 'en'],
+                      'fr_fil': ['fil', 'fr'],
+                    }
+        cls.team1_managers = ['de_en'] 
+        cls.team1_admins = ['en_only', 'en_fr']
+        cls.team1_contributors = ['pt_br_fr_de', 'fil']
+        cls.team2_admins = ['en_only', 'de_en']
+        cls.team2_contributors = ['en_fr', 'pt_br_fr_de', 'fr_fil']
+
+
+
+        for username, langs in cls.users.iteritems():
+            setattr(cls, username, UserFactory(username=username))
+            for lc in langs:
+                UserLangFactory(user=getattr(cls, username), language=lc)
+
+        #set the team 1 admins
+        for u in cls.team1_admins:
+            user = getattr(cls, u)
+            TeamMemberFactory.create(
+                                     role='ROLE_ADMIN',
+                                     team=cls.team1,
+                                     user=user)
+
+        #set the team 1 manager 
+        for u in cls.team1_managers:
+            user = getattr(cls, u)
+            TeamMemberFactory.create(
+                                     role='ROLE_MANAGER',
+                                     team=cls.team1,
+                                     user=user)
+        #set the team 1 contributors 
+        for u in cls.team1_contributors:
+            user = getattr(cls, u)
+            TeamMemberFactory.create(
+                                     role='ROLE_CONTRIBUTOR',
+                                     team=cls.team1,
+                                     user=user)
+        #set the team 2 admins   
+        for u in cls.team2_admins:
+            user = getattr(cls, u)
+            TeamMemberFactory.create(
+                                     role='ROLE_ADMIN',
+                                     team=cls.team2,
+                                     user=user)
+
+
+        #set the team 2 contributors 
+        for u in cls.team2_contributors:
+            user = getattr(cls, u)
+            TeamMemberFactory.create(
+                                     role='ROLE_CONTRIBUTOR',
+                                     team=cls.team2,
+                                     user=user)
+
+        cls.new_message_pg.open_page("/")
+         
+
+    def test_admins_team_list(self):
+        "Team list limited to team admins only"
+        self.new_message_pg.log_in(self.en_only.username, 'password')
+        self.new_message_pg.open_new_message_form()
+        en_only_teams = [self.team1.name, self.team2.name]
+        self.assertEqual(en_only_teams, self.new_message_pg.available_teams())
+        en_fr_teams = [self.team1.name]
+        self.new_message_pg.log_in(self.en_fr.username, 'password')
+        self.new_message_pg.open_new_message_form()
+        self.assertEqual(en_fr_teams, self.new_message_pg.available_teams())
+        
+
+    def test_managers_team_list(self):
+        "Managers can not message whole team"
+        self.new_message_pg.log_in(self.de_en.username, 'password')
+        self.new_message_pg.open_new_message_form()
+        de_en_teams = [self.team2.name]
+        self.assertEqual(de_en_teams, self.new_message_pg.available_teams())
+
+    def test_contributors_no_team_option(self):
+        """Contributors only don't see team message pulldown"""
+
+        self.new_message_pg.log_in(self.pt_br_fr_de.username, 'password')
+        self.new_message_pg.open_new_message_form()
+        self.assertFalse(self.new_message_pg.available_teams())
+
+    def test_team_language_message(self):
+        """Message users speaking a specific language"""
+        self.new_message_pg.log_in(self.en_only.username, 'password')
+        self.new_message_pg.open_new_message_form()
+        mail.outbox = []
+        self.new_message_pg.add_subject("To all German speaking test team 1")
+        self.new_message_pg.add_message("you rock!")
+        self.new_message_pg.choose_team(self.team1.name)
+        self.new_message_pg.choose_language('German')
+        self.new_message_pg.send()
+        self.assertTrue(self.new_message_pg.sent())
+        messages = mail.outbox
+        self.assertTrue(2, len(mail.outbox))
+        message_recipients = []
+        for m in mail.outbox:
+            message_recipients.append(m.recipients()[0].split('@')[0])
+        expected_recipients = ['de_en', 'pt_br_fr_de']
+        self.assertEqual(expected_recipients, message_recipients)
+     
+
+    def test_whole_team_message(self):
+        """Message all team members"""
+        self.new_message_pg.log_in(self.de_en.username, 'password')
+        self.new_message_pg.open_new_message_form()
+        mail.outbox = []
+        self.new_message_pg.add_subject("To all test team 2")
+        self.new_message_pg.add_message("you rock!")
+        self.new_message_pg.choose_team(self.team2.name)
+        self.new_message_pg.send()
+        self.assertTrue(self.new_message_pg.sent())
+        messages = mail.outbox
+        self.assertTrue(4, len(mail.outbox))
+        message_recipients = []
+        for m in mail.outbox:
+            message_recipients.append(m.recipients()[0].split('@')[0])
+        expected_recipients = ['owner2', 'en_only', 'en_fr', 'pt_br_fr_de', 'fr_fil']
+        self.assertEqual(sorted(expected_recipients), sorted(message_recipients))
+
+    def test_user_selected_disables_team(self):
+        """Choosing to message a user, disables team selections."""
+        self.new_message_pg.log_in(self.en_only.username, 'password')
+        self.new_message_pg.open_new_message_form()
+        mail.outbox = []
+        self.new_message_pg.add_subject("To de_en")
+        self.new_message_pg.add_message("you rock!")
+        self.new_message_pg.choose_user('de_en')
+        self.assertTrue(self.new_message_pg.team_choice_disabled())
+        self.assertTrue(self.new_message_pg.lang_choice_disabled())
+        self.new_message_pg.send()
+        self.assertTrue(self.new_message_pg.sent())
+        messages = mail.outbox
+        message_recipients = []
+        for m in mail.outbox:
+            message_recipients.append(m.recipients()[0].split('@')[0])
+        expected_recipients = ['de_en']
+        self.assertEqual(expected_recipients, message_recipients)
 
 class TestCaseTeamMessages(WebdriverTestCase):
     """TestSuite for searching team videos """
@@ -115,7 +281,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
         self.assertTrue(self._TEST_MESSAGES['INVITATION'] in 
             self.user_message_pg.message_text())
 
-    def test_messages__application(self):
+    def test_messages_application(self):
         """Custom message for user application.
 
         """
@@ -125,7 +291,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
         self.assertTrue(self._TEST_MESSAGES['APPLICATION'] in 
             self.a_team_pg.application_custom_message())
 
-    def test_messages__promoted_admin(self):
+    def test_messages_promoted_admin(self):
         """Message for user promoted to admin.
 
         """
@@ -140,7 +306,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
         self.assertTrue(self._TEST_MESSAGES['NEW_ADMIN'] in 
             self.user_message_pg.message_text())
 
-    def test_messages__promoted_manager(self):
+    def test_messages_promoted_manager(self):
         """Message for user promoted to manager.
 
         """

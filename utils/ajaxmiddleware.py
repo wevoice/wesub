@@ -21,12 +21,6 @@ class AjaxErrorMiddleware(object):
         def __init__(self, message):
             self.message = message
 
-    class ParameterMissingError(InputError):
-        def __init__(self, param):
-            super(AjaxErrorMiddleware.ParameterMissingError, self).__init__(
-                _('Required parameter missing: %s') % param)
-
-
     def process_exception(self, request, exception):
         if not request.is_ajax(): return
 

@@ -31,8 +31,8 @@ from widget.views import base_widget_params
 
 from templatetag_sugar.register import tag
 from templatetag_sugar.parser import Name, Variable, Constant
-
 from teams.models import Application
+from utils.text import fmt
 
 from apps.teams.forms import TaskUploadForm
 from apps.teams.permissions import (
@@ -273,9 +273,9 @@ def team_video_lang_detail(context, lang, team):
 
 @register.inclusion_tag('teams/_invite_friends_to_team.html', takes_context=True)
 def invite_friends_to_team(context, team):
-    context['invite_message'] = _(u'Can somebody help me subtitle these videos? %(url)s') % {
-            'url': team.get_site_url()
-        }
+    context['invite_message'] = fmt(_(u'Can somebody help me subtitle '
+                                      'these videos? %(url)s'),
+                                    url=team.get_site_url())
     return context
 
 @register.inclusion_tag('teams/_task_language_list.html', takes_context=True)

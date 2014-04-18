@@ -28,6 +28,7 @@ from teams.models import (
     Project, TeamLanguagePreference, TeamNotificationSetting, BillingReport,
     Partner, Application, ApplicationInvalidException, Invite, BillingRecord
 )
+from utils.text import fmt
 from videos.models import SubtitleLanguage
 
 
@@ -57,7 +58,8 @@ class TeamAdmin(admin.ModelAdmin):
         form = TeamAdminPageMessageForm(request.POST)
         if form.is_valid():
             count = form.send_to_teams(request.POST.getlist(u'_selected_action'), request.user)
-            self.message_user(request, _("%(count)s messages sent") % dict(count=count))
+            msg = fmt(_("%(count)s messages sent"), count=count)
+            self.message_user(request, msg)
         else:
             self.message_user(request, _("Fill all fields please."))
     send_message.short_description = _('Send message')

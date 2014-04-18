@@ -21,6 +21,7 @@ from widget.video_cache import (
 )
 
 from utils.metrics import Timer
+from utils.text import fmt
 from apps.videos.tasks import video_changed_tasks
 
 @task()
@@ -117,7 +118,8 @@ def _notify_teams_of_new_videos(team_qs):
         members = team.users.filter( notify_by_email=True, is_active=True) \
             .distinct()
 
-        subject = _(u'New %(team)s videos ready for subtitling!') % dict(team=team)
+        subject = fmt(_(u'New %(team)s videos ready for subtitling!'),
+                      team=team)
 
         for user in members:
             if not user.email:
