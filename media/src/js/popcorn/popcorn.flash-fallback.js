@@ -472,8 +472,8 @@ var jQuery = window.jQuery || null;
 
     // Helper for identifying URLs we know how to play.
     HTMLFlashFallbackVideoElement.prototype._canPlaySrc = function (url) {
-        var isH264 = (/\.mp4$/i.test(url) || /\.m4v$/i.test(url));
-        var isFlv = (/\.flv$/i.test(url));
+        var isH264 = /\.(mp4|m4v)(\?.*)?$/i.test(url);
+        var isFlv = (/\.flv(\?.*)?$/i.test(url));
         var supportsVideo = !!document.createElement('video').canPlayType;
 
         // does this browser supports the native h264?
