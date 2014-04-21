@@ -30,7 +30,7 @@ from externalsites import syncing
 from externalsites.exceptions import SyncingError
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from teams.models import Team
-from videos.models import VideoUrl
+from videos.models import VideoUrl, VideoFeed
 import videos.models
 
 def now():
@@ -40,6 +40,8 @@ def now():
 class ExternalAccount(models.Model):
     account_type = NotImplemented
     video_url_type = NotImplemented
+
+    team = models.OneToOneField(Team, unique=True)
 
     def is_for_video_url(self, video_url):
         return video_url.type == self.video_url_type
@@ -100,7 +102,6 @@ class KalturaAccount(ExternalAccount):
     account_type = 'K'
     video_url_type = videos.models.VIDEO_TYPE_KALTURA
 
-    team = models.OneToOneField(Team, unique=True)
     partner_id = models.CharField(max_length=100,
                                   verbose_name=_('Partner ID'))
     secret = models.CharField(
@@ -128,8 +129,38 @@ class KalturaAccount(ExternalAccount):
         syncing.kaltura.delete_subtitles(self.partner_id, self.secret,
                                          kaltura_id, language.language_code)
 
+class BrightcoveAccount(ExternalAccount):
+    account_type = 'B'
+    video_url_type = videos.models.VIDEO_TYPE_BRIGHTCOVE
+
+    publisher_id = models.CharField(max_length=100,
+                                    verbose_name=_('Publisher ID'))
+    write_token = models.CharField(max_length=100)
+    import_feed = models.OneToOneField(VideoFeed, null=True,
+                                       on_delete=models.SET_NULL)
+
+    def feed_url(self, player_id, tags):
+        return ('http://link.brightcove.com'
+                '/services/mrss/player%s/%s/%s'
+               ) % (player_id, self.publisher_id, '/'.join(tags))
+
+    def make_feed(self, player_id, tags=None):
+        if not tags:
+            tags = ('new',)
+        self.import_feed = VideoFeed.objects.create(
+            url=self.feed_url(player_id, tags),
+            team=self.team)
+        self.save()
+
+    def remove_feed(self):
+        if self.import_feed:
+            self.import_feed.delete();
+            self.import_feed = None
+            self.save()
+
 account_models = [
     KalturaAccount,
+    BrightcoveAccount,
 ]
 _account_type_to_model = dict(
     (model.account_type, model) for model in account_models

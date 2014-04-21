@@ -705,7 +705,7 @@ class TeamVideo(models.Model):
                                     thumb_sizes=(THUMBNAIL_SIZE, (120,90),))
     all_languages = models.BooleanField(_('Need help with all languages'), default=False,
         help_text=_(u'If you check this, other languages will not be displayed.'))
-    added_by = models.ForeignKey(User)
+    added_by = models.ForeignKey(User, null=True)
     # this is an auto_add like field, but done on the model save so the
     # admin doesn't throw a fit
     created = models.DateTimeField(blank=True)
