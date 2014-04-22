@@ -46,7 +46,8 @@ class ExternalAccount(models.Model):
     def is_for_video_url(self, video_url):
         return video_url.type == self.video_url_type
 
-    def update_subtitles(self, video_url, language, version):
+    def update_subtitles(self, video_url, language):
+        version = language.get_public_tip()
         sync_history_values = {
             'account': self,
             'video_url': video_url,
@@ -115,9 +116,9 @@ class KalturaAccount(ExternalAccount):
     def __unicode__(self):
         return "KalturaAccount: %s" % (self.partner_id)
 
-    def do_update_subtitles(self, video_url, language, version):
+    def do_update_subtitles(self, video_url, language, tip):
         kaltura_id = video_url.get_video_type().kaltura_id()
-        subtitles = language.get_public_tip().get_subtitles()
+        subtitles = tip.get_subtitles()
         sub_data = babelsubs.to(subtitles, 'srt')
 
         syncing.kaltura.update_subtitles(self.partner_id, self.secret,

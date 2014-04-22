@@ -76,7 +76,7 @@ class SignalHandlingTest(TestCase):
         self.assertEqual(self.mock_update_subtitles.delay.call_count, 1)
         self.mock_update_subtitles.delay.assert_called_with(
             KalturaAccount.account_type, self.account.id, self.video_url.id,
-            lang.id, tip.id)
+            lang.id)
 
     def test_delete_subititles_on_language_deleted(self):
         lang = self.video.subtitle_language('en')
@@ -161,9 +161,8 @@ class SubtitleTaskTest(TestCase):
         self.now += datetime.timedelta(minutes=1)
         return rv
 
-    def run_update_subtitles(self, language, version):
-        args = ('K', self.account.id, self.video_url.id, language.id,
-                version.id)
+    def run_update_subtitles(self, language):
+        args = ('K', self.account.id, self.video_url.id, language.id)
         test_utils.update_subtitles.original_func.apply(args=args)
 
     def run_delete_subtitles(self, language):
@@ -202,7 +201,7 @@ class SubtitleTaskTest(TestCase):
         now = self.now
         language = self.video.subtitle_language('en')
         version = language.get_tip()
-        self.run_update_subtitles(language, version)
+        self.run_update_subtitles(language)
         self.assertEquals(self.mock_update_subtitles.call_count, 1)
         self.mock_update_subtitles.assert_called_with(self.video_url,
                                                       language, version)
@@ -217,7 +216,7 @@ class SubtitleTaskTest(TestCase):
         self.mock_update_subtitles.side_effect = exc
         language = self.video.subtitle_language('en')
         version = language.get_tip()
-        self.run_update_subtitles(language, version)
+        self.run_update_subtitles(language)
         self.assertEquals(self.mock_update_subtitles.call_count, 1)
         self.mock_update_subtitles.assert_called_with(self.video_url,
                                                       language, version)
@@ -270,7 +269,7 @@ class SubtitleTaskTest(TestCase):
 
         now_values = {}
 
-        def update_subtitles(video_url, language, version):
+        def update_subtitles(video_url, language, tip):
             now_values[language.id] = self.now
             if language.language_code == 'es':
                 raise SyncingError('Error')
@@ -376,8 +375,7 @@ class KalturaAccountTest(TestCase):
     @patch_for_test('externalsites.syncing.kaltura.update_subtitles')
     def test_kalturaaccount_update_subtitles(self, mock_update_subtitles):
         srt_data = babelsubs.to(self.version.get_subtitles(), 'srt')
-        self.account.update_subtitles(self.video_url, self.language,
-                                      self.version)
+        self.account.update_subtitles(self.video_url, self.language)
         mock_update_subtitles.assert_called_with(self.partner_id, self.secret,
                                                  self.entry_id, 'en',
                                                  srt_data)

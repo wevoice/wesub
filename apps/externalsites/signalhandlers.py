@@ -36,7 +36,7 @@ def on_public_tip_changed(signal, sender, version, **kwargs):
     language = sender
     for account, video_url in lookup_accounts(language.video):
         tasks.update_subtitles.delay(account.account_type, account.id,
-                                     video_url.id, language.id, version.id)
+                                     video_url.id, language.id)
 
 @receiver(subtitles.signals.language_deleted)
 def on_language_deleted(signal, sender, **kwargs):
