@@ -434,6 +434,13 @@ div.fix-chosen div.chzn-container {
                     border-style: dotted;
                     border-width: 0 0 1px 0;
                 }
+                &.action {
+                    font-size: 11px;
+		    padding-left: 30px;
+                    &:after {
+                        content: ' →';
+                    }
+                }
             }
         }
         p {
@@ -442,7 +449,7 @@ div.fix-chosen div.chzn-container {
         .thumb {
             position: absolute;
             top: 2em; left: 0;
-
+	    
             a {
                 display: inline-block;
                 max-height: 229px;
@@ -684,9 +691,12 @@ div.fix-chosen div.chzn-container {
     .thumb {
         height: 45px;
         width: 45px;
-
         img {
             height: 45px;
+            &.small {
+                height: 15px;
+                width: 15px;
+            }
         }
     }
     &.current {

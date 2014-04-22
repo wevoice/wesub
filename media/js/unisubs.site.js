@@ -285,7 +285,6 @@ var Site = function(Site) {
 
                     var $anc = $('a.truncated-expand', $block.parent());
                     $anc.click(function() {
-
                         if ($block.height() !== maxHeight) {
                             $block.height(maxHeight);
                             $anc.text('Expand');
@@ -703,7 +702,7 @@ var Site = function(Site) {
         // Teams
         team_applications: function() {
             that.Utils.chosenify();
-            that.Utils.truncateTextBlocks($('div.application-note'), 90);
+            that.Utils.truncateTextBlocks($('div.application-note'), 30);
         },
         team_members_list: function() {
             that.Utils.resetLangFilter();
