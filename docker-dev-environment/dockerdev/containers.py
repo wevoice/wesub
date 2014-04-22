@@ -43,11 +43,11 @@ def get_cid(image_name):
     return open(cid_path(image_name)).read().strip()
 
 def get_running_images():
-    output = get_docker_output("ps -q")
+    output = get_docker_output("ps -q --no-trunc")
     return [line.strip() for line in output.split("\n")]
 
 def get_all_images():
-    output = get_docker_output("ps -a -q")
+    output = get_docker_output("ps -a -q --no-trunc")
     return [line.strip() for line in output.split("\n")]
 
 def initialize_mysql_container():
