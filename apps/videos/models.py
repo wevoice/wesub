@@ -1909,11 +1909,16 @@ class VideoFeed(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, blank=True, null=True)
     team = models.ForeignKey("teams.Team", blank=True, null=True)
+    last_update = models.DateTimeField(null=True)
 
     YOUTUBE_PAGE_SIZE = 25
 
     def __unicode__(self):
         return self.url
+
+    @staticmethod
+    def now():
+        return datetime.now()
 
     def update(self):
         importer = VideoImporter(self.url, self.user, self.last_link)
@@ -1921,6 +1926,16 @@ class VideoFeed(models.Model):
 
         if importer.last_link is not None:
             self.last_link = importer.last_link
-            self.save()
+        self.last_update = VideoFeed.now()
+        self.save()
+        for video in new_videos:
+            ImportedVideo.objects.create(feed=self, video=video)
         signals.feed_imported.send(sender=self, new_videos=new_videos)
         return new_videos
+
+class ImportedVideo(models.Model):
+    feed = models.ForeignKey(VideoFeed)
+    video = models.OneToOneField(Video)
+
+    class Meta:
+        ordering = ('-id',)

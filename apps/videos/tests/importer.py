@@ -24,7 +24,7 @@ import mock
 
 from utils import test_utils, test_factories
 from videos import signals
-from videos.models import Video, VideoUrl, VideoFeed
+from videos.models import Video, VideoUrl, VideoFeed, ImportedVideo
 from videos.feed_parser import importer
 from videos.types import HtmlFiveVideoType
 
@@ -161,7 +161,13 @@ class VideoImporterTestCase(TestCase):
 
 class VideoFeedTest(TestCase):
     @test_utils.patch_for_test('videos.models.VideoImporter')
-    def test_video_feed(self, mock_video_importer_class):
+    def setUp(self, MockVideoImporter):
+        self.MockVideoImporter = MockVideoImporter
+        self.mock_video_importer = mock.Mock()
+        self.mock_video_importer.last_link = None
+        MockVideoImporter.return_value = self.mock_video_importer
+
+    def test_video_feed(self):
         mock_feed_imported_handler = mock.Mock()
         signals.feed_imported.connect(mock_feed_imported_handler, weak=False)
         self.addCleanup(signals.feed_imported.disconnect,
@@ -174,24 +180,57 @@ class VideoFeedTest(TestCase):
 
         feed_videos = list(test_factories.create_video() for i in xrange(3))
 
-        mock_video_importer = mock.Mock()
-        mock_video_importer_class.return_value = mock_video_importer
-        mock_video_importer.last_link = last_link
-        mock_video_importer.import_videos.return_value = feed_videos
+        self.mock_video_importer.last_link = last_link
+        self.mock_video_importer.import_videos.return_value = feed_videos
         rv = feed.update()
-        mock_video_importer_class.assert_called_with(url, user, '')
-        mock_video_importer.import_videos.assert_called()
+        self.MockVideoImporter.assert_called_with(url, user, '')
+        self.mock_video_importer.import_videos.assert_called()
         self.assertEquals(rv, feed_videos)
         self.assertEquals(feed.last_link, last_link)
         mock_feed_imported_handler.assert_called_with(
             signal=signals.feed_imported, sender=feed, new_videos=feed_videos)
         # check doing another update, we should pass the last link in to
         # VideoImporter
-        mock_video_importer.import_videos.return_value = []
+        self.mock_video_importer.import_videos.return_value = []
         rv = feed.update()
-        mock_video_importer_class.assert_called_with(url, user, last_link)
-        mock_video_importer.import_videos.assert_called()
+        self.MockVideoImporter.assert_called_with(url, user, last_link)
+        self.mock_video_importer.import_videos.assert_called()
         self.assertEquals(rv, [])
         mock_feed_imported_handler.assert_called_with(
             signal=signals.feed_imported, sender=feed, new_videos=[])
-        self.assertEquals(feed.last_link, mock_video_importer.last_link)
+        self.assertEquals(feed.last_link, self.mock_video_importer.last_link)
+
+    @test_utils.patch_for_test('videos.models.VideoFeed.now')
+    def test_update_logging(self, mock_now):
+        feed = VideoFeed.objects.create(url='http://example.com/feed.rss')
+        # run update().  Check that we update last_imported and that
+        # ImportedVideo objects get created.  ImportedVideo objects should be
+        # ordered last to first
+        now = datetime.datetime(2000, 1, 1)
+        mock_now.return_value = now
+        videos = [test_factories.create_video() for i in xrange(5)]
+        self.mock_video_importer.import_videos.return_value = videos
+        feed.update()
+        self.assertEquals(feed.last_update, now)
+        self.assertEquals([iv.video for iv in feed.importedvideo_set.all()],
+                          list(reversed(videos)))
+        # run VideoFeed.update() again.  new videos should be added at the
+        # start of the list
+        videos2 = [test_factories.create_video() for i in xrange(5)]
+        self.mock_video_importer.import_videos.return_value = videos2
+        now += datetime.timedelta(days=1)
+        mock_now.return_value = now
+        feed.update()
+        self.assertEquals(feed.last_update, now)
+        self.assertEquals([iv.video for iv in feed.importedvideo_set.all()],
+                          list(reversed(videos2)) + list(reversed(videos)))
+        # run VideoFeed.update() one more time, with no new videos.
+        # last_update should still be upated
+        # start of the list
+        self.mock_video_importer.import_videos.return_value = []
+        now += datetime.timedelta(days=1)
+        mock_now.return_value = now
+        feed.update()
+        self.assertEquals(feed.last_update, now)
+        self.assertEquals([iv.video for iv in feed.importedvideo_set.all()],
+                          list(reversed(videos2)) + list(reversed(videos)))
