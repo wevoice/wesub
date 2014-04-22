@@ -109,6 +109,21 @@ class TestCaseCreateVideos(WebdriverTestCase):
         self.assertTrue(self.create_pg.submit_success())
         self.assertTrue(self.video_pg.video_embed_present())
 
+    def test_create_with_params(self):
+
+        """Add a an mp4 with params in the url.
+
+        """
+
+        url = ("http://s3.us.archive.org/nextdayvideo/enthought/scipy_2012/"
+              "Parallel_High_Performance_Statistical_Bootstrapping_in_Python.mp4"
+              "?Signature=Ku0vNWttnyZ4leEpRdGzq59nz0I%3D&Expires=1346740237"
+              "&AWSAccessKeyId=FEWGReWX3QbNk0h3")
+        self.create_pg.submit_video(url)
+        self.assertTrue(self.create_pg.submit_success())
+        self.assertTrue(self.video_pg.video_embed_present())
+
+
     def test_create_blip_flv(self):
         """Add a blip video.
 
