@@ -101,6 +101,15 @@ body {
 .v1 .team-banner {
     margin-bottom: 2em;
 }
+
+.v1 form {
+    span.bulk-actions {
+        button {
+           margin-left: 15px;
+        }
+    }
+}
+
 p.empty {
     clear: both;
     color: $normal;

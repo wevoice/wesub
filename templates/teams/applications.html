@@ -45,7 +45,7 @@
                             </div>
                         {% endif %}
 			    <span  class="thumb">
-				<input type="checkbox" value="{{item.id}}" name="applications[]">
+				<input class="bulkable" type="checkbox" value="{{item.id}}" name="applications[]">
 				<a href="{{ item.user.get_absolute_url }}">
 				  <img src="{{ item.user.avatar }}" class="small" alt="{{ item.user }} avatar">
 				</a>
@@ -64,8 +64,11 @@
                 {% endfor %}
             </ul>
             {% if is_paginated %}{% paginator %}{% endif %}
-	    <button type="submit" name="deny">{% trans "Deny selected" %}</button>
-	    <button type="submit" name="approve">{% trans "Approve selected" %}</button>
+	    <span class="bulk-actions">
+	      <input type="checkbox" id="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+	      <button type="submit" name="deny">{% trans "Deny selected" %}</button>
+	      <button type="submit" name="approve">{% trans "Approve selected" %}</button>
+	    </span>
 	</form>
         {% else %}
             <p class="empty">{% trans "There are no applications right now" %}...</p>
