@@ -859,7 +859,6 @@ def applications(request, slug):
         'team': team
     }
     if request.method == 'POST':
-        applications = request.POST.getlist('applications[]')
         if 'approve' in request.POST or 'deny' in request.POST:
             applications = request.POST.getlist('applications[]')
             approve = ('approve' in request.POST)
