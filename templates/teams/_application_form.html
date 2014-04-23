@@ -29,16 +29,16 @@
                                 We request that each new applicant does at least one full set of subtitles within the first week of joining. Aside from that, it’s up to you!
                             {% endblocktrans %}
                         </p>
+			<h4>{% trans "About you" %}</h4>
+                        <p>
+                        {% blocktrans %}
+                        Tell us a little bit about yourself and why you’re interested in translating with {{ team }}. This should be 3-5 sentences, no longer!
+                        {% endblocktrans %}
+                        </p>
                     {% endif %}
                 {% endwith %}
             </div>
             <div class="form">
-                <h4>{% trans "About you" %}</h4>
-                <p>
-                    {% blocktrans %}
-                        Tell us a little bit about yourself and why you’re interested in translating with {{ team }}. This should be 3-5 sentences, no longer!
-                    {% endblocktrans %}
-                </p>
                 <textarea></textarea>
             </div>
         </div>
