@@ -89,7 +89,7 @@ from videos.tasks import (
     upload_subtitles_to_original_service, delete_captions_in_original_service,
     delete_captions_in_original_service_by_code
 )
-from videos.models import Action, VideoUrl, Video
+from videos.models import Action, VideoUrl, Video, VideoFeed
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
@@ -624,7 +624,9 @@ def add_videos(request, slug):
     if form.is_valid():
         form.save()
         messages.success(request, form.success_message())
-        return redirect(team.get_absolute_url())
+        return redirect(reverse('teams:video_feeds', kwargs={
+            'slug': team.slug,
+        }))
 
     return { 'form': form, 'team': team, }
 
@@ -2199,3 +2201,43 @@ def billing(request):
         'cutoff': BILLING_CUTOFF
     }, RequestContext(request))
 
+@render_to('teams/feeds.html')
+@login_required
+def video_feeds(request, slug):
+    team = get_team_for_view(slug, request.user)
+    if not team.is_member(request.user):
+        return redirect_to_login(request.build_absolute_uri())
+
+    return {
+        'team': team,
+        'feeds': team.videofeed_set.all(),
+        'can_create_feed': can_add_video(team, request.user)
+    }
+
+@render_to('teams/feed.html')
+@login_required
+def video_feed(request, slug, feed_id):
+    team = get_team_for_view(slug, request.user)
+    if not team.is_member(request.user):
+        return redirect_to_login(request.build_absolute_uri())
+    feed = get_object_or_404(VideoFeed, team=team, id=feed_id)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'update':
+            feed.update()
+        return redirect(reverse('teams:video_feed', kwargs={
+            'slug': team.slug,
+            'feed_id': feed.id,
+        }))
+
+
+    imported_videos, pagination_info = paginate(feed.importedvideo_set.all(),
+                                                12, request.GET.get('page'))
+    context = {
+        'team': team,
+        'feed': feed,
+        'imported_videos': [iv.video for iv in imported_videos],
+    }
+    context.update(pagination_info)
+    return context

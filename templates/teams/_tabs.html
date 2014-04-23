@@ -21,6 +21,11 @@
             {% trans "Activity" %}
         </a>
     </li>
+    <li{% if current == "video_feeds" %} class="current" {% endif %}>
+        <a href="{% url teams:video_feeds team.slug %}">
+            {% trans "Feeds" %}
+        </a>
+    </li>
     {% if team|is_team_member:user %}
         {% if team.workflow_enabled %}
             <li{% if current == "tasks" %} class="current" {% endif %}>

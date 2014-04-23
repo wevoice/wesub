@@ -2738,6 +2738,60 @@ a.truncated-expand {
     }
 }
 
+#teams.video-feed {
+    h1 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    h2 {
+        margin: 1em 0 0 0;
+    }
+
+    .tools {
+
+        form {
+            display: inline;
+            margin-left: 12px;
+        }
+
+        div.submit {
+             margin: 0;
+             border: none;
+             display: inline;
+        }
+    }
+
+    .listing li.video {
+        width: 288px;
+        float: left;
+        padding: 1em 11px;
+        border: none;
+
+        a {
+            display: block;
+            color: #eee;
+            position: relative;
+        }
+
+        img {
+            width: 288px;
+            height: 162px;
+        }
+
+        h4 {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1em 10px;
+            background: rgba(0,0,0,.65);
+        }
+    }
+
+}
+
 
 #error {
 

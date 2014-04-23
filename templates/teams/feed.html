@@ -1,0 +1,56 @@
+{% extends "teams/base.html" %}
+
+{% load i18n l10n paginator teams_tags %}
+
+{% block title %}
+    {{ team }} | Amara
+{% endblock %}
+
+{% block body_attrs %}id="teams" class="v1 video-feed"{% endblock %}
+
+{% block view_content %}
+
+    <div class="view grid_8 omega">
+        {% with "video_feeds" as current %}
+            {% include "teams/_tabs.html" %}
+        {% endwith %}
+
+        <div class="tools group">
+            <h1>{{ feed.url }}</h1>
+            <span class="last-update">
+                {% if feed.last_update %}
+                {% blocktrans with feed.last_update|localize as last_update %}
+                Last import attempt: {{ last_update }}
+                {% endblocktrans %}
+                {% else %}
+                    {% trans "No import attempts" %}
+                {% endif %}
+            </span>
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update">
+                <div class="submit">
+                    <input type="submit" class="reduced" value="{% trans "Import Now" %}">
+                </div>
+            </form>
+        </div>
+
+        {% if imported_videos %}
+            <h2>{% trans "Videos:" %}</h2>
+            <ul class="listing group">
+                {% for video in imported_videos %}
+                    <li class="video">
+                        <a href="{{ video.get_absolute_url }}">
+                            <img src="{{ video.get_medium_thumbnail }}" alt="">
+                            <h4>{{ video.title_display }}</h4>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% if is_paginated %}{% paginator %}{% endif %}
+        {% else %}
+            <p class="empty">{% trans "No videos imported yet." %}</p>
+        {% endif %}
+    </div>
+
+{% endblock %}
