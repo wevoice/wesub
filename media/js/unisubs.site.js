@@ -271,6 +271,16 @@ var Site = function(Site) {
                 }
             });
         },
+        bulkCheckboxes: function(bulkCheckbox, bulkableCheckboxes, bulkCheckboxAnchor) {
+	    bulkCheckbox.change(function() {
+		bulkableCheckboxes.attr('checked', $(this).attr('checked'));
+		bulkCheckbox.attr("checked", $(this).attr('checked'))
+	    });
+	    bulkCheckboxAnchor.click(function() {
+		bulkCheckbox.attr("checked", !bulkCheckbox.attr("checked")).change();
+		return false;
+	    });
+	},
         truncateTextBlocks: function(blocks, maxHeight) {
             // Takes a list of jQuery objects and sets up
             // a nice truncate-by-height UI.
@@ -285,7 +295,6 @@ var Site = function(Site) {
 
                     var $anc = $('a.truncated-expand', $block.parent());
                     $anc.click(function() {
-
                         if ($block.height() !== maxHeight) {
                             $block.height(maxHeight);
                             $anc.text('Expand');
@@ -703,7 +712,8 @@ var Site = function(Site) {
         // Teams
         team_applications: function() {
             that.Utils.chosenify();
-            that.Utils.truncateTextBlocks($('div.application-note'), 90);
+            that.Utils.truncateTextBlocks($('div.application-note'), 30);
+            that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
         },
         team_members_list: function() {
             that.Utils.resetLangFilter();
