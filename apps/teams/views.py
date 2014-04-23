@@ -860,26 +860,29 @@ def applications(request, slug):
     }
     if request.method == 'POST':
         if 'approve' in request.POST or 'deny' in request.POST:
+            if not team.is_member(request.user):
+                raise Http404
             applications = request.POST.getlist('applications[]')
             approve = ('approve' in request.POST)
-            for application_pk in applications:
-                try:
-                    if not approve_deny_application(request.user, slug, application_pk, approve=approve):
-                        if approve:
-                            messages.error(request, _(u'You can\'t approve applications.'))
-                        else:
-                            messages.error(request, _(u'You can\'t deny applications.'))
-                        break
-                except Application.DoesNotExist:
-                    messages.error(request, _(u'Application does not exist.'))
-                    break
-                except ApplicationInvalidException:
-                    messages.error(request, _(u'Application already processed.'))
-                    break
-            if approve:
-                messages.success(request, _(u'Applications approved.'))
+            if not can_invite(team, request.user):
+                if approve:
+                    messages.error(request, _(u'You can\'t approve applications.'))
+                else:
+                    messages.error(request, _(u'You can\'t deny applications.'))
             else:
-                messages.success(request, _(u'Applications denied.'))
+                for application_pk in applications:
+                    try:
+                        approve_deny_application(request.user, team, application_pk, approve=approve)
+                    except Application.DoesNotExist:
+                        messages.error(request, _(u'Application does not exist.'))
+                        break
+                    except ApplicationInvalidException:
+                        messages.error(request, _(u'Application already processed.'))
+                        break
+                if approve:
+                    messages.success(request, _(u'Applications approved.'))
+                else:
+                    messages.success(request, _(u'Applications denied.'))
 
     return object_list(request, queryset=qs,
                        paginate_by=APLICATIONS_ON_PAGE,
@@ -887,36 +890,29 @@ def applications(request, slug):
                        template_object_name='applications',
                        extra_context=extra_context)
 
-def approve_deny_application(user, slug, application_pk, approve=True):
+def approve_deny_application(user, team, application_pk, approve=True):
     """
     :raises Http404: If user is not a team member
     :raises Application.DoesNotExist: If application does not exist
     :raises ApplicationInvalidException: If application was already processed
     returns True if user can approve, False otherwise
     """
-    team = get_team_for_view(slug, user)
-    if not team.is_member(user):
-        raise Http404
-    if can_invite(team, user):
-        application = team.applications.get(pk=application_pk)
-        if approve:
-            application.approve(user, "web UI")
-        else:
-            application.deny(user, "web UI")
+    application = team.applications.get(pk=application_pk)
+    if approve:
+        application.approve(user, "web UI")
     else:
-        return False
-    return True
+        application.deny(user, "web UI")
 
 @login_required
 def approve_application(request, slug, application_pk):
     team = get_team_for_view(slug, request.user)
     if not team.is_member(request.user):
         raise Http404
+    if not can_invite(team, request.user):
+        messages.error(request, _(u'You can\'t approve applications.'))
     try:
-        if approve_deny_application(request.user, slug, application_pk, approve=True):
-            messages.success(request, _(u'Application approved.'))
-        else:
-            messages.error(request, _(u'You can\'t approve applications.'))
+        approve_deny_application(request.user, team, application_pk, approve=True)
+        messages.success(request, _(u'Application approved.'))
     except Application.DoesNotExist:
         messages.error(request, _(u'Application does not exist.'))
     except ApplicationInvalidException:
@@ -928,11 +924,11 @@ def deny_application(request, slug, application_pk):
     team = get_team_for_view(slug, request.user)
     if not team.is_member(request.user):
         raise Http404
+    if not can_invite(team, request.user):
+        messages.error(request, _(u'You can\'t deny applications.'))
     try:
-        if approve_deny_application(request.user, slug, application_pk, approve=False):
-            messages.success(request, _(u'Applications denied.'))
-        else:
-            messages.error(request, _(u'You can\'t deny applications.'))
+        approve_deny_application(request.user, team, application_pk, approve=False)
+        messages.success(request, _(u'Application denied.'))
     except Application.DoesNotExist:
         messages.error(request, _(u'Application does not exist.'))
     except ApplicationInvalidException:
