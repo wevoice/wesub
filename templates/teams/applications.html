@@ -27,9 +27,14 @@
         {% endwith %}
 
         {% if applications_list %}
-            {% if is_paginated %}{% paginator %}{% endif %}
 	<form method="post" action="">{% csrf_token %}
-            <ul class="members listing">
+	  <span class="bulk-actions">
+	    <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+	    <button type="submit" name="deny">{% trans "Deny selected" %}</button>
+	    <button type="submit" name="approve">{% trans "Approve selected" %}</button>
+	  </span>
+          {% if is_paginated %}{% paginator %}{% endif %}
+          <ul class="members listing">
                 {% for item in applications_list %}
                 <li>
                   <h3>
@@ -65,7 +70,7 @@
             </ul>
             {% if is_paginated %}{% paginator %}{% endif %}
 	    <span class="bulk-actions">
-	      <input type="checkbox" id="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+	      <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
 	      <button type="submit" name="deny">{% trans "Deny selected" %}</button>
 	      <button type="submit" name="approve">{% trans "Approve selected" %}</button>
 	    </span>

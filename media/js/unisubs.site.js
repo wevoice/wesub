@@ -273,7 +273,8 @@ var Site = function(Site) {
         },
         bulkCheckboxes: function(bulkCheckbox, bulkableCheckboxes, bulkCheckboxAnchor) {
 	    bulkCheckbox.change(function() {
-		bulkableCheckboxes.attr('checked',bulkCheckbox.attr('checked'));
+		bulkableCheckboxes.attr('checked', $(this).attr('checked'));
+		bulkCheckbox.attr("checked", $(this).attr('checked'))
 	    });
 	    bulkCheckboxAnchor.click(function() {
 		bulkCheckbox.attr("checked", !bulkCheckbox.attr("checked")).change();
@@ -712,7 +713,7 @@ var Site = function(Site) {
         team_applications: function() {
             that.Utils.chosenify();
             that.Utils.truncateTextBlocks($('div.application-note'), 30);
-            that.Utils.bulkCheckboxes($('#bulk-select'), $('input.bulkable'), $('a.bulk-select'));
+            that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
         },
         team_members_list: function() {
             that.Utils.resetLangFilter();
