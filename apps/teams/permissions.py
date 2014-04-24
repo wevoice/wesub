@@ -439,7 +439,7 @@ def can_view_approve_tab(team, user):
     """
     role = get_role_for_target(user, team)
 
-    return role in [ROLE_ADMIN, ROLE_OWNER, ROLE_MANAGER]
+    return role in [ROLE_ADMIN, ROLE_OWNER]
 
 def can_change_team_settings(team, user):
     return can_view_settings_tab(team, user)

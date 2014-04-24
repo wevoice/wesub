@@ -372,7 +372,7 @@ class Team(models.Model):
         return qs.exists()
 
     def can_bulk_approve(self, user):
-        return self.is_owner(user) or self.is_admin(user) or self.is_manager(user) 
+        return self.is_owner(user) or self.is_admin(user)
 
     def is_owner(self, user):
         """
