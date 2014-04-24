@@ -106,6 +106,7 @@ CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS = getattr(settings, 'CUTTOFF_DUPLICATES_N
 VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 16)
 MEMBERS_ON_PAGE = getattr(settings, 'MEMBERS_ON_PAGE', 15)
 APLICATIONS_ON_PAGE = getattr(settings, 'APLICATIONS_ON_PAGE', 15)
+UNASSIGNED_TASKS_ON_PAGE = getattr(settings, 'UNASSIGNED_TASKS_ON_PAGE', 30)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
 DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
@@ -843,6 +844,36 @@ def remove_member(request, slug, user_pk):
     else:
         messages.error(request, _(u'You don\'t have permission to remove this member from the team.'))
         return HttpResponseRedirect(return_path)
+
+@login_required
+def approvals(request, slug):
+    team = get_team_for_view(slug, request.user)
+
+    if not team.is_member(request.user):
+        return  HttpResponseForbidden("Not allowed")
+
+    if not team.can_bulk_approve(request.user):
+        return  HttpResponseForbidden("Not allowed")
+
+    qs = team.unassigned_tasks()
+    extra_context = {
+        'team': team
+    }
+
+    if request.method == 'POST':
+        if 'approve' in request.POST:
+            approvals = request.POST.getlist('approvals[]')
+            approve = ('approve' in request.POST)
+            for  approval_pk in approvals:
+                task = team.get_task(approval_pk)
+                task.complete_approved(request.user)
+
+    return object_list(request, queryset=qs,
+                       paginate_by=UNASSIGNED_TASKS_ON_PAGE,
+                       template_name='teams/approvals.html',
+                       template_object_name='approvals',
+                       extra_context=extra_context)
+
 
 @login_required
 def applications(request, slug):

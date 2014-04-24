@@ -37,6 +37,7 @@ from utils.text import fmt
 from apps.teams.forms import TaskUploadForm
 from apps.teams.permissions import (
     can_view_settings_tab as _can_view_settings_tab,
+    can_view_approve_tab as _can_view_approve_tab,
     can_edit_video as _can_edit_video,
     can_rename_team as _can_rename_team,
     can_perform_task as _can_perform_task,
@@ -343,6 +344,10 @@ def member_projects(context, member, varname):
 @register.filter
 def can_view_settings_tab(team, user):
    return _can_view_settings_tab(team, user)
+
+@register.filter
+def can_view_approve_tab(team, user):
+   return _can_view_approve_tab(team, user)
 
 @register.filter
 def can_rename_team(team, user):

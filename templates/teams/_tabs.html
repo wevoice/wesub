@@ -21,6 +21,14 @@
             {% trans "Activity" %}
         </a>
     </li>
+
+    {% if team|can_view_approve_tab:user %}
+    <li{% if current == "approvals" %} class="current" {% endif %}>
+        <a href="{% url teams:approvals team.slug %}">
+            {% trans "Pending" %}
+        </a>
+    </li>
+    {% endif %}
     {% if team|is_team_member:user %}
         {% if team.workflow_enabled %}
             <li{% if current == "tasks" %} class="current" {% endif %}>

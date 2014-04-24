@@ -710,6 +710,10 @@ var Site = function(Site) {
         },
 
         // Teams
+        team_approvals: function() {
+            that.Utils.chosenify();
+            that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
+        },
         team_applications: function() {
             that.Utils.chosenify();
             that.Utils.truncateTextBlocks($('div.application-note'), 30);
