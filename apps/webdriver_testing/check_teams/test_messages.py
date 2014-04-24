@@ -139,7 +139,7 @@ class TestCaseMessageUsers(WebdriverTestCase):
         for m in mail.outbox:
             message_recipients.append(m.recipients()[0].split('@')[0])
         expected_recipients = ['de_en', 'pt_br_fr_de']
-        self.assertEqual(expected_recipients, message_recipients)
+        self.assertEqual(sorted(expected_recipients), sorted(message_recipients))
      
 
     def test_whole_team_message(self):

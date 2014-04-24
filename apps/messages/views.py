@@ -120,12 +120,15 @@ def new(request):
                 # But that means that we need to sort out the pk of newly created messages to
                 # be able to send the notifications
                 message_list = []
-                for member in form.cleaned_data['team'].members.all():
-                    if member.user != request.user:
-                        if (len(language) == 0) or (language in set(UserLanguage.objects.filter(user__exact=member.user).values_list('language', flat=True))):
-                            message_list.append(Message(user=member.user, author=request.user,
-                                        content=form.cleaned_data['content'],
-                                        subject=form.cleaned_data['subject']))
+                members = []
+                if len(language) == 0:
+                    members = map(lambda member: member.user, form.cleaned_data['team'].members.all().exclude(user__exact=request.user))
+                else:
+                    members = map(lambda member: member.user, UserLanguage.objects.filter(user__in=form.cleaned_data['team'].members.values('user')).filter(language__exact=language).exclude(user__exact=request.user))
+                for member in members:
+                    message_list.append(Message(user=member, author=request.user,
+                                                content=form.cleaned_data['content'],
+                                                subject=form.cleaned_data['subject']))
                 Message.objects.bulk_create(message_list);
                 new_messages_ids = Message.objects.filter(created__gt=now).values_list('pk', flat=True)
                 for pk in new_messages_ids:

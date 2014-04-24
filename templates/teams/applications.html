@@ -27,22 +27,34 @@
         {% endwith %}
 
         {% if applications_list %}
-            {% if is_paginated %}{% paginator %}{% endif %}
-            <ul class="members listing">
+	<form method="post" action="">{% csrf_token %}
+	  <span class="bulk-actions">
+	    <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+	    <button type="submit" name="deny">{% trans "Deny selected" %}</button>
+	    <button type="submit" name="approve">{% trans "Approve selected" %}</button>
+	  </span>
+          {% if is_paginated %}{% paginator %}{% endif %}
+          <ul class="members listing">
                 {% for item in applications_list %}
-                    <li>
-                        <h3>
-                            <a href="{{ item.user.get_absolute_url }}">{{ item.user }}</a>
-                            {% for lang in item.user.get_languages %}
-                                <span class="descriptor">{{ lang.get_language_display }}</span>
-                            {% endfor %}
-                        </h3>
+                <li>
+                  <h3>
+                    <a href="{{ item.user.get_absolute_url }}">{{ item.user }}</a>
+		    <a class="action" href="{% url messages:new %}?user={{ item.user.username }}">{% trans 'Send a message' %}</a>
+                    {% for lang in item.user.get_languages %}
+                    <span class="descriptor">{{ lang.get_language_display }}</span>
+                    {% endfor %}
+                  </h3>
                         {% if item.note %}
                             <div class="application-note">
                                 {{ item.note|urlize|linebreaksbr }}
                             </div>
                         {% endif %}
-                        <a href="{{ item.user.get_absolute_url }}" class="thumb"><img src="{{ item.user.avatar }}" alt="{{ item.user }} avatar"></a>
+			    <span  class="thumb">
+				<input class="bulkable" type="checkbox" value="{{item.id}}" name="applications[]">
+				<a href="{{ item.user.get_absolute_url }}">
+				  <img src="{{ item.user.avatar }}" class="small" alt="{{ item.user }} avatar">
+				</a>
+			    </span>
                         {% if team|can_approve_application:user %}
                             <ul class="actions">
                                 <li>
@@ -51,17 +63,18 @@
                                 <li>
                                     <a href="{% url teams:deny_application team.slug item.pk %}">{% trans 'Deny' %}</a>
                                 </li>
-                                <li>
-                                    <a href="{% url messages:new %}?user={{ item.user.username }}">
-                                        {% trans 'Send a message' %}
-                                    </a>
-                                </li>
                             </ul>
                         {% endif %}
                     </li>
                 {% endfor %}
             </ul>
             {% if is_paginated %}{% paginator %}{% endif %}
+	    <span class="bulk-actions">
+	      <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+	      <button type="submit" name="deny">{% trans "Deny selected" %}</button>
+	      <button type="submit" name="approve">{% trans "Approve selected" %}</button>
+	    </span>
+	</form>
         {% else %}
             <p class="empty">{% trans "There are no applications right now" %}...</p>
         {% endif %}
