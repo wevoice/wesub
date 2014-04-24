@@ -18,7 +18,8 @@
 
 from django import forms
 from django.core import validators
-from django.utils.translation import gettext as _
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 
 from externalsites import models
 
@@ -78,3 +79,50 @@ class KalturaAccountForm(AccountForm):
                 raise forms.ValidationError(
                     _('Partner ID must contain only numbers'))
         return self.cleaned_data['partner_id']
+
+class BrightcoveAccountForm(AccountForm):
+    label = _("Brightcove")
+
+    FEED_ALL_NEW = 'N'
+    FEED_WITH_TAGS = 'T'
+    FEED_CHOICES = (
+        (FEED_ALL_NEW, ugettext_lazy('All new videos')),
+        (FEED_WITH_TAGS, ugettext_lazy('Videos with tags:')),
+    )
+
+    publisher_id = forms.IntegerField()
+    feed_enabled = forms.BooleanField(required=False)
+    player_id = forms.CharField(required=False)
+    feed_type = forms.ChoiceField(choices=FEED_CHOICES,
+                                  initial=FEED_ALL_NEW)
+    feed_tags = forms.CharField(required=False)
+
+    class Meta:
+        model = models.BrightcoveAccount
+        fields = ['publisher_id', 'write_token' ]
+
+    def clean(self):
+        if self.cleaned_data['feed_enabled']:
+            if not self.cleaned_data['player_id']:
+                self._errors['player_id'] = [
+                    forms.ValidationError(
+                        _('Must specify a player id to import from a feed'))
+                ]
+            if (self.cleaned_data['feed_type'] == self.FEED_WITH_TAGS and
+                not self.cleaned_data['feed_tags']):
+                self._errors['feed_tags'] = [
+                    forms.ValidationError(_('Must specify tags to import'))
+                ]
+        return self.cleaned_data
+
+    def save(self, commit=True):
+        account = AccountForm.save(self, commit)
+        if self.cleaned_data['feed_enabled']:
+            if self.cleaned_data['feed_type'] == self.FEED_ALL_NEW:
+                account.make_feed(self.cleaned_data['player_id'])
+            elif self.cleaned_data['feed_type'] == self.FEED_WITH_TAGS:
+                account.make_feed(self.cleaned_data['player_id'],
+                                  self.cleaned_data['feed_tags'].split())
+        else:
+            account.remove_feed()
+        return account
