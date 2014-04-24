@@ -19,11 +19,148 @@
 from __future__ import absolute_import
 
 from django.test import TestCase
+import mock
 
-from externalsites.forms import BrightcoveAccountForm
+from externalsites.forms import BrightcoveAccountForm, AccountFormset
 from externalsites.models import BrightcoveAccount
 from videos.models import VideoFeed
 from utils import test_factories
+
+class TestAccountFormset(TestCase):
+    def setUp(self):
+        self.team = test_factories.create_team()
+        self.setup_forms()
+
+    def setup_forms(self):
+        self.foo_form_class = self.make_mock_form_class()
+        self.bar_form_class = self.make_mock_form_class()
+        self.foo_form = self.foo_form_class.return_value
+        self.bar_form = self.bar_form_class.return_value
+
+    def make_mock_form_class(self):
+        form = mock.Mock()
+        form.is_valid.return_value = True
+        form_class = mock.Mock()
+        form_class.return_value = form
+        form_class.get_account.return_value = None
+        return form_class
+
+    def make_formset(self, post_data=None):
+        class TestAccountFormset(AccountFormset):
+            form_classes = {
+                'foo': self.foo_form_class,
+                'bar': self.bar_form_class,
+            }
+        return TestAccountFormset(self.team, post_data)
+
+    def test_forms(self):
+        # We should create a form object for each account form.  Also we
+        # should create a form to enable/disable each account.
+        formset = self.make_formset()
+        self.assertEquals(set(formset.keys()),
+                          set(['foo', 'bar', 'enabled_accounts']))
+        self.foo_form_class.assert_called_with(self.team, None, instance=None,
+                                               prefix='foo')
+        self.bar_form_class.assert_called_with(self.team, None, instance=None,
+                                               prefix='bar')
+
+    def test_forms_and_fields_with_post_data(self):
+        data = {
+            'enabled_accounts-foo': '1',
+            'foo': 'bar',
+        }
+        formset = self.make_formset(data)
+        self.assertEquals(set(formset.keys()),
+                          set(['foo', 'bar', 'enabled_accounts']))
+        # foo is enabled, so it should get data
+        self.foo_form_class.assert_called_with(self.team, data, instance=None,
+                                               prefix='foo')
+        # bar is not enabled, so it should be unbound
+        self.bar_form_class.assert_called_with(self.team, None, instance=None,
+                                               prefix='bar')
+
+    def test_forms_and_fields_with_existing_accounts(self):
+        # AccountFormset should call get_account() for each form class.  If it
+        # returns a value, then we should pass it as the instance argument to
+        # the form constructor
+        foo_account = mock.Mock()
+        self.foo_form_class.get_account.return_value = foo_account
+        formset = self.make_formset()
+        self.foo_form_class.get_account.assert_called_with(self.team)
+        self.foo_form_class.assert_called_with(self.team, None,
+                                               instance=foo_account,
+                                               prefix='foo')
+
+    def test_accounts_enabled_form(self):
+        foo_account = mock.Mock()
+        self.foo_form_class.get_account.return_value = mock.Mock()
+        formset = self.make_formset()
+
+        self.assertEquals(set(formset['enabled_accounts'].fields.keys()),
+                          set(['foo', 'bar']))
+        foo_enabled_field = formset['enabled_accounts'].fields['foo']
+        bar_enabled_field = formset['enabled_accounts'].fields['bar']
+
+        # we should allow users to check or not check the checkboxes
+        self.assertEquals(foo_enabled_field.required, False)
+        self.assertEquals(bar_enabled_field.required, False)
+        # the label should always be "Enabled"
+        self.assertEquals(foo_enabled_field.label, "Enabled")
+        self.assertEquals(bar_enabled_field.label, "Enabled")
+        # we should set the initial value to True if the account is created
+        self.assertEquals(foo_enabled_field.initial, True)
+        self.assertEquals(bar_enabled_field.initial, False)
+
+    def test_is_valid(self):
+        # is valid should return true if all forms either valid or not enabled
+        data = {
+            'enabled_accounts-foo': '1',
+            'enabled_accounts-bar': '1',
+            'foo': 'bar',
+        }
+        formset = self.make_formset(data)
+        self.assertEquals(formset.is_valid(), True)
+        self.foo_form.is_valid.assert_called_with()
+        self.bar_form.is_valid.assert_called_with()
+
+        self.foo_form.is_valid.return_value = False
+        self.assertEquals(self.make_formset(data).is_valid(), False)
+
+        # if the foo account is not enabled, we shouldn't call is_valid() for
+        # it
+        del data['enabled_accounts-foo']
+        self.foo_form.is_valid.reset_mock()
+        self.foo_form.is_valid.return_value = False
+        self.bar_form.is_valid.reset_mock()
+        self.assertEquals(self.make_formset(data).is_valid(), True)
+        self.assertEquals(self.foo_form.is_valid.call_count, 0)
+        self.assertEquals(self.bar_form.is_valid.call_count, 1)
+
+    def test_is_valid_no_post_data(self):
+        # check a corner case, calling is_valid() without post data
+        formset = self.make_formset()
+        self.assertEquals(formset.is_valid(), False)
+
+    def test_save(self):
+        # save should call save on all account forms that are enabled
+        data = {
+            'enabled_accounts-foo': '1',
+            'enabled_accounts-bar': '1',
+        }
+        self.make_formset(data).save()
+        self.foo_form.save.assert_called_with()
+        self.bar_form.save.assert_called_with()
+
+    def test_delete_accounts(self):
+        # If enabled is not set, then we should delete accounts
+        data = {
+            'enabled_accounts-foo': '1',
+        }
+        self.make_formset(data).save()
+        self.foo_form.save.assert_called_with()
+        self.assertEquals(self.foo_form.delete_account.call_count, 0)
+        self.assertEquals(self.bar_form.save.call_count, 0)
+        self.bar_form.delete_account.assert_called_with()
 
 class BrightcoveFormTest(TestCase):
     def setUp(self):
@@ -119,7 +256,7 @@ class BrightcoveFormTest(TestCase):
             'player_id': self.player_id,
             'feed_type': BrightcoveAccountForm.FEED_ALL_NEW,
             'feed_tags': '',
-        })
+        }, instance=account)
         account = form.save()
         self.assertEquals(account.import_feed, None)
         self.assert_(not VideoFeed.objects.filter(id=old_import_feed.id))
