@@ -23,8 +23,8 @@ from django.test import TestCase
 
 from apps.teams.models import Team, TeamMember, TeamVideo, Project
 from apps.videos.models import Video, VideoUrl
-from auth.models import CustomUser as User
-from utils import test_factories
+from apps.auth.models import CustomUser as User
+from utils.factories import *
 from utils.panslugify import pan_slugify
 
 class ViewsTests(TestCase):
@@ -32,9 +32,7 @@ class ViewsTests(TestCase):
         self.auth = {
             "username": u"admin",
             "password": u"admin"}
-        self.user = test_factories.create_user(is_staff=True,
-                                               is_superuser=True,
-                                               **self.auth)
+        self.user = UserFactory(is_staff=True, is_superuser=True, **self.auth)
 
     def _create_base_team(self):
        self.team = Team(
@@ -74,14 +72,14 @@ class ViewsTests(TestCase):
         self.client.login(**self.auth)
         url = reverse("teams:settings_basic", kwargs={"slug": team.slug})
 
-        member = self._create_member(team, TeamMember.ROLE_ADMIN)
-        videos = [test_factories.create_video() for i in xrange(4)]
+        member = TeamMemberFactory(team=team, role=TeamMember.ROLE_ADMIN)
+        videos = [VideoFactory() for i in xrange(4)]
 
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
 
         for video in videos:
-            test_factories.create_team_video(team, member.user, video)
+            TeamVideoFactory(team=team, video=video, added_by=member.user)
 
         self.assertTrue(all([v.is_public for v in videos]))
 
@@ -146,15 +144,13 @@ class ViewsTests(TestCase):
         self.assertIn(u"There's already a project with this name", messages)
 
     def test_remove_video(self):
-        team = test_factories.create_team(slug="new-team",
-                                          membership_policy=4,
-                                          video_policy=1,
-                                          name="New-name")
+        team = TeamFactory(slug="new-team",
+                           membership_policy=4,
+                           video_policy=1,
+                           name="New-name")
 
         def create_member(role):
-            user = test_factories.create_user(username='test' + role,
-                                              password='test' + role)
-            return TeamMember.objects.create(user=user, role=role, team=team)
+            return TeamMemberFactory(role=role, team=team)
 
         admin = create_member(TeamMember.ROLE_ADMIN)
         contributor = create_member(TeamMember.ROLE_CONTRIBUTOR)
@@ -162,12 +158,12 @@ class ViewsTests(TestCase):
         owner = create_member(TeamMember.ROLE_OWNER)
 
         def create_team_video():
-            return test_factories.create_team_video(team, owner.user)
+            return TeamVideoFactory(team=team, added_by=owner.user)
 
         # The video policy determines who can remove videos from teams.
         for member in [contributor, manager, admin, owner]:
             self.client.login(username=member.user.username,
-                              password=member.user.username)
+                              password='password')
             tv = create_team_video()
             video_url = tv.video.get_video_url()
 
@@ -181,7 +177,7 @@ class ViewsTests(TestCase):
         # Only owners can delete videos entirely.
         for role in [owner]:
             self.client.login(username=role.user.username,
-                              password=role.user.username)
+                              password='password')
             tv = create_team_video()
             video_url = tv.video.get_video_url()
 
@@ -194,7 +190,7 @@ class ViewsTests(TestCase):
 
         for role in [contributor, manager, admin]:
             self.client.login(username=role.user.username,
-                              password=role.user.username)
+                              password='password')
             tv = create_team_video()
             video_url = tv.video.get_video_url()
 
@@ -209,8 +205,7 @@ class ViewsTests(TestCase):
         tv = create_team_video()
         video_url = tv.video.get_video_url()
         url = reverse("teams:remove_video", kwargs={"team_video_pk": tv.pk})
-        self.client.login(username=self.user.username,
-                          password=self.user.username)
+        self.client.login(username=self.user.username, password='password')
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
@@ -220,26 +215,26 @@ class ViewsTests(TestCase):
 
     def test_move_video_allowed(self):
         # Check that moving works when the user has permission.
-        video = test_factories.create_video()
-        old_team = test_factories.create_team(video_policy=Team.VP_MANAGER)
-        new_team = test_factories.create_team(video_policy=Team.VP_MANAGER)
-        team_video = test_factories.create_team_video(old_team, self.user,
-                                                      video)
+        video = VideoFactory()
+        old_team = TeamFactory(video_policy=Team.VP_MANAGER)
+        new_team = TeamFactory(video_policy=Team.VP_MANAGER)
+        team_video = TeamVideoFactory(team=old_team, video=video,
+                                      added_by=self.user)
         # Convenient functions for pulling models fresh from the DB.
         get_video = lambda: Video.objects.get(pk=video.pk)
         get_team_video = lambda: get_video().get_team_video()
 
         # Create a member that's an admin of BOTH teams.
         # This member should be able to move the video.
-        member = self._create_member(old_team, TeamMember.ROLE_ADMIN)
-        self._create_member(new_team, TeamMember.ROLE_ADMIN, member.user)
+        member = TeamMemberFactory(team=old_team, role=TeamMember.ROLE_ADMIN)
+        TeamMemberFactory(team=new_team, role=TeamMember.ROLE_ADMIN,
+                          user=member.user)
 
         self.assertEqual(get_team_video().team.pk, old_team.pk,
                          "Video did not start in the correct team.")
 
         # Move the video.
-        self.client.login(username=member.user.username,
-                          password=member.user.username)
+        self.client.login(username=member.user.username, password='password')
         url = reverse("teams:move_video")
         response = self.client.post(url, {'team_video': get_team_video().pk,
                                           'team': new_team.pk,})
@@ -254,11 +249,11 @@ class ViewsTests(TestCase):
     def test_move_video_disallowed_old(self):
         # Check that moving does not work when the user is blocked by the old
         # team.
-        video = test_factories.create_video()
-        old_team = test_factories.create_team(video_policy=Team.VP_MANAGER)
-        new_team = test_factories.create_team(video_policy=Team.VP_MANAGER)
-        team_video = test_factories.create_team_video(old_team, self.user,
-                                                      video)
+        video = VideoFactory()
+        old_team = TeamFactory(video_policy=Team.VP_MANAGER)
+        new_team = TeamFactory(video_policy=Team.VP_MANAGER)
+        team_video = TeamVideoFactory(team=old_team, video=video,
+                                      added_by=self.user)
         # Convenient functions for pulling models fresh from the DB.
         get_video = lambda: Video.objects.get(pk=video.pk)
         get_team_video = lambda: get_video().get_team_video()
@@ -266,15 +261,16 @@ class ViewsTests(TestCase):
         # Create a member that's a contributor to the old/current team.
         # This member should NOT be able to move the video because they cannot
         # remove it from the first team.
-        member = self._create_member(old_team, TeamMember.ROLE_CONTRIBUTOR)
-        self._create_member(new_team, TeamMember.ROLE_ADMIN, member.user)
+        member = TeamMemberFactory(team=old_team,
+                                   role=TeamMember.ROLE_CONTRIBUTOR)
+        TeamMemberFactory(team=new_team, role=TeamMember.ROLE_ADMIN,
+                          user=member.user)
 
         self.assertEqual(get_team_video().team.pk, old_team.pk,
                          "Video did not start in the correct team.")
 
         # Try to move the video.
-        self.client.login(username=member.user.username,
-                          password=member.user.username)
+        self.client.login(username=member.user.username, password='password')
         url = reverse("teams:move_video")
         response = self.client.post(url, {'team_video': get_team_video().pk,
                                           'team': new_team.pk,})
@@ -286,11 +282,11 @@ class ViewsTests(TestCase):
     def test_move_video_disallowed_new(self):
         # Check that moving does not work when the user is blocked by the new
         # team.
-        video = test_factories.create_video()
-        old_team = test_factories.create_team(video_policy=Team.VP_MANAGER)
-        new_team = test_factories.create_team(video_policy=Team.VP_MANAGER)
-        team_video = test_factories.create_team_video(old_team, self.user,
-                                                      video)
+        video = VideoFactory()
+        old_team = TeamFactory(video_policy=Team.VP_MANAGER)
+        new_team = TeamFactory(video_policy=Team.VP_MANAGER)
+        team_video = TeamVideoFactory(team=old_team, video=video,
+                                      added_by=self.user)
         # Convenient functions for pulling models fresh from the DB.
         get_video = lambda: Video.objects.get(pk=video.pk)
         get_team_video = lambda: get_video().get_team_video()
@@ -298,15 +294,15 @@ class ViewsTests(TestCase):
         # Create a member that's a contributor to the new/target team.
         # This member should NOT be able to move the video because they cannot
         # add it to the second team.
-        member = self._create_member(old_team, TeamMember.ROLE_ADMIN)
-        self._create_member(new_team, TeamMember.ROLE_CONTRIBUTOR, member.user)
+        member = TeamMemberFactory(team=old_team, role=TeamMember.ROLE_ADMIN)
+        TeamMemberFactory(team=new_team, role=TeamMember.ROLE_CONTRIBUTOR,
+                          user=member.user)
 
         self.assertEqual(get_team_video().team.pk, old_team.pk,
                          "Video did not start in the correct team.")
 
         # Try to move the video.
-        self.client.login(username=member.user.username,
-                          password=member.user.username)
+        self.client.login(username=member.user.username, password='password')
         url = reverse("teams:move_video")
         response = self.client.post(url, {'team_video': get_team_video().pk,
                                           'team': new_team.pk,})
@@ -316,12 +312,11 @@ class ViewsTests(TestCase):
                          "Video did not stay in the old team.")
 
     def test_team_permission(self):
-        team = test_factories.create_team(slug="private-team",
-                                          name="Private Team",
-                                          is_visible=False)
+        team = TeamFactory(slug="private-team", name="Private Team",
+                           is_visible=False)
         TeamMember.objects.create_first_member(team, self.user)
-        video = test_factories.create_video()
-        test_factories.create_team_video(team, self.user, video)
+        video = VideoFactory()
+        TeamVideoFactory(team=team, video=video, added_by=self.user)
 
         url = reverse("videos:video", kwargs={"video_id": video.video_id})
 

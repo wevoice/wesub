@@ -28,7 +28,8 @@ from videos.forms import (AddFromFeedForm, VideoForm, CreateSubtitlesForm,
                           MultiVideoCreateSubtitlesForm,)
 from videos.models import Video, VideoFeed
 from videos.types import video_type_registrar
-from utils import test_factories, test_utils
+from utils import test_utils
+from utils.factories import *
 from utils.translation import get_language_choices
 
 class TestVideoForm(TestCase):
@@ -88,7 +89,7 @@ class AddFromFeedFormTestCase(TestCase):
     @test_utils.patch_for_test('videos.forms.FeedParser')
     def setUp(self, MockFeedParserClass):
         TestCase.setUp(self)
-        self.user = test_factories.create_user()
+        self.user = UserFactory()
         mock_feed_parser = mock.Mock()
         mock_feed_parser.version = 1.0
         MockFeedParserClass.return_value = mock_feed_parser
@@ -167,8 +168,8 @@ class AddFromFeedFormTestCase(TestCase):
 class CreateSubtitlesFormTestBase(TestCase):
     @test_utils.patch_for_test('videos.forms.get_user_languages_from_request')
     def setUp(self, mock_get_user_languages_from_request):
-        self.video = test_factories.create_video()
-        self.user = test_factories.create_user()
+        self.video = VideoFactory()
+        self.user = UserFactory()
         self.mock_get_user_languages_from_request = \
                 mock_get_user_languages_from_request
 
@@ -202,7 +203,7 @@ class CreateSubtitlesFormTest(CreateSubtitlesFormTestBase):
                              key=lambda choice: choice[1]))
             return rv
 
-        self.user = test_factories.create_user(languages=['fr', 'es'])
+        self.user = UserFactory(languages=['fr', 'es'])
         self.assertEquals(
             self.make_form()['subtitle_language_code'].field.choices,
             language_choices_ordered('fr', 'es'))
@@ -276,8 +277,8 @@ class CreateSubtitlesFormTest(CreateSubtitlesFormTestBase):
         self.assertEquals(form.is_valid(), False)
 
     def test_user_permissions_check(self):
-        team = test_factories.create_team(subtitle_policy=40)
-        test_factories.create_team_video(team=team, video=self.video)
+        team = TeamFactory(subtitle_policy=40)
+        TeamVideoFactory(team=team, video=self.video)
         form = self.make_form({
             'primary_audio_language_code': 'en',
             'subtitle_language_code': 'fr',

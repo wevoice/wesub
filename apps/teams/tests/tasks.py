@@ -11,7 +11,7 @@ from apps.teams.forms import TaskCreateForm, TaskAssignForm
 from apps.teams.models import Task, Team, TeamVideo, TeamMember
 from apps.videos.models import Video
 from utils.testeditor import TestEditor
-from utils import test_factories
+from utils.factories import *
 
 # review setting constants
 DONT_REQUIRE_REVIEW = 0
@@ -31,17 +31,16 @@ TYPE_APPROVE = 40
 class AutoCreateTest(TestCase):
 
     def setUp(self):
-        self.team = test_factories.create_team(workflow_enabled=True)
-        w = test_factories.create_workflow(self.team,
-                                           autocreate_subtitle=True,
-                                           autocreate_translate=True)
-        self.admin = test_factories.create_team_member(
-            self.team, role=TeamMember.ROLE_ADMIN)
+        self.team = TeamFactory(workflow_enabled=True)
+        w = WorkflowFactory(team=self.team, autocreate_subtitle=True,
+                            autocreate_translate=True)
+        self.admin = TeamMemberFactory(team=self.team,
+                                       role=TeamMember.ROLE_ADMIN)
 
     def test_no_audio_language(self):
-        video = test_factories.create_video(primary_audio_language_code='')
-        tv = test_factories.create_team_video(self.team, self.admin.user,
-                                              video)
+        video = VideoFactory()
+        tv = TeamVideoFactory(team=self.team, video=video,
+                              added_by=self.admin.user)
         tasks = tv.task_set.all()
         self.assertEqual(tasks.count() , 1)
         transcribe_task = tasks.filter(type=10, language='')
@@ -49,9 +48,9 @@ class AutoCreateTest(TestCase):
 
     def test_audio_language(self):
         # create the original language for this video
-        video = test_factories.create_video(primary_audio_language_code='en')
-        tv = test_factories.create_team_video(self.team, self.admin.user,
-                                              video)
+        video = VideoFactory(primary_audio_language_code='en')
+        tv = TeamVideoFactory(team=self.team, video=video,
+                              added_by=self.admin.user)
         tasks = tv.task_set.all()
         self.assertEqual(tasks.count() , 1)
         transcribe_task = tasks.filter(type=10, language='en')
@@ -60,15 +59,16 @@ class AutoCreateTest(TestCase):
 class TranslateTranscribeTestBase(TestCase):
     """Base class for TranscriptionTaskTest and TranslationTaskTest."""
     def setUp(self):
-        self.team = test_factories.create_team(workflow_enabled=True)
-        self.workflow = test_factories.create_workflow(
-            self.team,
+        self.team = TeamFactory(workflow_enabled=True)
+        self.workflow = WorkflowFactory(
+            team=self.team,
             review_allowed=DONT_REQUIRE_REVIEW,
             approve_allowed=DONT_REQUIRE_APPROVAL)
-        self.admin = test_factories.create_team_member(
-            self.team, role=TeamMember.ROLE_ADMIN)
-        self.team_video = test_factories.create_team_video(self.team,
-                                                           self.admin.user)
+        self.admin = TeamMemberFactory(team=self.team,
+                                       role=TeamMember.ROLE_ADMIN)
+        self.team_video = TeamVideoFactory(
+            team=self.team, added_by=self.admin.user,
+            video__primary_audio_language_code='en')
         self.client = Client()
         self.login(self.admin.user)
 
@@ -190,8 +190,8 @@ class TranslateTranscribeTestBase(TestCase):
         self.workflow.save()
 
     def create_member(self):
-        return test_factories.create_team_member(
-            self.team, role=TeamMember.ROLE_CONTRIBUTOR)
+        return TeamMemberFactory(team=self.team,
+                                 role=TeamMember.ROLE_CONTRIBUTOR)
 
 
 class TranscriptionTaskTest(TranslateTranscribeTestBase):
@@ -411,10 +411,10 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         # We will move through the task pipeline and set the subtitle_version
         # attribute on each task.  The point is to simple check that we can
         # move through without any exceptions.
-        old_language = test_factories.create_old_subtitle_language(
-            self.team_video.video, 'en')
-        old_version = test_factories.create_old_subtitle_version(
-            old_language, member.user)
+        old_language = OldSubtitleLanguageFactory(video=self.team_video.video,
+                                                  language='en')
+        old_version = OldSubtitleVersionFactory(language=old_language,
+                                                user=member.user)
 
         # create the task
         self.submit_create_task(TYPE_SUBTITLE, member.user.pk)
@@ -610,11 +610,10 @@ class TranslationTaskTest(TranslateTranscribeTestBase):
 
 class ViewsTest(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team(workflow_enabled=True)
-        w = test_factories.create_workflow(self.team,
-                                           autocreate_subtitle=True)
-        self.admin = test_factories.create_team_member(
-            self.team, role=TeamMember.ROLE_ADMIN)
+        self.team = TeamFactory(workflow_enabled=True)
+        w = WorkflowFactory(team=self.team, autocreate_subtitle=True)
+        self.admin = TeamMemberFactory(team=self.team,
+                                       role=TeamMember.ROLE_ADMIN)
         self.client.login(username=self.admin.user.username,
                           password='password')
 
@@ -626,10 +625,10 @@ class ViewsTest(TestCase):
                           [t.id for t in tasks])
 
     def test_search(self):
-        video = test_factories.create_video(primary_audio_language_code='en',
-                                            title='MyTitle')
-        tv = test_factories.create_team_video(self.team, self.admin.user,
-                                              video)
+        video = VideoFactory(primary_audio_language_code='en',
+                             title='MyTitle')
+        tv = TeamVideoFactory(team=self.team, video=video,
+                              added_by=self.admin.user)
         self.assertEqual(tv.task_set.count(), 1)
         self.check_task_list(tv.task_set.all(), q='MyTitle')
         self.check_task_list(tv.task_set.all(), q='mytitle')
@@ -637,11 +636,11 @@ class ViewsTest(TestCase):
         self.check_task_list([], q='OtherTitle')
 
     def test_search_by_metadata(self):
-        video = test_factories.create_video(primary_audio_language_code='en',
-                                            title='MyTitle')
+        video = VideoFactory(primary_audio_language_code='en',
+                             title='MyTitle')
         video.update_metadata({'speaker-name': 'Person'})
-        tv = test_factories.create_team_video(self.team, self.admin.user,
-                                              video)
+        tv = TeamVideoFactory(team=self.team, video=video,
+                              added_by=self.admin.user)
         self.assertEqual(tv.task_set.count(), 1)
         self.check_task_list(tv.task_set.all(), q='Person')
         self.check_task_list(tv.task_set.all(), q='person')

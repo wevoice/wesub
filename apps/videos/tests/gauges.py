@@ -22,7 +22,7 @@ from django.test import TestCase
 import mock
 
 from subtitles import pipeline
-from utils import test_factories
+from utils.factories import *
 from videos.tasks import gauge_videos, gauge_videos_long
 
 class TestGauges(TestCase):
@@ -43,7 +43,7 @@ class TestGauges(TestCase):
         return self.gauges[name]
 
     def test_gauge_videos(self):
-        videos = [test_factories.create_video() for i in range(10)]
+        videos = [VideoFactory() for i in range(10)]
         # video #1 has 1 language with 1 version
         pipeline.add_subtitles(videos[0], 'en', None)
         # video #2 has 2 languages with 1 version
@@ -68,8 +68,8 @@ class TestGauges(TestCase):
         gauges['videos.SubtitleLanguage'].report.assert_called_once_with(5)
 
     def test_gauge_videos_long(self):
-        video1 = test_factories.create_video()
-        video2 = test_factories.create_video()
+        video1 = VideoFactory()
+        video2 = VideoFactory()
         pipeline.add_subtitles(video1, 'de', [
             (100, 200, "foo",{'new_paragraph':True} ),
             (300, 400, "bar",{'new_paragraph':True} ),

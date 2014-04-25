@@ -116,29 +116,6 @@ def create_project(team, **kwargs):
     defaults.update(kwargs)
     return Project.objects.create(team=team, **defaults)
 
-def dxfp_sample(language_code):
-    return ("""\
-<tt xmlns="http://www.w3.org/ns/ttml" xml:lang="%s">
- <head>
- <metadata xmlns:ttm="http://www.w3.org/ns/ttml#metadata">
- <ttm:title/>
- <ttm:description/>
- <ttm:copyright/>
- </metadata>
-
- <styling xmlns:tts="http://www.w3.org/ns/ttml#styling">
- <style xml:id="amara-style" tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="18px" tts:textAlign="center"/>
- </styling>
-
- <layout xmlns:tts="http://www.w3.org/ns/ttml#styling">
- <region xml:id="amara-subtitle-area" style="amara-style" tts:extent="560px 62px" tts:padding="5px 3px" tts:backgroundColor="black" tts:displayAlign="after"/>
- </layout>
- </head>
- <body region="amara-subtitle-area">
- <div><p begin="00:00:00,623" end="00:00:04,623">test subtitle</p>
- </div>
- </body>
-</tt>""" % language_code)
 
 def make_review_task(team_video, language_code, user, task_type='Translate',
                      sub_data=None):
@@ -237,7 +214,7 @@ def bulk_subs(sub_data):
     langs = {}
     versions = {}
     for video_title, language_data in sub_data.items():
-        video = create_video(title=video_title)
+        video = VideoFactory(title=video_title)
         videos[video_title] = video
         for language_code, version_data in language_data.items():
             lang = SubtitleLanguage.objects.create(

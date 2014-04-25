@@ -23,7 +23,7 @@ from apps.teams.models import Team, TeamVideo, TeamMember, Workflow, Task
 from auth.models import CustomUser as User
 from contextlib import contextmanager
 from apps.testhelpers import views as helpers
-from utils import test_factories
+from utils.factories import *
 from utils.translation import SUPPORTED_LANGUAGE_CODES
 
 from apps.teams.permissions_const import *
@@ -61,23 +61,24 @@ class BaseTestPermission(TestCase):
 
     def setup_users(self):
         self.user = User.objects.all()[0]
-        self.owner_account = test_factories.create_user(username='owner')
-        self.outsider = test_factories.create_user(username='outsider')
-        self.site_admin = test_factories.create_user(username='site_admin',
-                                                     is_staff=True)
+        self.owner_account = UserFactory(username='owner')
+        self.outsider = UserFactory(username='outsider')
+        self.site_admin = UserFactory(username='site_admin', is_staff=True)
 
     def setup_team(self):
-        self.team = test_factories.create_team()
-        self.owner = test_factories.create_team_member(
-            self.team, self.owner_account, role=TeamMember.ROLE_OWNER)
-        self.test_project = test_factories.create_project(self.team)
+        self.team = TeamFactory()
+        self.owner = TeamMemberFactory(team=self.team,
+                                       user=self.owner_account,
+                                       role=TeamMember.ROLE_OWNER)
+        self.test_project = ProjectFactory(team=self.team)
         self.default_project = self.team.default_project
 
     def setup_videos(self):
-        self.project_video = test_factories.create_team_video(
-            self.team, self.owner_account, project=self.test_project)
-        self.nonproject_video = test_factories.create_team_video(
-            self.team, self.owner_account)
+        self.project_video = TeamVideoFactory(team=self.team,
+                                              added_by=self.owner_account,
+                                              project=self.test_project)
+        self.nonproject_video = TeamVideoFactory(team=self.team,
+                                                 added_by=self.owner_account)
 
     def clear_cached_workflows(self):
         # delete the _cached_workflow attributes of our videos.  Their values
@@ -1122,13 +1123,11 @@ class CanPostEditSubtitlesTest(RolePermissionsTest):
 
 class TestViews(BaseTestPermission):
     def test_save_role(self):
-
         owner = self.owner
 
-        member_account = test_factories.create_user(username='member',
-                                                    password='hey')
-        member = test_factories.create_team_member(
-            self.team, member_account, role=TeamMember.ROLE_CONTRIBUTOR)
+        member_account = UserFactory(username='member', password='hey')
+        member = TeamMemberFactory(team=self.team, user=member_account,
+                                   role=TeamMember.ROLE_CONTRIBUTOR)
 
         tv = self.project_video
         video_url = reverse("videos:video", args=(tv.video.video_id,))

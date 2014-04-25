@@ -35,8 +35,8 @@ from externalsites.models import (KalturaAccount, SyncedSubtitleVersion,
 from externalsites.syncing import kaltura
 from subtitles import pipeline
 from teams.permissions_const import ROLE_ADMIN
-from utils import test_factories
 from utils import test_utils
+from utils.factories import *
 from utils.test_utils import patch_for_test
 import subtitles.signals
 
@@ -46,7 +46,7 @@ def create_kaltura_video(name):
     url = ('http://cdnbakmi.kaltura.com'
             '/p/1492321/sp/149232100/serveFlavor/entryId/'
             '%s/flavorId/1_dqgopb2z/name/%s.mp4') % (entry_id, name)
-    return test_factories.create_video(url=url, video_type='K')
+    return VideoFactory(video_url__url=url, video_url__type='K')
 
 class SignalHandlingTest(TestCase):
     @patch_for_test('externalsites.tasks.update_all_subtitles')
@@ -59,7 +59,7 @@ class SignalHandlingTest(TestCase):
         self.mock_update_all_subtitles = mock_update_all_subtitles
         self.video = create_kaltura_video('video')
         self.video_url = self.video.get_primary_videourl_obj()
-        team_video = test_factories.create_team_video(video=self.video)
+        team_video = TeamVideoFactory(video=self.video)
         self.team = team_video.team
         self.account = KalturaAccount.objects.create(
             team=self.team, partner_id=1234, secret='abcd')
@@ -117,13 +117,13 @@ class SignalHandlingTest(TestCase):
     def test_tasks_not_called_if_no_account(self):
         # for non-team videos, we shouldn't schedule a task
         video = create_kaltura_video('video2')
-        other_team = test_factories.create_team()
-        test_factories.create_team_video(other_team, video=video)
+        other_team = TeamFactory()
+        TeamVideoFactory(team=other_team, video=video)
         self.check_tasks_not_called(video)
 
     def test_tasks_not_called_for_non_team_videos(self):
-        video = test_factories.create_video()
-        test_factories.create_team_video(team=self.team, video=video)
+        video = VideoFactory()
+        TeamVideoFactory(team=self.team, video=video)
         self.check_tasks_not_called(video)
 
 class SubtitleTaskTest(TestCase):
@@ -137,7 +137,7 @@ class SubtitleTaskTest(TestCase):
         self.mock_delete_subtitles = mock_delete_subtitles
         self.video = create_kaltura_video('video')
         self.video_url = self.video.get_primary_videourl_obj()
-        team_video = test_factories.create_team_video(video=self.video)
+        team_video = TeamVideoFactory(video=self.video)
         self.team = team_video.team
         self.account = KalturaAccount.objects.create(
             team=self.team, partner_id=1234, secret='abcd')
@@ -361,13 +361,13 @@ class KalturaAccountTest(TestCase):
         self.partner_id = 1234
         self.secret = 'Secret'
         self.account = KalturaAccount.objects.create(
-            team=test_factories.create_team(), partner_id=self.partner_id,
+            team=TeamFactory(), partner_id=self.partner_id,
             secret = self.secret)
         self.entry_id = 'EntryId'
         url = ('http://cdnbakmi.kaltura.com'
                 '/p/1492321/sp/149232100/serveFlavor/entryId/'
                 '%s/flavorId/1_dqgopb2z/name/video.mp4') % self.entry_id
-        self.video = test_factories.create_video(url=url, video_type='K')
+        self.video = VideoFactory(video_url__url=url, video_url__type='K')
         self.video_url = self.video.get_primary_videourl_obj()
         self.version = pipeline.add_subtitles(self.video, 'en',
                                               [(100, 200, "sub 1")])
