@@ -6,7 +6,7 @@
     {% trans 'Videos' %} - {{ team }} | Amara
 {% endblock %}
 
-{% block html_attrs %}id="team_videos_list"{% endblock %}
+{% block html_attrs %}id="move_videos"{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -54,13 +54,7 @@
                     {% endif %}
                     <input type="text" name="q" value="{{ query }}" placeholder="Search {{ team }}&hellip;" />
                 </fieldset>
-            </form>
-            {% if can_move_videos %}
-                <a href="{% url teams:move_videos team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Move Videos" %}</a>
-            {% endif %}
-            {% if can_add_video %}
-                <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
-            {% endif %}
+            </form>  
             <a href="#filter" id="sort-filter">
                 {% trans 'Filter and Sort' %}
                 <span></span>
@@ -122,14 +116,20 @@
         </form>
 
         {% if team_video_md_list %}
+	<form  method="post" action="">{% csrf_token %}
+	  <span class="bulk-actions">
+	    <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+	    <button type="submit" name="move">{% trans "Move selected" %}</button>
+	  </span>
             <ul class="videos listing group">
                 {% with team|is_team_member:request.user as user_is_team_member %}
                     {% for md_obj in team_video_md_list %}
-                        {% team_video_detail md_obj %}
+		        {% team_video_summary md_obj %}
                     {% endfor %}
                 {% endwith %}
             </ul>
             {% if is_paginated %}{% paginator %}{% endif %}
+	</form>
         {% else %}
             <p class="empty">
                 {% if is_indexing %}
