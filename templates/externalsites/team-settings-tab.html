@@ -1,12 +1,11 @@
 {% extends "teams/base.html" %}
 {% load i18n teams_tags paginator media_compressor %}
 
-{% block title %}
-    {{ team }} {% trans 'Settings' %} | Amara
-{% endblock %}
+{% block html_attrs %}id="team_settings_externalsites"{% endblock %}
+
+{% block title %}{{ team }} {% trans 'Settings' %} | Amara{% endblock %}
 
 {% block view_content %}
-
     <div class="view grid_8 omega">
         {% with 'settings' as current %}
             {% include 'teams/_tabs.html' %}
@@ -19,7 +18,7 @@
         <form id="external-accounts" class="settings" method="POST" action="">
             {% csrf_token %}
 
-            <fieldset>
+            <fieldset class="kaltura{% if not forms.enabled_accounts.kaltura.value %} disabled{% endif %}">
                 <legend>{% trans "Kaltura" %}</legend>
                 {{ forms.kaltura.non_field_errors }}
                 {% include "_form_field.html" with field=forms.enabled_accounts.kaltura widget_type="checkbox" %}
@@ -29,7 +28,7 @@
                 </div>
             </fieldset>
 
-            <fieldset>
+            <fieldset class="brightcove{% if not forms.enabled_accounts.brightcove.value %} disabled{% endif %}">
                 <legend>{% trans "Brightcove" %}</legend>
                 {{ forms.brightcove.non_field_errors }}
                 {% include "_form_field.html" with field=forms.enabled_accounts.brightcove widget_type="checkbox" %}
@@ -40,9 +39,10 @@
                     <a class="import-feed" href="{% url teams:video_feed slug=team.slug feed_id=forms.brightcove.import_feed.id %}">View feed</a>
                     {% endif %}
                     {% include "_form_field.html" with field=forms.brightcove.feed_enabled widget_type="checkbox" %}
-                    <fieldset>
+                    <fieldset class="feed-fields">
                     {% include "_form_field.html" with field=forms.brightcove.player_id %}
                     {{ forms.brightcove.feed_tags.errors }}
+                    {{ forms.brightcove.feed_type.errors }}
                     <ul class="feed-import">
                     {% for choice in forms.brightcove.feed_type %}
                         <li>

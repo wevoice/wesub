@@ -2419,6 +2419,10 @@ a.truncated-expand {
         div.account-fields {
             padding-right: 8px;
         }
+
+        &.disabled div.account-fields {
+            display: none;
+        }
     }
 }
 

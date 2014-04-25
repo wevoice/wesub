@@ -78,7 +78,8 @@ class BrightcoveAccountForm(AccountForm):
         required=False, label=ugettext_lazy("Player ID"))
     feed_type = forms.ChoiceField(choices=FEED_CHOICES,
                                   initial=FEED_ALL_NEW,
-                                  widget=forms.RadioSelect)
+                                  widget=forms.RadioSelect,
+                                  required=False)
     feed_tags = forms.CharField(required=False)
 
     class Meta:
@@ -101,6 +102,10 @@ class BrightcoveAccountForm(AccountForm):
                 self.add_error(
                     'player_id',
                     _('Must specify a player id to import from a feed'))
+            if not self.cleaned_data['feed_type']:
+                self.add_error(
+                    'player_id',
+                    _('Must specify a feed type for import'))
             if (self.cleaned_data['feed_type'] == self.FEED_WITH_TAGS and
                 not self.cleaned_data['feed_tags']):
                 self.add_error('feed_tags',

@@ -174,9 +174,6 @@ class BrightcoveFormTest(TestCase):
         form = BrightcoveAccountForm(self.team, {
             'publisher_id': self.publisher_id,
             'write_token': self.write_token,
-            'player_id': '',
-            'feed_type': BrightcoveAccountForm.FEED_ALL_NEW,
-            'feed_tags': '',
         })
         self.assert_(form.is_valid(), form.errors.as_text())
         account = form.save()

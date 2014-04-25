@@ -910,6 +910,30 @@ var Site = function(Site) {
         team_settings_languages: function() {
             that.Utils.chosenify();
         },
+        team_settings_externalsites: function() {
+            $('form input[type="checkbox"][name^="enabled_accounts"]').change(function() {
+                var fieldset = $(this).closest('fieldset');
+                var accountFields = $('div.account-fields', fieldset);
+                if(this.checked) {
+                    accountFields.slideDown();
+                } else {
+                    accountFields.slideUp();
+                }
+            });
+
+            function updateBrightcoveFeedInputs() {
+                var cbx = $('#id_brightcove-feed_enabled');
+                var feedFields = $('fieldset.brightcove fieldset.feed-fields input');
+                if(cbx.attr('checked')) {
+                    feedFields.removeAttr('disabled');
+                } else {
+                    feedFields.attr('disabled', '1');
+                }
+            }
+
+            updateBrightcoveFeedInputs();
+            $('#id_brightcove-feed_enabled').change(updateBrightcoveFeedInputs);
+        },
 
         // Profile
         user_dashboard: function() {
