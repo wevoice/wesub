@@ -24,6 +24,7 @@ import mock
 from externalsites.forms import BrightcoveAccountForm, AccountFormset
 from externalsites.models import BrightcoveAccount
 from videos.models import VideoFeed
+from utils import test_utils
 from utils import test_factories
 
 class TestAccountFormset(TestCase):
@@ -203,6 +204,8 @@ class BrightcoveFormTest(TestCase):
         account = form.save()
         self.assertNotEquals(account.import_feed, None)
         self.assertEquals(account.import_feed.url, self.feed_url('new'))
+        test_utils.import_videos_from_feed.delay.assert_called_with(
+            account.import_feed.id)
 
     def test_feed_with_tags(self):
         form = BrightcoveAccountForm(self.team, {
@@ -218,6 +221,40 @@ class BrightcoveFormTest(TestCase):
         self.assertNotEquals(account.import_feed, None)
         self.assertEquals(account.import_feed.url,
                           self.feed_url('cats', 'dogs'))
+        test_utils.import_videos_from_feed.delay.assert_called_with(
+            account.import_feed.id)
+
+    def test_change_feed(self):
+        # test saving a form when we already have an import feed
+
+        # create an account with an import feed
+        account = BrightcoveAccount.objects.create(
+            team=self.team, publisher_id=self.publisher_id,
+            write_token=self.write_token)
+        account.make_feed(self.player_id, ['cats'])
+        first_feed = account.import_feed
+        # test saving a form with different feed tags.  We should update the
+        # feed URL, but not make a new feed object
+        data = {
+            'publisher_id': self.publisher_id,
+            'write_token': self.write_token,
+            'feed_enabled': '1',
+            'player_id': self.player_id,
+            'feed_type': BrightcoveAccountForm.FEED_WITH_TAGS,
+            'feed_tags': 'cats dogs  ',
+        }
+        form = BrightcoveAccountForm(self.team, data, instance=account)
+        account = form.save()
+        self.assertEquals(account.import_feed.id, first_feed.id)
+        test_utils.import_videos_from_feed.delay.assert_called_with(
+            account.import_feed.id)
+        # test saving the form with the same tags.  We should import videos
+        # for this save
+        form = BrightcoveAccountForm(self.team, data, instance=account)
+        account = form.save()
+        self.assertEquals(account.import_feed.id, first_feed.id)
+        self.assertEquals(test_utils.import_videos_from_feed.delay.call_count,
+                          1)
 
     def test_player_id_required_with_feed(self):
         form = BrightcoveAccountForm(self.team, {

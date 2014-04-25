@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
 from externalsites import models
+import videos.tasks
 
 class AccountForm(forms.ModelForm):
     """Base class for forms on the teams tab.
@@ -84,6 +85,11 @@ class BrightcoveAccountForm(AccountForm):
         model = models.BrightcoveAccount
         fields = ['publisher_id', 'write_token' ]
 
+    def __init__(self, team, data=None, **kwargs):
+        AccountForm.__init__(self, team, data, **kwargs)
+        if self.instance.import_feed is not None:
+            self.fields['feed_enabled'].initial = True
+
     def add_error(self, field_name, msg):
         self._errors[field_name] = self.error_class([msg])
         if field_name in self.cleaned_data:
@@ -105,10 +111,14 @@ class BrightcoveAccountForm(AccountForm):
         account = AccountForm.save(self)
         if self.cleaned_data['feed_enabled']:
             if self.cleaned_data['feed_type'] == self.FEED_ALL_NEW:
-                account.make_feed(self.cleaned_data['player_id'])
+                tags = None
             elif self.cleaned_data['feed_type'] == self.FEED_WITH_TAGS:
-                account.make_feed(self.cleaned_data['player_id'],
-                                  self.cleaned_data['feed_tags'].split())
+                tags = self.cleaned_data['feed_tags'].split()
+            feed_changed = account.make_feed(self.cleaned_data['player_id'],
+                                             tags)
+            if feed_changed:
+                videos.tasks.import_videos_from_feed.delay(
+                    account.import_feed.id)
         else:
             account.remove_feed()
         return account

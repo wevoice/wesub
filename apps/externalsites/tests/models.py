@@ -45,6 +45,15 @@ class BrightcoveAccountTest(TestCase):
         self.check_feed(
             'http://link.brightcove.com/services/mrss/player456/123/cats/dogs')
 
+    def test_make_feed_again(self):
+        # test calling make feed twice.  We should use the same VideoFeed
+        # object and change its URL.
+        self.assertEquals(self.account.import_feed, None)
+        self.account.make_feed(self.player_id)
+        first_import_feed_id = self.account.import_feed.id
+        self.account.make_feed(self.player_id, ['cats'])
+        self.assertEquals(self.account.import_feed.id, first_import_feed_id)
+
     def test_remove_feed(self):
         self.account.make_feed(self.player_id)
         self.account.remove_feed()

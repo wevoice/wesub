@@ -146,12 +146,25 @@ class BrightcoveAccount(ExternalAccount):
                ) % (player_id, self.publisher_id, '/'.join(tags))
 
     def make_feed(self, player_id, tags=None):
+        """Create a feed for this account.
+
+        :returns: True if the feed was changed
+        """
         if not tags:
             tags = ('new',)
-        self.import_feed = VideoFeed.objects.create(
-            url=self.feed_url(player_id, tags),
-            team=self.team)
-        self.save()
+        feed_url = self.feed_url(player_id, tags)
+        if self.import_feed:
+            if feed_url != self.import_feed.url:
+                self.import_feed.url = feed_url
+                self.import_feed.save()
+                return True
+        else:
+            self.import_feed = VideoFeed.objects.create(
+                url=self.feed_url(player_id, tags),
+                team=self.team)
+            self.save()
+            return True
+        return False
 
     def remove_feed(self):
         if self.import_feed:
