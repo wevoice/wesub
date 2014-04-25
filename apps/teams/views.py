@@ -566,6 +566,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
 
     try:
         member = team.get_member(request.user)
+        target_teams = request.user.managed_teams(include_manager=False)
     except TeamMember.DoesNotExist:
         member = None
 
