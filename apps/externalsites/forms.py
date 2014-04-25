@@ -115,18 +115,21 @@ class BrightcoveAccountForm(AccountForm):
     def save(self):
         account = AccountForm.save(self)
         if self.cleaned_data['feed_enabled']:
-            if self.cleaned_data['feed_type'] == self.FEED_ALL_NEW:
-                tags = None
-            elif self.cleaned_data['feed_type'] == self.FEED_WITH_TAGS:
-                tags = self.cleaned_data['feed_tags'].split()
             feed_changed = account.make_feed(self.cleaned_data['player_id'],
-                                             tags)
+                                             self._calc_feed_tags())
             if feed_changed:
                 videos.tasks.import_videos_from_feed.delay(
                     account.import_feed.id)
         else:
             account.remove_feed()
         return account
+
+    def _calc_feed_tags(self):
+        if self.cleaned_data['feed_type'] == self.FEED_ALL_NEW:
+            return None
+        elif self.cleaned_data['feed_type'] == self.FEED_WITH_TAGS:
+            return [tag.strip()
+                    for tag in self.cleaned_data['feed_tags'].split(',')]
 
     def import_feed(self):
         if self.instance:

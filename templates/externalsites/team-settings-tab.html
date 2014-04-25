@@ -49,6 +49,7 @@
                         {{ choice.tag }} {{ choice.choice_label }}
                         {% if choice.choice_value == "T" %}
                             {{ forms.brightcove.feed_tags }}
+                            <em>{% trans "separate tags with commas" %}</em>
                         {% endif %}
                         </li>
                     {% endfor %}

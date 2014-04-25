@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import datetime
+from urllib import quote_plus
 
 from django.db import models
 from django.db.models import  query
@@ -141,17 +142,20 @@ class BrightcoveAccount(ExternalAccount):
                                        on_delete=models.SET_NULL)
 
     def feed_url(self, player_id, tags):
-        return ('http://link.brightcove.com'
-                '/services/mrss/player%s/%s/%s'
-               ) % (player_id, self.publisher_id, '/'.join(tags))
+        url_start = ('http://link.brightcove.com'
+                    '/services/mrss/player%s/%s') % (
+                        player_id, self.publisher_id)
+        if tags is not None:
+            return '%s/tags/%s' % (url_start,
+                                   '/'.join(quote_plus(t) for t in tags))
+        else:
+            return url_start + "/new"
 
     def make_feed(self, player_id, tags=None):
         """Create a feed for this account.
 
         :returns: True if the feed was changed
         """
-        if not tags:
-            tags = ('new',)
         feed_url = self.feed_url(player_id, tags)
         if self.import_feed:
             if feed_url != self.import_feed.url:

@@ -20,6 +20,7 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 import mock
+from urllib import quote_plus
 
 from externalsites.forms import BrightcoveAccountForm, AccountFormset
 from externalsites.models import BrightcoveAccount
@@ -183,10 +184,16 @@ class BrightcoveFormTest(TestCase):
         self.assertEquals(account.import_feed, None)
 
     def feed_url(self, *tags):
-         return ('http://link.brightcove.com'
-                 '/services/mrss/player%s/%s/%s') % (
-                     self.player_id, self.publisher_id,
-                     '/'.join(tags))
+        if tags:
+            return ('http://link.brightcove.com'
+                    '/services/mrss/player%s/%s/tags/%s') % (
+                        self.player_id, self.publisher_id,
+                        '/'.join(quote_plus(t) for t in tags))
+        else:
+            return ('http://link.brightcove.com'
+                    '/services/mrss/player%s/%s/new') % (
+                        self.player_id, self.publisher_id,
+                    )
 
     def test_feed_all_new(self):
         form = BrightcoveAccountForm(self.team, {
@@ -200,24 +207,26 @@ class BrightcoveFormTest(TestCase):
         self.assert_(form.is_valid(), form.errors.as_text())
         account = form.save()
         self.assertNotEquals(account.import_feed, None)
-        self.assertEquals(account.import_feed.url, self.feed_url('new'))
+        self.assertEquals(account.import_feed.url, self.feed_url())
         test_utils.import_videos_from_feed.delay.assert_called_with(
             account.import_feed.id)
 
     def test_feed_with_tags(self):
+        # feed tags should be a comma separated list of tags.  If there are
+        # spaces inside the tag we should preserve them
         form = BrightcoveAccountForm(self.team, {
             'publisher_id': self.publisher_id,
             'write_token': self.write_token,
             'feed_enabled': '1',
             'player_id': self.player_id,
             'feed_type': BrightcoveAccountForm.FEED_WITH_TAGS,
-            'feed_tags': 'cats dogs  ',
+            'feed_tags': 'cats, cute pets,dogs  ',
         })
         self.assert_(form.is_valid(), form.errors.as_text())
         account = form.save()
         self.assertNotEquals(account.import_feed, None)
         self.assertEquals(account.import_feed.url,
-                          self.feed_url('cats', 'dogs'))
+                          self.feed_url('cats', 'cute pets', 'dogs'))
         test_utils.import_videos_from_feed.delay.assert_called_with(
             account.import_feed.id)
 
@@ -238,7 +247,7 @@ class BrightcoveFormTest(TestCase):
             'feed_enabled': '1',
             'player_id': self.player_id,
             'feed_type': BrightcoveAccountForm.FEED_WITH_TAGS,
-            'feed_tags': 'cats dogs  ',
+            'feed_tags': 'cats, dogs',
         }
         form = BrightcoveAccountForm(self.team, data, instance=account)
         account = form.save()

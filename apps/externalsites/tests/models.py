@@ -43,7 +43,11 @@ class BrightcoveAccountTest(TestCase):
             'http://link.brightcove.com/services/mrss/player456/123/new')
         self.account.make_feed(self.player_id, ['cats', 'dogs'])
         self.check_feed(
-            'http://link.brightcove.com/services/mrss/player456/123/cats/dogs')
+            'http://link.brightcove.com/services/mrss/player456/123/tags/cats/dogs')
+        # test with chars that need to be quoted
+        self.account.make_feed(self.player_id, ['~cats and dogs'])
+        self.check_feed(
+            'http://link.brightcove.com/services/mrss/player456/123/tags/%7Ecats+and+dogs')
 
     def test_make_feed_again(self):
         # test calling make feed twice.  We should use the same VideoFeed
