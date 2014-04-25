@@ -230,6 +230,29 @@ class BrightcoveFormTest(TestCase):
         test_utils.import_videos_from_feed.delay.assert_called_with(
             account.import_feed.id)
 
+    def test_feed_exists(self):
+        # test that we set initial values for the feed inputs for accounts
+        # with feeds created.
+
+        # create an account with an import feed
+        account = BrightcoveAccount.objects.create(
+            team=self.team, publisher_id=self.publisher_id,
+            write_token=self.write_token)
+        account.make_feed(self.player_id)
+        form = BrightcoveAccountForm(self.team, instance=account)
+        self.assertEquals(form.fields['player_id'].initial, self.player_id)
+        self.assertEquals(form.fields['feed_type'].initial,
+                          BrightcoveAccountForm.FEED_ALL_NEW)
+        self.assertEquals(form.fields['feed_tags'].initial, '')
+
+        # try again when using tags
+        account.make_feed(self.player_id, ['cats', 'dogs'])
+        form = BrightcoveAccountForm(self.team, instance=account)
+        self.assertEquals(form.fields['player_id'].initial, self.player_id)
+        self.assertEquals(form.fields['feed_type'].initial,
+                          BrightcoveAccountForm.FEED_WITH_TAGS)
+        self.assertEquals(form.fields['feed_tags'].initial, 'cats, dogs')
+
     def test_change_feed(self):
         # test saving a form when we already have an import feed
 

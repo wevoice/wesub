@@ -18,6 +18,7 @@
 
 import datetime
 from urllib import quote_plus
+import urlparse
 
 from django.db import models
 from django.db.models import  query
@@ -175,6 +176,25 @@ class BrightcoveAccount(ExternalAccount):
             self.import_feed.delete();
             self.import_feed = None
             self.save()
+
+    def feed_info(self):
+        if self.import_feed is None:
+            return None
+        path_parts = urlparse.urlparse(self.import_feed.url).path.split("/")
+        for part in path_parts:
+            if part.startswith("player"):
+                player_id = part[len("player"):]
+                break
+        else:
+            raise ValueError("Unable to parse feed URL")
+
+        try:
+            i = path_parts.index('tags')
+        except ValueError:
+            tags = None
+        else:
+            tags = tuple(path_parts[i+1:])
+        return player_id, tags
 
 account_models = [
     KalturaAccount,

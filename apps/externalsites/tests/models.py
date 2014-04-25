@@ -63,6 +63,16 @@ class BrightcoveAccountTest(TestCase):
         self.account.remove_feed()
         self.assertEquals(self.account.import_feed, None)
 
+    def test_feed_info(self):
+        self.assertEquals(self.account.feed_info(), None)
+
+        self.account.make_feed(self.player_id)
+        self.assertEquals(self.account.feed_info(), (self.player_id, None))
+
+        self.account.make_feed(self.player_id, ['cats', 'dogs'])
+        self.assertEquals(self.account.feed_info(),
+                          (self.player_id, ('cats', 'dogs')))
+
     def test_feed_removed_externally(self):
         # test what happens if the feed is deleted not through
         # BrightcoveAccount.remove_feed()

@@ -90,6 +90,14 @@ class BrightcoveAccountForm(AccountForm):
         AccountForm.__init__(self, team, data, **kwargs)
         if self.instance.import_feed is not None:
             self.fields['feed_enabled'].initial = True
+            player_id, tags = self.instance.feed_info()
+            self.fields['player_id'].initial = player_id
+            if tags is not None:
+                self.fields['feed_type'].initial = self.FEED_WITH_TAGS
+                self.fields['feed_tags'].initial = ', '.join(tags)
+            else:
+                self.fields['feed_type'].initial = self.FEED_ALL_NEW
+                self.fields['feed_tags'].initial = ''
 
     def add_error(self, field_name, msg):
         self._errors[field_name] = self.error_class([msg])
