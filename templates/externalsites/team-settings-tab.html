@@ -16,32 +16,50 @@
                 {% include 'teams/_subnav_settings.html' %}
             {% endwith %}
         </div>
-        {% for form in forms %}
-        <form class="settings" method="POST" action="">
-            <h2>{{ form.label }}</h2>
-
-            {{ form.non_field_errors }}
+        <form id="external-accounts" class="settings" method="POST" action="">
             {% csrf_token %}
-            <input type="hidden" name="form-name" value="{{ form.form_name }}" />
 
-            {% for field in form %}
             <fieldset>
-                <legend>{{ field.label }}</legend>
-                {{ field.errors }}
-                {% if field.help_text %}
-                    <p class="notation">{{ field.help_text }}</p>
-                {% endif %}
-                {{ field }}
+                <legend>{% trans "Kaltura" %}</legend>
+                {{ forms.kaltura.non_field_errors }}
+                {% include "_form_field.html" with field=forms.enabled_accounts.kaltura widget_type="checkbox" %}
+                <div class="account-fields">
+                    {% include "_form_field.html" with field=forms.kaltura.partner_id %}
+                    {% include "_form_field.html" with field=forms.kaltura.secret %}
+                </div>
             </fieldset>
-            {% endfor %}
+
+            <fieldset>
+                <legend>{% trans "Brightcove" %}</legend>
+                {{ forms.brightcove.non_field_errors }}
+                {% include "_form_field.html" with field=forms.enabled_accounts.brightcove widget_type="checkbox" %}
+                <div class="account-fields">
+                    {% include "_form_field.html" with field=forms.brightcove.publisher_id %}
+                    {% include "_form_field.html" with field=forms.brightcove.write_token %}
+                    {% if forms.brightcove.import_feed %}
+                    <a class="import-feed" href="{% url teams:video_feed slug=team.slug feed_id=forms.brightcove.import_feed.id %}">View feed</a>
+                    {% endif %}
+                    {% include "_form_field.html" with field=forms.brightcove.feed_enabled widget_type="checkbox" %}
+                    <fieldset>
+                    {% include "_form_field.html" with field=forms.brightcove.player_id %}
+                    {{ forms.brightcove.feed_tags.errors }}
+                    <ul class="feed-import">
+                    {% for choice in forms.brightcove.feed_type %}
+                        <li>
+                        {{ choice.tag }} {{ choice.choice_label }}
+                        {% if choice.choice_value == "T" %}
+                            {{ forms.brightcove.feed_tags }}
+                        {% endif %}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </fieldset>
+                </div>
+            </fieldset>
 
             <div class="submit">
-                {% if form.allow_remove %}
-                    <input type="submit" name="remove" class="submit delete" value="{% trans "Remove" %}" />
-                {% endif %}
                 <input type="submit" class="submit save" value="{% trans "Save" %}" />
             </div>
         </form>
-        {% endfor %}
     </div>
 {% endblock %}

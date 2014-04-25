@@ -2377,6 +2377,52 @@ a.truncated-expand {
         width: 50%;
     }
 }
+
+#teams form#external-accounts {
+    fieldset {
+        border: 1px solid $light-grey;
+        padding: 1em;
+        margin-bottom: 4em;
+
+        legend {
+            padding: 0 4px;
+        }
+
+        fieldset {
+            border: none;
+            padding: 0 0 0 4em;
+            margin: 0;
+        }
+
+        ul.feed-import {
+            margin: 0;
+            padding: 0;
+
+            input[type="text"] {
+                display: inline;
+                width: auto;
+                margin-left: 1em;
+            }
+        }
+
+        a.import-feed {
+            float: right;
+            color: $usblue;
+            margin-top: 1.5em;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        div.account-fields {
+            padding-right: 8px;
+        }
+    }
+}
+
+
 #teams div.join div#apply-modal {
     div.modal-body {
         div.message {

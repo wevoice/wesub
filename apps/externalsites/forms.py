@@ -65,33 +65,40 @@ class BrightcoveAccountForm(AccountForm):
     FEED_ALL_NEW = 'N'
     FEED_WITH_TAGS = 'T'
     FEED_CHOICES = (
-        (FEED_ALL_NEW, ugettext_lazy('All new videos')),
-        (FEED_WITH_TAGS, ugettext_lazy('Videos with tags:')),
+        (FEED_ALL_NEW, ugettext_lazy('Import all new videos')),
+        (FEED_WITH_TAGS, ugettext_lazy('Import videos with tags:')),
     )
 
-    publisher_id = forms.IntegerField()
-    feed_enabled = forms.BooleanField(required=False)
-    player_id = forms.CharField(required=False)
+    publisher_id = forms.IntegerField(label=ugettext_lazy("Publisher ID"))
+    write_token = forms.CharField(label=ugettext_lazy("Write token"))
+    feed_enabled = forms.BooleanField(
+        required=False, label=ugettext_lazy("Import Videos From Feed"))
+    player_id = forms.CharField(
+        required=False, label=ugettext_lazy("Player ID"))
     feed_type = forms.ChoiceField(choices=FEED_CHOICES,
-                                  initial=FEED_ALL_NEW)
+                                  initial=FEED_ALL_NEW,
+                                  widget=forms.RadioSelect)
     feed_tags = forms.CharField(required=False)
 
     class Meta:
         model = models.BrightcoveAccount
         fields = ['publisher_id', 'write_token' ]
 
+    def add_error(self, field_name, msg):
+        self._errors[field_name] = self.error_class([msg])
+        if field_name in self.cleaned_data:
+            del self.cleaned_data[field_name]
+
     def clean(self):
         if self.cleaned_data['feed_enabled']:
             if not self.cleaned_data['player_id']:
-                self._errors['player_id'] = [
-                    forms.ValidationError(
-                        _('Must specify a player id to import from a feed'))
-                ]
+                self.add_error(
+                    'player_id',
+                    _('Must specify a player id to import from a feed'))
             if (self.cleaned_data['feed_type'] == self.FEED_WITH_TAGS and
                 not self.cleaned_data['feed_tags']):
-                self._errors['feed_tags'] = [
-                    forms.ValidationError(_('Must specify tags to import'))
-                ]
+                self.add_error('feed_tags',
+                               _('Must specify tags to import'))
         return self.cleaned_data
 
     def save(self):
@@ -105,6 +112,12 @@ class BrightcoveAccountForm(AccountForm):
         else:
             account.remove_feed()
         return account
+
+    def import_feed(self):
+        if self.instance:
+            return self.instance.import_feed
+        else:
+            return None
 
 class AccountFormset(object):
     """dict-like object that contains multiple account forms.
