@@ -678,14 +678,6 @@ class TeamsTest(TestCase):
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
 
-        url = reverse("teams:detail", kwargs={"slug": team.pk})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
-
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
-
         url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url, {'q': 'Lions'})
         self.failUnlessEqual(response.status_code, 200)
@@ -833,22 +825,34 @@ class TeamsTest(TestCase):
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 404)
 
-    def test_is_visible(self):
-        hidden  = Team(name='secret', slug='secret', is_visible=False)
-        hidden.save()
-        teams = Team.objects.all()
-        url = reverse("teams:detail", kwargs={"slug":hidden.slug})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
-        url = reverse("teams:index")
+    def get_dashboard_page(self, team):
+        url = reverse("teams:dashboard", kwargs={"slug":team.slug})
+        return self.client.get(url)
 
-        response = self.client.get(url)
-        teams = response.context['teams_list']
-        self.assertTrue(len(teams) < 10)
-        teams_pks = [t.pk for t in teams]
-        print teams_pks, hidden.pk
+    def test_non_visible(self):
+        invitation_team = test_factories.create_team(
+            is_visible=False, membership_policy=Team.INVITATION_BY_ALL)
+        open_team = test_factories.create_team(
+            is_visible=False, membership_policy=Team.OPEN)
+        application_team = test_factories.create_team(
+            is_visible=False, membership_policy=Team.APPLICATION)
+        for team in (invitation_team, open_team, application_team):
+            test_factories.create_team_video(team)
 
-        self.assertNotIn(hidden.pk, teams_pks)
+        # non-visible teams should show up on the listing only if their are
+        # application-based on open
+        response = self.client.get(reverse('teams:index'))
+        self.assertEquals(set(response.context['teams_list']),
+                          set([application_team, open_team]))
+        # those teams listed should allow non-members to see their dashboards,
+        # but make sure that no videos are visible.
+        for team in (open_team, application_team):
+            response = self.get_dashboard_page(team)
+            self.assertEquals(response.status_code, 200)
+            self.assertEquals(response.context['videos'], [])
+        # invitation teams should not allow non-members to view them
+        response = self.get_dashboard_page(invitation_team)
+        self.assertEquals(response.status_code, 404)
 
     def test_search_with_utf8(self):
         title = (u'\u041f\u0435\u0442\u0443\u0445 '

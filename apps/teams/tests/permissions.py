@@ -92,8 +92,7 @@ class BaseTestPermission(TestCase):
                  lang=lang)
 
         # Handle the caching in permissions.get_role_for_target().
-        if hasattr(self.user, '_cached_teammember'):
-            delattr(self.user, '_cached_teammember')
+        self.uncache_team_member()
 
         try:
             yield
@@ -101,6 +100,10 @@ class BaseTestPermission(TestCase):
             remove_role(self.team, self.user, r)
 
         # Handle the caching in permissions.get_role_for_target().
+        self.uncache_team_member()
+
+    def uncache_team_member(self):
+        self.team.uncache_member(self.user)
         if hasattr(self.user, '_cached_teammember'):
             delattr(self.user, '_cached_teammember')
 
@@ -1148,20 +1151,15 @@ class TestViews(BaseTestPermission):
         self.assertTrue(can_create_and_edit_subtitles(member.user, tv))
         self.assertTrue(can_create_and_edit_translations(member.user, tv))
         self.assertFalse(can_view_settings_tab(self.team, member.user))
-        save_role(self.team, member, ROLE_ADMIN, [], [], owner.user)
-        member = TeamMember.objects.get(pk=member.pk)
-        self.assertEqual(member.role, ROLE_ADMIN)
 
+        self.save_role(member, owner, ROLE_ADMIN)
         self.assertTrue(can_add_video_somewhere(self.team, member.user))
         self.assertTrue(can_view_tasks_tab(self.team, member.user))
         self.assertTrue(can_create_and_edit_subtitles(member.user, tv))
         self.assertTrue(can_create_and_edit_translations(member.user, tv))
         self.assertTrue(can_view_settings_tab(self.team, member.user))
 
-        save_role(self.team, member, ROLE_CONTRIBUTOR, [], [], owner.user)
-        member = TeamMember.objects.get(pk=member.pk)
-
-        self.assertEqual(member.role, ROLE_CONTRIBUTOR)
+        self.save_role(member, owner, ROLE_CONTRIBUTOR)
         self.assertFalse(can_view_settings_tab(self.team, member.user))
         self.assertTrue(can_add_video_somewhere(self.team, member.user))
         self.assertTrue(can_view_tasks_tab(self.team, member.user))
@@ -1172,3 +1170,7 @@ class TestViews(BaseTestPermission):
         resp = self.client.get(video_url, follow=True)
         self.assertEqual(resp.status_code, 200)
 
+    def save_role(self, member, owner, role):
+        save_role(self.team, member, role, [], [], owner.user)
+        self.team.uncache_member(member.user)
+        self.assertEquals(self.team.get_member(member.user).role, role)

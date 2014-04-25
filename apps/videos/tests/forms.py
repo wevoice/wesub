@@ -36,7 +36,6 @@ class TestVideoForm(TestCase):
     def setUp(self, mock_url_exists):
         self.mock_url_exists = mock_url_exists
         mock_url_exists.return_value = True
-
         self.vimeo_urls = ("http://vimeo.com/17853047",)
         self.youtube_urls = ("http://youtu.be/HaAVZ2yXDBo",
                              "http://www.youtube.com/watch?v=HaAVZ2yXDBo")
@@ -84,7 +83,6 @@ class TestVideoForm(TestCase):
         for url in urls_to_test:
             form = VideoForm(data={"video_url":url})
             self.assertFalse(form.is_valid())
-
 
 class AddFromFeedFormTestCase(TestCase):
     @test_utils.patch_for_test('videos.forms.FeedParser')

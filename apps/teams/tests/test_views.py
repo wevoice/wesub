@@ -335,44 +335,6 @@ class ViewsTests(TestCase):
 
         self.client.logout()
 
-    def test_add_videos_via_feed(self):
-        team = self._create_base_team()
-        self.client.login(**self.auth)
-
-        url = reverse("teams:add_videos", kwargs={"slug": team.slug})
-
-        data = {
-            'feed_url': u'http://blip.tv/coxman/rss'
-        }
-
-        old_video_count = Video.objects.count()
-        old_team_video_count = TeamVideo.objects.filter(team=team).count()
-
-        response = self.client.post(url, data)
-        self.assertRedirects(response, team.get_absolute_url())
-
-        self.assertNotEquals(old_video_count, Video.objects.count())
-        self.assertNotEquals(old_team_video_count, TeamVideo.objects.filter(team=team).count())
-
-    def test_add_videos_via_youtube_user(self):
-        team = self._create_base_team()
-        self.client.login(**self.auth)
-
-        url = reverse("teams:add_videos", kwargs={"slug": team.slug})
-
-        data = {
-            'usernames': u'fernandotakai'
-        }
-
-        old_video_count = Video.objects.count()
-        old_team_video_count = TeamVideo.objects.filter(team=team).count()
-
-        response = self.client.post(url, data)
-        self.assertRedirects(response, team.get_absolute_url())
-
-        self.assertNotEquals(old_video_count, Video.objects.count())
-        self.assertNotEquals(old_team_video_count, TeamVideo.objects.filter(team=team).count())
-
     def _create_member(self, team, role, user=None):
         if not user:
             user = User.objects.create(username='test' + role)
