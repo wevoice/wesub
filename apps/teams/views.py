@@ -2202,12 +2202,8 @@ def billing(request):
     }, RequestContext(request))
 
 @render_to('teams/feeds.html')
-@login_required
-def video_feeds(request, slug):
-    team = get_team_for_view(slug, request.user)
-    if not team.is_member(request.user):
-        return redirect_to_login(request.build_absolute_uri())
-
+@settings_page
+def video_feeds(request, team):
     return {
         'team': team,
         'feeds': team.videofeed_set.all(),
@@ -2215,11 +2211,8 @@ def video_feeds(request, slug):
     }
 
 @render_to('teams/feed.html')
-@login_required
-def video_feed(request, slug, feed_id):
-    team = get_team_for_view(slug, request.user)
-    if not team.is_member(request.user):
-        return redirect_to_login(request.build_absolute_uri())
+@settings_page
+def video_feed(request, team, feed_id):
     feed = get_object_or_404(VideoFeed, team=team, id=feed_id)
 
     if request.method == 'POST':
