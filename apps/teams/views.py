@@ -51,7 +51,7 @@ from teams.forms import (
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
     make_billing_report_form, TaskCreateSubtitlesForm,
-    TeamMultiVideoCreateSubtitlesForm,
+    TeamMultiVideoCreateSubtitlesForm, MoveVideosForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -566,17 +566,21 @@ def move_videos(request, slug, project_slug=None, languages=None):
 
     try:
         member = team.get_member(request.user)
-        target_teams = request.user.managed_teams(include_manager=False)
     except TeamMember.DoesNotExist:
         member = None
 
 
     if request.method == 'POST':
-        if 'move' in request.POST:
+        form = MoveVideosForm(request.user, request.POST)
+        if 'move' in request.POST and form.is_valid():
             selected_videos = request.POST.getlist('selected_videos[]')
             print "Moving videos"
             print selected_videos
-
+            print "team"
+            print form.cleaned_data['team']
+    else:
+        form = MoveVideosForm(request.user)
+        
     project_filter = (project_slug if project_slug is not None
                       else request.GET.get('project'))
     if project_filter:
@@ -616,6 +620,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
         'can_edit_videos': can_add_video(team, request.user, project),
         'filtered': filtered,
         'all_videos_count': team.get_videos_for_user(request.user).count(),
+        'form': form
     })
 
     if extra_context['can_add_video'] or extra_context['can_edit_videos']:

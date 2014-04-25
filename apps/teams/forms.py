@@ -744,3 +744,15 @@ class TeamMultiVideoCreateSubtitlesForm(MultiVideoCreateSubtitlesForm):
             (tasks.incomplete_subtitle().filter(language='')
              .update(language=language))
         return MultiVideoCreateSubtitlesForm.handle_post(self)
+
+class MoveVideosForm(forms.Form):
+    team = forms.ModelChoiceField(queryset=Team.objects.none(),
+                                  required=True,
+                                  empty_label=None)
+
+    class Meta:
+        fields = ('team')
+
+    def __init__(self, user,  *args, **kwargs):
+        super(MoveVideosForm, self).__init__(*args, **kwargs)
+        self.fields['team'].queryset = user.managed_teams(include_manager=False)

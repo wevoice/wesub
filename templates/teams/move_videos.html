@@ -120,6 +120,9 @@
 	  <span class="bulk-actions">
 	    <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
 	    <button type="submit" name="move">{% trans "Move selected" %}</button>
+            <label for="id_team">to team</label>
+            {{ form.errors.team }}
+            {{ form.team }}
 	  </span>
             <ul class="videos listing group">
                 {% with team|is_team_member:request.user as user_is_team_member %}
