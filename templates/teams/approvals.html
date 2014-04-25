@@ -1,0 +1,56 @@
+{% extends "teams/base.html" %}
+
+{% load i18n teams_tags paginator %}
+
+{% block title %}
+    {{ team }} {% trans 'Team Approvals' %} | Amara
+{% endblock %}
+
+{% block html_attrs %}id="team_approvals"{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(function() {
+            $select = $("select#lang-filter, select#role-filter", ".tools");
+            $select.change(function(e) {
+                window.location = $(this).children('option:selected').attr('value');
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block view_content %}
+
+    <div class="view grid_8 omega">
+        {% with 'approvals' as current %}
+            {% include 'teams/_tabs.html' %}
+        {% endwith %}
+        {% if approvals_list %}
+	<form method="post" action="">{% csrf_token %}
+	  <span class="bulk-actions">
+	    <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+	    <button type="submit" name="approve">{% trans "Approve selected" %}</button>
+	  </span>
+          {% if is_paginated %}{% paginator %}{% endif %}
+          <ul class="members listing">
+                {% for item in approvals_list %}
+                <li>
+		  <h3>
+		  <input class="bulkable" type="checkbox" value="{{item.id}}" name="approvals[]">
+		    {{ item.summary }}
+		  </h3>
+                </li>
+                {% endfor %}
+            </ul>
+            {% if is_paginated %}{% paginator %}{% endif %}
+	    <span class="bulk-actions">
+	      <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+	      <button type="submit" name="approve">{% trans "Approve selected" %}</button>
+	    </span>
+	</form>
+        {% else %}
+            <p class="empty">{% trans "There are no approvals right now" %}...</p>
+        {% endif %}
+    </div>
+    
+{% endblock %}
