@@ -562,39 +562,49 @@ def detail(request, slug, project_slug=None, languages=None):
 def move_videos(request, slug, project_slug=None, languages=None):
     team = get_team_for_view(slug, request.user)
     if not can_move_videos(team, request.user):
-        return  HttpResponseForbidden("Not allowed")
+        return HttpResponseForbidden("Not allowed")
 
     try:
         member = team.get_member(request.user)
     except TeamMember.DoesNotExist:
         member = None
 
+    managed_teams = request.user.managed_teams(include_manager=False)
+    managed_projects = Project.objects.filter(team__in=managed_teams)
+    managed_projects_choices = map(lambda project: {'id': project.id, 'team': str(project.team.id), 'name': str(project)}, managed_projects)
 
     if request.method == 'POST':
-        print "Received POST request"
         form = MoveVideosForm(request.user, request.POST)
         if 'move' in request.POST and form.is_valid():
-            print "Valid"
+            target_team = form.cleaned_data['team']
+            if target_team not in managed_teams:
+                return  HttpResponseForbidden("Not allowed")
+    
+            project_id = request.POST.get('projects',None)
+            target_project = None
+            if project_id:
+                try:
+                    target_project = Project.objects.get(id=project_id)
+                    if target_project not in managed_projects:
+                        return  HttpResponseForbidden("Not allowed")
+                except Entry.DoesNotExist:
+                    return  HttpResponseBadRequest("Illegal Request")
+                except MultipleObjectsReturned:
+                    return  HttpResponseServerError("Internal Error")
             selected_videos = request.POST.getlist('selected_videos[]')
-            print "Moving videos"
-            print selected_videos
-            print "team"
-            print form.cleaned_data['team']
-            print "Project"
-            print request.POST['projects']
             for video_id in selected_videos:
-                print "About to process ", video_id
-                team_video = TeamVideo.objects.filter(id=video_id)
-                print "team_video"
-                print team_video
-                team_video[0].move_to(form.cleaned_data['team'], project=Project.objects.filter(id=request.POST['projects'])[0])
+                try:
+                    team_video = TeamVideo.objects.get(id=video_id)
+                    if team_video.team not in managed_teams:
+                        return  HttpResponseForbidden("Not allowed")
+                    team_video.move_to(target_team, project=target_project)
+                except Entry.DoesNotExist:
+                    return  HttpResponseBadRequest("Illegal Request")
+                except MultipleObjectsReturned:
+                    return  HttpResponseServerError("Internal Error")
     else:
         form = MoveVideosForm(request.user)
-
-    managed_teams = request.user.managed_teams(include_manager=False)
-    projects = map(lambda project: {'slug': project.id, 'team': str(project.team.id), 'name': project.name}, Project.objects.filter(team__in=managed_teams))
-    print "Projects", projects
-        
+     
     project_filter = (project_slug if project_slug is not None
                       else request.GET.get('project'))
     if project_filter:
@@ -635,7 +645,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
         'filtered': filtered,
         'all_videos_count': team.get_videos_for_user(request.user).count(),
         'form': form,
-        'projects': projects
+        'projects': managed_projects_choices
     })
 
     if extra_context['can_add_video'] or extra_context['can_edit_videos']:

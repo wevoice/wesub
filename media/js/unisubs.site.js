@@ -280,41 +280,41 @@ var Site = function(Site) {
 		bulkCheckbox.attr("checked", !bulkCheckbox.attr("checked")).change();
 		return false;
 	    });
-	},
-	optionswitch: function(myfilter) {
-	    //Populate the optionstore if the first time through
-	    if ($('#optionstore').text() == "") {
-		$('option[class^="sub-"]').each(function() {
+	},	
+	filterOptions: function(filter, store, select) {
+	    // Populate the store if not done yet
+	    if (store.text() == "") {
+		$('option[class^="store-"]').each(function() {
 		    var optvalue = $(this).val();
 		    var optclass = $(this).attr('class');
 		    var opttext = $(this).text();
-		    optionlist = $('#optionstore').text() + "@%" + optvalue + "@%" + optclass + "@%" + opttext;
-		    $('#optionstore').text(optionlist);
+		    optionlist = store.text() + "@%" + optvalue + "@%" + optclass + "@%" + opttext;
+		    store.text(optionlist);
 		});
 	    }
-	    //delete everything
-	    $('option[class^="sub-"]').remove();
-	    // put the filtered stuff back
-	    populateoption = that.Utils.rewriteoption(myfilter);
-	    $('#projects').html(populateoption);
+	    // Delete everything
+	    $('option[class^="store-"]').remove();
+	    // Put the filtered stuff back
+	    populateOptions = that.Utils.rewriteOptions(filter, store);
+	    select.html(populateOptions);
 	},
-	rewriteoption: function (myfilter) {
-	    //rewrite only the filtered stuff back into the option
-	    var options = $('#optionstore').text().split('@%');
-	    var resultgood = false;
-	    var myfilterclass = "sub-" + myfilter;
-	    var optionlisting = "";
+	rewriteOptions: function (filter, store) {
+	    // Rewrite only the filtered stuff back into the option
+	    var options = store.text().split('@%');
+	    var result = false;
+	    var filterClass = "store-" + filter;
+	    var optionListing = "";
     
-	    myfilterclass = (myfilter != "")?myfilterclass:"all";
+	    filterClass = (filter != "") ? filterClass : "all";
 	    //first variable is always the value, second is always the class, third is always the text
 	    for (var i = 3; i < options.length; i = i + 3) {
-		if (options[i - 1] == myfilterclass || myfilterclass == "all") {
-		    optionlisting = optionlisting + '<option value="' + options[i - 2] + '" class="sub-' + options[i - 1] + '">' + options[i] + '</option>';
-		    resultgood = true;
+		if (options[i - 1] == filterClass || filterClass == "all") {
+		    optionListing = optionListing + '<option value="' + options[i - 2] + '" class="sub-' + options[i - 1] + '">' + options[i] + '</option>';
+		    result = true;
 		}
 	    }
-	    if (resultgood) {
-		return optionlisting;
+	    if (result) {
+		return optionListing;
 	    }
 	},
         truncateTextBlocks: function(blocks, maxHeight) {
@@ -749,10 +749,10 @@ var Site = function(Site) {
             that.Utils.chosenify();
             that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
 	    $('#id_team').change(function() {
-		var cattype = $(this).val();
-		that.Utils.optionswitch(cattype);
-	    });
-	    $('#id_team').change();
+		var filter = $(this).val();
+		that.Utils.filterOptions(filter, $('#projects-store'), $('#projects-select'));
+	    }).change();
+	    //$('#id_team');
         },
         team_applications: function() {
             that.Utils.chosenify();
