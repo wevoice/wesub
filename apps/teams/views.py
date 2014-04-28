@@ -571,15 +571,29 @@ def move_videos(request, slug, project_slug=None, languages=None):
 
 
     if request.method == 'POST':
+        print "Received POST request"
         form = MoveVideosForm(request.user, request.POST)
         if 'move' in request.POST and form.is_valid():
+            print "Valid"
             selected_videos = request.POST.getlist('selected_videos[]')
             print "Moving videos"
             print selected_videos
             print "team"
             print form.cleaned_data['team']
+            print "Project"
+            print request.POST['projects']
+            for video_id in selected_videos:
+                print "About to process ", video_id
+                team_video = TeamVideo.objects.filter(id=video_id)
+                print "team_video"
+                print team_video
+                team_video[0].move_to(form.cleaned_data['team'], project=Project.objects.filter(id=request.POST['projects'])[0])
     else:
         form = MoveVideosForm(request.user)
+
+    managed_teams = request.user.managed_teams(include_manager=False)
+    projects = map(lambda project: {'slug': project.id, 'team': str(project.team.id), 'name': project.name}, Project.objects.filter(team__in=managed_teams))
+    print "Projects", projects
         
     project_filter = (project_slug if project_slug is not None
                       else request.GET.get('project'))
@@ -620,7 +634,8 @@ def move_videos(request, slug, project_slug=None, languages=None):
         'can_edit_videos': can_add_video(team, request.user, project),
         'filtered': filtered,
         'all_videos_count': team.get_videos_for_user(request.user).count(),
-        'form': form
+        'form': form,
+        'projects': projects
     })
 
     if extra_context['can_add_video'] or extra_context['can_edit_videos']:

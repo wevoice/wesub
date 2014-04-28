@@ -136,7 +136,7 @@ var Site = function(Site) {
          */
 
         chosenify: function() {
-            $('select', '.v1 .content').filter(function() {
+            $('select', '.v1 .content').not('.raw-select').filter(function() {
                 if ($(this).parents('div').hasClass('ajaxChosen')) {
                     return false;
                 }
@@ -280,6 +280,42 @@ var Site = function(Site) {
 		bulkCheckbox.attr("checked", !bulkCheckbox.attr("checked")).change();
 		return false;
 	    });
+	},
+	optionswitch: function(myfilter) {
+	    //Populate the optionstore if the first time through
+	    if ($('#optionstore').text() == "") {
+		$('option[class^="sub-"]').each(function() {
+		    var optvalue = $(this).val();
+		    var optclass = $(this).attr('class');
+		    var opttext = $(this).text();
+		    optionlist = $('#optionstore').text() + "@%" + optvalue + "@%" + optclass + "@%" + opttext;
+		    $('#optionstore').text(optionlist);
+		});
+	    }
+	    //delete everything
+	    $('option[class^="sub-"]').remove();
+	    // put the filtered stuff back
+	    populateoption = that.Utils.rewriteoption(myfilter);
+	    $('#projects').html(populateoption);
+	},
+	rewriteoption: function (myfilter) {
+	    //rewrite only the filtered stuff back into the option
+	    var options = $('#optionstore').text().split('@%');
+	    var resultgood = false;
+	    var myfilterclass = "sub-" + myfilter;
+	    var optionlisting = "";
+    
+	    myfilterclass = (myfilter != "")?myfilterclass:"all";
+	    //first variable is always the value, second is always the class, third is always the text
+	    for (var i = 3; i < options.length; i = i + 3) {
+		if (options[i - 1] == myfilterclass || myfilterclass == "all") {
+		    optionlisting = optionlisting + '<option value="' + options[i - 2] + '" class="sub-' + options[i - 1] + '">' + options[i] + '</option>';
+		    resultgood = true;
+		}
+	    }
+	    if (resultgood) {
+		return optionlisting;
+	    }
 	},
         truncateTextBlocks: function(blocks, maxHeight) {
             // Takes a list of jQuery objects and sets up
@@ -708,11 +744,15 @@ var Site = function(Site) {
         diffing: function() {
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },
-
         // Teams
         move_videos: function() {
             that.Utils.chosenify();
             that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
+	    $('#id_team').change(function() {
+		var cattype = $(this).val();
+		that.Utils.optionswitch(cattype);
+	    });
+	    $('#id_team').change();
         },
         team_applications: function() {
             that.Utils.chosenify();

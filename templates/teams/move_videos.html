@@ -123,6 +123,14 @@
             <label for="id_team">to team</label>
             {{ form.errors.team }}
             {{ form.team }}
+            <label for="id_project">to project</label>
+
+	    <select name="projects" id="projects" size="1" class="raw-select">
+	      {% for project in projects %}
+	      <option value="{{project.slug}}" class="sub-{{ project.team }}">{{ project.name }}</option>
+	      {% endfor %}
+	    </select>
+	    <span id="optionstore" style="display:none;"></span>
 	  </span>
             <ul class="videos listing group">
                 {% with team|is_team_member:request.user as user_is_team_member %}
