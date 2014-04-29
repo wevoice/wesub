@@ -420,7 +420,7 @@ def _get_videos_for_detail_page(team, user, query, project, language_code,
         'user': user,
         'project': project,
         'query': query,
-        'sort': sort,
+        'sort': sort
     }
     num_completed_langs = language = exclude_language = None
     if language_mode == '+':
@@ -621,13 +621,25 @@ def move_videos(request, slug, project_slug=None, languages=None):
     query = request.GET.get('q', '')
     sort = request.GET.get('sort')
     language_filter = request.GET.get('lang')
+    primary_audio_language_filter = request.GET.get('primary-audio-lang', 'any')
     language_code = language_filter if language_filter != 'any' else None
+    primary_audio_language_code = primary_audio_language_filter if primary_audio_language_filter != 'any' else None
     language_mode = request.GET.get('lang-mode', '+')
     filtered = bool(set(request.GET.keys()).intersection([
         'project', 'lang', 'sort']))
 
     qs = _get_videos_for_detail_page(team, request.user, query, project,
                                      language_code, language_mode, sort)
+
+     # As we want to search with None values, we can not use haystack/solr
+     # A possibility would be to use haystack's raw queries but it does not
+     # seem to be available in our version
+     # So filtering it as a list for now
+    if primary_audio_language_code is not None:
+        if primary_audio_language_code == "-":
+            qs = filter(lambda x: (x.original_language == None), qs)
+        else:
+            qs = filter(lambda x: (x.original_language != None), qs)
 
     extra_context = widget.add_onsite_js_files({})
     extra_context.update({
@@ -639,6 +651,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
         'language_code': language_code,
         'language_mode': language_mode,
         'sort': sort,
+        'primary_audio_language_filter': primary_audio_language_filter,
         'can_add_video': can_add_video(team, request.user, project),
         'can_move_videos': can_move_videos(team, request.user),
         'can_edit_videos': can_add_video(team, request.user, project),
@@ -690,7 +703,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
     else:
         extra_context['order_name'] = sort_names['-time']
 
-    extra_context['current_videos_count'] = qs.count()
+    extra_context['current_videos_count'] = len(qs)
 
     team_video_md_list, pagination_info = paginate(qs, per_page, request.GET.get('page'))
     extra_context.update(pagination_info)
