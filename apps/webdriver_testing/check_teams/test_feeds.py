@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from webdriver_testing.pages.site_pages.teams import add_feed_page
+from webdriver_testing.pages.site_pages.teams import feeds_page
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.data_factories import UserFactory
 from webdriver_testing.data_factories import TeamMemberFactory
-from videos.models import VideoUrl
+from videos.models import VideoFeed
 
 
 
@@ -23,6 +24,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         cls.feed_pg = add_feed_page.AddFeedPage(cls)
         cls.feed_pg.open_feed_page(cls.team.slug)
         cls.feed_pg.log_in(cls.user.username, 'password')
+        cls.feeds_pg = feeds_page.FeedsPage(cls)
 
     def setUp(self):
         self.feed_pg.open_feed_page(self.team.slug)
@@ -40,59 +42,65 @@ class TestCaseAddFeeds(WebdriverTestCase):
                           '/latestvideoss/uploads already exists')
         self.assertEqual(expected_error, self.feed_pg.submit_error())
 
-
-    def test_youtube_user_url(self):
-        """Add a youtube user url feed
-
-        """
-        url = "http://www.youtube.com/user/jdragojevic"
-        self.feed_pg.submit_youtube_user_page(url)
-        self.assertTrue(self.feed_pg.submit_successful())
-
     def test_vimeo(self):
         """Add a vimeo feed
 
         """
-        url = "http://vimeo.com/jeroenhouben/videos/rss"
+        url = "http://vimeo.com/amaravideos/videos/rss"
         self.feed_pg.submit_feed_url(url)
         self.assertTrue(self.feed_pg.submit_successful())
+        feed = VideoFeed.objects.get(url=url)
+        feed.update()
+        self.feeds_pg.open_feed_details(self.team.slug, feed.id)
+        self.assertEqual(1, self.feeds_pg.num_videos()) 
 
     def test_youtube_feed(self):
         """Add a youtube feed
 
         """
         url = "http://gdata.youtube.com/feeds/api/users/amaratestuser/uploads"
-        video_url = ("http://www.youtube.com/watch?v=q26umaF242I")
         self.feed_pg.submit_feed_url(url)
         self.assertTrue(self.feed_pg.submit_successful())
-        vurl = VideoUrl.objects.get(url=video_url)
-        self.assertTrue('Y', vurl.type)
-        self.assertEqual(self.team.name, vurl.video.teamvideo.team.name)
+
+        feed = VideoFeed.objects.get(url=url)
+        feed.update()
+        self.feeds_pg.open_feed_details(self.team.slug, feed.id)
+        self.assertEqual(3, self.feeds_pg.num_videos()) 
+
+
+    def test_brightcove_feed(self):
+        """Add a brightcove new videos feed
+
+        """
+        url = ("http://link.brightcove.com/services/mrss/"
+              "player3091474522001/2903498771001/tags/tag%20with%20spaces")
+        self.feed_pg.submit_feed_url(url)
+        self.assertTrue(self.feed_pg.submit_successful())
+        feed = VideoFeed.objects.get(url=url)
+        feed.update()
+        self.feeds_pg.open_feed_details(self.team.slug, feed.id)
+        self.assertEqual(1, self.feeds_pg.num_videos()) 
 
     def test_kaltura_yahoo_feed(self):
         """Add a kaltura yahoo feed
 
         """
         url = "http://qa.pculture.org/feeds_test/kaltura_yahoo_feed.rss"
-        video_url = ("http://cdnbakmi.kaltura.com/p/1492321/sp/149232100/"
-                     "serveFlavor/entryId/1_ydvz9mq1/flavorId/1_i3dcmygl/"
-                     "name/a.mp4")
         self.feed_pg.submit_feed_url(url)
         self.assertTrue(self.feed_pg.submit_successful())
-        vurl = VideoUrl.objects.get(url=video_url)
-        self.assertTrue('K', vurl.type)
-        self.assertEqual(self.team.name, vurl.video.teamvideo.team.name)
+        feed = VideoFeed.objects.get(url=url)
+        feed.update()
+        self.feeds_pg.open_feed_details(self.team.slug, feed.id)
+        self.assertEqual(3, self.feeds_pg.num_videos()) 
 
     def test_kaltura_itunes_feed(self):
         """Add a kaltura itunes feed
 
         """
         url = "http://qa.pculture.org/feeds_test/kaltura_itunes_feed.rss"
-        video_url = ("http://cdnbakmi.kaltura.com/p/1492321/sp/149232100/"
-                     "serveFlavor/entryId/1_zlgl6ut8/flavorId/1_dqgopb2z/"
-                     "name/a.mp4")
         self.feed_pg.submit_feed_url(url)
         self.assertTrue(self.feed_pg.submit_successful())
-        vurl = VideoUrl.objects.get(url=video_url)
-        self.assertTrue('K', vurl.type)
-        self.assertEqual(self.team.name, vurl.video.teamvideo.team.name)
+        feed = VideoFeed.objects.get(url=url)
+        feed.update()
+        self.feeds_pg.open_feed_details(self.team.slug, feed.id)
+        self.assertEqual(3, self.feeds_pg.num_videos()) 
