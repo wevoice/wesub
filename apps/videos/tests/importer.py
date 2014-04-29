@@ -22,7 +22,8 @@ import datetime
 from django.test import TestCase
 import mock
 
-from utils import test_utils, test_factories
+from utils import test_utils
+from utils.factories import *
 from videos import signals
 from videos.models import Video, VideoUrl, VideoFeed, ImportedVideo
 from videos.feed_parser import importer
@@ -32,7 +33,7 @@ class VideoImporterTestCase(TestCase):
     @test_utils.patch_for_test('videos.feed_parser.importer.FeedParser')
     def setUp(self, mock_feedparser_class):
         TestCase.setUp(self)
-        self.user = test_factories.create_user()
+        self.user = UserFactory()
         self.base_url = 'http://example.com/'
         self.mock_feedparser_class = mock_feedparser_class
 
@@ -172,13 +173,13 @@ class VideoFeedTest(TestCase):
         signals.feed_imported.connect(mock_feed_imported_handler, weak=False)
         self.addCleanup(signals.feed_imported.disconnect,
                         mock_feed_imported_handler)
-        user = test_factories.create_user()
+        user = UserFactory()
 
         url = 'http://example.com/feed.rss'
         last_link = 'http://example.com/video3'
         feed = VideoFeed.objects.create(url=url, user=user)
 
-        feed_videos = list(test_factories.create_video() for i in xrange(3))
+        feed_videos = list(VideoFactory() for i in xrange(3))
 
         self.mock_video_importer.last_link = last_link
         self.mock_video_importer.import_videos.return_value = feed_videos

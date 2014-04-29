@@ -41,7 +41,8 @@ from django.core.urlresolvers import reverse
 from widget import video_cache
 from datetime import datetime, timedelta
 from django.conf import settings
-from utils import test_utils, test_factories
+from utils import test_utils
+from utils.factories import VideoFactory, UserFactory
 
 VIDEO_URL = 'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv'
 
@@ -1122,8 +1123,8 @@ class TestFormatConvertion(TestCase):
 
 class TestLineageOnRPC(TestCase):
     def setUp(self):
-        self.video = test_factories.create_video()
-        self.user_0 = test_factories.create_user()
+        self.video = VideoFactory()
+        self.user_0 = UserFactory()
 
     def _edit_and_save(self, video, language_code, sset, translated_from_language_code=None):
         request = RequestMockup(self.user_0)

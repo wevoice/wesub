@@ -5,7 +5,8 @@ from django.utils import translation
 from django.test import TestCase
 import mock
 
-from utils import test_factories, test_utils
+from utils import test_utils
+from utils.factories import *
 from utils.celery_search_index import update_search_index
 from videos.models import Video
 from videos.search_indexes import VideoIndex
@@ -15,7 +16,7 @@ from subtitles.models import SubtitleLanguage
 class MetadataFieldsTest(TestCase):
     def setUp(self):
         TestCase.setUp(self)
-        self.video = test_factories.create_video()
+        self.video = VideoFactory()
 
     def test_metadata_starts_blank(self):
         version = pipeline.add_subtitles(self.video, 'en', None)
@@ -192,7 +193,7 @@ class MetadataFieldsTest(TestCase):
 class MetadataViewsTest(TestCase):
     def setUp(self):
         TestCase.setUp(self)
-        self.video = test_factories.create_video()
+        self.video = VideoFactory()
         self.video.update_metadata({
             'location': 'Place',
         })

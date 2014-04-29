@@ -22,7 +22,7 @@ from datetime import datetime, date, timedelta
 from django.test import TestCase
 import mock
 
-from utils import test_factories
+from utils.factories import VideoFactory
 from utils import test_utils
 from statistic import hitcounts
 from statistic.models import LastHitCountMigration
@@ -319,14 +319,14 @@ class VideoHitCountManagerTest(HitCountManagerTestBase):
         return hitcounts.VideoHitCountManager()
 
     def make_three_objects(self):
-        return [test_factories.create_video() for i in range(3)]
+        return [VideoFactory() for i in range(3)]
 
     last_hit_count_migration_type = 'V'
 
     # tests specific to videos
     def test_migrate_updates_view_count(self):
-        video = test_factories.create_video()
-        video2 = test_factories.create_video()
+        video = VideoFactory()
+        video2 = VideoFactory()
         self.add_hit(video, datetime(2013, 1, 1, 0))
         self.add_hit(video, datetime(2013, 1, 1, 1))
         self.add_hit(video, datetime(2013, 1, 1, 2))
@@ -351,8 +351,8 @@ class SubtitleViewCountManagerTest(HitCountManagerTestBase):
         return hitcounts.SubtitleViewCountManager()
 
     def make_three_objects(self):
-        v1 = test_factories.create_video()
-        v2 = test_factories.create_video()
+        v1 = VideoFactory()
+        v2 = VideoFactory()
         return [
             pipeline.add_subtitles(v1, 'en', None).subtitle_language,
             pipeline.add_subtitles(v1, 'fr', None).subtitle_language,
