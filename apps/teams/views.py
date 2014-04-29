@@ -2254,7 +2254,7 @@ def video_feed(request, team, feed_id):
 
 
     imported_videos, pagination_info = paginate(feed.importedvideo_set.all(),
-                                                12, request.GET.get('page'))
+                                                8, request.GET.get('page'))
     context = {
         'team': team,
         'feed': feed,
