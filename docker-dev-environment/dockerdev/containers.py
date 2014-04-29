@@ -21,6 +21,7 @@ import time
 
 from dockerdev.paths import cid_path
 from dockerdev.rundocker import run_docker, get_docker_output, run_manage
+from dockerdev.version import get_version
 
 SERVICE_IMAGES = [
     'amara-dev-mysql',
@@ -42,12 +43,20 @@ def get_cid(image_name):
         return None
     return open(cid_path(image_name)).read().strip()
 
+def run_ps(all=False):
+    args = ["ps", "-q"]
+    if all:
+        args.append("-a")
+    if get_version() >= (0, 10, 0):
+        args.append("--no-trunc")
+    return get_docker_output(" ".join(args))
+
 def get_running_images():
-    output = get_docker_output("ps -q --no-trunc")
+    output = run_ps()
     return [line.strip() for line in output.split("\n")]
 
 def get_all_images():
-    output = get_docker_output("ps -a -q --no-trunc")
+    output = run_ps(all=True)
     return [line.strip() for line in output.split("\n")]
 
 def initialize_mysql_container():
