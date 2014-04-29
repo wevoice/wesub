@@ -29,7 +29,8 @@ from videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version, make_rollback_to
 )
 from widget import video_cache
-from utils import test_factories, test_utils
+from utils import test_utils
+from utils.factories import *
 
 def refresh(m):
     return m.__class__._default_manager.get(pk=m.pk)
@@ -212,7 +213,7 @@ class TestModelsSaving(TestCase):
 
 class TestSubtitleLanguageCaching(TestCase):
     def setUp(self):
-        self.videos, self.langs, self.versions = test_factories.bulk_subs({
+        self.videos, self.langs, self.versions = bulk_subs({
             'video': {
                 'en': [
                     {},

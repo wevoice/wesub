@@ -28,11 +28,15 @@ from videos.forms import (AddFromFeedForm, VideoForm, CreateSubtitlesForm,
                           MultiVideoCreateSubtitlesForm,)
 from videos.models import Video, VideoFeed
 from videos.types import video_type_registrar
-from utils import test_factories, test_utils
+from utils import test_utils
+from utils.factories import *
 from utils.translation import get_language_choices
 
 class TestVideoForm(TestCase):
-    def setUp(self):
+    @test_utils.patch_for_test('videos.forms.url_exists')
+    def setUp(self, mock_url_exists):
+        self.mock_url_exists = mock_url_exists
+        mock_url_exists.return_value = True
         self.vimeo_urls = ("http://vimeo.com/17853047",)
         self.youtube_urls = ("http://youtu.be/HaAVZ2yXDBo",
                              "http://www.youtube.com/watch?v=HaAVZ2yXDBo")
@@ -42,7 +46,7 @@ class TestVideoForm(TestCase):
     def _test_urls(self, urls):
         for url in urls:
             form = VideoForm(data={"video_url":url})
-            self.assertTrue(form.is_valid())
+            self.assertTrue(form.is_valid(), msg=form.errors.as_text())
             video = form.save()
             video_type = video_type_registrar.video_type_for_url(url)
             # double check we never confuse video_id with video.id with videoid, sigh
@@ -68,12 +72,24 @@ class TestVideoForm(TestCase):
     def test_dailymotion_urls(self):
         self._test_urls(self.daily_motion_urls)
 
+    def test_file_not_found_urls(self):
+        self.mock_url_exists.return_value = False
+        urls_to_test = [
+            self.youtube_urls[0],
+            self.vimeo_urls[0],
+            self.html5_urls[0],
+            self.daily_motion_urls[0],
+        ]
+
+        for url in urls_to_test:
+            form = VideoForm(data={"video_url":url})
+            self.assertFalse(form.is_valid())
 
 class AddFromFeedFormTestCase(TestCase):
     @test_utils.patch_for_test('videos.forms.FeedParser')
     def setUp(self, MockFeedParserClass):
         TestCase.setUp(self)
-        self.user = test_factories.create_user()
+        self.user = UserFactory()
         mock_feed_parser = mock.Mock()
         mock_feed_parser.version = 1.0
         MockFeedParserClass.return_value = mock_feed_parser
@@ -152,8 +168,8 @@ class AddFromFeedFormTestCase(TestCase):
 class CreateSubtitlesFormTestBase(TestCase):
     @test_utils.patch_for_test('videos.forms.get_user_languages_from_request')
     def setUp(self, mock_get_user_languages_from_request):
-        self.video = test_factories.create_video()
-        self.user = test_factories.create_user()
+        self.video = VideoFactory()
+        self.user = UserFactory()
         self.mock_get_user_languages_from_request = \
                 mock_get_user_languages_from_request
 
@@ -187,7 +203,7 @@ class CreateSubtitlesFormTest(CreateSubtitlesFormTestBase):
                              key=lambda choice: choice[1]))
             return rv
 
-        self.user = test_factories.create_user(languages=['fr', 'es'])
+        self.user = UserFactory(languages=['fr', 'es'])
         self.assertEquals(
             self.make_form()['subtitle_language_code'].field.choices,
             language_choices_ordered('fr', 'es'))
@@ -261,8 +277,8 @@ class CreateSubtitlesFormTest(CreateSubtitlesFormTestBase):
         self.assertEquals(form.is_valid(), False)
 
     def test_user_permissions_check(self):
-        team = test_factories.create_team(subtitle_policy=40)
-        test_factories.create_team_video(team=team, video=self.video)
+        team = TeamFactory(subtitle_policy=40)
+        TeamVideoFactory(team=team, video=self.video)
         form = self.make_form({
             'primary_audio_language_code': 'en',
             'subtitle_language_code': 'fr',

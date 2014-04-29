@@ -20,7 +20,29 @@
 from django.core.urlresolvers import reverse
 import simplejson as json
 
-from utils import test_factories
+def dxfp_sample(language_code):
+    return ("""\
+<tt xmlns="http://www.w3.org/ns/ttml" xml:lang="%s">
+ <head>
+ <metadata xmlns:ttm="http://www.w3.org/ns/ttml#metadata">
+ <ttm:title/>
+ <ttm:description/>
+ <ttm:copyright/>
+ </metadata>
+
+ <styling xmlns:tts="http://www.w3.org/ns/ttml#styling">
+ <style xml:id="amara-style" tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="18px" tts:textAlign="center"/>
+ </styling>
+
+ <layout xmlns:tts="http://www.w3.org/ns/ttml#styling">
+ <region xml:id="amara-subtitle-area" style="amara-style" tts:extent="560px 62px" tts:padding="5px 3px" tts:backgroundColor="black" tts:displayAlign="after"/>
+ </layout>
+ </head>
+ <body region="amara-subtitle-area">
+ <div><p begin="00:00:00,623" end="00:00:04,623">test subtitle</p>
+ </div>
+ </body>
+</tt>""" % language_code)
 
 class TestEditor(object):
     """Simulates the editor widget for unit tests"""
@@ -88,7 +110,7 @@ class TestEditor(object):
     def run(self, language_code, completed=True, save_for_later=False):
         """Make the HTTP requests to simulate the editor
 
-        We will use test_factories.dxfp_sample() for the subtitle data.
+        We will use dxfp_sample() for the subtitle data.
 
         :param language_code: code for the language of these subtitles
         :param completed: simulate the completed checkbox being set
@@ -117,7 +139,7 @@ class TestEditor(object):
                                 completed=completed,
                                 save_for_later=save_for_later,
                                 session_pk=session_pk,
-                                subtitles=test_factories.dxfp_sample('en'),
+                                subtitles=dxfp_sample('en'),
                                 task_approved=self.task_approved,
                                 task_id=self.task_id,
                                 task_notes=self.task_notes,

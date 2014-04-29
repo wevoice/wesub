@@ -50,7 +50,8 @@ from apps.videos.tests.data import (
 )
 from apps.widget import video_cache
 from apps.widget.tests import create_two_sub_session, RequestMockup
-from utils import test_factories, test_utils
+from utils import test_utils
+from utils.factories import *
 
 class TestViews(WebUseTest):
     fixtures = ['test.json', 'subtitle_fixtures.json']
@@ -460,21 +461,19 @@ class VideoTitleTest(TestCase):
                           correct_title)
 
     def test_video_title(self):
-        video = test_factories.create_video(
-            primary_audio_language_code='en', title='foo')
+        video = VideoFactory(primary_audio_language_code='en', title='foo')
         self.check_video_page_title(video,
                                     'foo with subtitles | Amara')
 
     def test_video_language_title(self):
-        video = test_factories.create_video(
-            primary_audio_language_code='en', title='foo')
+        video = VideoFactory(primary_audio_language_code='en', title='foo')
         pipeline.add_subtitles(video, 'en', None, title="English Title")
         self.check_video_page_title(video,
                                     'English Title with subtitles | Amara')
 
     def test_video_language_title(self):
-        video = test_factories.create_video(
-            primary_audio_language_code='en', title='Video Title')
+        video = VideoFactory(primary_audio_language_code='en',
+                             title='Video Title')
         en_version = pipeline.add_subtitles(video, 'en', None,
                                          title="English Title")
         en = en_version.subtitle_language
@@ -484,8 +483,8 @@ class VideoTitleTest(TestCase):
     def test_video_language_title_translation(self):
         # for translated languages, we display the title in the same way.  In
         # the past we displayed it differently, this test is still useful
-        video = test_factories.create_video(
-            primary_audio_language_code='en', title='Video Title')
+        video = VideoFactory(primary_audio_language_code='en',
+                             title='Video Title')
         en_version = pipeline.add_subtitles(video, 'en', None,
                                          title="English Title")
         fr_version = pipeline.add_subtitles(video, 'fr', None,
@@ -498,8 +497,8 @@ class VideoTitleTest(TestCase):
     def test_video_language_title_fallback(self):
         # if a language doesn't have a title, then we fall back to the video
         # title (which is the english title, since that's the primary audoio
-        video = test_factories.create_video(
-            primary_audio_language_code='en', title='Video Title')
+        video = VideoFactory(primary_audio_language_code='en',
+                             title='Video Title')
         en_version = pipeline.add_subtitles(video, 'en', None)
         en = en_version.subtitle_language
         self.check_language_page_title(en,
@@ -507,19 +506,18 @@ class VideoTitleTest(TestCase):
 
 class MakeLanguageListTestCase(TestCase):
     def setUp(self):
-        self.video = test_factories.create_video(
-            primary_audio_language_code='en')
+        self.video = VideoFactory(primary_audio_language_code='en')
 
     def setup_team(self):
-        self.team = test_factories.create_team(workflow_enabled=True)
+        self.team = TeamFactory(workflow_enabled=True)
         workflow = self.team.get_workflow()
         workflow.review_allowed = workflow.REVIEW_IDS['Admin must review']
         workflow.approve_allowed = workflow.APPROVE_IDS['Admin must approve']
         workflow.save()
-        self.user = test_factories.create_team_member(self.team).user
-        self.team_video = test_factories.create_team_video(self.team,
-                                                           self.user,
-                                                           self.video)
+        self.user = TeamMemberFactory(team=self.team).user
+        self.team_video = TeamVideoFactory(team=self.team,
+                                           video=self.video,
+                                           added_by=self.user)
 
     def add_completed_subtitles(self, language, subtitles, **kwargs):
         language = self.add_not_completed_subtitles(language, subtitles,

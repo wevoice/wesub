@@ -21,14 +21,14 @@ from __future__ import absolute_import
 
 from django.core.urlresolvers import reverse
 
-from utils import test_factories
+from utils.factories import *
 from teams.models import TeamVideo
 from videos.tests.feeds import FeedImportTest
 
 class TeamAddVideosTest(FeedImportTest):
     def test_video_feed_submit(self):
-        team = test_factories.create_team()
-        user = test_factories.create_team_member(team).user
+        team = TeamFactory()
+        user = TeamMemberFactory(team=team).user
         self.client.login(username=user.username, password='password')
         feed_url = u'http://example.com/feed'
         url = reverse('teams:add_videos', kwargs={'slug':team.slug})

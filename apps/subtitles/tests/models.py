@@ -35,7 +35,7 @@ from apps.subtitles.tests.utils import (
     ancestor_ids
 )
 from apps.teams.models import Team, TeamMember, TeamVideo
-from utils import test_factories
+from utils.factories import *
 
 class TestSubtitleLanguage(TestCase):
     def setUp(self):
@@ -1710,7 +1710,7 @@ class TestSubtitleLanguageHavingQueries(TestCase):
 
 class TestSubtitleLanguageTipQueries(TestCase):
     def setUp(self):
-        self.videos, self.langs, self.versions = test_factories.bulk_subs({
+        self.videos, self.langs, self.versions = bulk_subs({
             'v1': {
                 'en': [
                     {},
@@ -1764,7 +1764,7 @@ class TestSubtitleLanguageTipQueries(TestCase):
 
 class TestSubtitleLanguageCaching(TestCase):
     def setUp(self):
-        self.video = test_factories.create_video()
+        self.video = VideoFactory()
         pipeline.add_subtitles(self.video, 'en', None, visibility='public')
         self.public_tip = pipeline.add_subtitles(self.video, 'en', None,
                                             visibility='public')
@@ -1828,7 +1828,7 @@ class TestSubtitleLanguageCaching(TestCase):
 
 class TestFetchAndJoin(TestCase):
     def setUp(self):
-        self.videos, self.langs, self.versions = test_factories.bulk_subs({
+        self.videos, self.langs, self.versions = bulk_subs({
             'v': {
                 'en': [
                     {},
