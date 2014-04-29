@@ -24,6 +24,7 @@ import random
 from datetime import datetime, date
 import time
 import re
+import urlparse
 
 from django.utils.safestring import mark_safe
 from django.core.cache import cache
@@ -1919,6 +1920,9 @@ class VideoFeed(models.Model):
     @staticmethod
     def now():
         return datetime.now()
+
+    def domain(self):
+        return urlparse.urlparse(self.url).netloc
 
     def update(self):
         importer = VideoImporter(self.url, self.user, self.last_link)
