@@ -62,7 +62,7 @@ class BrightcoveVideoType(VideoType):
         raise ValueError("cant find %s in %s" % (name, self.url))
 
     def _resolve_url_redirects(self, url):
-        return requests.head(url).url
+        return requests.head(url, allow_redirects=True).url
 
     @property
     def video_id(self):
