@@ -123,32 +123,6 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         self.assertEqual('Your application is pending', 
                          self.a_team_pg.replacement_text())
 
-    def test_user_leaves_rejoin(self):
-        """User leaves team can rejoin without application
-
-        """
-        self.a_team_pg.log_out()
-        test_joiner = UserFactory.create()
-        self.a_team_pg.log_in(test_joiner.username, 'password')
-        self.a_team_pg.open_team_page(self.team.slug)
-        self.a_team_pg.apply()
-        self.a_team_pg.submit_application()
-        user_app = ApplicationFactory.build(
-            team=self.team,
-            user=test_joiner,
-            )
-        user_app.approve(
-            author = self.team_owner.username, 
-            interface = "web UI")
-        user_app.save()
-        self.a_team_pg.open_team_page(self.team.slug)
-        self.a_team_pg.leave_team(self.team.slug)
-        self.a_team_pg.open_team_page(self.team.slug)
-        self.a_team_pg.apply()
-        self.a_team_pg.submit_application()
-        self.team_dir_pg.open_my_teams_page()
-        self.assertIn(self.team.name, self.team_dir_pg.teams_on_page())
-
 
     def test_rejected_no_reapply(self):
         """User removed from a team can not re-apply.

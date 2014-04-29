@@ -63,7 +63,7 @@
             <div id="bar_right">
                 <div id="bar_search">
                     <form method="get" action="{{BASE_URL}}{% url search:index %}">
-                        <input type="text" name="q" />
+                        <input type="text" name="q" placeholder='{% trans "Search Amara&hellip;" %}'/>
                     </form>
                 </div>
                 <ul id="bar_menu" class="clearfix">
