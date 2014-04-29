@@ -752,7 +752,6 @@ var Site = function(Site) {
 		var filter = $(this).val();
 		that.Utils.filterOptions(filter, $('#projects-store'), $('#projects-select'));
 	    }).change();
-	    //$('#id_team');
         },
         team_applications: function() {
             that.Utils.chosenify();

@@ -129,19 +129,21 @@
         {% if team_video_md_list %}
 	<form  method="post" action="">{% csrf_token %}
 	  <span class="bulk-actions">
-	    <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
-	    <button type="submit" name="move">{% trans "Move selected" %}</button>
-            <label for="id_team">to team</label>
+            <label for="id_team">Team</label>
             {{ form.errors.team }}
             {{ form.team }}
-            <label for="id_project">to project</label>
-
+            <label for="id_project">Project</label>
 	    <select name="projects" id="projects-select" size="1" class="raw-select">
 	      {% for project in projects %}
 	      <option value="{{project.id}}" class="store-{{ project.team }}">{{ project.name }}</option>
 	      {% endfor %}
 	    </select>
+	    <button type="submit" name="move">{% trans "Move selected" %}</button>
 	    <span id="projects-store" style="display:none;"></span>
+	  </span>
+	  <br />
+	  <span class="bulk-actions">
+	    <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
 	  </span>
             <ul class="videos listing group">
                 {% with team|is_team_member:request.user as user_is_team_member %}
