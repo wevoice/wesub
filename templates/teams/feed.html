@@ -15,9 +15,17 @@
             {% include "teams/_tabs.html" %}
         {% endwith %}
 
-        <div class="tools group">
-            <h1>{{ feed.url }}</h1>
-            <span class="last-update">
+        <div class="title">
+            <form class="import-now" method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update">
+                <div class="submit">
+                    <input type="submit" class="reduced" value="{% trans "Import Now" %}">
+                </div>
+            </form>
+            <h1>{% blocktrans with feed.domain as domain %}{{ domain }} Video Feed{% endblocktrans %}</h1>
+            <a href="{{ feed.url }}">{{ feed.url }}</a>
+            <p class="last-update">
                 {% if feed.last_update %}
                 {% blocktrans with feed.last_update|localize as last_update %}
                 Last import attempt: {{ last_update }}
@@ -25,14 +33,7 @@
                 {% else %}
                     {% trans "No import attempts" %}
                 {% endif %}
-            </span>
-            <form method="post" action="">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="update">
-                <div class="submit">
-                    <input type="submit" class="reduced" value="{% trans "Import Now" %}">
-                </div>
-            </form>
+            </p>
         </div>
 
         {% if imported_videos %}

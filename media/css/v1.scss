@@ -2807,29 +2807,37 @@ a.truncated-expand {
     }
 }
 
-#teams.video-feed {
-    h1 {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+#teams.video-feed .content {
 
     h2 {
         margin: 1em 0 0 0;
     }
 
-    .tools {
+    .title {
+        text-align: left;
+        padding: 1em 0 1em 1em;
+        border-bottom: 1px solid #e8ebed;
+        clear: both;
 
-        form {
-            display: inline;
-            margin-left: 12px;
+        h1 {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin: 0 0 0.2em 0;
         }
+    }
 
-        div.submit {
-             margin: 0;
-             border: none;
-             display: inline;
-        }
+    form.import-now {
+        float: right;
+        display: inline;
+        margin-left: 12px;
+        padding: 0;
+    }
+
+    div.submit {
+         margin: 0;
+         border: none;
+         display: inline;
     }
 
     .listing li.video {
