@@ -1932,7 +1932,9 @@ class VideoFeed(models.Model):
             self.last_link = importer.last_link
         self.last_update = VideoFeed.now()
         self.save()
-        for video in new_videos:
+        # create videos last-to-first so that the latest video is at the top
+        # of the list when viewing the imported videos
+        for video in reversed(new_videos):
             ImportedVideo.objects.create(feed=self, video=video)
         signals.feed_imported.send(sender=self, new_videos=new_videos)
         return new_videos

@@ -209,22 +209,22 @@ class VideoFeedTest(TestCase):
         # ordered last to first
         now = datetime.datetime(2000, 1, 1)
         mock_now.return_value = now
-        videos = [test_factories.create_video() for i in xrange(5)]
+        videos = [VideoFactory() for i in xrange(5)]
         self.mock_video_importer.import_videos.return_value = videos
         feed.update()
         self.assertEquals(feed.last_update, now)
         self.assertEquals([iv.video for iv in feed.importedvideo_set.all()],
-                          list(reversed(videos)))
+                          videos)
         # run VideoFeed.update() again.  new videos should be added at the
         # start of the list
-        videos2 = [test_factories.create_video() for i in xrange(5)]
+        videos2 = [VideoFactory() for i in xrange(5)]
         self.mock_video_importer.import_videos.return_value = videos2
         now += datetime.timedelta(days=1)
         mock_now.return_value = now
         feed.update()
         self.assertEquals(feed.last_update, now)
         self.assertEquals([iv.video for iv in feed.importedvideo_set.all()],
-                          list(reversed(videos2)) + list(reversed(videos)))
+                          videos2 + videos)
         # run VideoFeed.update() one more time, with no new videos.
         # last_update should still be upated
         # start of the list
@@ -234,4 +234,4 @@ class VideoFeedTest(TestCase):
         feed.update()
         self.assertEquals(feed.last_update, now)
         self.assertEquals([iv.video for iv in feed.importedvideo_set.all()],
-                          list(reversed(videos2)) + list(reversed(videos)))
+                          videos2 + videos)
