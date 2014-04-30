@@ -1906,7 +1906,6 @@ pre_delete.connect(video_cache.on_video_url_delete, VideoUrl)
 # VideoFeed
 class VideoFeed(models.Model):
     url = models.URLField()
-    last_link = models.URLField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, blank=True, null=True)
     team = models.ForeignKey("teams.Team", blank=True, null=True)
@@ -1925,11 +1924,9 @@ class VideoFeed(models.Model):
         return urlparse.urlparse(self.url).netloc
 
     def update(self):
-        importer = VideoImporter(self.url, self.user, self.last_link)
+        importer = VideoImporter(self.url, self.user)
         new_videos = importer.import_videos()
 
-        if importer.last_link is not None:
-            self.last_link = importer.last_link
         self.last_update = VideoFeed.now()
         self.save()
         # create videos last-to-first so that the latest video is at the top
