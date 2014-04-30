@@ -2918,3 +2918,16 @@ a.truncated-expand {
 #security h3 {
     margin-top: 2em;
 }
+
+.v1 form {
+    table, th, td
+        {
+           border: 1px solid #DCE2E5;
+        }
+        table {
+            th {
+                padding: 10px;
+                font-weight: bold;
+            }
+        }
+}

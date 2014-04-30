@@ -32,16 +32,34 @@
 	    <button type="submit" name="approve">{% trans "Approve selected" %}</button>
 	  </span>
           {% if is_paginated %}{% paginator %}{% endif %}
-          <ul class="members listing">
+          <table border="1" class="members listing">
+	    <tr>
+	      <th> </th>
+	      <th>{% trans 'Video' %}</th>
+	      <th>{% trans 'Language code' %}</th>
+	      <th>{% trans 'Assignee' %}</th>
+	      <th>{% trans 'Last modified' %}</th>
+	    </tr>
                 {% for item in approvals_list %}
-                <li>
-		  <h3>
-		  <input class="bulkable" type="checkbox" value="{{item.id}}" name="approvals[]">
-		    {{ item.summary }}
-		  </h3>
-                </li>
+                <tr>
+		  <td>
+		    <input class="bulkable" type="checkbox" value="{{item.id}}" name="approvals[]">
+		  </td>
+		  <td>
+		    {{ item.team_video }}
+		  </td>
+		  <td>
+		    {{ item.language }}
+		  </td>
+		  <td>
+		    {{ item.assignee }}
+		  </td>
+		  <td>
+		    {{ item.modified }}
+		  </td>
+                </tr>
                 {% endfor %}
-            </ul>
+          </table>
             {% if is_paginated %}{% paginator %}{% endif %}
 	    <span class="bulk-actions">
 	      <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>

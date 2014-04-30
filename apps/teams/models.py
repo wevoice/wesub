@@ -1785,7 +1785,6 @@ class Task(models.Model):
         Return a brief summary of the task
         """
         output = unicode(self.team_video)
-        print "1", output
         if self.body:
             output += unicode(self.body.split('\n',1)[0].strip()[:20])
         return output
