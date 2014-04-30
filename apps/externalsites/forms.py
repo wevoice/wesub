@@ -71,7 +71,9 @@ class BrightcoveAccountForm(AccountForm):
     )
 
     publisher_id = forms.IntegerField(label=ugettext_lazy("Publisher ID"))
-    write_token = forms.CharField(label=ugettext_lazy("Write token"))
+    write_token = forms.CharField(
+        label=ugettext_lazy("Sync subtitles with this write token"),
+        required=False)
     feed_enabled = forms.BooleanField(
         required=False, label=ugettext_lazy("Import Videos From Feed"))
     player_id = forms.CharField(
