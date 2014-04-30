@@ -19,6 +19,7 @@
 from collections import namedtuple
 
 from django import template
+from datetime import timedelta
 from teams.models import Team, TeamVideo, Project, TeamMember, Workflow, Task
 from django.db.models import Count
 from videos.models import Video
@@ -143,6 +144,12 @@ def is_team_member(team, user):
 def user_role(team, user):
     member = TeamMember.objects.get(team=team,user=user)
     return member.role
+
+@register.filter
+def recent(date, now):
+    if (now - date) <= timedelta(days=21):
+        return "recent"
+    return ""
 
 @register.filter
 def user_tasks_count(team, user):

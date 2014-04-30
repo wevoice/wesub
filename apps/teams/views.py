@@ -20,6 +20,7 @@ import logging
 import random
 
 import babelsubs
+from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -857,16 +858,19 @@ def approvals(request, slug):
 
     qs = team.unassigned_tasks(sort='modified')
     extra_context = {
-        'team': team
+        'team': team,
+        'now':datetime.now() 
     }
 
     if request.method == 'POST':
         if 'approve' in request.POST:
             approvals = request.POST.getlist('approvals[]')
-            approve = ('approve' in request.POST)
             for  approval_pk in approvals:
-                task = team.get_task(approval_pk)
-                task.complete_approved(request.user)
+                try:
+                    task = team.get_task(approval_pk)
+                    task.complete_approved(request.user)
+                except:
+                    HttpResponseForbidden(_(u'Invalid task to approve'))
 
     return object_list(request, queryset=qs,
                        paginate_by=UNASSIGNED_TASKS_ON_PAGE,

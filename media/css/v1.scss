@@ -2922,6 +2922,9 @@ a.truncated-expand {
 .v1 form {
     table.simple-list, th, td {
         border: 1px solid #DCE2E5;
+        tr.recent {
+            background-color: #EAEAEA;
+        }
         th {
             border: 1px solid #DCE2E5;
             padding: 10px;

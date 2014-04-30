@@ -41,7 +41,7 @@
 	      <th>{% trans 'Last modified' %}</th>
 	    </tr>
                 {% for item in approvals_list %}
-                <tr>
+                <tr class="{{ item.modified|recent:now }}">
 		  <td>
 		    <input class="bulkable" type="checkbox" value="{{item.id}}" name="approvals[]">
 		  </td>
