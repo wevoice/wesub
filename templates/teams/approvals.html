@@ -22,7 +22,7 @@
 {% block view_content %}
 
     <div class="view grid_8 omega">
-        {% with 'approvals' as current %}
+        {% with 'tasks' as current %}
             {% include 'teams/_tabs.html' %}
         {% endwith %}
         {% if approvals_list %}
