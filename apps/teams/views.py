@@ -645,8 +645,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
                 id__in=team_videos_pks,
                 video__primary_audio_language_code__in=["", None]).values_list('id', flat=True)
         else:
-            team_videos = TeamVideo.objects.filter(id__in=team_videos_pks).exclude(
-                video__primary_audio_language_code__in=["", None]).values_list('id', flat=True)
+            team_videos = TeamVideo.objects.filter(id__in=team_videos_pks, video__primary_audio_language_code__gt="").values_list('id', flat=True)
         # This is necessary because team_video_pk is not indexed by solr
         qs = filter(lambda x: x.team_video_pk in team_videos, qs)
 
