@@ -855,7 +855,7 @@ def approvals(request, slug):
     if not team.can_bulk_approve(request.user):
         return  HttpResponseForbidden("Not allowed")
 
-    qs = team.unassigned_tasks()
+    qs = team.unassigned_tasks(sort='modified')
     extra_context = {
         'team': team
     }

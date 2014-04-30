@@ -458,8 +458,10 @@ class Team(models.Model):
             setattr(self, '_videos_count', self.teamvideo_set.count())
         return self._videos_count
 
-    def unassigned_tasks(self):
+    def unassigned_tasks(self, sort=None):
         qs = Task.objects.filter(team=self, deleted=False, completed=None, assignee=None, type=Task.TYPE_IDS['Approve'])
+        if sort is not None:
+            qs = qs.order_by(sort)
         return qs
         
     def get_task(self, task_pk):
