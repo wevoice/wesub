@@ -2920,14 +2920,15 @@ a.truncated-expand {
 }
 
 .v1 form {
-    table, th, td
-        {
-           border: 1px solid #DCE2E5;
+    table.simple-list, th, td {
+        border: 1px solid #DCE2E5;
+        th {
+            border: 1px solid #DCE2E5;
+            padding: 10px;
+            font-weight: bold;
         }
-        table {
-            th {
-                padding: 10px;
-                font-weight: bold;
-            }
+        td {
+            border: 1px solid #DCE2E5;
         }
+    }
 }
