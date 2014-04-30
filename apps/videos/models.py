@@ -1925,7 +1925,8 @@ class VideoFeed(models.Model):
 
     def update(self):
         importer = VideoImporter(self.url, self.user)
-        new_videos = importer.import_videos()
+        new_videos = importer.import_videos(
+            import_next=self.last_update is None)
 
         self.last_update = VideoFeed.now()
         self.save()
