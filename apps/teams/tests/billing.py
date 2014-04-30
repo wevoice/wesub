@@ -9,7 +9,7 @@ from teams.models import BillingRecord, BillingReport, Task
 from subtitles.pipeline import add_subtitles
 from teams.permissions_const import (ROLE_CONTRIBUTOR, ROLE_MANAGER,
                                      ROLE_ADMIN)
-from utils import test_factories
+from utils.factories import *
 from utils import test_utils
 
 def make_subtitle_lines(count, seconds=60):
@@ -74,7 +74,7 @@ def group_report_rows(report_rows, key_columns):
 
 class BillingRecordTest(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team()
+        self.team = TeamFactory()
 
     def add_subtitles(self, video, *args, **kwargs):
         version = add_subtitles(video, *args, **kwargs)
@@ -94,10 +94,10 @@ class BillingRecordTest(TestCase):
 
     def test_language_number(self):
         date_maker = DateMaker()
-        user = test_factories.create_team_member(self.team).user
+        user = TeamMemberFactory(team=self.team).user
 
-        video = test_factories.create_video(primary_audio_language_code='en')
-        test_factories.create_team_video(self.team, user, video)
+        video = VideoFactory(primary_audio_language_code='en')
+        TeamVideoFactory(team=self.team, video=video, added_by=user)
         self.add_subtitles(video, 'en', make_subtitle_lines(4),
                            created=date_maker.next_date(),
                            complete=True)
@@ -108,8 +108,8 @@ class BillingRecordTest(TestCase):
                            created=date_maker.next_date(),
                            complete=True)
 
-        video2 = test_factories.create_video(primary_audio_language_code='en')
-        test_factories.create_team_video(self.team, user, video2)
+        video2 = VideoFactory(primary_audio_language_code='en')
+        TeamVideoFactory(team=self.team, video=video2, added_by=user)
         # the english version was added before the date range of the report.
         # It should still bump the language number though.
         self.add_subtitles(video2, 'en', make_subtitle_lines(4),
@@ -130,10 +130,10 @@ class BillingRecordTest(TestCase):
 
     def test_missing_records(self):
         date_maker = DateMaker()
-        user = test_factories.create_team_member(self.team).user
+        user = TeamMemberFactory(team=self.team).user
 
-        video = test_factories.create_video(primary_audio_language_code='en')
-        test_factories.create_team_video(self.team, user, video)
+        video = VideoFactory(primary_audio_language_code='en')
+        TeamVideoFactory(team=self.team, video=video, added_by=user)
         # For en and de, we call pipeline.add_subtitles directly, so there's
         # no BillingRecord in the sytem.  This simulates the languages that
         # were completed before BillingRecords were around.
@@ -167,10 +167,10 @@ class BillingRecordTest(TestCase):
 
     def test_minutes(self):
         date_maker = DateMaker()
-        user = test_factories.create_team_member(self.team).user
+        user = TeamMemberFactory(team=self.team).user
 
-        video = test_factories.create_video(primary_audio_language_code='en')
-        test_factories.create_team_video(self.team, user, video)
+        video = VideoFactory(primary_audio_language_code='en')
+        TeamVideoFactory(team=self.team, video=video, added_by=user)
         self.add_subtitles(video, 'en', make_subtitle_lines(100, 100),
                            created=date_maker.next_date(), complete=True)
         self.add_subtitles(video, 'fr', make_subtitle_lines(100, 80),
@@ -187,7 +187,7 @@ class BillingRecordTest(TestCase):
 
 class ProcessReportTest(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team()
+        self.team = TeamFactory()
         self.report = BillingReport.objects.create(
             start_date=datetime(2013, 1, 1),
             end_date=datetime(2013, 2, 1),
@@ -221,30 +221,25 @@ class ApprovalTestBase(TestCase):
         self.setup_videos()
 
     def setup_team(self):
-        self.team = test_factories.create_team(workflow_enabled=True)
-        test_factories.create_workflow(
-            self.team,
-            review_allowed=20, # manager must review
-            approve_allowed=20, # admin must approve
-        )
+        self.team = TeamFactory(workflow_enabled=True)
+        WorkflowFactory(team=self.team,
+                        review_allowed=20, # manager must review
+                        approve_allowed=20) # admin must approve
 
     def setup_users(self):
         # make a bunch of users to subtitle/review the work
-        subtitlers = [test_factories.create_user(pay_rate_code='S%s' % i)
+        subtitlers = [UserFactory(pay_rate_code='S%s' % i)
                       for i in xrange(3)]
-        reviewers = [test_factories.create_user(pay_rate_code='R%s' % i)
+        reviewers = [UserFactory(pay_rate_code='R%s' % i)
                      for i in xrange(2)]
         for u in subtitlers:
-            test_factories.create_team_member(user=u, team=self.team,
-                                              role=ROLE_CONTRIBUTOR)
+            TeamMemberFactory(user=u, team=self.team, role=ROLE_CONTRIBUTOR)
         for u in reviewers:
-            test_factories.create_team_member(user=u, team=self.team,
-                                              role=ROLE_MANAGER)
+            TeamMemberFactory(user=u, team=self.team, role=ROLE_MANAGER)
         self.subtitler_iter = itertools.cycle(subtitlers)
         self.reviewer_iter = itertools.cycle(reviewers)
 
-        self.admin = test_factories.create_team_member(team=self.team,
-                                                       role=ROLE_ADMIN).user
+        self.admin = TeamMemberFactory(team=self.team, role=ROLE_ADMIN).user
         self.users = dict((unicode(u), u) for u in subtitlers + reviewers)
         self.users[unicode(self.admin)] = self.admin
 
@@ -259,9 +254,9 @@ class ApprovalTestBase(TestCase):
         self.subtitle_dates = {}
         self.translations = set()
 
-        v1 = test_factories.create_team_video(self.team).video
-        v2 = test_factories.create_team_video(self.team).video
-        v3 = test_factories.create_team_video(self.team).video
+        v1 = TeamVideoFactory(team=self.team).video
+        v2 = TeamVideoFactory(team=self.team).video
+        v3 = TeamVideoFactory(team=self.team).video
         languages = [
             (v1, 'en'),
             (v1, 'fr'),
@@ -292,9 +287,9 @@ class ApprovalTestBase(TestCase):
                 self.translations.add((video_id, language_code))
             else:
                 task_type = 'Subtitle'
-            review_task = test_factories.make_review_task(
-                video.get_team_video(), language_code, subtitler, task_type,
-                sub_data=make_subtitle_lines(10, 90))
+            review_task = TaskFactory.create_review(
+                video.get_team_video(), language_code, subtitler,
+                type=task_type, sub_data=make_subtitle_lines(10, 90))
             self.subtitle_dates[video_id, language_code] = \
                     self.date_maker.current_date
             review_task.body = note
@@ -475,21 +470,18 @@ class SimpleApprovalTestCase(TestCase):
     def setUp(self, mock_now):
         self.date_maker = DateMaker()
         mock_now.side_effect = self.date_maker.next_date
-        self.team = test_factories.create_team(workflow_enabled=True)
-        test_factories.create_workflow(
-            self.team,
-            review_allowed=0, # no review
-            approve_allowed=20, # admin must approve
-        )
-        self.admin = test_factories.create_team_member(team=self.team,
-                                                       role=ROLE_ADMIN).user
-        self.video = test_factories.create_team_video(self.team).video
+        self.team = TeamFactory(workflow_enabled=True)
+        WorkflowFactory(team=self.team,
+                        review_allowed=0, # no review
+                        approve_allowed=20) # admin must approve
+        self.admin = TeamMemberFactory(team=self.team, role=ROLE_ADMIN).user
+        self.video = TeamVideoFactory(team=self.team).video
 
 class ApprovalForUsersNoReviewTest(SimpleApprovalTestCase):
     # Test the approval for users type when review is disabled
     def test_report(self):
-        approve_task = test_factories.make_approve_task(
-            self.video.get_team_video(), 'en', self.admin, 'Subtitle')
+        approve_task = TaskFactory.create_approve(
+            self.video.get_team_video(), 'en', self.admin, type='Subtitle')
         approve_task.complete_approved(self.admin)
         report = BillingReport.objects.create(
             start_date=self.date_maker.start_date(),
@@ -511,9 +503,9 @@ class ApprovalForUsersNoReviewTest(SimpleApprovalTestCase):
 class ApprovalReportSubtitleWithNoTimingTest(SimpleApprovalTestCase):
     # Test the approval for users type when review is disabled
     def check_report(self, subtitle_data):
-        approve_task = test_factories.make_approve_task(
-            self.video.get_team_video(), 'en', self.admin, 'Subtitle',
-            subtitle_data)
+        approve_task = TaskFactory.create_approve(
+            self.video.get_team_video(), 'en', self.admin, type='Subtitle',
+            sub_data=subtitle_data)
         approve_task.complete_approved(self.admin)
         report = BillingReport.objects.create(
             start_date=self.date_maker.start_date(),

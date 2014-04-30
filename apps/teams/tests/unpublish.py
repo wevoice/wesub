@@ -7,20 +7,19 @@ from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
 from apps.teams.models import Task
 from apps.teams.forms import DeleteLanguageForm
 from apps.teams.permissions_const import ROLE_ADMIN, ROLE_OWNER, ROLE_MANAGER, ROLE_CONTRIBUTOR
-from utils import test_factories
+from utils.factories import *
 
 class UnpublishTestCase(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team(workflow_enabled=True)
-        self.workflow = test_factories.create_workflow(self.team)
-        self.user = test_factories.create_user(is_staff=True)
-        self.member = test_factories.create_team_member(self.team, self.user,
-                                                        role=ROLE_ADMIN)
-        self.video = test_factories.create_video()
-        self.team_video = test_factories.create_team_video(self.team,
-                                                           self.user,
-                                                           self.video)
-        self.non_team_video = test_factories.create_video()
+        self.team = TeamFactory(workflow_enabled=True)
+        self.workflow = WorkflowFactory(team=self.team)
+        self.user = UserFactory(is_staff=True)
+        self.member = TeamMemberFactory(team=self.team, user=self.user,
+                                        role=ROLE_ADMIN)
+        self.video = VideoFactory(primary_audio_language_code='en')
+        self.team_video = TeamVideoFactory(team=self.team, added_by=self.user,
+                                           video=self.video)
+        self.non_team_video = VideoFactory()
         # create a bunch of versions
         self.versions = [
             pipeline.add_subtitles(self.video, 'en', None) for i in xrange(5)
@@ -96,8 +95,8 @@ class DeleteLanguageModelTest(UnpublishTestCase):
              approved=Task.APPROVED_IDS['Approved'],
              new_subtitle_version=self.versions[-1]).save()
         # add a task for another video, but with the same language
-        other_team_video = test_factories.create_team_video(self.team,
-                                                            self.user)
+        other_team_video = TeamVideoFactory(team=self.team,
+                                            added_by=self.user)
         Task(team=self.team, team_video=other_team_video, assignee=None,
              language=self.language.language_code,
              type=Task.TYPE_IDS['Translate']).save()
@@ -124,8 +123,8 @@ class DeleteLanguageModelTest(UnpublishTestCase):
              assignee=self.user,
              new_subtitle_version=v).save()
         # make review/approve tasks
-        test_factories.make_review_task(self.team_video, 'es', self.user)
-        test_factories.make_approve_task(self.team_video, 'sv', self.user)
+        TaskFactory.create_review(self.team_video, 'es', self.user)
+        TaskFactory.create_approve(self.team_video, 'sv', self.user)
         # check initial task counts
         translate_qs = Task.objects.incomplete_translate().filter(
             language='de')
@@ -208,16 +207,14 @@ class DeleteLanguageFormTest(UnpublishTestCase):
 
     def test_permissions(self):
         # only team admins and staff members should be able to submit the form
-        self.check_user_perm(test_factories.create_user(), False)
-        self.check_user_perm(test_factories.create_user(is_staff=True), True)
+        self.check_user_perm(UserFactory(), False)
+        self.check_user_perm(UserFactory(is_staff=True), True)
         for role in (ROLE_ADMIN, ROLE_OWNER):
-            user = test_factories.create_user()
-            test_factories.create_team_member(self.team, user, role=role)
-            self.check_user_perm(user, True)
+            member = TeamMemberFactory(team=self.team, role=role)
+            self.check_user_perm(member.user, True)
         for role in (ROLE_CONTRIBUTOR, ROLE_MANAGER):
-            user = test_factories.create_user()
-            test_factories.create_team_member(self.team, user, role=role)
-            self.check_user_perm(user, False)
+            member = TeamMemberFactory(team=self.team, role=role)
+            self.check_user_perm(member.user, False)
 
 class DeleteLanguageViewTest(UnpublishTestCase):
     def setUp(self):
@@ -298,21 +295,19 @@ class DeleteLanguageViewTest(UnpublishTestCase):
         response = self.client.get(url)
         button_html = '<a class="button" href="%s">' % self.url
         if should_be_present:
-            self.assert_(button_html in response.content)
+            self.assert_(button_html in response.content.decode('utf-8'))
         else:
-            self.assert_(button_html not in response.content)
+            self.assert_(button_html not in response.content.decode('utf-8'))
 
     def test_permissions(self):
-        self.check_user_perm(test_factories.create_user(), False)
-        self.check_user_perm(test_factories.create_user(is_staff=True), True)
+        self.check_user_perm(UserFactory(), False)
+        self.check_user_perm(UserFactory(is_staff=True), True)
         for role in (ROLE_ADMIN, ROLE_OWNER):
-            user = test_factories.create_user()
-            test_factories.create_team_member(self.team, user, role=role)
-            self.check_user_perm(user, True)
+            member = TeamMemberFactory(team=self.team, role=role)
+            self.check_user_perm(member.user, True)
         for role in (ROLE_CONTRIBUTOR, ROLE_MANAGER):
-            user = test_factories.create_user()
-            test_factories.create_team_member(self.team, user, role=role)
-            self.check_user_perm(user, False)
+            member = TeamMemberFactory(team=self.team, role=role)
+            self.check_user_perm(member.user, False)
 
     def test_no_button_for_non_team_videos(self):
         non_team_version = pipeline.add_subtitles(self.non_team_video, 'en',

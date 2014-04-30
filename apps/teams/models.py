@@ -353,6 +353,11 @@ class Team(models.Model):
     def user_is_member(self, user):
         return self.get_member(user) is not None
 
+    def uncache_member(self, user):
+        try:
+            del self._member_cache[user.id]
+        except KeyError:
+            pass
 
     def _is_role(self, user, role=None):
         """Return whether the given user has the given role in this team.

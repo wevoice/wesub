@@ -26,12 +26,13 @@ import mock
 
 from subtitles import pipeline
 from teams.models import TeamVideo
-from utils import test_factories, test_utils
+from utils.factories import *
 
 class TeamVideoSearchIndexTestCase(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team()
-        self.user = test_factories.create_team_member(self.team).user
+        member = TeamMemberFactory()
+        self.team = member.team
+        self.user = member.user
 
     def reindex_team_videos(self):
         site.get_index(TeamVideo).reindex()
@@ -49,10 +50,10 @@ class TeamVideoSearchIndexTestCase(TestCase):
         # make a bunch of videos that either have or don't have french
         # subtitles.  Make sure we test both single languages and multiple
         # languages.
-        tv1 = test_factories.create_team_video(team=self.team)
-        tv2 = test_factories.create_team_video(team=self.team)
-        tv3 = test_factories.create_team_video(team=self.team)
-        tv4 = test_factories.create_team_video(team=self.team)
+        tv1 = TeamVideoFactory(team=self.team)
+        tv2 = TeamVideoFactory(team=self.team)
+        tv3 = TeamVideoFactory(team=self.team)
+        tv4 = TeamVideoFactory(team=self.team)
         pipeline.add_subtitles(tv1.video, 'en', None, complete=True)
         pipeline.add_subtitles(tv2.video, 'en', None, complete=True)
         pipeline.add_subtitles(tv2.video, 'es', None, complete=True)

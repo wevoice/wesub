@@ -33,7 +33,8 @@ from auth.models import CustomUser as User
 from tasks import get_youtube_data
 from subtitles.pipeline import add_subtitles
 from apps.testhelpers import views as helpers
-from utils import test_factories
+from utils.factories import (UserFactory, ThirdPartyAccountFactory,
+                             TeamFactory, TeamVideoFactory)
 
 import mock
 
@@ -50,8 +51,8 @@ class AccountTest(TestCase):
         ])
 
     def test_retrieval(self):
-        tpa = test_factories.create_third_party_account(self.vurl)
-        tpa.users.add(test_factories.create_user())
+        tpa = ThirdPartyAccountFactory(video_url=self.vurl)
+        tpa.users.add(UserFactory())
 
         with self.assertRaises(ImproperlyConfigured):
             ThirdPartyAccount.objects.always_push_account()
@@ -61,7 +62,7 @@ class AccountTest(TestCase):
                           tpa)
 
     def test_rules(self):
-        team_video = test_factories.create_team_video()
+        team_video = TeamVideoFactory()
         video = team_video.video
         username = video.user.username
 
@@ -86,25 +87,25 @@ class AccountTest(TestCase):
 
     def test_check_authorization_not_linked(self):
         # test check_authorization when not linked to a user or team
-        test_factories.create_third_party_account(self.vurl)
+        ThirdPartyAccountFactory(video_url=self.vurl)
         self.assertEquals(check_authorization(self.video), (False, False))
 
     def test_check_authorization_individual(self):
         # test check_authorization when linked to a user
-        tpa = test_factories.create_third_party_account(self.vurl)
-        tpa.users.add(test_factories.create_user())
+        tpa = ThirdPartyAccountFactory(video_url=self.vurl)
+        tpa.users.add(UserFactory())
         # FIXME: should this return True if the user for the ThirdPartyAccount
         # doesn't match the user of the video?
         self.assertEquals(check_authorization(self.video), (True, True))
 
     def test_check_authorization_team(self):
         # test check_authorization when linked to a team
-        team = test_factories.create_team()
-        tpa = test_factories.create_third_party_account(self.vurl)
+        team = TeamFactory()
+        tpa = ThirdPartyAccountFactory(video_url=self.vurl)
         tpa.teams.add(team)
 
         self.assertEquals(check_authorization(self.video), (False, False))
-        test_factories.create_team_video(team, video=self.video)
+        TeamVideoFactory(team=team, video=self.video)
         self.video.clear_team_video_cache()
         self.assertEquals(check_authorization(self.video), (True, True))
 
@@ -120,7 +121,7 @@ class AccountTest(TestCase):
         self.assertTrue(can_be_synced(lang.get_tip()))
 
     def test_mirror_existing(self):
-        user = test_factories.create_user()
+        user = UserFactory()
         tpa1 = ThirdPartyAccount.objects.create(username='a1')
         tpa2 = ThirdPartyAccount.objects.create(username='a2')
         self.vurl.owner_username = 'a1'
@@ -141,7 +142,7 @@ class AccountTest(TestCase):
         self.assertTrue(can_be_synced(version))
 
     def test_resolve_ownership(self):
-        tpa = test_factories.create_third_party_account(self.vurl)
+        tpa = ThirdPartyAccountFactory(video_url=self.vurl)
 
         # test with a video that should be linked to an account
         owner = ThirdPartyAccount.objects.resolve_ownership(self.vurl)
@@ -161,8 +162,8 @@ class AccountTest(TestCase):
         # owner_username field
 
         # create 2 accounts with the same full name
-        account = test_factories.create_third_party_account(
-            self.vurl, full_name='Amara Test')
+        account = ThirdPartyAccountFactory(video_url=self.vurl,
+                                           full_name='Amara Test')
         other_account = ThirdPartyAccount.objects.create(
             type=self.vurl.type, username='other_user', 
             full_name='Amara Test', oauth_access_token='123',
@@ -177,8 +178,8 @@ class AccountTest(TestCase):
         self.assertEquals(self.vurl.owner_username, 'amaratestuser')
 
     def test_mirror_on_third_party(self):
-        tpa = test_factories.create_third_party_account(self.vurl)
-        tpa.users.add(test_factories.create_user())
+        tpa = ThirdPartyAccountFactory(video_url=self.vurl)
+        tpa.users.add(UserFactory())
         self.make_language_complete()
         lang = self.video.subtitle_language()
 
