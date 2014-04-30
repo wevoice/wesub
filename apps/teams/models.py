@@ -805,7 +805,7 @@ class TeamVideo(models.Model):
         This method expects you to have run the correct permissions checks.
         """
         old_team = self.team
-        if old_team == new_team:
+        if old_team == new_team and project == self.project:
             return
 
         # these imports are here to avoid circular imports, hacky
