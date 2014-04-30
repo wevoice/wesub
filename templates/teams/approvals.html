@@ -36,6 +36,7 @@
 	    <tr>
 	      <th> </th>
 	      <th>{% trans 'Video' %}</th>
+	      <th>{% trans 'Project' %}</th>
 	      <th>{% trans 'Language code' %}</th>
 	      <th>{% trans 'Assignee' %}</th>
 	      <th>{% trans 'Last modified' %}</th>
@@ -47,6 +48,9 @@
 		  </td>
 		  <td>
 		    {{ item.team_video }}
+		  </td>
+		  <td>
+		    {{ item.team_video.project }}
 		  </td>
 		  <td>
 		    {{ item.language }}
