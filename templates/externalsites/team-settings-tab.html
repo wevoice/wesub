@@ -63,4 +63,14 @@
             </div>
         </form>
     </div>
+</div>
+
+<aside id="confirm-delete-account-modal" class="modal" role="dialog" aria-labeledby="confirm-delete-title">
+    <h3 id="confrim-delete-title">{% trans 'About to delete account settings' %}</h3>
+    <p>{% trans 'You have disabled an account that was previously enabled.  If you continue, then the settings for that account will be lost.' %}</p>
+    <footer class="buttons">
+        <button class="continue">{% trans 'Continue' %}</button>
+        <button class="close">{% trans 'Cancel' %}</button>
+    </footer>
+</aside>
 {% endblock %}
