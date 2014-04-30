@@ -629,17 +629,26 @@ def move_videos(request, slug, project_slug=None, languages=None):
         'project', 'lang', 'sort']))
 
     qs = _get_videos_for_detail_page(team, request.user, query, project,
-                                     language_code, language_mode, sort)
+                                     language_code, language_mode,
+                                     sort)
 
-     # As we want to search with None values, we can not use haystack/solr
-     # A possibility would be to use haystack's raw queries but it does not
-     # seem to be available in our version
-     # So filtering it as a list for now
+    # TODO: This needs to be improved but should not be too bad
+    # because it only applies on already filtered videos, and
+    # only in case there is a primary_audio_language_code filter
+    #
+    # It is to check the primary_audio_language_code
+    # which is part of video, not team_video
     if primary_audio_language_code is not None:
+        team_videos_pks = qs.values_list('team_video_pk', flat=True)
         if primary_audio_language_code == "-":
-            qs = filter(lambda x: (x.original_language == None), qs)
+            team_videos = TeamVideo.objects.filter(
+                id__in=team_videos_pks,
+                video__primary_audio_language_code__in=["", None]).values_list('id', flat=True)
         else:
-            qs = filter(lambda x: (x.original_language != None), qs)
+            team_videos = TeamVideo.objects.filter(id__in=team_videos_pks).exclude(
+                video__primary_audio_language_code__in=["", None]).values_list('id', flat=True)
+        # This is necessary because team_video_pk is not indexed by solr
+        qs = filter(lambda x: x.team_video_pk in team_videos, qs)
 
     extra_context = widget.add_onsite_js_files({})
     extra_context.update({
