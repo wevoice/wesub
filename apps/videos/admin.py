@@ -79,7 +79,7 @@ class VideoFeedAdmin(admin.ModelAdmin):
             import_videos_from_feed.delay(feed.id)
     update.short_description = "Update feeds"
 
-    list_display = ['url', 'last_link', 'created', 'user']
+    list_display = ['url', 'created', 'user']
     raw_id_fields = ['user']
     actions = [update]
 
