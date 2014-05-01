@@ -25,6 +25,10 @@
         {% with 'tasks' as current %}
             {% include 'teams/_tabs.html' %}
         {% endwith %}
+	<div>
+	  <h3>{% trans "Bulk Accept Approval Tasks" %}</h3>
+	  <p>{% trans "White tasks haven't been modified in more than 3 weeks" %}</p>
+	</div>
         {% if approvals_list %}
 	<form method="post" action="">{% csrf_token %}
 	  <span class="bulk-actions">
