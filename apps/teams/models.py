@@ -644,6 +644,11 @@ class Project(models.Model):
             return u"---------"
         return u"%s" % (self.name)
 
+    def display(self, default_project_label=None):
+        if self.is_default_project and default_project_label is not None:
+            return default_project_label
+        return self.__unicode__()
+
     def save(self, slug=None,*args, **kwargs):
         self.modified = datetime.datetime.now()
         slug = slug if slug is not None else self.slug or self.name

@@ -26,8 +26,8 @@
             {% include 'teams/_tabs.html' %}
         {% endwith %}
 	<div>
-	  <h3>{% trans "Bulk Accept Approval Tasks" %}</h3>
-	  <p>{% trans "White tasks haven't been modified in more than 3 weeks" %}</p>
+	  <h3>{% trans "Bulk Accept Unassigned Approval Tasks" %}</h3>
+	  <p><em>{% trans "Tasks in white rows haven't been modified in more than 3 weeks." %}</em></p>
 	</div>
         {% if approvals_list %}
 	<form method="post" action="">{% csrf_token %}
@@ -42,7 +42,6 @@
 	      <th>{% trans 'Video' %}</th>
 	      <th>{% trans 'Project' %}</th>
 	      <th>{% trans 'Language' %}</th>
-	      <th>{% trans 'Assignee' %}</th>
 	      <th>{% trans 'Last modified' %}</th>
 	    </tr>
                 {% for item in approvals_list %}
@@ -54,13 +53,10 @@
 		    {{ item.team_video }}
 		  </td>
 		  <td>
-		    {{ item.team_video.project }}
+		    {{ item.team_video.project|display_project:"None" }}
 		  </td>
 		  <td>
 		    {{ item.language|display_language }}
-		  </td>
-		  <td>
-		    {{ item.assignee }}
 		  </td>
 		  <td>
 		    {{ item.modified }}

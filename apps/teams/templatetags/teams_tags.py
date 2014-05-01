@@ -158,6 +158,10 @@ def display_language(language_code):
     return language_code
 
 @register.filter
+def display_project(project, default_project_label):
+    return project.display(_(default_project_label))
+
+@register.filter
 def user_tasks_count(team, user):
     tasks = Task.objects.filter(team=team,assignee=user,deleted=False,completed=None)
     return tasks.count()
