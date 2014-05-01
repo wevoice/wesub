@@ -152,6 +152,12 @@ def recent(date, now):
     return ""
 
 @register.filter
+def display_language(language_code):
+    if language_code in ALL_LANGUAGES_DICT:
+        return ALL_LANGUAGES_DICT[language_code]
+    return language_code
+
+@register.filter
 def user_tasks_count(team, user):
     tasks = Task.objects.filter(team=team,assignee=user,deleted=False,completed=None)
     return tasks.count()
