@@ -263,6 +263,17 @@ def team_move_video_select(context):
                                 and team.pk != team_video.team.pk]
     return context
 
+@register.inclusion_tag('teams/_team_video_summary.html', takes_context=True)
+def team_video_summary(context, team_video_search_record):
+    context['search_record'] = team_video_search_record
+    video_url = team_video_search_record.video_url
+    context['team_video_widget_params'] = base_widget_params(context['request'], {
+        'video_url': video_url,
+        'base_state': {},
+        'effectiveVideoURL': video_url
+    })
+    return context
+
 @register.inclusion_tag('teams/_team_video_detail.html', takes_context=True)
 def team_video_detail(context, team_video_search_record):
     context['search_record'] = team_video_search_record

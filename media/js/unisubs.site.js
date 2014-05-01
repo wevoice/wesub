@@ -136,7 +136,7 @@ var Site = function(Site) {
          */
 
         chosenify: function() {
-            $('select', '.v1 .content').filter(function() {
+            $('select', '.v1 .content').not('.raw-select').filter(function() {
                 if ($(this).parents('div').hasClass('ajaxChosen')) {
                     return false;
                 }
@@ -280,6 +280,42 @@ var Site = function(Site) {
 		bulkCheckbox.attr("checked", !bulkCheckbox.attr("checked")).change();
 		return false;
 	    });
+	},	
+	filterOptions: function(filter, store, select) {
+	    // Populate the store if not done yet
+	    if (store.text() == "") {
+		$('option[class^="store-"]').each(function() {
+		    var optvalue = $(this).val();
+		    var optclass = $(this).attr('class');
+		    var opttext = $(this).text();
+		    optionlist = store.text() + "@%" + optvalue + "@%" + optclass + "@%" + opttext;
+		    store.text(optionlist);
+		});
+	    }
+	    // Delete everything
+	    $('option[class^="store-"]').remove();
+	    // Put the filtered stuff back
+	    populateOptions = that.Utils.rewriteOptions(filter, store);
+	    select.html(populateOptions);
+	},
+	rewriteOptions: function (filter, store) {
+	    // Rewrite only the filtered stuff back into the option
+	    var options = store.text().split('@%');
+	    var result = false;
+	    var filterClass = "store-" + filter;
+	    var optionListing = "";
+    
+	    filterClass = (filter != "") ? filterClass : "all";
+	    //first variable is always the value, second is always the class, third is always the text
+	    for (var i = 3; i < options.length; i = i + 3) {
+		if (options[i - 1] == filterClass || filterClass == "all") {
+		    optionListing = optionListing + '<option value="' + options[i - 2] + '" class="sub-' + options[i - 1] + '">' + options[i] + '</option>';
+		    result = true;
+		}
+	    }
+	    if (result) {
+		return optionListing;
+	    }
 	},
         truncateTextBlocks: function(blocks, maxHeight) {
             // Takes a list of jQuery objects and sets up
@@ -708,11 +744,18 @@ var Site = function(Site) {
         diffing: function() {
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },
-
         // Teams
         team_approvals: function() {
             that.Utils.chosenify();
             that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
+	},
+        move_videos: function() {
+            that.Utils.chosenify();
+            that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
+	    $('#id_team').change(function() {
+		var filter = $(this).val();
+		that.Utils.filterOptions(filter, $('#projects-store'), $('#projects-select'));
+	    }).change();
         },
         team_applications: function() {
             that.Utils.chosenify();
