@@ -1040,6 +1040,13 @@ def approvals(request, slug):
         return  HttpResponseForbidden("Not allowed")
 
     qs = team.unassigned_tasks(sort='modified')
+    # Use prefetch_related to fetch the video for each task.  This dramically
+    # reduces the number of queries in order to print out the video title.
+    # prefetch_related() is better than select_related() in this case because
+    # if multiple tasks are for the same Video object, prefetch_related() will
+    # only create 1 object while select_related() will create 1 per task.
+    # Re-using the same object means better caching.
+    qs = qs.prefetch_related('team_video__video', 'team_video__project')
     extra_context = {
         'team': team,
         'now':datetime.now() 
