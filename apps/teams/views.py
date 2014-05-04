@@ -1046,6 +1046,7 @@ def approvals(request, slug):
     # if multiple tasks are for the same Video object, prefetch_related() will
     # only create 1 object while select_related() will create 1 per task.
     # Re-using the same object means better caching.
+    qs.exclude(new_subtitle_version__subtitle_language__subtitles_complete=True)
     qs = qs.prefetch_related('team_video__video', 'team_video__project')
     extra_context = {
         'team': team,
