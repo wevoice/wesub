@@ -19,6 +19,7 @@
 from collections import namedtuple
 
 from django import template
+from datetime import timedelta
 from teams.models import Team, TeamVideo, Project, TeamMember, Workflow, Task
 from django.db.models import Count
 from videos.models import Video
@@ -37,6 +38,7 @@ from utils.text import fmt
 from apps.teams.forms import TaskUploadForm
 from apps.teams.permissions import (
     can_view_settings_tab as _can_view_settings_tab,
+    can_view_approve_tab as _can_view_approve_tab,
     can_edit_video as _can_edit_video,
     can_rename_team as _can_rename_team,
     can_perform_task as _can_perform_task,
@@ -144,6 +146,22 @@ def user_role(team, user):
     return member.role
 
 @register.filter
+def recent(date, now):
+    if (now - date) <= timedelta(days=21):
+        return "recent"
+    return ""
+
+@register.filter
+def display_language(language_code):
+    if language_code in ALL_LANGUAGES_DICT:
+        return ALL_LANGUAGES_DICT[language_code]
+    return language_code
+
+@register.filter
+def display_project(project, default_project_label):
+    return project.display(_(default_project_label))
+
+@register.filter
 def user_tasks_count(team, user):
     tasks = Task.objects.filter(team=team,assignee=user,deleted=False,completed=None)
     return tasks.count()
@@ -245,6 +263,17 @@ def team_move_video_select(context):
                                 and team.pk != team_video.team.pk]
     return context
 
+@register.inclusion_tag('teams/_team_video_summary.html', takes_context=True)
+def team_video_summary(context, team_video_search_record):
+    context['search_record'] = team_video_search_record
+    video_url = team_video_search_record.video_url
+    context['team_video_widget_params'] = base_widget_params(context['request'], {
+        'video_url': video_url,
+        'base_state': {},
+        'effectiveVideoURL': video_url
+    })
+    return context
+
 @register.inclusion_tag('teams/_team_video_detail.html', takes_context=True)
 def team_video_detail(context, team_video_search_record):
     context['search_record'] = team_video_search_record
@@ -343,6 +372,10 @@ def member_projects(context, member, varname):
 @register.filter
 def can_view_settings_tab(team, user):
    return _can_view_settings_tab(team, user)
+
+@register.filter
+def can_view_approve_tab(team, user):
+   return _can_view_approve_tab(team, user)
 
 @register.filter
 def can_rename_team(team, user):

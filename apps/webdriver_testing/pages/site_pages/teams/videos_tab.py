@@ -18,6 +18,7 @@ class VideosTab(ATeamPage):
     _VIDEO_LANGS = '.languages'
     _VIDEO_TASK_LINK = '.callout' # href has the url
     _ADD_VIDEO = 'a[href*="add/video"]'
+    _MOVE_VIDEOS = 'a[href*="move-videos"]'
     _CLEAR_FILTERS = 'a.cancel'
     _FILTERS = 'a#sort-filter span'
     _FILTER_OPEN = 'a#sort-filter span.open'
@@ -40,7 +41,6 @@ class VideosTab(ATeamPage):
     _EDIT_TEAM = 'select#id_team'
     _MOVE_VIDEO = 'div.submit a#move-video'
     _SUBMIT_MOVE_CONFIRM = 'div.modal-footer input.btn.danger'
-
     _NEW_THUMB_LINK = "form a[href*='user-data']"
 
     #FILTER and SORT
@@ -49,7 +49,14 @@ class VideosTab(ATeamPage):
     _LANG_MODE_FILTER = 'select#lang_mode'
     _SORT_FILTER = 'select[name="sort"]'
     _PROJECT_FILTER = 'select#project'
+    _PRIMARY_AUDIO_FILTER = 'select#primary_audio_lang'
     _UPDATE_FILTER = 'button#update'
+
+    #BULK MOVE VIDEOS
+    _BULK_SELECT = "a.bulk-select" 
+    _BULK_TEAM_PULLDOWN = "div#id_team_chzn a"
+    _BULK_PROJECTS = "select#projects-select"
+    _MOVE_SELECTED = "button[name='move']"
 
     def open_videos_tab(self, team):
         """Open the team with the provided team slug.
@@ -108,6 +115,15 @@ class VideosTab(ATeamPage):
         self.click_by_css('div#project_chzn a.chzn-single')
         self.select_from_chosen(self._PROJECT_FILTER, project)
 
+    def primary_audio_filter(self, setting):
+        """Filter the displayed videos by primary audio set 
+
+        This is only for bulk move videos page.
+        """
+        self._open_filters()
+        self.click_by_css('div#primary_audio_lang_chzn a.chzn-single')
+        self.select_from_chosen(self._PRIMARY_AUDIO_FILTER, setting)
+
 
     def sub_lang_filter(self, language, has=True):
         """Filter the displayed videos by subtitle language'
@@ -121,7 +137,7 @@ class VideosTab(ATeamPage):
         self.select_from_chosen(self._LANG_FILTER, language)
         if not has:
             self.click_by_css('div#lang_mode_chzn a.chzn-single')
-            self.select_from_chosen(self._LANG_MODE_FILTER, "doesn't have")
+            self.select_from_chosen(self._LANG_MODE_FILTER, "doesn't have" )
 
             
 
@@ -333,3 +349,21 @@ class VideosTab(ATeamPage):
     def videos_displayed(self):
         self.logger.info('Waiting for videos to display on page.')
         self.wait_for_element_present(self._VIDEO_THUMB)
+
+    def open_bulk_move(self):
+        self.click_by_css(self._MOVE_VIDEOS)
+
+    def bulk_select(self):
+        self.wait_for_element_present(self._BULK_SELECT)
+        self.click_by_css(self._BULK_SELECT)
+        
+    def bulk_team(self, team):
+        self.click_by_css(self._BULK_TEAM_PULLDOWN)
+        self.select_from_chosen(self._EDIT_TEAM, team)
+
+    def bulk_project(self, project):
+        self.select_option_by_text(self._BULK_PROJECTS, project)
+
+    def submit_bulk_move(self):
+        self.click_by_css(self._MOVE_SELECTED) 
+

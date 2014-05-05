@@ -96,6 +96,9 @@ class TestCaseMessageUsers(WebdriverTestCase):
         cls.new_message_pg.open_page("/")
          
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file("%s.png" % self.id())
+
     def test_admins_team_list(self):
         "Team list limited to team admins only"
         self.new_message_pg.log_in(self.en_only.username, 'password')
@@ -153,12 +156,35 @@ class TestCaseMessageUsers(WebdriverTestCase):
         self.new_message_pg.send()
         self.assertTrue(self.new_message_pg.sent())
         messages = mail.outbox
-        self.assertTrue(4, len(mail.outbox))
+        self.assertEqual(4, len(mail.outbox))
         message_recipients = []
         for m in mail.outbox:
             message_recipients.append(m.recipients()[0].split('@')[0])
         expected_recipients = ['owner2', 'en_only', 'en_fr', 'pt_br_fr_de', 'fr_fil']
         self.assertEqual(sorted(expected_recipients), sorted(message_recipients))
+
+
+
+   
+
+    def test_large_team_message(self):
+        """Message all team members"""
+        for x in range(0,1000):
+            TeamMemberFactory.create(role='ROLE_CONTRIBUTOR',
+                                     team=self.team2,
+                                     user=UserFactory.create())
+        self.new_message_pg.log_in(self.de_en.username, 'password')
+        self.new_message_pg.open_new_message_form()
+        mail.outbox = []
+        self.new_message_pg.add_subject("To all test team 2")
+        self.new_message_pg.add_message("you rock!")
+        self.new_message_pg.choose_team(self.team2.name)
+        start = time.clock()
+        self.new_message_pg.send()
+        self.assertTrue(self.new_message_pg.sent())
+        elapsed = (time.clock() - start)
+        self.logger.info(elapsed)
+        self.assertEqual(1005, len(mail.outbox))
 
     def test_user_selected_disables_team(self):
         """Choosing to message a user, disables team selections."""

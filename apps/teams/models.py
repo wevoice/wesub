@@ -376,6 +376,9 @@ class Team(models.Model):
             qs = qs.filter(role=role)
         return qs.exists()
 
+    def can_bulk_approve(self, user):
+        return self.is_owner(user) or self.is_admin(user)
+
     def is_owner(self, user):
         """
         Return whether the given user is an owner of this team.
@@ -454,6 +457,15 @@ class Team(models.Model):
         if not hasattr(self, '_videos_count'):
             setattr(self, '_videos_count', self.teamvideo_set.count())
         return self._videos_count
+
+    def unassigned_tasks(self, sort=None):
+        qs = Task.objects.filter(team=self, deleted=False, completed=None, assignee=None, type=Task.TYPE_IDS['Approve'])
+        if sort is not None:
+            qs = qs.order_by(sort)
+        return qs
+        
+    def get_task(self, task_pk):
+        return Task.objects.get(pk=task_pk)
 
     def _count_tasks(self):
         qs = Task.objects.filter(team=self, deleted=False, completed=None)
@@ -631,6 +643,11 @@ class Project(models.Model):
         if self.is_default_project:
             return u"---------"
         return u"%s" % (self.name)
+
+    def display(self, default_project_label=None):
+        if self.is_default_project and default_project_label is not None:
+            return default_project_label
+        return self.__unicode__()
 
     def save(self, slug=None,*args, **kwargs):
         self.modified = datetime.datetime.now()
@@ -810,7 +827,7 @@ class TeamVideo(models.Model):
         This method expects you to have run the correct permissions checks.
         """
         old_team = self.team
-        if old_team == new_team:
+        if old_team == new_team and project == self.project:
             return
 
         # these imports are here to avoid circular imports, hacky
@@ -1774,6 +1791,15 @@ class Task(models.Model):
         return u'Task %s (%s) for %s' % (self.id or "unsaved",
                                          self.get_type_display(),
                                          self.team_video)
+    @property
+    def summary(self):
+        """
+        Return a brief summary of the task
+        """
+        output = unicode(self.team_video)
+        if self.body:
+            output += unicode(self.body.split('\n',1)[0].strip()[:20])
+        return output
 
     @staticmethod
     def now():
@@ -1951,7 +1977,9 @@ class Task(models.Model):
             # Check if this is a post-publish edit.
             # According to #1039 we don't wanna auto-assign the assignee
             version = self.get_subtitle_version()
-            if version and version.subtitle_language.is_complete_and_synced():
+            if (version and 
+                version.is_public() and
+                version.subtitle_language.is_complete_and_synced()):
                 return None
 
             type = Task.TYPE_IDS['Approve']

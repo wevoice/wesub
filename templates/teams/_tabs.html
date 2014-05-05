@@ -21,6 +21,7 @@
             {% trans "Activity" %}
         </a>
     </li>
+
     {% if team|is_team_member:user %}
         {% if team.workflow_enabled %}
             <li{% if current == "tasks" %} class="current" {% endif %}>

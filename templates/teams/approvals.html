@@ -1,0 +1,78 @@
+{% extends "teams/base.html" %}
+
+{% load i18n teams_tags paginator %}
+
+{% block title %}
+    {{ team }} {% trans 'Team Approvals' %} | Amara
+{% endblock %}
+
+{% block html_attrs %}id="team_approvals"{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(function() {
+            $select = $("select#lang-filter, select#role-filter", ".tools");
+            $select.change(function(e) {
+                window.location = $(this).children('option:selected').attr('value');
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block view_content %}
+
+    <div class="view grid_8 omega">
+        {% with 'tasks' as current %}
+            {% include 'teams/_tabs.html' %}
+        {% endwith %}
+	<div>
+	  <h3>{% trans "Bulk Accept Unassigned Approval Tasks" %}</h3>
+	  <p><em>{% trans "Tasks in white rows haven't been modified in more than 3 weeks." %}</em></p>
+	</div>
+        {% if approvals_list %}
+	<form method="post" action="">{% csrf_token %}
+	  <span class="bulk-actions">
+	    <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+	    <button type="submit" name="approve">{% trans "Approve selected" %}</button>
+	  </span>
+          {% if is_paginated %}{% paginator %}{% endif %}
+          <table border="1" class="simple-list members listing">
+	    <tr>
+	      <th> </th>
+	      <th>{% trans 'Video' %}</th>
+	      <th>{% trans 'Project' %}</th>
+	      <th>{% trans 'Language' %}</th>
+	      <th>{% trans 'Last modified' %}</th>
+	    </tr>
+                {% for item in approvals_list %}
+                <tr class="{{ item.modified|recent:now }}">
+		  <td>
+		    <input class="bulkable" type="checkbox" value="{{item.id}}" name="approvals[]">
+		  </td>
+		  <td>
+		    {{ item.team_video }}
+		  </td>
+		  <td>
+		    {{ item.team_video.project|display_project:"None" }}
+		  </td>
+		  <td>
+		    {{ item.language|display_language }}
+		  </td>
+		  <td>
+		    {{ item.modified }}
+		  </td>
+                </tr>
+                {% endfor %}
+          </table>
+            {% if is_paginated %}{% paginator %}{% endif %}
+	    <span class="bulk-actions">
+	      <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+	      <button type="submit" name="approve">{% trans "Approve selected" %}</button>
+	    </span>
+	</form>
+        {% else %}
+            <p class="empty">{% trans "There are no approvals right now" %}...</p>
+        {% endif %}
+    </div>
+    
+{% endblock %}
