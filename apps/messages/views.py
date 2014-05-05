@@ -33,7 +33,7 @@ from apps.auth.models import UserLanguage
 from apps.messages.forms import SendMessageForm, NewMessageForm
 from apps.messages.models import Message
 from apps.messages.rpc import MessagesApiClass
-from messages.tasks import send_new_message_notification
+from messages.tasks import send_new_message_notification, send_new_messages_notifications
 from utils import render_to_json, render_to
 from utils.rpc import RpcRouter
 
@@ -131,8 +131,8 @@ def new(request):
                                                 subject=form.cleaned_data['subject']))
                 Message.objects.bulk_create(message_list);
                 new_messages_ids = Message.objects.filter(created__gt=now).values_list('pk', flat=True)
-                for pk in new_messages_ids:
-                    send_new_message_notification.delay(pk)
+                send_new_messages_notifications.delay(new_messages_ids)
+                
             messages.success(request, _(u'Message sent.'))
             return HttpResponseRedirect(reverse('messages:inbox'))
         else:
