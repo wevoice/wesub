@@ -57,6 +57,11 @@ def _team_sends_notification(team, notification_setting_name):
     return not team.settings.filter( key=Setting.KEY_IDS[notification_setting_name]).exists()
 
 @task()
+def send_new_messages_notifications(message_ids):
+    for message_id in message_ids:
+        send_new_message_notification(message_id)
+
+@task()
 def send_new_message_notification(message_id):
     from messages.models import Message
     try:
