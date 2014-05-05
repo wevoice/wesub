@@ -370,7 +370,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.assertEquals(task.assignee, self.admin.user)
         self.check_tip_is_public(False)
 
-    def test_review_and_approve_send_back(self):
+    def test_review_and_approve(self):
         self.change_workflow_settings(ADMIN_MUST_REVIEW,
                                       ADMIN_MUST_APPROVE)
         self.workflow.save()
@@ -399,6 +399,46 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.assertEquals(self.get_approve_task().body, "Test Note")
         self.check_incomplete_counts(0, 0, 0)
         self.check_tip_is_public(True)
+
+    def test_review_and_send_back_approve(self):
+        admin2 = TeamMemberFactory(team=self.team, role=TeamMember.ROLE_ADMIN)
+        self.change_workflow_settings(ADMIN_MUST_REVIEW,
+                                      ADMIN_MUST_APPROVE)
+        self.workflow.save()
+        member = self.create_member()
+        self.submit_create_task(TYPE_SUBTITLE, member.user.pk)
+        task = self.get_subtitle_task()
+        self.login(member.user)
+        self.perform_subtitle_task(task)
+        # test test that the review task is next
+        self.check_incomplete_counts(0, 1, 0)
+        self.check_tip_is_public(False)
+        # perform the review
+        review_task = self.get_review_task()
+        self.login(self.admin.user)
+        self.submit_assign(self.admin, review_task)
+        self.perform_review_task(review_task, "Test Review Note")
+        # check that that worked
+        self.check_incomplete_counts(0, 0, 1)
+        self.check_tip_is_public(False)
+        self.assertEquals(self.get_review_task().body, "Test Review Note")
+        # send the task back during approval
+        approve_task = self.get_approve_task()
+        self.login(admin2.user)
+        self.submit_assign(admin2, approve_task)
+        self.perform_approve_task(approve_task, "Test Note",
+                                  approval=Task.APPROVED_IDS['Rejected'])
+        # The review task should be assigned to the original reviewer
+        self.check_tip_is_public(False)
+        self.login(self.admin.user)
+        review_task = self.team_video.task_set.incomplete_review().get()
+        self.assertEquals(review_task.assignee, self.admin.user)
+        # accept the review task again, the approve task should be assigned to
+        # the original approver
+        self.perform_review_task(review_task, "Test Review Note")
+        self.check_tip_is_public(False)
+        approve_task = self.team_video.task_set.incomplete_approve().get()
+        self.assertEquals(approve_task.assignee, admin2.user)
 
     def test_review_and_approve_with_old_version(self):
         self.change_workflow_settings(ADMIN_MUST_REVIEW,

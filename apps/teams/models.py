@@ -1977,7 +1977,9 @@ class Task(models.Model):
             # Check if this is a post-publish edit.
             # According to #1039 we don't wanna auto-assign the assignee
             version = self.get_subtitle_version()
-            if version and version.subtitle_language.is_complete_and_synced():
+            if (version and 
+                version.is_public() and
+                version.subtitle_language.is_complete_and_synced()):
                 return None
 
             type = Task.TYPE_IDS['Approve']
