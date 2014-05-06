@@ -850,31 +850,32 @@ class TeamVideo(models.Model):
 
         self.save()
 
-        # We need to make any as-yet-unmoderated versions public.
-        # TODO: Dedupe this and the team video delete signal.
-        video = self.video
-
-        video.newsubtitleversion_set.extant().update(visibility='public')
-        video.is_public = new_team.is_visible
-        video.moderated_by = new_team if new_team.moderates_videos() else None
-        video.save()
-
-        TeamVideoMigration.objects.create(from_team=old_team,
-                                          to_team=new_team,
-                                          to_project=self.project)
-
-        # Update all Solr data.
-        metadata_manager.update_metadata(video.pk)
-        video.update_search_index()
-        tasks.update_one_team_video(self.pk)
         if not within_team:
+            # We need to make any as-yet-unmoderated versions public.
+            # TODO: Dedupe this and the team video delete signal.
+            video = self.video
+
+            video.newsubtitleversion_set.extant().update(visibility='public')
+            video.is_public = new_team.is_visible
+            video.moderated_by = new_team if new_team.moderates_videos() else None
+            video.save()
+
+            TeamVideoMigration.objects.create(from_team=old_team,
+                                              to_team=new_team,
+                                              to_project=self.project)
+
+            # Update all Solr data.
+            metadata_manager.update_metadata(video.pk)
+            video.update_search_index()
+            tasks.update_one_team_video(self.pk)
+
             # Create any necessary tasks.
             autocreate_tasks(self)
 
-        # fire a http notification that a new video has hit this team:
-        api_teamvideo_new.send(self)
-        video_moved_from_team_to_team.send(sender=self,
-                destination_team=new_team, video=self.video)
+            # fire a http notification that a new video has hit this team:
+            api_teamvideo_new.send(self)
+            video_moved_from_team_to_team.send(sender=self,
+                                               destination_team=new_team, video=self.video)
 
 class TeamVideoMigration(models.Model):
     from_team = models.ForeignKey(Team, related_name='+')
