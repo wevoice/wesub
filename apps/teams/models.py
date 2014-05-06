@@ -832,17 +832,18 @@ class TeamVideo(models.Model):
         old_team = self.team
         if old_team == new_team and project == self.project:
             return
-
+        within_team = (old_team == new_team)
         # these imports are here to avoid circular imports, hacky
         from teams.signals import api_teamvideo_new
         from teams.signals import video_moved_from_team_to_team
         from videos import metadata_manager
         # For now, we'll just delete any tasks associated with the moved video.
-        self.task_set.update(deleted=True)
+        if not within_team:
+            self.task_set.update(deleted=True)
 
-        # We move the video by just switching the team, instead of deleting and
-        # recreating it.
-        self.team = new_team
+            # We move the video by just switching the team, instead of deleting and
+            # recreating it.
+            self.team = new_team
 
         # projects are always team dependent:
         if project:
@@ -852,31 +853,32 @@ class TeamVideo(models.Model):
 
         self.save()
 
-        # We need to make any as-yet-unmoderated versions public.
-        # TODO: Dedupe this and the team video delete signal.
-        video = self.video
+        if not within_team:
+            # We need to make any as-yet-unmoderated versions public.
+            # TODO: Dedupe this and the team video delete signal.
+            video = self.video
 
-        video.newsubtitleversion_set.extant().update(visibility='public')
-        video.is_public = new_team.is_visible
-        video.moderated_by = new_team if new_team.moderates_videos() else None
-        video.save()
+            video.newsubtitleversion_set.extant().update(visibility='public')
+            video.is_public = new_team.is_visible
+            video.moderated_by = new_team if new_team.moderates_videos() else None
+            video.save()
 
-        TeamVideoMigration.objects.create(from_team=old_team,
-                                          to_team=new_team,
-                                          to_project=self.project)
+            TeamVideoMigration.objects.create(from_team=old_team,
+                                              to_team=new_team,
+                                              to_project=self.project)
 
-        # Update all Solr data.
-        metadata_manager.update_metadata(video.pk)
-        video.update_search_index()
-        tasks.update_one_team_video(self.pk)
+            # Update all Solr data.
+            metadata_manager.update_metadata(video.pk)
+            video.update_search_index()
+            tasks.update_one_team_video(self.pk)
 
-        # Create any necessary tasks.
-        autocreate_tasks(self)
+            # Create any necessary tasks.
+            autocreate_tasks(self)
 
-        # fire a http notification that a new video has hit this team:
-        api_teamvideo_new.send(self)
-        video_moved_from_team_to_team.send(sender=self,
-                destination_team=new_team, video=self.video)
+            # fire a http notification that a new video has hit this team:
+            api_teamvideo_new.send(self)
+            video_moved_from_team_to_team.send(sender=self,
+                                               destination_team=new_team, video=self.video)
 
 class TeamVideoMigration(models.Model):
     from_team = models.ForeignKey(Team, related_name='+')
