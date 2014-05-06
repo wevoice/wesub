@@ -829,17 +829,18 @@ class TeamVideo(models.Model):
         old_team = self.team
         if old_team == new_team and project == self.project:
             return
-
+        within_team = (old_team == new_team)
         # these imports are here to avoid circular imports, hacky
         from teams.signals import api_teamvideo_new
         from teams.signals import video_moved_from_team_to_team
         from videos import metadata_manager
         # For now, we'll just delete any tasks associated with the moved video.
-        self.task_set.update(deleted=True)
+        if not within_team:
+            self.task_set.update(deleted=True)
 
-        # We move the video by just switching the team, instead of deleting and
-        # recreating it.
-        self.team = new_team
+            # We move the video by just switching the team, instead of deleting and
+            # recreating it.
+            self.team = new_team
 
         # projects are always team dependent:
         if project:
@@ -866,9 +867,9 @@ class TeamVideo(models.Model):
         metadata_manager.update_metadata(video.pk)
         video.update_search_index()
         tasks.update_one_team_video(self.pk)
-
-        # Create any necessary tasks.
-        autocreate_tasks(self)
+        if not within_team:
+            # Create any necessary tasks.
+            autocreate_tasks(self)
 
         # fire a http notification that a new video has hit this team:
         api_teamvideo_new.send(self)
