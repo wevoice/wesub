@@ -1054,18 +1054,22 @@ def approvals(request, slug):
     qs = qs.prefetch_related('team_video__video', 'team_video__project')
     extra_context = {
         'team': team,
-        'now':datetime.now() 
+        'now':datetime.now()
     }
 
     if request.method == 'POST':
         if 'approve' in request.POST:
             approvals = request.POST.getlist('approvals[]')
-            for  approval_pk in approvals:
-                try:
-                    task = team.get_task(approval_pk)
-                    task.complete_approved(request.user)
-                except:
-                    HttpResponseForbidden(_(u'Invalid task to approve'))
+            # Retrieving tasks and updating them is now done in bulk,
+            # this should be much more efficient.
+            # Not sure about the best place to add that code
+            tasks = team.get_tasks(approvals)
+            try:
+                tasks.update(assignee=request.user,
+                             approved=Task.APPROVED_IDS['Approved'],
+                             completed=datetime.now())
+            except:
+                HttpResponseForbidden(_(u'Invalid task to approve'))
 
     return object_list(request, queryset=qs,
                        paginate_by=UNASSIGNED_TASKS_ON_PAGE,
