@@ -35,8 +35,6 @@ class TestCaseEntryExit(WebdriverTestCase):
         cls.video_pg.log_in(cls.user.username, 'password')
         cls.user = UserFactory.create()
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
 
     def test_exit_to_legacy(self):
         """Open legacy editor from new.
