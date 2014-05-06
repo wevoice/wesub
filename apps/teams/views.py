@@ -65,7 +65,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
-    can_delete_language, can_move_videos
+    can_delete_language, can_move_videos, can_sort_by_primary_language
 )
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
@@ -651,6 +651,10 @@ def move_videos(request, slug, project_slug=None, languages=None):
         # This is necessary because team_video_pk is not indexed by solr
         qs = filter(lambda x: x.team_video_pk in team_videos, qs)
 
+    # This is a temporary restriction until we properly fix
+    # the performance issues there
+    if not can_sort_by_primary_language(team, request.user):
+        primary_audio_language_filter = None
     extra_context = widget.add_onsite_js_files({})
     extra_context.update({
         'team': team,

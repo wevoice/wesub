@@ -119,6 +119,7 @@
                     </option>
                 </select>
             </div>
+            {% if primary_audio_language_filter %}
             <div class="filter-chunk">
               {% trans 'Primary audio language:' %}
               <select name="primary-audio-lang" id="primary_audio_lang">
@@ -127,6 +128,7 @@
                 <option value="-"{% if primary_audio_language_filter == '-' %} selected="selected"{% endif %}>{% trans "not set" %}</option>
               </select>
             </div>
+	    {% endif %}
         </form>
 
         {% if team_video_md_list %}
