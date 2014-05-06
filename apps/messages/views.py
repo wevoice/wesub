@@ -122,9 +122,9 @@ def new(request):
                 message_list = []
                 members = []
                 if len(language) == 0:
-                    members = map(lambda member: member.user, form.cleaned_data['team'].members.all().exclude(user__exact=request.user))
+                    members = map(lambda member: member.user, form.cleaned_data['team'].members.all().exclude(user__exact=request.user).select_related('user'))
                 else:
-                    members = map(lambda member: member.user, UserLanguage.objects.filter(user__in=form.cleaned_data['team'].members.values('user')).filter(language__exact=language).exclude(user__exact=request.user))
+                    members = map(lambda member: member.user, UserLanguage.objects.filter(user__in=form.cleaned_data['team'].members.values('user')).filter(language__exact=language).exclude(user__exact=request.user).select_related('user'))
                 for member in members:
                     message_list.append(Message(user=member, author=request.user,
                                                 content=form.cleaned_data['content'],
