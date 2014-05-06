@@ -467,6 +467,9 @@ class Team(models.Model):
     def get_task(self, task_pk):
         return Task.objects.get(pk=task_pk)
 
+    def get_tasks(self, task_pks):
+        return Task.objects.filter(pk__in=task_pks)
+
     def _count_tasks(self):
         qs = Task.objects.filter(team=self, deleted=False, completed=None)
         # quick, check, are there more than 1000 tasks, if so return 1001, and
