@@ -129,9 +129,7 @@ def new(request):
                     message_list.append(Message(user=member, author=request.user,
                                                 content=form.cleaned_data['content'],
                                                 subject=form.cleaned_data['subject']))
-                # Not sure if it is necessary to limit the batch size, but it seems resonable
-                # We might have dozens of thousand of messages to create
-                Message.objects.bulk_create(message_list, batch_size=1000);
+                Message.objects.bulk_create(message_list);
                 new_messages_ids = Message.objects.filter(created__gt=now).values_list('pk', flat=True)
                 # Creating a bunch of reasonably-sized tasks
                 batch = 0
