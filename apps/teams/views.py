@@ -95,6 +95,8 @@ from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 
+from teams.bulk_actions import complete_approve_tasks
+
 logger = logging.getLogger("teams.views")
 
 
@@ -1044,6 +1046,7 @@ def approvals(request, slug):
         return  HttpResponseForbidden("Not allowed")
 
     qs = team.unassigned_tasks(sort='modified')
+
     # Use prefetch_related to fetch the video for each task.  This dramically
     # reduces the number of queries in order to print out the video title.
     # prefetch_related() is better than select_related() in this case because
@@ -1068,6 +1071,7 @@ def approvals(request, slug):
                 tasks.update(assignee=request.user,
                              approved=Task.APPROVED_IDS['Approved'],
                              completed=datetime.now())
+                complete_approve_tasks(tasks)
             except:
                 HttpResponseForbidden(_(u'Invalid task to approve'))
 
