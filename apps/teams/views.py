@@ -22,6 +22,7 @@ import random
 import babelsubs
 from datetime import datetime
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required
@@ -1033,6 +1034,12 @@ def remove_member(request, slug, user_pk):
         messages.error(request, _(u'You don\'t have permission to remove this member from the team.'))
         return HttpResponseRedirect(return_path)
 
+
+def complete_approved_tasks(tasks, user):
+    tasks.update(assignee=user,
+                 approved=Task.APPROVED_IDS['Approved'],
+                 completed=datetime.now())
+
 @login_required
 def approvals(request, slug):
     team = get_team_for_view(slug, request.user)
@@ -1044,6 +1051,7 @@ def approvals(request, slug):
         return  HttpResponseForbidden("Not allowed")
 
     qs = team.unassigned_tasks(sort='modified')
+
     # Use prefetch_related to fetch the video for each task.  This dramically
     # reduces the number of queries in order to print out the video title.
     # prefetch_related() is better than select_related() in this case because
@@ -1068,6 +1076,8 @@ def approvals(request, slug):
                 tasks.update(assignee=request.user,
                              approved=Task.APPROVED_IDS['Approved'],
                              completed=datetime.now())
+                for task in tasks:
+                    task._complete_approve(lang_ct=ContentType.objects.get_for_model(NewSubtitleLanguage))
             except:
                 HttpResponseForbidden(_(u'Invalid task to approve'))
 

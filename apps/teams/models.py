@@ -463,12 +463,12 @@ class Team(models.Model):
         if sort is not None:
             qs = qs.order_by(sort)
         return qs
-        
+
     def get_task(self, task_pk):
         return Task.objects.get(pk=task_pk)
 
     def get_tasks(self, task_pks):
-        return Task.objects.filter(pk__in=task_pks)
+        return Task.objects.filter(pk__in=task_pks).select_related('new_subtitle_version', 'new_subtitle_version__subtitle_language', 'team_video', 'team_video__video', 'team_video__video__teamvideo', 'workflow')
 
     def _count_tasks(self):
         qs = Task.objects.filter(team=self, deleted=False, completed=None)
@@ -1833,10 +1833,11 @@ class Task(models.Model):
             t.cached_video_url = video_url_map.get(t.team_video.video_id)
 
 
-    def _add_comment(self):
+    def _add_comment(self, lang_ct=None):
         """Add a comment on the SubtitleLanguage for this task with the body as content."""
         if self.body.strip():
-            lang_ct = ContentType.objects.get_for_model(NewSubtitleLanguage)
+            if lang_ct is None:
+                lang_ct = ContentType.objects.get_for_model(NewSubtitleLanguage)
             comment = Comment(
                 content=self.body,
                 object_pk=self.new_subtitle_version.subtitle_language.pk,
@@ -2132,14 +2133,14 @@ class Task(models.Model):
 
         return task
 
-    def _complete_approve(self):
+    def _complete_approve(self, lang_ct=None):
         """Handle the messy details of completing an approve task."""
         approval = self.approved == Task.APPROVED_IDS['Approved']
         sv = self.get_subtitle_version()
         if approval:
             self._ensure_language_complete(sv.subtitle_language)
 
-        self._add_comment()
+        self._add_comment(lang_ct=lang_ct)
 
         if approval:
             # The subtitles are acceptable, so make them public!
