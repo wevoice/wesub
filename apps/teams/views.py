@@ -22,7 +22,6 @@ import random
 import babelsubs
 from datetime import datetime
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required
@@ -95,6 +94,8 @@ from videos.models import Action, VideoUrl, Video
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
+
+from teams.bulk_actions import complete_approve_tasks
 
 logger = logging.getLogger("teams.views")
 
@@ -1034,12 +1035,6 @@ def remove_member(request, slug, user_pk):
         messages.error(request, _(u'You don\'t have permission to remove this member from the team.'))
         return HttpResponseRedirect(return_path)
 
-
-def complete_approved_tasks(tasks, user):
-    tasks.update(assignee=user,
-                 approved=Task.APPROVED_IDS['Approved'],
-                 completed=datetime.now())
-
 @login_required
 def approvals(request, slug):
     team = get_team_for_view(slug, request.user)
@@ -1076,8 +1071,7 @@ def approvals(request, slug):
                 tasks.update(assignee=request.user,
                              approved=Task.APPROVED_IDS['Approved'],
                              completed=datetime.now())
-                for task in tasks:
-                    task._complete_approve(lang_ct=ContentType.objects.get_for_model(NewSubtitleLanguage))
+                complete_approve_tasks(tasks)
             except:
                 HttpResponseForbidden(_(u'Invalid task to approve'))
 

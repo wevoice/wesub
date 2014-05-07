@@ -2133,6 +2133,9 @@ class Task(models.Model):
 
         return task
 
+    def do_complete_approve(self, lang_ct=None):
+        return self._complete_approve(lang_ct=lang_ct)
+
     def _complete_approve(self, lang_ct=None):
         """Handle the messy details of completing an approve task."""
         approval = self.approved == Task.APPROVED_IDS['Approved']
