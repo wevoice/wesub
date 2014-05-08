@@ -31,7 +31,8 @@ from teams.permissions import add_role
 from teams.rpc import TeamsApiClass
 from teams.templatetags import teams_tags
 from teams.tests.teamstestsutils import refresh_obj, reset_solr
-from utils import test_utils, test_factories
+from utils import test_utils
+from utils.factories import *
 from utils.rpc import Error, Msg
 from videos import metadata_manager
 from videos.models import Video, SubtitleVersion
@@ -48,12 +49,12 @@ def fix_teams_roles(teams=None):
 class TestNotification(TestCase):
     def setUp(self):
         fix_teams_roles()
-        self.team = test_factories.create_team()
-        self.user = test_factories.create_user()
+        self.team = TeamFactory()
+        self.user = UserFactory()
         self.tm = TeamMember(team=self.team, user=self.user)
         self.tm.save()
-        self.tv1 = test_factories.create_team_video(self.team, self.user)
-        self.tv2 = test_factories.create_team_video(self.team, self.user)
+        self.tv1 = TeamVideoFactory(team=self.team, added_by=self.user)
+        self.tv2 = TeamVideoFactory(team=self.team, added_by=self.user)
 
     def test_new_team_video_notification(self):
         #check initial data
@@ -147,10 +148,10 @@ class TestNotification(TestCase):
 
 class NeedsNewVideoNotificationTest(TestCase):
     def make_team(self, notify_interval, add_video=True):
-        team = test_factories.create_team(notify_interval=notify_interval)
-        member = test_factories.create_team_member(team)
+        team = TeamFactory(notify_interval=notify_interval)
+        member = TeamMemberFactory(team=team)
         if add_video:
-            test_factories.create_team_video(team, member.user)
+            TeamVideoFactory(team=team, added_by=member.user)
         return team
 
     def setUp(self):
@@ -179,11 +180,11 @@ class TeamVideoTest(TestCase):
             "password": u"admin"
         }
 
-        self.user = test_factories.create_user(**self.auth)
-        self.team = test_factories.create_team()
+        self.user = UserFactory(**self.auth)
+        self.team = TeamFactory()
 
-        test_factories.create_team_member(self.team, self.user,
-                                          role=TeamMember.ROLE_ADMIN)
+        TeamMemberFactory(team=self.team, user=self.user,
+                          role=TeamMember.ROLE_ADMIN)
         reset_solr()
 
     def _get_team_videos(self):
@@ -243,14 +244,12 @@ class TeamVideoTest(TestCase):
             self.assertTrue(self._search_for_video(video))
 
     def test_wrong_project_team_fails(self):
-        project = test_factories.create_project(self.team,
-                                                name="One Project")
-        team_video = test_factories.create_team_video(self.team, self.user,
-                                 description="", project=project)
+        project = ProjectFactory(team=self.team, name="One Project")
+        team_video = TeamVideoFactory(team=self.team, added_by=self.user,
+                                      description="", project=project)
 
-        other_team = test_factories.create_team()
-        other_project = test_factories.create_project(other_team,
-                                                      name="Other Project")
+        other_team = TeamFactory()
+        other_project = ProjectFactory(team=other_team, name="Other Project")
 
         team_video.project = other_project
 
@@ -265,8 +264,8 @@ class TeamVideoTest(TestCase):
 
     def test_publish_draft_when_teamvideo_deleted(self):
         user = User.objects.all()[0]
-        team = test_factories.create_team()
-        tv = test_factories.create_team_video(team, user)
+        team = TeamFactory()
+        tv = TeamVideoFactory(team=team, added_by=user)
         video = tv.video
 
         subs = [(0, 1000, 'Hello',)]
@@ -291,10 +290,8 @@ class TeamsTest(TestCase):
             "username": u"admin",
             "password": u"admin"
         }
-        self.user = test_factories.create_user(username=u'admin',
-                                               password=u'admin',
-                                               is_staff=True,
-                                               is_superuser=True)
+        self.user = UserFactory(username=u'admin', password=u'admin',
+                                is_staff=True, is_superuser=True)
         reset_solr()
 
     def _add_team_video(self, team, language, video_url):
@@ -384,9 +381,9 @@ class TeamsTest(TestCase):
         return response.context['team_video_md_list']
 
     def test_team_join_leave(self):
-        team = test_factories.create_team()
-        manager = test_factories.create_user()
-        test_factories.create_team_member(team, manager)
+        team = TeamFactory()
+        manager = UserFactory()
+        TeamMemberFactory(team=team, user=manager)
 
         join_url = reverse('teams:join_team', args=[team.slug])
         leave_url = reverse('teams:leave_team', args=[team.slug])
@@ -418,9 +415,9 @@ class TeamsTest(TestCase):
     def test_add_video(self):
         self.client.login(**self.auth)
 
-        team = test_factories.create_team()
+        team = TeamFactory()
         self.assertEqual(team.users.count(), 0)
-        test_factories.create_team_member(team, self.user)
+        TeamMemberFactory(team=team, user=self.user)
         self.assertEqual(team.users.count(), 1)
 
         for tm in team.members.all():
@@ -434,9 +431,9 @@ class TeamsTest(TestCase):
 
     def test_team_video_delete(self):
         #this test can fail only on MySQL
-        team = test_factories.create_team()
-        video = test_factories.create_video()
-        tv = test_factories.create_team_video(team, self.user, video)
+        team = TeamFactory()
+        video = VideoFactory()
+        tv = TeamVideoFactory(team=team, added_by=self.user, video=video)
 
         # create a few languages with subs
         from videos.tests.videotestutils import create_langs_and_versions
@@ -484,10 +481,9 @@ class TeamsTest(TestCase):
     def test_detail_contents_after_edit(self):
         # make sure edits show up in search result from solr
         self.client.login(**self.auth)
-        team = test_factories.create_team()
-        test_factories.create_team_member(team, self.user)
-        tv = test_factories.create_team_video(team, self.user,
-                                              description='')
+        team = TeamFactory()
+        TeamMemberFactory(team=team, user=self.user)
+        tv = TeamVideoFactory(team=team, added_by=self.user, description='')
         data = {
             "languages-MAX_NUM_FORMS": u"",
             "languages-INITIAL_FORMS": u"0",
@@ -516,9 +512,9 @@ class TeamsTest(TestCase):
     def test_detail_contents_after_remove(self):
         # make sure removals show up in search result from solr
         self.client.login(**self.auth)
-        team = test_factories.create_team()
-        test_factories.create_team_member(team, self.user)
-        tv = test_factories.create_team_video(team, self.user)
+        team = TeamFactory()
+        TeamMemberFactory(team=team, user=self.user)
+        tv = TeamVideoFactory(team=team, added_by=self.user)
         num_team_videos = len(self._tv_search_record_list(team))
 
         url = reverse("teams:remove_video", kwargs={"team_video_pk": tv.pk})
@@ -678,14 +674,6 @@ class TeamsTest(TestCase):
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
 
-        url = reverse("teams:detail", kwargs={"slug": team.pk})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
-
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
-
         url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url, {'q': 'Lions'})
         self.failUnlessEqual(response.status_code, 200)
@@ -770,7 +758,7 @@ class TeamsTest(TestCase):
             pass
 
         #----------inviting to team-----------
-        user2 = test_factories.create_user(password='alerion')
+        user2 = UserFactory(password='alerion')
 
         member = TeamMember.objects.get(user=self.user, team=team)
         member.role = TeamMember.ROLE_OWNER
@@ -833,30 +821,43 @@ class TeamsTest(TestCase):
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 404)
 
-    def test_is_visible(self):
-        hidden  = Team(name='secret', slug='secret', is_visible=False)
-        hidden.save()
-        teams = Team.objects.all()
-        url = reverse("teams:detail", kwargs={"slug":hidden.slug})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
-        url = reverse("teams:index")
+    def get_dashboard_page(self, team):
+        url = reverse("teams:dashboard", kwargs={"slug":team.slug})
+        return self.client.get(url)
 
-        response = self.client.get(url)
-        teams = response.context['teams_list']
-        self.assertTrue(len(teams) < 10)
-        teams_pks = [t.pk for t in teams]
-        print teams_pks, hidden.pk
+    def test_non_visible(self):
+        invitation_team = TeamFactory(is_visible=False,
+                                      membership_policy=Team.INVITATION_BY_ALL)
+        open_team = TeamFactory(is_visible=False,
+                                membership_policy=Team.OPEN)
+        application_team = TeamFactory(is_visible=False,
+                                       membership_policy=Team.APPLICATION)
 
-        self.assertNotIn(hidden.pk, teams_pks)
+        for team in (invitation_team, open_team, application_team):
+            TeamVideoFactory(team=team)
+
+        # non-visible teams should show up on the listing only if their are
+        # application-based on open
+        response = self.client.get(reverse('teams:index'))
+        self.assertEquals(set(response.context['teams_list']),
+                          set([application_team, open_team]))
+        # those teams listed should allow non-members to see their dashboards,
+        # but make sure that no videos are visible.
+        for team in (open_team, application_team):
+            response = self.get_dashboard_page(team)
+            self.assertEquals(response.status_code, 200)
+            self.assertEquals(response.context['videos'], [])
+        # invitation teams should not allow non-members to view them
+        response = self.get_dashboard_page(invitation_team)
+        self.assertEquals(response.status_code, 404)
 
     def test_search_with_utf8(self):
         title = (u'\u041f\u0435\u0442\u0443\u0445 '
                  u'\u043e\u0442\u0436\u0438\u0433\u0430\u0435\u0442!!!')
         # "Петух отжигает!!!"
-        team = test_factories.create_team()
-        test_factories.create_team_member(team, self.user)
-        video = test_factories.create_video(title=title)
+        team = TeamFactory()
+        TeamMemberFactory(team=team, user=self.user)
+        video = VideoFactory(title=title)
 
         self.assertTrue(video.get_team_video() is None)
 
@@ -875,7 +876,7 @@ class TeamsTest(TestCase):
 
 class TeamListingTest(TestCase):
     def setUp(self):
-        self.random_user = test_factories.create_user()
+        self.random_user = UserFactory()
         self.public_teams = {}
         self.private_teams = {}
         for is_visible in True, False:
@@ -883,8 +884,8 @@ class TeamListingTest(TestCase):
                 self.setup_team(is_visible, membership_policy)
 
     def setup_team(self, is_visible, membership_policy):
-        team = test_factories.create_team(is_visible=is_visible,
-                                          membership_policy=membership_policy)
+        team = TeamFactory(is_visible=is_visible,
+                           membership_policy=membership_policy)
         if is_visible:
             self.public_teams[membership_policy] = team
         else:
@@ -914,7 +915,7 @@ class TeamListingTest(TestCase):
 
     def test_members_see_private_teams(self):
         private_team = self.private_teams[Team.INVITATION_BY_ADMIN]
-        user = test_factories.create_team_member(private_team).user
+        user = TeamMemberFactory(team=private_team).user
         self.check_listing(user,
                            self.publicly_listed_teams() + [private_team])
 
@@ -922,9 +923,9 @@ class TeamListingTest(TestCase):
         # if a user is a member of a public team, make sure we don't list it
         # twice
         public_team = self.public_teams[Team.INVITATION_BY_ADMIN]
-        user = test_factories.create_team_member(public_team).user
+        user = TeamMemberFactory(team=public_team).user
         # make a second team member, which is one way this error happens
-        test_factories.create_team_member(public_team)
+        TeamMemberFactory(team=public_team)
         self.check_listing(user, self.publicly_listed_teams())
 
     def test_deleted_teams_not_listed(self):
@@ -1046,7 +1047,7 @@ class TeamsDetailQueryTest(TestCase):
             "username": u"admin",
             "password": u"admin"
         }
-        self.user = test_factories.create_user(**self.auth)
+        self.user = UserFactory(**self.auth)
 
         self.client.login(**self.auth)
         from apps.testhelpers.views import _create_videos, _create_team_videos
@@ -1086,7 +1087,7 @@ class TeamsDetailQueryTest(TestCase):
 class TestLanguagePreference(TestCase):
     def setUp(self):
         fix_teams_roles()
-        self.team = test_factories.create_team()
+        self.team = TeamFactory()
         self.langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
         from apps.teams.cache import invalidate_lang_preferences
         invalidate_lang_preferences(self.team)
@@ -1494,7 +1495,7 @@ class PartnerTest(TestCase):
             "username": u"admin",
             "password": u"admin"
         }
-        self.user = test_factories.create_user(**self.auth)
+        self.user = UserFactory(**self.auth)
 
         self.client.login(**self.auth)
         from apps.testhelpers.views import _create_videos, _create_team_videos
@@ -1513,11 +1514,11 @@ class PartnerTest(TestCase):
 
         self.assertEquals(0, Workflow.objects.count())
 
-        team = test_factories.create_team(workflow_enabled=True)
-        user = test_factories.create_user()
-        test_factories.create_team_member(team, user)
-        video = test_factories.create_video()
-        test_factories.create_team_video(team, user, video)
+        team = TeamFactory(workflow_enabled=True)
+        user = UserFactory()
+        TeamMemberFactory(team=team, user=user)
+        video = VideoFactory()
+        TeamVideoFactory(team=team, added_by=user, video=video)
 
         Workflow.objects.create(team=team, approve_allowed=20)
 
@@ -1630,8 +1631,8 @@ class PartnerTest(TestCase):
         from apps.videos.tasks import video_changed_tasks
 
         user = User.objects.all()[0]
-        team = test_factories.create_team()
-        tv = test_factories.create_team_video(team, user)
+        team = TeamFactory()
+        tv = TeamVideoFactory(team=team, added_by=user)
         video = tv.video
 
         self.assertEquals(0, BillingRecord.objects.count())
@@ -1654,8 +1655,9 @@ class PartnerTest(TestCase):
         from apps.videos.tasks import video_changed_tasks
 
         user = User.objects.all()[0]
-        team = test_factories.create_team()
-        tv = test_factories.create_team_video(team, user)
+        team = TeamFactory()
+        tv = TeamVideoFactory(team=team, added_by=user,
+                              video__primary_audio_language_code='en')
         video = tv.video
 
         self.assertEquals(0, BillingRecord.objects.count())
@@ -1690,8 +1692,8 @@ class PartnerTest(TestCase):
         from apps.videos.tasks import video_changed_tasks
 
         user = User.objects.all()[0]
-        team = test_factories.create_team()
-        tv = test_factories.create_team_video(team, user)
+        team = TeamFactory()
+        tv = TeamVideoFactory(team=team, added_by=user)
         video = tv.video
 
         self.assertEquals(0, BillingRecord.objects.count())

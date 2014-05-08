@@ -107,6 +107,12 @@ body {
         button {
            margin-left: 15px;
         }
+        .chzn-container {
+           vertical-align: middle;
+        }
+        select {
+           width: 170px;
+        }
     }
 }
 
@@ -2917,4 +2923,25 @@ a.truncated-expand {
 
 #security h3 {
     margin-top: 2em;
+}
+
+.v1 form {
+    table.simple-list, th, td {
+        border: 1px solid #DCE2E5;
+        tr.recent {
+            background-color: #EAEAEA;
+        }
+        th {
+            border: 1px solid #DCE2E5;
+            padding: 10px;
+            font-weight: bold;
+        }
+        td {
+            border: 1px solid #DCE2E5;
+        }
+    }
+}
+
+.v1 div.view div h3 {
+    padding: 30px 0 10px 0;
 }

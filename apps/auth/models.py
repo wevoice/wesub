@@ -230,12 +230,12 @@ class CustomUser(BaseUser):
     def speaks_language(self, language_code):
         return language_code in [l.language for l in self.get_languages()]
 
-    def managed_teams(self):
+    def managed_teams(self, include_manager=True):
         from apps.teams.models import TeamMember
-        return self.teams.filter(members__role__in=[
-            TeamMember.ROLE_OWNER,
-            TeamMember.ROLE_ADMIN,
-            TeamMember.ROLE_MANAGER])
+        possible_roles = [TeamMember.ROLE_OWNER, TeamMember.ROLE_ADMIN]
+        if include_manager:
+            possible_roles.append(TeamMember.ROLE_MANAGER)
+        return self.teams.filter(members__role__in=possible_roles)
 
     def messageable_teams(self):
         from apps.teams.models import Team

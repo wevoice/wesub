@@ -41,6 +41,11 @@ class TasksTab(ATeamPage):
     _ASSIGN_AND_PERFORM = 'a.perform-task'
     _DISABLED_TASK = '.cannot-perform'
 
+
+    #BULK
+    _BULK_SELECT = "a.bulk-select"
+    _BULK_APPROVE = "button[name='approve']"
+
     def open_tasks_tab(self, team):
         """Open the team with the provided team slug.
 
@@ -125,3 +130,8 @@ class TasksTab(ATeamPage):
 
     def your_tasks(self):
         self.click_link_partial_text('Your tasks')
+
+    def bulk_approve_tasks(self):
+        self.click_by_css(self._BULK_SELECT)
+        self.click_by_css(self._BULK_APPROVE)
+

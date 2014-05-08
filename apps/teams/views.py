@@ -20,6 +20,7 @@ import logging
 import random
 
 import babelsubs
+from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -51,7 +52,7 @@ from teams.forms import (
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
     make_billing_report_form, TaskCreateSubtitlesForm,
-    TeamMultiVideoCreateSubtitlesForm,
+    TeamMultiVideoCreateSubtitlesForm, MoveVideosForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -64,7 +65,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
-    can_delete_language,
+    can_delete_language, can_move_videos, can_sort_by_primary_language
 )
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
@@ -94,6 +95,8 @@ from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 
+from teams.bulk_actions import complete_approve_tasks
+
 logger = logging.getLogger("teams.views")
 
 
@@ -106,6 +109,7 @@ CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS = getattr(settings, 'CUTTOFF_DUPLICATES_N
 VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 16)
 MEMBERS_ON_PAGE = getattr(settings, 'MEMBERS_ON_PAGE', 15)
 APLICATIONS_ON_PAGE = getattr(settings, 'APLICATIONS_ON_PAGE', 15)
+UNASSIGNED_TASKS_ON_PAGE = getattr(settings, 'UNASSIGNED_TASKS_ON_PAGE', 30)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
 DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
@@ -420,7 +424,7 @@ def _get_videos_for_detail_page(team, user, query, project, language_code,
         'user': user,
         'project': project,
         'query': query,
-        'sort': sort,
+        'sort': sort
     }
     num_completed_langs = language = exclude_language = None
     if language_mode == '+':
@@ -481,6 +485,7 @@ def detail(request, slug, project_slug=None, languages=None):
         'language_mode': language_mode,
         'sort': sort,
         'can_add_video': can_add_video(team, request.user, project),
+        'can_move_videos': can_move_videos(team, request.user),
         'can_edit_videos': can_add_video(team, request.user, project),
         'filtered': filtered,
         'all_videos_count': team.get_videos_for_user(request.user).count(),
@@ -529,6 +534,192 @@ def detail(request, slug, project_slug=None, languages=None):
         extra_context['order_name'] = sort_names['-time']
 
     extra_context['current_videos_count'] = qs.count()
+
+    team_video_md_list, pagination_info = paginate(qs, per_page, request.GET.get('page'))
+    extra_context.update(pagination_info)
+    extra_context['team_video_md_list'] = team_video_md_list
+    extra_context['team_workflows'] = list(
+        Workflow.objects.filter(team=team.id)
+                        .select_related('project', 'team', 'team_video'))
+
+    if not filtered and not query:
+        if project:
+            is_indexing = project.videos_count != extra_context['current_videos_count']
+        else:
+            is_indexing = team.videos.all().count() != extra_context['current_videos_count']
+        extra_context['is_indexing'] = is_indexing
+
+    if is_editor:
+        team_video_ids = [record.team_video_pk for record in team_video_md_list]
+        team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('video', 'team', 'project'))
+        team_videos = dict((tv.pk, tv) for tv in team_videos)
+        for record in team_video_md_list:
+            if record:
+                record._team_video = team_videos.get(record.team_video_pk)
+                if record._team_video:
+                    record._team_video.original_language_code = record.original_language
+                    record._team_video.completed_langs = record.video_completed_langs
+    return extra_context
+
+@timefn
+@render_to('teams/move_videos.html')
+def move_videos(request, slug, project_slug=None, languages=None):
+    team = get_team_for_view(slug, request.user)
+    if not can_move_videos(team, request.user):
+        return HttpResponseForbidden("Not allowed")
+
+    try:
+        member = team.get_member(request.user)
+    except TeamMember.DoesNotExist:
+        member = None
+
+    managed_teams = request.user.managed_teams(include_manager=False)
+    managed_projects = Project.objects.filter(team__in=managed_teams)
+    managed_projects_choices = map(lambda project: {'id': project.id, 'team': str(project.team.id), 'name': str(project)}, managed_projects)
+
+    if request.method == 'POST':
+        form = MoveVideosForm(request.user, request.POST)
+        if 'move' in request.POST and form.is_valid():
+            target_team = form.cleaned_data['team']
+            if target_team not in managed_teams:
+                return  HttpResponseForbidden("Not allowed")
+    
+            project_id = request.POST.get('projects',None)
+            target_project = None
+            if project_id:
+                try:
+                    target_project = Project.objects.get(id=project_id)
+                    if target_project not in managed_projects:
+                        return  HttpResponseForbidden("Not allowed")
+                except Entry.DoesNotExist:
+                    return  HttpResponseBadRequest("Illegal Request")
+                except MultipleObjectsReturned:
+                    return  HttpResponseServerError("Internal Error")
+            selected_videos = request.POST.getlist('selected_videos[]')
+            for video_id in selected_videos:
+                try:
+                    team_video = TeamVideo.objects.get(id=video_id)
+                    if team_video.team not in managed_teams:
+                        return  HttpResponseForbidden("Not allowed")
+                    team_video.move_to(target_team, project=target_project)
+                except Entry.DoesNotExist:
+                    return  HttpResponseBadRequest("Illegal Request")
+                except MultipleObjectsReturned:
+                    return  HttpResponseServerError("Internal Error")
+    else:
+        form = MoveVideosForm(request.user)
+     
+    project_filter = (project_slug if project_slug is not None
+                      else request.GET.get('project'))
+    if project_filter:
+        if project_filter == 'any':
+            project = None
+        else:
+            try:
+                project = Project.objects.get(team=team, slug=project_filter)
+            except Project.DoesNotExist:
+                project = None
+    else:
+        project = _default_project_for_team(team)
+
+    query = request.GET.get('q', '')
+    sort = request.GET.get('sort')
+    language_filter = request.GET.get('lang')
+    primary_audio_language_filter = request.GET.get('primary-audio-lang', 'any')
+    language_code = language_filter if language_filter != 'any' else None
+    primary_audio_language_code = primary_audio_language_filter if primary_audio_language_filter != 'any' else None
+    language_mode = request.GET.get('lang-mode', '+')
+    filtered = bool(set(request.GET.keys()).intersection([
+        'project', 'lang', 'sort']))
+
+    qs = _get_videos_for_detail_page(team, request.user, query, project,
+                                     language_code, language_mode,
+                                     sort)
+
+    # TODO: This needs to be improved but should not be too bad
+    # because it only applies on already filtered videos, and
+    # only in case there is a primary_audio_language_code filter
+    #
+    # It is to check the primary_audio_language_code
+    # which is part of video, not team_video
+    if primary_audio_language_code is not None:
+        team_videos_pks = qs.values_list('team_video_pk', flat=True)
+        if primary_audio_language_code == "-":
+            team_videos = TeamVideo.objects.filter(
+                id__in=team_videos_pks,
+                video__primary_audio_language_code__in=["", None]).values_list('id', flat=True)
+        else:
+            team_videos = TeamVideo.objects.filter(id__in=team_videos_pks, video__primary_audio_language_code__gt="").values_list('id', flat=True)
+        # This is necessary because team_video_pk is not indexed by solr
+        qs = filter(lambda x: x.team_video_pk in team_videos, qs)
+
+    # This is a temporary restriction until we properly fix
+    # the performance issues there
+    if not can_sort_by_primary_language(team, request.user):
+        primary_audio_language_filter = None
+    extra_context = widget.add_onsite_js_files({})
+    extra_context.update({
+        'team': team,
+        'member': member,
+        'project':project,
+        'project_filter': project_filter,
+        'language_filter': language_filter,
+        'language_code': language_code,
+        'language_mode': language_mode,
+        'sort': sort,
+        'primary_audio_language_filter': primary_audio_language_filter,
+        'can_add_video': can_add_video(team, request.user, project),
+        'can_move_videos': can_move_videos(team, request.user),
+        'can_edit_videos': can_add_video(team, request.user, project),
+        'filtered': filtered,
+        'all_videos_count': team.get_videos_for_user(request.user).count(),
+        'form': form,
+        'projects': managed_projects_choices
+    })
+
+    if extra_context['can_add_video'] or extra_context['can_edit_videos']:
+        # Cheat and reduce the number of videos on the page if we're dealing
+        # with someone who can edit videos in the team, for performance
+        # reasons.
+        is_editor = True
+        per_page = 8
+    else:
+        is_editor = False
+        per_page = VIDEOS_ON_PAGE
+
+    general_settings = {}
+    add_general_settings(request, general_settings)
+    extra_context['general_settings'] = json.dumps(general_settings)
+
+    if team.video:
+        extra_context['widget_params'] = base_widget_params(request, {
+            'video_url': team.video.get_video_url(),
+            'base_state': {}
+        })
+
+    readable_langs = TeamLanguagePreference.objects.get_readable(team)
+    language_choices = [(code, name) for code, name in get_language_choices()
+                        if code in readable_langs]
+
+    extra_context['project_choices'] = team.project_set.exclude(name='_root')
+
+    extra_context['language_choices'] = language_choices
+    extra_context['query'] = query
+
+    sort_names = {
+        'name': 'Name, A-Z',
+        '-name': 'Name, Z-A',
+        'time': 'Time, Oldest',
+        '-time': 'Time, Newest',
+        'subs': 'Subtitles, Least',
+        '-subs': 'Subtitles, Most',
+    }
+    if sort:
+        extra_context['order_name'] = sort_names[sort]
+    else:
+        extra_context['order_name'] = sort_names['-time']
+
+    extra_context['current_videos_count'] = len(qs)
 
     team_video_md_list, pagination_info = paginate(qs, per_page, request.GET.get('page'))
     extra_context.update(pagination_info)
@@ -843,6 +1034,53 @@ def remove_member(request, slug, user_pk):
     else:
         messages.error(request, _(u'You don\'t have permission to remove this member from the team.'))
         return HttpResponseRedirect(return_path)
+
+@login_required
+def approvals(request, slug):
+    team = get_team_for_view(slug, request.user)
+
+    if not team.is_member(request.user):
+        return  HttpResponseForbidden("Not allowed")
+
+    if not team.can_bulk_approve(request.user):
+        return  HttpResponseForbidden("Not allowed")
+
+    qs = team.unassigned_tasks(sort='modified')
+
+    # Use prefetch_related to fetch the video for each task.  This dramically
+    # reduces the number of queries in order to print out the video title.
+    # prefetch_related() is better than select_related() in this case because
+    # if multiple tasks are for the same Video object, prefetch_related() will
+    # only create 1 object while select_related() will create 1 per task.
+    # Re-using the same object means better caching.
+    qs = qs.filter(new_subtitle_version__subtitle_language__subtitles_complete=True)
+    qs = qs.prefetch_related('team_video__video', 'team_video__project')
+    extra_context = {
+        'team': team,
+        'now':datetime.now()
+    }
+
+    if request.method == 'POST':
+        if 'approve' in request.POST:
+            approvals = request.POST.getlist('approvals[]')
+            # Retrieving tasks and updating them is now done in bulk,
+            # this should be much more efficient.
+            # Not sure about the best place to add that code
+            tasks = team.get_tasks(approvals)
+            try:
+                tasks.update(assignee=request.user,
+                             approved=Task.APPROVED_IDS['Approved'],
+                             completed=datetime.now())
+                complete_approve_tasks(tasks)
+            except:
+                HttpResponseForbidden(_(u'Invalid task to approve'))
+
+    return object_list(request, queryset=qs,
+                       paginate_by=UNASSIGNED_TASKS_ON_PAGE,
+                       template_name='teams/approvals.html',
+                       template_object_name='approvals',
+                       extra_context=extra_context)
+
 
 @login_required
 def applications(request, slug):

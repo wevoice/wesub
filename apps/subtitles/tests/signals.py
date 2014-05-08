@@ -23,18 +23,17 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 import mock
-from utils import test_factories
+from utils.factories import *
 from utils.test_utils import patch_for_test
 from subtitles import signals
 from subtitles import pipeline
 
 class SignalsTest(TestCase):
     def setUp(self):
-        self.video = test_factories.create_video()
-        self.team = test_factories.create_team()
-        self.member = test_factories.create_team_member(self.team)
-        self.team_video = test_factories.create_team_video(
-            self.team, self.member.user, self.video)
+        self.team_video = TeamVideoFactory()
+        self.video = self.team_video.video
+        self.team = self.team_video.team
+        self.member = self.team.get_member(self.team_video.added_by)
 
     @patch_for_test('subtitles.signals.public_tip_changed')
     @patch_for_test('subtitles.signals.language_deleted')

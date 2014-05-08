@@ -41,6 +41,15 @@
     {% endwith %}
 
     <div class="tools group">
+
+
+      {% if team|can_view_approve_tab:user %}
+        <a class="button reduced" href="{% url teams:approvals team.slug %}">
+          {% trans "Bulk approve tasks" %}
+        </a>
+      </li>
+      {% endif %}
+
         {% include "teams/_search.html" %}
         {% if filters.team_video != None %}
             {% can_create_any_task_for_teamvideo filters.team_video request.user %}

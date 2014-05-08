@@ -6,7 +6,7 @@
     {% trans 'Videos' %} - {{ team }} | Amara
 {% endblock %}
 
-{% block html_attrs %}id="team_videos_list"{% endblock %}
+{% block html_attrs %}id="move_videos"{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -52,20 +52,20 @@
                     {% if sort %}
                     <input type="hidden" name="sort" value="{{ sort }}" />
                     {% endif %}
+                    {% if primary_audio_language_filter %}
+                    <input type="hidden" name="primary_audio_language" value="{{ primary_audio_language_filter }}" />
+                    {% endif %}
                     <input type="text" name="q" value="{{ query }}" placeholder="Search {{ team }}&hellip;" />
                 </fieldset>
-            </form>
-            {% if can_move_videos %}
-                <a href="{% url teams:move_videos team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Move Videos" %}</a>
-            {% endif %}
-            {% if can_add_video %}
-                <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
-            {% endif %}
+            </form>  
             <a href="#filter" id="sort-filter">
                 {% trans 'Filter and Sort' %}
                 <span></span>
             </a>
         </div>
+	<div>
+	  <h3>{% trans "Move videos" %}</h3>
+	</div>
         <form class="filters videos-list group no-ajax{% if filtered %} active{% endif %}" action="" method="GET">
             <input type="hidden" name="q" value="{{ query }}" />
             <button class="reduced" id="update">Update</button>
@@ -119,17 +119,46 @@
                     </option>
                 </select>
             </div>
+            {% if primary_audio_language_filter %}
+            <div class="filter-chunk">
+              {% trans 'Primary audio language:' %}
+              <select name="primary-audio-lang" id="primary_audio_lang">
+                <option value="any"{% if primary_audio_language_filter == 'any' %} selected="selected"{% endif %}>{% trans "any" %}</option>
+                <option value="+"{% if primary_audio_language_filter == '+' %} selected="selected"{% endif %}>{% trans "set" %}</option>
+                <option value="-"{% if primary_audio_language_filter == '-' %} selected="selected"{% endif %}>{% trans "not set" %}</option>
+              </select>
+            </div>
+	    {% endif %}
         </form>
 
         {% if team_video_md_list %}
+	<form  method="post" action="">{% csrf_token %}
+	  <span class="bulk-actions">
+            <label for="id_team">Team</label>
+            {{ form.errors.team }}
+            {{ form.team }}
+            <label for="id_project">Project</label>
+	    <select name="projects" id="projects-select" size="1" class="raw-select">
+	      {% for project in projects %}
+	      <option value="{{project.id}}" class="store-{{ project.team }}">{{ project.name }}</option>
+	      {% endfor %}
+	    </select>
+	    <button type="submit" name="move">{% trans "Move selected" %}</button>
+	    <span id="projects-store" style="display:none;"></span>
+	  </span>
+	  <br />
+	  <span class="bulk-actions">
+	    <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+	  </span>
             <ul class="videos listing group">
                 {% with team|is_team_member:request.user as user_is_team_member %}
                     {% for md_obj in team_video_md_list %}
-                        {% team_video_detail md_obj %}
+		        {% team_video_summary md_obj %}
                     {% endfor %}
                 {% endwith %}
             </ul>
             {% if is_paginated %}{% paginator %}{% endif %}
+	</form>
         {% else %}
             <p class="empty">
                 {% if is_indexing %}

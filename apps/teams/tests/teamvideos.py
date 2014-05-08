@@ -24,19 +24,19 @@ from django.test import TestCase
 import mock
 
 from teams.models import Project, TeamVideoMigration
-from utils import test_factories, test_utils
+from utils import test_utils
+from utils.factories import *
 
 class TeamMoveTest(TestCase):
     def setUp(self):
         TestCase.setUp(self)
-        self.team = test_factories.create_team()
+        self.team = TeamFactory()
         self.project = Project.objects.create(team=self.team, name='project1')
-        self.team2 = test_factories.create_team()
+        self.team2 = TeamFactory()
         self.project2 = Project.objects.create(team=self.team2,
                                                name='project2')
-        self.video = test_factories.create_video()
-        self.team_video = test_factories.create_team_video(self.team,
-                                                           video=self.video)
+        self.video = VideoFactory()
+        self.team_video = TeamVideoFactory(team=self.team, video=self.video)
 
     def check_migration(self, migration, datetime, from_team, to_team,
                         to_project):

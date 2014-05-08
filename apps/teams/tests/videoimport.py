@@ -24,7 +24,7 @@ import mock
 
 from teams.signals import api_teamvideo_new
 from videos.signals import feed_imported
-from utils import test_factories
+from utils.factories import *
 
 class TeamVideoImportTestCase(TestCase):
     def test_create_team_videos_for_team_feed(self):
@@ -33,9 +33,9 @@ class TeamVideoImportTestCase(TestCase):
         self.addCleanup(api_teamvideo_new.disconnect,
                         api_teamvideo_new_handler)
 
-        team = test_factories.create_team()
-        user = test_factories.create_team_member(team).user
-        videos = [test_factories.create_video() for i in xrange(5)]
+        team = TeamFactory()
+        user = TeamMemberFactory(team=team).user
+        videos = [VideoFactory() for i in xrange(5)]
         feed = mock.Mock(team=team, user=user)
         feed_imported.send(sender=feed, new_videos=videos)
         for video in videos:
@@ -52,9 +52,9 @@ class TeamVideoImportTestCase(TestCase):
                                                    any_order=True)
 
     def test_noop_for_non_team_feed(self):
-        team = test_factories.create_team()
-        user = test_factories.create_user()
-        videos = [test_factories.create_video() for i in xrange(5)]
+        team = TeamFactory()
+        user = UserFactory()
+        videos = [VideoFactory() for i in xrange(5)]
         feed = mock.Mock(team=None, user=user)
         feed_imported.send(sender=feed, new_videos=videos)
         for video in videos:
