@@ -122,17 +122,22 @@ def new(request):
                 message_list = []
                 members = []
                 if len(language) == 0:
-                    members = map(lambda member: member.user, form.cleaned_data['team'].members.all().exclude(user__exact=request.user))
+                    members = map(lambda member: member.user, form.cleaned_data['team'].members.all().exclude(user__exact=request.user).select_related('user'))
                 else:
-                    members = map(lambda member: member.user, UserLanguage.objects.filter(user__in=form.cleaned_data['team'].members.values('user')).filter(language__exact=language).exclude(user__exact=request.user))
+                    members = map(lambda member: member.user, UserLanguage.objects.filter(user__in=form.cleaned_data['team'].members.values('user')).filter(language__exact=language).exclude(user__exact=request.user).select_related('user'))
                 for member in members:
                     message_list.append(Message(user=member, author=request.user,
                                                 content=form.cleaned_data['content'],
                                                 subject=form.cleaned_data['subject']))
                 Message.objects.bulk_create(message_list);
                 new_messages_ids = Message.objects.filter(created__gt=now).values_list('pk', flat=True)
-                send_new_messages_notifications.delay(new_messages_ids)
-                
+                # Creating a bunch of reasonably-sized tasks
+                batch = 0
+                batch_size = 1000
+                while batch < len(new_messages_ids):
+                    send_new_messages_notifications.delay(new_messages_ids[batch:batch+batch_size])
+                    batch += batch_size
+
             messages.success(request, _(u'Message sent.'))
             return HttpResponseRedirect(reverse('messages:inbox'))
         else:

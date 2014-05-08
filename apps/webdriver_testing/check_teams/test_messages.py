@@ -95,10 +95,6 @@ class TestCaseMessageUsers(WebdriverTestCase):
 
         cls.new_message_pg.open_page("/")
          
-
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
-
     def test_admins_team_list(self):
         "Team list limited to team admins only"
         self.new_message_pg.log_in(self.en_only.username, 'password')
@@ -156,7 +152,7 @@ class TestCaseMessageUsers(WebdriverTestCase):
         self.new_message_pg.send()
         self.assertTrue(self.new_message_pg.sent())
         messages = mail.outbox
-        self.assertEqual(4, len(mail.outbox))
+        self.assertEqual(5, len(mail.outbox))
         message_recipients = []
         for m in mail.outbox:
             message_recipients.append(m.recipients()[0].split('@')[0])
@@ -183,8 +179,10 @@ class TestCaseMessageUsers(WebdriverTestCase):
         self.new_message_pg.send()
         self.assertTrue(self.new_message_pg.sent())
         elapsed = (time.clock() - start)
-        self.logger.info(elapsed)
-        self.assertEqual(1005, len(mail.outbox))
+        self.assertLess(elapsed, 10)
+        self.user_message_pg.open_sent_messages()
+        self.assertTrue(self.user_message_pg.message_subject(), 'To all test team 2')
+
 
     def test_user_selected_disables_team(self):
         """Choosing to message a user, disables team selections."""

@@ -70,7 +70,6 @@ class TestCasePublishedVideos(WebdriverTestCase):
             self.team.translate_policy=20
             self.team.save()
 
-
     def test_subtitleme(self):
         """Subtitle Me button displayed on published transcript. """
         self.video_pg.open_video_page(self.published.video_id)

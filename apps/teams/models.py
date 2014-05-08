@@ -463,9 +463,12 @@ class Team(models.Model):
         if sort is not None:
             qs = qs.order_by(sort)
         return qs
-        
+
     def get_task(self, task_pk):
         return Task.objects.get(pk=task_pk)
+
+    def get_tasks(self, task_pks):
+        return Task.objects.filter(pk__in=task_pks).select_related('new_subtitle_version', 'new_subtitle_version__subtitle_language', 'team_video', 'team_video__video', 'team_video__video__teamvideo', 'workflow')
 
     def _count_tasks(self):
         qs = Task.objects.filter(team=self, deleted=False, completed=None)
@@ -829,17 +832,18 @@ class TeamVideo(models.Model):
         old_team = self.team
         if old_team == new_team and project == self.project:
             return
-
+        within_team = (old_team == new_team)
         # these imports are here to avoid circular imports, hacky
         from teams.signals import api_teamvideo_new
         from teams.signals import video_moved_from_team_to_team
         from videos import metadata_manager
         # For now, we'll just delete any tasks associated with the moved video.
-        self.task_set.update(deleted=True)
+        if not within_team:
+            self.task_set.update(deleted=True)
 
-        # We move the video by just switching the team, instead of deleting and
-        # recreating it.
-        self.team = new_team
+            # We move the video by just switching the team, instead of deleting and
+            # recreating it.
+            self.team = new_team
 
         # projects are always team dependent:
         if project:
@@ -849,31 +853,32 @@ class TeamVideo(models.Model):
 
         self.save()
 
-        # We need to make any as-yet-unmoderated versions public.
-        # TODO: Dedupe this and the team video delete signal.
-        video = self.video
+        if not within_team:
+            # We need to make any as-yet-unmoderated versions public.
+            # TODO: Dedupe this and the team video delete signal.
+            video = self.video
 
-        video.newsubtitleversion_set.extant().update(visibility='public')
-        video.is_public = new_team.is_visible
-        video.moderated_by = new_team if new_team.moderates_videos() else None
-        video.save()
+            video.newsubtitleversion_set.extant().update(visibility='public')
+            video.is_public = new_team.is_visible
+            video.moderated_by = new_team if new_team.moderates_videos() else None
+            video.save()
 
-        TeamVideoMigration.objects.create(from_team=old_team,
-                                          to_team=new_team,
-                                          to_project=self.project)
+            TeamVideoMigration.objects.create(from_team=old_team,
+                                              to_team=new_team,
+                                              to_project=self.project)
 
-        # Update all Solr data.
-        metadata_manager.update_metadata(video.pk)
-        video.update_search_index()
-        tasks.update_one_team_video(self.pk)
+            # Update all Solr data.
+            metadata_manager.update_metadata(video.pk)
+            video.update_search_index()
+            tasks.update_one_team_video(self.pk)
 
-        # Create any necessary tasks.
-        autocreate_tasks(self)
+            # Create any necessary tasks.
+            autocreate_tasks(self)
 
-        # fire a http notification that a new video has hit this team:
-        api_teamvideo_new.send(self)
-        video_moved_from_team_to_team.send(sender=self,
-                destination_team=new_team, video=self.video)
+            # fire a http notification that a new video has hit this team:
+            api_teamvideo_new.send(self)
+            video_moved_from_team_to_team.send(sender=self,
+                                               destination_team=new_team, video=self.video)
 
 class TeamVideoMigration(models.Model):
     from_team = models.ForeignKey(Team, related_name='+')
@@ -1830,10 +1835,11 @@ class Task(models.Model):
             t.cached_video_url = video_url_map.get(t.team_video.video_id)
 
 
-    def _add_comment(self):
+    def _add_comment(self, lang_ct=None):
         """Add a comment on the SubtitleLanguage for this task with the body as content."""
         if self.body.strip():
-            lang_ct = ContentType.objects.get_for_model(NewSubtitleLanguage)
+            if lang_ct is None:
+                lang_ct = ContentType.objects.get_for_model(NewSubtitleLanguage)
             comment = Comment(
                 content=self.body,
                 object_pk=self.new_subtitle_version.subtitle_language.pk,
@@ -2129,14 +2135,17 @@ class Task(models.Model):
 
         return task
 
-    def _complete_approve(self):
+    def do_complete_approve(self, lang_ct=None):
+        return self._complete_approve(lang_ct=lang_ct)
+
+    def _complete_approve(self, lang_ct=None):
         """Handle the messy details of completing an approve task."""
         approval = self.approved == Task.APPROVED_IDS['Approved']
         sv = self.get_subtitle_version()
         if approval:
             self._ensure_language_complete(sv.subtitle_language)
 
-        self._add_comment()
+        self._add_comment(lang_ct=lang_ct)
 
         if approval:
             # The subtitles are acceptable, so make them public!

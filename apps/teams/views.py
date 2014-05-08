@@ -65,7 +65,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
-    can_delete_language, can_move_videos
+    can_delete_language, can_move_videos, can_sort_by_primary_language
 )
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
@@ -94,6 +94,8 @@ from videos.models import Action, VideoUrl, Video, VideoFeed
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
+
+from teams.bulk_actions import complete_approve_tasks
 
 logger = logging.getLogger("teams.views")
 
@@ -651,6 +653,10 @@ def move_videos(request, slug, project_slug=None, languages=None):
         # This is necessary because team_video_pk is not indexed by solr
         qs = filter(lambda x: x.team_video_pk in team_videos, qs)
 
+    # This is a temporary restriction until we properly fix
+    # the performance issues there
+    if not can_sort_by_primary_language(team, request.user):
+        primary_audio_language_filter = None
     extra_context = widget.add_onsite_js_files({})
     extra_context.update({
         'team': team,
@@ -1042,6 +1048,7 @@ def approvals(request, slug):
         return  HttpResponseForbidden("Not allowed")
 
     qs = team.unassigned_tasks(sort='modified')
+
     # Use prefetch_related to fetch the video for each task.  This dramically
     # reduces the number of queries in order to print out the video title.
     # prefetch_related() is better than select_related() in this case because
@@ -1052,18 +1059,23 @@ def approvals(request, slug):
     qs = qs.prefetch_related('team_video__video', 'team_video__project')
     extra_context = {
         'team': team,
-        'now':datetime.now() 
+        'now':datetime.now()
     }
 
     if request.method == 'POST':
         if 'approve' in request.POST:
             approvals = request.POST.getlist('approvals[]')
-            for  approval_pk in approvals:
-                try:
-                    task = team.get_task(approval_pk)
-                    task.complete_approved(request.user)
-                except:
-                    HttpResponseForbidden(_(u'Invalid task to approve'))
+            # Retrieving tasks and updating them is now done in bulk,
+            # this should be much more efficient.
+            # Not sure about the best place to add that code
+            tasks = team.get_tasks(approvals)
+            try:
+                tasks.update(assignee=request.user,
+                             approved=Task.APPROVED_IDS['Approved'],
+                             completed=datetime.now())
+                complete_approve_tasks(tasks)
+            except:
+                HttpResponseForbidden(_(u'Invalid task to approve'))
 
     return object_list(request, queryset=qs,
                        paginate_by=UNASSIGNED_TASKS_ON_PAGE,
