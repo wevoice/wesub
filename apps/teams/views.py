@@ -1077,6 +1077,34 @@ def approvals(request, slug):
             except:
                 HttpResponseForbidden(_(u'Invalid task to approve'))
 
+    query = request.GET.get('q', '')
+    sort = request.GET.get('sort')
+    filtered = bool(set(request.GET.keys()).intersection([
+        'project', 'lang', 'sort']))
+
+    language_filter = request.GET.get('lang')
+    language_code = language_filter if language_filter != 'any' else None
+    if language_code:
+        qs = qs.filter(language=language_code)
+
+    project_filter = request.GET.get('project')
+    project = None
+    if project_filter:
+        if project_filter != 'any':
+            try:
+                project = Project.objects.get(team=team, slug=project_filter)
+            except:
+                pass
+    if project:
+        qs = qs.filter(team_video__project=project)
+    
+    extra_context['project'] = project
+    extra_context['language_code'] = language_code
+    extra_context['language_filter'] = language_filter
+    readable_langs = TeamLanguagePreference.objects.get_readable(team)
+    extra_context['language_choices'] =  [(code, name) for code, name in get_language_choices()
+                                           if code in set(qs.values_list('language', flat=True))]
+    extra_context['project_choices'] = team.project_set.exclude(name=Project.DEFAULT_NAME).filter(id__in=qs.values_list('team_video__project', flat=True))
     return object_list(request, queryset=qs,
                        paginate_by=UNASSIGNED_TASKS_ON_PAGE,
                        template_name='teams/approvals.html',
