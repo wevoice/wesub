@@ -27,26 +27,26 @@ var angular = angular || null;
 
     var module = angular.module('amara.SubtitleEditor.subtitles.models', []);
 
-    function emptyDFXP() {
+    function emptyDFXP(languageCode) {
         /* Get a DFXP string for an empty subtitle set */
-        return '<tt xmlns="http://www.w3.org/ns/ttml" xmlns:tts="http://www.w3.org/ns/ttml#styling" xml:lang="en">\
-        <head>\
-            <metadata xmlns:ttm="http://www.w3.org/ns/ttml#metadata">\
-                <ttm:title/>\
-                <ttm:description/>\
-                <ttm:copyright/>\
-            </metadata>\
-            <styling xmlns:tts="http://www.w3.org/ns/ttml#styling">\
-                <style xml:id="amara-style" tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="18px" tts:textAlign="center"/>\
-            </styling>\
-            <layout xmlns:tts="http://www.w3.org/ns/ttml#styling">\
-                <region xml:id="amara-subtitle-area" style="amara-style" tts:extent="560px 62px" tts:padding="5px 3px" tts:backgroundColor="black" tts:displayAlign="after"/>\
-            </layout>\
-        </head>\
-        <body region="amara-subtitle-area">\
-            <div></div>\
-        </body>\
-    </tt>';
+        return '<tt xmlns="http://www.w3.org/ns/ttml" xmlns:tts="http://www.w3.org/ns/ttml#styling" xml:lang="' + languageCode + '">\
+    <head>\
+        <metadata xmlns:ttm="http://www.w3.org/ns/ttml#metadata">\
+            <ttm:title/>\
+            <ttm:description/>\
+            <ttm:copyright/>\
+        </metadata>\
+        <styling xmlns:tts="http://www.w3.org/ns/ttml#styling">\
+            <style xml:id="amara-style" tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="18px" tts:textAlign="center"/>\
+        </styling>\
+        <layout xmlns:tts="http://www.w3.org/ns/ttml#styling">\
+            <region xml:id="amara-subtitle-area" style="amara-style" tts:extent="560px 62px" tts:padding="5px 3px" tts:backgroundColor="black" tts:displayAlign="after"/>\
+        </layout>\
+    </head>\
+    <body region="amara-subtitle-area">\
+        <div></div>\
+    </body>\
+</tt>';
     };
 
     function Subtitle(startTime, endTime, markdown, startOfParagraph) {
@@ -188,9 +188,14 @@ var angular = angular || null;
         return dfxp.markdownToHTML(markdown);
     }
 
-    SubtitleList.prototype.loadXML = function(subtitlesXML) {
+    SubtitleList.prototype.loadXML = function(subtitlesXML, languageCode) {
         if(subtitlesXML === null) {
-            subtitlesXML = emptyDFXP();
+            subtitlesXML = $.parseXML(emptyDFXP(languageCode));
+        } else {
+            subtitlesXML = $.parseXML(subtitlesXML);
+            // Force the language attribute to be the correct value.  We used
+            // to have a bug where we would always set it to en
+            $(subtitlesXML.documentElement).attr('xml:lang', languageCode);
         }
         this.parser.init(subtitlesXML);
         var syncedSubs = [];
@@ -632,7 +637,8 @@ var angular = angular || null;
                     that.metadata[key] = subtitleData.metadata[key];
                 }
                 that.description = subtitleData.description;
-                that.subtitleList.loadXML(subtitleData.subtitles);
+                that.subtitleList.loadXML(subtitleData.subtitles,
+                    languageCode);
             });
         },
         initEmptySubtitles: function(languageCode, baseLanguage) {
@@ -640,7 +646,7 @@ var angular = angular || null;
             this.versionNumber = null;
             this.title = '';
             this.description = '';
-            this.subtitleList.loadXML(null);
+            this.subtitleList.loadXML(null, languageCode);
             this.state = 'loaded';
             this.initMetadataFromVideo();
             if(baseLanguage) {

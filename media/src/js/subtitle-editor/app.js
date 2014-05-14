@@ -495,7 +495,8 @@ var angular = angular || null;
             var savedData = SubtitleBackupStorage.getBackup(video.id,
                     $scope.workingSubtitles.language.code,
                     editingVersion.versionNumber);
-            $scope.workingSubtitles.subtitleList.loadXML(savedData);
+            $scope.workingSubtitles.subtitleList.loadXML(savedData,
+                    $scope.workingSubtitles.language.code);
             $scope.$root.$emit('work-done');
         }
 

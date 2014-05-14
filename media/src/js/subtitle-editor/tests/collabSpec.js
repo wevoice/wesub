@@ -10,7 +10,7 @@ describe('The Collab Controller', function() {
 
     beforeEach(inject(function(SubtitleList) {
         subtitleList = new SubtitleList();
-        subtitleList.loadXML(null);
+        subtitleList.loadXML(null, 'en');
         var sub = subtitleList.insertSubtitleBefore(null);
         subtitleList.updateSubtitleContent(sub, 'content');
         subtitleList.updateSubtitleTime(sub, 500, 1000);

@@ -13,7 +13,7 @@ describe('TimelineController', function() {
 
     beforeEach(inject(function(SubtitleList) {
         subtitleList = new SubtitleList();
-        subtitleList.loadXML(null);
+        subtitleList.loadXML(null, 'en');
         for(var i = 0; i < 5; i++) {
             var sub = subtitleList.insertSubtitleBefore(null);
             subtitleList.updateSubtitleContent(sub, 'subtitle ' + i);

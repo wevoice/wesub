@@ -23,7 +23,7 @@ describe('The Workflow class', function() {
 
     beforeEach(inject(function(SubtitleList, Workflow) {
         subtitleList = new SubtitleList();
-        subtitleList.loadXML(null);
+        subtitleList.loadXML(null, 'en');
         workflow = makeWorkflow(Workflow, subtitleList);
     }));
 
@@ -126,7 +126,7 @@ describe('WorkflowProgressionController', function() {
         $scope.dialogManager = {
             'showFreezeBox': jasmine.createSpy()
         };
-        subtitleList.loadXML(null);
+        subtitleList.loadXML(null, 'en');
         $scope.workingSubtitles = { subtitleList: subtitleList };
         $scope.workflow = makeWorkflow(Workflow, subtitleList);
         spyOn($scope, '$emit');
@@ -211,7 +211,7 @@ describe('when the enter key creates a new subtitle', function() {
     beforeEach(inject(function($rootScope, $controller, CurrentEditManager, SubtitleList) {
         $scope = $rootScope;
         subtitleList = new SubtitleList();
-        subtitleList.loadXML(null);
+        subtitleList.loadXML(null, 'en');
         $scope.workingSubtitles = {
             subtitleList: subtitleList,
         }
@@ -262,7 +262,7 @@ describe('when enter creates a new subtitle', function() {
         $scope.timelineShown = false;
         $scope.currentEdit = new CurrentEditManager();
         subtitleList = new SubtitleList();
-        subtitleList.loadXML(null);
+        subtitleList.loadXML(null, 'en');
         $scope.workingSubtitles = { subtitleList: subtitleList };
         $controller("AppControllerEvents", {
             $scope: $scope,
