@@ -7,7 +7,7 @@ describe('Test the SubtitleList class', function() {
 
     beforeEach(inject(function(SubtitleList) {
         subtitleList = new SubtitleList();
-        subtitleList.loadXML(null, 'en');
+        subtitleList.loadEmptySubs('en');
 
         this.addMatchers({
             'toHaveTimes': function(startTime, endTime) {

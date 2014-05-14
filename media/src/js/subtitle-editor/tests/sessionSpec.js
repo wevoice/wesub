@@ -16,7 +16,7 @@ describe('The SessionBackend', function() {
         EditorData = $injector.get('EditorData');
         SubtitleStorage = $injector.get('SubtitleStorage');
         subtitleList = new ($injector.get('SubtitleList'))();
-        subtitleList.loadXML(null, 'en');
+        subtitleList.loadEmptySubs('en');
         $rootScope = $injector.get('$rootScope');
         $scope = $rootScope.$new();
         $scope.workingSubtitles = {

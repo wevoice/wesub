@@ -19,7 +19,7 @@ describe('Test the subtitle-repeat directive', function() {
         displayTime = $filter('displayTime');
         subtitles = [];
         subtitleList = new SubtitleList();
-        subtitleList.loadXML(null, 'en');
+        subtitleList.loadEmptySubs('en');
         for(var i = 0; i < 5; i++) {
             var sub = subtitleList.insertSubtitleBefore(null);
             subtitleList.updateSubtitleContent(sub, 'subtitle ' + i);

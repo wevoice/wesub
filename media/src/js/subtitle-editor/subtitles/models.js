@@ -44,7 +44,7 @@ var angular = angular || null;
         </layout>\
     </head>\
     <body region="amara-subtitle-area">\
-        <div></div>\
+        <div xml:lang="' + languageCode + '"></div>\
     </body>\
 </tt>';
     };
@@ -188,15 +188,11 @@ var angular = angular || null;
         return dfxp.markdownToHTML(markdown);
     }
 
-    SubtitleList.prototype.loadXML = function(subtitlesXML, languageCode) {
-        if(subtitlesXML === null) {
-            subtitlesXML = $.parseXML(emptyDFXP(languageCode));
-        } else {
-            subtitlesXML = $.parseXML(subtitlesXML);
-            // Force the language attribute to be the correct value.  We used
-            // to have a bug where we would always set it to en
-            $(subtitlesXML.documentElement).attr('xml:lang', languageCode);
-        }
+    SubtitleList.prototype.loadEmptySubs = function(languageCode) {
+        this.loadXML(emptyDFXP(languageCode));
+    }
+
+    SubtitleList.prototype.loadXML = function(subtitlesXML) {
         this.parser.init(subtitlesXML);
         var syncedSubs = [];
         var unsyncedSubs = [];
@@ -637,8 +633,7 @@ var angular = angular || null;
                     that.metadata[key] = subtitleData.metadata[key];
                 }
                 that.description = subtitleData.description;
-                that.subtitleList.loadXML(subtitleData.subtitles,
-                    languageCode);
+                that.subtitleList.loadXML(subtitleData.subtitles);
             });
         },
         initEmptySubtitles: function(languageCode, baseLanguage) {
@@ -646,7 +641,7 @@ var angular = angular || null;
             this.versionNumber = null;
             this.title = '';
             this.description = '';
-            this.subtitleList.loadXML(null, languageCode);
+            this.subtitleList.loadEmptySubs(languageCode);
             this.state = 'loaded';
             this.initMetadataFromVideo();
             if(baseLanguage) {
