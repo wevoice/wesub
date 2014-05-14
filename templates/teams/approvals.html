@@ -50,7 +50,15 @@
 		    <input class="bulkable" type="checkbox" value="{{item.id}}" name="approvals[]">
 		  </td>
 		  <td>
-		    {{ item.team_video }}
+		    {% with item.get_subtitle_version as version %}
+                      {% if version %}
+		        <a href="{{ version.get_absolute_url }}"  target="_blank">{{ item.team_video }}</a><br/>
+		        <div class="one-line-summary">{{ version.title }}</div>
+		        <div class="one-line-summary">{{ version.description }}</div>
+		      {% else %}
+		        {{ item.team_video }}
+		      {% endif %}
+		    {% endwith %}
 		  </td>
 		  <td>
 		    {{ item.team_video.project|display_project:"None" }}
