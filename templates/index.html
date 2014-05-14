@@ -13,11 +13,31 @@
 {% endblock %}
 
 {% block main_content %}
+
+<!-- Override the email confirmation message on home page -->
+{% block email_confirmation_block %} {% endblock %}
+
+<!-- Override the youtube banner display on home page -->
+{% block youtube_prompt %} {% endblock youtube_prompt %}
     
+{% block pro_amara_banner %} 
+  <a href="//pro.amara.org">
+    <div id="banner-ondemand">
+        <h2>{% trans "Need professional subtitles?" %}</h2>
+        <h3><span>{% trans "Check out Amara On Demand &raquo;" %}</span></h3>
+    </div>
+  </a>
+{% endblock %}
+
 <div id="home-blurb">
     <h1>{% trans "The easiest way to caption and translate any video." %}</h1>
-    <p>{% trans "The most powerful and flexible subtitling platform in the world." %}</p>
 </div>
+
+
+<!-- Override the select language dialog so it's not displayed on homepage -->
+{% block select_language_dialog %} {% endblock %}
+
+  
 <div id="home-left">
     <div id="subtitle" class="clearfix">
         <form action="{% url videos:create %}" method="POST">
@@ -54,14 +74,7 @@
         {% blocktrans %}
             Revolutionize how you create subtitles and reach viewers. Increase viewership with transcription, captioning, and translation services, and flexible API and integration options.
         {% endblocktrans %}
-        <a href="http://about.amara.org/enterprise/">{% trans "See our pro services." %}</a>
-        </p>
-    </div>
-    <div>
-        <h2>{% trans "Order Captions" %}</h2>
-        <p>
-            {% trans "Lower costs and higher quality. Order captions and translations from Amara now, with rapid turnaround." %}
-            <a href="http://about.amara.org/order-subtitles/">{% trans "Learn more." %}</a>
+        <a href="http://pro.amara.org/">{% trans "See our pro services." %}</a>
         </p>
     </div>
 </div>
@@ -85,7 +98,7 @@
 </div>
 <div class="clearfix"></div>
 <div id="benefits" class="clearfix">
-    <a class="button" href="http://about.amara.org/enterprise/">{% trans "Pro Services" %}</a>
+    <a class="button" href="http://pro.amara.org/">{% trans "Pro Services" %}</a>
     <h2>{% trans "See how these companies use Amara to caption and subtitle more effectively." %}</h2>
 </div>
 <div id="partners">
