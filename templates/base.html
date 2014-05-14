@@ -86,6 +86,11 @@
             {% select_language_dialog %}
         {% endblock %}
     </div>
+
+    <!-- empty block for banner above page content -->
+    <div>
+    {% block amara-pro  %} {% endblock %}
+    </div>
     <div class="content container_12 wrapper clearfix">
         {% block youtube_prompt %}
         {% if request|show_youtube_prompt and not hide_prompt %}
