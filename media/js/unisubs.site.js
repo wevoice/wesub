@@ -759,7 +759,7 @@ var Site = function(Site) {
         },
         team_applications: function() {
             that.Utils.chosenify();
-            that.Utils.truncateTextBlocks($('div.application-note'), 30);
+            that.Utils.truncateTextBlocks($('div.application-note'), 50);
             that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
         },
         team_members_list: function() {
