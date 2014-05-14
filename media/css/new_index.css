@@ -315,3 +315,38 @@ body#index a:hover {
 #index ul.video_list h4 {
     line-height: 15px
 }
+
+#banner-ondemand {
+width: 100%;
+background-color: #1572ae;
+margin-top: 24px;
+padding: 10px 0;
+border-top: 1px solid #333333;
+border-bottom: 1px solid #333333;
+position: relative;
+text-align: center;
+}
+
+#banner-ondemand h2 {
+font-size: 26px;
+margin: 0 0 2px 0;
+font-family: "Helvetica Neue",Helvetica,sans-serif;
+font-weight: 200;
+letter-spacing: 0.025em;
+color: #FFFFFF;
+}
+
+#banner-ondemand h3 {
+font-size: 18px;
+margin: 0;
+font-family: "Helvetica Neue",Helvetica,sans-serif;
+font-weight: 200;
+letter-spacing: 0.08em;
+color: #BBBBBB;
+padding-bottom: 4px;
+}
+
+#banner-ondemand span {
+text-decoration: underline;
+}
+
