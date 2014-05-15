@@ -123,7 +123,7 @@ class CreateVideoUrlForm(forms.ModelForm):
         try:
             video_type = video_type_registrar.video_type_for_url(url)
 
-            video_url = video_type.video_url(video_type)
+            video_url = video_type.convert_to_video_url()
 
             if video_type.requires_url_exists and  not url_exists(video_url) :
                 raise forms.ValidationError(_(u'This URL appears to be a broken link.'))
@@ -221,7 +221,7 @@ class VideoForm(forms.Form):
                 # we need to use the cannonical url as the user provided might need
                 # redirection (i.e. youtu.be/fdaf/), and django's validator will
                 # choke on redirection (urllib2 for python2.6), see https://unisubs.sifterapp.com/projects/12298/issues/427646/comments
-                video_url = video_type.video_url(video_type)
+                video_url = video_type.convert_to_video_url()
 
                 if not url_exists(video_url) :
                     raise forms.ValidationError(_(u'This URL appears to be a broken link.'))

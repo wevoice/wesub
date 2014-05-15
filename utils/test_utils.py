@@ -208,6 +208,7 @@ invalidate_widget_video_cache = mock.Mock()
 update_subtitles = mock.Mock()
 delete_subtitles = mock.Mock()
 update_all_subtitles = mock.Mock()
+import_videos_from_feed = mock.Mock()
 
 class MonkeyPatcher(object):
     """Replace a functions with mock objects for the tests.
@@ -232,6 +233,7 @@ class MonkeyPatcher(object):
             ('externalsites.tasks.update_subtitles', update_subtitles),
             ('externalsites.tasks.delete_subtitles', delete_subtitles),
             ('externalsites.tasks.update_all_subtitles', update_all_subtitles),
+            ('videos.tasks.import_videos_from_feed', import_videos_from_feed),
         ]
         self.patches = []
         self.mock_object_initial_data = {}

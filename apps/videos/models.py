@@ -24,6 +24,7 @@ import random
 from datetime import datetime, date
 import time
 import re
+import urlparse
 
 from django.utils.safestring import mark_safe
 from django.core.cache import cache
@@ -512,7 +513,9 @@ class Video(models.Model):
         if not video:
             try:
                 video_url_obj = VideoUrl.objects.get(
-                    type=vt.abbreviation, **vt.create_kwars())
+                    type=vt.abbreviation,
+                    videoid=vt.video_id,
+                    url=vt.convert_to_video_url())
                 if user:
                     Action.create_video_handler(video_url_obj.video, user)
                 return video_url_obj.video, False
@@ -1874,7 +1877,7 @@ class VideoUrl(models.Model):
 
     @property
     def effective_url(self):
-        return self.get_video_type_class().video_url(self)
+        return self.url
 
     def kaltura_id(self):
         if self.type == 'K':
@@ -1903,22 +1906,40 @@ pre_delete.connect(video_cache.on_video_url_delete, VideoUrl)
 # VideoFeed
 class VideoFeed(models.Model):
     url = models.URLField()
-    last_link = models.URLField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, blank=True, null=True)
     team = models.ForeignKey("teams.Team", blank=True, null=True)
+    last_update = models.DateTimeField(null=True)
 
     YOUTUBE_PAGE_SIZE = 25
 
     def __unicode__(self):
         return self.url
 
-    def update(self):
-        importer = VideoImporter(self.url, self.user, self.last_link)
-        new_videos = importer.import_videos()
+    @staticmethod
+    def now():
+        return datetime.now()
 
-        if importer.last_link is not None:
-            self.last_link = importer.last_link
-            self.save()
+    def domain(self):
+        return urlparse.urlparse(self.url).netloc
+
+    def update(self):
+        importer = VideoImporter(self.url, self.user)
+        new_videos = importer.import_videos(
+            import_next=self.last_update is None)
+
+        self.last_update = VideoFeed.now()
+        self.save()
+        # create videos last-to-first so that the latest video is at the top
+        # of the list when viewing the imported videos
+        for video in reversed(new_videos):
+            ImportedVideo.objects.create(feed=self, video=video)
         signals.feed_imported.send(sender=self, new_videos=new_videos)
         return new_videos
+
+class ImportedVideo(models.Model):
+    feed = models.ForeignKey(VideoFeed)
+    video = models.OneToOneField(Video)
+
+    class Meta:
+        ordering = ('-id',)

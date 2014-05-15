@@ -25,7 +25,7 @@ import mock
 from utils import test_utils
 from utils.factories import *
 from videos import signals
-from videos.models import Video, VideoUrl, VideoFeed
+from videos.models import Video, VideoUrl, VideoFeed, ImportedVideo
 from videos.feed_parser import importer
 from videos.types import HtmlFiveVideoType
 
@@ -51,7 +51,7 @@ class VideoImporterTestCase(TestCase):
     def video_type(self, name):
         return HtmlFiveVideoType(self.url(name))
 
-    def setup_feed_items(self, item_info):
+    def setup_feed_items(self, item_info, links=None):
         """Setup the return vaule for FeedParser.
 
         :param item_info: list of (name, extra_info dict) tuples to
@@ -65,13 +65,15 @@ class VideoImporterTestCase(TestCase):
             (self.video_type(name), info, self.entry(name))
             for (name, info) in item_info
         ]
-
+        if links is not None:
+            self.feed_parser.feed.feed = {
+                'links': links
+            }
         self.mock_feedparser_class.return_value = self.feed_parser
 
-    def run_import_videos(self, import_since=None):
-        import_obj = importer.VideoImporter(self.feed_url(), self.user,
-                                            import_since=import_since)
-        self.import_videos_rv = import_obj.import_videos()
+    def run_import_videos(self, import_next=False):
+        import_obj = importer.VideoImporter(self.feed_url(), self.user)
+        self.import_videos_rv = import_obj.import_videos(import_next)
 
     def check_videos(self, *feed_item_names):
         all_videos = list(Video.objects.all())
@@ -91,7 +93,6 @@ class VideoImporterTestCase(TestCase):
         ])
         self.run_import_videos()
         self.feed_parser.items.assert_called_with(
-            since=None,
             ignore_error=True,
         )
         self.check_videos('item-1', 'item-2', 'item-3')
@@ -110,15 +111,39 @@ class VideoImporterTestCase(TestCase):
         self.assertEquals(video1.title, 'foo')
         self.assertEquals(video2.title, 'bar')
 
-    def test_import_since(self):
-        # test the import_since paramater.  There's not much to do here, just
-        # make sure it gets passed on to the items function.
-        self.setup_feed_items([])
-        self.run_import_videos(import_since=self.url('item-1'))
-        self.feed_parser.items.assert_called_with(
-            since=self.url('item-1'),
-            ignore_error=True,
-        )
+    def test_import_new_items(self):
+        # Test that we import videos when some already have been created
+
+        # try updating a feed when 1 video is already in the DB
+        VideoFactory(video_url__url=self.url('item-1'))
+        self.setup_feed_items([
+            ('item-1', {}),
+            ('item-2', {}),
+            ('item-3', {}),
+        ])
+        self.run_import_videos()
+        # all 3 videos should now be created
+        self.assertEquals(Video.objects.count(), 3)
+        # import_videos should only return the 2 new videos
+        self.assertEquals(self.import_videos_rv, [
+            VideoUrl.objects.get(url=self.url('item-2')).video,
+            VideoUrl.objects.get(url=self.url('item-3')).video,
+        ])
+        # check running import videos again, with a mix of old and new items
+        self.setup_feed_items([
+            ('item-0', {}), # new
+            ('item-1', {}), # old
+            ('item-2', {}), # old
+            ('item-4', {}), # new
+        ])
+        self.run_import_videos()
+        # all 4 videos should be created
+        self.assertEquals(Video.objects.count(), 5)
+        # import_videos should only return the 2 new videos
+        self.assertEquals(self.import_videos_rv, [
+            VideoUrl.objects.get(url=self.url('item-0')).video,
+            VideoUrl.objects.get(url=self.url('item-4')).video,
+        ])
 
     def test_import_extra_links_from_youtube(self):
         # test importing extra items from youtube.
@@ -128,10 +153,7 @@ class VideoImporterTestCase(TestCase):
         # link with rel=next.  If the link is present, then we parse that link
         # and check again for a link with rel=next.
         self.base_url = 'http://youtube.com/'
-        # to keep things simple, each feed has 0 items.  We just care about
-        # which feed urls get parsed.
-        self.setup_feed_items([])
-        links_iter = iter([
+        links = [
             [
                 { 'href': self.url('feed.rss?p=1'), 'rel': 'next', },
                 { 'href': self.url('other-thing.html')},
@@ -143,26 +165,36 @@ class VideoImporterTestCase(TestCase):
             [
                 { 'href': self.url('license.html'), 'rel': 'license'},
             ],
-        ])
+        ]
+        links_iter = iter(links)
         urls_parsed = []
         def make_feed_parser(url):
             urls_parsed.append(url)
-            self.feed_parser.feed.feed = {
-                'links': links_iter.next()
-            }
+            self.setup_feed_items([], links_iter.next())
             return self.feed_parser
         self.mock_feedparser_class.side_effect = make_feed_parser
 
-        self.run_import_videos()
+        self.run_import_videos(import_next=True)
         self.assertEquals(urls_parsed, [
             self.feed_url(),
             self.url('feed.rss?p=1'),
             self.url('feed.rss?p=2'),
         ])
+        # if import_next is false, we should skip the logic
+        urls_parsed = []
+        links_iter = iter(links)
+        self.run_import_videos(import_next=False)
+        self.assertEquals(urls_parsed, [self.feed_url()])
 
 class VideoFeedTest(TestCase):
     @test_utils.patch_for_test('videos.models.VideoImporter')
-    def test_video_feed(self, mock_video_importer_class):
+    def setUp(self, MockVideoImporter):
+        self.MockVideoImporter = MockVideoImporter
+        self.mock_video_importer = mock.Mock()
+        self.mock_video_importer.last_link = None
+        MockVideoImporter.return_value = self.mock_video_importer
+
+    def test_video_feed(self):
         mock_feed_imported_handler = mock.Mock()
         signals.feed_imported.connect(mock_feed_imported_handler, weak=False)
         self.addCleanup(signals.feed_imported.disconnect,
@@ -170,29 +202,62 @@ class VideoFeedTest(TestCase):
         user = UserFactory()
 
         url = 'http://example.com/feed.rss'
-        last_link = 'http://example.com/video3'
         feed = VideoFeed.objects.create(url=url, user=user)
 
         feed_videos = list(VideoFactory() for i in xrange(3))
 
-        mock_video_importer = mock.Mock()
-        mock_video_importer_class.return_value = mock_video_importer
-        mock_video_importer.last_link = last_link
-        mock_video_importer.import_videos.return_value = feed_videos
+        self.mock_video_importer.import_videos.return_value = feed_videos
         rv = feed.update()
-        mock_video_importer_class.assert_called_with(url, user, '')
-        mock_video_importer.import_videos.assert_called()
+        self.MockVideoImporter.assert_called_with(url, user)
+        self.mock_video_importer.import_videos.assert_called_with(import_next=True)
         self.assertEquals(rv, feed_videos)
-        self.assertEquals(feed.last_link, last_link)
         mock_feed_imported_handler.assert_called_with(
             signal=signals.feed_imported, sender=feed, new_videos=feed_videos)
-        # check doing another update, we should pass the last link in to
-        # VideoImporter
-        mock_video_importer.import_videos.return_value = []
+        # check doing another update, this time we should pass
+        # import_next=False
+        self.mock_video_importer.import_videos.return_value = []
         rv = feed.update()
-        mock_video_importer_class.assert_called_with(url, user, last_link)
-        mock_video_importer.import_videos.assert_called()
+        self.MockVideoImporter.assert_called_with(url, user)
+        self.mock_video_importer.import_videos.assert_called_with(import_next=False)
         self.assertEquals(rv, [])
         mock_feed_imported_handler.assert_called_with(
             signal=signals.feed_imported, sender=feed, new_videos=[])
-        self.assertEquals(feed.last_link, mock_video_importer.last_link)
+
+    def make_video(self, number):
+        video_url = 'http://example.com/video-{0}.mp4'.format(number)
+        return VideoFactory.create(video_url__url=video_url)
+
+    @test_utils.patch_for_test('videos.models.VideoFeed.now')
+    def test_update_logging(self, mock_now):
+        feed = VideoFeed.objects.create(url='http://example.com/feed.rss')
+        # run update().  Check that we update last_imported and that
+        # ImportedVideo objects get created.  ImportedVideo objects should be
+        # ordered last to first
+        now = datetime.datetime(2000, 1, 1)
+        mock_now.return_value = now
+        videos = [VideoFactory() for i in xrange(5)]
+        self.mock_video_importer.import_videos.return_value = videos
+        feed.update()
+        self.assertEquals(feed.last_update, now)
+        self.assertEquals([iv.video for iv in feed.importedvideo_set.all()],
+                          videos)
+        # run VideoFeed.update() again.  new videos should be added at the
+        # start of the list
+        videos2 = [VideoFactory() for i in xrange(5)]
+        self.mock_video_importer.import_videos.return_value = videos2
+        now += datetime.timedelta(days=1)
+        mock_now.return_value = now
+        feed.update()
+        self.assertEquals(feed.last_update, now)
+        self.assertEquals([iv.video for iv in feed.importedvideo_set.all()],
+                          videos2 + videos)
+        # run VideoFeed.update() one more time, with no new videos.
+        # last_update should still be upated
+        # start of the list
+        self.mock_video_importer.import_videos.return_value = []
+        now += datetime.timedelta(days=1)
+        mock_now.return_value = now
+        feed.update()
+        self.assertEquals(feed.last_update, now)
+        self.assertEquals([iv.video for iv in feed.importedvideo_set.all()],
+                          videos2 + videos)

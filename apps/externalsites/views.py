@@ -49,33 +49,18 @@ class AccountFormHandler(object):
 
 @settings_page
 def team_settings_tab(request, team):
-    form_classes = [
-        forms.KalturaAccountForm,
-    ]
-    posted_form = None
-
     if request.method == 'POST':
-        for FormClass in form_classes:
-            if FormClass.should_process_data(request.POST):
-                posted_form = FormClass(team, request.POST)
-                if 'remove' in request.POST and posted_form.allow_remove:
-                    posted_form.delete_account()
-                    return redirect('teams:settings_externalsites',
-                                    slug=team.slug)
-                if posted_form.is_valid():
-                    posted_form.save()
-                    return redirect('teams:settings_externalsites',
-                                    slug=team.slug)
-    all_forms = []
-    for FormClass in form_classes:
-        if posted_form is not None and isinstance(posted_form, FormClass):
-            all_forms.append(posted_form)
-        else:
-            all_forms.append(FormClass(team))
+        formset = forms.AccountFormset(team, request.POST)
+    else:
+        formset = forms.AccountFormset(team, None)
+
+    if formset.is_valid():
+        formset.save()
+        return redirect('teams:settings_externalsites', slug=team.slug)
 
     return render(request, 'externalsites/team-settings-tab.html', {
         'team': team,
-        'forms': all_forms,
+        'forms': formset,
     })
 
 @staff_member_required

@@ -90,7 +90,7 @@ from videos.tasks import (
     upload_subtitles_to_original_service, delete_captions_in_original_service,
     delete_captions_in_original_service_by_code
 )
-from videos.models import Action, VideoUrl, Video
+from videos.models import Action, VideoUrl, Video, VideoFeed
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
@@ -109,7 +109,7 @@ CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS = getattr(settings, 'CUTTOFF_DUPLICATES_N
 VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 16)
 MEMBERS_ON_PAGE = getattr(settings, 'MEMBERS_ON_PAGE', 15)
 APLICATIONS_ON_PAGE = getattr(settings, 'APLICATIONS_ON_PAGE', 15)
-UNASSIGNED_TASKS_ON_PAGE = getattr(settings, 'UNASSIGNED_TASKS_ON_PAGE', 30)
+UNASSIGNED_TASKS_ON_PAGE = getattr(settings, 'UNASSIGNED_TASKS_ON_PAGE', 15)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
 DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
@@ -814,7 +814,9 @@ def add_videos(request, slug):
     if form.is_valid():
         form.save()
         messages.success(request, form.success_message())
-        return redirect(team.get_absolute_url())
+        return redirect(reverse('teams:video_feeds', kwargs={
+            'slug': team.slug,
+        }))
 
     return { 'form': form, 'team': team, }
 
@@ -2465,3 +2467,36 @@ def billing(request):
         'cutoff': BILLING_CUTOFF
     }, RequestContext(request))
 
+@render_to('teams/feeds.html')
+@settings_page
+def video_feeds(request, team):
+    return {
+        'team': team,
+        'feeds': team.videofeed_set.all(),
+        'can_create_feed': can_add_video(team, request.user)
+    }
+
+@render_to('teams/feed.html')
+@settings_page
+def video_feed(request, team, feed_id):
+    feed = get_object_or_404(VideoFeed, team=team, id=feed_id)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'update':
+            feed.update()
+        return redirect(reverse('teams:video_feed', kwargs={
+            'slug': team.slug,
+            'feed_id': feed.id,
+        }))
+
+
+    imported_videos, pagination_info = paginate(feed.importedvideo_set.all(),
+                                                8, request.GET.get('page'))
+    context = {
+        'team': team,
+        'feed': feed,
+        'imported_videos': [iv.video for iv in imported_videos],
+    }
+    context.update(pagination_info)
+    return context

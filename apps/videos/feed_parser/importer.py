@@ -22,21 +22,18 @@ from .parser import FeedParser
 
 class VideoImporter(object):
     """Import videos from a feed URL."""
-    def __init__(self, url, user, import_since=None):
+    def __init__(self, url, user):
         """Create a VideoImporter
 
         :param url: feed url
         :param user: User that creates videos for
-        :param import_since: URL of the last imported link.  If set, we will
-        only import videos after this link
         """
         self.url = url
         self.user = user
-        self.import_since = import_since
         self.checked_entries = 0
         self.last_link = ''
 
-    def import_videos(self):
+    def import_videos(self, import_next=False):
         self._created_videos = []
         feed_parser = FeedParser(self.url)
         # the link at the top of the feed should be the latest link
@@ -45,7 +42,7 @@ class VideoImporter(object):
         except (IndexError, KeyError):
             pass
         self._create_videos(feed_parser)
-        if self.import_since is None and 'youtube' in self.url:
+        if import_next and 'youtube' in self.url:
             self._import_extra_links_from_youtube(feed_parser)
         rv = self._created_videos
         del self._created_videos
@@ -63,12 +60,12 @@ class VideoImporter(object):
         while next_urls:
             url = next_urls[0]['href']
             feed_parser = FeedParser(url)
+            last_created_video_count = len(self._created_videos)
             self._create_videos(feed_parser)
             next_urls = self._next_urls(feed_parser)
 
     def _create_videos(self, feed_parser):
-        _iter = feed_parser.items(since=self.import_since,
-                                  ignore_error=True)
+        _iter = feed_parser.items(ignore_error=True)
 
         for vt, info, entry in _iter:
             if vt:
@@ -79,9 +76,9 @@ class VideoImporter(object):
         from videos.models import Video
         video, created = Video.get_or_create_for_url(
             vt=video_type, user=self.user)
-        if info:
-            for name, value in info.items():
-                setattr(video, name, value)
-            video.save()
         if created:
+            if info:
+                for name, value in info.items():
+                    setattr(video, name, value)
+                video.save()
             self._created_videos.append(video)

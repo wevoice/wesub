@@ -759,7 +759,7 @@ var Site = function(Site) {
         },
         team_applications: function() {
             that.Utils.chosenify();
-            that.Utils.truncateTextBlocks($('div.application-note'), 30);
+            that.Utils.truncateTextBlocks($('div.application-note'), 50);
             that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
         },
         team_members_list: function() {
@@ -966,6 +966,69 @@ var Site = function(Site) {
         },
         team_settings_languages: function() {
             that.Utils.chosenify();
+        },
+        team_settings_externalsites: function() {
+            // Track accounts that were enabled but are now disabled;
+            function getAccountType(fieldset) {
+                var classes = $(fieldset).attr('class').split(" ");
+                for(var i=0; i < classes.length; i++) {
+                    if(classes[i] != 'disabled') {
+                        return classes[i];
+                    }
+                }
+                return "";
+            }
+            var accountsToBeDisabled = {};
+            function accountWillBeDisabled() {
+                for(var key in accountsToBeDisabled) {
+                    if(accountsToBeDisabled[key]) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+
+            $('form input[type="checkbox"][name^="enabled_accounts"]').change(function() {
+                var fieldset = $(this).closest('fieldset');
+                var accountFields = $('div.account-fields', fieldset);
+                if(this.checked) {
+                    accountFields.slideDown();
+                    delete accountsToBeDisabled[getAccountType(fieldset)];
+                } else {
+                    if(!fieldset.hasClass('disabled')) {
+                        accountsToBeDisabled[getAccountType(fieldset)] = true;
+                    }
+                    accountFields.slideUp();
+                }
+            });
+
+
+            var form = $('form#external-accounts');
+            form.submit(function(evt) {
+                if(accountWillBeDisabled()) {
+                    evt.preventDefault();
+                    window.site.openModalDialog('#confirm-delete-account-modal');
+                    $('#confirm-delete-account-modal button.continue').click(function() {
+                        accountsToBeDisabled = {};
+                        form.submit();
+                    });
+
+                }
+            });
+
+            function updateBrightcoveFeedInputs() {
+                var cbx = $('#id_brightcove-feed_enabled');
+                var feedFields = $('fieldset.brightcove fieldset.feed-fields input');
+                if(cbx.attr('checked')) {
+                    feedFields.removeAttr('disabled');
+                } else {
+                    feedFields.attr('disabled', '1');
+                }
+            }
+
+            updateBrightcoveFeedInputs();
+            $('#id_brightcove-feed_enabled').change(updateBrightcoveFeedInputs);
         },
 
         // Profile

@@ -32,9 +32,6 @@ class GoogleVideoType(VideoType):
     def matches_video_url(cls, url):
         return bool(google_video.GOOGLE_VIDEO_REGEX.match(url))
 
-    def create_kwars(self):
-        return { 'url': self.format_url(self.url) }
-    
     def set_values(self, video_obj):
         video_obj.title = google_video.scrape_title(self.url)
         video_obj.description = google_video.scrape_description(self.url)

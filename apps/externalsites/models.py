@@ -17,6 +17,8 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import datetime
+from urllib import quote_plus
+import urlparse
 
 from django.db import models
 from django.db.models import  query
@@ -30,7 +32,7 @@ from externalsites import syncing
 from externalsites.exceptions import SyncingError
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from teams.models import Team
-from videos.models import VideoUrl
+from videos.models import VideoUrl, VideoFeed
 import videos.models
 
 def now():
@@ -41,10 +43,13 @@ class ExternalAccount(models.Model):
     account_type = NotImplemented
     video_url_type = NotImplemented
 
+    team = models.OneToOneField(Team, unique=True)
+
     def is_for_video_url(self, video_url):
         return video_url.type == self.video_url_type
 
-    def update_subtitles(self, video_url, language, version):
+    def update_subtitles(self, video_url, language):
+        version = language.get_public_tip()
         sync_history_values = {
             'account': self,
             'video_url': video_url,
@@ -100,7 +105,6 @@ class KalturaAccount(ExternalAccount):
     account_type = 'K'
     video_url_type = videos.models.VIDEO_TYPE_KALTURA
 
-    team = models.OneToOneField(Team, unique=True)
     partner_id = models.CharField(max_length=100,
                                   verbose_name=_('Partner ID'))
     secret = models.CharField(
@@ -114,9 +118,9 @@ class KalturaAccount(ExternalAccount):
     def __unicode__(self):
         return "KalturaAccount: %s" % (self.partner_id)
 
-    def do_update_subtitles(self, video_url, language, version):
+    def do_update_subtitles(self, video_url, language, tip):
         kaltura_id = video_url.get_video_type().kaltura_id()
-        subtitles = language.get_public_tip().get_subtitles()
+        subtitles = tip.get_subtitles()
         sub_data = babelsubs.to(subtitles, 'srt')
 
         syncing.kaltura.update_subtitles(self.partner_id, self.secret,
@@ -128,8 +132,73 @@ class KalturaAccount(ExternalAccount):
         syncing.kaltura.delete_subtitles(self.partner_id, self.secret,
                                          kaltura_id, language.language_code)
 
+class BrightcoveAccount(ExternalAccount):
+    account_type = 'B'
+    video_url_type = videos.models.VIDEO_TYPE_BRIGHTCOVE
+
+    publisher_id = models.CharField(max_length=100,
+                                    verbose_name=_('Publisher ID'))
+    write_token = models.CharField(max_length=100)
+    import_feed = models.OneToOneField(VideoFeed, null=True,
+                                       on_delete=models.SET_NULL)
+
+    def feed_url(self, player_id, tags):
+        url_start = ('http://link.brightcove.com'
+                    '/services/mrss/player%s/%s') % (
+                        player_id, self.publisher_id)
+        if tags is not None:
+            return '%s/tags/%s' % (url_start,
+                                   '/'.join(quote_plus(t) for t in tags))
+        else:
+            return url_start + "/new"
+
+    def make_feed(self, player_id, tags=None):
+        """Create a feed for this account.
+
+        :returns: True if the feed was changed
+        """
+        feed_url = self.feed_url(player_id, tags)
+        if self.import_feed:
+            if feed_url != self.import_feed.url:
+                self.import_feed.url = feed_url
+                self.import_feed.save()
+                return True
+        else:
+            self.import_feed = VideoFeed.objects.create(
+                url=self.feed_url(player_id, tags),
+                team=self.team)
+            self.save()
+            return True
+        return False
+
+    def remove_feed(self):
+        if self.import_feed:
+            self.import_feed.delete();
+            self.import_feed = None
+            self.save()
+
+    def feed_info(self):
+        if self.import_feed is None:
+            return None
+        path_parts = urlparse.urlparse(self.import_feed.url).path.split("/")
+        for part in path_parts:
+            if part.startswith("player"):
+                player_id = part[len("player"):]
+                break
+        else:
+            raise ValueError("Unable to parse feed URL")
+
+        try:
+            i = path_parts.index('tags')
+        except ValueError:
+            tags = None
+        else:
+            tags = tuple(path_parts[i+1:])
+        return player_id, tags
+
 account_models = [
     KalturaAccount,
+    BrightcoveAccount,
 ]
 _account_type_to_model = dict(
     (model.account_type, model) for model in account_models

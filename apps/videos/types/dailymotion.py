@@ -56,9 +56,6 @@ class DailymotionVideoType(VideoType):
 
         return False
 
-    def create_kwars(self):
-        return {'videoid': self.video_id}
-
     def set_values(self, video_obj):
         metadata = self.get_metadata(self.video_id)
         video_obj.description = metadata.get('description', u'')

@@ -63,9 +63,6 @@ class VimeoVideoType(VideoType):
     def matches_video_url(cls, url):
         return bool(vimeo.VIMEO_REGEX.match(url))
 
-    def create_kwars(self):
-        return { 'videoid': self.videoid }
-    
     def set_values(self, video_obj):
         if vimeo.VIMEO_API_KEY and vimeo.VIMEO_API_SECRET:
             try:

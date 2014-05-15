@@ -94,7 +94,7 @@ def save_thumbnail_in_s3(video_id):
         content = ContentFile(response.content)
         video.s3_thumbnail.save(video.thumbnail.split('/')[-1], content)
 
-@periodic_task(run_every=crontab(minute=0, hour=1))
+@periodic_task(run_every=crontab(minute=0))
 def update_from_feed(*args, **kwargs):
     for feed in VideoFeed.objects.all():
         update_video_feed.delay(feed.pk)

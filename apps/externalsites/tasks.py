@@ -28,17 +28,15 @@ from videos.models import VideoUrl
 celery_logger = logging.getLogger('celery.task')
 
 @task
-def update_subtitles(account_type, account_id, video_url_id, lang_id,
-                     version_id):
+def update_subtitles(account_type, account_id, video_url_id, lang_id):
     """Update a subtitles for a language"""
     celery_logger.info("externalsites.tasks.update_subtitles"
                        "(%s, %s, %s, %s, %s)", account_type, account_id,
-                       video_url_id, lang_id, version_id)
+                       video_url_id, lang_id)
     try:
         account = get_account(account_type, account_id)
         language = SubtitleLanguage.objects.get(id=lang_id)
         video_url = VideoUrl.objects.get(id=video_url_id)
-        version = SubtitleVersion.objects.get(id=version_id)
     except ObjectDoesNotExist, e:
         celery_logger.error(
             'Lookup error in update_subtitles(): %s' % e,
@@ -49,13 +47,12 @@ def update_subtitles(account_type, account_id, video_url_id, lang_id,
                     'account_id': account_id,
                     'video_url_id': video_url_id,
                     'lang_id': lang_id,
-                    'version_id': version_id,
                 }
             }
         )
         return
     else:
-        account.update_subtitles(video_url, language, version)
+        account.update_subtitles(video_url, language)
 
 @task
 def delete_subtitles(account_type, account_id, video_url_id, lang_id):
@@ -116,5 +113,4 @@ def update_all_subtitles(account_type, account_id):
 
 def _sync_all_languages(account, video_url, video):
     for language in video.newsubtitlelanguage_set.having_public_versions():
-        account.update_subtitles(video_url, language,
-                                 language.get_public_tip())
+        account.update_subtitles(video_url, language)

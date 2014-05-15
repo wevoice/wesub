@@ -24,7 +24,7 @@ from dailymotion import DailymotionVideoType
 from vimeo import VimeoVideoType
 from wistia import WistiaVideoType
 from flv import FLVVideoType
-from brigthcove import BrightcoveVideoType
+from brightcove import BrightcoveVideoType
 from mp3 import Mp3VideoType
 
 video_type_registrar = VideoTypeRegistrar()

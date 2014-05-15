@@ -371,9 +371,6 @@ class YoutubeVideoType(VideoType):
         hostname = urlparse(url).netloc
         return  hostname in YoutubeVideoType.HOSTNAMES and  cls._get_video_id(url)
 
-    def create_kwars(self):
-        return {'videoid': self.video_id}
-
     def set_values(self, video_obj, fetch_subs_async=True):
         video_obj.title =  self.entry.media.title.text or ''
         description = ''

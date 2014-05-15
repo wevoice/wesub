@@ -18,9 +18,13 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from webdriver_testing.pages.site_pages import create_page
+from webdriver_testing.pages.site_pages import watch_page
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages import video_page
 from videos.models import VideoUrl
+from videos.models import VideoFeed
+from django.core import management
+
 
 class TestCaseCreateVideos(WebdriverTestCase):
     """ TestSuite for video submission tests. """
@@ -35,7 +39,6 @@ class TestCaseCreateVideos(WebdriverTestCase):
     
 
     def tearDown(self):
-        super(TestCaseCreateVideos, self).setUp()
         self.create_pg.open_create_page()
 
     def test_create_youtube(self):
@@ -163,6 +166,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseAddFeeds, cls).setUpClass()
         cls.create_pg = create_page.CreatePage(cls)
+        cls.watch_pg = watch_page.WatchPage(cls)
         cls.create_pg.open_create_page()
     
 
@@ -174,7 +178,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.create_pg = create_page.CreatePage(self)
         self.create_pg.open_create_page()
 
-    def test_feed__youtube_user(self):
+    def test_feed_youtube_user(self):
         """Add a youtube user feed
 
         """
@@ -182,7 +186,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.create_pg.submit_youtube_users_videos(youtube_user)
         self.assertTrue(self.create_pg.multi_submit_successful())
 
-    def test_feed__youtube_user_url(self):
+    def test_feed_youtube_user_url(self):
         """Add a youtube user url feed
 
         """
@@ -190,7 +194,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.create_pg.submit_youtube_user_page(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
 
-    def test_feed__vimeo(self):
+    def test_feed_vimeo(self):
         """Add a vimeo feed
 
         """
@@ -198,7 +202,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
 
-    def test_feed__dailymotion(self):
+    def test_feed_dailymotion(self):
         """Add a dailymotion feed
 
         """
@@ -206,7 +210,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
 
-    def test_feed__dailymotion_large(self):
+    def test_feed_dailymotion_large(self):
         """Add a v. large dailymotion feed
 
         """
@@ -214,7 +218,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
 
-    def test_feed__blip(self):
+    def test_feed_blip(self):
         """Add a blip feed
 
         """
@@ -222,7 +226,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
 
-    def test_feed__blip_workaround(self):
+    def test_feed_blip_workaround(self):
         """Add a individual blip video as feed (blip workaround)
 
         """
@@ -242,8 +246,14 @@ class TestCaseAddFeeds(WebdriverTestCase):
         video_url = ("http://www.youtube.com/watch?v=q26umaF242I")
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
-        vurl = VideoUrl.objects.get(url=video_url)
-        self.assertTrue('Y', vurl.type)
+        feed = VideoFeed.objects.get(url=url)
+        feed.update()
+        management.call_command('update_index', interactive=False) 
+        self.watch_pg.open_watch_page()
+        test_text = 'Amara Test Video'
+        results_pg = self.watch_pg.basic_search(test_text)
+        self.assertTrue(results_pg.search_has_results())
+
 
     def test_kaltura_yahoo_feed(self):
         """Add a kaltura yahoo feed
@@ -255,6 +265,8 @@ class TestCaseAddFeeds(WebdriverTestCase):
                      "name/a.mp4")
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
+        f = VideoFeed.objects.get(url=url)
+        f.update()
         vurl = VideoUrl.objects.get(url=video_url)
         self.assertTrue('K', vurl.type)
 
@@ -268,5 +280,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
                      "name/a.mp4")
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
+        feed = VideoFeed.objects.get(url=url)
+        feed.update()
         vurl = VideoUrl.objects.get(url=video_url)
         self.assertTrue('K', vurl.type)

@@ -2402,6 +2402,56 @@ a.truncated-expand {
         width: 50%;
     }
 }
+
+#teams form#external-accounts {
+    fieldset {
+        border: 1px solid $light-grey;
+        padding: 1em;
+        margin-bottom: 4em;
+
+        legend {
+            padding: 0 4px;
+        }
+
+        fieldset {
+            border: none;
+            padding: 0 0 0 4em;
+            margin: 0;
+        }
+
+        ul.feed-import {
+            margin: 0;
+            padding: 0;
+
+            input[type="text"] {
+                display: inline;
+                width: auto;
+                margin-left: 1em;
+            }
+        }
+
+        a.import-feed {
+            float: right;
+            color: $usblue;
+            margin-top: 1.5em;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        div.account-fields {
+            padding-right: 8px;
+        }
+
+        &.disabled div.account-fields {
+            display: none;
+        }
+    }
+}
+
+
 #teams div.join div#apply-modal {
     div.modal-body {
         div.message {
@@ -2763,6 +2813,68 @@ a.truncated-expand {
     }
 }
 
+#teams.video-feed .content {
+
+    h2 {
+        margin: 1em 0 0 0;
+    }
+
+    .title {
+        text-align: left;
+        padding: 1em 0 1em 1em;
+        border-bottom: 1px solid #e8ebed;
+        clear: both;
+
+        h1 {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin: 0 0 0.2em 0;
+        }
+    }
+
+    form.import-now {
+        float: right;
+        display: inline;
+        margin-left: 12px;
+        padding: 0;
+    }
+
+    div.submit {
+         margin: 0;
+         border: none;
+         display: inline;
+    }
+
+    .listing li.video {
+        width: 288px;
+        float: left;
+        padding: 1em 11px;
+        border: none;
+
+        a {
+            display: block;
+            color: #eee;
+            position: relative;
+        }
+
+        img {
+            width: 288px;
+            height: 162px;
+        }
+
+        h4 {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1em 10px;
+            background: rgba(0,0,0,.65);
+        }
+    }
+
+}
+
 
 #error {
 
@@ -2944,4 +3056,11 @@ a.truncated-expand {
 
 .v1 div.view div h3 {
     padding: 30px 0 10px 0;
+}
+
+.v1 .one-line-summary {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

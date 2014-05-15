@@ -1,12 +1,11 @@
 {% extends "teams/base.html" %}
 {% load i18n teams_tags paginator media_compressor %}
 
-{% block title %}
-    {{ team }} {% trans 'Settings' %} | Amara
-{% endblock %}
+{% block html_attrs %}id="team_settings_externalsites"{% endblock %}
+
+{% block title %}{{ team }} {% trans 'Settings' %} | Amara{% endblock %}
 
 {% block view_content %}
-
     <div class="view grid_8 omega">
         {% with 'settings' as current %}
             {% include 'teams/_tabs.html' %}
@@ -16,32 +15,62 @@
                 {% include 'teams/_subnav_settings.html' %}
             {% endwith %}
         </div>
-        {% for form in forms %}
-        <form class="settings" method="POST" action="">
-            <h2>{{ form.label }}</h2>
-
-            {{ form.non_field_errors }}
+        <form id="external-accounts" class="settings" method="POST" action="">
             {% csrf_token %}
-            <input type="hidden" name="form-name" value="{{ form.form_name }}" />
 
-            {% for field in form %}
-            <fieldset>
-                <legend>{{ field.label }}</legend>
-                {{ field.errors }}
-                {% if field.help_text %}
-                    <p class="notation">{{ field.help_text }}</p>
-                {% endif %}
-                {{ field }}
+            <fieldset class="kaltura{% if not forms.enabled_accounts.kaltura.value %} disabled{% endif %}">
+                <legend>{% trans "Kaltura" %}</legend>
+                {{ forms.kaltura.non_field_errors }}
+                {% include "_form_field.html" with field=forms.enabled_accounts.kaltura widget_type="checkbox" %}
+                <div class="account-fields">
+                    {% include "_form_field.html" with field=forms.kaltura.partner_id %}
+                    {% include "_form_field.html" with field=forms.kaltura.secret %}
+                </div>
             </fieldset>
-            {% endfor %}
+
+            <fieldset class="brightcove{% if not forms.enabled_accounts.brightcove.value %} disabled{% endif %}">
+                <legend>{% trans "Brightcove" %}</legend>
+                {{ forms.brightcove.non_field_errors }}
+                {% include "_form_field.html" with field=forms.enabled_accounts.brightcove widget_type="checkbox" %}
+                <div class="account-fields">
+                    {% include "_form_field.html" with field=forms.brightcove.publisher_id %}
+                    {% include "_form_field.html" with field=forms.brightcove.write_token %}
+                    {% if forms.brightcove.import_feed %}
+                    <a class="import-feed" href="{% url teams:video_feed slug=team.slug feed_id=forms.brightcove.import_feed.id %}">View feed</a>
+                    {% endif %}
+                    {% include "_form_field.html" with field=forms.brightcove.feed_enabled widget_type="checkbox" %}
+                    <fieldset class="feed-fields">
+                    {% include "_form_field.html" with field=forms.brightcove.player_id %}
+                    {{ forms.brightcove.feed_tags.errors }}
+                    {{ forms.brightcove.feed_type.errors }}
+                    <ul class="feed-import">
+                    {% for choice in forms.brightcove.feed_type %}
+                        <li>
+                        {{ choice.tag }} {{ choice.choice_label }}
+                        {% if choice.choice_value == "T" %}
+                            {{ forms.brightcove.feed_tags }}
+                            <em>{% trans "separate tags with commas" %}</em>
+                        {% endif %}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </fieldset>
+                </div>
+            </fieldset>
 
             <div class="submit">
-                {% if form.allow_remove %}
-                    <input type="submit" name="remove" class="submit delete" value="{% trans "Remove" %}" />
-                {% endif %}
                 <input type="submit" class="submit save" value="{% trans "Save" %}" />
             </div>
         </form>
-        {% endfor %}
     </div>
+</div>
+
+<aside id="confirm-delete-account-modal" class="modal" role="dialog" aria-labeledby="confirm-delete-title">
+    <h3 id="confrim-delete-title">{% trans 'About to delete account settings' %}</h3>
+    <p>{% trans 'You have disabled an account that was previously enabled.  If you continue, then the settings for that account will be lost.' %}</p>
+    <footer class="buttons">
+        <button class="continue">{% trans 'Continue' %}</button>
+        <button class="close">{% trans 'Cancel' %}</button>
+    </footer>
+</aside>
 {% endblock %}

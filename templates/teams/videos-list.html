@@ -61,6 +61,11 @@
             {% if can_add_video %}
                 <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
             {% endif %}
+            {% if team|can_view_settings_tab:user %}
+                <a class="button" href="{% url teams:video_feeds slug=team.slug %}">
+                    {% trans "Video Feeds" %}
+                </a>
+            {% endif %}
             <a href="#filter" id="sort-filter">
                 {% trans 'Filter and Sort' %}
                 <span></span>
