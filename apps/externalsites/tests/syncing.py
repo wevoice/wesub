@@ -24,6 +24,7 @@ import string
 
 from django.test import TestCase
 from django.db.models.signals import post_save
+from django.utils import simplejson as json
 import babelsubs
 import mock
 
@@ -32,7 +33,7 @@ from externalsites import signalhandlers
 from externalsites.exceptions import SyncingError
 from externalsites.models import (KalturaAccount, SyncedSubtitleVersion,
                                   SyncHistory)
-from externalsites.syncing import kaltura
+from externalsites.syncing import kaltura, brightcove
 from subtitles import pipeline
 from teams.permissions_const import ROLE_ADMIN
 from utils import test_utils
@@ -673,3 +674,122 @@ class KalturaSyncingTest(TestCase):
             self.assertRaises(SyncingError, kaltura.update_subtitles,
                               self.partner_id, self.secret, self.video_id,
                               'pt-br', "CaptionData")
+
+class BrightcoveSyncingTest(TestCase):
+    WRITE_URL = 'https://api.brightcove.com/services/post'
+
+    @test_utils.patch_for_test('externalsites.syncing.brightcove.requests')
+    def setUp(self, mock_requests):
+        self.mock_requests = mock_requests
+        self.write_token = 'abc'
+        self.video_id = '123'
+        self.video = VideoFactory(primary_audio_language_code='en')
+        pipeline.add_subtitles(self.video, 'en', [
+            (100, 200, 'content'),
+        ])
+        pipeline.add_subtitles(self.video, 'fr', [
+            (100, 200, 'fr content'),
+        ])
+
+    def test_upload_subtitles(self):
+        self.setup_add_captions_success_response()
+        brightcove.update_subtitles(self.write_token, self.video_id,
+                                    self.video)
+
+        data = {
+            'method': 'add_captioning',
+            'params': {
+                'token': self.write_token,
+                'video_id': self.video_id,
+                'caption_source': {
+                    'displayName': 'Amara Captions',
+                }
+            }
+        }
+        self.mock_requests.post.assert_called_with(
+            self.WRITE_URL,
+            data={ 'JSONRPC': json.dumps(data) },
+            files={ 'file': self.video.get_merged_dfxp() }
+        )
+
+    def test_delete_subtitles(self):
+        self.setup_delete_captions_success_response()
+        brightcove.delete_subtitles(self.write_token, self.video_id)
+
+        data = {
+            'method': 'delete_captioning',
+            'params': {
+                'token': self.write_token,
+                'video_id': self.video_id,
+            }
+        }
+
+        self.mock_requests.post.assert_called_with(
+            self.WRITE_URL,
+            data={ 'json': json.dumps(data) })
+
+    def test_update_subtitles_invalid_write_token(self):
+        self.setup_invalid_token_response()
+        self.assertRaises(SyncingError, brightcove.update_subtitles,
+                          self.write_token, self.video_id, self.video)
+
+    def test_update_subtitles_invalid_video_id(self):
+        self.setup_invalid_video_id_response()
+        self.assertRaises(SyncingError, brightcove.update_subtitles,
+                          self.write_token, self.video_id, self.video)
+
+    def test_delete_subtitles_invalid_write_token(self):
+        self.setup_invalid_token_response()
+        self.assertRaises(SyncingError, brightcove.delete_subtitles,
+                          self.write_token, self.video_id)
+
+    def test_delete_subtitles_invalid_video_id(self):
+        self.setup_invalid_video_id_response()
+        self.assertRaises(SyncingError, brightcove.delete_subtitles,
+                          self.write_token, self.video_id)
+
+    def setup_add_captions_success_response(self):
+        self.mock_requests.post.return_value.json ={
+            'id': None,
+            'error': None,
+            'result': {
+                'captionSources': [
+                    {'url': None,
+                     'isRemote': False,
+                     'displayName': 'Amara Captions',
+                     'complete': False,
+                     'id': 3569221155001,
+                    }
+                ],
+                'id': self.video_id,
+            },
+        }
+
+    def setup_delete_captions_success_response(self):
+        self.mock_requests.post.return_value.json = {
+            'id': None,
+            'result': {},
+            'error': None,
+        }
+
+    def setup_invalid_token_response(self):
+        self.mock_requests.post.return_value.json = {
+            'id': None,
+            'result': None,
+            'error': {
+                'message': 'invalid token',
+                'code': 210,
+                'name': 'InvalidTokenError',
+            }
+        }
+
+    def setup_invalid_video_id_response(self):
+        self.mock_requests.post.return_value.json = {
+            'id': None,
+            'result': None,
+            'error': {
+                'message': 'Cannot find the specified video.',
+                'code': 304,
+                'name': 'IllegalValueError',
+            }
+        }

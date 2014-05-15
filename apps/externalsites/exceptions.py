@@ -22,5 +22,5 @@ class SyncingError(StandardError):
         self.msg = msg % args
 
     def __str__(self):
-        return "SyncingError: %s" % (self.msg,)
+        return self.msg
 
