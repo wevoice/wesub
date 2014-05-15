@@ -334,19 +334,10 @@ def download(request, video_id, language_code, filename, format,
 
 def download_all(request, video_id, filename):
     video = get_object_or_404(Video, video_id=video_id)
-    video.prefetch_languages(with_public_tips=True)
+    merged_dfxp = video.get_merged_dfxp()
 
-    subtitle_sets = []
-    for language in video.all_subtitle_languages():
-        tip = language.get_public_tip()
-        if tip is not None:
-            if language.is_primary_audio_language():
-                subtitle_sets.insert(0, tip.get_subtitles())
-            else:
-                subtitle_sets.append(tip.get_subtitles())
-
-    if len(subtitle_sets) == 0:
-        raise Http404
+    if merged_dfxp is None:
+        raise Http404()
 
     response = HttpResponse(babelsubs.dfxp_merge(subtitle_sets),
                             mimetype="text/plain")

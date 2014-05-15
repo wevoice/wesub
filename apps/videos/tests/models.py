@@ -18,6 +18,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.test import TestCase
+import babelsubs
 import mock
 
 from auth.models import CustomUser as User
@@ -313,3 +314,31 @@ class TestSubtitleLanguageCaching(TestCase):
                 # fetching the version video should be cached
                 lang.get_tip(public=True).video
                 lang.get_tip(public=False).video
+
+
+class TestGetMergedDFXP(TestCase):
+    def test_get_merged_dfxp(self):
+        video = VideoFactory(primary_audio_language_code='en')
+        pipeline.add_subtitles(video, 'en', [
+            (100, 200, 'text'),
+        ])
+        pipeline.add_subtitles(video, 'fr', [
+            (100, 200, 'french text'),
+        ])
+        pipeline.add_subtitles(video, 'es', [
+            (100, 200, 'spanish text'),
+        ])
+        pipeline.add_subtitles(video, 'de', [
+            (100, 200, 'spanish text'),
+        ], visibility='private')
+
+        video.clear_language_cache()
+
+        subtitles = [
+            video.subtitle_language(lang).get_public_tip().get_subtitles()
+            for lang in ('en', 'fr', 'es')
+        ]
+
+
+        self.assertEquals(video.get_merged_dfxp(),
+                          babelsubs.dfxp_merge(subtitles))
