@@ -18,7 +18,6 @@
 
 from __future__ import absolute_import
 import datetime
-import hashlib
 import itertools
 import string
 
@@ -41,14 +40,6 @@ from utils.factories import *
 from utils.test_utils import patch_for_test
 import subtitles.signals
 
-def create_kaltura_video(name):
-    # generate something that looks like a kaltura id
-    entry_id = '1_' + hashlib.md5(name).hexdigest()[:8]
-    url = ('http://cdnbakmi.kaltura.com'
-            '/p/1492321/sp/149232100/serveFlavor/entryId/'
-            '%s/flavorId/1_dqgopb2z/name/%s.mp4') % (entry_id, name)
-    return VideoFactory(video_url__url=url, video_url__type='K')
-
 class SignalHandlingTest(TestCase):
     @patch_for_test('externalsites.tasks.update_all_subtitles')
     @patch_for_test('externalsites.tasks.update_subtitles')
@@ -58,7 +49,7 @@ class SignalHandlingTest(TestCase):
         self.mock_delete_subtitles = mock_delete_subtitles
         self.mock_update_subtitles = mock_update_subtitles
         self.mock_update_all_subtitles = mock_update_all_subtitles
-        self.video = create_kaltura_video('video')
+        self.video = KalturaVideoFactory(name='video')
         self.video_url = self.video.get_primary_videourl_obj()
         team_video = TeamVideoFactory(video=self.video)
         self.team = team_video.team
@@ -112,12 +103,12 @@ class SignalHandlingTest(TestCase):
         self.assertEquals(self.mock_delete_subtitles.call_count, 0)
 
     def test_tasks_not_called_for_non_team_videos(self):
-        video = create_kaltura_video('video2')
+        video = KalturaVideoFactory(name='video2')
         self.check_tasks_not_called(video)
 
     def test_tasks_not_called_if_no_account(self):
         # for non-team videos, we shouldn't schedule a task
-        video = create_kaltura_video('video2')
+        video = KalturaVideoFactory(name='video2')
         other_team = TeamFactory()
         TeamVideoFactory(team=other_team, video=video)
         self.check_tasks_not_called(video)
@@ -136,7 +127,7 @@ class SubtitleTaskTest(TestCase):
         mock_now.side_effect = self.make_now
         self.mock_update_subtitles = mock_update_subtitles
         self.mock_delete_subtitles = mock_delete_subtitles
-        self.video = create_kaltura_video('video')
+        self.video = KalturaVideoFactory(name='video')
         self.video_url = self.video.get_primary_videourl_obj()
         team_video = TeamVideoFactory(video=self.video)
         self.team = team_video.team
@@ -675,7 +666,58 @@ class KalturaSyncingTest(TestCase):
                               self.partner_id, self.secret, self.video_id,
                               'pt-br', "CaptionData")
 
-class BrightcoveSyncingTest(TestCase):
+class BrightcoveAccountSyncingTest(TestCase):
+    # Test that the BrightcoveAccount model makes the correct calls in
+    # response to update_subtitles() and delete_subtitles()
+
+    def setUp(self):
+        self.account = BrightcoveAccountFactory()
+        self.video_id = '1234'
+        self.video = BrightcoveVideoFactory(brightcove_id=self.video_id,
+                                            primary_audio_language_code='en')
+        TeamVideoFactory(video=self.video, team=self.account.team)
+        self.video_url = self.video.get_primary_videourl_obj()
+
+    def add_subtitles(self, language_code):
+        pipeline.add_subtitles(self.video, language_code, [
+            (100, 200, 'content'),
+        ])
+        self.video.clear_language_cache()
+        self.account.update_subtitles(
+            self.video_url, self.video.subtitle_language(language_code))
+
+    def delete_subtitles(self, language_code):
+        language = self.video.subtitle_language(language_code)
+        language.nuke_language()
+        self.video.clear_language_cache()
+        self.account.delete_subtitles(self.video_url, language)
+
+    @test_utils.patch_for_test('externalsites.syncing.brightcove.update_subtitles')
+    @test_utils.patch_for_test('externalsites.syncing.brightcove.delete_subtitles')
+    def test_brightcove_account_syncing(self, mock_delete_subtitles,
+                                        mock_update_subtitles):
+        # when we add subtitles, update_subtitles() should be called.
+        self.add_subtitles('en')
+        mock_update_subtitles.assert_called_with(self.account.write_token,
+                                                 self.video_id, self.video)
+        mock_update_subtitles.reset()
+        self.add_subtitles('fr')
+        mock_update_subtitles.assert_called_with(self.account.write_token,
+                                                 self.video_id, self.video)
+        mock_update_subtitles.reset()
+        # when we delete subtitles, we should still call update_subtitles()
+        # since we are updating the entire set of subtitles
+        self.delete_subtitles('fr')
+        mock_update_subtitles.assert_called_with(self.account.write_token,
+                                                 self.video_id, self.video)
+        mock_update_subtitles.reset()
+        # until we delete the last language, then we should call
+        # delete_subtitles()
+        self.delete_subtitles('en')
+        mock_delete_subtitles.assert_called_with(self.account.write_token,
+                                                 self.video_id)
+
+class BrightcoveAPITest(TestCase):
     WRITE_URL = 'https://api.brightcove.com/services/post'
 
     @test_utils.patch_for_test('externalsites.syncing.brightcove.requests')
@@ -683,7 +725,8 @@ class BrightcoveSyncingTest(TestCase):
         self.mock_requests = mock_requests
         self.write_token = 'abc'
         self.video_id = '123'
-        self.video = VideoFactory(primary_audio_language_code='en')
+        self.video = BrightcoveVideoFactory(brightcove_id=self.video_id,
+                                            primary_audio_language_code='en')
         pipeline.add_subtitles(self.video, 'en', [
             (100, 200, 'content'),
         ])

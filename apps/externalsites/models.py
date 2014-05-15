@@ -142,6 +142,22 @@ class BrightcoveAccount(ExternalAccount):
     import_feed = models.OneToOneField(VideoFeed, null=True,
                                        on_delete=models.SET_NULL)
 
+    def do_update_subtitles(self, video_url, language, tip):
+        video_id = video_url.get_video_type().brightcove_id
+        syncing.brightcove.update_subtitles(self.write_token, video_id,
+                                            language.video)
+
+    def do_delete_subtitles(self, video_url, language):
+        video_id = video_url.get_video_type().brightcove_id
+        if language.video.get_merged_dfxp() is not None:
+            # There are other languaguages still, we need to update the
+            # subtitles by merging those language's DFXP
+            syncing.brightcove.update_subtitles(self.write_token, video_id,
+                                                language.video)
+        else:
+            # No languages left, delete the subtitles
+            syncing.brightcove.delete_subtitles(self.write_token, video_id)
+
     def feed_url(self, player_id, tags):
         url_start = ('http://link.brightcove.com'
                     '/services/mrss/player%s/%s') % (
