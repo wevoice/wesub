@@ -1,5 +1,5 @@
 import logging
-from celery.task import task, periodic_task
+from celery.task import task
 from celery.schedules import timedelta
 from videos.models import VideoUrl, VIDEO_TYPE_YOUTUBE
 from videos.types import UPDATE_VERSION_ACTION
@@ -59,11 +59,10 @@ def mirror_existing_youtube_videos(user_pk):
                 UPDATE_VERSION_ACTION, version)
 
 
-@periodic_task(run_every=timedelta(seconds=300))
+@task
 def gauge_tpas():
     count = ThirdPartyAccount.objects.filter(type=VIDEO_TYPE_YOUTUBE).count()
     Gauge('youtube.accounts_linked').report(count)
-
 
 @task
 def remove_youtube_descriptions_for_tpa(tpa_pk):

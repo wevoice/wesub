@@ -3,7 +3,6 @@ import logging
 
 logger = logging.getLogger('teams.tasks')
 
-from celery.decorators import periodic_task
 from celery.schedules import crontab, timedelta
 from celery.task import task
 from django.conf import settings
@@ -64,7 +63,7 @@ def update_video_public_field(team_id):
             video.save()
             video_changed_tasks(video.id)
 
-@periodic_task(run_every=crontab(minute=0, hour=7))
+@task
 def expire_tasks():
     """Find any tasks that are past their expiration date and unassign them.
 
@@ -91,13 +90,13 @@ def expire_tasks():
 
 
 
-@periodic_task(run_every=crontab(minute=0, hour=23))
+@task
 def add_videos_notification_daily(*args, **kwargs):
     from teams.models import Team
     team_qs = Team.objects.needs_new_video_notification(Team.NOTIFY_DAILY)
     _notify_teams_of_new_videos(team_qs)
 
-@periodic_task(run_every=crontab(minute=0))
+@task
 def add_videos_notification_hourly(*args, **kwargs):
     from teams.models import Team
     team_qs = Team.objects.needs_new_video_notification(Team.NOTIFY_HOURLY)
@@ -182,7 +181,7 @@ def api_notify_on_application_activity(team_pk, event_name, application_pk):
         team_pk, event_name, application_pk=application_pk)
 
 
-@periodic_task(run_every=timedelta(seconds=300))
+@task
 def gauge_teams():
     from teams.models import Task, Team, TeamMember
     Gauge('teams.Task').report(Task.objects.count())

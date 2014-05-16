@@ -1,9 +1,9 @@
-from celery.decorators import periodic_task
+from celery.decorators import task
 from celery.schedules import timedelta
 
 from apps.auth.models import CustomUser
 from utils.metrics import Gauge
 
-@periodic_task(run_every=timedelta(seconds=300))
+@task
 def gauge_auth():
     Gauge('auth.CustomUser').report(CustomUser.objects.count())
