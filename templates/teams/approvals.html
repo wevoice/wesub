@@ -25,6 +25,49 @@
         {% with 'tasks' as current %}
             {% include 'teams/_tabs.html' %}
         {% endwith %}
+        <div class="tools group">
+          <form action="" method="get" class="search">
+            <fieldset>
+              {% if project_filter %}
+              <input type="hidden" name="project" value="{{ project_filter }}" />
+              {% endif %}
+              {% if language_filter %}
+              <input type="hidden" name="lang" value="{{ language_filter }}" />
+              {% endif %}
+            </fieldset>
+          </form>  
+          <a href="#filter" id="sort-filter">
+            {% trans 'Filter' %}
+            <span></span>
+          </a>
+        </div>
+        <form class="filters videos-list group no-ajax{% if filtered %} active{% endif %}" action="" method="GET">
+            <input type="hidden" name="q" value="{{ query }}" />
+            <button class="reduced" id="update">Update</button>
+            {% if filtered %}
+            <a href="{% url teams:detail team.slug %}{% if query %}?q={{ query }}{% endif %}" class="button cancel">Clear</a>
+            {% endif %}
+            <div class="group">
+                <div class="filter-chunk">
+                    <span class="inner">{% trans 'Project:' %}</span>
+                    <select name="project" id="project">
+                        <option value="any"{% if project == None %} selected="selected"{% endif %}>{% trans 'any' %}</option>
+                        {% for project_choice in project_choices %}
+                        <option {% if project == project_choice %}selected="selected"{% endif %} value="{{ project_choice.slug }}">{{ project_choice.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-chunk">
+                    {% trans 'Language:' %}
+                    <select name="lang" id="lang">
+                        <option value="any"{% if language_code == None %}selected="selected"{% endif %}>{% trans 'any' %}</option>
+                        {% for code, name in language_choices %}
+                            <option {% if language_code == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </form>
 	<div>
 	  <h3>{% trans "Bulk Accept Unassigned Approval Tasks" %}</h3>
 	  <p><em>{% trans "Tasks in white rows haven't been modified in more than 3 weeks." %}</em></p>
