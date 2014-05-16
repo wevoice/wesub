@@ -928,6 +928,7 @@ LOGGING = {
     },
 }
 
+from periodic_tasks_settings import CELERYBEAT_SCHEDULE
 
 try:
     import debug_toolbar
