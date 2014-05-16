@@ -637,7 +637,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             subs = add_credit(subtitle_version, subs)
             self.add_credit_to_description(subtitle_version.subtitle_language.video)
 
-        content = babelsubs.generators.discover('srt').generate(subs).encode('utf-8')
+        content = babelsubs.generators.discover('sbv').generate(subs).encode('utf-8')
         title = ""
 
         if hasattr(self, "captions") is False:
@@ -650,7 +650,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
         res = self.create_track(self.youtube_video_id, title, lang,
                 content, settings.YOUTUBE_CLIENT_ID,
-                settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
+                settings.YOUTUBE_API_SECRET, self.token, {'fmt':'sbv'})
         Meter('youtube.subs_pushed').inc()
         return res
 
