@@ -22,6 +22,32 @@ from django.contrib import admin
 
 from externalsites import models
 
+class SyncHistoryAdmin(admin.ModelAdmin):
+    fields = (
+        'video_url',
+        'account_type',
+        'account_id',
+        'language',
+        'datetime',
+        'version',
+        'result',
+        'details',
+    )
+    readonly_fields = (
+        'video_url',
+        'account_type',
+        'account_id',
+        'language',
+        'datetime',
+        'version',
+    )
+
+    class Meta:
+        model = models.SyncHistory
+
+    def has_add_permission(self, request):
+        return False
+
 admin.site.register(models.KalturaAccount)
 admin.site.register(models.SyncedSubtitleVersion)
-admin.site.register(models.SyncHistory)
+admin.site.register(models.SyncHistory, SyncHistoryAdmin)
