@@ -65,10 +65,21 @@ class VideoImporter(object):
             next_urls = self._next_urls(feed_parser)
 
     def _create_videos(self, feed_parser):
-        _iter = feed_parser.items(ignore_error=True)
+        from videos.models import VideoUrl
 
-        for vt, info, entry in _iter:
-            if vt:
+        items = list(feed_parser.items(ignore_error=True))
+
+        urls = [
+            vt.convert_to_video_url()
+            for vt, info, entry in items
+            if vt is not None
+        ]
+        existing_urls = set(VideoUrl.objects
+                            .filter(url__in=urls)
+                            .values_list('url', flat=True))
+
+        for vt, info, entry in items:
+            if vt and vt.convert_to_video_url() not in existing_urls:
                 self._create_video(vt, info, entry)
             self.checked_entries += 1
 
@@ -76,6 +87,8 @@ class VideoImporter(object):
         from videos.models import Video
         video, created = Video.get_or_create_for_url(
             vt=video_type, user=self.user)
+        # created should always be True, since we filtered out existing items
+        # already, but check it anyways
         if created:
             if info:
                 for name, value in info.items():

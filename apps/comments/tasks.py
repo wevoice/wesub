@@ -17,13 +17,12 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from datetime import timedelta
 
-from celery.decorators import periodic_task
+from celery.decorators import task
 
 from apps.comments.models import Comment
 from utils.metrics import Gauge
 
-
-@periodic_task(run_every=timedelta(seconds=300))
+@task
 def gauge_comments():
     Gauge('comments.Comment').report(Comment.objects.count())
 

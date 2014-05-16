@@ -17,7 +17,6 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from datetime import timedelta
 
-from celery.decorators import periodic_task
 from celery.schedules import crontab
 from celery.task import task
 
@@ -29,7 +28,7 @@ from statistic.models import (
 )
 from utils.metrics import Gauge
 
-@periodic_task(run_every=timedelta(seconds=300))
+@task
 def gauge_statistic():
     Gauge('statistic.shares.twitter').report(TweeterShareStatistic.objects.count())
     Gauge('statistic.shares.facebook').report(FBShareStatistic.objects.count())
@@ -46,7 +45,7 @@ def graphite_slugify(s):
         s = s.replace(c, '_')
     return s
 
-@periodic_task(run_every=timedelta(minutes=5))
+@task
 def gauge_statistic_languages():
     from apps.videos.models import SubtitleLanguage, ALL_LANGUAGES
 
@@ -64,6 +63,6 @@ def gauge_statistic_languages():
         Gauge('statistic.languages.%s.count' % name).report(count)
 
 
-@periodic_task(run_every=crontab(hour=1, minute=0))
+@task
 def migrate_hit_counts():
     hitcounts.migrate_all()

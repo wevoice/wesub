@@ -17,7 +17,6 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
 
-from celery.decorators import periodic_task
 from celery.schedules import crontab, timedelta
 from celery.signals import task_failure
 from celery.task import task
@@ -65,7 +64,7 @@ def process_failure_signal(exception, traceback, sender, task_id,
         pass
 task_failure.connect(process_failure_signal)
 
-@periodic_task(run_every=crontab(hour=3, day_of_week=1))
+@task
 def cleanup():
     import datetime
     from django.db import transaction
@@ -94,7 +93,7 @@ def save_thumbnail_in_s3(video_id):
         content = ContentFile(response.content)
         video.s3_thumbnail.save(video.thumbnail.split('/')[-1], content)
 
-@periodic_task(run_every=crontab(minute=0))
+@task
 def update_from_feed(*args, **kwargs):
     for feed in VideoFeed.objects.all():
         update_video_feed.delay(feed.pk)
@@ -414,7 +413,7 @@ def _save_video_feed(feed_url, user):
     except VideoFeed.DoesNotExist:
         return VideoFeed.objects.create(url=feed_url, user=user)
 
-@periodic_task(run_every=timedelta(seconds=300))
+@task
 def gauge_videos():
     Gauge('videos.Video').report(Video.objects.count())
     Gauge('videos.Video-captioned').report(
@@ -423,13 +422,13 @@ def gauge_videos():
     Gauge('videos.SubtitleLanguage').report(SubtitleLanguage.objects.count())
 
 
-@periodic_task(run_every=timedelta(days=1))
+@task
 def gauge_videos_long():
     Gauge('videos.Subtitle').report(
         SubtitleVersion.objects.subtitle_count())
 
-@periodic_task(run_every=timedelta(seconds=60))
-def gague_billing_records():
+@task
+def gauge_billing_records():
     from teams.models import BillingRecord
     Gauge('teams.BillingRecord').report(BillingRecord.objects.count())
 
