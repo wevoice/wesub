@@ -50,6 +50,8 @@ class ExternalAccount(models.Model):
 
     def update_subtitles(self, video_url, language):
         version = language.get_public_tip()
+        if version is None:
+            return
         sync_history_values = {
             'account': self,
             'video_url': video_url,
