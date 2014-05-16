@@ -24,6 +24,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 import mock
 
+from utils import test_utils
 from videos.feed_parser import FeedParser
 from videos.models import Video, VideoFeed
 from videos.types.vimeo import VimeoVideoType
@@ -63,6 +64,7 @@ class TestFeedsSubmit(FeedImportTest):
 
     def test_video_feed_submit(self):
         self.submit_feed_url(u'http://example.com/feed')
+        test_utils.import_videos_from_feed.run_original()
         self.assertEqual(Video.objects.count(), 2)
 
     def test_video_youtube_username_submit(self):
@@ -71,6 +73,7 @@ class TestFeedsSubmit(FeedImportTest):
         }
         response = self.client.post(reverse('videos:create_from_feed'), data)
         self.assertRedirects(response, reverse('videos:create'))
+        test_utils.import_videos_from_feed.run_original()
         self.assertEqual(Video.objects.count(), 2)
         feed_url = ('https://gdata.youtube.com'
                     '/feeds/api/users/amaratestuser/uploads')
@@ -87,7 +90,7 @@ class TestFeedsSubmit(FeedImportTest):
         self.assertEqual(Video.objects.count(), 0)
 
         vf = VideoFeed.objects.get()
-        self.assertEqual(vf.last_link, '')
+        self.assertEqual(vf.url,  u'http://example.com/feed')
 
 class TestFeedParser(FeedImportTest):
     # TODO: add test for MediaFeedEntryParser. I just can't find RSS link for it
