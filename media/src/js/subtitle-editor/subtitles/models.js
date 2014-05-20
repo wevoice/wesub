@@ -36,11 +36,12 @@ var angular = angular || null;
             <ttm:description/>\
             <ttm:copyright/>\
         </metadata>\
-        <styling xmlns:tts="http://www.w3.org/ns/ttml#styling">\
-            <style xml:id="amara-style" tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="18px" tts:textAlign="center"/>\
+        <styling>\
+            <style xml:id="amara-style" tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="18px" tts:backgroundColor="transparent" tts:textOutline="black 1px 0px" tts:textAlign="center"/>\
         </styling>\
-        <layout xmlns:tts="http://www.w3.org/ns/ttml#styling">\
-            <region xml:id="amara-subtitle-area" style="amara-style" tts:extent="560px 62px" tts:padding="5px 3px" tts:backgroundColor="black" tts:displayAlign="after"/>\
+        <layout>\
+            <region xml:id="amara-subtitle-area" style="amara-style" tts:extent="100% 100%" tts:origin="0% 80%" />\
+            <region xml:id="top" style="amara-style" tts:extent="100% 100%" tts:origin="0% 0%" tts:textAlign="center"/>\
         </layout>\
     </head>\
     <body region="amara-subtitle-area">\
