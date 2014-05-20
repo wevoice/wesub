@@ -50,7 +50,7 @@ class ExternalAccount(models.Model):
 
     def update_subtitles(self, video_url, language):
         version = language.get_public_tip()
-        if version is None:
+        if version is None or self.should_skip_syncing():
             return
         sync_history_values = {
             'account': self,
@@ -76,6 +76,8 @@ class ExternalAccount(models.Model):
             'video_url': video_url,
             'action': SyncHistory.ACTION_DELETE_SUBTITLES,
         }
+        if self.should_skip_syncing():
+            return
 
         try:
             self.do_delete_subtitles(video_url, language)
@@ -99,6 +101,13 @@ class ExternalAccount(models.Model):
         Subclasses must implement this method.
         """
         raise NotImplementedError()
+
+    def should_skip_syncing(self):
+        """Return True if we should not sync subtitles.
+
+        Subclasses may optionally override this method.
+        """
+        return False
 
     class Meta:
         abstract = True
@@ -159,6 +168,9 @@ class BrightcoveAccount(ExternalAccount):
         else:
             # No languages left, delete the subtitles
             syncing.brightcove.delete_subtitles(self.write_token, video_id)
+
+    def should_skip_syncing(self):
+        return self.write_token == ''
 
     def feed_url(self, player_id, tags):
         url_start = ('http://link.brightcove.com'

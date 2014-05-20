@@ -717,6 +717,22 @@ class BrightcoveAccountSyncingTest(TestCase):
         mock_delete_subtitles.assert_called_with(self.account.write_token,
                                                  self.video_id)
 
+    @test_utils.patch_for_test('externalsites.syncing.brightcove.update_subtitles')
+    @test_utils.patch_for_test('externalsites.syncing.brightcove.delete_subtitles')
+    def test_no_write_token(self, mock_delete_subtitles,
+                            mock_update_subtitles):
+        # if we don't have a write token set, we should skip syncing
+        self.account.write_token = ''
+        self.account.save()
+        self.add_subtitles('en')
+        self.assertEquals(mock_update_subtitles.call_count, 0)
+        # we shouldn't record sync history either in this case
+        self.assertEquals(SyncHistory.objects.count(), 0)
+        # the same should happen on delete
+        self.delete_subtitles('en')
+        self.assertEquals(mock_delete_subtitles.call_count, 0)
+        self.assertEquals(SyncHistory.objects.count(), 0)
+
 class BrightcoveAPITest(TestCase):
     WRITE_URL = 'https://api.brightcove.com/services/post'
 
