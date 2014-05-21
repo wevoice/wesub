@@ -45,13 +45,7 @@ def run_manage(manage_args, docker_args=None, settings='docker_dev_settings',
         '/opt/ve/unisubs/bin/python',
         '/opt/apps/unisubs/manage.py',
     ] + manage_args)
-    run_docker(" ".join(run_cmd))
-    cid = open(cid_path(image_name)).read().strip()
-    with open("/dev/null", "w") as dev_null:
-        run_docker("stop %s" % cid, stdout=dev_null)
-        run_docker("wait %s" % cid, stdout=dev_null)
-        run_docker("rm %s" % cid, stdout=dev_null)
-    os.remove(cid_path(image_name))
+    run_and_cleanup(image_name, run_cmd)
 
 def run_shell(docker_args=None):
     image_name = unique_image_name('amara-dev-shell')
@@ -60,7 +54,10 @@ def run_shell(docker_args=None):
         run_cmd.extend(docker_args)
     run_cmd.extend(['amara-dev', '/bin/bash', '--init-file',
                     '/opt/ve/unisubs/bin/activate'])
-    run_docker(" ".join(run_cmd))
+    run_and_cleanup(image_name, run_cmd)
+
+def run_and_cleanup(image_name, command):
+    run_docker(" ".join(command))
     cid = open(cid_path(image_name)).read().strip()
     with open("/dev/null", "w") as dev_null:
         run_docker("stop %s" % cid, stdout=dev_null)

@@ -129,7 +129,7 @@ def new(request):
                     message_list.append(Message(user=member, author=request.user,
                                                 content=form.cleaned_data['content'],
                                                 subject=form.cleaned_data['subject']))
-                Message.objects.bulk_create(message_list);
+                Message.objects.bulk_create(message_list, batch_size=500);
                 new_messages_ids = Message.objects.filter(created__gt=now).values_list('pk', flat=True)
                 # Creating a bunch of reasonably-sized tasks
                 batch = 0
