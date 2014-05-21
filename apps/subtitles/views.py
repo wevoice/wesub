@@ -339,7 +339,6 @@ def download_all(request, video_id, filename):
     if merged_dfxp is None:
         raise Http404()
 
-    response = HttpResponse(babelsubs.dfxp_merge(subtitle_sets),
-                            mimetype="text/plain")
+    response = HttpResponse(merged_dfxp, mimetype="text/plain")
     response['Content-Disposition'] = 'attachment'
     return response
