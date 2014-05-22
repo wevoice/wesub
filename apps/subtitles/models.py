@@ -1327,6 +1327,9 @@ class SubtitleVersion(models.Model):
         if self._subtitles == None:
             self._subtitles = load_from(decompress(self.serialized_subtitles),
                     type='dfxp').to_internal()
+            # force the subtitles to have the correct language code.  For a
+            # while we had a bug where we always set to to "en"
+            self._subtitles.set_language(self.language_code)
 
         return self._subtitles
 

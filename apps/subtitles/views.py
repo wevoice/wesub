@@ -331,3 +331,14 @@ def download(request, video_id, language_code, filename, format,
     response['Content-Disposition'] = 'attachment'
     return response
 
+
+def download_all(request, video_id, filename):
+    video = get_object_or_404(Video, video_id=video_id)
+    merged_dfxp = video.get_merged_dfxp()
+
+    if merged_dfxp is None:
+        raise Http404()
+
+    response = HttpResponse(merged_dfxp, mimetype="text/plain")
+    response['Content-Disposition'] = 'attachment'
+    return response

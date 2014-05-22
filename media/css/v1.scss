@@ -2831,14 +2831,22 @@ a.truncated-expand {
             white-space: nowrap;
             margin: 0 0 0.2em 0;
         }
+
+        .actions {
+            float: right;
+            margin-left: 6px;
+
+            form {
+                margin-bottom: 12px;
+                padding: 0;
+            }
+            a.button {
+                display: block;
+                margin: 0;
+            }
+        }
     }
 
-    form.import-now {
-        float: right;
-        display: inline;
-        margin-left: 12px;
-        padding: 0;
-    }
 
     div.submit {
          margin: 0;

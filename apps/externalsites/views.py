@@ -87,12 +87,9 @@ def resync(request, video_url_id, language_code):
 def _resync_video(team, video_url, language):
     account = get_account_for_videourl(team, video_url)
     if account is None:
-        logger.warning("resyncing subtitles: no account")
         return
     tip = language.get_public_tip()
     if tip is not None:
-        logger.info("resyncing subtitle: updating")
-        account.update_subtitles(video_url, language, tip)
+        account.update_subtitles(video_url, language)
     else:
-        logger.info("resyncing subtitle: deleting")
         account.delete_subtitles(video_url, language)
