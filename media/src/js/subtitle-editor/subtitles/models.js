@@ -40,11 +40,11 @@ var angular = angular || null;
             <style xml:id="amara-style" tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="18px" tts:backgroundColor="transparent" tts:textOutline="black 1px 0px" tts:textAlign="center"/>\
         </styling>\
         <layout>\
-            <region xml:id="amara-subtitle-area" style="amara-style" tts:extent="100% 100%" tts:origin="0% 80%" />\
-            <region xml:id="top" style="amara-style" tts:extent="100% 100%" tts:origin="0% 0%" tts:textAlign="center"/>\
+            <region xml:id="bottom" style="amara-style" tts:extent="100% 20%" tts:origin="0 80%" />\
+            <region xml:id="top" style="amara-style" tts:extent="100% 20%" tts:origin="0 0" tts:textAlign="center"/>\
         </layout>\
     </head>\
-    <body region="amara-subtitle-area">\
+    <body region="bottom">\
         <div xml:lang="' + languageCode + '"></div>\
     </body>\
 </tt>';

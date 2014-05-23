@@ -38,6 +38,7 @@ from uslogging.models import WidgetDialogLog
 from utils import send_templated_email
 from utils.forms import flatten_errorlists
 from utils.metrics import Meter
+from utils.subtitles import create_new_subtitles
 from utils.translation import get_user_languages_from_request
 from videos import models
 from videos.models import record_workflow_origin, Subtitle
@@ -1173,7 +1174,7 @@ class Rpc(BaseRpc):
         if not version and not latest_version:
             version_number = 0
             language_code = language.language_code
-            subtitles = SubtitleSet(language_code).to_xml()
+            subtitles = create_new_subtitles(language_code).to_xml()
             is_latest = True
             metadata = language.get_metadata()
             for key in language.video.get_metadata():

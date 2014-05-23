@@ -34,6 +34,7 @@ from apps.teams.permissions import (
 )
 from apps.videos.tasks import video_changed_tasks
 from utils.text import fmt
+from utils.subtitles import load_subtitles
 from utils.translation import get_language_choices, get_language_label
 
 
@@ -223,8 +224,11 @@ class SubtitlesUploadForm(forms.Form):
         decoded = force_unicode(text, encoding) if not is_xml else text
 
         try:
-            parser = babelsubs.load_from(decoded, type=self.extension)
-            self._parsed_subtitles = parser.to_internal()
+            # we don't know the language code yet, since we are early in the
+            # clean process.  Set it to blank for now and we'll set it to the
+            # correct value in save()
+            self._parsed_subtitles = load_subtitles('', decoded,
+                                                    self.extension)
         except TypeError, e:
             raise forms.ValidationError(e)
         except ValueError, e:
@@ -356,6 +360,7 @@ class SubtitlesUploadForm(forms.Form):
 
 
         subtitles = self._parsed_subtitles
+        subtitles.set_language(language_code)
         if from_language_code:
             # If this is a translation, its subtitles should use the timing data
             # from the source.  We know that the source has at least as many

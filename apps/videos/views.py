@@ -62,7 +62,7 @@ from apps.videos import permissions
 from apps.videos.decorators import get_video_revision, get_video_from_code
 from apps.videos.forms import (
     VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm,
-    CreateVideoUrlForm, TranscriptionFileForm, AddFromFeedForm,
+    CreateVideoUrlForm, AddFromFeedForm,
     ChangeVideoOriginalLanguageForm, CreateSubtitlesForm,
 )
 from apps.videos.models import (
@@ -460,16 +460,6 @@ def upload_subtitles(request):
         output['errors'] = {'__all__': [force_unicode(e)]}
 
     return response(output)
-
-@login_required
-def upload_transcription_file(request):
-    output = {}
-    form = TranscriptionFileForm(request.POST, request.FILES)
-    if form.is_valid():
-        output['text'] = getattr(form, 'file_text', '')
-    else:
-        output['errors'] = form.get_errors()
-    return HttpResponse(u'<textarea>%s</textarea>'  % json.dumps(output))
 
 def feedback(request, hide_captcha=False):
     output = dict(success=False)
