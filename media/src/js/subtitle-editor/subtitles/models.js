@@ -44,9 +44,7 @@ var angular = angular || null;
             <region xml:id="top" style="amara-style" tts:extent="100% 20%" tts:origin="0 0" tts:textAlign="center"/>\
         </layout>\
     </head>\
-    <body region="bottom">\
-        <div xml:lang="' + languageCode + '"></div>\
-    </body>\
+    <body region="bottom"><div /></body>\
 </tt>';
     };
 
