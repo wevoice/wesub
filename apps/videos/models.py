@@ -51,11 +51,10 @@ from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
-from utils.subtitles import create_new_subtitles
+from utils.subtitles import create_new_subtitles, dfxp_merge
 from utils.text import fmt
 from apps.teams.moderation_const import MODERATION_STATUSES, UNMODERATED
 from raven.contrib.django.models import client
-import babelsubs
 
 NO_SUBTITLES, SUBTITLES_FINISHED = range(2)
 VIDEO_TYPE_HTML5 = 'H'
@@ -714,7 +713,7 @@ class Video(models.Model):
                     subtitle_sets.append(tip.get_subtitles())
 
         if len(subtitle_sets) > 0:
-            return babelsubs.dfxp_merge(subtitle_sets)
+            return dfxp_merge(subtitle_sets)
         else:
             return None
 

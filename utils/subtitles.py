@@ -47,3 +47,6 @@ def load_subtitles(language_code, content, file_type):
 
 def load_subtitles_from_file(language_code, path):
     return subtitle_loader.load(language_code, path)
+
+def dfxp_merge(subtitle_sets):
+    return subtitle_loader.dfxp_merge(subtitle_sets)
