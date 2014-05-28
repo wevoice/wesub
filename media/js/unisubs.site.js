@@ -274,7 +274,10 @@ var Site = function(Site) {
         bulkCheckboxes: function(bulkCheckbox, bulkableCheckboxes, bulkCheckboxAnchor) {
 	    bulkCheckbox.change(function() {
 		bulkableCheckboxes.attr('checked', $(this).attr('checked'));
-		bulkCheckbox.attr("checked", $(this).attr('checked'))
+		bulkCheckbox.attr("checked", $(this).attr('checked'));
+	    });
+	    bulkableCheckboxes.change(function() {
+		bulkCheckbox.attr('checked', false);
 	    });
 	    bulkCheckboxAnchor.click(function() {
 		bulkCheckbox.attr("checked", !bulkCheckbox.attr("checked")).change();
