@@ -19,6 +19,8 @@
 """utils.factories.py -- Factoryboy factories for testing
 """
 
+from __future__ import absolute_import
+
 import datetime
 import hashlib
 

@@ -43,6 +43,7 @@ from videos.behaviors import make_video_title
 
 from utils.compress import compress, decompress
 from utils.redis_utils import RedisSimpleField
+from utils.subtitles import create_new_subtitles
 from utils.translation import is_rtl
 
 
@@ -1347,7 +1348,7 @@ class SubtitleVersion(models.Model):
         """
         # TODO: Fix the language code to use the proper standard.
         if subtitles == None:
-            subtitles = SubtitleSet(self.language_code)
+            subtitles = create_new_subtitles(self.language_code)
         elif isinstance(subtitles, str) or isinstance(subtitles, unicode):
             subtitles = SubtitleSet(self.language_code, initial_data=subtitles)
         elif isinstance(subtitles, SubtitleSet):

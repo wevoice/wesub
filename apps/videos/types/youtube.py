@@ -37,6 +37,7 @@ from lxml import etree
 from base import VideoType, VideoTypeError
 from utils.translation import SUPPORTED_LANGUAGE_CODES
 from utils.metrics import Meter, Occurrence
+from utils.subtitles import load_subtitles
 
 from unilangs import LanguageCode
 
@@ -256,7 +257,7 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
 
     xml = force_unicode(xml, 'utf-8')
 
-    subs = babelsubs.parsers.discover('srt').parse(xml).to_internal()
+    subs = load_subtitles(lc, xml, 'srt')
     version = add_subtitles(video, lc, subs, note="From youtube", complete=True, origin=ORIGIN_IMPORTED)
 
     # do not pass a version_id else, we'll trigger emails for those edits
