@@ -21,7 +21,7 @@ import simplejson as json
 import babelsubs
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.db.models import Count
 from django.conf import settings
 from django.contrib import messages
@@ -305,7 +305,7 @@ def download(request, video_id, language_code, filename, format,
 
     language = video.subtitle_language(language_code)
     if language is None:
-        raise Http404
+        raise Http404()
 
     team_video = video.get_team_video()
 
@@ -318,7 +318,7 @@ def download(request, video_id, language_code, filename, format,
                                    version_number=version_number)
 
     if not version:
-        raise Http404
+        raise Http404()
     if not format in babelsubs.get_available_formats():
         raise HttpResponseServerError("Format not found")
 
@@ -331,3 +331,14 @@ def download(request, video_id, language_code, filename, format,
     response['Content-Disposition'] = 'attachment'
     return response
 
+
+def download_all(request, video_id, filename):
+    video = get_object_or_404(Video, video_id=video_id)
+    merged_dfxp = video.get_merged_dfxp()
+
+    if merged_dfxp is None:
+        raise Http404()
+
+    response = HttpResponse(merged_dfxp, mimetype="text/plain")
+    response['Content-Disposition'] = 'attachment'
+    return response

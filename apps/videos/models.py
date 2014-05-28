@@ -39,7 +39,6 @@ from django.template.defaultfilters import slugify
 from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
 
-
 from auth.models import CustomUser as User, Awards
 from videos import behaviors
 from videos import metadata
@@ -52,11 +51,10 @@ from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
+from utils.subtitles import create_new_subtitles, dfxp_merge
 from utils.text import fmt
-
 from apps.teams.moderation_const import MODERATION_STATUSES, UNMODERATED
 from raven.contrib.django.models import client
-from babelsubs import storage
 
 NO_SUBTITLES, SUBTITLES_FINISHED = range(2)
 VIDEO_TYPE_HTML5 = 'H'
@@ -701,6 +699,24 @@ class Video(models.Model):
         """Return all SubtitleLanguages for this video with the given language code."""
         return self.newsubtitlelanguage_set.filter(language_code=language_code)
 
+    def get_merged_dfxp(self):
+        """Get a DFXP file containing subtitles for all languages."""
+        self.prefetch_languages(with_public_tips=True)
+
+        subtitle_sets = []
+        for language in self.all_subtitle_languages():
+            tip = language.get_public_tip()
+            if tip is not None:
+                if language.is_primary_audio_language():
+                    subtitle_sets.insert(0, tip.get_subtitles())
+                else:
+                    subtitle_sets.append(tip.get_subtitles())
+
+        if len(subtitle_sets) > 0:
+            return dfxp_merge(subtitle_sets)
+        else:
+            return None
+
     def version(self, version_number=None, language=None, public_only=True):
         """Return the SubtitleVersion for this video matching the given criteria.
 
@@ -765,7 +781,7 @@ class Video(models.Model):
             return version.get_subtitles()
         else:
             language_code = language.language_code if language else self.primary_audio_language_code
-            return storage.SubtitleSet(language_code)
+            return create_new_subtitles(language_code)
 
     def latest_subtitles(self, language_code=None, public_only=True):
         version = self.latest_version(language_code, public_only=public_only)

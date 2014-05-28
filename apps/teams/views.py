@@ -2507,6 +2507,11 @@ def video_feed(request, team, feed_id):
         action = request.POST.get('action')
         if action == 'update':
             feed.update()
+        elif action == 'delete':
+            feed.delete()
+            return redirect(reverse('teams:video_feeds', kwargs={
+                'slug': team.slug,
+            }))
         return redirect(reverse('teams:video_feed', kwargs={
             'slug': team.slug,
             'feed_id': feed.id,

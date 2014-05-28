@@ -55,57 +55,6 @@ def language_choices_with_empty():
     choices.extend(get_language_choices())
     return choices
 
-class TranscriptionFileForm(forms.Form, AjaxForm):
-    txtfile = forms.FileField()
-
-    def clean_txtfile(self):
-        f = self.cleaned_data['txtfile']
-
-        if f.name.split('.')[-1] != 'txt':
-            raise forms.ValidationError(_('File should have txt format'))
-
-        if f.size > KB_SIZELIMIT * 1024:
-            raise forms.ValidationError(fmt(
-                _(u'File size should be less %(size)s kb'),
-                size=KB_SIZELIMIT))
-
-        text = f.read()
-        encoding = chardet.detect(text)['encoding']
-        if not encoding:
-            raise forms.ValidationError(_(u'Can not detect file encoding'))
-        try:
-            self.file_text = force_unicode(text, encoding)
-        except DjangoUnicodeDecodeError:
-            raise forms.ValidationError(_(u'Can\'t encode file. It should have utf8 encoding.'))
-        f.seek(0)
-
-        return f
-
-    def clean_subtitles(self):
-        subtitles = self.cleaned_data['subtitles']
-        if subtitles.size > KB_SIZELIMIT * 1024:
-            raise forms.ValidationError(fmt(
-                _(u'File size should be less %(size)s kb'),
-                size=KB_SIZELIMIT))
-        parts = subtitles.name.split('.')
-        extension = parts[-1].lower()
-        if extension not in babelsubs.get_available_formats():
-            raise forms.ValidationError(
-                fmt(_(u'Incorrect format. '
-                      u'Upload one of the following: %(formats)s.'),
-                    formats=", ".join(babelsubs.get_available_formats())))
-        text = subtitles.read()
-        encoding = chardet.detect(text)['encoding']
-        if not encoding:
-            raise forms.ValidationError(_(u'Can not detect file encoding'))
-        try:
-            parser = babelsubs.parsers.discover(extension)
-            subtitle_set = parser('en', force_unicode(text, encoding))
-        except babelsubs.SubtitleParserError:
-            raise forms.ValidationError(_(u'Incorrect subtitles format'))
-        subtitles.seek(0)
-        return subtitles
-
 class CreateVideoUrlForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):

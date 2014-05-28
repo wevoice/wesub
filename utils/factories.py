@@ -19,7 +19,10 @@
 """utils.factories.py -- Factoryboy factories for testing
 """
 
+from __future__ import absolute_import
+
 import datetime
+import hashlib
 
 from django.contrib.auth.hashers import make_password
 from django.template.defaultfilters import slugify
@@ -28,6 +31,7 @@ from factory.django import DjangoModelFactory
 
 import accountlinker.models
 import auth.models
+import externalsites.models
 import subtitles.models
 import teams.models
 import videos.models
@@ -48,6 +52,33 @@ class VideoFactory(DjangoModelFactory):
     allow_community_edits = False
 
     video_url = factory.RelatedFactory(VideoURLFactory, 'video', primary=True)
+
+class KalturaVideoFactory(VideoFactory):
+    FACTORY_HIDDEN_ARGS = ('name',)
+
+    video_url__type = 'K'
+    name = 'video'
+
+    @factory.lazy_attribute
+    def video_url__url(self):
+        # generate a video with a kaltura-style URL
+        entry_id = '1_' + hashlib.md5(self.name).hexdigest()[:8]
+        return ('http://cdnbakmi.kaltura.com'
+                '/p/1492321/sp/149232100/serveFlavor/entryId/'
+                '%s/flavorId/1_dqgopb2z/name/%s.mp4') % (entry_id,
+                                                         self.name)
+
+class BrightcoveVideoFactory(VideoFactory):
+    # generate a video with a brightcove-style URL
+    FACTORY_HIDDEN_ARGS = ('brightcove_id', 'player_id')
+
+    player_id = '1234'
+    video_url__type = 'C'
+
+    @factory.lazy_attribute
+    def video_url__url(self):
+        return 'http://bcove.me/services/link/bcpid%s/bctid%s' % (
+            self.player_id, self.brightcove_id)
 
 class UserFactory(DjangoModelFactory):
     FACTORY_FOR = auth.models.CustomUser
@@ -195,6 +226,13 @@ class OldSubtitleVersionFactory(DjangoModelFactory):
     title = 'Title'
     description = 'Description'
     datetime_started = datetime.datetime(2000, 1, 1)
+
+class BrightcoveAccountFactory(DjangoModelFactory):
+    FACTORY_FOR = externalsites.models.BrightcoveAccount
+
+    team = factory.SubFactory(TeamFactory)
+    publisher_id = 'publisher'
+    write_token = 'write-token'
 
 def bulk_subs(sub_data):
     """Create a bunch of videos/languages/versions

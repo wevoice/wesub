@@ -38,10 +38,11 @@
                 </span>
                 <ul>
                   {% for format_name in downloadable_formats %}
-                     <li>
-                     <a href="{% subtitle_download_url version format_name %}">{{format_name|upper}}</a>
-                    </li>
+                     <li><a href="{% subtitle_download_url version format_name %}">{{format_name|upper}}</a></li>
                   {% endfor %}
+                  {% if show_download_all %}
+                  <li><a href="{% url subtitles:download_all video.video_id video.get_download_filename %}">{% trans "DFXP All Languages" %}</a></li>
+                  {% endif %}
                 </ul>
             </div>
         {% endif %}

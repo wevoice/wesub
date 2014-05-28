@@ -36,6 +36,17 @@
     }
     ////////////////////////////////////////////
 
+    // Should be triggered when the content of the iframe is know
+    // This content is used to have the host page include the transcript
+    // for indexing 
+    function setIndexingContent(content) {
+	if(hostPage.source)
+	    hostPage.source.postMessage({resize: false, index: hostPage.index,
+					 content: content,
+					}, hostPage.origin);
+    }
+    ////////////////////////////////////////////
+
     function regexEscape(str) {
         var specials = /[.*+?|()\[\]{}\\$^]/g; // .*+?|()[]{}\$^
         return str.replace(specials, "\\$&");
@@ -496,9 +507,11 @@
 
                     // Remove the loading indicator.
                     this.$transcriptBody.html('');
+                    var indexingTranscript = "";
 
                     for (var i = 0; i < subtitles.length; i++) {
                         var line = this.addSubtitleLine(subtitles[i]);
+                        indexingTranscript += " " + subtitles[i].text;
                         this.pop.code({
                             start: subtitles[i].start / 1000.0,
                             end: subtitles[i].end / 1000.0,
@@ -513,6 +526,8 @@
                             }
                         });
                     }
+
+	            setIndexingContent(indexingTranscript);
 
                     this.$amaraTranscriptLines = _$('a.amara-transcript-line', this.$transcriptBody);
 

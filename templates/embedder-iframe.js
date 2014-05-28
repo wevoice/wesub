@@ -12,11 +12,17 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	    iframes[index].width = width + 10;
 	    iframes[index].height = height + 10;
 	};
+	var updateContent = function(index, content) {
+	    iframes[index].innerHTML = content;
+	};
 	this.resizeReceiver = function(e) {
 	    if (e.data.initDone)
 		window.clearInterval(timers[e.data.index]);
 	    if (e.data.resize)
 		resize(e.data.index, e.data.width, e.data.height);
+	    if (e.data.content)
+		updateContent(e.data.index, e.data.content);
+
 	};
 	this.initIframes = function() {
 	    var elements = document.getElementsByClassName("amara-embed");
