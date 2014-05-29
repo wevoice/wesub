@@ -21,6 +21,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	var updateLoading = function(index) {
 	    iframes[index].parentNode.style.backgroundColor = "transparent";
 	    iframes[index].style.visibility = "visible";
+	    iframes[index].style.opacity = 1;
 	    loadingDivs[index].style.display = "none";
 	};
 	this.resizeReceiver = function(e) {
@@ -61,6 +62,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		iframe.style.overflow = "hidden";
 		iframe.scrolling = "no";
 		iframe.style.visibility = "hidden";
+		iframe.style.opacity = 0;
 		currentDiv.appendChild(iframe);
 		loadingDivs.push(loadingDiv);
 		iframes.push(iframe);
