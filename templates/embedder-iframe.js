@@ -5,15 +5,23 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 (function(window) {
     var AmaraIframeController = function() {
 	var iframes = [];
+	var loadingDivs = [];
 	var timers = [];
 	var iframeDomain = '';
 	var resize = function(index, width, height) {
+            if (iframes[index].style.visibility == "visible")
+                iframes[index].parentNode.style.height = "";
 	    iframes[index].width = 0;
-	    iframes[index].width = width + 10;
-	    iframes[index].height = height + 10;
+	    iframes[index].width = width;
+	    iframes[index].height = height;
 	};
 	var updateContent = function(index, content) {
 	    iframes[index].innerHTML = content;
+	};
+	var updateLoading = function(index) {
+	    iframes[index].parentNode.style.backgroundColor = "transparent";
+	    iframes[index].style.visibility = "visible";
+	    loadingDivs[index].style.display = "none";
 	};
 	this.resizeReceiver = function(e) {
 	    if (e.data.initDone)
@@ -22,7 +30,8 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		resize(e.data.index, e.data.width, e.data.height);
 	    if (e.data.content)
 		updateContent(e.data.index, e.data.content);
-
+	    if (e.data.videoReady)
+                updateLoading(e.data.index);
 	};
 	this.initIframes = function() {
 	    var elements = document.getElementsByClassName("amara-embed");
@@ -32,12 +41,28 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	    iframeDomain = "http://" + parser.host;
 	    for (var i = 0 ; i < elements.length ; i++) {
 		var currentDiv = elements[i];
+                var loadingDiv = document.createElement("DIV");
+                if (currentDiv.dataset.width)
+                    currentDiv.style.width = currentDiv.dataset.width;
+                if (currentDiv.dataset.height)
+                    currentDiv.style.height = (36 + parseInt(currentDiv.dataset.height)) + "px";
+                currentDiv.style.backgroundColor = "#ddd";
+                loadingDiv.style.paddingTop = "200px";
+                loadingDiv.style.textAlign = "center";
+                loadingImg = document.createElement("IMG");
+                loadingImg.src = "http://" + parser.host + "/site_media/images/embedder/loading.gif";
+                loadingDiv.appendChild(loadingImg);
+                currentDiv.appendChild(loadingDiv); 
+
 		var iframe = document.createElement("IFRAME");
 		iframe.src = "http://" + parser.host + "/embedder-widget-iframe/?data=" +
 		    encodeURIComponent(JSON.stringify(currentDiv.dataset));
 		iframe.style.border = "none";
 		iframe.style.overflow = "hidden";
+		iframe.scrolling = "no";
+		iframe.style.visibility = "hidden";
 		currentDiv.appendChild(iframe);
+		loadingDivs.push(loadingDiv);
 		iframes.push(iframe);
 	    }
 	};

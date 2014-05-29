@@ -47,6 +47,13 @@
     }
     ////////////////////////////////////////////
 
+    function notifyVideoLoadedToHost() {
+	if(hostPage.source)
+	    hostPage.source.postMessage({resize: false, index: hostPage.index,
+					 videoReady: true,
+					}, hostPage.origin);
+    }
+
     function regexEscape(str) {
         var specials = /[.*+?|()\[\]{}\\$^]/g; // .*+?|()[]{}\$^
         return str.replace(specials, "\\$&");
@@ -343,6 +350,7 @@
                     that.setCurrentLanguageMessage('Loading…');
                     that.waitUntilVideoIsComplete(
                         function() {
+                            notifyVideoLoadedToHost();
                             // Grab the subtitles for the initial language and do yo' thang.
                             if (that.model.get('is_on_amara')) {
 
