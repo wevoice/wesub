@@ -80,7 +80,9 @@ var angular = angular || null;
     }
 
     Subtitle.prototype.characterCount = function() {
-        return dfxp.markdownToPlaintext(this.markdown).length;
+        var rawContent = dfxp.markdownToPlaintext(this.markdown);
+        // Newline characters are not counted
+        return (rawContent.length - (rawContent.match(/\n/g) || []).length);
     }
 
     Subtitle.prototype.characterRate = function() {
