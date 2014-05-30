@@ -258,7 +258,6 @@
                 'mousemove':                             'mouseMoved',
 
                 // Toolbar
-//                'click a.amara-current-language':        'languageButtonClicked',
                 'click a.amara-share-button':            'shareButtonClicked',
                 'click a.amara-subtitles-button':        'toggleSubtitlesDisplay',
                 'click ul.amara-languages-list a.language-item':       'changeLanguage',
@@ -364,8 +363,12 @@
                                 that.loadSubtitles(that.model.get('initial_language'));
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
-                                that.setCurrentLanguageMessage('Video not on Amara');
-				that.setTranscriptDisplay(false);
+                                // Language selector drop-up menu becomes a link to amara
+                                that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'));
+                                that.$amaraCurrentLang.attr("target", '_blank');
+                                that.$amaraCurrentLang.removeAttr("data-toggle");
+                                that.setCurrentLanguageMessage('Add to Amara');
+                                that.setTranscriptDisplay(false);
                             }
                             sizeUpdated();
                         }
@@ -704,10 +707,6 @@
                     this.$amaraContextMenu.remove();
 
                 }
-            },
-            languageButtonClicked: function() {
-                this.$amaraLanguagesList.toggle();
-                return false;
             },
             linkToTranscriptLine: function(line) {
                 this.hideTranscriptContextMenu();
