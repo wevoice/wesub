@@ -258,7 +258,6 @@
                 'mousemove':                             'mouseMoved',
 
                 // Toolbar
-//                'click a.amara-current-language':        'languageButtonClicked',
                 'click a.amara-share-button':            'shareButtonClicked',
                 'click a.amara-subtitles-button':        'toggleSubtitlesDisplay',
                 'click ul.amara-languages-list a.language-item':       'changeLanguage',
@@ -360,13 +359,16 @@
                                 that.$viewOnAmaraButton.attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
                                 _$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
                                 // Make the request to fetch the initial subtitles.
-                                //
                                 // TODO: This needs to be an option.
                                 that.loadSubtitles(that.model.get('initial_language'));
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
-                                that.setCurrentLanguageMessage('Video not on Amara');
-				that.setTranscriptDisplay(false);
+                                // Language selector drop-up menu becomes a link to amara
+                                that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'));
+                                that.$amaraCurrentLang.attr("target", '_blank');
+                                that.$amaraCurrentLang.removeAttr("data-toggle");
+                                that.setCurrentLanguageMessage('Add to Amara');
+                                that.setTranscriptDisplay(false);
                             }
                             sizeUpdated();
                         }
@@ -494,7 +496,7 @@
 
                 var that = this;
 
-                this.setCurrentLanguageMessage('Loading…');
+                //this.setCurrentLanguageMessage('Loading…');
 
                 // remove plugins added for previous languages
                 this.pop.removePlugin('code');
@@ -605,37 +607,44 @@
             loadSubtitles: function(language) {
                 // If we've already fetched subtitles for this language, don't
                 // fetch them again.
-                var subtitleSets = this.model.subtitles.where({'language': language});
                 var that = this;
-                if (subtitleSets.length) {
-                    this.setCurrentLanguage(language);
-                } else {
-                    this.fetchSubtitles(language, function() {
-                        that.setCurrentLanguage(language);
-                    });
-                }
+		if (language) {
+                    var subtitleSets = this.model.subtitles.where({'language': language});
+                    if (subtitleSets.length) {
+			this.setCurrentLanguage(language);
+                    } else {
+			this.fetchSubtitles(language, function() {
+                            that.setCurrentLanguage(language);
+			});
+                    }
+		} else {
+                    that.setCurrentLanguage("");
+		}
             },
             setCurrentLanguage: function(language) {
                 this.buildTranscript(language);
                 this.buildSubtitles(language);
-		this.setSubtitlesDisplay(this.model.get('show_subtitles_default'));
-		this.setTranscriptDisplay(this.model.get('show_transcript_default'));
-                this.scrollTranscriptToCurrentTime();
-                var subtitleSets = this.model.subtitles.where({'language': language});
-                if (subtitleSets.length) {
-                    var languageCode = subtitleSets[0].get('language');
-                    var languageName = this.getLanguageNameForCode(languageCode);
-		    _$('ul.amara-languages-list a').removeClass('currently-selected');
-		    this.$amaraLanguagesList.find("[data-language='" + language + "']").addClass('currently-selected');
-                    this.$amaraCurrentLang.text(languageName);
-                    _$('#amara-download-subtitles').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
-		    _$('ul.amara-languages-list li').removeClass('currently-selected-item');
-		    _$('.currently-selected').parent().addClass('currently-selected-item');
-                    // Show the expander triangle
-                    this.$amaraCurrentLang.css('background-image', '');
-                } else {
-                    this.setCurrentLanguageMessage('');
-                }
+		if (language.length) {
+		    this.setSubtitlesDisplay(this.model.get('show_subtitles_default'));
+		    this.setTranscriptDisplay(this.model.get('show_transcript_default'));
+                    this.scrollTranscriptToCurrentTime();
+                    var subtitleSets = this.model.subtitles.where({'language': language});
+                    if (subtitleSets.length) {
+			var languageCode = subtitleSets[0].get('language');
+			var languageName = this.getLanguageNameForCode(languageCode);
+			_$('ul.amara-languages-list a').removeClass('currently-selected');
+			this.$amaraLanguagesList.find("[data-language='" + language + "']").addClass('currently-selected');
+			this.$amaraCurrentLang.text(languageName);
+			_$('#amara-download-subtitles').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
+			_$('ul.amara-languages-list li').removeClass('currently-selected-item');
+			_$('.currently-selected').parent().addClass('currently-selected-item');
+                    } else {
+			this.setCurrentLanguageMessage('No Subtiles');
+                    }
+		} else
+		    this.setCurrentLanguageMessage('No Subtiles');
+                // Show the expander triangle
+                this.$amaraCurrentLang.css('background-image', '');
             },
             fetchSubtitles: function(language, callback) {
                 // Make a call to the Amara API and retrieve a set of subtitles for a specific
@@ -698,10 +707,6 @@
                     this.$amaraContextMenu.remove();
 
                 }
-            },
-            languageButtonClicked: function() {
-                this.$amaraLanguagesList.toggle();
-                return false;
             },
             linkToTranscriptLine: function(line) {
                 this.hideTranscriptContextMenu();
@@ -856,10 +861,13 @@
                 return false;
             },
             toggleSubtitlesDisplay: function() {
-
-                // TODO: This button needs to be disabled unless we have subtitles to toggle.
-                this.$popSubtitlesContainer.toggle();
-                this.$subtitlesButton.toggleClass('amara-button-enabled');
+		if (this.model.get('initial_language')) {
+                    // TODO: This button needs to be disabled unless we have subtitles to toggle.
+                    this.$popSubtitlesContainer.toggle();
+                    this.$subtitlesButton.toggleClass('amara-button-enabled');
+		} else {
+                    this.$subtitlesButton.removeClass('amara-button-enabled');
+		}
                 return false;
             },
             toggleTranscriptDisplay: function() {
