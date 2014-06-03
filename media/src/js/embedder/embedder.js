@@ -358,7 +358,7 @@
                                 that.buildLanguageSelector();
                                 // update the view on amara button
                                 that.$viewOnAmaraButton.attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
-                                _$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
+                                _$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/subtitles/editor/' + that.model.get('id') + '/en/');
                                 // Make the request to fetch the initial subtitles.
                                 //
                                 // TODO: This needs to be an option.
