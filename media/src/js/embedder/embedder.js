@@ -629,6 +629,7 @@
 		    this.$amaraLanguagesList.find("[data-language='" + language + "']").addClass('currently-selected');
                     this.$amaraCurrentLang.text(languageName);
                     _$('#amara-download-subtitles').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
+                    _$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/subtitles/editor/' + this.model.get('id') + '/' + languageCode);
 		    _$('ul.amara-languages-list li').removeClass('currently-selected-item');
 		    _$('.currently-selected').parent().addClass('currently-selected-item');
                     // Show the expander triangle
