@@ -353,11 +353,9 @@ class VideoPageContext(dict):
             setup_tab_method(request, video, video_url, tab)
 
     def setup_tab_video(self, request, video, video_url, tab):
-        self['widget_params'] = _widget_params(
-            request, video, language=None,
-            video_url=video_url and video_url.effective_url,
-            size=(620,370)
-        )
+        self['width'] = "620"
+        self['height'] = "370"
+        self['video_url'] = video.get_video_url()
 
 @get_video_from_code
 def redirect_to_video(request, video):
