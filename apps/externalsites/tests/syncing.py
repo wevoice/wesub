@@ -671,7 +671,7 @@ class BrightcoveAccountSyncingTest(TestCase):
     # response to update_subtitles() and delete_subtitles()
 
     def setUp(self):
-        self.account = BrightcoveAccountFactory()
+        self.account = BrightcoveAccountFactory(team=TeamFactory())
         self.video_id = '1234'
         self.video = BrightcoveVideoFactory(brightcove_id=self.video_id,
                                             primary_audio_language_code='en')

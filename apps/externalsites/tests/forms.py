@@ -22,15 +22,16 @@ from django.test import TestCase
 import mock
 from urllib import quote_plus
 
-from externalsites.forms import BrightcoveAccountForm, AccountFormset
+from externalsites.forms import (AccountForm, BrightcoveAccountForm,
+                                 AccountFormset)
 from externalsites.models import BrightcoveAccount
 from videos.models import VideoFeed
 from utils import test_utils
-from utils import test_factories
+from utils.factories import *
 
 class TestAccountFormset(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team()
+        self.team = TeamFactory()
         self.setup_forms()
 
     def setup_forms(self):
@@ -164,9 +165,36 @@ class TestAccountFormset(TestCase):
         self.assertEquals(self.bar_form.save.call_count, 0)
         self.bar_form.delete_account.assert_called_with()
 
+class AccountFormTest(TestCase):
+    # Test the base AccountForm class.
+    class TestAccountForm(AccountForm):
+        class Meta:
+            model = BrightcoveAccount
+
+    def test_save_with_team(self):
+        team = TeamFactory()
+        form = self.TestAccountForm(team)
+        account = form.save()
+        self.assertEquals(account.team, team)
+        self.assertEquals(account.user, None)
+
+    def test_save_with_user(self):
+        user = UserFactory()
+        form = self.TestAccountForm(user)
+        account = form.save()
+        self.assertEquals(account.user, user)
+        self.assertEquals(account.team, None)
+
+    def test_delete(self):
+        team = TeamFactory()
+        account = BrightcoveAccountFactory(team=team)
+        form = self.TestAccountForm(team, instance=account)
+        form.delete_account()
+        self.assertEquals(BrightcoveAccount.objects.count(), 0)
+
 class BrightcoveFormTest(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team()
+        self.team = TeamFactory()
         self.publisher_id = '123'
         self.player_id = '456'
         self.write_token = '789'

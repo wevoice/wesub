@@ -21,27 +21,25 @@ from django.core import validators
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
+from auth.models import CustomUser as User
+from teams.models import Team
 from externalsites import models
 import videos.tasks
 
 class AccountForm(forms.ModelForm):
-    """Base class for forms on the teams tab.
-
-    We show multiples forms on that tab.  This class helps provide a generic
-    interface so that the view code doesn't need to special case each form
-    """
+    """Base class for forms on the teams or user profile tab."""
 
     enabled = forms.BooleanField(required=False)
 
-    def __init__(self, team, data=None, **kwargs):
-        self.team = team
+    def __init__(self, owner, data=None, **kwargs):
+        self.owner = owner
         forms.ModelForm.__init__(self, data, **kwargs)
 
     @classmethod
-    def get_account(cls, team):
+    def get_account(cls, owner):
         ModelClass = cls._meta.model
         try:
-            return ModelClass.objects.filter(team=team).get()
+            return ModelClass.objects.get_for_owner(owner)
         except ModelClass.DoesNotExist:
             return None
 
@@ -51,7 +49,14 @@ class AccountForm(forms.ModelForm):
 
     def save(self):
         account = forms.ModelForm.save(self, commit=False)
-        account.team = self.team
+        if isinstance(self.owner, Team):
+            account.type = models.ExternalAccount.TYPE_TEAM
+            account.owner_id = self.owner.id
+        elif isinstance(self.owner, User):
+            account.type = models.ExternalAccount.TYPE_USER
+            account.owner_id = self.owner.id
+        else:
+            raise TypeError("Invalid owner type: %s" % self.owner)
         account.save()
         return account
 
@@ -158,10 +163,10 @@ class AccountFormset(object):
         'kaltura': KalturaAccountForm,
         'brightcove': BrightcoveAccountForm,
     }
-    def __init__(self, team, data=None):
+    def __init__(self, owner, data=None):
         self.is_bound = data is not None
         existing_accounts = dict(
-            (name, form_class.get_account(team))
+            (name, form_class.get_account(owner))
             for (name, form_class) in self.form_classes.items())
 
         enabled_accounts = self.make_enabled_accounts(existing_accounts, data)
@@ -179,7 +184,7 @@ class AccountFormset(object):
                 form_data = data
             else:
                 form_data = None
-            self.forms[name] = form_class(team, form_data,
+            self.forms[name] = form_class(owner, form_data,
                                           instance=existing_accounts[name],
                                           prefix=name)
 

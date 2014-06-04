@@ -20,15 +20,42 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 
-from externalsites.models import BrightcoveAccount
+from externalsites.models import BrightcoveAccount, lookup_accounts
 from videos.models import VideoFeed
-from utils import test_factories
+from utils.factories import *
+
+class LookupAccountTest(TestCase):
+    def test_team_account(self):
+        video = BrightcoveVideoFactory()
+        team_video = TeamVideoFactory(video=video)
+        account = BrightcoveAccountFactory(team=team_video.team)
+
+        self.assertEquals(lookup_accounts(video), [
+            (account, video.get_primary_videourl_obj())
+        ])
+
+    def test_user_account(self):
+        user = UserFactory()
+        video = BrightcoveVideoFactory(user=user)
+        account = BrightcoveAccountFactory(user=user)
+
+        self.assertEquals(lookup_accounts(video), [
+            (account, video.get_primary_videourl_obj())
+        ])
+
+    def test_user_account_ignored_for_team_videos(self):
+        user = UserFactory()
+        video = BrightcoveVideoFactory(user=user)
+        account = BrightcoveAccountFactory(user=user)
+        team_video = TeamVideoFactory(video=video)
+
+        self.assertEquals(lookup_accounts(video), [])
 
 class BrightcoveAccountTest(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team()
-        self.account = BrightcoveAccount.objects.create(
-            team=self.team, publisher_id='123', write_token='789')
+        self.team = TeamFactory()
+        self.account = BrightcoveAccountFactory.create(team=self.team,
+                                                       publisher_id='123')
         self.player_id = '456'
 
     def check_feed(self, feed_url):

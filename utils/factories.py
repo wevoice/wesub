@@ -72,6 +72,7 @@ class BrightcoveVideoFactory(VideoFactory):
     # generate a video with a brightcove-style URL
     FACTORY_HIDDEN_ARGS = ('brightcove_id', 'player_id')
 
+    brightcove_id = 'abc'
     player_id = '1234'
     video_url__type = 'C'
 
@@ -230,7 +231,6 @@ class OldSubtitleVersionFactory(DjangoModelFactory):
 class BrightcoveAccountFactory(DjangoModelFactory):
     FACTORY_FOR = externalsites.models.BrightcoveAccount
 
-    team = factory.SubFactory(TeamFactory)
     publisher_id = 'publisher'
     write_token = 'write-token'
 

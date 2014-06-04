@@ -28,6 +28,7 @@ import babelsubs
 # or else things blow up
 import haystack
 
+from auth.models import CustomUser as User
 from externalsites import syncing
 from externalsites.exceptions import SyncingError
 from subtitles.models import SubtitleLanguage, SubtitleVersion
@@ -39,11 +40,56 @@ def now():
     # define now as a function so it can be patched in the unittests
     return datetime.datetime.now()
 
+class ExternalAccountManager(models.Manager):
+    def create(self, team=None, user=None, **kwargs):
+        if team is not None and user is not None:
+            raise ValueError("team and user can't both be specified")
+        if team is not None:
+            kwargs['type'] = ExternalAccount.TYPE_TEAM
+            kwargs['owner_id'] = team.id
+        elif user is not None:
+            kwargs['type'] = ExternalAccount.TYPE_USER
+            kwargs['owner_id'] = user.id
+
+        return super(ExternalAccountManager, self).create(**kwargs)
+
+    def get_for_owner(self, owner):
+        if isinstance(owner, Team):
+            return self.get(type=ExternalAccount.TYPE_TEAM, owner_id=owner.id)
+        elif isinstance(owner, User):
+            return self.get(type=ExternalAccount.TYPE_USER, owner_id=owner.id)
+        else:
+            raise TypeError("Invalid owner type: %r" % owner)
+
 class ExternalAccount(models.Model):
     account_type = NotImplemented
     video_url_type = NotImplemented
 
-    team = models.OneToOneField(Team, unique=True)
+    TYPE_USER = 'U'
+    TYPE_TEAM = 'T'
+    TYPE_CHOICES = (
+        (TYPE_USER, _('User')),
+        (TYPE_TEAM, _('Team')),
+    )
+
+    type = models.CharField(max_length=1,choices=TYPE_CHOICES)
+    owner_id = models.IntegerField()
+
+    objects = ExternalAccountManager()
+
+    @property
+    def team(self):
+        if self.type == ExternalAccount.TYPE_TEAM:
+            return Team.objects.get(id=self.owner_id)
+        else:
+            return None
+
+    @property
+    def user(self):
+        if self.type == ExternalAccount.TYPE_USER:
+            return User.objects.get(id=self.owner_id)
+        else:
+            return None
 
     def is_for_video_url(self, video_url):
         return video_url.type == self.video_url_type
@@ -111,6 +157,9 @@ class ExternalAccount(models.Model):
 
     class Meta:
         abstract = True
+        unique_together = [
+            ('type', 'owner_id')
+        ]
 
 class KalturaAccount(ExternalAccount):
     account_type = 'K'
@@ -254,12 +303,15 @@ def lookup_accounts(video):
     :returns: list of (account, video_url) tuples
     """
     team_video = video.get_team_video()
-    if team_video is None:
-        return []
-    team = team_video.team
     rv = []
     for video_url in video.get_video_urls():
-        account = get_account_for_videourl(team, video_url)
+        if team_video is not None:
+            account = get_account_for_videourl(ExternalAccount.TYPE_TEAM,
+                                               team_video.team_id, video_url)
+        else:
+            account = get_account_for_videourl(ExternalAccount.TYPE_USER,
+                                               video.user_id, video_url)
+
         if account is not None:
             rv.append((account, video_url))
     return rv
@@ -267,12 +319,12 @@ def lookup_accounts(video):
 def can_sync_videourl(video_url):
     return video_url.type in _video_type_to_account_model
 
-def get_account_for_videourl(team, video_url):
+def get_account_for_videourl(type_, owner_id, video_url):
     AccountModel = _video_type_to_account_model.get(video_url.type)
     if AccountModel is None:
         return None
     try:
-        return AccountModel.objects.get(team=team)
+        return AccountModel.objects.get(type=type_, owner_id=owner_id)
     except AccountModel.DoesNotExist:
         return None
 
