@@ -1,8 +1,8 @@
 {% load widget i18n subtitles_tags teams_tags videos_tags %}
-<div class="tab" id="video-tab">
+<div class="tab" id="video-tab"> 
   <div class="amara-embed" data-height="{{ height }}px" data-width="{{ width }}px" data-url="{{ video_url }}">
   </div>
-  <script type="text/javascript" src='http://localhost:8000/embedder-iframe'>
+  <script type="text/javascript" src='{% url embedder_iframe %}'>
   </script>
     <div id="metadata" {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %}>
         {% for field in metadata %}
