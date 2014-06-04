@@ -147,6 +147,9 @@
             url: '',
             show_logo: true,
             show_order_subtitles: true,
+            show_improve_subtitles: true,
+            show_download_subtitles: true,
+            show_embed_code: true,
             show_subtitles_default: false,
             show_transcript_default: false,
             width: '',
@@ -419,7 +422,11 @@
                 this.$amaraLanguagesList.append(this.templateVideo({
                         video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
 		}));
-                this.$amaraLanguagesList.append('            <li role="presentation" class="divider"></li>');
+		if (this.model.get('show_order_subtitles') ||
+		    this.model.get('show_download_subtitles') ||
+		    this.model.get('show_improve_subtitles') ||
+		    this.model.get('show_embed_code'))
+                    this.$amaraLanguagesList.append('            <li role="presentation" class="divider"></li>');
 		// TODO: This wont work if we have several widgets in one page
                 this.$amaraLanguagesList.append('            <li role="presentation"><div><ul id="language-list-inside"></ul></div></li>');
                 
@@ -990,9 +997,9 @@
             },
 	    templateVideoHTML: function() {
                 return '' +
-                '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="Improve these subtitles on amara.org">Improve these Subtitles</a></li>' +
-                '<li role="presentation" class="unisubs-embed-link"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embed code">Get Embed Code</a></li>' +
-                '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>' +
+                (this.model.get('show_improve_subtitles') ? '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="Improve these subtitles on amara.org">Improve these Subtitles</a></li>' : '') +
+                (this.model.get('show_embed_code') ? '<li role="presentation" class="unisubs-embed-link"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embed code">Get Embed Code</a></li>' : '') +
+                (this.model.get('show_download_subtitles') ? '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>' : '') +
 		(this.model.get('show_order_subtitles') ? '<li role="presentation" class="unisubs-order-subtitles"><a role="menuitem" tabindex="-1" href="http://about.amara.org/order-subtitles/" target="blank" title="Order Captions or Subtitles">Order Captions or Subtitles</a></li>' : '');
 	    },
 	    templateHTML: function() {
@@ -1046,7 +1053,6 @@
                 '&lt;div class="amara-embed" data-height="480px" data-width="854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
                 '                        </pre>' +
                 '                        <ul>' +
-                '                            <li>Hide Amara logo: <code>data-hide-logo="true"</code>.</li>' +
                 '                            <li>Hide order subtitles menu item: <code>data-hide-order="true"</code>.</li>' +
                 '                            <li>Set initial active subtitle language: <code>data-initial-language="en"</code>.</li>' +
                 '                            <li>Display subtitles by default: <code>data-show-subtitles-default="true"</code>.</li>' +
@@ -1129,6 +1135,9 @@
                         'url': $div.data('url'),
                         'show_logo': $div.data('hide-logo') ? false : true,
                         'show_order_subtitles': $div.data('hide-order') ? false : true,
+                        'show_improve_subtitles': $div.data('hide-improve') ? false : true,
+                        'show_download_subtitles': $div.data('hide-download') ? false : true,
+                        'show_embed_code': $div.data('hide-embed') ? false : true,
 			'show_subtitles_default': $div.data('show-subtitles-default'),
 			'show_transcript_default': $div.data('show-transcript-default'),
                     }]);
