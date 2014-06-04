@@ -357,7 +357,7 @@
                                 that.buildLanguageSelector();
                                 // update the view on amara button
                                 that.$viewOnAmaraButton.attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
-                                _$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
+                                _$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/subtitles/editor/' + that.model.get('id') + '/en/');
                                 // Make the request to fetch the initial subtitles.
                                 // TODO: This needs to be an option.
                                 that.loadSubtitles(that.model.get('initial_language'));
@@ -636,6 +636,7 @@
 			this.$amaraLanguagesList.find("[data-language='" + language + "']").addClass('currently-selected');
 			this.$amaraCurrentLang.text(languageName);
 			_$('#amara-download-subtitles').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
+			_$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/subtitles/editor/' + this.model.get('id') + '/' + languageCode);
 			_$('ul.amara-languages-list li').removeClass('currently-selected-item');
 			_$('.currently-selected').parent().addClass('currently-selected-item');
                     } else {
@@ -1001,7 +1002,7 @@
                 '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="Improve these subtitles on amara.org">Improve these Subtitles</a></li>' +
                 '<li role="presentation" class="unisubs-embed-link"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embed code">Get Embed Code</a></li>' +
                 '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>' +
-		(this.model.get('show_order_subtitles') ? '<li role="presentation" class="unisubs-order-subtitles"><a role="menuitem" tabindex="-1" href="http://about.amara.org/order-subtitles/" target="blank" title="Order Captions or Subtitles">Order Captions or Subtitles</a></li>' : '');
+		(this.model.get('show_order_subtitles') ? '<li role="presentation" class="unisubs-order-subtitles"><a role="menuitem" tabindex="-1" href="http://pro.amara.org/ondemand" target="blank" title="Order Captions or Subtitles">Order Captions or Subtitles</a></li>' : '');
 	    },
 	    templateHTML: function() {
 		return '' +
