@@ -9,7 +9,9 @@
 
 {% block scripts %}
 {% include_bundle "unisubs-onsite-compiled" %}
-<script src="{% url videos:rpc_api %}" type="text/javascript"></script>  
+<script src="{% url videos:rpc_api %}" type="text/javascript"></script>
+<script src="{% url embedder_iframe %}" type="text/javascript"></script>
+</script>
 {% endblock %}
 
 {% block amara-pro %} 
@@ -81,21 +83,8 @@
 </div>
 
 <div id="home-right">
-    {% block widget_container %}
-        <div id="widget_div" class="unisubs-widget"></div> 
-        <script type="text/javascript"> 
-            var widget_widget_div = unisubs.widget.SameDomainEmbed.embed(
-                document.getElementById('widget_div'), { 
-                    base_state: {},
-                    video_config: {
-                    poster: "https://s3.amazonaws.com/s3.www.universalsubtitles.org/images/about-poster.png",
-                    style: "width:460px;height:348px;",
-                    play_to_click: true
-                },
-                video_url: "http://vimeo.com/39734142",
-                alternate_video_urls: []});
-        </script>
-    {% endblock %}
+  <div class="amara-embed" data-height="348px" data-width="460px" data-url="http://vimeo.com/39734142">
+  </div>
 </div>
 <div class="clearfix"></div>
 <div id="benefits" class="clearfix">
