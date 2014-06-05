@@ -3032,7 +3032,8 @@ def get_minutes_for_version(version, round_up_to_integer):
     return minutes
 
 class BillingRecord(models.Model):
-    video = models.ForeignKey(Video)
+    # The billing record should still exist if the video is deleted
+    video = models.ForeignKey(Video, blank=True, null=True, on_delete=models.SET_NULL)
 
     subtitle_version = models.ForeignKey(SubtitleVersion, null=True,
             blank=True)
