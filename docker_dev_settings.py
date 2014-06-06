@@ -27,6 +27,7 @@ DEBUG = True
 EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 SITE_ID = 1
 SITE_NAME = 'unisubs-dev'
+DEFAULT_PROTOCOL = 'http'
 SECRET_KEY = 'a9yr_yzp2vmj-2q1zq)d2+b^w(7fqu2o&jh18u9dozjbd@-$0!'
 STATIC_URL_BASE = STATIC_URL = "http://unisubs.example.com:8000/site_media/"
 MEDIA_URL = "http://unisubs.example.com:8000/user-data/"
@@ -46,6 +47,8 @@ VIMEO_API_SECRET = 'bdaeb531298eeee1'
 
 FACEBOOK_APP_KEY = FACEBOOK_APP_ID = '255603057797860'
 FACEBOOK_SECRET_KEY = '2a18604dac1ad7e9817f80f3aa3a69f2'
+
+YOUTUBE_CLIENT_FORCE_HTTPS = False
 
 def get_host_address():
     """Get the address of the host machine."""
@@ -138,3 +141,8 @@ LOGGING = {
         },
     },
 }
+
+try:
+    from docker_dev_settings_local import *
+except ImportError:
+    pass
