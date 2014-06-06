@@ -23,7 +23,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 
-from externalsites.models import get_account_for_videourl
+from externalsites.models import lookup_account
 from videos.models import VideoUrl
 from teams.views import settings_page
 from externalsites import forms
@@ -71,11 +71,7 @@ def resync(request, video_url_id, language_code):
 
     if request.method == 'POST':
         logger.info("resyncing subtitles: %s (%s)", video, video_url)
-        team_video = video.get_team_video()
-        if team_video is not None:
-            _resync_video(team_video.team, video_url, language)
-        else:
-            logger.warning("resyncing subtitles: not a team video")
+        _resync_video(video, video_url, language)
 
     redirect_url = reverse('videos:translation_history', kwargs={
         'video_id': video.video_id,
@@ -84,8 +80,8 @@ def resync(request, video_url_id, language_code):
     })
     return HttpResponseRedirect(redirect_url + '?tab=sync-history')
 
-def _resync_video(team, video_url, language):
-    account = get_account_for_videourl(team, video_url)
+def _resync_video(video, video_url, language):
+    account = lookup_account(video, video_url)
     if account is None:
         return
     tip = language.get_public_tip()

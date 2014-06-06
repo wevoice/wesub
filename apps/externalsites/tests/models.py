@@ -25,23 +25,25 @@ from videos.models import VideoFeed
 from utils.factories import *
 
 class LookupAccountTest(TestCase):
+    def check_lookup_accounts(self, video, account):
+        self.assertEquals(lookup_accounts(video), [
+            (account, video.get_primary_videourl_obj())
+        ])
+
+    def check_lookup_accounts_returns_nothing(self, video):
+        self.assertEquals(lookup_accounts(video), [])
+
     def test_team_account(self):
         video = BrightcoveVideoFactory()
         team_video = TeamVideoFactory(video=video)
         account = BrightcoveAccountFactory(team=team_video.team)
-
-        self.assertEquals(lookup_accounts(video), [
-            (account, video.get_primary_videourl_obj())
-        ])
+        self.check_lookup_accounts(video, account)
 
     def test_user_account(self):
         user = UserFactory()
         video = BrightcoveVideoFactory(user=user)
         account = BrightcoveAccountFactory(user=user)
-
-        self.assertEquals(lookup_accounts(video), [
-            (account, video.get_primary_videourl_obj())
-        ])
+        self.check_lookup_accounts(video, account)
 
     def test_user_account_ignored_for_team_videos(self):
         user = UserFactory()
@@ -49,7 +51,25 @@ class LookupAccountTest(TestCase):
         account = BrightcoveAccountFactory(user=user)
         team_video = TeamVideoFactory(video=video)
 
-        self.assertEquals(lookup_accounts(video), [])
+        self.check_lookup_accounts_returns_nothing(video)
+
+    def test_youtube(self):
+        team = TeamFactory()
+        account1 = YouTubeAccountFactory(username='user1', team=team)
+        account2 = YouTubeAccountFactory(username='user2', team=team)
+        video1 = YouTubeVideoFactory(video_url__owner_username='user1')
+        video2 = YouTubeVideoFactory(video_url__owner_username='user2')
+        # video for a user that we don't have an account for
+        video3 = YouTubeVideoFactory(video_url__owner_username='user3')
+        # video without a username set
+        video4 = YouTubeVideoFactory(video_url__owner_username='')
+        for video in (video1, video2, video3):
+            TeamVideoFactory(video=video, team=team)
+
+        self.check_lookup_accounts(video1, account1)
+        self.check_lookup_accounts(video2, account2)
+        self.check_lookup_accounts_returns_nothing(video3)
+        self.check_lookup_accounts_returns_nothing(video4)
 
 class BrightcoveAccountTest(TestCase):
     def setUp(self):

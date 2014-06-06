@@ -61,6 +61,25 @@ class ExternalAccountManager(models.Manager):
         else:
             raise TypeError("Invalid owner type: %r" % owner)
 
+    def for_video_url(self, video_url):
+        """Filter accounts by a VideoUrl
+
+        By default this is a no-op, but subclasses like YouTubeAccount
+        override it.
+        """
+        return self
+
+    def lookup(self, video, video_url):
+        qs = self.for_video_url(video_url)
+
+        team_video = video.get_team_video()
+        if team_video is not None:
+            return qs.get(type=ExternalAccount.TYPE_TEAM,
+                          owner_id=team_video.team_id)
+        else:
+            return qs.get(type=ExternalAccount.TYPE_USER,
+                          owner_id=video.user_id)
+
 class ExternalAccount(models.Model):
     account_type = NotImplemented
     video_url_type = NotImplemented
@@ -275,9 +294,41 @@ class BrightcoveAccount(ExternalAccount):
             tags = tuple(path_parts[i+1:])
         return player_id, tags
 
+
+class YouTubeAccountManager(ExternalAccountManager):
+    def for_video_url(self, video_url):
+        if video_url.owner_username:
+            return self.filter(username=video_url.owner_username)
+        else:
+            return self.none()
+
+class YouTubeAccount(ExternalAccount):
+    """YouTube account to sync to.
+
+    Note that we can have multiple youtube accounts for a user/team.  We use
+    the username attribute to lookup a specific account for a video.
+    """
+    account_type = 'Y'
+    video_url_type = videos.models.VIDEO_TYPE_YOUTUBE
+
+    username = models.CharField(max_length=255, db_index=True,
+                                null=False, blank=False)
+    oauth_access_token = models.CharField(max_length=255, db_index=True,
+                                          null=False, blank=False)
+    oauth_refresh_token = models.CharField(max_length=255, db_index=True,
+                                           null=False, blank=False)
+
+    objects = YouTubeAccountManager()
+
+    class Meta:
+        unique_together = [
+            ('type', 'owner_id', 'username'),
+        ]
+
 account_models = [
     KalturaAccount,
     BrightcoveAccount,
+    YouTubeAccount,
 ]
 _account_type_to_model = dict(
     (model.account_type, model) for model in account_models
@@ -305,28 +356,23 @@ def lookup_accounts(video):
     team_video = video.get_team_video()
     rv = []
     for video_url in video.get_video_urls():
-        if team_video is not None:
-            account = get_account_for_videourl(ExternalAccount.TYPE_TEAM,
-                                               team_video.team_id, video_url)
-        else:
-            account = get_account_for_videourl(ExternalAccount.TYPE_USER,
-                                               video.user_id, video_url)
-
+        account = lookup_account(video, video_url)
         if account is not None:
             rv.append((account, video_url))
     return rv
 
-def can_sync_videourl(video_url):
-    return video_url.type in _video_type_to_account_model
-
-def get_account_for_videourl(type_, owner_id, video_url):
+def lookup_account(video, video_url):
     AccountModel = _video_type_to_account_model.get(video_url.type)
     if AccountModel is None:
         return None
     try:
-        return AccountModel.objects.get(type=type_, owner_id=owner_id)
+        return AccountModel.objects.lookup(video, video_url)
     except AccountModel.DoesNotExist:
         return None
+
+def can_sync_videourl(video_url):
+    return video_url.type in _video_type_to_account_model
+
 
 class SyncedSubtitleVersionManager(models.Manager):
     def set_synced_version(self, account, video_url, language, version):

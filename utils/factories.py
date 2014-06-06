@@ -81,6 +81,9 @@ class BrightcoveVideoFactory(VideoFactory):
         return 'http://bcove.me/services/link/bcpid%s/bctid%s' % (
             self.player_id, self.brightcove_id)
 
+class YouTubeVideoFactory(VideoFactory):
+    video_url__type = 'Y'
+
 class UserFactory(DjangoModelFactory):
     FACTORY_FOR = auth.models.CustomUser
 
@@ -233,6 +236,13 @@ class BrightcoveAccountFactory(DjangoModelFactory):
 
     publisher_id = 'publisher'
     write_token = 'write-token'
+
+class YouTubeAccountFactory(DjangoModelFactory):
+    FACTORY_FOR = externalsites.models.YouTubeAccount
+
+    username = 'youtubeuser'
+    oauth_access_token = 'access-token'
+    oauth_refresh_token = 'refresh-token'
 
 def bulk_subs(sub_data):
     """Create a bunch of videos/languages/versions
