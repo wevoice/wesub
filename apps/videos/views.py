@@ -353,11 +353,9 @@ class VideoPageContext(dict):
             setup_tab_method(request, video, video_url, tab)
 
     def setup_tab_video(self, request, video, video_url, tab):
-        self['widget_params'] = _widget_params(
-            request, video, language=None,
-            video_url=video_url and video_url.effective_url,
-            size=(620,370)
-        )
+        self['width'] = "620"
+        self['height'] = "370"
+        self['video_url'] = video.get_video_url()
 
 @get_video_from_code
 def redirect_to_video(request, video):
@@ -589,9 +587,10 @@ class LanguagePageContext(dict):
         self['page_title'] = self.page_title(language)
         self['edit_url'] = language.get_widget_url()
         self['shows_widget_sharing'] = video.can_user_see(request.user)
-        self['widget_params'] = _widget_params(request, video, version_no=None,
-                                                  language=language,
-                                                  size=(289, 173))
+        self['width'] = "289"
+        self['height'] = "173"
+        self['video_url'] = video.get_video_url()
+        self['language'] = language
         _add_share_panel_context_for_history(self, video, language)
         if video.get_team_video() is not None:
             self['team'] = video.get_team_video().team
