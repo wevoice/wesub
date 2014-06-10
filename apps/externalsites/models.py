@@ -21,7 +21,7 @@ from urllib import quote_plus
 import urlparse
 
 from django.db import models
-from django.db.models import  query
+from django.db.models import query
 from django.utils.translation import ugettext_lazy as _
 import babelsubs
 # because of our insane circular imports we need to import haystack right here
@@ -53,13 +53,14 @@ class ExternalAccountManager(models.Manager):
 
         return super(ExternalAccountManager, self).create(**kwargs)
 
-    def get_for_owner(self, owner):
+    def for_owner(self, owner):
         if isinstance(owner, Team):
-            return self.get(type=ExternalAccount.TYPE_TEAM, owner_id=owner.id)
+            type_ = ExternalAccount.TYPE_TEAM
         elif isinstance(owner, User):
-            return self.get(type=ExternalAccount.TYPE_USER, owner_id=owner.id)
+            type_ = ExternalAccount.TYPE_USER
         else:
             raise TypeError("Invalid owner type: %r" % owner)
+        return self.filter(type=type_, owner_id=owner.id)
 
     def for_video_url(self, video_url):
         """Filter accounts by a VideoUrl
@@ -311,18 +312,16 @@ class YouTubeAccount(ExternalAccount):
     account_type = 'Y'
     video_url_type = videos.models.VIDEO_TYPE_YOUTUBE
 
-    username = models.CharField(max_length=255, db_index=True,
-                                null=False, blank=False)
-    oauth_access_token = models.CharField(max_length=255, db_index=True,
-                                          null=False, blank=False)
-    oauth_refresh_token = models.CharField(max_length=255, db_index=True,
-                                           null=False, blank=False)
+    channel_id = models.CharField(max_length=255, db_index=True)
+    username = models.CharField(max_length=255)
+    oauth_access_token = models.CharField(max_length=255)
+    oauth_refresh_token = models.CharField(max_length=255)
 
     objects = YouTubeAccountManager()
 
     class Meta:
         unique_together = [
-            ('type', 'owner_id', 'username'),
+            ('type', 'owner_id', 'channel_id'),
         ]
 
 account_models = [

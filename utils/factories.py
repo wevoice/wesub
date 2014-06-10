@@ -240,7 +240,8 @@ class BrightcoveAccountFactory(DjangoModelFactory):
 class YouTubeAccountFactory(DjangoModelFactory):
     FACTORY_FOR = externalsites.models.YouTubeAccount
 
-    username = 'youtubeuser'
+    username = factory.Sequence(lambda n: 'youtube-user-%s' % n)
+    channel_id = factory.Sequence(lambda n: 'channel-id-%s' % n)
     oauth_access_token = 'access-token'
     oauth_refresh_token = 'refresh-token'
 

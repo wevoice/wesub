@@ -39,7 +39,7 @@ class AccountForm(forms.ModelForm):
     def get_account(cls, owner):
         ModelClass = cls._meta.model
         try:
-            return ModelClass.objects.get_for_owner(owner)
+            return ModelClass.objects.for_owner(owner).get()
         except ModelClass.DoesNotExist:
             return None
 

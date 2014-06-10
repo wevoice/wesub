@@ -18,15 +18,19 @@
 
 import logging
 
+from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
-from externalsites.models import lookup_account
-from videos.models import VideoUrl
-from teams.views import settings_page
 from externalsites import forms
+from externalsites.models import lookup_account, YouTubeAccount
+from localeurl.utils import universal_url
+from teams.models import Team
+from teams.views import settings_page
+from utils import youtube
+from videos.models import VideoUrl
 
 logger = logging.getLogger('amara.externalsites.views')
 
@@ -56,12 +60,65 @@ def team_settings_tab(request, team):
 
     if formset.is_valid():
         formset.save()
-        return redirect('teams:settings_externalsites', slug=team.slug)
+        return redirect(settings_page_redirect_url(team, request.POST))
 
     return render(request, 'externalsites/team-settings-tab.html', {
         'team': team,
         'forms': formset,
+        'youtube_accounts': YouTubeAccount.objects.for_owner(team),
     })
+
+def settings_page_redirect_url(team, data):
+    if 'add-youtube-account' in data:
+        return '%s?team_slug=%s' % (
+            reverse('externalsites:youtube-add-account'), team.slug)
+    else:
+        return reverse('teams:settings_externalsites', kwargs={
+            'slug': team.slug,
+        })
+
+def youtube_callback_url():
+    return universal_url('externalsites:youtube-callback')
+
+def youtube_add_account(request):
+    if 'team_slug' in request.GET:
+        state = {'team_slug': request.GET['team_slug']}
+    else:
+        logging.error("youtube_add_account: Unknown owner")
+        raise Http404()
+    return redirect(youtube.request_token_url(youtube_callback_url(), state))
+
+def youtube_callback(request):
+    try:
+        auth_info = youtube.handle_callback(request, youtube_callback_url())
+    except youtube.APIError, e:
+        logging.error("youtube_callback_team: %s" % e)
+        messages.error(request, e.message)
+        # there's no good place to redirect the user to since we don't know
+        # what team/user they were trying to add the account for.  I guess the
+        # homepage is as good as any.
+        return redirect('videos.views.index')
+
+    account_data = {
+        'username': auth_info.username,
+        'channel_id': auth_info.channel_id,
+        'oauth_access_token': auth_info.access_token,
+        'oauth_refresh_token': auth_info.refresh_token,
+    }
+    if 'team_slug' in auth_info.state:
+        team = get_object_or_404(Team, slug=auth_info.state['team_slug'])
+        account_data['team'] = team
+        redirect_url = reverse('teams:settings_externalsites', kwargs={
+            'slug': team.slug,
+        })
+    else:
+        logger.error("youtube_callback: invalid state data: %s" %
+                     auth_info.state)
+        messages.error(request, _("Error in auth callback"))
+        return redirect('videos.views.index')
+
+    YouTubeAccount.objects.create(**account_data)
+    return redirect(redirect_url)
 
 @staff_member_required
 def resync(request, video_url_id, language_code):

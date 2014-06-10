@@ -2445,6 +2445,10 @@ a.truncated-expand {
             padding-right: 8px;
         }
 
+        p.no-accounts {
+            font-style: italic;
+        }
+
         &.disabled div.account-fields {
             display: none;
         }

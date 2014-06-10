@@ -853,6 +853,7 @@ MEDIA_BUNDLES = {
 }
 
 
+YOUTUBE_CLIENT_FORCE_HTTPS = True
 EMAIL_BACKEND = "utils.safemail.InternalOnlyBackend"
 EMAIL_FILE_PATH = '/tmp/unisubs-messages'
 # on staging and dev only the emails listed bellow will receive actual mail
