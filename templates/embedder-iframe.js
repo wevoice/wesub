@@ -34,10 +34,9 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	    if (e.data.videoReady)
                 updateLoading(e.data.index);
 	};
-	this.initIframes = function() {
-	    var elements = document.getElementsByClassName("amara-embed");
+
+	this.initIframes = function(elements) {
 	    var parser = document.createElement('a');
-	    window.addEventListener('message', this.resizeReceiver, false);
 	    parser.href = THIS_JS_FILE;
 	    iframeDomain = "http://" + parser.host;
 	    for (var i = 0 ; i < elements.length ; i++) {
@@ -72,16 +71,14 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	    }
 	};
 	this.initResize = function() {
-	    var controller = this;
-	    var newIndex = 0;
-	    iframes.forEach(function(iframe, index) {
+            var controller = this;
+            iframes.forEach(function(iframe, index) {
 		timers.push(window.setInterval(function() {
-		    controller.postToIframe(iframe, index);
+                    controller.postToIframe(iframe, index);
 		}
-					       ,100));
-	    });
-	};
-
+                                               ,100));
+            });
+        };
 	this.postToIframe = function(iframe, index) {
 	    if (iframe.contentWindow) {
 		iframe.contentWindow.postMessage({fromIframeController: true, index: index}, iframeDomain);
@@ -92,8 +89,22 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 
     var initIframeController = function() {
 	var controller = new window.AmaraIframeController();
-	controller.initIframes();
+	window.addEventListener('message', controller.resizeReceiver, false);
+	controller.initIframes(document.getElementsByClassName("amara-embed"));
 	controller.initResize();
+	document.addEventListener("DOMNodeInserted", function(event) {
+	    var elements = document.getElementsByClassName("amara-embed");
+	    var emptyElements = [];
+	    for (var i = 0 ; i < elements.length ; i++) {
+		if (elements[i].childNodes.length == 0 || ((elements[i].childNodes.length == 1) && (elements[i].childNodes[0].nodeType == 3)))
+		    emptyElements.push(elements[i]);
+	    }
+	    if (emptyElements.length > 0)
+		controller.initIframes(emptyElements);
+	    controller.initResize();
+
+	});
+
     };
     window.initIframeController = initIframeController;
 
