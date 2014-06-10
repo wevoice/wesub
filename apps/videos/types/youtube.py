@@ -38,11 +38,12 @@ from base import VideoType, VideoTypeError
 from utils.translation import SUPPORTED_LANGUAGE_CODES
 from utils.metrics import Meter, Occurrence
 from utils.subtitles import load_subtitles
+from utils import youtube
 
 from unilangs import LanguageCode
 
 
-logger = logging.getLogger("youtube")
+logger = logging.getLogger("videos.types.youtube")
 
 YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
 YOUTUBE_ALWAYS_PUSH_USERNAME = getattr(settings,
@@ -342,12 +343,6 @@ class YoutubeVideoType(VideoType):
     def __init__(self, url):
         self.url = url
         self.videoid = self._get_video_id(self.url)
-        self.entry = self._get_entry(self.video_id)
-
-        # we can't rely on author.name as that might not be unique
-        # and it also won't match what the 3rd party account has
-        username_url = self.entry.author[0].uri.text
-        self.username = username_url[username_url.rfind("/")+ 1:]
 
     @property
     def video_id(self):
@@ -372,37 +367,28 @@ class YoutubeVideoType(VideoType):
         hostname = urlparse(url).netloc
         return  hostname in YoutubeVideoType.HOSTNAMES and  cls._get_video_id(url)
 
-    def set_values(self, video_obj, fetch_subs_async=True):
-        video_obj.title =  self.entry.media.title.text or ''
-        description = ''
-        if self.entry.media.description:
-            description =  self.entry.media.description.text or ''
-        video_obj.description = description
-        if self.entry.media.duration:
-            video_obj.duration = int(self.entry.media.duration.seconds)
-        if self.entry.media.thumbnail:
-            # max here will return the thumbnail with the biggest height
-            thumbnail = max([(int(t.height), t) for t in self.entry.media.thumbnail])
-            video_obj.thumbnail = thumbnail[1].url
-        video_obj.small_thumbnail = 'http://i.ytimg.com/vi/%s/default.jpg' % self.video_id
-        video_obj.save()
+    def get_video_info(self):
+        if not hasattr(self, '_video_info'):
+            self._video_info = youtube.get_video_info(self.video_id)
+        return self._video_info
 
-        Meter('youtube.video_imported').inc()
+    def set_values(self, video, fetch_subs_async=True):
+        video_info = self.get_video_info()
+        video.title = video_info.title
+        video.description = video_info.description
+        video.duration = video_info.duration
+        video.thumbnail = video_info.thumbnail_url
 
         try:
-            self.get_subtitles(video_obj, async=fetch_subs_async)
+            self.get_subtitles(video, async=fetch_subs_async)
         except :
             logger.exception("Error getting subs from youtube:" )
 
-        return video_obj
-
-    def _get_entry(self, video_id):
-        Meter('youtube.api_request').inc()
-        try:
-            return yt_service.GetYouTubeVideoEntry(video_id=str(video_id))
-        except RequestError, e:
-            err = e[0].get('body', 'Undefined error')
-            raise VideoTypeError('Youtube error: %s' % err)
+    def videourl_create_values(self):
+        video_info = self.get_video_info()
+        return {
+            'owner_username': video_info.channel_id,
+        }
 
     @classmethod
     def url_from_id(cls, video_id):
@@ -415,7 +401,7 @@ class YoutubeVideoType(VideoType):
             video_id = match and match.group('video_id')
             if bool(video_id):
                 return video_id
-        return False
+        raise ValueError("Unknown video id")
 
     @classmethod
     def _get_response_from_youtube(cls, url, return_string=False):

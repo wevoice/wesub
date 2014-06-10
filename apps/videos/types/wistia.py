@@ -66,11 +66,9 @@ class WistiaVideoType(VideoType):
             video_obj.small_thumbnail = wistia.get_small_thumbnail_url(self.url, self.shortmem) or ''
             video_obj.title = wistia.scrape_title(self.url, self.shortmem)
             video_obj.description = strip_tags(wistia.scrape_description(self.url, self.shortmem))
-            video_obj.save()
         except Exception:
             # in case the Wistia video is private.
             pass
-        return video_obj
     
     def _get_wistia_id(self, video_url):
         return wistia.WISTIA_REGEX.match(video_url).groupdict().get('video_id') 

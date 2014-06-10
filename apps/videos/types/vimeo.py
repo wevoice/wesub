@@ -70,11 +70,9 @@ class VimeoVideoType(VideoType):
                 video_obj.small_thumbnail = vimeo.get_small_thumbnail_url(self.url, self.shortmem) or ''
                 video_obj.title = vimeo.scrape_title(self.url, self.shortmem)
                 video_obj.description = strip_tags(vimeo.scrape_description(self.url, self.shortmem))
-                video_obj.save()
             except Exception:
                 # in case the Vimeo video is private.
                 pass
-        return video_obj
     
     def _get_vimeo_id(self, video_url):
         return vimeo.VIMEO_REGEX.match(video_url).groupdict().get('video_id') 

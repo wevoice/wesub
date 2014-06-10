@@ -61,7 +61,6 @@ class DailymotionVideoType(VideoType):
         video_obj.description = metadata.get('description', u'')
         video_obj.title = metadata.get('title', '')
         video_obj.thumbnail = metadata.get('thumbnail_url') or ''
-        return video_obj
 
     @classmethod
     def get_video_id(cls, video_url):

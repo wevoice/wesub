@@ -67,10 +67,6 @@ class BlipTvVideoType(VideoType):
         if 'thumbnailUrl' in json:
             video_obj.thumbnail = json['thumbnailUrl']
 
-        video_obj.save()
-
-        return video_obj
-
     def _parse_url(self):
         matches = self.pattern.match(self.url).groupdict()
         return matches['subsite'], matches['file_id']

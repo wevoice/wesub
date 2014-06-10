@@ -21,6 +21,7 @@
 from collections import namedtuple
 import logging
 import urllib
+import re
 import simplejson as json
 
 from django.conf import settings
@@ -36,6 +37,12 @@ class APIError(StandardError):
 class OAuthError(APIError):
     """Error handling YouTube's OAuth."""
     pass
+
+OAuthCallbackData = namedtuple('OAuthCallbackData', [
+    'refresh_token', 'access_token', 'channel_id', 'username', 'state'
+])
+VideoInfo = namedtuple('VideoInfo',
+                       'channel_id title description duration thumbnail_url')
 
 logger = logging.getLogger('utils.youtube')
 
@@ -68,10 +75,6 @@ def request_token_url(redirect_uri, state):
 
     return ("https://accounts.google.com/o/oauth2/auth?" + 
             urllib.urlencode(params))
-
-OAuthCallbackData = namedtuple('OAuthCallbackData', [
-    'refresh_token', 'access_token', 'channel_id', 'username', 'state'
-])
 
 def handle_callback(request, redirect_uri):
     """Handle the youtube oauth callback.
@@ -151,7 +154,11 @@ def _api_get(access_token, url_path, **params):
     :param url_path: url path relative to YOUTUBE_REQUEST_URL_BASE
     :param params: GET params to add to the URL
     """
-    headers = {'Authorization': 'Bearer %s' % access_token}
+    if access_token is not None:
+        headers = {'Authorization': 'Bearer %s' % access_token}
+    else:
+        headers = {}
+        params['key'] = settings.YOUTUBE_API_KEY
     url = YOUTUBE_REQUEST_URL_BASE + url_path
     response = requests.get(url, params=params, headers=headers)
     if response.status_code != 200:
@@ -179,3 +186,24 @@ def get_user_info(access_token):
                         mine='true')
     channel = response.json['items'][0]
     return channel['id'], channel['snippet']['title']
+
+def _parse_8601_duration(duration):
+    """Convert a duration in iso 8601 format to seconds as an integer."""
+    match = re.match(r'PT((\d+)M)?(\d+)S', duration)
+    if match is None:
+        return None
+    rv = int(match.group(3))
+    if match.group(2):
+        rv += int(match.group(2)) * 60
+    return rv
+
+def get_video_info(video_id):
+    response = _api_get(None, 'videos', part='snippet,contentDetails', id=video_id)
+    snippet = response.json['items'][0]['snippet']
+    content_details = response.json['items'][0]['contentDetails']
+
+    return VideoInfo(snippet['channelId'],
+                     snippet['title'],
+                     snippet['description'],
+                     _parse_8601_duration(content_details['duration']),
+                     snippet['thumbnails']['high']['url'])

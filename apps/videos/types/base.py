@@ -50,9 +50,12 @@ class VideoType(object):
         return {
             'allow_community_edits': True
         }
-    
-    def set_values(self, video_obj):
-        return video_obj
+
+    def set_values(self, video):
+        pass
+
+    def videourl_create_values(self):
+        return {}
     
     @classmethod
     def format_url(cls, url):

@@ -299,7 +299,7 @@ class BrightcoveAccount(ExternalAccount):
 class YouTubeAccountManager(ExternalAccountManager):
     def for_video_url(self, video_url):
         if video_url.owner_username:
-            return self.filter(username=video_url.owner_username)
+            return self.filter(channel_id=video_url.owner_username)
         else:
             return self.none()
 

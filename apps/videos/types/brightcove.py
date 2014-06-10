@@ -75,9 +75,3 @@ class BrightcoveVideoType(VideoType):
                 if bool(r.match(url)):
                     return True
         return False
-
-    def set_values(self, video_obj):
-        # FIXME:
-        # brighcove api is not available until you spend at least 499 / month. ?!
-        # maybe we can grab this over the client and send it to the backend?
-        return video_obj

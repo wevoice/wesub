@@ -523,7 +523,7 @@ class Video(models.Model):
                 kwargs = {}
                 if vt.CAN_IMPORT_SUBTITLES:
                     kwargs['fetch_subs_async'] = fetch_subs_async
-                obj = vt.set_values(obj, **kwargs)
+                vt.set_values(obj, **kwargs)
                 if obj.title:
                     obj.slug = slugify(obj.title)
                 obj.user = user
@@ -542,6 +542,7 @@ class Video(models.Model):
                 }
                 if vt.video_id:
                     defaults['videoid'] = vt.video_id
+                defaults.update(vt.videourl_create_values())
                 video_url_obj, created = VideoUrl.objects.get_or_create(url=vt.convert_to_video_url(),
                                                                         defaults=defaults)
                 try:
@@ -557,15 +558,6 @@ class Video(models.Model):
            video_url_obj.created = timestamp
            video_url_obj.save(updates_timestamp=False)
         user and user.notify_by_message and video.followers.add(user)
-        if not video_url_obj.owner_username:
-            if hasattr(vt, 'username'):
-                video_url_obj.owner_username = vt.username
-                video_url_obj.save()
-
-        if vt.abbreviation == VIDEO_TYPE_YOUTUBE:
-            # Only try to update the Youtube description once we have made sure
-            # that we have set the owner_username.
-            add_amara_description_credit_to_youtube_video.delay(video.video_id)
 
         return video, created
 
