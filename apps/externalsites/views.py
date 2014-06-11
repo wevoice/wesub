@@ -102,7 +102,6 @@ def youtube_callback(request):
     account_data = {
         'username': auth_info.username,
         'channel_id': auth_info.channel_id,
-        'oauth_access_token': auth_info.access_token,
         'oauth_refresh_token': auth_info.refresh_token,
     }
     if 'team_slug' in auth_info.state:

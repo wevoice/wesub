@@ -314,7 +314,6 @@ class YouTubeAccount(ExternalAccount):
 
     channel_id = models.CharField(max_length=255, db_index=True)
     username = models.CharField(max_length=255)
-    oauth_access_token = models.CharField(max_length=255)
     oauth_refresh_token = models.CharField(max_length=255)
 
     objects = YouTubeAccountManager()

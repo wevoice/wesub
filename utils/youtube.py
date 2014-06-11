@@ -76,6 +76,15 @@ def request_token_url(redirect_uri, state):
     return ("https://accounts.google.com/o/oauth2/auth?" + 
             urllib.urlencode(params))
 
+def _oauth_token_post(**params):
+    params["client_id"] = settings.YOUTUBE_CLIENT_ID
+    params["client_secret"] = settings.YOUTUBE_CLIENT_SECRET
+    
+    return requests.post("https://accounts.google.com/o/oauth2/token",
+                             data=params, headers={
+        "Content-Type": "application/x-www-form-urlencoded"
+    })
+
 def handle_callback(request, redirect_uri):
     """Handle the youtube oauth callback.
 
@@ -101,23 +110,13 @@ def handle_callback(request, redirect_uri):
         state = json.loads(state)
 
     # exchange the auth code for refresh/access tokens
-    params = {
-        "client_id": settings.YOUTUBE_CLIENT_ID,
-        "client_secret": settings.YOUTUBE_CLIENT_SECRET,
-        "redirect_uri": redirect_uri,
-        "code": code,
-        "grant_type": "authorization_code",
-    }
-    
-    response = requests.post("https://accounts.google.com/o/oauth2/token",
-                             data=params, headers={
-        "Content-Type": "application/x-www-form-urlencoded"
-    })
+    response = _oauth_token_post(code=code, grant_type='authorization_code',
+                                 redirect_uri=redirect_uri)
 
     if response.status_code != 200:
         logger.error("Error requesting Youtube OAuth token", extra={
                     "data": {
-                        "sent_params": params,
+                        "sent_params": response.request.params,
                         "original_request": request,
                         "response": response.content
                     },
@@ -144,6 +143,11 @@ def handle_callback(request, redirect_uri):
         user_info[1],
         state,
     )
+
+def get_new_access_token(refresh_token):
+    response = _oauth_token_post(grant_type='refresh_token',
+                                 refresh_token=refresh_token)
+    return response.json['access_token']
 
 YOUTUBE_REQUEST_URL_BASE = 'https://www.googleapis.com/youtube/v3/'
 def _api_get(access_token, url_path, **params):

@@ -15,7 +15,6 @@ class Migration(SchemaMigration):
             ('channel_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
             ('type', self.gf('django.db.models.fields.CharField')(max_length=1)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('oauth_access_token', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('owner_id', self.gf('django.db.models.fields.IntegerField')()),
         ))
         db.send_create_signal('externalsites', ['YouTubeAccount'])
@@ -137,7 +136,6 @@ class Migration(SchemaMigration):
             'Meta': {'unique_together': "[('type', 'owner_id', 'channel_id')]", 'object_name': 'YouTubeAccount'},
             'channel_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'oauth_access_token': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'oauth_refresh_token': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'owner_id': ('django.db.models.fields.IntegerField', [], {}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
