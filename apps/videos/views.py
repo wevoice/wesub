@@ -73,7 +73,7 @@ from apps.videos.search_indexes import VideoIndex
 from apps.videos.share_utils import _add_share_panel_context_for_video, _add_share_panel_context_for_history
 from apps.videos.tasks import video_changed_tasks
 from apps.widget.views import base_widget_params
-from externalsites.models import can_sync_videourl
+from externalsites.models import can_sync_videourl, SyncHistory
 from utils import send_templated_email
 from utils.basexconverter import base62
 from utils.decorators import never_in_prod
@@ -666,7 +666,9 @@ class LanguagePageContextRevisions(LanguagePageContext):
 
 class LanguagePageContextSyncHistory(LanguagePageContext):
     def setup_tab(self, request, video, language, version):
-        self['sync_history'] = language.synchistory_set.order_by('-id').all()
+        self['sync_history'] = (language.synchistory_set
+                                .select_related('version')
+                                .fetch_with_accounts())
         self['current_version'] = language.get_public_tip()
         synced_versions = []
         for video_url in video.get_video_urls():

@@ -50,7 +50,7 @@
             <td> {{ item.datetime }}</td>
             <td> {{ item.get_account }}</td>
             <td> {{ item.get_action_display }}</td>
-            <td> <a href="{{ item.version.get_absolute_url }}">{{ item.version.version_number }}</a></td>
+            <td> {{ item.version.version_number }}</td>
             <td class="last"> {{ item.get_result_display }}</td>
             <td class="last"> {{ item.details }}</td>
         </tr>

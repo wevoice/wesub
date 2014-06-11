@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import collections
 import datetime
 from urllib import quote_plus
 import urlparse
@@ -445,6 +446,30 @@ class SyncedSubtitleVersion(models.Model):
     def get_account(self):
         return get_account(self.account_type, self.account_id)
 
+class SyncHistoryQuerySet(query.QuerySet):
+    def fetch_with_accounts(self):
+        """Fetch SyncHistory objects and join them to their related accounst
+
+        This reduces the query count if you're going to call get_account() for
+        each object in the returned list.
+        """
+        results = list(self)
+        # calculate all account types and ids present in the results
+        all_accounts = collections.defaultdict(set)
+        for sh in results:
+            all_accounts[sh.account_type].add(sh.account_id)
+        # do a single lookup for each account type
+        account_map = {}
+        for account_type, account_ids in all_accounts.items():
+            AccountModel = _account_type_to_model[account_type]
+            for account in AccountModel.objects.filter(id__in=account_ids):
+                account_map[account_type, account.id] = account
+        # call cache_account for each result
+        for result in results:
+            result.cache_account(account_map[result.account_type,
+                                             result.account_id])
+        return results
+
 class SyncHistoryManager(models.Manager):
     def get_for_language(self, language):
         return self.filter(language=language).order_by('-id')
@@ -474,6 +499,9 @@ class SyncHistoryManager(models.Manager):
             kwargs['account_id'] = account.id
             kwargs['account_type'] = account.account_type
         return models.Manager.create(self, *args, **kwargs)
+
+    def get_query_set(self):
+        return SyncHistoryQuerySet(self.model)
 
 class SyncHistory(models.Model):
     """History of all subtitle sync attempts."""
@@ -517,5 +545,9 @@ class SyncHistory(models.Model):
             self.get_result_display())
 
     def get_account(self):
-        return get_account(self.account_type, self.account_id)
+        if not hasattr(self, '_account'):
+            self._account = get_account(self.account_type, self.account_id)
+        return self._account
 
+    def cache_account(self, account):
+        self._account = account
