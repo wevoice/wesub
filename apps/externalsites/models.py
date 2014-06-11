@@ -33,6 +33,7 @@ from externalsites import syncing
 from externalsites.exceptions import SyncingError
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from teams.models import Team
+from utils import youtube
 from videos.models import VideoUrl, VideoFeed
 import videos.models
 
@@ -196,7 +197,7 @@ class KalturaAccount(ExternalAccount):
         verbose_name = _('Kaltura account')
 
     def __unicode__(self):
-        return "KalturaAccount: %s" % (self.partner_id)
+        return "Kaltura: %s" % (self.partner_id)
 
     def do_update_subtitles(self, video_url, language, tip):
         kaltura_id = video_url.get_video_type().kaltura_id()
@@ -221,6 +222,9 @@ class BrightcoveAccount(ExternalAccount):
     write_token = models.CharField(max_length=100)
     import_feed = models.OneToOneField(VideoFeed, null=True,
                                        on_delete=models.SET_NULL)
+
+    def __unicode__(self):
+        return "Brightcove: %s" % (self.publisher_id)
 
     def do_update_subtitles(self, video_url, language, tip):
         video_id = video_url.get_video_type().brightcove_id
@@ -322,6 +326,23 @@ class YouTubeAccount(ExternalAccount):
         unique_together = [
             ('type', 'owner_id', 'channel_id'),
         ]
+
+    def __unicode__(self):
+        return "YouTube: %s" % (self.username)
+
+    def do_update_subtitles(self, video_url, language, version):
+        """Do the work needed to update subititles.
+
+        Subclasses must implement this method.
+        """
+        access_token = youtube.get_new_access_token(self.oauth_refresh_token)
+        syncing.youtube.update_subtitles(video_url.videoid, access_token,
+                                         version)
+                                         
+    def do_delete_subtitles(self, video_url, language):
+        access_token = youtube.get_new_access_token(self.oauth_refresh_token)
+        syncing.youtube.delete_subtitles(video_url.videoid, access_token,
+                                         language.language_code)
 
 account_models = [
     KalturaAccount,

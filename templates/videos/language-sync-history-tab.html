@@ -48,7 +48,7 @@
         {% for item in sync_history %}
         <tr>
             <td> {{ item.datetime }}</td>
-            <td> {{ item.get_account_type_display }}</td>
+            <td> {{ item.get_account }}</td>
             <td> {{ item.get_action_display }}</td>
             <td> <a href="{{ item.version.get_absolute_url }}">{{ item.version.version_number }}</a></td>
             <td class="last"> {{ item.get_result_display }}</td>
