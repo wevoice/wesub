@@ -3036,14 +3036,14 @@ class BillingRecord(models.Model):
     video = models.ForeignKey(Video, blank=True, null=True, on_delete=models.SET_NULL)
 
     subtitle_version = models.ForeignKey(SubtitleVersion, null=True,
-            blank=True)
+            blank=True, on_delete=models.SET_NULL)
     new_subtitle_version = models.ForeignKey(NewSubtitleVersion, null=True,
-            blank=True)
+            blank=True, on_delete=models.SET_NULL)
 
     subtitle_language = models.ForeignKey(SubtitleLanguage, null=True,
-            blank=True)
+            blank=True, on_delete=models.SET_NULL)
     new_subtitle_language = models.ForeignKey(NewSubtitleLanguage, null=True,
-            blank=True)
+            blank=True, on_delete=models.SET_NULL)
 
     minutes = models.FloatField(blank=True, null=True)
     is_original = models.BooleanField()
