@@ -382,6 +382,7 @@ def lookup_accounts(video):
     return rv
 
 def lookup_account(video, video_url):
+    video_url.fix_owner_username()
     AccountModel = _video_type_to_account_model.get(video_url.type)
     if AccountModel is None:
         return None

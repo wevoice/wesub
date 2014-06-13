@@ -54,8 +54,8 @@ class VideoType(object):
     def set_values(self, video):
         pass
 
-    def videourl_create_values(self):
-        return {}
+    def owner_username(self):
+        return None
     
     @classmethod
     def format_url(cls, url):

@@ -83,6 +83,12 @@ class BrightcoveVideoFactory(VideoFactory):
 
 class YouTubeVideoFactory(VideoFactory):
     video_url__type = 'Y'
+    video_url__videoid = factory.Sequence(lambda n: 'video{0}'.format(n))
+
+    @factory.lazy_attribute
+    def video_url__url(self):
+        return ('https://www.youtube.com/watch?v=%s' %
+                self.video_url__videoid)
 
 class UserFactory(DjangoModelFactory):
     FACTORY_FOR = auth.models.CustomUser
@@ -208,8 +214,8 @@ class ThirdPartyAccountFactory(DjangoModelFactory):
     FACTORY_FOR = accountlinker.models.ThirdPartyAccount
     FACTORY_HIDDEN_ARGS = ('video_url',)
 
-    oauth_access_token = '123'
-    oauth_refresh_token = ''
+    oauth_access_token = 'test-access-token'
+    oauth_refresh_token = 'test-refresh-token'
 
     username = factory.LazyAttribute(lambda tpa: tpa.video_url.owner_username)
     type = factory.LazyAttribute(lambda tpa: tpa.video_url.type)
@@ -242,7 +248,6 @@ class YouTubeAccountFactory(DjangoModelFactory):
 
     username = factory.Sequence(lambda n: 'youtube-user-%s' % n)
     channel_id = factory.Sequence(lambda n: 'channel-id-%s' % n)
-    oauth_access_token = 'access-token'
     oauth_refresh_token = 'refresh-token'
 
 def bulk_subs(sub_data):

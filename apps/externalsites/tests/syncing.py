@@ -27,17 +27,17 @@ from django.utils import simplejson as json
 import babelsubs
 import mock
 
-from externalsites import tasks
 from externalsites import signalhandlers
 from externalsites.exceptions import SyncingError
 from externalsites.models import (KalturaAccount, SyncedSubtitleVersion,
-                                  SyncHistory)
+                                  SyncHistory, lookup_account)
 from externalsites.syncing import kaltura, brightcove
 from subtitles import pipeline
 from teams.permissions_const import ROLE_ADMIN
 from utils import test_utils
 from utils.factories import *
 from utils.test_utils import patch_for_test
+import utils.youtube
 import subtitles.signals
 
 class SignalHandlingTest(TestCase):
@@ -852,3 +852,51 @@ class BrightcoveAPITest(TestCase):
                 'name': 'IllegalValueError',
             }
         }
+
+class RefetchYoutubeChannelIDTest(TestCase):
+    # test re-fetching youtube channel for VideoUrl where username is
+    # NULL.
+    #
+    # This is mostly for a particular case: when we moved the youtube
+    # syncing code to the externalsites app, we also changed from using
+    # youtube usernames to using google channel ids which are more
+    # general.  For the existing VideoUrl objects, we set the username to
+    # NULL with the expectation that it would be refetched on the next
+    # sync
+    @patch_for_test('utils.youtube.get_video_info')
+    def setUp(self, mock_get_video_info):
+        mock_get_video_info.return_value = utils.youtube.VideoInfo(
+            'test-channel-id', 'title', 'description', 10,
+            'http://example.com/thumbnail.png')
+        self.mock_get_video_info = mock_get_video_info
+        self.user = UserFactory()
+        self.video = YouTubeVideoFactory(user=self.user)
+        pipeline.add_subtitles(self.video, 'en', None)
+        self.video_url = self.video.get_primary_videourl_obj()
+        self.video_url.username = None
+        self.video_url.save()
+        self.account = YouTubeAccountFactory(user=self.user,
+                                             channel_id='test-channel-id')
+
+    def test_lookup_account(self):
+        # the normal case is that we refetch the channel ID in
+        # lookup_account()
+        account = lookup_account(self.video, self.video_url)
+        self.assertEquals(account, self.account)
+        self.check_username_fixed()
+
+    @patch_for_test('externalsites.models.YouTubeAccount.update_subtitles')
+    def test_update_all_subtitles(self, mock_update_subtitles):
+        # we also need to refetch the id in update_all_subtitles(), which
+        # bypasses lookup_account()
+        test_utils.update_all_subtitles.original_func.apply(
+            args=(self.account.account_type, self.account.id))
+        mock_update_subtitles.assert_called_with(
+            self.video_url, self.video.subtitle_language('en'))
+        self.check_username_fixed()
+
+    def check_username_fixed(self):
+        self.mock_get_video_info.assert_called_with(self.video_url.videoid)
+        self.assertEquals(
+            self.video.get_primary_videourl_obj().owner_username,
+            'test-channel-id')

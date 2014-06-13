@@ -384,11 +384,8 @@ class YoutubeVideoType(VideoType):
         except :
             logger.exception("Error getting subs from youtube:" )
 
-    def videourl_create_values(self):
-        video_info = self.get_video_info()
-        return {
-            'owner_username': video_info.channel_id,
-        }
+    def owner_username(self):
+        return self.get_video_info().channel_id
 
     @classmethod
     def url_from_id(cls, video_id):

@@ -538,11 +538,11 @@ class Video(models.Model):
                     'original': True,
                     'primary': True,
                     'added_by': user,
-                    'video': obj
+                    'video': obj,
+                    'owner_username': vt.owner_username(),
                 }
                 if vt.video_id:
                     defaults['videoid'] = vt.video_id
-                defaults.update(vt.videourl_create_values())
                 video_url_obj, created = VideoUrl.objects.get_or_create(url=vt.convert_to_video_url(),
                                                                         defaults=defaults)
                 try:
@@ -1821,7 +1821,6 @@ class VideoUrl(models.Model):
     # shuch as Youtube or Vimeo username
     owner_username = models.CharField(max_length=255, blank=True, null=True)
 
-
     class Meta:
         ordering = ("video", "-primary",)
 
@@ -1866,6 +1865,24 @@ class VideoUrl(models.Model):
         # set this one to primary
         self.primary = True
         self.save(updates_timestamp=False)
+
+    def fix_owner_username(self):
+        """Workaround for us changing how owner_usernames work.
+
+        At some point we changed how owner_usernames works for youtube videos.
+        Rather than trying to change the owner_usernames attribute for all
+        videos at once in a huge migration, we set them to None.  Then before
+        we need to use the username, we call fix_owner_username() and fix it
+        then.
+        """
+
+        types_to_fix = (
+            VIDEO_TYPE_YOUTUBE,
+        )
+
+        if self.type in types_to_fix and self.owner_username is None:
+            self.owner_username = self.get_video_type().owner_username()
+            self.save()
 
     def get_video_type_class(self):
         try:

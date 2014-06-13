@@ -11,6 +11,7 @@ from nose.plugins import Plugin
 from nose.tools import assert_equal
 import mock
 import requests
+import utils.youtube
 
 
 REQUEST_CALLBACKS = []
@@ -87,7 +88,7 @@ save_thumbnail_in_s3 = mock.Mock()
 update_team_video = mock.Mock()
 update_search_index = mock.Mock()
 
-def mock_youtube_get_entry(video_id):
+def mock_youtube_get_video_info(video_id):
     # map video ids to (title, description, author, duration) tuples
     video_id_map = {
         'e4MSN6IImpI': ('Doodling in Math Class: Binary Trees',
@@ -178,24 +179,11 @@ def mock_youtube_get_entry(video_id):
     # Youtube descriptions can be very long, just use a mock one for testing
     # purposes
     description = "Test Description"
+    thumbnail_url = 'http://example.com/youtube-%s-thumb.png' % video_id
+    return utils.youtube.VideoInfo(author, title, description, duration,
+                                   thumbnail_url)
 
-    entry = mock.Mock()
-    mock_author = mock.Mock()
-    mock_author.name.text = author
-    mock_author.uri.text = author
-    entry.author = [mock_author]
-    entry.media.title.text = title
-    entry.media.description.text = description
-    entry.media.duration.seconds = duration
-    entry.media.thumbnail = []
-    for i in range(4):
-        thumb = mock.Mock()
-        thumb.url = 'http://i.ytimg.com/vi/%s/%s.jpg' % (video_id, i)
-        thumb.width = i * 100
-        thumb.height = i * 75
-        entry.media.thumbnail.append(thumb)
-    return entry
-youtube_get_entry = mock.Mock(side_effect=mock_youtube_get_entry)
+youtube_get_video_info = mock.Mock(side_effect=mock_youtube_get_video_info)
 youtube_get_subtitled_languages = mock.Mock(return_value=[])
 _add_amara_description_credit_to_youtube_vurl = mock.Mock()
 
@@ -220,8 +208,7 @@ class MonkeyPatcher(object):
             ('teams.tasks.update_one_team_video', update_team_video),
             ('utils.celery_search_index.update_search_index',
              update_search_index),
-            ('videos.types.youtube.YoutubeVideoType._get_entry',
-             youtube_get_entry),
+            ('utils.youtube.get_video_info', youtube_get_video_info),
             ('videos.types.youtube.YoutubeVideoType.get_subtitled_languages',
              youtube_get_subtitled_languages),
             ('videos.tasks._add_amara_description_credit_to_youtube_vurl',
