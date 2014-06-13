@@ -24,6 +24,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
+from auth.models import CustomUser as User
 from externalsites import forms
 from externalsites.models import lookup_account, YouTubeAccount
 from localeurl.utils import universal_url
@@ -83,6 +84,8 @@ def youtube_callback_url():
 def youtube_add_account(request):
     if 'team_slug' in request.GET:
         state = {'team_slug': request.GET['team_slug']}
+    elif 'username' in request.GET:
+        state = {'username': request.GET['username']}
     else:
         logging.error("youtube_add_account: Unknown owner")
         raise Http404()
@@ -110,6 +113,10 @@ def youtube_callback(request):
         redirect_url = reverse('teams:settings_externalsites', kwargs={
             'slug': team.slug,
         })
+    elif 'username' in auth_info.state:
+        user = get_object_or_404(User, username=auth_info.state['username'])
+        account_data['user'] = user
+        redirect_url = reverse('profiles:account')
     else:
         logger.error("youtube_callback: invalid state data: %s" %
                      auth_info.state)

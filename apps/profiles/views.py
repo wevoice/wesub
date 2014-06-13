@@ -36,6 +36,7 @@ from profiles.forms import (EditUserForm, EditAccountForm, SendMessageForm,
                             EditAvatarForm, AdminProfileForm)
 from profiles.rpc import ProfileApiClass
 from apps.messages.models import Message
+from externalsites.models import YouTubeAccount
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
 from teams.models import Task
@@ -191,7 +192,6 @@ def account(request):
     else:
         form = EditAccountForm(instance=request.user, label_suffix="")
 
-    third_party_accounts = request.user.third_party_accounts.all()
     twitters = request.user.twitteraccount_set.all()
     facebooks = request.user.facebookaccount_set.all()
 
@@ -199,7 +199,7 @@ def account(request):
         'form': form,
         'user_info': request.user,
         'edit_profile_page': True,
-        'third_party': third_party_accounts,
+        'youtube_accounts': YouTubeAccount.objects.for_owner(request.user),
         'twitters': twitters,
         'facebooks': facebooks,
         'hide_prompt': True
