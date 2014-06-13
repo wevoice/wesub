@@ -146,6 +146,7 @@
             subtitles: [], // Backbone collection
             url: '',
             show_logo: true,
+            show_subtitle_me: true,
             show_order_subtitles: true,
             show_improve_subtitles: true,
             show_download_subtitles: true,
@@ -370,6 +371,8 @@
                                 // Language selector drop-up menu becomes a link to amara
 				that.model.set({'no_subtitles': true});
 				_$(".amara-displays").hide();
+				if (!that.model.get('show_subtitle_me'))
+				    _$(".amara-languages").hide();
 				_$(".amara-languages").css('min-width', "130px").css({"border-left-color": "#2B2C2D", "border-left-width":"1px", "border-left-style":"solid"});
 				if (that.model.get('is_on_amara'))
                                     that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
@@ -1149,6 +1152,7 @@
                         'div': this,
                         'initial_language': $div.data('initial-language'),
                         'url': $div.data('url'),
+			'show_subtitle_me': $div.data('hide-subtitle-me') ? false : true,
                         'show_logo': $div.data('hide-logo') ? false : true,
                         'show_order_subtitles': $div.data('hide-order') ? false : true,
                         'show_improve_subtitles': $div.data('hide-improve') ? false : true,
