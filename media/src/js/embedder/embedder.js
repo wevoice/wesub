@@ -368,6 +368,9 @@
                                 // Do some other stuff for videos that aren't yet on Amara
 				// or that do not have subtitles
                                 // Language selector drop-up menu becomes a link to amara
+				that.model.set({'no_subtitles': true});
+				_$(".amara-displays").hide();
+				_$(".amara-languages").css('min-width', "130px").css({"border-left-color": "#2B2C2D", "border-left-width":"1px", "border-left-style":"solid"});
 				if (that.model.get('is_on_amara'))
                                     that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
 				else
