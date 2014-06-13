@@ -331,6 +331,10 @@ class YouTubeAccount(ExternalAccount):
     def __unicode__(self):
         return "YouTube: %s" % (self.username)
 
+    def is_for_video_url(self, video_url):
+        return (video_url.type == self.video_url_type and
+                video_url.owner_username == self.channel_id)
+
     def do_update_subtitles(self, video_url, language, version):
         """Do the work needed to update subititles.
 

@@ -20,7 +20,8 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 
-from externalsites.models import BrightcoveAccount, lookup_accounts
+from externalsites.models import (BrightcoveAccount, lookup_accounts,
+                                  account_models)
 from videos.models import VideoFeed
 from utils.factories import *
 
@@ -32,6 +33,10 @@ class LookupAccountTest(TestCase):
 
     def check_lookup_accounts_returns_nothing(self, video):
         self.assertEquals(lookup_accounts(video), [])
+
+    def check_is_for_video_url(self, account, video, correct_value):
+        video_url = video.get_primary_videourl_obj()
+        self.assertEquals(account.is_for_video_url(video_url), correct_value)
 
     def test_team_account(self):
         video = BrightcoveVideoFactory()
@@ -55,8 +60,8 @@ class LookupAccountTest(TestCase):
 
     def test_youtube(self):
         team = TeamFactory()
-        account1 = YouTubeAccountFactory(username='user1', team=team)
-        account2 = YouTubeAccountFactory(username='user2', team=team)
+        account1 = YouTubeAccountFactory(channel_id='user1', team=team)
+        account2 = YouTubeAccountFactory(channel_id='user2', team=team)
         video1 = YouTubeVideoFactory(video_url__owner_username='user1')
         video2 = YouTubeVideoFactory(video_url__owner_username='user2')
         # video for a user that we don't have an account for
@@ -70,6 +75,12 @@ class LookupAccountTest(TestCase):
         self.check_lookup_accounts(video2, account2)
         self.check_lookup_accounts_returns_nothing(video3)
         self.check_lookup_accounts_returns_nothing(video4)
+        # test ExternalAccount.is_for_video_url() which works in the reverse
+        # direction
+        self.check_is_for_video_url(account1, video1, True)
+        self.check_is_for_video_url(account1, video2, False)
+        self.check_is_for_video_url(account1, video3, False)
+        self.check_is_for_video_url(account1, video4, False)
 
 class BrightcoveAccountTest(TestCase):
     def setUp(self):
