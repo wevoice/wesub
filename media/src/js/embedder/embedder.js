@@ -354,7 +354,7 @@
                         function() {
                             notifyVideoLoadedToHost();
                             // Grab the subtitles for the initial language and do yo' thang.
-                            if (that.model.get('is_on_amara')) {
+                            if (that.model.get('is_on_amara') && that.model.get('initial_language')) {
 
                                 // Build the language selection dropdown menu.
                                 that.buildLanguageSelector();
@@ -365,12 +365,16 @@
                                 // TODO: This needs to be an option.
                                 that.loadSubtitles(that.model.get('initial_language'));
                             } else {
-                                // Do some other stuff for videos that aren't yet on Amara.
+                                // Do some other stuff for videos that aren't yet on Amara
+				// or that do not have subtitles
                                 // Language selector drop-up menu becomes a link to amara
-                                that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'));
+				if (that.model.get('is_on_amara'))
+                                    that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
+				else
+                                    that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'));
                                 that.$amaraCurrentLang.attr("target", '_blank');
                                 that.$amaraCurrentLang.removeAttr("data-toggle");
-                                that.setCurrentLanguageMessage('Add to Amara');
+                                that.setCurrentLanguageMessage('subtitle me');
                                 that.setTranscriptDisplay(false);
                             }
                             sizeUpdated();
