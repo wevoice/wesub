@@ -52,7 +52,7 @@ try:
     from dev_settings_test_local import *
 except ImportError:
     pass
-BROKER_PORT = 
+BROKER_PORT = 5672
 BROKER_USER = 'guest'
 BROKER_PASSWORD = 'guest'
 

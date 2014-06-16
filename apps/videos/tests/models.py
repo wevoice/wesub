@@ -30,6 +30,7 @@ from videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version, make_rollback_to
 )
 from widget import video_cache
+from utils.subtitles import dfxp_merge
 from utils import test_utils
 from utils.factories import *
 
@@ -339,6 +340,4 @@ class TestGetMergedDFXP(TestCase):
             for lang in ('en', 'fr', 'es')
         ]
 
-
-        self.assertEquals(video.get_merged_dfxp(),
-                          babelsubs.dfxp_merge(subtitles))
+        self.assertEquals(video.get_merged_dfxp(), dfxp_merge(subtitles))

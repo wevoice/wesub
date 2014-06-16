@@ -30,7 +30,7 @@ from apps.auth.models import CustomUser as User
 from django.core import mail
 from comments.models import Comment
 from localeurl.utils import universal_url, DEFAULT_PROTOCOL
-from messages.tasks import  send_video_comment_notification, SUBJECT_EMAIL_VIDEO_COMMENTED
+from messages.tasks import  send_video_comment_notification
 
 
 class CommentEmailTests(TestCase):
@@ -82,6 +82,11 @@ class CommentEmailTests(TestCase):
                                        kwargs={"video_id":vid}))
         self.assertEqual(correct_url,
                          universal_url("videos:video", args=(vid,)))
+    
+    def check_subject(self, email):
+        self.assertEqual(email.subject,
+                         u'%s left a comment on the video %s' % (
+                             self.comment.user, self.video.title_display()))
 
     def test_simple_email(self):
         num_followers = 5
@@ -89,10 +94,7 @@ class CommentEmailTests(TestCase):
         mail.outbox = []
         send_video_comment_notification(self.comment.pk)
         self.assertEqual(len(mail.outbox), num_followers)
-        email = mail.outbox[0]
-        self.assertEqual(email.subject, SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=self.comment.user.username,
-                                                                          title=self.video.title_display()))
-        return None
+        self.check_subject(mail.outbox[0])
 
     def test_email_content(self):
         num_followers = 2
@@ -113,9 +115,7 @@ class CommentEmailTests(TestCase):
         response = self._post_comment_for(self.video)
         followers = set(self.video.notification_list(self.logged_user))
         self.assertEqual(len(mail.outbox), len(followers))
-        email = mail.outbox[0]
-        self.assertEqual(email.subject, SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=str(self.comment.user),
-                                                                          title=self.video.title_display()))
+        self.check_subject(mail.outbox[0])
 
     def test_comment_view_for_language(self):
         num_followers = 2
@@ -125,7 +125,4 @@ class CommentEmailTests(TestCase):
         response = self._post_comment_for(lang)
         followers = set(self.video.notification_list(self.logged_user))
         self.assertEqual(len(mail.outbox), len(followers))
-        email = mail.outbox[0]
-        self.assertEqual(email.subject, SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=self.comment.user.username,
-                                                                          title=self.video.title_display()))
-        
+        self.check_subject(mail.outbox[0])
