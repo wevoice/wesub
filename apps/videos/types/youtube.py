@@ -365,7 +365,8 @@ class YoutubeVideoType(VideoType):
     @classmethod
     def matches_video_url(cls, url):
         hostname = urlparse(url).netloc
-        return  hostname in YoutubeVideoType.HOSTNAMES and  cls._get_video_id(url)
+        return (hostname in YoutubeVideoType.HOSTNAMES and
+                any(pattern.search(url) for pattern in cls._url_patterns))
 
     def get_video_info(self):
         if not hasattr(self, '_video_info'):

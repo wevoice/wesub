@@ -43,6 +43,7 @@ from videos.types.youtube import (
     _prepare_subtitle_data_for_version, add_credit, should_add_credit
 )
 from utils import test_utils
+from utils import youtube
 
 class YoutubeVideoTypeTest(TestCase):
     fixtures = ['test.json']
@@ -64,16 +65,22 @@ class YoutubeVideoTypeTest(TestCase):
         }]
         self.shorter_url = "http://youtu.be/HaAVZ2yXDBo"
 
-    def test_set_values(self):
-        youtbe_url = 'http://www.youtube.com/watch?v=_ShmidkrcY0'
+    @test_utils.patch_for_test('utils.youtube.get_video_info')
+    def test_set_values(self, mock_get_video_info):
+        video_info = youtube.VideoInfo('test-channel-id', 'title',
+                                       'description', 100,
+                                       'http://example.com/thumb.png')
+        mock_get_video_info.return_value = video_info
 
-        video, created = Video.get_or_create_for_url(youtbe_url)
+        video, created = Video.get_or_create_for_url(
+            'http://www.youtube.com/watch?v=_ShmidkrcY0')
         vu = video.videourl_set.all()[:1].get()
 
         self.assertEqual(vu.videoid, '_ShmidkrcY0')
-        self.assertTrue(video.title)
-        self.assertEqual(video.duration, 79)
-        self.assertTrue(video.thumbnail)
+        self.assertEqual(video.title, video_info.title)
+        self.assertEqual(video.description, video_info.description)
+        self.assertEqual(video.duration, video_info.duration)
+        self.assertEqual(video.thumbnail, video_info.thumbnail_url)
 
     def test_matches_video_url(self):
         for item in self.data:

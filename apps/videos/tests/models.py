@@ -100,7 +100,7 @@ class TestVideo(TestCase):
             self.assertEquals(refresh(video).title, correct_title)
 
         # Test title before any subtitles are added.
-        _assert_title("The Sea Organ of Zadar")
+        _assert_title(test_utils.test_video_info.title)
 
         # Make a subtitle language in the primary language.
         video.primary_audio_language_code = 'en'
@@ -108,7 +108,7 @@ class TestVideo(TestCase):
         sl_en = make_subtitle_language(video, 'en')
 
         # Just adding languages shouldn't affect the title.
-        _assert_title("The Sea Organ of Zadar")
+        _assert_title(test_utils.test_video_info.title)
 
         # Add subtitles with a custom title.  The title should be updated to
         # reflect this.
