@@ -134,7 +134,7 @@ class MonkeyPatcher(object):
             ('videos.tasks.import_videos_from_feed', import_videos_from_feed),
         ]
         self.patches = []
-        self.mock_object_initial_data = {}
+        self.initial_side_effects = {}
         for func_name, mock_obj in patch_info:
             self.start_patch(func_name, mock_obj)
 
@@ -142,7 +142,7 @@ class MonkeyPatcher(object):
         patch = mock.patch(func_name, mock_obj)
         mock_obj = patch.start()
         self.setup_run_original(mock_obj, patch)
-        self.mock_object_initial_data[mock_obj] = mock_obj.__dict__.copy()
+        self.initial_side_effects[mock_obj] = mock_obj.side_effect
         self.patches.append(patch)
 
         if (not func_name.startswith("apps.") and
@@ -180,11 +180,13 @@ class MonkeyPatcher(object):
             patch.stop()
 
     def reset_mocks(self):
-        for mock_obj, initial_data in self.mock_object_initial_data.items():
-            # we used to call reset_mock() here, but this works better.  It
-            # also resets the things like return_value and side_effect to
-            # their initial value.
-            mock_obj.__dict__ = initial_data.copy()
+        for mock_obj, side_effect in self.initial_side_effects.items():
+            mock_obj.reset_mock()
+            # reset_mock doesn't reset the side effect, and we wouldn't want
+            # it to anyways since we only want to reset side effects that the
+            # unittests set.  So we save side_effect right after we create the
+            # mock and restore it here
+            mock_obj.side_effect = side_effect
 
 class UnisubsTestPlugin(Plugin):
     name = 'Amara Test Plugin'

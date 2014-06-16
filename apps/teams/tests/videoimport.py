@@ -39,9 +39,10 @@ class TeamVideoImportTestCase(TestCase):
         feed = mock.Mock(team=team, user=user)
         feed_imported.send(sender=feed, new_videos=videos)
         for video in videos:
-            self.assertNotEquals(video.get_team_video(), None)
-            self.assertEquals(video.get_team_video().team, team)
-
+            team_video = video.get_team_video()
+            self.assertNotEquals(team_video, None)
+            self.assertEquals(team_video.team, team)
+            self.assertEquals(team_video.added_by, user)
 
         correct_api_calls = [
             mock.call(signal=api_teamvideo_new, sender=video.get_team_video())
