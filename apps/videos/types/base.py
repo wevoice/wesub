@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from urlparse import urlparse
+
 from django.core.exceptions import ValidationError
 
 class VideoType(object):
@@ -44,7 +45,22 @@ class VideoType(object):
     @classmethod
     def matches_video_url(cls, url):
         raise Exception('Not implemented')
-    
+
+    @staticmethod
+    def url_extension(url):
+        """Get the extension of an URL's path.
+
+        Returns the extension as a lowercase string (without the "." part).
+        If the path for url doesn't have an extension, None is returned.
+        """
+
+        parsed = urlparse(url)
+        components = parsed.path.split('.')
+        if len(components) == 1:
+            # no extension at all
+            return None
+        return components[-1].lower()
+
     @property
     def defaults(self):
         return {
@@ -57,8 +73,6 @@ class VideoType(object):
     @classmethod
     def format_url(cls, url):
         return url.strip()
-        # parsed_url = urlparse(url.strip())
-        # return '%s://%s%s' % (parsed_url.scheme or 'http', parsed_url.netloc, parsed_url.path)    
     
 class VideoTypeRegistrar(dict):
     

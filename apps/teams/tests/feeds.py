@@ -21,8 +21,10 @@ from __future__ import absolute_import
 
 from django.core.urlresolvers import reverse
 
+from utils import test_utils
 from utils.factories import *
 from teams.models import TeamVideo
+from videos.models import VideoFeed
 from videos.tests.feeds import FeedImportTest
 
 class TeamAddVideosTest(FeedImportTest):
@@ -33,10 +35,12 @@ class TeamAddVideosTest(FeedImportTest):
         feed_url = u'http://example.com/feed'
         url = reverse('teams:add_videos', kwargs={'slug':team.slug})
         data = { 'feed_url': feed_url, }
+        self.client.post(url, data)
 
-        response = self.client.post(url, data)
-
-        self.assertEqual(team.videos.count(), 2)
-        for video in team.videos.all():
-            self.assertEquals(video.user, user)
-            self.assertEquals(video.get_team_video().added_by, user)
+        import_task = test_utils.import_videos_from_feed.delay
+        self.assertEquals(import_task.call_count, 1)
+        feed_id = import_task.call_args[0][0]
+        feed = VideoFeed.objects.get(id=feed_id)
+        self.assertEquals(feed.url, feed_url)
+        self.assertEquals(feed.team, team)
+        self.assertEquals(feed.user, user)

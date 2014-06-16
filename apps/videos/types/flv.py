@@ -17,16 +17,12 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from videos.types.base import VideoType
-import re
-
-URL_REGEX = re.compile('^http(s)?://.+/.+\.flv$', re.I)
 
 class FLVVideoType(VideoType):
 
     abbreviation = 'L'
-    name = 'FLV'   
-    
+    name = 'FLV'
+
     @classmethod
     def matches_video_url(cls, url):
-        url = cls.format_url(url)
-        return bool(URL_REGEX.match(url))         
+        return cls.url_extension(url) == 'flv'

@@ -62,3 +62,6 @@ markdown2==2.0.0
 -e git+https://github.com/pculture/babelsubs.git#egg=babelsubs
 -e git+https://github.com/pculture/unilangs.git#egg=unilangs
 pytz==2012f
+# Testing requirements
+nose-exclude==0.2.0
+unittest2==0.5.1
