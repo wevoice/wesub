@@ -2685,7 +2685,6 @@ class BillingReport(models.Model):
                 unicode(approve_task.assignee),
                 self._report_date(approve_task.completed),
             ))
-
         return rows
 
     def generate_rows_type_approval_for_users(self):
@@ -2815,17 +2814,16 @@ class BillingReportGenerator(object):
             self.rows = [self.header()]
         else:
             self.rows = []
-
         all_records = list(all_records)
 
         self.make_language_number_map(all_records)
         self.make_languages_without_records(all_records)
-
         for video, records in groupby(all_records, lambda r: r.video):
             records = list(records)
-            for lang in self.languages_without_records.get(video.id, []):
-                self.rows.append(
-                    self.make_row_for_lang_without_record(video, lang))
+            if video:
+                for lang in self.languages_without_records.get(video.id, []):
+                    self.rows.append(
+                        self.make_row_for_lang_without_record(video, lang))
             for r in records:
                 self.rows.append(self.make_row(video, r))
 
@@ -2845,12 +2843,12 @@ class BillingReportGenerator(object):
 
     def make_row(self, video, record):
         return [
-            video.title_display(),
-            video.video_id,
-            record.new_subtitle_language.language_code,
+            video and video.title_display(),
+            video and video.video_id,
+            record.new_subtitle_language and record.new_subtitle_language.language_code,
             record.minutes,
             record.is_original,
-            self.language_number_map[record.id],
+            self.language_number_map and self.language_number_map[record.id],
             record.team.slug,
             record.created.strftime('%Y-%m-%d %H:%M:%S'),
             record.source,
@@ -2860,12 +2858,12 @@ class BillingReportGenerator(object):
     def make_language_number_map(self, records):
         self.language_number_map = {}
         videos = set(r.video for r in records)
-        video_counts = dict((v.id, 0) for v in videos)
+        video_counts = dict((v and v.id, 0) for v in videos)
         qs = (BillingRecord.objects
               .filter(video__in=videos)
               .order_by('created'))
         for record in qs:
-            vid = record.video.id
+            vid = record.video and record.video.id
             video_counts[vid] += 1
             self.language_number_map[record.id] = video_counts[vid]
 
@@ -3059,8 +3057,8 @@ class BillingRecord(models.Model):
 
 
     def __unicode__(self):
-        return "%s - %s" % (self.video.video_id,
-                self.new_subtitle_language.language_code)
+        return "%s - %s" % (self.video and self.video.video_id,
+                self.new_subtitle_language and self.new_subtitle_language.language_code)
 
     def save(self, *args, **kwargs):
         if not self.minutes and self.minutes != 0.0:
