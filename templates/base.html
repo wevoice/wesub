@@ -38,6 +38,8 @@
     {% include_bundle "site_base_js" %}
     <script type="text/javascript" src="{% url js_i18n_catalog %}"></script>
     <script src="{% url profiles:rpc_api %}" type="text/javascript"></script>  
+    <script type="text/javascript" src='{% url embedder_iframe %}'>
+    </script>
     {% block scripts %}{% endblock %}
     <script type="text/javascript">
         window.STATIC_URL = '{{ STATIC_URL }}';
