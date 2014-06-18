@@ -53,7 +53,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
                     loadingDiv.style.paddingTop = "200px";
                 loadingDiv.style.textAlign = "center";
                 loadingImg = document.createElement("IMG");
-                loadingImg.src = loadingImg.src = "{{ static_url }}/images/embedder/loading.gif";
+                loadingImg.src = "{{ static_url }}/images/embedder/loading.gif";
                 loadingDiv.appendChild(loadingImg);
                 currentDiv.appendChild(loadingDiv); 
 
