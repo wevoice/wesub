@@ -27,6 +27,7 @@ import hashlib
 from django.contrib.auth.hashers import make_password
 from django.template.defaultfilters import slugify
 import factory
+from factory import Factory
 from factory.django import DjangoModelFactory
 
 import accountlinker.models
@@ -36,6 +37,7 @@ import subtitles.models
 import teams.models
 import videos.models
 from subtitles import pipeline
+from utils import youtube
 
 class VideoURLFactory(DjangoModelFactory):
     FACTORY_FOR = videos.models.VideoUrl
@@ -153,6 +155,7 @@ class TeamVideoFactory(DjangoModelFactory):
     def _generate(cls, create, attrs):
         tv = super(TeamVideoFactory, cls)._generate(create, attrs)
         tv.video.user = tv.added_by
+        tv.video.clear_team_video_cache()
         return tv
 
     @factory.lazy_attribute
@@ -249,6 +252,15 @@ class YouTubeAccountFactory(DjangoModelFactory):
     username = factory.Sequence(lambda n: 'youtube-user-%s' % n)
     channel_id = factory.Sequence(lambda n: 'channel-id-%s' % n)
     oauth_refresh_token = 'refresh-token'
+
+class YouTubeVideoInfoFactory(Factory):
+    FACTORY_FOR = youtube.VideoInfo
+
+    channel_id = 'test-channel-id'
+    title = 'test title'
+    description = 'test description'
+    duration = 100
+    thumbnail_url = 'http://example.com/thumbnail.png'
 
 def bulk_subs(sub_data):
     """Create a bunch of videos/languages/versions

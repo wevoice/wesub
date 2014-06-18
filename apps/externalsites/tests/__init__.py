@@ -4,3 +4,4 @@ from .syncing import *
 from .models import *
 from .forms import *
 from .views import *
+from .credit import *

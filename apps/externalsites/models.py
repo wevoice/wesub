@@ -343,7 +343,7 @@ class YouTubeAccount(ExternalAccount):
         access_token = youtube.get_new_access_token(self.oauth_refresh_token)
         syncing.youtube.update_subtitles(video_url.videoid, access_token,
                                          version)
-                                         
+
     def do_delete_subtitles(self, video_url, language):
         access_token = youtube.get_new_access_token(self.oauth_refresh_token)
         syncing.youtube.delete_subtitles(video_url.videoid, access_token,
@@ -556,3 +556,12 @@ class SyncHistory(models.Model):
 
     def cache_account(self, account):
         self._account = account
+
+class CreditedVideoUrl(models.Model):
+    """Track videos that we have added our amara credit to.
+
+    This model is pretty simple.  If a VideoUrl exists in the table, then
+    we've added our amara credit to it and we shouldn't try to add it again.
+    """
+
+    video_url = models.ForeignKey(VideoUrl, primary_key=True)

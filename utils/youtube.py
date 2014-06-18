@@ -211,3 +211,6 @@ def get_video_info(video_id):
                      snippet['description'],
                      _parse_8601_duration(content_details['duration']),
                      snippet['thumbnails']['high']['url'])
+
+def update_video_description(video_id, access_token, description):
+    pass
