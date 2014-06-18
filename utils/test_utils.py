@@ -1,6 +1,7 @@
 import collections
 import functools
 import os
+import simplejson as json
 import urlparse
 
 import mock
@@ -92,7 +93,9 @@ test_video_info = utils.youtube.VideoInfo(
     'test-channel-id', 'test-title', 'test-description', 60,
     'http://example.com/youtube-thumb.png')
 youtube_get_video_info = mock.Mock(return_value=test_video_info)
+youtube_get_user_info = mock.Mock(return_value=test_video_info)
 youtube_get_new_access_token = mock.Mock(return_value='test-access-token')
+youtube_update_video_description = mock.Mock()
 youtube_get_subtitled_languages = mock.Mock(return_value=[])
 _add_amara_description_credit_to_youtube_vurl = mock.Mock()
 
@@ -118,8 +121,11 @@ class MonkeyPatcher(object):
             ('utils.celery_search_index.update_search_index',
              update_search_index),
             ('utils.youtube.get_video_info', youtube_get_video_info),
+            ('utils.youtube.get_user_info', youtube_get_user_info),
             ('utils.youtube.get_new_access_token',
              youtube_get_new_access_token),
+            ('utils.youtube.update_video_description',
+             youtube_update_video_description),
             ('videos.types.youtube.YoutubeVideoType.get_subtitled_languages',
              youtube_get_subtitled_languages),
             ('videos.tasks._add_amara_description_credit_to_youtube_vurl',
@@ -248,7 +254,7 @@ def patch_for_test(spec):
 patch_for_test.__test__ = False
 
 ExpectedRequest = collections.namedtuple(
-    "ExpectedRequest", "method url params data body status_code")
+    "ExpectedRequest", "method url params data headers body status_code")
 
 class RequestsMocker(object):
     """Mock code that uses the requests module
@@ -270,10 +276,11 @@ class RequestsMocker(object):
     def __init__(self):
         self.expected_requests = []
 
-    def expect_request(self, method, url, params=None, data=None, body='',
-                       status_code=200):
+    def expect_request(self, method, url, params=None, data=None,
+                       headers=None, body='', status_code=200):
         self.expected_requests.append(
-            ExpectedRequest(method, url, params, data, body, status_code))
+            ExpectedRequest(method, url, params, data, headers, body,
+                            status_code))
 
     def __enter__(self):
         self.setup_patchers()
@@ -285,7 +292,7 @@ class RequestsMocker(object):
 
     def setup_patchers(self):
         self.patchers = []
-        for method in ('get', 'post', 'put', 'delete'):
+        for method in ('get', 'post', 'put', 'delete', 'request'):
             mock_obj = mock.Mock()
             mock_obj.side_effect = getattr(self, 'mock_%s' % method)
             patcher = mock.patch('requests.%s' % method, mock_obj)
@@ -297,36 +304,47 @@ class RequestsMocker(object):
             patcher.stop()
         self.patchers = []
 
-    def mock_get(self, url, params=None, data=None):
-        return self.check_request('get', url, params, data)
+    def mock_get(self, url, params=None, data=None, headers=None):
+        return self.check_request('get', url, params, data, headers)
 
-    def mock_post(self, url, params=None, data=None):
-        return self.check_request('post', url, params, data)
+    def mock_post(self, url, params=None, data=None, headers=None):
+        return self.check_request('post', url, params, data, headers)
 
-    def mock_put(self, url, params=None, data=None):
-        return self.check_request('put', url, params, data)
+    def mock_put(self, url, params=None, data=None, headers=None):
+        return self.check_request('put', url, params, data, headers)
 
-    def mock_delete(self, url, params=None, data=None):
-        return self.check_request('delete', url, params, data)
+    def mock_delete(self, url, params=None, data=None, headers=None):
+        return self.check_request('delete', url, params, data, headers)
 
-    def check_request(self, method, url, params, data):
+    def mock_request(self, method, url, params=None, data=None, headers=None):
+        return self.check_request(method.lower(), url, params, data, headers)
+
+    def check_request(self, method, url, params, data, headers):
         try:
             expected = self.expected_requests.pop(0)
         except IndexError:
             raise AssertionError("RequestsMocker: No more calls expected, "
                                  "but got %s %s %s %s" % 
-                                 (method, url, params, data))
+                                 (method, url, params, data, headers))
 
         assert_equal(method, expected.method)
         assert_equal(url, expected.url)
         assert_equal(params, expected.params)
-        assert_equal(data, expected.data)
-        return self.make_response(expected.status_code, expected.body)
+        if (expected.headers is not None and
+            expected.headers.get('content-type') == 'application/json'):
+            assert_equal(json.loads(data), json.loads(expected.data))
+        else:
+            assert_equal(data, expected.data)
+        assert_equal(headers, expected.headers)
+        request = requests.Request(method=method, url=url, params=params,
+                                   data=data, headers=headers)
+        return self.make_response(request, expected.status_code, expected.body)
 
-    def make_response(self, status_code, body):
+    def make_response(self, request, status_code, body):
         response = requests.Response()
         response._content = body
         response.status_code = status_code
+        response.request = request
         return response
 
     def check_no_more_expected_calls(self):

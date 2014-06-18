@@ -79,7 +79,7 @@ def request_token_url(redirect_uri, state):
 def _oauth_token_post(**params):
     params["client_id"] = settings.YOUTUBE_CLIENT_ID
     params["client_secret"] = settings.YOUTUBE_CLIENT_SECRET
-    
+
     return requests.post("https://accounts.google.com/o/oauth2/token",
                              data=params, headers={
         "Content-Type": "application/x-www-form-urlencoded"
@@ -126,7 +126,7 @@ def handle_callback(request, redirect_uri):
     if response.json.get('error', None):
         logger.error("Error on requesting Youtube OAuth token", extra={
                     "data": {
-                        "sent_params": params,
+                        "sent_params": response.request.params,
                         "original_request": request,
                         "response": response.content
                     },
@@ -134,7 +134,6 @@ def handle_callback(request, redirect_uri):
         raise OAuthError(response.json['error'])
 
     user_info = get_user_info(response.json['access_token'])
-
 
     return OAuthCallbackData(
         response.json['refresh_token'],
@@ -150,21 +149,30 @@ def get_new_access_token(refresh_token):
     return response.json['access_token']
 
 YOUTUBE_REQUEST_URL_BASE = 'https://www.googleapis.com/youtube/v3/'
-def _api_get(access_token, url_path, **params):
-    """Make a youtube request
+def _make_api_request(method, access_token, url_path, data=None, params=None,
+                      headers=None):
+    """Make a youtube API request
 
+    :param method: HTTP method to use
     :param access_token: access token to use, or None for APIs that don't
     need authentication
     :param url_path: url path relative to YOUTUBE_REQUEST_URL_BASE
-    :param params: GET params to add to the URL
+    :param data: data to send to the server
+    :param params: params to add to the URL
+    :param headers: headers to send to the server
     """
     if access_token is not None:
-        headers = {'Authorization': 'Bearer %s' % access_token}
+        if headers is None:
+            headers = {}
+        headers['Authorization'] = 'Bearer %s' % access_token
     else:
-        headers = {}
+        headers = None
+        if params is None:
+            params = {}
         params['key'] = settings.YOUTUBE_API_KEY
     url = YOUTUBE_REQUEST_URL_BASE + url_path
-    response = requests.get(url, params=params, headers=headers)
+    response = requests.request(method, url, data=data, params=params,
+                                headers=headers)
     if response.status_code != 200:
         try:
             errors = response.json['error']['errors']
@@ -176,6 +184,27 @@ def _api_get(access_token, url_path, **params):
         raise APIError(message)
     return response
 
+def channel_get(access_token, part, mine='true'):
+    return _make_api_request('get', access_token, 'channels', params={
+        'part': ','.join(part),
+        'mine': mine,
+    })
+
+def video_get(access_token, video_id, part):
+    return _make_api_request('get', access_token, 'videos', params={
+        'id': video_id,
+        'part': ','.join(part),
+    })
+
+def video_put(access_token, video_id, **data):
+    part = '.'.join(data.keys())
+    data['id'] = video_id
+    return _make_api_request('put', access_token, 'videos', params={
+        'part': part,
+    }, data=json.dumps(data), headers={
+        'content-type': 'application/json'
+    })
+
 def get_user_info(access_token):
     """Get info about a user logged in with access_token
 
@@ -186,8 +215,7 @@ def get_user_info(access_token):
 
     :returns: (channel_id, display_name) tuple
     """
-    response = _api_get(access_token, 'channels', part='id,snippet',
-                        mine='true')
+    response = channel_get(access_token, part=['id','snippet'])
     channel = response.json['items'][0]
     return channel['id'], channel['snippet']['title']
 
@@ -202,7 +230,7 @@ def _parse_8601_duration(duration):
     return rv
 
 def get_video_info(video_id):
-    response = _api_get(None, 'videos', part='snippet,contentDetails', id=video_id)
+    response = video_get(None, video_id, ['snippet', 'contentDetails'])
     snippet = response.json['items'][0]['snippet']
     content_details = response.json['items'][0]['contentDetails']
 
@@ -213,4 +241,9 @@ def get_video_info(video_id):
                      snippet['thumbnails']['high']['url'])
 
 def update_video_description(video_id, access_token, description):
-    pass
+    # get the current snippet for the video
+    response = video_get(access_token, video_id, ['snippet'])
+    snippet = response.json['items'][0]['snippet']
+    # send back the snippet with the new description
+    snippet['description'] = description
+    video_put(access_token, video_id, snippet=snippet)
