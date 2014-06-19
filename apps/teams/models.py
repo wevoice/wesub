@@ -2842,12 +2842,12 @@ class BillingReportGenerator(object):
 
     def make_row(self, video, record):
         return [
-            video and video.title_display(),
-            video and video.video_id,
-            record.new_subtitle_language and record.new_subtitle_language.language_code,
+            (video and video.title_display()) or "----",
+            (video and video.video_id) or "deleted",
+            (record.new_subtitle_language and record.new_subtitle_language.language_code) or "----",
             record.minutes,
             record.is_original,
-            self.language_number_map and (record.id in self.language_number_map) and self.language_number_map[record.id],
+            (self.language_number_map and (record.id in self.language_number_map) and self.language_number_map[record.id]) or "----",
             record.team.slug,
             record.created.strftime('%Y-%m-%d %H:%M:%S'),
             record.source,
