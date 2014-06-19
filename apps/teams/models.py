@@ -2815,7 +2815,6 @@ class BillingReportGenerator(object):
         else:
             self.rows = []
         all_records = list(all_records)
-
         self.make_language_number_map(all_records)
         self.make_languages_without_records(all_records)
         for video, records in groupby(all_records, lambda r: r.video):
@@ -2848,7 +2847,7 @@ class BillingReportGenerator(object):
             record.new_subtitle_language and record.new_subtitle_language.language_code,
             record.minutes,
             record.is_original,
-            self.language_number_map and self.language_number_map[record.id],
+            self.language_number_map and (record.id in self.language_number_map) and self.language_number_map[record.id],
             record.team.slug,
             record.created.strftime('%Y-%m-%d %H:%M:%S'),
             record.source,
