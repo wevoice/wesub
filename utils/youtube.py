@@ -148,6 +148,10 @@ def get_new_access_token(refresh_token):
                                  refresh_token=refresh_token)
     return response.json['access_token']
 
+def revoke_auth_token(refresh_token):
+    requests.get('https://accounts.google.com/o/oauth2/revoke',
+                 params={'token': refresh_token})
+
 YOUTUBE_REQUEST_URL_BASE = 'https://www.googleapis.com/youtube/v3/'
 def _make_api_request(method, access_token, url_path, data=None, params=None,
                       headers=None):

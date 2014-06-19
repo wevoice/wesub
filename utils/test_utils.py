@@ -18,7 +18,6 @@ import utils.youtube
 REQUEST_CALLBACKS = []
 
 class Response(dict):
-
     status = 200
     content = ""
 
@@ -95,6 +94,7 @@ test_video_info = utils.youtube.VideoInfo(
 youtube_get_video_info = mock.Mock(return_value=test_video_info)
 youtube_get_user_info = mock.Mock(return_value=test_video_info)
 youtube_get_new_access_token = mock.Mock(return_value='test-access-token')
+youtube_revoke_auth_token = mock.Mock()
 youtube_update_video_description = mock.Mock()
 youtube_get_subtitled_languages = mock.Mock(return_value=[])
 _add_amara_description_credit_to_youtube_vurl = mock.Mock()
@@ -124,6 +124,7 @@ class MonkeyPatcher(object):
             ('utils.youtube.get_user_info', youtube_get_user_info),
             ('utils.youtube.get_new_access_token',
              youtube_get_new_access_token),
+            ('utils.youtube.revoke_auth_token', youtube_revoke_auth_token),
             ('utils.youtube.update_video_description',
              youtube_update_video_description),
             ('videos.types.youtube.YoutubeVideoType.get_subtitled_languages',

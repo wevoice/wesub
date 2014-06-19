@@ -61,6 +61,10 @@ def team_settings_tab(request, team):
 
     if formset.is_valid():
         formset.save()
+        if 'remove-youtube-account' in request.POST:
+            account = YouTubeAccount.objects.for_owner(team).get(
+                id=request.POST['remove-youtube-account'])
+            account.delete()
         return redirect(settings_page_redirect_url(team, request.POST))
 
     return render(request, 'externalsites/team-settings-tab.html', {

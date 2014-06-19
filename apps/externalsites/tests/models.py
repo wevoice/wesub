@@ -23,6 +23,7 @@ from django.test import TestCase
 from externalsites.models import (BrightcoveAccount, lookup_accounts,
                                   account_models)
 from videos.models import VideoFeed
+from utils import test_utils
 from utils.factories import *
 
 class LookupAccountTest(TestCase):
@@ -139,3 +140,11 @@ class BrightcoveAccountTest(TestCase):
 
         account = BrightcoveAccount.objects.get(id=self.account.id)
         self.assertEquals(account.import_feed, None)
+
+class YoutubeAccountTest(TestCase):
+    def test_revoke_token_on_delete(self):
+        account = YouTubeAccountFactory(user=UserFactory())
+        account.delete()
+        self.assertEquals(test_utils.youtube_revoke_auth_token.call_count, 1)
+        test_utils.youtube_revoke_auth_token.assert_called_with(
+            account.oauth_refresh_token)

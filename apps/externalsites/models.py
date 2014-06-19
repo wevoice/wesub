@@ -200,6 +200,10 @@ class KalturaAccount(ExternalAccount):
     def __unicode__(self):
         return "Kaltura: %s" % (self.partner_id)
 
+    def get_owner_display(self):
+        return fmt(_('partner id %(partner_id)s',
+                     partner_id=self.partner_id))
+
     def do_update_subtitles(self, video_url, language, tip):
         kaltura_id = video_url.get_video_type().kaltura_id()
         subtitles = tip.get_subtitles()
@@ -224,8 +228,15 @@ class BrightcoveAccount(ExternalAccount):
     import_feed = models.OneToOneField(VideoFeed, null=True,
                                        on_delete=models.SET_NULL)
 
+    class Meta:
+        verbose_name = _('Brightcove account')
+
     def __unicode__(self):
         return "Brightcove: %s" % (self.publisher_id)
+
+    def get_owner_display(self):
+        return fmt(_('publisher id %(publisher_id)s',
+                     publisher_id=self.publisher_id))
 
     def do_update_subtitles(self, video_url, language, tip):
         video_id = video_url.get_video_type().brightcove_id
@@ -324,12 +335,16 @@ class YouTubeAccount(ExternalAccount):
     objects = YouTubeAccountManager()
 
     class Meta:
+        verbose_name = _('YouTube account')
         unique_together = [
             ('type', 'owner_id', 'channel_id'),
         ]
 
     def __unicode__(self):
         return "YouTube: %s" % (self.username)
+
+    def get_owner_display(self):
+        return self.username
 
     def is_for_video_url(self, video_url):
         return (video_url.type == self.video_url_type and
@@ -348,6 +363,10 @@ class YouTubeAccount(ExternalAccount):
         access_token = youtube.get_new_access_token(self.oauth_refresh_token)
         syncing.youtube.delete_subtitles(video_url.videoid, access_token,
                                          language.language_code)
+
+    def delete(self):
+        youtube.revoke_auth_token(self.oauth_refresh_token)
+        super(YouTubeAccount, self).delete()
 
 account_models = [
     KalturaAccount,

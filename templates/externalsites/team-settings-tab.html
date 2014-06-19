@@ -21,12 +21,18 @@
             <fieldset class="youtube">
                 <legend>{% trans "YouTube" %}</legend>
                 {% if youtube_accounts %}
-                <h4>{% trans 'Current accounts' %}</h4>
-                <ul>
+                <table>
+                    <tr>
+                        <th colspan=2>{% trans 'Current accounts' %}</th>
+                    </tr>
                     {% for account in youtube_accounts %}
-                        <li>{{ account.username }}</li>
+                    <tr class="{% cycle 'odd' 'even' %}">
+                        <td>{{ account.username }}</td>
+                        <td class="actions"><button class="reduced" name="remove-youtube-account" value="{{ account.id }}" type="submit">{% trans 'remove account' %}</button>
+                        </td>
+                    </tr>
                     {% endfor %}
-                </ul>
+                </table>
                 {% else %}
                 <p class="no-accounts">{% trans 'No youtube accounts linked yet.' %}</p>
                 {% endif %}

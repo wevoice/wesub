@@ -65,6 +65,14 @@ class YouTubeTestCase(TestCase):
                 'test-refresh-token')
         self.assertEqual(access_token, 'test-access-token')
 
+    def test_revoke_auth_token(self):
+        mocker = RequestsMocker()
+        mocker.expect_request(
+            'get', 'https://accounts.google.com/o/oauth2/revoke',
+            params={'token': 'test-token'})
+        with mocker:
+            utils.youtube.revoke_auth_token('test-token')
+
     def test_get_user_info(self):
         mocker = RequestsMocker()
         mocker.expect_request(

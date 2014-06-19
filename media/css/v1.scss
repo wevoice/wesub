@@ -2453,6 +2453,30 @@ a.truncated-expand {
             display: none;
         }
     }
+
+    table {
+        border: 1px solid $light-grey;
+
+        th, td {
+            border: none;
+            padding: 0.5em 1em;
+        }
+
+        th {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        td {
+            &.actions {
+                text-align: right;
+
+                button {
+                    margin: 0;
+                }
+            }
+        }
+    }
 }
 
 
