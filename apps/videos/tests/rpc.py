@@ -19,23 +19,24 @@
 
 from django.test import TestCase
 
-from apps.auth.models import CustomUser as User
-from apps.videos.rpc import VideosApiClass
-from apps.videos.models import Video, Action
+from auth.models import CustomUser as User
+from utils.factories import *
+from utils.rpc import Error
+from videos.rpc import VideosApiClass
+from videos.models import Video, Action
 
 
 class RpcTest(TestCase):
-    fixtures = ['test.json']
-
     def setUp(self):
         self.rpc = VideosApiClass()
-        self.user = User.objects.get(username='admin')
-        self.video = Video.objects.get(video_id='iGzkk7nwWX8F')
-
+        self.user = UserFactory(is_superuser=True)
+        self.video = VideoFactory()
 
     def test_change_title_video(self):
         title = u'New title'
-        self.rpc.change_title_video(self.video.pk, title, self.user)
+        rv = self.rpc.change_title_video(self.video.pk, title, self.user)
+        if isinstance(rv, Error):
+            raise AssertionError('RPC error: %s' % rv)
 
         video = Video.objects.get(pk=self.video.pk)
         self.assertEqual(video.title, title)

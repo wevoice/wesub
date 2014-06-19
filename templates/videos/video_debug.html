@@ -294,21 +294,4 @@ jQuery(function($) {
 <b>{{k}}</b>: <pre>{{v|pprint}}</pre><br/>
 {% endfor %}
 
-
-{% if is_youtube %}
-
-<h2>Sync to Youtube</h2>
-<p>Choose a language and hit that button</p>
-<form method="post">
-    {% csrf_token %}
-    <select name="language">
-        {% for lang in video.newsubtitlelanguage_set.all %}
-            <option value="{{ lang.pk }}">{{ lang.language_code }}</option>
-        {% endfor %}
-    </select>
-    <input type="hidden" name="action" value="sync" />
-    <input type="submit" value="Sync to Youtube" class="btn" />
-</form>
-{% endif %}
-
 {% endblock %}

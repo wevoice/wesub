@@ -20,21 +20,25 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from apps.auth.models import CustomUser as User, EmailConfirmation
-from apps.messages import tasks as notifier
-from apps.messages.models import Message
-from apps.subtitles import models as sub_models
-from apps.subtitles.pipeline import add_subtitles
-from apps.teams.forms import InviteForm
-from apps.teams.models import (
-    Team, TeamMember, Application, Workflow, TeamVideo, Task
+from auth.models import CustomUser as User, EmailConfirmation
+from messages import tasks as n
+from messages import tasks as notifier
+from messages.models import Message
+from subtitles import models as sub_models
+from subtitles.pipeline import add_subtitles
+from teams import tasks as team_tasks
+from teams.forms import InviteForm
+from teams.models import (
+    Team, TeamMember, Application, Workflow, TeamVideo, Task, Setting, Invite,
+    Application
 )
-from apps.videos.models import Action, Video
+from teams.moderation_const import WAITING_MODERATION
 from utils import send_templated_email
-
+from utils.factories import *
+from videos.models import Action, Video
+from videos.tasks import video_changed_tasks
 
 class MessageTest(TestCase):
-
     def setUp(self):
         self.author = User.objects.all()[:1].get()
         self.subject = "Let's talk"
@@ -319,7 +323,6 @@ class MessageTest(TestCase):
         Notification should be sent.
         Setup  a team with moderated videos
         """
-        from teams.moderation_const import WAITING_MODERATION
         def video_with_two_followers():
             v, c = Video.get_or_create_for_url("http://blip.tv/file/get/Miropcf-AboutUniversalSubtitles847.ogv")
             f1 = User.objects.all()[0]
@@ -346,7 +349,6 @@ class MessageTest(TestCase):
 
         v = video_with_two_followers()
         mail.outbox = []
-        from videos.tasks import  video_changed_tasks
         v = video_with_two_followers()
         sv = new_version(v)
         video_changed_tasks(v.pk, sv.pk)
@@ -431,32 +433,23 @@ class MessageTest(TestCase):
 
 
 class TeamBlockSettingsTest(TestCase):
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-
     def test_block_settings_for_team(self):
-        from teams.models import Setting, Invite, Application
-        from messages import tasks as n
-        from teams import tasks as team_tasks
+        team = TeamFactory()
 
-        team_video = TeamVideo.objects.all()[0]
+        owner = UserFactory(
+            notify_by_email=True,
+            notify_by_message=True)
+        TeamMemberFactory(team=team, user=owner,
+                          role=TeamMember.ROLE_OWNER)
+
+        user = UserFactory(notify_by_email=True)
+        member = TeamMemberFactory(team=team, user=user)
+
+        team_video = TeamVideoFactory(team=team)
         video = team_video.video
-        team = team_video.team
-        user = User.objects.all()[0]
 
-        user.notify_by_email = True
-        user.save()
+        invite = Invite.objects.create(team=team, user=user, author=owner)
 
-        owner = User.objects.all()[2]
-        owner.notify_by_email = owner.notify_by_message = True
-        owner.save()
-
-        TeamMember.objects.get_or_create(team=team, user=owner,
-                                         role=TeamMember.ROLE_OWNER)
-        invite = Invite.objects.get_or_create(team=team,
-                                              user=user,
-                                              author=User.objects.all()[1])[0]
-        member = TeamMember.objects.create(team=team, user=user)
-        team_video = TeamVideo.objects.filter(team=team)[0]
         task_assigned = Task.objects.create(team=team, team_video=team_video,
                                             type=10, assignee=member.user)
 

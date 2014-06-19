@@ -17,64 +17,18 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import datetime
-
 from django.test import TestCase
-from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
-from django.contrib.contenttypes.models import ContentType
-
-from videos.models import Video
-from apps.auth.models import CustomUser as User
 
 from django.core import mail
-from comments.models import Comment
 from localeurl.utils import universal_url, DEFAULT_PROTOCOL
-from messages.tasks import  send_video_comment_notification
+from subtitles import pipeline
+from utils.factories import *
 
-
-class CommentEmailTests(TestCase):
-
-    fixtures = ['test.json', 'subtitle_fixtures.json']
-
-    def setUp(self):
-        self.user = User.objects.all()[0]
-        self.video = Video.objects.all()[0]
-
-        self.auth = dict(username='admin', password='admin')
-        self.logged_user = User.objects.get(username=self.auth['username'])
-        l = self.video.subtitle_language()
-        l.language_code = "en"
-        l.save()
-        comment = Comment(content_object=self.video)
-        comment.user = self.logged_user
-        comment.content = "testme"
-        comment.submit_date = datetime.datetime.now()
-        comment.save()
-        self.comment = comment
-
-    def _create_followers(self, video, num_followers):
-        for x in xrange(0,num_followers):
-            u = User(username="%s@example.lcom" %x, email="%s@example.com" % x)
-            u.save()
-            video.followers.add(u)
-            
-    def _post_comment_for(self, obj):
-        self.client.login(**self.auth)
-        data = {
-          "content": "hi from tests",
-          'content_type' : ContentType.objects.get_for_model(obj).pk,
-          'object_pk':obj.pk
-
-          }
-        response = self.client.post(reverse("comments:post"), data)
-        self.assertEqual(response.status_code, 200)
-        return response
-
-
+class UniversalUrlsTest(TestCase):
     def test_universal_urls(self):
-        domain= Site.objects.get_current().domain
-        vid = self.video.video_id
+        domain = Site.objects.get_current().domain
+        vid = 'test-video-id'
         correct_url = "%s://%s/videos/%s/info/" % (
             DEFAULT_PROTOCOL, domain, vid)
         self.assertEqual(correct_url,
@@ -82,47 +36,50 @@ class CommentEmailTests(TestCase):
                                        kwargs={"video_id":vid}))
         self.assertEqual(correct_url,
                          universal_url("videos:video", args=(vid,)))
-    
-    def check_subject(self, email):
-        self.assertEqual(email.subject,
-                         u'%s left a comment on the video %s' % (
-                             self.comment.user, self.video.title_display()))
 
-    def test_simple_email(self):
-        num_followers = 5
-        self._create_followers(self.video, num_followers)
+class VideoCommentEmailTest(TestCase):
+    def setUp(self):
+        self.user = UserFactory(email='video-user@example.com')
+        self.other_user = UserFactory(email='other-user@example.com')
+        self.video = VideoFactory(user=self.user)
+        for x in range(5):
+            self.video.followers.add(
+                UserFactory(email='follower-%s@example.com' % x))
+        self.followers = list(self.video.followers.all())
         mail.outbox = []
-        send_video_comment_notification(self.comment.pk)
-        self.assertEqual(len(mail.outbox), num_followers)
-        self.check_subject(mail.outbox[0])
 
-    def test_email_content(self):
-        num_followers = 2
-        body_dicts = []
-        from utils import tasks
-        self._create_followers(self.video, num_followers)
-        mail.outbox = []
-        send_video_comment_notification(self.comment.pk)
-        self.assertEqual(len(mail.outbox), num_followers)
-        for msg in mail.outbox:
-            self.assertEqual(msg.subject, u'admin left a comment on the video Hax')
-        
+    def comment_subject(self, user):
+        return u'%s left a comment on the video %s' % (
+            user, self.video.title_display())
 
-    def test_comment_view_for_video(self):
-        num_followers = 2
-        self._create_followers(self.video, num_followers)
+    def check_emails(self, subject, correct_recipients):
+        recipients = set()
+        for email in mail.outbox:
+            recipients.update(email.to)
+            self.assertEqual(email.subject, subject)
+        self.assertEqual(recipients,
+                         set([u.email for u in correct_recipients]))
         mail.outbox = []
-        response = self._post_comment_for(self.video)
-        followers = set(self.video.notification_list(self.logged_user))
-        self.assertEqual(len(mail.outbox), len(followers))
-        self.check_subject(mail.outbox[0])
 
-    def test_comment_view_for_language(self):
-        num_followers = 2
-        self._create_followers(self.video, num_followers)
-        lang = self.video.subtitle_language()
-        mail.outbox = []
-        response = self._post_comment_for(lang)
-        followers = set(self.video.notification_list(self.logged_user))
-        self.assertEqual(len(mail.outbox), len(followers))
-        self.check_subject(mail.outbox[0])
+    def test_video_comment_emails(self):
+        # normally we should send notifications to all followers
+        comment = CommentFactory(content_object=self.video,
+                                 user=self.other_user)
+        self.check_emails(self.comment_subject(self.other_user),
+                          self.followers)
+        # if one of those users posts the comment, then we should not send it
+        # to them
+        comment = CommentFactory(content_object=self.video,
+                                 user=self.followers[0])
+        self.check_emails(self.comment_subject(self.followers[0]),
+                          self.followers[1:])
+
+    def test_language_comment_emails(self):
+        # posting a comment on the language should also notify the video
+        # followers
+        pipeline.add_subtitles(self.video, 'en', None)
+        comment = CommentFactory(
+            content_object=self.video.subtitle_language('en'),
+            user=self.other_user)
+        self.check_emails(self.comment_subject(self.other_user),
+                          self.followers)

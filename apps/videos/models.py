@@ -490,7 +490,6 @@ class Video(models.Model):
         from types.base import VideoTypeError
         from videos.tasks import (
             save_thumbnail_in_s3,
-            add_amara_description_credit_to_youtube_video
         )
 
         try:

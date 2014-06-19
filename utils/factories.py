@@ -32,6 +32,7 @@ from factory.django import DjangoModelFactory
 
 import accountlinker.models
 import auth.models
+import comments.models
 import externalsites.models
 import subtitles.models
 import teams.models
@@ -252,6 +253,12 @@ class YouTubeAccountFactory(DjangoModelFactory):
     username = factory.Sequence(lambda n: 'youtube-user-%s' % n)
     channel_id = factory.Sequence(lambda n: 'channel-id-%s' % n)
     oauth_refresh_token = 'refresh-token'
+
+class CommentFactory(DjangoModelFactory):
+    FACTORY_FOR = comments.models.Comment
+    user = factory.SubFactory(UserFactory)
+    content = "test-content"
+    submit_date = datetime.datetime(2000, 1, 1)
 
 class YouTubeVideoInfoFactory(Factory):
     FACTORY_FOR = youtube.VideoInfo

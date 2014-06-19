@@ -23,7 +23,7 @@ import simplejson as json
 from django.conf import settings
 from django.test import TestCase
 
-from utils.test_utils import RequestsMocker
+from utils import test_utils
 import utils.youtube
 
 class YouTubeTestCase(TestCase):
@@ -46,7 +46,7 @@ class YouTubeTestCase(TestCase):
                          correct_url)
 
     def test_get_new_access_token(self):
-        mocker = RequestsMocker()
+        mocker = test_utils.RequestsMocker()
         mocker.expect_request(
             'post', "https://accounts.google.com/o/oauth2/token", data={
                 'client_id': settings.YOUTUBE_CLIENT_ID,
@@ -66,15 +66,16 @@ class YouTubeTestCase(TestCase):
         self.assertEqual(access_token, 'test-access-token')
 
     def test_revoke_auth_token(self):
-        mocker = RequestsMocker()
+        mocker = test_utils.RequestsMocker()
         mocker.expect_request(
             'get', 'https://accounts.google.com/o/oauth2/revoke',
             params={'token': 'test-token'})
+        test_utils.youtube_revoke_auth_token.run_original_for_test()
         with mocker:
             utils.youtube.revoke_auth_token('test-token')
 
     def test_get_user_info(self):
-        mocker = RequestsMocker()
+        mocker = test_utils.RequestsMocker()
         mocker.expect_request(
             'get', 'https://www.googleapis.com/youtube/v3/channels', params={
                 'part': 'id,snippet',
@@ -98,7 +99,7 @@ class YouTubeTestCase(TestCase):
         self.assertEqual(user_info, ('test-channel-id', 'test-username'))
 
     def test_get_video_info(self):
-        mocker = RequestsMocker()
+        mocker = test_utils.RequestsMocker()
         mocker.expect_request(
             'get', 'https://www.googleapis.com/youtube/v3/videos', params={
                 'part': 'snippet,contentDetails',
@@ -134,7 +135,7 @@ class YouTubeTestCase(TestCase):
         self.assertEqual(video_info.thumbnail_url, 'test-thumbnail-url')
 
     def test_update_video_description(self):
-        mocker = RequestsMocker()
+        mocker = test_utils.RequestsMocker()
         mocker.expect_request(
             'get', 'https://www.googleapis.com/youtube/v3/videos', params={
                 'part': 'snippet',
@@ -191,7 +192,7 @@ class HandleCallbackTest(TestCase):
     def test_normal_case(self):
         redirect_uri = 'http://example.com/my-callback'
 
-        mocker = RequestsMocker()
+        mocker = test_utils.RequestsMocker()
         mocker.expect_request(
             'post', "https://accounts.google.com/o/oauth2/token", data={
                 'client_id': settings.YOUTUBE_CLIENT_ID,
@@ -241,7 +242,7 @@ class HandleCallbackTest(TestCase):
     def test_error(self):
         redirect_uri = 'http://example.com/my-callback'
 
-        mocker = RequestsMocker()
+        mocker = test_utils.RequestsMocker()
         mocker.expect_request(
             'post', "https://accounts.google.com/o/oauth2/token", data={
                 'client_id': settings.YOUTUBE_CLIENT_ID,
@@ -267,7 +268,7 @@ class HandleCallbackTest(TestCase):
     def test_status_code_error(self):
         redirect_uri = 'http://example.com/my-callback'
 
-        mocker = RequestsMocker()
+        mocker = test_utils.RequestsMocker()
         mocker.expect_request(
             'post', "https://accounts.google.com/o/oauth2/token", data={
                 'client_id': settings.YOUTUBE_CLIENT_ID,

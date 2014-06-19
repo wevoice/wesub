@@ -89,8 +89,6 @@ class CustomUser(BaseUser):
     is_partner = models.BooleanField(default=False)
     pay_rate_code = models.CharField(max_length=3, blank=True, default='')
     can_send_messages = models.BooleanField(default=True)
-    third_party_accounts = models.ManyToManyField("accountlinker.ThirdPartyAccount",
-            related_name='users', verbose_name=_('third party accounts'))
 
     objects = UserManager()
 

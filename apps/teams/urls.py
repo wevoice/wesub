@@ -74,8 +74,6 @@ urlpatterns = patterns('teams.views',
     url(r'^(?P<slug>[-\w]+)/p/(?P<project_slug>[-\w]+)?/?$', 'detail', name='project_video_list'),
     # TODO: Review these...
     url(r'^(?P<slug>[-\w]+)/p/(?P<project_slug>[-\w]+)/tasks/?$', 'team_tasks', name='project_tasks'),
-    url(r'^(?P<slug>[-\w]+)/third-party-accounts/$', 'third_party_accounts', name='third-party-accounts'),
-    url(r'^(?P<slug>[-\w]+)/third-party-accounts/sync/(?P<account_id>[-\w]+)$', 'sync_third_party_account', name='sync-third-party-account'),
     url(r'^(?P<slug>[-\w]+)/delete-language/(?P<lang_id>[\w\-]+)/', 'delete_language', name='delete-language'),
     url(r'^(?P<slug>[-\w]+)/auto-captions-status/$', 'auto_captions_status', name='auto-captions-status'),
 )

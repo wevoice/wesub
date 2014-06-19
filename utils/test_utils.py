@@ -97,7 +97,7 @@ youtube_get_new_access_token = mock.Mock(return_value='test-access-token')
 youtube_revoke_auth_token = mock.Mock()
 youtube_update_video_description = mock.Mock()
 youtube_get_subtitled_languages = mock.Mock(return_value=[])
-_add_amara_description_credit_to_youtube_vurl = mock.Mock()
+url_exists = mock.Mock(return_value=True)
 
 current_locks = set()
 acquire_lock = mock.Mock(
@@ -129,10 +129,9 @@ class MonkeyPatcher(object):
              youtube_update_video_description),
             ('videos.types.youtube.YoutubeVideoType.get_subtitled_languages',
              youtube_get_subtitled_languages),
-            ('videos.tasks._add_amara_description_credit_to_youtube_vurl',
-             _add_amara_description_credit_to_youtube_vurl),
             ('utils.applock.acquire_lock', acquire_lock),
             ('utils.applock.release_lock', release_lock),
+            ('utils.http.url_exists', url_exists),
             ('widget.video_cache.invalidate_cache',
              invalidate_widget_video_cache),
             ('externalsites.tasks.update_subtitles', update_subtitles),

@@ -2031,12 +2031,10 @@ class TestTeamInteractions(TestCase):
 
 
 class TestSubtitleMetadata(TestCase):
-    fixtures = ['staging_users.json', 'staging_videos.json']
-
     def setUp(self):
         self.video = make_video()
         self.sl_en = make_sl(self.video, 'en')
-        self.user = User.objects.all()[0]
+        self.user = UserFactory()
 
     def test_reviewed_by_setting(self):
         version = self.sl_en.add_version()

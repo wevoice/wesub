@@ -566,12 +566,6 @@ def can_delete_language(user, language):
             _can_delete_language(team_video.team, user))
 
 @register.filter
-def sync_third_party_account(account, team):
-    return reverse('teams:sync-third-party-account',
-            kwargs={'slug': team.slug, 'account_id': account.pk})
-
-
-@register.filter
 def get_upload_form(task, user):
     """Return a TaskUploadForm for the given Task and User.
 
