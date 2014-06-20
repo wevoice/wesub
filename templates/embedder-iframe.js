@@ -18,11 +18,15 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	var updateContent = function(index, content) {
 	    iframes[index].innerHTML = content;
 	};
-	var updateLoading = function(index) {
-	    iframes[index].parentNode.style.backgroundColor = "transparent";
-	    iframes[index].style.visibility = "visible";
-	    iframes[index].style.opacity = 1;
-	    loadingDivs[index].style.display = "none";
+	var updateLoading = function(index, error) {
+            if (error) {
+                loadingDivs[index].innerHTML = "Video type not supported by Amara player";
+            } else {
+	        loadingDivs[index].style.display = "none";
+	        iframes[index].style.visibility = "visible";
+	        iframes[index].style.opacity = 1;
+	        iframes[index].parentNode.style.backgroundColor = "transparent";
+            }
 	};
 	this.resizeReceiver = function(e) {
 	    if (e.data.initDone)
@@ -31,6 +35,8 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		resize(e.data.index, e.data.width, e.data.height);
 	    if (e.data.content)
 		updateContent(e.data.index, e.data.content);
+            if (e.data.error == window.MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED)
+                updateLoading(e.data.index, true);
 	    if (e.data.videoReady)
                 updateLoading(e.data.index);
 	};

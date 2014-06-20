@@ -47,11 +47,11 @@
     }
     ////////////////////////////////////////////
 
-    function notifyVideoLoadedToHost() {
+    function notifyVideoLoadedToHost(error) {
 	if(hostPage.source)
 	    hostPage.source.postMessage({resize: false, index: hostPage.index,
-					 videoReady: true,
-					}, hostPage.origin);
+					 videoReady: (error == undefined),
+                                         error: error}, hostPage.origin);
     }
 
     function regexEscape(str) {
@@ -313,6 +313,12 @@
                 this.$el.height('auto');
                 // Init the Popcorn video.
                 this.pop = this.loadPopcorn();
+
+                this.pop.on('error', function() {
+                    if (that.pop.error.code == window.MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+                            notifyVideoLoadedToHost(window.MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED);
+		    }
+                });
 
                 this.pop.on('loadedmetadata', function() {
                     // This does not work for html5 videos. The size must be the one set as parameter
