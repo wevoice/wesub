@@ -11,11 +11,18 @@
             <p class="notation">Use the following code to embed this video. See our <a href="https://github.com/pculture/unisubs/wiki/Embed-Code-Usage-Guide" title="Embed usage guide">usage guide</a> for more details on embedding.</p>
         </div>
         <div class="modal-body">
-            <form>
-                <fieldset>
-                    <textarea readonly="readonly" rows="8">{{share_panel_embed_code}}</textarea>
-                </fieldset>
-            </form>
+	  <p>Paste this in your document somewhere (closest to the closing body tag is preferable):
+	      <pre>
+&lt;script type="text/javascript" src='http://amara.org/embedder-iframe'&gt;
+&lt;/script&gt;
+	      </pre>
+	  </p>
+	  <p>Paste this inside your HTML body, where you want to include the widget, with the width and height of your choosing:
+	    <pre>
+&lt;div class="amara-embed" data-height="{{ height }}px" data-width="{{ width }}px" data-url="{{ video_url }}"&gt;
+&lt;/div&gt;
+	    </pre>
+	  </p>
         </div>
     </div>
 </div>

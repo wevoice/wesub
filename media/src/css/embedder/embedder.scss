@@ -218,6 +218,7 @@ div.amara-embed {
                 padding: 0 10px;
                 position: relative;
                 width: 21%;
+                min-width: 100px;
                 .amara-current-language {
                     background: transparent url('../../images/embedder/amara-sprites.png') right -187px no-repeat;
                     color: #DEDEDE;
