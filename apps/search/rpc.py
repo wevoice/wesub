@@ -27,33 +27,16 @@ from django.template import RequestContext
 from django.core.cache import cache
 
 class SearchApiClass(object):
-
-    def search(self, rdata, user, testing=False):
-        sqs = VideoIndex.public()
-
-        rdata['q'] = rdata['q'] or u' '
-        q = rdata.get('q')
-
-        if q:
-            sqs = SearchForm.apply_query(q, sqs)
-            form = SearchForm(rdata, sqs=sqs)
-        else:
-            form = SearchForm(rdata)
-
-        if form.is_valid():
-            qs = form.search_qs(sqs)
-        else:
-            qs = VideoIndex.public().none()
-
-        #result = [item.object for item in qs]
-        #qs1 = Video.objects.filter(title__contains=rdata['q'])
-        #for o in qs1:
-        #    if not o in result:
-        #        print o.title
+    def search(self, rdata, user):
+        form = SearchForm(rdata)
 
         display_views = form.get_display_views()
-        output = render_page(rdata.get('page', 1), qs, 20, display_views=display_views)
-        output['sidebar'] = render_to_string('search/_sidebar.html', dict(form=form, rdata=rdata))
+        output = render_page(rdata.get('page', 1), form.queryset(), 20,
+                             display_views=display_views)
+        output['sidebar'] = render_to_string('search/_sidebar.html', {
+            'form': form,
+            'rdata': rdata,
+        })
 
         # Assume we're currently indexing if the number of public
         # indexed vids differs from the count of video objects by
@@ -64,8 +47,5 @@ class SearchApiClass(object):
             cache.set('is_indexing', is_indexing, 300)
 
         output['is_indexing'] = is_indexing
-
-        if testing:
-            output['sqs'] = qs
 
         return output

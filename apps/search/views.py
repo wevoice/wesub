@@ -54,6 +54,6 @@ def index(request):
         return HttpResponseRedirect(url)
     else:
         return {
-            'form': SearchForm(sqs=VideoIndex.public())
+            'form': SearchForm(),
         }
 
