@@ -28,6 +28,14 @@ from django.core.cache import cache
 
 class SearchApiClass(object):
     def search(self, rdata, user):
+        try:
+            return self._search(rdata, user)
+        except StandardError:
+            import traceback
+            traceback.print_exc()
+            raise
+
+    def _search(self, rdata, user):
         form = SearchForm(rdata)
 
         display_views = form.get_display_views()

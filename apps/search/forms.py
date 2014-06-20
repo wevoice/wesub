@@ -23,6 +23,30 @@ from videos.search_indexes import VideoIndex
 
 ALL_LANGUAGES = get_language_choices()
 
+def _get_language_facet_counts(sqs):
+    """Use haystack faceting to find the counts for the language fields
+
+    The facet count data will be a list of (language_code, count) tuples.
+
+    Return a tuple containing facet count data for the video language and
+    the subtitle languages
+    """
+
+    sqs = sqs.facet('video_language').facet('languages')
+    facet_counts = sqs.facet_counts()
+
+    try:
+        video_lang_counts = facet_counts['fields']['video_language']
+    except KeyError:
+        video_lang_counts = []
+
+    try:
+        language_counts = facet_counts['fields']['languages']
+    except KeyError:
+        language_counts = []
+
+    return (video_lang_counts, language_counts)
+
 class SearchForm(forms.Form):
     SORT_CHOICES = (
         ('score', _(u'Relevance')),
@@ -42,17 +66,15 @@ class SearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)
-        sqs = VideoIndex.public()
 
-        facet_data = sqs.facet('video_language').facet('languages').facet_counts()
-        try:
-            video_langs_data = facet_data['fields']['video_language']
-        except KeyError:
-            video_langs_data = {}
-        self.fields['video_lang'].choices = self._make_choices_from_faceting(video_langs_data)
+        video_language_facet_counts, language_facet_counts = \
+            _get_language_facet_counts(self.queryset_from_query())
 
-        langs_data = facet_data['fields']['languages']
-        self.fields['langs'].choices = self._make_choices_from_faceting(langs_data)
+        self.fields['video_lang'].choices = self._make_choices_from_faceting(
+            video_language_facet_counts)
+
+        self.fields['langs'].choices = self._make_choices_from_faceting(
+            language_facet_counts)
 
     def get_display_views(self):
         if not hasattr(self, 'cleaned_data'):
@@ -89,19 +111,26 @@ class SearchForm(forms.Form):
 
         return choices
 
+    def queryset_from_query(self):
+        q = self.data.get('q')
+        if q:
+            qs = VideoIndex.public()
+            return (qs
+                    .auto_query(q)
+                    .filter_or(title=qs.query.clean(q)))
+        else:
+            return self.empty_queryset()
+
     def queryset(self):
         if not self.is_valid():
-            return VideoIndex.public().none()
-        q = self.cleaned_data.get('q')
+            return self.empty_queryset()
         ordering = self.cleaned_data.get('sort', '')
         langs = self.cleaned_data.get('langs')
         video_language = self.cleaned_data.get('video_lang')
 
-        qs = VideoIndex.public()
-        if q:
-            qs = qs.auto_query(q).filter_or(title=qs.query.clean(q))
+        qs = self.queryset_from_query()
 
-        #aplly filtering
+        #apply filtering
         if video_language:
             qs = qs.filter(video_language_exact=video_language)
 
@@ -115,3 +144,5 @@ class SearchForm(forms.Form):
 
         return qs
 
+    def empty_queryset(self):
+        return VideoIndex.public().none()

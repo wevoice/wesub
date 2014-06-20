@@ -21,6 +21,7 @@ from django.test import TestCase
 from search.forms import SearchForm
 from utils.rpc import RpcMultiValueDict
 from videos.search_indexes import VideoIndex
+from utils import test_utils
 
 class SearchTest(TestCase):
     def get_search_qs(self, query, **params):
@@ -45,7 +46,13 @@ class SearchTest(TestCase):
         self.assertEqual(str(self.get_search_qs('')),
                          str(VideoIndex.public().none()))
 
-    def test_language_filter(self):
+    def test_video_lang_filter(self):
+        # set up fake faceting info so that we can select english as the
+        # filter
+        test_utils.get_language_facet_counts.return_value = (
+            [('en', 10)], []
+        )
+
         sqs = self.get_search_qs('foo', video_lang='en')
         correct_sqs = (VideoIndex.public()
                        .auto_query('foo')

@@ -109,6 +109,7 @@ update_subtitles = mock.Mock()
 delete_subtitles = mock.Mock()
 update_all_subtitles = mock.Mock()
 import_videos_from_feed = mock.Mock()
+get_language_facet_counts = mock.Mock(return_value=([], []))
 
 class MonkeyPatcher(object):
     """Replace a functions with mock objects for the tests.
@@ -138,6 +139,8 @@ class MonkeyPatcher(object):
             ('externalsites.tasks.delete_subtitles', delete_subtitles),
             ('externalsites.tasks.update_all_subtitles', update_all_subtitles),
             ('videos.tasks.import_videos_from_feed', import_videos_from_feed),
+            ('search.forms._get_language_facet_counts',
+             get_language_facet_counts)
         ]
         self.patches = []
         self.initial_side_effects = {}
