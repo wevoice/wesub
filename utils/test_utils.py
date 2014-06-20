@@ -207,12 +207,21 @@ class UnisubsTestPlugin(Plugin):
             os.path.join(settings.PROJECT_ROOT, 'libs'),
         ])
 
+    def options(self, parser, env=os.environ):
+        parser.add_option("--with-webdriver",
+                          action="store_true", dest="webdriver",
+                          default=False, help="Enable webdriver tests")
+
     def configure(self, options, conf):
-        super(UnisubsTestPlugin, self).configure(options, conf)
         # force enabled to always be True.  This only gets loaded because we
         # manually specify the plugin in the dev_settings_test.py file.  So
         # it's pretty safe to assume the user wants us enabled.
         self.enabled = True
+        if not options.webdriver:
+            self.directories_to_skip.add(
+                os.path.join(settings.PROJECT_ROOT, 'apps',
+                             'webdriver_testing'),
+            )
 
     def begin(self):
         self.patcher.patch_functions()
