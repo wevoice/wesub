@@ -203,6 +203,24 @@ class TestCaseBilling(WebdriverTestCase):
         self.assertIn(self.video.video_id, self.bill_dict.keys())
 
 
+    def test_delete_video(self):
+
+        video1, tv1 = self._create_tv_with_original_subs(self.user, self.team)
+        video, tv = self._create_tv_with_original_subs(self.user, self.team)
+        video.delete()
+        report = BillingFactory(start_date=(datetime.date.today() - 
+                                            datetime.timedelta(1)),
+                                end_date=datetime.datetime.now(),
+                                )
+        report.teams=[self.team]
+        report.save()
+        report.process()
+        self.logger.info(report.csv_file)
+        bill = 'user-data/%s' % report.csv_file
+        self.logger.info(bill)
+        bill_dict = self._bill_dict(bill)
+        self.assertIn('deleted', bill_dict.keys())
+
     def test_crowd_billing_fields(self):
         video, tv = self._create_tv_with_original_subs(self.user, self.team)
         report = BillingFactory(start_date=(datetime.date.today() - 
@@ -323,8 +341,8 @@ class TestCaseDemandReports(WebdriverTestCase):
 
         cls.contributor2 = TeamMemberFactory(role="ROLE_CONTRIBUTOR",
                 team=team,
-                user__first_name='Gabriel José de la Concordia'.decode("utf-8"), 
-                user__last_name='García Márquez'.decode("utf-8")).user
+                user__first_name='Gabriel José de la Concordia'.decode("utf8"), 
+                user__last_name='García Márquez'.decode("utf8")).user
         cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=team).user
         cls.manager = TeamMemberFactory(role="ROLE_MANAGER",team=team).user
 
