@@ -267,6 +267,7 @@ class EditorPage(UnisubsPage):
         return removed_text
 
     def hover_tools_menu(self):
+        self.wait_for_element_visible(self._TOOLS_MENU)
         self.hover_by_css(self._TOOLS_MENU)
 
     def tools_menu_items(self):

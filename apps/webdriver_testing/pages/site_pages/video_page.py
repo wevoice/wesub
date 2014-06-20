@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from apps.webdriver_testing.pages.site_pages import UnisubsPage
+from webdriver_testing.pages.site_pages import UnisubsPage
 from urlparse import urlsplit
 
 
@@ -15,8 +15,6 @@ class VideoPage(UnisubsPage):
     _SPEAKER_NAME = "div.content div div > h4"
     _LOCATION = "div.content div div h4:nth-child(2)"
     _DESCRIPTION = "div#description"
-    _EMBEDDED_VIDEO = "div.unisubs-widget div.unisubs-videoTab-container"
-    _SUBTITLE_MENU = "a.unisubs-subtitleMeLink span.unisubs-tabTextchoose"
     _LIKE_FACEBOOK = "li.unisubs-facebook-like button"
     _POST_FACEBOOK = "a.facebook"
     _POST_TWITTER = "a.twittter"
@@ -35,10 +33,11 @@ class VideoPage(UnisubsPage):
     _VIDEO_TAB = 'a[href="?tab=video"]'
     _COMMENTS_TAB = 'a[href="?tab=comments"]'
     _ACTIVITY_TAB = 'a[href="?tab=activity"]'
+    _SYNC_HISTORY_TAB = 'a[href="?tab=sync-history"]'
 
     _CONTRIBUTE = "div.contribute"
     _ADD_SUBTITLES = "a.open-modal"
-    _ADD_SUBS_TEXT = "Add a new langauge!"
+    _ADD_SUBS_TEXT = "Add a new language!"
     _ADD_LANGUAGE_SELECT = "select#id_subtitle_language_code"
 
     #VIDEO SIDE SECTION
@@ -84,6 +83,10 @@ class VideoPage(UnisubsPage):
     def open_video_activity(self, video_id):
         self.open_video_page(video_id)
         self.click_by_css(self._ACTIVITY_TAB)
+
+    def open_sync_history(self, video_id):
+        self.open_video_page(video_id)
+        self.click_by_css(self._SYNC_HISTORY_TAB)
 
     def video_title(self):
         return self.get_text_by_css(self._VIDEO_TITLE)
@@ -149,11 +152,6 @@ class VideoPage(UnisubsPage):
     def location(self):
         return self.get_text_by_css(self._LOCATION)
 
-
-    def video_embed_present(self):
-        if self.is_element_present(self._EMBEDDED_VIDEO):
-            return True
-
     def add_subtitles(self, lang='en'):
         self.click_by_css(self._ADD_SUBTITLES)
 
@@ -170,14 +168,9 @@ class VideoPage(UnisubsPage):
     def unfeature_video(self):
         self.click_link_text('Unfeature video')
 
-    def displays_subtitle_me(self):
-        return self.is_element_visible(self._SUBTITLE_MENU)
-
-    def click_subtitle_me(self):
-        self.click_by_css(self._SUBTITLE_MENU)
-
     def displays_add_subtitles(self):
-        return self.is_text_present(self._CONTRIBUTE, self._ADD_SUBS_TEXT)
+        contrib_text = self.get_text_by_css(self._CONTRIBUTE)
+        return (self._ADD_SUBS_TEXT in contrib_text)
 
     def displays_upload_subtitles(self):
         return self.is_element_visible(self._UPLOAD_SUBTITLES)
