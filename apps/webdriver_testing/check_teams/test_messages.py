@@ -165,7 +165,7 @@ class TestCaseMessageUsers(WebdriverTestCase):
 
     def test_large_team_message(self):
         """Message all team members"""
-        for x in range(0,1000):
+        for x in range(0,20):
             TeamMemberFactory.create(role='ROLE_CONTRIBUTOR',
                                      team=self.team2,
                                      user=UserFactory.create())

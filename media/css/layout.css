@@ -928,3 +928,8 @@ a.active {
   clear: both;
   padding-top: 3em;
 }
+
+.wrapper .centered-div {
+    display: table;
+    margin: 10px auto;
+}
