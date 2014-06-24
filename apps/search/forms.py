@@ -119,7 +119,7 @@ class SearchForm(forms.Form):
                     .auto_query(q)
                     .filter_or(title=qs.query.clean(q)))
         else:
-            return self.empty_queryset()
+            return VideoIndex.public()
 
     def queryset(self):
         if not self.is_valid():
