@@ -37,7 +37,6 @@ from utils.rpc import Error, Msg
 from videos import metadata_manager
 from videos.models import Video, SubtitleVersion
 from videos.search_indexes import VideoIndex
-from widget.tests import create_two_sub_session, RequestMockup
 
 LANGUAGE_RE = re.compile(r"S_([a-zA-Z\-]+)")
 
@@ -457,26 +456,6 @@ class TeamsTest(TestCase):
             self.assertTrue(l.subtitleversion_set.full().count())
         self.assertTrue(video.is_public)
         self.assertEqual(video.moderated_by, None)
-
-    def test_complete_contents(self):
-        #request = RequestMockup(User.objects.all()[0])
-        request = RequestMockup(self.user)
-        create_two_sub_session(request, completed=True)
-
-        team, new_team_video = self._create_new_team_video()
-        video = Video.objects.get(id=new_team_video.video.id)
-
-        # We have to update the metadata here to make sure the video is marked
-        # as complete for Solr.
-        metadata_manager.update_metadata(video.pk)
-
-        reset_solr()
-
-        search_record_list = self._complete_search_record_list(team)
-        self.assertEqual(1, len(search_record_list))
-        search_record = search_record_list[0]
-        self.assertEqual(1, len(search_record.video_completed_langs))
-        self.assertEqual('en', search_record.video_completed_langs[0])
 
     def test_detail_contents_after_edit(self):
         # make sure edits show up in search result from solr

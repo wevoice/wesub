@@ -35,10 +35,6 @@ from apps.videos.tests.videotestutils import (
     WebUseTest, refresh_obj, _create_trans
 )
 from apps.widget.rpc import Rpc
-from apps.widget.tests import (
-    create_two_sub_dependent_session, create_two_sub_session, RequestMockup,
-    NotAuthenticatedUser
-)
 
 up = os.path.dirname
 
@@ -200,10 +196,9 @@ class UploadSubtitlesTest(WebUseTest):
         user2 = get_user(2)
         video = get_video()
         sl_en = make_subtitle_language(video, 'en')
-        request1 = RequestMockup(user1)
 
         # Lock the language for user 1.
-        sl_en.writelock(user1, request1.browser_id)
+        sl_en.writelock(user1, 'test-browser-id')
         self.assertTrue(sl_en.is_writelocked)
 
         # Now try to upload subtitles as user 2.

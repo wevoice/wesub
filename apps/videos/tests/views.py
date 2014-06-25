@@ -49,7 +49,6 @@ from apps.videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version
 )
 from apps.widget import video_cache
-from apps.widget.tests import create_two_sub_session, RequestMockup
 from utils import test_utils
 from utils.factories import *
 
