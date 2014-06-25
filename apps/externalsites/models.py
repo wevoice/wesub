@@ -344,7 +344,10 @@ class YouTubeAccount(ExternalAccount):
         return "YouTube: %s" % (self.username)
 
     def get_owner_display(self):
-        return self.username
+        if self.username:
+            return self.username
+        else:
+            return _('No username')
 
     def is_for_video_url(self, video_url):
         return (video_url.type == self.video_url_type and

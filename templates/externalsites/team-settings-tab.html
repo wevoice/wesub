@@ -27,7 +27,7 @@
                     </tr>
                     {% for account in youtube_accounts %}
                     <tr class="{% cycle 'odd' 'even' %}">
-                        <td>{{ account.username }}</td>
+                        <td>{{ account.get_owner_display }}</td>
                         <td class="actions"><button class="reduced" name="remove-youtube-account" value="{{ account.id }}" type="submit">{% trans 'remove account' %}</button>
                         </td>
                     </tr>
