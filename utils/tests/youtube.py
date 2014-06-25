@@ -65,6 +65,26 @@ class YouTubeTestCase(TestCase):
                 'test-refresh-token')
         self.assertEqual(access_token, 'test-access-token')
 
+    def test_get_new_access_token_error(self):
+        mocker = test_utils.RequestsMocker()
+        mocker.expect_request(
+            'post', "https://accounts.google.com/o/oauth2/token", data={
+                'client_id': settings.YOUTUBE_CLIENT_ID,
+                'client_secret': settings.YOUTUBE_CLIENT_SECRET,
+                'grant_type': 'refresh_token',
+                'refresh_token': 'test-refresh-token',
+            }, headers={
+                "Content-Type": "application/x-www-form-urlencoded"
+            }, body=json.dumps({
+                'error': 'test-error',
+            }),
+        )
+        utils.youtube.get_new_access_token.run_original_for_test()
+        with mocker:
+            self.assertRaises(utils.youtube.OAuthError,
+                              utils.youtube.get_new_access_token,
+                              'test-refresh-token')
+
     def test_revoke_auth_token(self):
         mocker = test_utils.RequestsMocker()
         mocker.expect_request(

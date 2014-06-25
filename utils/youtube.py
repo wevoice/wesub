@@ -80,10 +80,30 @@ def _oauth_token_post(**params):
     params["client_id"] = settings.YOUTUBE_CLIENT_ID
     params["client_secret"] = settings.YOUTUBE_CLIENT_SECRET
 
-    return requests.post("https://accounts.google.com/o/oauth2/token",
+    response = requests.post("https://accounts.google.com/o/oauth2/token",
                              data=params, headers={
         "Content-Type": "application/x-www-form-urlencoded"
     })
+
+    if response.status_code != 200:
+        logger.error("Error requesting Youtube OAuth token", extra={
+                    "data": {
+                        "sent_data": params,
+                        "response": response.content
+                    },
+                })
+        raise OAuthError('Authentication error')
+
+    if response.json.get('error', None):
+        logger.error("Error on requesting Youtube OAuth token", extra={
+                    "data": {
+                        "sent_data": params,
+                        "response": response.content
+                    },
+                })
+        raise OAuthError(response.json['error'])
+
+    return response
 
 def handle_callback(request, redirect_uri):
     """Handle the youtube oauth callback.
@@ -113,25 +133,6 @@ def handle_callback(request, redirect_uri):
     response = _oauth_token_post(code=code, grant_type='authorization_code',
                                  redirect_uri=redirect_uri)
 
-    if response.status_code != 200:
-        logger.error("Error requesting Youtube OAuth token", extra={
-                    "data": {
-                        "sent_params": response.request.params,
-                        "original_request": request,
-                        "response": response.content
-                    },
-                })
-        raise OAuthError('Authentication error')
-
-    if response.json.get('error', None):
-        logger.error("Error on requesting Youtube OAuth token", extra={
-                    "data": {
-                        "sent_params": response.request.params,
-                        "original_request": request,
-                        "response": response.content
-                    },
-                })
-        raise OAuthError(response.json['error'])
 
     user_info = get_user_info(response.json['access_token'])
 
