@@ -24,9 +24,9 @@ Right now the only site we handle is YouTube
 from django.utils.translation import ugettext as _
 from django.utils import translation
 
+from externalsites import models
 from utils import youtube
 from utils.text import fmt
-from externalsites.models import CreditedVideoUrl
 from videos.templatetags.videos_tags import shortlink_for_video
 
 def calc_credit_text(video):
@@ -35,7 +35,11 @@ def calc_credit_text(video):
                              shortlink_for_video(video))
 
 def videourl_has_credit(video_url):
-    return CreditedVideoUrl.objects.filter(video_url=video_url).exists()
+    return models.CreditedVideoUrl.objects.filter(video_url=video_url).exists()
+
+def should_add_credit_to_video_url(video_url, account):
+    return (isinstance(account, models.YouTubeAccount) and
+            account.type != models.ExternalAccount.TYPE_TEAM)
 
 def add_credit_to_video_url(video_url, account):
     """Add credit to a video on an external site
@@ -55,4 +59,4 @@ def add_credit_to_video_url(video_url, account):
         youtube.update_video_description(video_id, access_token,
                                          new_description)
 
-    CreditedVideoUrl.objects.create(video_url=video_url)
+    models.CreditedVideoUrl.objects.create(video_url=video_url)

@@ -21,8 +21,8 @@ import logging
 from celery.task import task
 from django.core.exceptions import ObjectDoesNotExist
 
-from externalsites import youtubecredit
-from externalsites.models import get_account, lookup_account, YouTubeAccount
+from externalsites import credit
+from externalsites.models import get_account, lookup_account
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from utils import youtube
 from videos.models import VideoUrl
@@ -126,5 +126,5 @@ def _sync_all_languages(account, video_url, video):
 def add_amara_credit(video_url_id):
     video_url = VideoUrl.objects.get(id=video_url_id)
     account = lookup_account(video_url.video, video_url)
-    if isinstance(account, YouTubeAccount):
-        youtubecredit.add_credit_to_video_url(video_url, account)
+    if credit.should_add_credit_to_video_url(video_url, account):
+        credit.add_credit_to_video_url(video_url, account)

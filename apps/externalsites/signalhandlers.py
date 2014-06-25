@@ -21,8 +21,9 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
+from externalsites import credit
 from externalsites import tasks
-from externalsites.models import (YouTubeAccount, KalturaAccount,
+from externalsites.models import (KalturaAccount,
                                   lookup_accounts, lookup_account)
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from videos.models import Video, VideoUrl
@@ -38,7 +39,7 @@ def on_public_tip_changed(signal, sender, version, **kwargs):
     for account, video_url in lookup_accounts(language.video):
         tasks.update_subtitles.delay(account.account_type, account.id,
                                      video_url.id, language.id)
-        if isinstance(account, YouTubeAccount):
+        if credit.should_add_credit_to_video_url(video_url, account):
             tasks.add_amara_credit.delay(video_url.id)
 
 @receiver(subtitles.signals.language_deleted)
@@ -59,5 +60,5 @@ def on_videourl_save(signal, sender, instance, created, **kwargs):
     video_url = instance
     if created:
         account = lookup_account(instance.video, instance)
-        if account and isinstance(account, YouTubeAccount):
+        if credit.should_add_credit_to_video_url(video_url, account):
             tasks.add_amara_credit.delay(instance.id)

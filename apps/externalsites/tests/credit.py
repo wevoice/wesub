@@ -22,11 +22,40 @@ from django.contrib.sites.models import Site
 from django.test import TestCase
 
 from externalsites import tasks
-from externalsites.youtubecredit import add_credit_to_video_url
+from externalsites.credit import (add_credit_to_video_url,
+                                         should_add_credit_to_video_url)
 from subtitles import pipeline
 from videos.templatetags.videos_tags import shortlink_for_video
 from utils import test_utils
 from utils.factories import *
+
+class ShouldAddCreditTest(TestCase):
+    def test_non_youtube_video(self):
+        user = UserFactory()
+        account = BrightcoveAccountFactory(user=user)
+        video_url = BrightcoveVideoFactory().get_primary_videourl_obj()
+        self.assertEqual(should_add_credit_to_video_url(video_url, account),
+                         False)
+
+    def test_youtube_video(self):
+        user = UserFactory()
+        account = YouTubeAccountFactory(user=user)
+        video_url = YouTubeVideoFactory().get_primary_videourl_obj()
+        self.assertEqual(should_add_credit_to_video_url(video_url, account),
+                         True)
+
+    def test_youtube_video_team_account(self):
+        team = TeamFactory()
+        account = YouTubeAccountFactory(team=team)
+        video_url = YouTubeVideoFactory().get_primary_videourl_obj()
+        self.assertEqual(should_add_credit_to_video_url(video_url, account),
+                         False)
+
+    def test_no_account(self):
+        user = UserFactory()
+        video_url = YouTubeVideoFactory().get_primary_videourl_obj()
+        self.assertEqual(should_add_credit_to_video_url(video_url, None),
+                         False)
 
 class BaseCreditTest(TestCase):
     @test_utils.patch_for_test('utils.youtube.update_video_description')
@@ -143,7 +172,7 @@ class AddCreditScheduleTest(BaseCreditTest):
         self.assertEqual(self.mock_add_amara_credit.delay.call_count, 0)
 
 class AddCreditTaskTest(TestCase):
-    @test_utils.patch_for_test('externalsites.youtubecredit.add_credit_to_video_url')
+    @test_utils.patch_for_test('externalsites.credit.add_credit_to_video_url')
     def setUp(self, mock_add_credit_to_video_url):
         self.mock_add_credit_to_video_url = mock_add_credit_to_video_url
 
