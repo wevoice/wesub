@@ -5,7 +5,10 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+    depends_on = (
+        ("externalsites", "0008_import_accountlinker_data"),
+    )
+
     def forwards(self, orm):
         
         # Removing M2M table for field third_party_accounts on 'CustomUser'

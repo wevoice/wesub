@@ -49,5 +49,7 @@ class SyncHistoryAdmin(admin.ModelAdmin):
         return False
 
 admin.site.register(models.KalturaAccount)
+admin.site.register(models.BrightcoveAccount)
+admin.site.register(models.YouTubeAccount)
 admin.site.register(models.SyncedSubtitleVersion)
 admin.site.register(models.SyncHistory, SyncHistoryAdmin)

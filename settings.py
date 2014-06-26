@@ -422,6 +422,7 @@ INSTALLED_APPS = (
     'openid_consumer',
     'socialauth',
     # our apps
+    'accountlinker',
     'amaradotorg',
     'amaracelery',
     'comments',
