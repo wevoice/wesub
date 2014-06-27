@@ -22,11 +22,11 @@ from django.test import TestCase
 
 from externalsites.models import BrightcoveAccount
 from videos.models import VideoFeed
-from utils import test_factories
+from utils.factories import *
 
 class BrightcoveAccountTest(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team()
+        self.team = TeamFactory()
         self.account = BrightcoveAccount.objects.create(
             team=self.team, publisher_id='123', write_token='789')
         self.player_id = '456'

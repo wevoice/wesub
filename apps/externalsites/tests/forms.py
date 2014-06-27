@@ -26,11 +26,11 @@ from externalsites.forms import BrightcoveAccountForm, AccountFormset
 from externalsites.models import BrightcoveAccount
 from videos.models import VideoFeed
 from utils import test_utils
-from utils import test_factories
+from utils.factories import *
 
 class TestAccountFormset(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team()
+        self.team = TeamFactory()
         self.setup_forms()
 
     def setup_forms(self):
@@ -166,7 +166,7 @@ class TestAccountFormset(TestCase):
 
 class BrightcoveFormTest(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team()
+        self.team = TeamFactory()
         self.publisher_id = '123'
         self.player_id = '456'
         self.write_token = '789'
