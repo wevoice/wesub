@@ -164,7 +164,7 @@ class MetadataFieldsTest(TestCase):
                                              'speaker-name': 'Santa',
                                              'location': 'North Pole',
                                          })
-        with mock.patch('apps.videos.metadata._') as mock_gettext:
+        with mock.patch('videos.metadata._') as mock_gettext:
             mock_gettext.return_value = 'Mock Translation'
             metadata = version.get_metadata()
             self.assertEquals(metadata.convert_for_display(), [

@@ -27,14 +27,14 @@ from django.test import TestCase
 
 from babelsubs.storage import SubtitleSet
 
-from apps.auth.models import CustomUser as User
-from apps.subtitles import pipeline
-from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
-from apps.subtitles.tests.utils import (
+from auth.models import CustomUser as User
+from subtitles import pipeline
+from subtitles.models import SubtitleLanguage, SubtitleVersion
+from subtitles.tests.utils import (
     make_video, make_video_2, make_video_3, make_sl, refresh, ids, parent_ids,
     ancestor_ids
 )
-from apps.teams.models import Team, TeamMember, TeamVideo
+from teams.models import Team, TeamMember, TeamVideo
 from utils.factories import *
 
 class TestSubtitleLanguage(TestCase):

@@ -24,10 +24,10 @@ import babelsubs
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from apps.auth.models import CustomUser as User
-from apps.subtitles.pipeline import add_subtitles
-from apps.videos.models import Video, SubtitleLanguage, SubtitleVersion
-from apps.videos.tests.data import get_user
+from auth.models import CustomUser as User
+from subtitles.pipeline import add_subtitles
+from videos.models import Video, SubtitleLanguage, SubtitleVersion
+from videos.tests.data import get_user
 
 
 math_captcha.forms.math_clean = lambda form: None

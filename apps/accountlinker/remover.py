@@ -23,11 +23,11 @@ from time import sleep
 from django.conf import settings
 import gdata
 
-from apps.videos.models import VideoUrl, Video, VIDEO_TYPE_YOUTUBE
-from apps.videos.types import video_type_registrar, UPDATE_VERSION_ACTION
-from apps.videos.types.youtube import YouTubeApiBridge
-from apps.accountlinker.models import ThirdPartyAccount
-from apps.accountlinker.models import (
+from videos.models import VideoUrl, Video, VIDEO_TYPE_YOUTUBE
+from videos.types import video_type_registrar, UPDATE_VERSION_ACTION
+from videos.types.youtube import YouTubeApiBridge
+from accountlinker.models import ThirdPartyAccount
+from accountlinker.models import (
     AMARA_DESCRIPTION_CREDIT, AMARA_SHORT_DESCRIPTON_CREDIT
 )
 

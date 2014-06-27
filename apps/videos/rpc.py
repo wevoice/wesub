@@ -25,10 +25,10 @@ from django.template.defaultfilters import slugify
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
 
-from apps.subtitles.models import SubtitleLanguage
-from apps.videos.models import Video, Action
-from apps.videos.search_indexes import VideoIndex
-from apps.videos.tasks import send_change_title_email
+from subtitles.models import SubtitleLanguage
+from videos.models import Video, Action
+from videos.search_indexes import VideoIndex
+from videos.tasks import send_change_title_email
 from utils.celery_search_index import update_search_index
 from utils.multi_query_set import MultiQuerySet
 from utils.rpc import Error, Msg, RpcExceptionEvent, add_request_to_kwargs

@@ -88,7 +88,7 @@ def get_random(qs):
     return qs[random.randint(0, qs.count())]
 
 def get_specific_language(pk):
-    from apps.videos.models import SubtitleLanguage
+    from videos.models import SubtitleLanguage
 
     try:
         sl = SubtitleLanguage.objects.get(pk=int(language_pk))
@@ -110,7 +110,7 @@ def get_unsynced_subtitle_language():
     dev/staging/prod.
 
     """
-    from apps.videos.models import SubtitleLanguage
+    from videos.models import SubtitleLanguage
 
     try:
         sl = get_random(SubtitleLanguage.objects.filter(needs_sync=True))
@@ -134,7 +134,7 @@ def get_unsynced_subtitle_version_language():
     make it robust against different data in dev/staging/prod.
 
     """
-    from apps.videos.models import SubtitleVersion
+    from videos.models import SubtitleVersion
 
     try:
         sv = get_random(SubtitleVersion.objects.filter(
@@ -157,7 +157,7 @@ def get_unsynced_subtitle_version_language():
     return sl
 
 def get_counts():
-    from apps.videos.models import SubtitleLanguage, SubtitleVersion
+    from videos.models import SubtitleLanguage, SubtitleVersion
 
     slo = SubtitleLanguage.objects
     sl_total = slo.count()
@@ -318,7 +318,7 @@ def _add_sl(sl):
     Doesn't perform any sanity checks.
 
     """
-    from apps.subtitles.models import SubtitleLanguage as NewSubtitleLanguage
+    from subtitles.models import SubtitleLanguage as NewSubtitleLanguage
 
     nsl = NewSubtitleLanguage(
         video=sl.video,
@@ -354,7 +354,7 @@ def get_visibility_from_old_version(sv):
 
 def _stack_version(sv, nsl):
     """Stack the given version onto the given new SL."""
-    from apps.subtitles import pipeline
+    from subtitles import pipeline
 
     visibility = get_visibility_from_old_version(sv)
 
@@ -390,7 +390,7 @@ def _stack_versions(sls):
     2. We need to shove all the versions into it.
 
     """
-    from apps.subtitles.models import SubtitleLanguage as NewSubtitleLanguage
+    from subtitles.models import SubtitleLanguage as NewSubtitleLanguage
 
     # First we'll turn the Queryset into a list so we don't hit the DB all the
     # time.
@@ -478,7 +478,7 @@ def _handle_duplicate_languages(sl):
     versions as well.  I don't think it's a big problem.
 
     """
-    from apps.videos.models import SubtitleLanguage
+    from videos.models import SubtitleLanguage
 
     if dry:
         # Yeah I'm not even gonna try to handle this fully, we'll just bail on
@@ -502,8 +502,8 @@ def _handle_duplicate_languages(sl):
 
 def _create_subtitle_language(sl):
     """Sync the given subtitle language, creating a new one."""
-    from apps.subtitles.models import VALID_LANGUAGE_CODES
-    from apps.videos.models import SubtitleLanguage, Video
+    from subtitles.models import VALID_LANGUAGE_CODES
+    from videos.models import SubtitleLanguage, Video
     from utils.metrics import Meter
 
     try:
@@ -707,7 +707,7 @@ def _create_subtitle_version(sv, last_version):
     the chain, the parents of the new version will set to the tip of the source:
 
     """
-    from apps.subtitles import pipeline
+    from subtitles import pipeline
     from django.core.exceptions import MultipleObjectsReturned
 
     sl = sv.language

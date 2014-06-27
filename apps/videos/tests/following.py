@@ -17,12 +17,12 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from apps.teams.models import Task
-from apps.videos.tests.data import (
+from teams.models import Task
+from videos.tests.data import (
     get_user, get_video, get_team, get_team_member, get_team_video,
     make_subtitle_language, make_subtitle_version
 )
-from apps.videos.tests.videotestutils import WebUseTest
+from videos.tests.videotestutils import WebUseTest
 
 class TestFollowingVideos(WebUseTest):
     def _assertFollowers(self, item, users):

@@ -20,16 +20,16 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from apps.auth.models import CustomUser as User, EmailConfirmation
-from apps.messages import tasks as notifier
-from apps.messages.models import Message
-from apps.subtitles import models as sub_models
-from apps.subtitles.pipeline import add_subtitles
-from apps.teams.forms import InviteForm
-from apps.teams.models import (
+from auth.models import CustomUser as User, EmailConfirmation
+from messages import tasks as notifier
+from messages.models import Message
+from subtitles import models as sub_models
+from subtitles.pipeline import add_subtitles
+from teams.forms import InviteForm
+from teams.models import (
     Team, TeamMember, Application, Workflow, TeamVideo, Task
 )
-from apps.videos.models import Action, Video
+from videos.models import Action, Video
 from utils import send_templated_email
 
 

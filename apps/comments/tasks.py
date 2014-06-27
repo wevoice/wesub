@@ -19,7 +19,7 @@ from datetime import timedelta
 
 from celery.decorators import task
 
-from apps.comments.models import Comment
+from comments.models import Comment
 from utils.metrics import Gauge
 
 @task

@@ -3,7 +3,7 @@ import time
 import atom
 from south.db import db
 from south.v2 import DataMigration
-from apps.videos.types.youtube import YouTubeApiBridge
+from videos.types.youtube import YouTubeApiBridge
 
 import logging
 

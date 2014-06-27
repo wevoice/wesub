@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.pages.site_pages import user_messages_page
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.pages.site_pages import user_messages_page
 
 
 class TestCaseMessages(WebdriverTestCase):

@@ -32,7 +32,7 @@ from teams.models import Team, TeamVideo
 from auth.models import CustomUser as User
 from tasks import get_youtube_data
 from subtitles.pipeline import add_subtitles
-from apps.testhelpers import views as helpers
+from testhelpers import views as helpers
 from utils.factories import (UserFactory, ThirdPartyAccountFactory,
                              TeamFactory, TeamVideoFactory)
 

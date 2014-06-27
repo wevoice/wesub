@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
-from apps.videos.models import Video
-from apps.videos.metadata_manager import update_metadata
+from videos.models import Video
+from videos.metadata_manager import update_metadata
 from time import sleep
 import logging 
 import sys

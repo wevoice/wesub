@@ -53,7 +53,7 @@ from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
 from utils.subtitles import create_new_subtitles, dfxp_merge
 from utils.text import fmt
-from apps.teams.moderation_const import MODERATION_STATUSES, UNMODERATED
+from teams.moderation_const import MODERATION_STATUSES, UNMODERATED
 from raven.contrib.django.models import client
 
 NO_SUBTITLES, SUBTITLES_FINISHED = range(2)

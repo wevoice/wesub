@@ -2,13 +2,13 @@ import os
 import time
 import itertools
 import operator
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import TeamMemberFactory
 
-from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing import data_helpers
+from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 
 class TestCaseTeamsResource(WebdriverTestCase):
     """TestSuite for getting and modifying video urls via api_v2.  """

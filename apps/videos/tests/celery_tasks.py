@@ -25,17 +25,17 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.test import TestCase
 
-from apps.auth.models import CustomUser as User
-from apps.comments.forms import CommentForm
-from apps.comments.models import Comment
-from apps.messages.models import Message
-from apps.videos.models import Video
-from apps.subtitles.models import (
+from auth.models import CustomUser as User
+from comments.forms import CommentForm
+from comments.models import Comment
+from messages.models import Message
+from videos.models import Video
+from subtitles.models import (
     SubtitleLanguage, SubtitleVersion
 )
-from apps.subtitles import pipeline
+from subtitles import pipeline
 
-from apps.videos.tasks import video_changed_tasks, send_change_title_email, send_new_version_notification
+from videos.tasks import video_changed_tasks, send_change_title_email, send_new_version_notification
 
 class TestCeleryTasks(TestCase):
     fixtures = ['test.json', 'subtitle_fixtures.json']

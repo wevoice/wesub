@@ -1,8 +1,9 @@
+from __future__ import absolute_import
+
 from django.core.management import call_command
 
-from apps.teams.models import Team, TeamMember, Workflow
-
-from widget.rpc import Rpc    
+from teams.models import Team, TeamMember, Workflow
+from widget.rpc import Rpc
 
 def refresh_obj(m):
     return m.__class__._default_manager.get(pk=m.pk)
@@ -14,5 +15,4 @@ def reset_solr():
     sb.clear()
     call_command('update_index')
 
-
-rpc = Rpc()    
+rpc = Rpc()

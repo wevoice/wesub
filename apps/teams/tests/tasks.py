@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 import simplejson as json
 
@@ -7,9 +9,9 @@ from django.core.urlresolvers import reverse
 import mock
 
 from auth.models import CustomUser as User
-from apps.teams.forms import TaskCreateForm, TaskAssignForm
-from apps.teams.models import Task, Team, TeamVideo, TeamMember
-from apps.videos.models import Video
+from teams.forms import TaskCreateForm, TaskAssignForm
+from teams.models import Task, Team, TeamVideo, TeamMember
+from videos.models import Video
 from utils.testeditor import TestEditor
 from utils.factories import *
 

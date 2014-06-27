@@ -4,7 +4,7 @@ import time
 
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import ElementNotVisibleException
-from apps.webdriver_testing.pages.site_pages import UnisubsPage
+from webdriver_testing.pages.site_pages import UnisubsPage
 
 class EditorPage(UnisubsPage):
     """

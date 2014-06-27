@@ -247,12 +247,6 @@ class MonkeyPatcher(object):
         self.initial_side_effects[mock_obj] = mock_obj.side_effect
         self.patches.append(patch)
 
-        if (not func_name.startswith("apps.") and
-            not func_name.startswith("utils")):
-            # Ugh have to patch the function twice since some modules use
-            # app and some don't
-            self.start_patch('apps.' + func_name, mock_obj)
-
     def setup_run_original(self, mock_obj, patch):
         mock_obj.original_func = patch.temp_original
         mock_obj.run_original = functools.partial(self.run_original,
@@ -329,6 +323,10 @@ class UnisubsTestPlugin(Plugin):
     def wantDirectory(self, dirname):
         if dirname in self.directories_to_skip:
             return False
+        if dirname == os.path.join(settings.PROJECT_ROOT, 'apps'):
+            # force the tests from the apps directory to be loaded, even
+            # though it's not a package
+            return True
         return None
 
 def patch_for_test(spec):

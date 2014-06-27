@@ -33,7 +33,7 @@ from auth.models import CustomUser
 from videos.models import Video, Action, SubtitleLanguage
 from videos import models
 from subtitles import models as sub_models
-from apps.subtitles.pipeline import rollback_to
+from subtitles.pipeline import rollback_to
 from widget.models import SubtitlingSession
 from widget.rpc import Rpc
 from widget.null_rpc import NullRpc

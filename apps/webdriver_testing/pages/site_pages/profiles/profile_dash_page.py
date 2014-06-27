@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from apps.webdriver_testing.pages.site_pages.profiles import ProfilePage
+from webdriver_testing.pages.site_pages.profiles import ProfilePage
 
 class ProfileDashPage(ProfilePage):
     """

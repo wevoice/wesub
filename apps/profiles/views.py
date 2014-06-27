@@ -35,7 +35,7 @@ from auth.models import CustomUser as User
 from profiles.forms import (EditUserForm, EditAccountForm, SendMessageForm,
                             EditAvatarForm, AdminProfileForm)
 from profiles.rpc import ProfileApiClass
-from apps.messages.models import Message
+from messages.models import Message
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
 from teams.models import Task

@@ -26,7 +26,7 @@ from haystack.indexes import (
 )
 from haystack.query import SearchQuerySet
 from teams import models
-from apps.subtitles.models import SubtitleLanguage
+from subtitles.models import SubtitleLanguage
 
 from haystack.exceptions import AlreadyRegistered
 

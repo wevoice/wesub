@@ -18,7 +18,7 @@
 from django.test import TestCase
 from subtitles.pipeline import  add_subtitles
 from subtitles.templatetags.new_subtitles_tags import visibility_display
-from apps.subtitles.tests.utils import (
+from subtitles.tests.utils import (
     make_video, make_subtitle_set
 )
 

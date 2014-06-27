@@ -57,9 +57,9 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 import gdata
 
-from apps.videos.models import VideoUrl, Video, VIDEO_TYPE_YOUTUBE
-from apps.videos.types import video_type_registrar, UPDATE_VERSION_ACTION
-from apps.videos.types.youtube import YouTubeApiBridge
+from videos.models import VideoUrl, Video, VIDEO_TYPE_YOUTUBE
+from videos.types import video_type_registrar, UPDATE_VERSION_ACTION
+from videos.types.youtube import YouTubeApiBridge
 
 
 UPLOAD_URI_BASE = 'http://gdata.youtube.com/feeds/api/users/default/uploads/%s'
@@ -87,7 +87,7 @@ class Command(BaseCommand):
         self.stdout.flush()
 
     def _resync_subs_for_video(self, video):
-        from apps.accountlinker.models import ThirdPartyAccount
+        from accountlinker.models import ThirdPartyAccount
         languages = video.subtitlelanguage_set.all()
         self.log(video)
 
@@ -106,8 +106,8 @@ class Command(BaseCommand):
         return video.video_id
 
     def _fix_video(self, vurl):
-        from apps.accountlinker.models import ThirdPartyAccount
-        from apps.videos.templatetags.videos_tags import shortlink_for_video
+        from accountlinker.models import ThirdPartyAccount
+        from videos.templatetags.videos_tags import shortlink_for_video
 
         video = vurl.video
         language_code = video.language
@@ -178,7 +178,7 @@ class Command(BaseCommand):
 
     def _get_supposed_credit(self, vurl, language='en'):
         # Sometimes I hate Python :(
-        from apps.accountlinker.models import (
+        from accountlinker.models import (
             translate_string, AMARA_DESCRIPTION_CREDIT
         )
         credit = translate_string(AMARA_DESCRIPTION_CREDIT, language)

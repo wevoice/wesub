@@ -23,7 +23,7 @@ from datetime import timedelta
 from teams.models import Team, TeamVideo, Project, TeamMember, Workflow, Task
 from django.db.models import Count
 from videos.models import Video
-from apps.widget import video_cache
+from widget import video_cache
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _, ngettext
 from django.core.urlresolvers import reverse
@@ -35,8 +35,8 @@ from templatetag_sugar.parser import Name, Variable, Constant
 from teams.models import Application
 from utils.text import fmt
 
-from apps.teams.forms import TaskUploadForm
-from apps.teams.permissions import (
+from teams.forms import TaskUploadForm
+from teams.permissions import (
     can_view_settings_tab as _can_view_settings_tab,
     can_view_approve_tab as _can_view_approve_tab,
     can_edit_video as _can_edit_video,
@@ -51,7 +51,7 @@ from apps.teams.permissions import (
     can_approve as _can_approve,
     can_delete_language as _can_delete_language,
 )
-from apps.teams.permissions import (
+from teams.permissions import (
     can_invite, can_add_video_somewhere,
     can_create_tasks, can_create_task_subtitle, can_create_task_translate,
     can_create_and_edit_subtitles, can_create_and_edit_translations

@@ -18,7 +18,7 @@
 
 from django.contrib import admin
 
-from apps.thirdpartyaccounts.models import TwitterAccount, FacebookAccount
+from thirdpartyaccounts.models import TwitterAccount, FacebookAccount
 
 
 class TwitterAccountAdmin(admin.ModelAdmin):

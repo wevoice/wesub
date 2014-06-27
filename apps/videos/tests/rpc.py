@@ -19,9 +19,9 @@
 
 from django.test import TestCase
 
-from apps.auth.models import CustomUser as User
-from apps.videos.rpc import VideosApiClass
-from apps.videos.models import Video, Action
+from auth.models import CustomUser as User
+from videos.rpc import VideosApiClass
+from videos.models import Video, Action
 
 
 class RpcTest(TestCase):

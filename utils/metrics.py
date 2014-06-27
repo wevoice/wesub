@@ -146,11 +146,6 @@ def time(f):
     import paths.  Python is dumb sometimes.
 
     '''
-    # Ugly hack to help normalize our crazy module names.
-    path = f.__module__
-    if path.startswith('apps.'):
-        path = path[5:]
-
     name = 'functions.' + f.__module__ + '.' + f.__name__
 
     @wraps(f)

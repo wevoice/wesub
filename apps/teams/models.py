@@ -37,11 +37,11 @@ from haystack import site
 from haystack.query import SQ
 
 import teams.moderation_const as MODERATION
-from apps.comments.models import Comment
+from comments.models import Comment
 from auth.models import CustomUser as User
 from auth.providers import get_authentication_provider
 from messages import tasks as notifier
-from apps.subtitles import shims
+from subtitles import shims
 from subtitles.signals import language_deleted
 from teams.moderation_const import WAITING_MODERATION, UNMODERATED, APPROVED
 from teams.permissions_const import (
@@ -2034,7 +2034,7 @@ class Task(models.Model):
             sv.publish()
 
             # We need to make sure this is updated correctly here.
-            from apps.videos import metadata_manager
+            from videos import metadata_manager
             metadata_manager.update_metadata(self.team_video.video.pk)
 
             if self.workflow.autocreate_translate:
@@ -2073,7 +2073,7 @@ class Task(models.Model):
             sv.publish()
 
             # We need to make sure this is updated correctly here.
-            from apps.videos import metadata_manager
+            from videos import metadata_manager
             metadata_manager.update_metadata(self.team_video.video.pk)
             upload_subtitles_to_original_service.delay(sv.pk)
 

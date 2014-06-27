@@ -32,7 +32,7 @@ class SimpleTest(TestCase):
                     "translations": []
                     }], 
             "title": "c" }
-        from apps.testhelpers.views import _create_videos
+        from testhelpers.views import _create_videos
         videos = _create_videos([data], [])
         v = models.Video.objects.get(title='c')
         en = v.subtitle_language('en')

@@ -22,8 +22,8 @@ from django import template
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import linebreaks
 
-from apps.subtitles.forms import SubtitlesUploadForm
-from apps.videos.forms import CreateVideoUrlForm
+from subtitles.forms import SubtitlesUploadForm
+from videos.forms import CreateVideoUrlForm
 
 
 register = template.Library()

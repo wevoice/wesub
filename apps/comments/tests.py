@@ -25,7 +25,7 @@ from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 
 from videos.models import Video
-from apps.auth.models import CustomUser as User
+from auth.models import CustomUser as User
 
 from django.core import mail
 from comments.models import Comment

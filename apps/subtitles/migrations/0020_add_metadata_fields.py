@@ -9,13 +9,13 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Adding field 'SubtitleVersion.meta_1_content'
-        db.add_column('subtitles_subtitleversion', 'meta_1_content', self.gf('apps.videos.metadata.MetadataContentField')(default='', max_length=255, blank=True), keep_default=False)
+        db.add_column('subtitles_subtitleversion', 'meta_1_content', self.gf('videos.metadata.MetadataContentField')(default='', max_length=255, blank=True), keep_default=False)
 
         # Adding field 'SubtitleVersion.meta_2_content'
-        db.add_column('subtitles_subtitleversion', 'meta_2_content', self.gf('apps.videos.metadata.MetadataContentField')(default='', max_length=255, blank=True), keep_default=False)
+        db.add_column('subtitles_subtitleversion', 'meta_2_content', self.gf('videos.metadata.MetadataContentField')(default='', max_length=255, blank=True), keep_default=False)
 
         # Adding field 'SubtitleVersion.meta_3_content'
-        db.add_column('subtitles_subtitleversion', 'meta_3_content', self.gf('apps.videos.metadata.MetadataContentField')(default='', max_length=255, blank=True), keep_default=False)
+        db.add_column('subtitles_subtitleversion', 'meta_3_content', self.gf('videos.metadata.MetadataContentField')(default='', max_length=255, blank=True), keep_default=False)
     
     
     def backwards(self, orm):
@@ -133,9 +133,9 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language_code': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
-            'meta_1_content': ('apps.videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
-            'meta_2_content': ('apps.videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
-            'meta_3_content': ('apps.videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'meta_1_content': ('videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'meta_2_content': ('videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'meta_3_content': ('videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
             'note': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '512', 'blank': 'True'}),
             'origin': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
             'parents': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['subtitles.SubtitleVersion']", 'symmetrical': 'False', 'blank': 'True'}),
