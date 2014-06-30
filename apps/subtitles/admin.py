@@ -21,7 +21,7 @@
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.core.urlresolvers import reverse
-from apps.subtitles.models import (get_lineage, Collaborator, SubtitleLanguage,
+from subtitles.models import (get_lineage, Collaborator, SubtitleLanguage,
                                    SubtitleVersion)
 
 

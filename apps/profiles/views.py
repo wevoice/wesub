@@ -35,7 +35,6 @@ from auth.models import CustomUser as User
 from profiles.forms import (EditUserForm, EditAccountForm, SendMessageForm,
                             EditAvatarForm, AdminProfileForm)
 from profiles.rpc import ProfileApiClass
-from apps.messages.models import Message
 import externalsites.models
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
@@ -45,7 +44,6 @@ from subtitles.models import SubtitleLanguage
 from videos.models import (
     Action, VideoUrl, Video, VIDEO_TYPE_YOUTUBE, VideoFeed
 )
-
 
 logger = logging.getLogger(__name__)
 

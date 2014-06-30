@@ -18,7 +18,7 @@
 
 """app.videos.permissions -- Video permissions checks."""
 
-import apps.teams.permissions as teams_permissions
+import teams.permissions as teams_permissions
 
 def can_user_edit_video_urls(video, user):
     """Check if a user has permission to add a URL to a video."""

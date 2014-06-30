@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
-from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.teams.models import TeamMember
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
+from webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.data_factories import UserFactory
+from teams.models import TeamMember
 
 
 class TestCaseLeaveTeam(WebdriverTestCase):

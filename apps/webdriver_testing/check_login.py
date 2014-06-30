@@ -1,7 +1,7 @@
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import watch_page
-from apps.webdriver_testing.data_factories import UserFactory 
-from apps.webdriver_testing import data_helpers
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import watch_page
+from webdriver_testing.data_factories import UserFactory 
+from webdriver_testing import data_helpers
 from django.core import management
 import datetime
 

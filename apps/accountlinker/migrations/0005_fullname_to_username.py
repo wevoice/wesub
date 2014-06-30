@@ -3,7 +3,6 @@ import time
 import atom
 from south.db import db
 from south.v2 import DataMigration
-
 import logging
 
 class Migration(DataMigration):

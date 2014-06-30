@@ -1,22 +1,22 @@
 import datetime
 import factory
-from apps.videos.models import Video 
-from apps.videos.models import VideoUrl
-from apps.teams.models import Team
-from apps.teams.models import Partner
-from apps.teams.models import TeamMember
-from apps.teams.models import MembershipNarrowing
-from apps.teams.models import Task
-from apps.teams.models import TeamVideo
-from apps.teams.models import Invite
-from apps.teams.models import Application
-from apps.teams.models import Project
-from apps.teams.models import TeamLanguagePreference
-from apps.teams.models import Workflow 
-from apps.teams.models import BillingReport
-from apps.auth.models import CustomUser as User
-from apps.auth.models import UserLanguage
-from apps.messages.models import Message
+from videos.models import Video 
+from videos.models import VideoUrl
+from teams.models import Team
+from teams.models import Partner
+from teams.models import TeamMember
+from teams.models import MembershipNarrowing
+from teams.models import Task
+from teams.models import TeamVideo
+from teams.models import Invite
+from teams.models import Application
+from teams.models import Project
+from teams.models import TeamLanguagePreference
+from teams.models import Workflow 
+from teams.models import BillingReport
+from auth.models import CustomUser as User
+from auth.models import UserLanguage
+from messages.models import Message
 
 class TeamManagerLanguageFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = MembershipNarrowing

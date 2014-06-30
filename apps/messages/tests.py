@@ -21,8 +21,6 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from auth.models import CustomUser as User, EmailConfirmation
-from messages import tasks as n
-from messages import tasks as notifier
 from messages.models import Message
 from subtitles import models as sub_models
 from subtitles.pipeline import add_subtitles
@@ -37,6 +35,7 @@ from utils import send_templated_email
 from utils.factories import *
 from videos.models import Action, Video
 from videos.tasks import video_changed_tasks
+import messages.tasks
 
 class MessageTest(TestCase):
     def setUp(self):
@@ -121,7 +120,7 @@ class MessageTest(TestCase):
         contributor_messge_count_1, contributor_email_count_1 = _get_counts(contributor)
         # save the last team member and check that each group has appropriate counts
         tm.save()
-        notifier.team_member_new(tm.pk)
+        messages.tasks.team_member_new(tm.pk)
         # owner and admins should receive email + message
         owner_messge_count_2, owner_email_count_2 = _get_counts(owner)
         self.assertEqual(owner_messge_count_1 + 1, owner_messge_count_2)
@@ -196,7 +195,7 @@ class MessageTest(TestCase):
         tm_user_pk = tm.user.pk
         team_pk = tm.team.pk
         tm.delete()
-        notifier.team_member_leave(team_pk, tm_user_pk)
+        messages.tasks.team_member_leave(team_pk, tm_user_pk)
         # save the last team member and check that each group has appropriate counts
         # owner and admins should receive email + message
         owner_messge_count_2, owner_email_count_2 = _get_counts(owner)
@@ -264,7 +263,7 @@ class MessageTest(TestCase):
         # now delete and check numers
         app = Application.objects.create(team=team,user=applying_user)
         app.save()
-        notifier.application_sent.run(app.pk)
+        messages.tasks.application_sent.run(app.pk)
         # owner and admins should receive email + message
         owner_messge_count_2, owner_email_count_2 = _get_counts(owner)
         self.assertEqual(owner_messge_count_1 + 1, owner_messge_count_2)
@@ -467,43 +466,43 @@ class TeamBlockSettingsTest(TestCase):
 
         to_test = (
             ("block_invitation_sent_message",
-             n.team_invitation_sent,
+             messages.tasks.team_invitation_sent,
              (invite.pk,)),
 
             ("block_application_sent_message",
-             n.application_sent,
+             messages.tasks.application_sent,
              (Application.objects.get_or_create(team=team, note='', user=user)[0].pk,)),
 
             ("block_application_denided_message",
-             n.team_application_denied,
+             messages.tasks.team_application_denied,
              (Application.objects.get_or_create(team=team, note='', user=user)[0].pk,)),
 
             ("block_team_member_new_message",
-             n.team_member_new,
+             messages.tasks.team_member_new,
              (member.pk, )),
 
             ("block_team_member_leave_message",
-             n.team_member_leave,
+             messages.tasks.team_member_leave,
              (team.pk,member.user.pk )),
 
             ("block_task_assigned_message",
-             n.team_task_assigned,
+             messages.tasks.team_task_assigned,
              (task_assigned.pk,)),
 
             ("block_reviewed_and_published_message",
-             n.reviewed_and_published,
+             messages.tasks.reviewed_and_published,
              (task_with_version.pk,)),
 
             ("block_reviewed_and_pending_approval_message",
-             n.reviewed_and_pending_approval,
+             messages.tasks.reviewed_and_pending_approval,
              (task_with_version.pk,)),
             
             ("block_reviewed_and_sent_back_message",
-             n.reviewed_and_sent_back,
+             messages.tasks.reviewed_and_sent_back,
              (task_with_version.pk,)),
 
             ("block_approved_message",
-             n.approved_notification,
+             messages.tasks.approved_notification,
              (task_with_version.pk,)),
 
         )

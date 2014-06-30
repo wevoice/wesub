@@ -20,7 +20,7 @@ import datetime
 
 from django.db import models
 
-from apps.auth.models import CustomUser as User
+from auth.models import CustomUser as User
 
 
 class ThirdPartyAccount(models.Model):

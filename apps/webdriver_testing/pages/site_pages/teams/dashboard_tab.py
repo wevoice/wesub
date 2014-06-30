@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
+from webdriver_testing.pages.site_pages.teams import ATeamPage
 import time
 
 class DashboardTab(ATeamPage):

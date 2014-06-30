@@ -29,8 +29,8 @@ import optparse
 
 from deploy.git_helpers import get_current_commit_hash
 
-from apps import widget
-from apps.unisubs_compressor.contrib.rjsmin import jsmin
+from import widget
+from unisubs_compressor.contrib.rjsmin import jsmin
 
 # on vagrant .git is a symlink and this needts to be ran before media compilation ;(
 LAST_COMMIT_GUID = get_current_commit_hash() or settings.LAST_COMMIT_GUID.split('/')[-1]

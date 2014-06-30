@@ -1,7 +1,7 @@
 from celery.decorators import task
 from celery.schedules import timedelta
 
-from apps.auth.models import CustomUser
+from auth.models import CustomUser
 from utils.metrics import Gauge
 
 @task

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from apps.webdriver_testing.pages import Page
+from webdriver_testing.pages import Page
 import time
 
 class EditorDialogs(Page):

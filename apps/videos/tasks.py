@@ -40,7 +40,7 @@ from subtitles.models import (
 from auth.models import CustomUser as User
 from videos.types import video_type_registrar
 from videos.types import UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
-from apps.videos.types import VideoTypeError
+from videos.types import VideoTypeError
 
 celery_logger = logging.getLogger('celery.task')
 

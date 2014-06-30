@@ -1029,7 +1029,7 @@ class TeamsDetailQueryTest(TestCase):
         self.user = UserFactory(**self.auth)
 
         self.client.login(**self.auth)
-        from apps.testhelpers.views import _create_videos, _create_team_videos
+        from testhelpers.views import _create_videos, _create_team_videos
         fixture_path = os.path.join(settings.PROJECT_ROOT, "apps", "videos", "fixtures", "teams-list.json")
         data = json.load(open(fixture_path))
         self.videos = _create_videos(data, [self.user])
@@ -1068,7 +1068,7 @@ class TestLanguagePreference(TestCase):
         fix_teams_roles()
         self.team = TeamFactory()
         self.langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
-        from apps.teams.cache import invalidate_lang_preferences
+        from teams.cache import invalidate_lang_preferences
         invalidate_lang_preferences(self.team)
 
     def test_readable_lang(self):
@@ -1477,7 +1477,7 @@ class PartnerTest(TestCase):
         self.user = UserFactory(**self.auth)
 
         self.client.login(**self.auth)
-        from apps.testhelpers.views import _create_videos, _create_team_videos
+        from testhelpers.views import _create_videos, _create_team_videos
         fixture_path = os.path.join(settings.PROJECT_ROOT, "apps", "videos", "fixtures", "teams-list.json")
         data = json.load(open(fixture_path))
         self.videos = _create_videos(data, [self.user])
@@ -1488,8 +1488,8 @@ class PartnerTest(TestCase):
     def test_approved(self):
         # TODO: Closing this up to unblock a merge
         return
-        from apps.teams.models import Workflow, BillingReport
-        # from apps.teams.moderation_const import APPROVED
+        from teams.models import Workflow, BillingReport
+        # from teams.moderation_const import APPROVED
 
         self.assertEquals(0, Workflow.objects.count())
 
@@ -1554,7 +1554,7 @@ class PartnerTest(TestCase):
     def test_get_imported(self):
         # TODO: Closing this up to unblock a merge
         return
-        from apps.teams.models import BillingReport
+        from teams.models import BillingReport
         team = Team.objects.all()[0]
         video = Video.objects.all()[0]
 
@@ -1606,8 +1606,8 @@ class PartnerTest(TestCase):
         self.assertTrue(sl_cs.pk in imported_pks)
 
     def test_incomplete_language(self):
-        from apps.teams.models import BillingRecord
-        from apps.videos.tasks import video_changed_tasks
+        from teams.models import BillingRecord
+        from videos.tasks import video_changed_tasks
 
         user = User.objects.all()[0]
         team = TeamFactory()
@@ -1630,8 +1630,8 @@ class PartnerTest(TestCase):
         self.assertEquals(0, BillingRecord.objects.count())
 
     def test_original_language(self):
-        from apps.teams.models import BillingRecord
-        from apps.videos.tasks import video_changed_tasks
+        from teams.models import BillingRecord
+        from videos.tasks import video_changed_tasks
 
         user = User.objects.all()[0]
         team = TeamFactory()
@@ -1667,8 +1667,8 @@ class PartnerTest(TestCase):
         self.assertFalse(br_cs.is_original)
 
     def test_get_minutes(self):
-        from apps.teams.models import BillingRecord
-        from apps.videos.tasks import video_changed_tasks
+        from teams.models import BillingRecord
+        from videos.tasks import video_changed_tasks
 
         user = User.objects.all()[0]
         team = TeamFactory()

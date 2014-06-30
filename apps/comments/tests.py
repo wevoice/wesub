@@ -19,8 +19,8 @@
 
 from django.test import TestCase
 from django.contrib.sites.models import Site
-
 from django.core import mail
+
 from localeurl.utils import universal_url, DEFAULT_PROTOCOL
 from subtitles import pipeline
 from utils.factories import *

@@ -1,9 +1,10 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
 
 from auth.models import CustomUser as User
-from apps.teams.models import Team, TeamMember
-from apps.teams.forms import CreateTeamForm
-
+from teams.models import Team, TeamMember
+from teams.forms import CreateTeamForm
 
 class BaseMembershipTests(TestCase):
     def setUp(self):

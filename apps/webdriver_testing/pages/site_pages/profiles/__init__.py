@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from apps.webdriver_testing.pages.site_pages import UnisubsPage
+from webdriver_testing.pages.site_pages import UnisubsPage
 
 class ProfilePage(UnisubsPage):
     """

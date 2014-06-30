@@ -25,7 +25,6 @@ from utils.rpc import Error
 from videos.rpc import VideosApiClass
 from videos.models import Video, Action
 
-
 class RpcTest(TestCase):
     def setUp(self):
         self.rpc = VideosApiClass()

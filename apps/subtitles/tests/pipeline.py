@@ -24,10 +24,10 @@ from django.test import TestCase
 
 from babelsubs.storage import SubtitleSet, SubtitleLine
 
-from apps.auth.models import CustomUser as User
-from apps.subtitles import pipeline
-from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
-from apps.subtitles.tests.utils import make_video, make_video_2
+from auth.models import CustomUser as User
+from subtitles import pipeline
+from subtitles.models import SubtitleLanguage, SubtitleVersion
+from subtitles.tests.utils import make_video, make_video_2
 
 
 class TestHelperFunctions(TestCase):

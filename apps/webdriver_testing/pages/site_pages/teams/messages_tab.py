@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
+from webdriver_testing.pages.site_pages.teams import ATeamPage
 
 class MessagesTab(ATeamPage):
     """Actions for the Messages tab of the Team Settings Page.

@@ -26,9 +26,9 @@ from babelsubs.generators.srt import SRTGenerator
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
-from apps.auth.models import CustomUser as User
-from apps.subtitles.forms import SubtitlesUploadForm
-from apps.subtitles.tests.utils import (
+from auth.models import CustomUser as User
+from subtitles.forms import SubtitlesUploadForm
+from subtitles.tests.utils import (
     make_video, make_sl, make_subtitle_set, refresh
 )
 

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import time
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import TeamMemberFactory
 
-from apps.webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing.data_factories import TeamVideoFactory
 
-from apps.webdriver_testing import data_helpers
+from webdriver_testing import data_helpers
 
 class TestCaseActivity(WebdriverTestCase):
     """TestSuite for listing things that happened.

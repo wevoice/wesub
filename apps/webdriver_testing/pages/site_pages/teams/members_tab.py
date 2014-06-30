@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import time
-from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
+from webdriver_testing.pages.site_pages.teams import ATeamPage
 
 class MembersTab(ATeamPage):
 

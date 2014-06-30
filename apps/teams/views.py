@@ -41,8 +41,8 @@ from django.utils.encoding import iri_to_uri, force_unicode
 from django.views.generic.list_detail import object_list
 
 import widget
-from apps.auth.models import UserLanguage, CustomUser as User
-from apps.videos.templatetags.paginator import paginate
+from auth.models import UserLanguage, CustomUser as User
+from videos.templatetags.paginator import paginate
 from messages import tasks as notifier
 from teams.forms import (
     CreateTeamForm, AddTeamVideoForm, EditTeamVideoForm,
@@ -72,7 +72,7 @@ from teams.tasks import (
     update_video_moderation, update_one_team_video, update_video_public_field,
     invalidate_video_visibility_caches, process_billing_report
 )
-from apps.videos.tasks import video_changed_tasks
+from videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
 from utils.metrics import time as timefn
@@ -1660,7 +1660,7 @@ def team_tasks(request, slug, project_slug=None):
         filtered = filtered + 1
 
     widget_settings = {}
-    from apps.widget.rpc import add_general_settings
+    from widget.rpc import add_general_settings
     add_general_settings(request, widget_settings)
 
     Task.add_cached_video_urls(tasks)

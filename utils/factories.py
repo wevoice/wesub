@@ -30,7 +30,6 @@ import factory
 from factory import Factory
 from factory.django import DjangoModelFactory
 
-import accountlinker.models
 import auth.models
 import comments.models
 import externalsites.models
@@ -213,16 +212,6 @@ class TaskFactory(DjangoModelFactory):
         task.assignee = user
         task.approved = teams.models.Task.APPROVED_IDS['Approved']
         return task.complete()
-
-class ThirdPartyAccountFactory(DjangoModelFactory):
-    FACTORY_FOR = accountlinker.models.ThirdPartyAccount
-    FACTORY_HIDDEN_ARGS = ('video_url',)
-
-    oauth_access_token = 'test-access-token'
-    oauth_refresh_token = 'test-refresh-token'
-
-    username = factory.LazyAttribute(lambda tpa: tpa.video_url.owner_username)
-    type = factory.LazyAttribute(lambda tpa: tpa.video_url.type)
 
 class SubtitleLanguageFactory(DjangoModelFactory):
     FACTORY_FOR = subtitles.models.SubtitleLanguage

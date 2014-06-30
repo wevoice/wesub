@@ -3,7 +3,7 @@ import datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
-from apps.teams.moderation_const import APPROVED, UNMODERATED
+from teams.moderation_const import APPROVED, UNMODERATED
 
 # Copied from the model because South doesn't freeze Model methods.
 def _filter_public(language, versions, public_only):

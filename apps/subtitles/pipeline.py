@@ -56,7 +56,7 @@ a nutshell:
 
 from django.db import transaction
 
-from apps.subtitles.models import (
+from subtitles.models import (
     SubtitleLanguage, SubtitleVersion, ORIGIN_ROLLBACK, ORIGIN_API,
     ORIGIN_UPLOAD, ORIGIN_WEB_EDITOR
 )
@@ -137,7 +137,7 @@ def _user_can_bypass_moderation(team_video, version, committer):
     if not committer:
         return True
 
-    from apps.teams.permissions import can_publish_edits_immediately
+    from teams.permissions import can_publish_edits_immediately
     subtitle_language = version.subtitle_language
 
     is_post_publish_edit = (version.sibling_set.public()
@@ -164,7 +164,7 @@ def _set_language_for_subtitle_tasks(team_video, saved_version):
 def _handle_outstanding_tasks(outstanding_tasks, version, team_video, committer,
                               complete):
     """Handle any existing tasks for this subtitle addition."""
-    from apps.teams.permissions import can_assign_task
+    from teams.permissions import can_assign_task
 
     language_code = version.language_code
 
@@ -213,7 +213,7 @@ def _create_necessary_tasks(version, team_video, workflow, committer, complete):
     So we may (or may not) need to create a task for this version/language.
 
     """
-    from apps.teams.models import Task
+    from teams.models import Task
 
     if complete:
         # If the subtitles are complete, then the new task will be either

@@ -40,7 +40,7 @@ try:
 except ImportError:
     raise ImportError, "The boto Python library is not installed."
 
-from apps.unisubs_compressor.management.commands.compile_media import get_cache_dir
+from unisubs_compressor.management.commands.compile_media import get_cache_dir
 from deploy.git_helpers import get_current_commit_hash
 from compile_media import NO_UNIQUE_URL
 

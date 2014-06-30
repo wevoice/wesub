@@ -30,25 +30,25 @@ from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
 from vidscraper.sites import blip
 
-from apps.auth.models import CustomUser as User
-from apps.subtitles import pipeline
-from apps.teams.models import Task
-from apps.teams.permissions_const import ROLE_ADMIN
-from apps.videos.share_utils import _make_email_url
-from apps.videos.tasks import video_changed_tasks
-from apps.videos.templatetags.subtitles_tags import format_sub_time
-from apps.videos.tests.videotestutils import (
+from auth.models import CustomUser as User
+from subtitles import pipeline
+from teams.models import Task
+from teams.permissions_const import ROLE_ADMIN
+from videos.share_utils import _make_email_url
+from videos.tasks import video_changed_tasks
+from videos.templatetags.subtitles_tags import format_sub_time
+from videos.tests.videotestutils import (
     WebUseTest, create_langs_and_versions
 )
-from apps.videos import views
-from apps.videos.models import (
+from videos import views
+from videos.models import (
     Video, VideoUrl, Action, VIDEO_TYPE_YOUTUBE, SubtitleVersion,
     SubtitleLanguage, Subtitle, UserTestResult
 )
-from apps.videos.tests.data import (
+from videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version
 )
-from apps.widget import video_cache
+from widget import video_cache
 from utils import test_utils
 from utils.factories import *
 

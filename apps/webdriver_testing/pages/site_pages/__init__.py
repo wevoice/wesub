@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils.importlib import import_module
 from django.contrib.auth import authenticate
 
-from apps.webdriver_testing.pages import Page
+from webdriver_testing.pages import Page
 
 class UnisubsPage(Page):
     """

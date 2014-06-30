@@ -1,8 +1,8 @@
 import os
 import simplejson
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing import data_helpers
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing import data_helpers
 
 class TestCaseLanguagesFetch(WebdriverTestCase):
     """TestSuite for fetching the list of available languages via the api.

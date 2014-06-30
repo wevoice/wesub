@@ -15,15 +15,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+
+from __future__ import absolute_import
+
 from os import path
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from apps.teams.models import Team, TeamMember, TeamVideo, Project
-from apps.videos.models import Video, VideoUrl
-from apps.auth.models import CustomUser as User
+from teams.models import Team, TeamMember, TeamVideo, Project
+from videos.models import Video, VideoUrl
+from auth.models import CustomUser as User
 from utils.factories import *
 from utils.panslugify import pan_slugify
 

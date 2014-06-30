@@ -966,3 +966,9 @@ try:
     }
 except ImportError:
     pass
+
+# This needs to run as soon as possible, as soon as the rest of the settings
+# are set up seems like a good time.
+from localeurl import patch_reverse
+patch_reverse()
+

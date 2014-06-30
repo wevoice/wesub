@@ -22,8 +22,8 @@ from django.contrib.sites.models import Site
 from django.template import RequestContext, TemplateDoesNotExist
 from django.conf import settings
 from django.http import Http404
-from apps.videos.models import Video
-from apps.videos.views import _widget_params
+from videos.models import Video
+from videos.views import _widget_params
 
 class ExtraContextHelpers(object):
 

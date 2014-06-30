@@ -24,15 +24,15 @@ from django import forms
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 
-from apps.subtitles import pipeline
-from apps.subtitles.shims import is_dependent
-from apps.subtitles.models import ORIGIN_UPLOAD, SubtitleLanguage
-from apps.teams.models import Task
-from apps.teams.permissions import (
+from subtitles import pipeline
+from subtitles.shims import is_dependent
+from subtitles.models import ORIGIN_UPLOAD, SubtitleLanguage
+from teams.models import Task
+from teams.permissions import (
     can_perform_task, can_create_and_edit_subtitles,
     can_create_and_edit_translations
 )
-from apps.videos.tasks import video_changed_tasks
+from videos.tasks import video_changed_tasks
 from utils.text import fmt
 from utils.subtitles import load_subtitles
 from utils.translation import get_language_choices, get_language_label

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages.teams import messages_tab
-from apps.webdriver_testing.pages.site_pages.teams import tasks_tab
-from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamLangPrefFactory
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages.teams import messages_tab
+from webdriver_testing.pages.site_pages.teams import tasks_tab
+from webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.data_factories import TeamLangPrefFactory
 
-from apps.webdriver_testing.data_factories import WorkflowFactory
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing import data_helpers
+from webdriver_testing.data_factories import WorkflowFactory
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing import data_helpers
 import time
 
 class TestCaseTeamGuidelines(WebdriverTestCase):    

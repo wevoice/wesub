@@ -264,7 +264,7 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     # do not pass a version_id else, we'll trigger emails for those edits
     video_changed_tasks.delay(video.pk)
     Meter('youtube.lang_imported').inc()
-    from apps.teams.models import BillingRecord
+    from teams.models import BillingRecord
     # there is a caveat here, if running with CELERY_ALWAYS_EAGER,
     # this is called before there's a team video, and the billing records won't
     # be created. On the real world, it should be safe to assume that between

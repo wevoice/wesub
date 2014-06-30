@@ -2,11 +2,11 @@ import mock
 from django.test import TestCase
 from django.test.client import Client
 
-from apps.subtitles import pipeline
-from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
-from apps.teams.models import Task
-from apps.teams.forms import DeleteLanguageForm
-from apps.teams.permissions_const import ROLE_ADMIN, ROLE_OWNER, ROLE_MANAGER, ROLE_CONTRIBUTOR
+from subtitles import pipeline
+from subtitles.models import SubtitleLanguage, SubtitleVersion
+from teams.models import Task
+from teams.forms import DeleteLanguageForm
+from teams.permissions_const import ROLE_ADMIN, ROLE_OWNER, ROLE_MANAGER, ROLE_CONTRIBUTOR
 from utils.factories import *
 
 class UnpublishTestCase(TestCase):

@@ -16,18 +16,20 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
+
 import datetime
 from django.test import TestCase
 from django.core.urlresolvers import reverse
-from apps.teams.models import Team, TeamVideo, TeamMember, Workflow, Task
+from teams.models import Team, TeamVideo, TeamMember, Workflow, Task
 from auth.models import CustomUser as User
 from contextlib import contextmanager
-from apps.testhelpers import views as helpers
+from testhelpers import views as helpers
 from utils.factories import *
 from utils.translation import SUPPORTED_LANGUAGE_CODES
 
-from apps.teams.permissions_const import *
-from apps.teams.permissions import (
+from teams.permissions_const import *
+from teams.permissions import (
     remove_role, add_role, can_message_all_members, can_add_video,
     roles_user_can_assign, can_rename_team, can_view_settings_tab,
     can_change_team_settings, can_view_tasks_tab, can_invite,

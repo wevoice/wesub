@@ -2,7 +2,7 @@
 import time
 from nose.tools import assert_equals
 from nose.tools import assert_true
-from apps.webdriver_testing.pages.site_pages import UnisubsPage
+from webdriver_testing.pages.site_pages import UnisubsPage
 
 
 class ATeamPage(UnisubsPage):

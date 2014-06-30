@@ -27,23 +27,23 @@ from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from apps.subtitles.forms import SubtitlesUploadForm
-from apps.teams.models import (
+from subtitles.forms import SubtitlesUploadForm
+from teams.models import (
     Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite, BillingReport
 )
-from apps.teams.permissions import (
+from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
     can_assign_task, can_delete_language, can_remove_video
 )
-from apps.teams.permissions_const import ROLE_NAMES
-from apps.videos.forms import (AddFromFeedForm, language_choices_with_empty,
+from teams.permissions_const import ROLE_NAMES
+from videos.forms import (AddFromFeedForm, language_choices_with_empty,
                                CreateSubtitlesForm,
                                MultiVideoCreateSubtitlesForm)
-from apps.videos.models import (
+from videos.models import (
         VideoMetadata, VIDEO_META_TYPE_IDS, Video, VideoFeed,
 )
-from apps.videos.search_indexes import VideoIndex
-from apps.videos.tasks import import_videos_from_feed
+from videos.search_indexes import VideoIndex
+from videos.tasks import import_videos_from_feed
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.translation import get_language_choices

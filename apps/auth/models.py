@@ -43,11 +43,6 @@ from django.core.urlresolvers import reverse
 
 from tastypie.models import ApiKey
 
-# I'm not sure this is the best way do do this, but this models.py is executed
-# before all other and before url.py
-from localeurl import patch_reverse
-patch_reverse()
-
 from utils.tasks import send_templated_email_async
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
@@ -229,15 +224,15 @@ class CustomUser(BaseUser):
         return language_code in [l.language for l in self.get_languages()]
 
     def managed_teams(self, include_manager=True):
-        from apps.teams.models import TeamMember
+        from teams.models import TeamMember
         possible_roles = [TeamMember.ROLE_OWNER, TeamMember.ROLE_ADMIN]
         if include_manager:
             possible_roles.append(TeamMember.ROLE_MANAGER)
         return self.teams.filter(members__role__in=possible_roles)
 
     def messageable_teams(self):
-        from apps.teams.models import Team
-        from apps.teams.permissions import can_message_all_members
+        from teams.models import Team
+        from teams.permissions import can_message_all_members
 
         teams = self.teams.all()
         messageable_team_ids = [t.id for t in teams if can_message_all_members(t, self)]
@@ -250,7 +245,7 @@ class CustomUser(BaseUser):
         return Team.objects.filter(id__in=messageable_team_ids)
 
     def open_tasks(self):
-        from apps.teams.models import Task
+        from teams.models import Task
         return Task.objects.incomplete().filter(assignee=self)
 
     def _get_gravatar(self, size):
