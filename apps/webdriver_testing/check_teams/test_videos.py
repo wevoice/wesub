@@ -3,7 +3,9 @@
 import json
 import time
 import os
-import filecmp
+
+from videos.models import Video
+
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages.teams import videos_tab
 from webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
@@ -298,19 +300,22 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
                         .format(cls.team.slug, cls.project1.slug))
         cls.project2_page = ('teams/{0}/videos/?project={1}'
                         .format(cls.team.slug, cls.project2.slug))
-
+    def tearDown(self):
+        self.browser.get_screenshot_as_file("%s.png" %self.id())
 
     def test_add_new(self):
         """Submit a new video for the team and assign to a project.
 
         """
+        test_url = 'http://www.youtube.com/watch?v=i_0DXxNeaQ0'
         project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
             self.project2.slug)
         self.videos_tab.open_page(project_page)
-        self.videos_tab.add_video(
-            url = 'http://www.youtube.com/watch?v=i_0DXxNeaQ0',
-            project = self.project2.name)
-        management.call_command('update_index', interactive=False)
+        self.videos_tab.add_video(url=test_url, project=self.project2.name)
+        video, _ = Video.get_or_create_for_url(test_url)
+        video.update_search_index()
+       # management.call_command('update_video_metadata')
+       # management.call_command('update_index', interactive=False)
 
         self.videos_tab.open_page(project_page)
         self.assertTrue(self.videos_tab.video_present(

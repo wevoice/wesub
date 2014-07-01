@@ -45,10 +45,10 @@ class TestCaseComments(WebdriverTestCase):
         msg = str(mail.outbox[-1].message())
         self.assertIn('This is a great video',
                       msg)
-
+        
         self.assertIn('<a href="{0}{1}?tab=comments">'.format(
                 self.base_url[:-1], 
-                rmlocale(self.video.get_absolute_url())), msg)
+                self.video.get_absolute_url()), msg)
 
 
     def test_video_lang_comment_message(self):

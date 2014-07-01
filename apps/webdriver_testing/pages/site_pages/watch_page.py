@@ -38,10 +38,10 @@ class WatchPage(VideoListings):
         self.click_by_css(self._SEARCH_PULLDOWN)
         if orig_lang:
             self.logger.info('specifying the orig lang to search')
-            self.select_option_by_text(self._SEARCH_ORIG_LANG, orig_lang)
+            self.select_option_by_value(self._SEARCH_ORIG_LANG, orig_lang)
         if trans_lang:
             self.logger.info('specifying the translated language to search')
-            self.select_option_by_text(self._SEARCH_TRANS_LANG, trans_lang)
+            self.select_option_by_value(self._SEARCH_TRANS_LANG, trans_lang)
                
         if search_term:
             self.logger.info('entering the search term %s' % search_term)
