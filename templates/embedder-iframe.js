@@ -46,9 +46,9 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
                     currentDiv.style.width = currentDiv.dataset.width;
                 if (currentDiv.dataset.height)
                     currentDiv.style.height = (36 + parseInt(currentDiv.dataset.height)) + "px";
-                currentDiv.style.backgroundColor = "#ddd";
+                currentDiv.style.backgroundColor = "#1b1c1d";
                 if (currentDiv.dataset.height)
-                    loadingDiv.style.paddingTop = ((36 + parseInt(currentDiv.dataset.height)) / 2 - 50) + "px";
+                    loadingDiv.style.paddingTop = ((36 + parseInt(currentDiv.dataset.height)) / 2 - 33) + "px";
                 else
                     loadingDiv.style.paddingTop = "200px";
                 loadingDiv.style.textAlign = "center";
