@@ -334,6 +334,8 @@ class ThirdPartyAccount(models.Model):
                                           null=False, blank=False)
     oauth_refresh_token = models.CharField(max_length=255, db_index=True,
                                            null=False, blank=False)
+    channel_id = models.CharField(max_length=255, default='', blank=True,
+                                  db_index=True)
 
     objects = ThirdPartyAccountManager()
 
