@@ -19,7 +19,9 @@ easy_install pip
 pip install uwsgi virtualenv
 
 # install google closure
-svn checkout -r 1196 http://closure-library.googlecode.com/svn/trunk/ $CLOSURE_PATH
+git clone https://github.com/google/closure-library $CLOSURE_PATH
+pushd $CLOSURE_PATH && git checkout adbcc8ef6530ea16bac9f877901fe6b32995c5ff
+popd
 # symlink for compilation
 ln -sf $CLOSURE_PATH $APP_DIR/media/js/closure-library
 
