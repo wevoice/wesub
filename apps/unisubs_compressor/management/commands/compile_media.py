@@ -29,7 +29,7 @@ import optparse
 
 from deploy.git_helpers import get_current_commit_hash
 
-from import widget
+import widget
 from unisubs_compressor.contrib.rjsmin import jsmin
 
 # on vagrant .git is a symlink and this needts to be ran before media compilation ;(
