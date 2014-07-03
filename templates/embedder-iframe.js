@@ -20,7 +20,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	};
 	var updateLoading = function(index, error) {
             if (error) {
-                loadingDivs[index].innerHTML = "Video type not supported by Amara player";
+                loadingDivs[index].innerHTML = "This video type is not supported by the Amara embedder. You can check if your hosting service offers HTML5 video resources.";
             } else {
 	        loadingDivs[index].style.display = "none";
 	        iframes[index].style.visibility = "visible";
@@ -58,6 +58,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
                     loadingDiv.style.paddingTop = ((36 + parseInt(currentDiv.dataset.height)) / 2 - 33) + "px";
                 else
                     loadingDiv.style.paddingTop = "200px";
+		loadingDiv.style.paddingLeft = loadingDiv.style.paddingRight = "50px";
                 loadingDiv.style.textAlign = "center";
                 loadingImg = document.createElement("IMG");
                 loadingImg.src = "{{ static_url }}images/embedder/loading.gif";
