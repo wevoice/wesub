@@ -53,6 +53,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
                 if (currentDiv.dataset.height)
                     currentDiv.style.height = (36 + parseInt(currentDiv.dataset.height)) + "px";
                 currentDiv.style.backgroundColor = "#1b1c1d";
+                currentDiv.style.color = "white";
                 if (currentDiv.dataset.height)
                     loadingDiv.style.paddingTop = ((36 + parseInt(currentDiv.dataset.height)) / 2 - 33) + "px";
                 else
