@@ -17,8 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import re
-
-from dockerdev.rundocker import get_docker_output
+import subprocess
 
 _get_version_cache = None
 def get_version():
@@ -28,7 +27,12 @@ def get_version():
     return _get_version_cache
 
 def calc_version():
-    version_info = get_docker_output("-v")
+    version_info = subprocess.check_output("docker -v", shell=True)
     version = re.search(r'version ([\d\.]+)', version_info).group(1)
     return tuple(int(num) for num in version.split("."))
 
+def uses_long_cidfiles():
+    return get_version() >= (0, 9, 0)
+
+def double_dash_cidfile():
+    return get_version() >= (0, 9, 0)

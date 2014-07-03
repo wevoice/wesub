@@ -635,10 +635,6 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.assertIn(self.contributor.email, email_to)
         self.assertIn(self.accepted_review, msg)
 
-
-
-
-
     def test_review_reject_transcription_reassigned(self):
         """Transcription task is reassigned when rejected by reviewer """
         video = self.data_utils.create_video()
@@ -1100,7 +1096,8 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.assertFalse(self.tasks_tab.task_present(
                 'Approve Swedish Subtitles', video.title))
 
-    def test_transcription_resume_original_lang(self):
+
+    def test_a_resume_no_reset_original_lang(self):
         """Resuming task does not reset originl language. """
         tv = self.data_utils.create_video()
         TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)

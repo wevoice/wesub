@@ -56,10 +56,6 @@ class TestCaseBulkApprove(WebdriverTestCase):
         self.tasks_tab.open_page('teams/%s/approvals/' %self.team.slug)
 
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
-
-
     def complete_review_tasks(self, tv):
         """Complete the review task, 20 for approve, 30 for reject.
  

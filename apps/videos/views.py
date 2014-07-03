@@ -792,13 +792,9 @@ def diffing(request, first_version, second_pk):
     else:
         context['rollback_allowed'] = True
 
-    context['width_0'] = "480"
-    context['height_0'] = "360"
-    context['video_url_0'] = video.get_video_url()
-
-    context['width_1'] = "480"
-    context['height_1'] = "360"
-    context['video_url_1'] = video.get_video_url()
+    context['width'] = "480"
+    context['height'] = "360"
+    context['video_url'] = video.get_video_url()
 
     return render_to_response('videos/diffing.html', context,
                               context_instance=RequestContext(request))

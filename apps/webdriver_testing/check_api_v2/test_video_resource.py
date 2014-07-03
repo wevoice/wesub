@@ -199,7 +199,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             self.assertEqual(v, response[k])
 
         #Check video displays on the site
-        self.assertTrue(self.video_pg.video_embed_present())
+        self.assertTrue(self.video_pg.displays_add_subtitles())
 
 
     def test_team_video_create(self):
@@ -222,7 +222,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             self.assertEqual(v, response[k])
 
         #Check video displays on the site
-        self.assertTrue(self.video_pg.video_embed_present())
+        self.assertTrue(self.video_pg.displays_add_subtitles())
 
 
     def test_video_details(self):

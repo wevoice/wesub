@@ -3,15 +3,12 @@ import os
 
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.data_factories import TeamMemberFactory
-
-
 from webdriver_testing.data_factories import TeamVideoFactory
 from webdriver_testing.data_factories import WorkflowFactory
 from webdriver_testing.data_factories import UserFactory
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages import video_page
 from webdriver_testing.pages.site_pages import video_language_page
-from webdriver_testing.pages.editor_pages import unisubs_menu
 from webdriver_testing.pages.editor_pages import dialogs
 
 
@@ -24,10 +21,7 @@ class TestCasePublishedVideos(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
-        cls.menu = unisubs_menu.UnisubsMenu(cls)
         cls.create_modal = dialogs.CreateLanguageSelection(cls)
-
-
         cls.user = UserFactory(username = 'user', is_partner=True)
         
         #Add a team with workflows, tasks and preferred languages
@@ -70,111 +64,35 @@ class TestCasePublishedVideos(WebdriverTestCase):
             self.team.translate_policy=20
             self.team.save()
 
-    def test_subtitleme(self):
-        """Subtitle Me button displayed on published transcript. """
-        self.video_pg.open_video_page(self.published.video_id)
-        self.assertTrue(self.video_pg.displays_subtitle_me())
-
-
-    def test_video__add_subtitles(self):
+    def test_video_add_subtitles(self):
         """No Add Subtitles option in the video view for moderated videos"""
 
         self.video_pg.open_video_page(self.published.video_id)
         self.assertFalse(self.video_pg.displays_add_subtitles())
 
-    def test_video__upload_subtitles(self):
+    def test_video_upload_subtitles(self):
         """No Upload Subtitles option in the video view for moderated videos"""
 
         self.video_pg.open_video_page(self.published.video_id)
         self.assertFalse(self.video_pg.displays_upload_subtitles())
 
-    def test_video__add_translation(self):
+    def test_video_add_translation(self):
         """No Add Translation in the video view for moderated videos"""
-
         self.video_pg.open_video_page(self.published.video_id)
         self.assertFalse(self.video_pg.displays_add_subtitles())
 
-    def test_playback(self):
-        """Published version can be played on the video page."""
-        self.video_pg.open_video_page(self.published.video_id)
-        self.video_pg.log_in(self.member.username, 'password')
-        self.menu.open_menu()
-        self.menu.select_language('English')
-        self.assertEqual('English', self.menu.visible_menu_text())
-
-    def test_published__guest_display(self):
+    def test_published_guest_display(self):
         """Published version is visible to guests in subtitle view"""
         self.video_pg.open_video_page(self.published.video_id)
         self.video_lang_pg.open_video_lang_page(self.published.video_id, 'en')
         self.assertTrue(self.video_lang_pg.displays_subtitles())
 
-    def test_published__nonmember_display(self):
+    def test_published_nonmember_display(self):
         """Published version is visible to non-members in subtitle view"""
         self.video_pg.open_video_page(self.published.video_id)
         self.video_pg.log_in(self.nonmember.username, 'password')
         self.video_lang_pg.open_video_lang_page(self.published.video_id, 'en')
         self.assertTrue(self.video_lang_pg.displays_subtitles())
-
-    def test_sub_policy_members__guest(self):
-        """Subtitle policy: members, guest has no improve subtitles in menu."""
-        self.video_pg.open_video_page(self.published.video_id)
-        self.menu.open_menu()
-        self.assertFalse(self.menu.displays_improve_subtitles())
-
-    def test_trans_policy_members__guest(self):
-        """Translate policy: members, guest has no new translation in menu.
-
-        """
-        self.video_pg.log_out()
-        self.video_pg.open_video_page(self.published.video_id)
-        self.menu.open_menu()
-        self.assertFalse(self.menu.displays_new_translation())
-        self.assertTrue(self.menu.displays_moderated_message())
-
-
-    def test_sub_policy_members__nonmember(self):
-        """Subtitle policy: members, non-member has no improve subtitles menu.
-
-        """
-        self.video_pg.log_in(self.nonmember.username, 'password')
-        self.video_pg.open_video_page(self.published.video_id)
-        self.menu.open_menu()
-        self.assertFalse(self.menu.displays_improve_subtitles())
-
-    def test_trans_policy_members__nonmember(self):
-        """Translate policy: members, non-member has no new translation menu.
-
-        """
-        self.video_pg.log_in(self.nonmember.username, 'password')
-        self.video_pg.open_video_page(self.published.video_id)
-        self.menu.open_menu()
-        self.assertFalse(self.menu.displays_new_translation())
-
-    def test_trans_policy_members__member(self):
-        """Translate policy: members, member has new translation menu."""
-
-        self.video_pg.log_in(self.member.username, 'password')
-        self.video_pg.open_video_page(self.published.video_id)
-        self.menu.open_menu()
-        self.assertTrue(self.menu.displays_new_translation())
-
-    def test_sub_policy_manager__member(self):
-        """Subtitle policy: members, member has improve subtitles menu."""
-        self.team.subtitle_policy=30
-        self.team.save()
-        self.video_pg.log_in(self.member.username, 'password')
-        self.video_pg.open_video_page(self.published.video_id)
-        self.menu.open_menu()
-        self.assertFalse(self.menu.displays_improve_subtitles())
-
-    def test_trans_policy_manager__member(self):
-        """Translate policy: members, member has new translation menu."""
-        self.team.translate_policy=30
-        self.team.save()
-        self.video_pg.log_in(self.member.username, 'password')
-        self.video_pg.open_video_page(self.published.video_id)
-        self.menu.open_menu()
-        self.assertFalse(self.menu.displays_new_translation())
 
 
 class TestCaseDraftVideos(WebdriverTestCase):    
@@ -186,12 +104,8 @@ class TestCaseDraftVideos(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
-        cls.menu = unisubs_menu.UnisubsMenu(cls)
         cls.create_modal = dialogs.CreateLanguageSelection(cls)
-
-
         cls.user = UserFactory(username = 'user', is_partner=True)
-        
         #Add a team with workflows, tasks and preferred languages
         cls.logger.info('setup: Create a team with tasks enabled')
         cls.team = TeamMemberFactory.create(team__workflow_enabled=True,
@@ -228,65 +142,32 @@ class TestCaseDraftVideos(WebdriverTestCase):
         self.team.save()
         self.video_pg.open_video_page(self.draft.video_id)
 
-
-    def test_subtitleme__draft(self):
-        """No Subtitle Me button in the video view for draft transcript."""
-
-        self.assertNotIn('Subtitle Me', self.menu.visible_menu_text())
-
-
-    def test_video__add_subtitles(self):
+    def test_video_add_subtitles(self):
         """No Add Subtitles option in the video view for moderated videos"""
 
         self.assertFalse(self.video_pg.displays_add_subtitles())
 
-    def test_video__upload_subtitles(self):
+    def test_video_upload_subtitles(self):
         """No Upload Subtitles option in the video view for moderated videos"""
 
         self.assertFalse(self.video_pg.displays_upload_subtitles())
 
-    def test_video__add_translation(self):
-        """No Add Translation in the video view for moderated videos"""
-
-        self.assertFalse(self.video_pg.displays_add_subtitles())
-
-    def test_draft__guest_display(self):
+    def test_draft_guest_display(self):
         """Draft is not visible to guests in subtitle view."""
         self.video_lang_pg.open_video_lang_page(self.draft.video_id, 'en')
         self.assertIn('waiting to be moderated', self.video_lang_pg.displays_subtitles())
 
-    def test_draft__nonmember_display(self):
+    def test_draft_nonmember_display(self):
         """Draft is not visible to non-members in subtitle view."""
         self.video_pg.log_in(self.nonmember.username, 'password')
         self.video_lang_pg.open_video_lang_page(self.draft.video_id, 'en')
         self.assertIn('waiting to be moderated', self.video_lang_pg.displays_subtitles())
 
-    def test_draft__member_display(self):
+    def test_draft_member_display(self):
         """Draft is visible to members in subtitle view."""
         self.video_pg.log_in(self.member.username, 'password')
         self.video_lang_pg.open_video_lang_page(self.draft.video_id, 'en')
         self.assertTrue(self.video_lang_pg.displays_subtitles())
-
-    def test_draft__playback(self):
-        """Draft can not be played on the video page."""
-        self.video_pg.log_in(self.member.username, 'password')
-        self.assertFalse(self.video_pg.displays_add_subtitles())
-
-    def test_draft__guest_improve(self):
-        """Subtitle policy: members, guest has no improve subtitles in menu."""
-        self.assertFalse(self.video_pg.displays_add_subtitles())
-
-    def test_draft__translate(self):
-        """Draft can not be the source for a new translation.
-        
-        """
-        #Opening up translation permissions, otherwise the menu is hidden
-        self.team.translate_policy=10
-        self.team.save()
-        self.video_pg.log_in(self.member.username, 'password')
-        self.video_pg.open_video_page(self.draft.video_id)
-        self.assertFalse(self.video_pg.displays_subtitle_me())
-
 
 class TestCaseViewSubtitles(WebdriverTestCase):    
     NEW_BROWSER_PER_TEST_CASE = False
@@ -376,42 +257,42 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         self.video_pg.open_video_page(self.video.video_id)
 
 
-    def test_status_img__original_complete(self):
+    def test_status_img_original_complete(self):
         """Orignal lang complete, shows complete status button.
 
         """
         _, en_status = self.video_pg.language_status('English')
         self.assertIn('status-complete', en_status)
 
-    def test_tags__original(self):
+    def test_tags_original(self):
         """Orignal lang has original tag.
 
         """
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original', en_tag)
 
-    def test_tags__needs_approval(self):
+    def test_tags_needs_approval(self):
         """Language awaiting approval, shows needs approval tag.
 
         """
         sv_tag, _ = self.video_pg.language_status('Swedish')
         self.assertEqual('needs approval', sv_tag)
 
-    def test_tags__needs_review(self):
+    def test_tags_needs_review(self):
         """Language awaiting review, shows needs review tag.
 
         """
         de_tag, _ = self.video_pg.language_status('German')
         self.assertEqual('needs review', de_tag)
 
-    def test_tags__incomplete(self):
+    def test_tags_incomplete(self):
         """Incomplete language, shows incomplete tag.
 
         """
         ru_tag, _ = self.video_pg.language_status('Russian')
         self.assertEqual('incomplete', ru_tag)
 
-    def test_status_img__translation_review(self):
+    def test_status_img_translation_review(self):
         """Translation lang complete, shows needs review status button.
 
         """
@@ -419,14 +300,14 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         self.assertIn('status-needs-review', sv_status)
 
 
-    def test_status_img__incomplete(self):
+    def test_status_img_incomplete(self):
         """Incomplete translation displays incomplete status button.
 
         """
         _, ru_status = self.video_pg.language_status('Russian')
         self.assertIn('status-incomplete', ru_status)
 
-    def test_tags__original_review(self):
+    def test_tags_original_review(self):
         """Tag display for original language needs review."""
 
         vid, tv = self._add_team_video()
@@ -436,7 +317,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original | needs review', en_tag)
 
-    def test_tags__original_approve(self):
+    def test_tags_original_approve(self):
         """Tag display for original language needs approval."""
         vid, tv = self._add_team_video()
         self._upload_subtitles(vid, 'en', self.rev1, self.contributor, 
@@ -447,7 +328,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original | needs approval', en_tag)
 
-    def test_tags__original_incomplete(self):
+    def test_tags_original_incomplete(self):
         vid, tv = self._add_team_video()
         self._upload_subtitles(vid, 'en', self.rev1, self.contributor, 
                               complete=False)
