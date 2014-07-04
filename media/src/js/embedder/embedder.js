@@ -299,7 +299,16 @@
                 // If jQuery exists on the page, Backbone tries to use it and there's an odd
                 // bug if we don't convert it to a local Zepto object.
                 this.$el = _$(this.$el.get(0));
-		this.$el.prepend('<div class="video-div"><div style="position:absolute;" class="amara-popcorn"></div><div class="video-thumbnail" style="position:absolute;"></div></div>');
+		// We add a thumbnail, which includes the thumbnail image
+		// if it was set, plus a play button
+		this.$el.prepend('<div class="video-div">' +
+                                 '  <div style="position:absolute;" class="amara-popcorn"></div>' +
+                                 '  <div class="video-thumbnail" style="position:absolute;">' +
+                                 '    <div class="thumbnail-button medium"><button class="play"></button></div>' +
+                                 '  </div>' +
+                                 '</div>');
+                _$('div.thumbnail-button', this.$el).css("margin-top", ((this.$el.height() - 70)/ 2) + "px"); 
+
                 this.$popContainer = _$('div.amara-popcorn', this.$el);
                 this.$thumbnailContainer = _$('div.video-thumbnail', this.$el);
                 this.$videoDivContainer = _$('div.video-div', this.$el);
@@ -310,7 +319,6 @@
                 this.$thumbnailContainer.height(this.$el.height());
                 this.$videoDivContainer.width(this.$el.width());
                 this.$videoDivContainer.height(this.$el.height());
-
                 this.model.set('height', this.$popContainer.height());
                 this.model.set('width', this.$popContainer.width());
                 // This is a hack until Popcorn.js supports passing a DOM elem to
