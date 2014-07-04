@@ -260,7 +260,7 @@
                 // Global
                 'click':                                 'mouseClicked',
                 'mousemove':                             'mouseMoved',
-
+		'click div.video-thumbnail':              'thumbnailClicked',
                 // Toolbar
                 'click a.amara-share-button':            'shareButtonClicked',
                 'click a.amara-subtitles-button':        'toggleSubtitlesDisplay',
@@ -277,6 +277,15 @@
                 'click a.amara-transcript-line':         'transcriptLineClicked'
                 //'contextmenu a.amara-transcript-line':   'showTranscriptContextMenu'
             },
+	    initThumbnail: function() {
+		if (this.model.get('thumbnail')) {
+		    this.$thumbnailContainer.css('background', '#000000 url(' +  this.model.get('thumbnail') + ') no-repeat').css('background-size', '100%');
+		    this.$thumbnailContainer.show();
+		}
+	    },
+	    hideThumbnail: function() {
+		this.$thumbnailContainer.hide();
+	    },
             render: function() {
 
                 // TODO: Split this monster of a render() into several render()s.
@@ -290,19 +299,20 @@
                 // If jQuery exists on the page, Backbone tries to use it and there's an odd
                 // bug if we don't convert it to a local Zepto object.
                 this.$el = _$(this.$el.get(0));
-
-                // Create a container that we will use to inject the Popcorn video.
-                this.$el.prepend('<div class="amara-popcorn"></div>');
-
+		this.$el.prepend('<div class="video-div"><div style="position:absolute;" class="amara-popcorn"></div><div class="video-thumbnail" style="position:absolute;"></div></div>');
                 this.$popContainer = _$('div.amara-popcorn', this.$el);
-
+                this.$thumbnailContainer = _$('div.video-thumbnail', this.$el);
+                this.$videoDivContainer = _$('div.video-div', this.$el);
                 // Copy the width and height to the new Popcorn container.
                 this.$popContainer.width(this.$el.width());
                 this.$popContainer.height(this.$el.height());
+                this.$thumbnailContainer.width(this.$el.width());
+                this.$thumbnailContainer.height(this.$el.height());
+                this.$videoDivContainer.width(this.$el.width());
+                this.$videoDivContainer.height(this.$el.height());
 
                 this.model.set('height', this.$popContainer.height());
                 this.model.set('width', this.$popContainer.width());
-
                 // This is a hack until Popcorn.js supports passing a DOM elem to
                 // its smart() method. See: http://bit.ly/L0Lb7t
                 var id = 'amara-popcorn-' + Math.floor(Math.random() * 100000000);
@@ -329,6 +339,7 @@
                         width: that.model.get('width')
                     }));
 
+		    that.initThumbnail();
                     // In case of HTML5 videos, we need to set their dimension directly to the video element
                     _$('video', that.$popContainer).width(that.$popContainer.width()).height(that.$popContainer.height());
 
@@ -353,7 +364,6 @@
                     that.setCurrentLanguageMessage('Loading…');
                     that.waitUntilVideoIsComplete(
                         function() {
-                            notifyVideoLoadedToHost();
                             // Grab the subtitles for the initial language and do yo' thang.
                             if (that.model.get('is_on_amara') && that.model.get('initial_language')) {
 
@@ -384,6 +394,7 @@
                                 that.setTranscriptDisplay(false);
                             }
                             sizeUpdated();
+			    notifyVideoLoadedToHost();
                         }
                     );
                 });
@@ -418,6 +429,10 @@
             // View methods.
             mouseClicked: function(e) {
                 this.hideTranscriptContextMenu();
+            },
+            thumbnailClicked: function(e) {
+		this.hideThumbnail();
+		this.pop.play();
             },
             mouseMoved: function(e) {
                 this.setCursorPosition(e);
