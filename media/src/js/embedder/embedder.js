@@ -278,10 +278,10 @@
                 //'contextmenu a.amara-transcript-line':   'showTranscriptContextMenu'
             },
 	    initThumbnail: function() {
-		if (this.model.get('thumbnail')) {
+		if (this.model.get('thumbnail'))
 		    this.$thumbnailContainer.css('background', '#000000 url(' +  this.model.get('thumbnail') + ') no-repeat').css('background-size', '100%');
-		    this.$thumbnailContainer.show();
-		}
+		else
+		    this.$thumbnailContainer.hide();
 	    },
 	    hideThumbnail: function() {
 		this.$thumbnailContainer.hide();
