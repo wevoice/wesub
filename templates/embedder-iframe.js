@@ -18,11 +18,15 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	var updateContent = function(index, content) {
 	    iframes[index].innerHTML = content;
 	};
-	var updateLoading = function(index) {
-	    iframes[index].parentNode.style.backgroundColor = "transparent";
-	    iframes[index].style.visibility = "visible";
-	    iframes[index].style.opacity = 1;
-	    loadingDivs[index].style.display = "none";
+	var updateLoading = function(index, error) {
+            if (error) {
+                loadingDivs[index].innerHTML = "This video type is not supported by the Amara embedder. You can check if your hosting service offers HTML5 video resources.";
+            } else {
+	        loadingDivs[index].style.display = "none";
+	        iframes[index].style.visibility = "visible";
+	        iframes[index].style.opacity = 1;
+	        iframes[index].parentNode.style.backgroundColor = "transparent";
+            }
 	};
 	this.resizeReceiver = function(e) {
 	    if (e.data.initDone)
@@ -31,6 +35,8 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		resize(e.data.index, e.data.width, e.data.height);
 	    if (e.data.content)
 		updateContent(e.data.index, e.data.content);
+            if (e.data.error == window.MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED)
+                updateLoading(e.data.index, true);
 	    if (e.data.videoReady)
                 updateLoading(e.data.index);
 	};
@@ -46,11 +52,13 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
                     currentDiv.style.width = currentDiv.dataset.width;
                 if (currentDiv.dataset.height)
                     currentDiv.style.height = (36 + parseInt(currentDiv.dataset.height)) + "px";
-                currentDiv.style.backgroundColor = "#ddd";
+                currentDiv.style.backgroundColor = "#1b1c1d";
+                currentDiv.style.color = "white";
                 if (currentDiv.dataset.height)
-                    loadingDiv.style.paddingTop = ((36 + parseInt(currentDiv.dataset.height)) / 2 - 50) + "px";
+                    loadingDiv.style.paddingTop = ((36 + parseInt(currentDiv.dataset.height)) / 2 - 33) + "px";
                 else
                     loadingDiv.style.paddingTop = "200px";
+		loadingDiv.style.paddingLeft = loadingDiv.style.paddingRight = "50px";
                 loadingDiv.style.textAlign = "center";
                 loadingImg = document.createElement("IMG");
                 loadingImg.src = "{{ static_url }}images/embedder/loading.gif";
