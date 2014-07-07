@@ -456,7 +456,7 @@ ul.amara-languages-list > li {
 
 // This creates a nice play button that would overlay the thumbnail
 
-$color: rgba(100,100,100,.8);
+$color: rgba(50,50,50,.8);
 $color-dark: darken($color, 25%);
 $size: 1em;
 
@@ -505,7 +505,8 @@ button:active {
 
 div.thumbnail-button {
  /* @size sets the relative size of the buttons, define before calling the buttons mixin */
-  $size: 8em;  
+  $size: 8em; 
+  opacity: 0.7; 
   @include buttons();
   text-align: center;
   position: relative;
