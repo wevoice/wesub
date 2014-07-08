@@ -24,3 +24,5 @@ class SyncingError(StandardError):
     def __str__(self):
         return self.msg
 
+class YouTubeAccountExistsError(StandardError):
+    pass

@@ -20,8 +20,9 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 
-from externalsites.models import (BrightcoveAccount, lookup_accounts,
-                                  account_models)
+from externalsites.exceptions import YouTubeAccountExistsError
+from externalsites.models import (BrightcoveAccount, YouTubeAccount,
+                                  lookup_accounts, account_models)
 from videos.models import VideoFeed
 from utils import test_utils
 from utils.factories import *
@@ -148,3 +149,27 @@ class YoutubeAccountTest(TestCase):
         self.assertEquals(test_utils.youtube_revoke_auth_token.call_count, 1)
         test_utils.youtube_revoke_auth_token.assert_called_with(
             account.oauth_refresh_token)
+
+    def test_create_or_update(self):
+        # if there are no other accounts for a channel_id, create_or_update()
+        # should create the account and return it
+        user = UserFactory()
+        auth_info = {
+            'username': 'YouTubeUser',
+            'channel_id': 'test-channel-id',
+            'oauth_refresh_token': 'test-refresh-token',
+        }
+        self.assertEquals(YouTubeAccount.objects.all().count(), 0)
+        YouTubeAccount.objects.create_or_update(user=user, **auth_info)
+        self.assertEquals(YouTubeAccount.objects.all().count(), 1)
+
+        # Now that there is an account, it should update the existing account
+        # and throw a YouTubeAccountExistsError
+        team = TeamFactory()
+        auth_info['oauth_refresh_token'] = 'test-refresh-token2'
+        self.assertRaises(YouTubeAccountExistsError,
+                          YouTubeAccount.objects.create_or_update, team=team,
+                          **auth_info)
+        self.assertEquals(YouTubeAccount.objects.all().count(), 1)
+        account = YouTubeAccount.objects.all().get()
+        self.assertEquals(account.oauth_refresh_token, 'test-refresh-token2')

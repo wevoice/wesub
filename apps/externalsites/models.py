@@ -31,10 +31,11 @@ import haystack
 
 from auth.models import CustomUser as User
 from externalsites import syncing
-from externalsites.exceptions import SyncingError
+from externalsites.exceptions import SyncingError, YouTubeAccountExistsError
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from teams.models import Team
 from utils import youtube
+from utils.text import fmt
 from videos.models import VideoUrl, VideoFeed
 import videos.models
 
@@ -319,6 +320,30 @@ class YouTubeAccountManager(ExternalAccountManager):
         else:
             return self.none()
 
+    def create_or_update(self, channel_id, oauth_refresh_token, **data):
+        """Create a new YouTubeAccount, if none exists for the channel_id
+
+        If we already have an account for that channel id, then we don't want
+        to create a new account.  Instead, we update the existing account with
+        the new refresh token and throw a YouTubeAccountExistsError
+        """
+        if self.filter(channel_id=channel_id).count() == 0:
+            return self.create(channel_id=channel_id,
+                               oauth_refresh_token=oauth_refresh_token,
+                               **data)
+        other_account = self.get(channel_id=channel_id)
+        other_account.oauth_refresh_token = oauth_refresh_token
+        other_account.save()
+        if other_account.type == ExternalAccount.TYPE_TEAM:
+            msg = fmt(_('That youtube account has already been linked '
+                        'to the %(team)s team'),
+                      team=other_account.team)
+        else:
+            msg = fmt(_('That youtube account has already been linked '
+                        'to the user %(username)s'),
+                      username=other_account.user.username)
+        raise YouTubeAccountExistsError(msg)
+
 class YouTubeAccount(ExternalAccount):
     """YouTube account to sync to.
 
@@ -328,7 +353,7 @@ class YouTubeAccount(ExternalAccount):
     account_type = 'Y'
     video_url_type = videos.models.VIDEO_TYPE_YOUTUBE
 
-    channel_id = models.CharField(max_length=255, db_index=True)
+    channel_id = models.CharField(max_length=255, unique=True)
     username = models.CharField(max_length=255)
     oauth_refresh_token = models.CharField(max_length=255)
 

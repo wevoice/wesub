@@ -26,6 +26,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from auth.models import CustomUser as User
 from externalsites import forms
+from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import lookup_account, YouTubeAccount
 from localeurl.utils import universal_url
 from teams.models import Team
@@ -127,7 +128,10 @@ def youtube_callback(request):
         messages.error(request, _("Error in auth callback"))
         return redirect('videos.views.index')
 
-    YouTubeAccount.objects.create(**account_data)
+    try:
+        YouTubeAccount.objects.create_or_update(**account_data)
+    except YouTubeAccountExistsError, e:
+        messages.error(request, str(e))
     return redirect(redirect_url)
 
 @staff_member_required

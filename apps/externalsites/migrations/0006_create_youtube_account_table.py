@@ -12,7 +12,7 @@ class Migration(SchemaMigration):
         db.create_table('externalsites_youtubeaccount', (
             ('username', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('oauth_refresh_token', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('channel_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
+            ('channel_id', self.gf('django.db.models.fields.CharField')(max_length=255, unique=True)),
             ('type', self.gf('django.db.models.fields.CharField')(max_length=1)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('owner_id', self.gf('django.db.models.fields.IntegerField')()),
@@ -134,7 +134,7 @@ class Migration(SchemaMigration):
         },
         'externalsites.youtubeaccount': {
             'Meta': {'unique_together': "[('type', 'owner_id', 'channel_id')]", 'object_name': 'YouTubeAccount'},
-            'channel_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'channel_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'unique': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'oauth_refresh_token': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'owner_id': ('django.db.models.fields.IntegerField', [], {}),
