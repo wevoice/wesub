@@ -10,6 +10,8 @@ class Migration(DataMigration):
     
     def forwards(self, orm):
         "Write your forwards methods here."
+        YouTubeAccount = orm['externalsites.YouTubeAccount']
+        VideoFeed = orm['videos.VideoFeed']
 
         # import user accounts.  Note that we don't care about the type field,
         # since we never created another type than the youtube type
@@ -21,6 +23,22 @@ class Migration(DataMigration):
             "FROM auth_customuser_third_party_accounts m2m "
             "JOIN accountlinker_thirdpartyaccount tpa "
             "ON m2m.thirdpartyaccount_id = tpa.id")
+        # link the VideoFeed for user accounts.
+        for account in YouTubeAccount.objects.all():
+            username = account.username.replace(' ', '')
+            feed_url = ("https://gdata.youtube.com/"
+                        "feeds/api/users/%s/uploads" % username)
+            try:
+                feed = VideoFeed.objects.filter(url=feed_url)[:1].get()
+            except VideoFeed.DoesNotExist:
+                pass
+            else:
+                # for some reason we can't just set account.import_feed and
+                # account.save().  Use a SQL update statement instead.
+                db.execute("UPDATE externalsites_youtubeaccount "
+                           "SET import_feed_id = %s "
+                           "WHERE id = %s", (feed.id, account.id))
+
         # import team accounts
         db.execute(
             "INSERT INTO externalsites_youtubeaccount "
@@ -30,6 +48,7 @@ class Migration(DataMigration):
             "FROM teams_team_third_party_accounts m2m "
             "JOIN accountlinker_thirdpartyaccount tpa "
             "ON m2m.thirdpartyaccount_id = tpa.id")
+
     
     def backwards(self, orm):
         "Write your backwards methods here."
@@ -168,9 +187,9 @@ class Migration(DataMigration):
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language_code': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
-            'meta_1_content': ('apps.videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
-            'meta_2_content': ('apps.videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
-            'meta_3_content': ('apps.videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'meta_1_content': ('videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'meta_2_content': ('videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'meta_3_content': ('videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
             'note': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '512', 'blank': 'True'}),
             'origin': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
             'parents': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['subtitles.SubtitleVersion']", 'symmetrical': 'False', 'blank': 'True'}),

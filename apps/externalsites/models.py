@@ -356,6 +356,8 @@ class YouTubeAccount(ExternalAccount):
     channel_id = models.CharField(max_length=255, unique=True)
     username = models.CharField(max_length=255)
     oauth_refresh_token = models.CharField(max_length=255)
+    import_feed = models.OneToOneField(VideoFeed, null=True,
+                                       on_delete=models.SET_NULL)
 
     objects = YouTubeAccountManager()
 
@@ -367,6 +369,17 @@ class YouTubeAccount(ExternalAccount):
 
     def __unicode__(self):
         return "YouTube: %s" % (self.username)
+
+    def feed_url(self):
+        return 'https://gdata.youtube.com/feeds/api/users/%s/uploads' % (
+            self.channel_id)
+
+    def create_feed(self):
+        if self.import_feed is not None:
+            raise ValueError("Feed already created")
+        self.import_feed = VideoFeed.objects.create(url=self.feed_url(),
+                                                    team=self.team)
+        self.save()
 
     def get_owner_display(self):
         if self.username:
@@ -394,6 +407,8 @@ class YouTubeAccount(ExternalAccount):
 
     def delete(self):
         youtube.revoke_auth_token(self.oauth_refresh_token)
+        if self.import_feed is not None:
+            self.import_feed.delete()
         super(YouTubeAccount, self).delete()
 
 account_models = [

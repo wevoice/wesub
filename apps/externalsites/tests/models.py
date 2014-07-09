@@ -150,6 +150,24 @@ class YoutubeAccountTest(TestCase):
         test_utils.youtube_revoke_auth_token.assert_called_with(
             account.oauth_refresh_token)
 
+    def test_create_feed(self):
+        account = YouTubeAccountFactory(user=UserFactory(),
+                                        channel_id='test-channel-id')
+        self.assertEqual(account.import_feed, None)
+        account.create_feed()
+        self.assertNotEqual(account.import_feed, None)
+        self.assertEqual(account.import_feed.url,
+                         'https://gdata.youtube.com/'
+                         'feeds/api/users/test-channel-id/uploads')
+
+    def test_delete_feed_on_account_delete(self):
+        account = YouTubeAccountFactory(user=UserFactory(),
+                                        channel_id='test-channel-id')
+        account.create_feed()
+        self.assertEqual(VideoFeed.objects.count(), 1)
+        account.delete()
+        self.assertEqual(VideoFeed.objects.count(), 0)
+
     def test_create_or_update(self):
         # if there are no other accounts for a channel_id, create_or_update()
         # should create the account and return it
@@ -157,7 +175,8 @@ class YoutubeAccountTest(TestCase):
         auth_info = {
             'username': 'YouTubeUser',
             'channel_id': 'test-channel-id',
-            'oauth_refresh_token': 'test-refresh-token',
+            'oauth_refresh_token':
+            'test-refresh-token',
         }
         self.assertEquals(YouTubeAccount.objects.all().count(), 0)
         YouTubeAccount.objects.create_or_update(user=user, **auth_info)

@@ -11,8 +11,9 @@ class Migration(SchemaMigration):
         # Adding model 'YouTubeAccount'
         db.create_table('externalsites_youtubeaccount', (
             ('username', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('import_feed', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['videos.VideoFeed'], unique=True, null=True)),
             ('oauth_refresh_token', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('channel_id', self.gf('django.db.models.fields.CharField')(max_length=255, unique=True)),
+            ('channel_id', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
             ('type', self.gf('django.db.models.fields.CharField')(max_length=1)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('owner_id', self.gf('django.db.models.fields.IntegerField')()),
@@ -166,9 +167,9 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language_code': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
-            'meta_1_content': ('apps.videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
-            'meta_2_content': ('apps.videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
-            'meta_3_content': ('apps.videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'meta_1_content': ('videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'meta_2_content': ('videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'meta_3_content': ('videos.metadata.MetadataContentField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
             'note': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '512', 'blank': 'True'}),
             'origin': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
             'parents': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['subtitles.SubtitleVersion']", 'symmetrical': 'False', 'blank': 'True'}),
