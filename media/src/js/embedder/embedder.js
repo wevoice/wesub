@@ -21,18 +21,28 @@
 	    if (e.data.fromIframeController) {
 		hostPage = {origin: e.origin, source: e.source, index: e.data.index};
 		hostPage.source.postMessage({initDone: true, index: hostPage.index}, hostPage.origin);
-		sizeUpdated();
 		window.removeEventListener('message', initReceiver, false);
 	    }
 	}
     }
     // Should be triggered whenever the size of the content of the widget changes
-    function sizeUpdated() {
-	if(hostPage.source)
+    function sizeUpdated(model) {
+	if(hostPage.source) {
+	    var width;
+	    if (model && model.get("width"))
+		width = model.get("width");
+	    else
+		width = _$(".amara-tools").width();
+	    var height;
+	    if (model && model.get("height"))
+		height = model.get("height") + 37;
+	    else
+		height = _$(".amara-popcorn").height() + _$(".amara-tools").height();
 	    hostPage.source.postMessage({resize: true, index: hostPage.index,
-					 width: _$(".amara-tools").width(),
-					 height: _$(".amara-popcorn").height() + _$(".amara-tools").height(),
+					 width: width,
+					 height: height,
 					}, hostPage.origin);
+	}
     }
     ////////////////////////////////////////////
 
@@ -52,6 +62,17 @@
 	    hostPage.source.postMessage({resize: false, index: hostPage.index,
 					 videoReady: (error == undefined),
                                          error: error}, hostPage.origin);
+    }
+
+    function notifyThumbnailLoadedToHost(args) {
+	if(hostPage.source) {
+	    hostPage.source.postMessage({resize: false, index: hostPage.index,
+					 thumbnailReady: args && (args.error == undefined),
+                                         error: args && args.error}, hostPage.origin);
+	    if (args && args.model)
+		sizeUpdated(args.model);
+	} else
+            setTimeout(function() { notifyThumbnailLoadedToHost(args && args.error); }, 50);
     }
 
     function regexEscape(str) {
@@ -191,6 +212,7 @@
                             if (resp.objects.length === 1) {
                                 // Set all of the API attrs as attrs on the video model.
                                 video.set(resp.objects[0]);
+				sizeUpdated(video);
 				var visibleLanguages = _$.map(_$.grep(video.get('languages'), function(language) {return language.visible;}),
 							  function(language) {return language.code;});
                                 // Set the initial language to either the one provided by the initial
@@ -211,6 +233,7 @@
 
                         // Mark that the video model has been completely populated.
                         video.set('is_complete', true);
+			video.view.initThumbnail();
                     }
                 });
             }
@@ -278,8 +301,11 @@
                 //'contextmenu a.amara-transcript-line':   'showTranscriptContextMenu'
             },
 	    initThumbnail: function() {
-		if (this.model.get('thumbnail'))
+		if (this.model.get('thumbnail')) {
+		    console.log("Thumbnail is " + this.model.get('thumbnail'));
 		    this.$thumbnailContainer.css('background', '#000000 url(' +  this.model.get('thumbnail') + ') no-repeat').css('background-size', '100%');
+		    notifyThumbnailLoadedToHost({model: this.model});
+		}
 		else
 		    this.$thumbnailContainer.hide();
 	    },
@@ -289,7 +315,6 @@
             render: function() {
 
                 // TODO: Split this monster of a render() into several render()s.
-                
                 var that = this;
                 this.subtitleLines = [];
                 this.currentSearch = '';
@@ -352,8 +377,6 @@
 			download_subtitle_url: '',
                         width: that.model.get('width')
                     }));
-
-		    that.initThumbnail();
                     // In case of HTML5 videos, we need to set their dimension directly to the video element
                     _$('video', that.$popContainer).width(that.$popContainer.width()).height(that.$popContainer.height());
 
@@ -412,7 +435,6 @@
                         }
                     );
                 });
-                sizeUpdated();
                 return this;
 
             },
@@ -445,8 +467,10 @@
                 this.hideTranscriptContextMenu();
             },
             thumbnailClicked: function(e) {
-		this.hideThumbnail();
-		this.pop.play();
+		if (this.pop && this.pop.play) {
+		    this.hideThumbnail();
+		    this.pop.play();
+		}
             },
             mouseMoved: function(e) {
                 this.setCursorPosition(e);
@@ -713,7 +737,6 @@
                     dataType: 'jsonp',
                     success: function(resp) {
                         // Save these subtitles to the video's 'subtitles' collection.
-
                         // TODO: Placeholder until we have the API return the language code.
                         resp.language = language;
 
