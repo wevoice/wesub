@@ -71,7 +71,6 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		iframe.style.border = "none";
 		iframe.style.overflow = "hidden";
 		iframe.scrolling = "no";
-		iframe.style.visibility = "hidden";
 		iframe.style.opacity = 0;
 		currentDiv.appendChild(iframe);
 		loadingDivs.push(loadingDiv);
