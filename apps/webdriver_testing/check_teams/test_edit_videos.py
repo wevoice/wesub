@@ -217,25 +217,27 @@ class TestCaseEdit(WebdriverTestCase):
         self.assertTrue(self.videos_tab.video_present(video_title))
 
 
-    def test_bulk_move(self):
+    def test_bulk_move_tedx(self):
         """Move videos with primary audio set and 0 subtitles.
 
         """
-
-        team2 = TeamMemberFactory.create(user=self.admin_user).team
+  
+        team2 = TeamMemberFactory.create(user=self.admin_user,
+                                         team__name="TEDx Import",
+                                         team__slug="tedxtalks-import").team
         audio_codes = ['en', 'fr', 'de', 'hu', 'en']
         for lc in audio_codes:
             vid_data = {'video__primary_audio_language_code': lc }
             v = self.data_utils.create_video(**vid_data)
-            tv = TeamVideoFactory(team=self.team, 
+            tv = TeamVideoFactory(team=team2, 
                                   added_by=self.admin_user, 
                                   video=v)
             self.logger.info(v.primary_audio_language_code)
             metadata_manager.update_metadata(tv.video.pk)
         management.call_command('update_index', interactive=False)
-        management.call_command('index_team_videos', self.team.slug)
+        management.call_command('index_team_videos', team2.slug)
         self.videos_tab.log_in(self.admin_user.username, 'password')
-        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.open_videos_tab(team2.slug)
         self.videos_tab.open_bulk_move()
         self.videos_tab.primary_audio_filter(setting='set')
         self.videos_tab.sub_lang_filter("any", has=False)
@@ -244,11 +246,11 @@ class TestCaseEdit(WebdriverTestCase):
         vid = self.videos_tab.first_video_listed()
         self.logger.info(vid)
         self.videos_tab.bulk_select()
-        self.videos_tab.bulk_team(team2.name)
+        self.videos_tab.bulk_team(self.team.name)
         self.videos_tab.submit_bulk_move()
 
         management.call_command('update_index', interactive=False)
-        self.videos_tab.open_videos_tab(team2.slug)
+        self.videos_tab.open_videos_tab(self.team.slug)
         self.assertTrue(self.videos_tab.video_present(vid))
 
 

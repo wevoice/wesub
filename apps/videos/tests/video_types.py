@@ -113,21 +113,17 @@ class HtmlFiveVideoTypeTest(TestCase):
         self.vt = HtmlFiveVideoType
 
     def test_type(self):
-        url = 'http://someurl.com/video.ogv?val=should&val1=be#removed'
-        clean_url = 'http://someurl.com/video.ogv'
-
-        video, created = Video.get_or_create_for_url(url)
-        vu = video.videourl_set.all()[:1].get()
-
-        self.assertEqual(vu.url, clean_url)
-
-        self.assertTrue(self.vt.matches_video_url(url))
+        self.assertTrue(self.vt.matches_video_url(
+            'http://someurl.com/video.ogv'))
+        self.assertTrue(self.vt.matches_video_url(
+            'http://someurl.com/video.OGV'))
         self.assertTrue(self.vt.matches_video_url('http://someurl.com/video.ogg'))
         self.assertTrue(self.vt.matches_video_url('http://someurl.com/video.mp4'))
         self.assertTrue(self.vt.matches_video_url('http://someurl.com/video.m4v'))
         self.assertTrue(self.vt.matches_video_url('http://someurl.com/video.webm'))
 
         self.assertFalse(self.vt.matches_video_url('http://someurl.ogv'))
+        self.assertFalse(self.vt.matches_video_url('http://someurl.com/ogv'))
         self.assertFalse(self.vt.matches_video_url(''))
         #for this is other type
         self.assertFalse(self.vt.matches_video_url('http://someurl.com/video.flv'))
@@ -138,18 +134,12 @@ class Mp3VideoTypeTest(TestCase):
         self.vt = Mp3VideoType
 
     def test_type(self):
-        url = 'http://someurl.com/audio.mp3?val=should&val1=be#removed'
-        clean_url = 'http://someurl.com/audio.mp3'
-
-        video, created = Video.get_or_create_for_url(url)
-        vu = video.videourl_set.all()[:1].get()
-
-        self.assertEqual(vu.url, clean_url)
-
-        self.assertTrue(self.vt.matches_video_url(url))
-
-        self.assertTrue(self.vt.matches_video_url('http://someurl.com/audio.mp3'))
-        self.assertFalse(self.vt.matches_video_url('http://someurl.com/mp3.audio'))
+        self.assertTrue(self.vt.matches_video_url(
+            'http://someurl.com/audio.mp3'))
+        self.assertTrue(self.vt.matches_video_url(
+            'http://someurl.com/audio.MP3'))
+        self.assertFalse(self.vt.matches_video_url(
+            'http://someurl.com/mp3.audio'))
 
 class BlipTvVideoTypeTest(TestCase):
     def setUp(self):
@@ -215,19 +205,15 @@ class FLVVideoTypeTest(TestCase):
         self.vt = FLVVideoType
 
     def test_type(self):
-        url = 'http://someurl.com/video.flv?val=should&val1=be#removed'
-        clean_url = 'http://someurl.com/video.flv'
 
-        video, created = Video.get_or_create_for_url(url)
-        vu = video.videourl_set.all()[:1].get()
-
-        self.assertEqual(vu.url, clean_url)
-
-        self.assertTrue(self.vt.matches_video_url(url))
-
-        self.assertFalse(self.vt.matches_video_url('http://someurl.flv'))
-        self.assertFalse(self.vt.matches_video_url(''))
-        self.assertFalse(self.vt.matches_video_url('http://someurl.com/flv.video'))
+        self.assertTrue(self.vt.matches_video_url(
+            'http://someurl.com/video.flv'))
+        self.assertFalse(self.vt.matches_video_url(
+            'http://someurl.flv'))
+        self.assertFalse(self.vt.matches_video_url(
+            ''))
+        self.assertFalse(self.vt.matches_video_url(
+            'http://someurl.com/flv.video'))
 
     def test_blip_type(self):
         url = 'http://blip.tv/file/get/Coldguy-SpineBreakersLiveAWizardOfEarthsea210.FLV'

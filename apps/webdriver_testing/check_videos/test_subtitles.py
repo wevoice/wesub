@@ -8,7 +8,6 @@ from webdriver_testing import data_helpers
 from webdriver_testing.data_factories import UserFactory
 from webdriver_testing.data_factories import VideoUrlFactory
 from webdriver_testing.pages.editor_pages import subtitle_editor
-from webdriver_testing.pages.editor_pages import unisubs_menu 
 
 
 class TestCaseSubtitles(WebdriverTestCase):
@@ -19,8 +18,6 @@ class TestCaseSubtitles(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseSubtitles, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
-        cls.menu = unisubs_menu.UnisubsMenu(cls)
-
         cls.user = UserFactory.create()
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
@@ -42,4 +39,4 @@ class TestCaseSubtitles(WebdriverTestCase):
                 }
         self.data_utils.upload_subs(self.user, **data)
         self.video_pg.open_video_page(video.video_id)
-        self.assertEqual('English', self.menu.visible_menu_text())
+        self.assertIn('English', self.video_pg.subtitle_languages())

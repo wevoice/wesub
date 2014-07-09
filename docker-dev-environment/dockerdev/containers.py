@@ -21,7 +21,7 @@ import time
 
 from dockerdev.paths import cid_path
 from dockerdev.rundocker import run_docker, get_docker_output, run_manage
-from dockerdev.version import get_version
+from dockerdev import version
 
 SERVICE_IMAGES = [
     'amara-dev-mysql',
@@ -47,7 +47,7 @@ def run_ps(all=False):
     args = ["ps", "-q"]
     if all:
         args.append("-a")
-    if get_version() >= (0, 10, 0):
+    if version.uses_long_cidfiles():
         args.append("--no-trunc")
     return get_docker_output(" ".join(args))
 
@@ -68,9 +68,12 @@ def run_image(image_name):
     cmd_line = [
         'run',
         '-d',
-        '-cidfile=%s' % cid_path(image_name),
         '-h=%s' % image_name,
     ]
+    if version.double_dash_cidfile():
+        cmd_line.append('--cidfile=%s' % cid_path(image_name))
+    else:
+        cmd_line.append('-cidfile=%s' % cid_path(image_name))
     for port_map in PORT_MAPPINGS.get(image_name, []):
         cmd_line.append("-p=%s" % port_map)
     cmd_line.append(image_name)

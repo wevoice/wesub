@@ -47,11 +47,11 @@
     }
     ////////////////////////////////////////////
 
-    function notifyVideoLoadedToHost() {
+    function notifyVideoLoadedToHost(error) {
 	if(hostPage.source)
 	    hostPage.source.postMessage({resize: false, index: hostPage.index,
-					 videoReady: true,
-					}, hostPage.origin);
+					 videoReady: (error == undefined),
+                                         error: error}, hostPage.origin);
     }
 
     function regexEscape(str) {
@@ -146,7 +146,11 @@
             subtitles: [], // Backbone collection
             url: '',
             show_logo: true,
+            show_subtitle_me: true,
             show_order_subtitles: true,
+            show_improve_subtitles: true,
+            show_download_subtitles: true,
+            show_embed_code: true,
             show_subtitles_default: false,
             show_transcript_default: false,
             width: '',
@@ -256,7 +260,7 @@
                 // Global
                 'click':                                 'mouseClicked',
                 'mousemove':                             'mouseMoved',
-
+		'click div.video-thumbnail':              'thumbnailClicked',
                 // Toolbar
                 'click a.amara-share-button':            'shareButtonClicked',
                 'click a.amara-subtitles-button':        'toggleSubtitlesDisplay',
@@ -273,6 +277,15 @@
                 'click a.amara-transcript-line':         'transcriptLineClicked'
                 //'contextmenu a.amara-transcript-line':   'showTranscriptContextMenu'
             },
+	    initThumbnail: function() {
+		if (this.model.get('thumbnail'))
+		    this.$thumbnailContainer.css('background', '#000000 url(' +  this.model.get('thumbnail') + ') no-repeat').css('background-size', '100%');
+		else
+		    this.$thumbnailContainer.hide();
+	    },
+	    hideThumbnail: function() {
+		this.$thumbnailContainer.hide();
+	    },
             render: function() {
 
                 // TODO: Split this monster of a render() into several render()s.
@@ -286,19 +299,28 @@
                 // If jQuery exists on the page, Backbone tries to use it and there's an odd
                 // bug if we don't convert it to a local Zepto object.
                 this.$el = _$(this.$el.get(0));
-
-                // Create a container that we will use to inject the Popcorn video.
-                this.$el.prepend('<div class="amara-popcorn"></div>');
+		// We add a thumbnail, which includes the thumbnail image
+		// if it was set, plus a play button
+		this.$el.prepend('<div class="video-div">' +
+                                 '  <div style="position:absolute;" class="amara-popcorn"></div>' +
+                                 '  <div class="video-thumbnail" style="position:absolute;">' +
+                                 '    <div class="thumbnail-button medium"><button class="play"></button></div>' +
+                                 '  </div>' +
+                                 '</div>');
+                _$('div.thumbnail-button', this.$el).css("margin-top", ((this.$el.height() - 70)/ 2) + "px"); 
 
                 this.$popContainer = _$('div.amara-popcorn', this.$el);
-
+                this.$thumbnailContainer = _$('div.video-thumbnail', this.$el);
+                this.$videoDivContainer = _$('div.video-div', this.$el);
                 // Copy the width and height to the new Popcorn container.
                 this.$popContainer.width(this.$el.width());
                 this.$popContainer.height(this.$el.height());
-
+                this.$thumbnailContainer.width(this.$el.width());
+                this.$thumbnailContainer.height(this.$el.height());
+                this.$videoDivContainer.width(this.$el.width());
+                this.$videoDivContainer.height(this.$el.height());
                 this.model.set('height', this.$popContainer.height());
                 this.model.set('width', this.$popContainer.width());
-
                 // This is a hack until Popcorn.js supports passing a DOM elem to
                 // its smart() method. See: http://bit.ly/L0Lb7t
                 var id = 'amara-popcorn-' + Math.floor(Math.random() * 100000000);
@@ -309,6 +331,12 @@
                 this.$el.height('auto');
                 // Init the Popcorn video.
                 this.pop = this.loadPopcorn();
+
+                this.pop.on('error', function() {
+                    if (that.pop.error.code == window.MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+                            notifyVideoLoadedToHost(window.MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED);
+		    }
+                });
 
                 this.pop.on('loadedmetadata', function() {
                     // This does not work for html5 videos. The size must be the one set as parameter
@@ -325,6 +353,7 @@
                         width: that.model.get('width')
                     }));
 
+		    that.initThumbnail();
                     // In case of HTML5 videos, we need to set their dimension directly to the video element
                     _$('video', that.$popContainer).width(that.$popContainer.width()).height(that.$popContainer.height());
 
@@ -349,9 +378,8 @@
                     that.setCurrentLanguageMessage('Loading…');
                     that.waitUntilVideoIsComplete(
                         function() {
-                            notifyVideoLoadedToHost();
                             // Grab the subtitles for the initial language and do yo' thang.
-                            if (that.model.get('is_on_amara')) {
+                            if (that.model.get('is_on_amara') && that.model.get('initial_language')) {
 
                                 // Build the language selection dropdown menu.
                                 that.buildLanguageSelector();
@@ -362,15 +390,25 @@
                                 // TODO: This needs to be an option.
                                 that.loadSubtitles(that.model.get('initial_language'));
                             } else {
-                                // Do some other stuff for videos that aren't yet on Amara.
+                                // Do some other stuff for videos that aren't yet on Amara
+				// or that do not have subtitles
                                 // Language selector drop-up menu becomes a link to amara
-                                that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'));
+				that.model.set({'no_subtitles': true});
+				_$(".amara-displays").hide();
+				if (!that.model.get('show_subtitle_me'))
+				    _$(".amara-languages").hide();
+				_$(".amara-languages").css('min-width', "130px").css({"border-left-color": "#2B2C2D", "border-left-width":"1px", "border-left-style":"solid"});
+				if (that.model.get('is_on_amara'))
+                                    that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
+				else
+                                    that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'));
                                 that.$amaraCurrentLang.attr("target", '_blank');
                                 that.$amaraCurrentLang.removeAttr("data-toggle");
-                                that.setCurrentLanguageMessage('Add to Amara');
+                                that.setCurrentLanguageMessage('subtitle me');
                                 that.setTranscriptDisplay(false);
                             }
                             sizeUpdated();
+			    notifyVideoLoadedToHost();
                         }
                     );
                 });
@@ -406,6 +444,10 @@
             mouseClicked: function(e) {
                 this.hideTranscriptContextMenu();
             },
+            thumbnailClicked: function(e) {
+		this.hideThumbnail();
+		this.pop.play();
+            },
             mouseMoved: function(e) {
                 this.setCursorPosition(e);
             },
@@ -421,7 +463,11 @@
                 this.$amaraLanguagesList.append(this.templateVideo({
                         video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
 		}));
-                this.$amaraLanguagesList.append('            <li role="presentation" class="divider"></li>');
+		if (this.model.get('show_order_subtitles') ||
+		    this.model.get('show_download_subtitles') ||
+		    this.model.get('show_improve_subtitles') ||
+		    this.model.get('show_embed_code'))
+                    this.$amaraLanguagesList.append('            <li role="presentation" class="divider"></li>');
 		// TODO: This wont work if we have several widgets in one page
                 this.$amaraLanguagesList.append('            <li role="presentation"><div><ul id="language-list-inside"></ul></div></li>');
                 
@@ -999,9 +1045,9 @@
             },
 	    templateVideoHTML: function() {
                 return '' +
-                '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="Improve these subtitles on amara.org">Improve these Subtitles</a></li>' +
-                '<li role="presentation" class="unisubs-embed-link"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embed code">Get Embed Code</a></li>' +
-                '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>' +
+                (this.model.get('show_improve_subtitles') ? '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="Improve these subtitles on amara.org">Improve these Subtitles</a></li>' : '') +
+                (this.model.get('show_embed_code') ? '<li role="presentation" class="unisubs-embed-link"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embed code">Get Embed Code</a></li>' : '') +
+                (this.model.get('show_download_subtitles') ? '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>' : '') +
 		(this.model.get('show_order_subtitles') ? '<li role="presentation" class="unisubs-order-subtitles"><a role="menuitem" tabindex="-1" href="http://pro.amara.org/ondemand" target="blank" title="Order Captions or Subtitles">Order Captions or Subtitles</a></li>' : '');
 	    },
 	    templateHTML: function() {
@@ -1055,7 +1101,6 @@
                 '&lt;div class="amara-embed" data-height="480px" data-width="854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
                 '                        </pre>' +
                 '                        <ul>' +
-                '                            <li>Hide Amara logo: <code>data-hide-logo="true"</code>.</li>' +
                 '                            <li>Hide order subtitles menu item: <code>data-hide-order="true"</code>.</li>' +
                 '                            <li>Set initial active subtitle language: <code>data-initial-language="en"</code>.</li>' +
                 '                            <li>Display subtitles by default: <code>data-show-subtitles-default="true"</code>.</li>' +
@@ -1136,8 +1181,12 @@
                         'div': this,
                         'initial_language': $div.data('initial-language'),
                         'url': $div.data('url'),
+			'show_subtitle_me': $div.data('hide-subtitle-me') ? false : true,
                         'show_logo': $div.data('hide-logo') ? false : true,
                         'show_order_subtitles': $div.data('hide-order') ? false : true,
+                        'show_improve_subtitles': $div.data('hide-improve') ? false : true,
+                        'show_download_subtitles': $div.data('hide-download') ? false : true,
+                        'show_embed_code': $div.data('hide-embed') ? false : true,
 			'show_subtitles_default': $div.data('show-subtitles-default'),
 			'show_transcript_default': $div.data('show-transcript-default'),
                     }]);

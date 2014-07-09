@@ -17,16 +17,13 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from videos.types.base import VideoType
-import re
-
-URL_REGEX = re.compile('^https?://.+/.+\.(ogv|ogg|mp4|m4v|webm)(\?.*)?$', re.I)
 
 class HtmlFiveVideoType(VideoType):
-
     abbreviation = 'H'
-    name = 'HTML5'   
-    
+    name = 'HTML5'
+
+    valid_extensions = set(['ogv', 'ogg', 'mp4', 'm4v', 'webm'])
+
     @classmethod
     def matches_video_url(cls, url):
-        url = cls.format_url(url)
-        return bool(URL_REGEX.match(url))
+        return cls.url_extension(url) in cls.valid_extensions
