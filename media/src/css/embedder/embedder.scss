@@ -440,6 +440,11 @@ ul.dropdown-menu.amara-languages-list {
 ul.amara-languages-list > li {
     margin-top: 5px;
 }
+
+video {
+    background-color: black;
+}
+
 #language-list-inside li a {
     padding-top: 3px;
     padding-bottom: 3px;
@@ -453,3 +458,72 @@ ul.amara-languages-list > li {
 #language-list-inside li a.language-item:focus {
     background-color: #F5F5F5;
 }
+
+// This creates a nice play button that would overlay the thumbnail
+
+$color: rgba(50,50,50,.8);
+$color-dark: darken($color, 25%);
+$size: 1em;
+
+@mixin buttons() {
+button {
+  position: relative;
+  display: inline-block;
+  padding: .6em;
+  background: linear-gradient(#fff, #ccc), #c9c5c9;
+  border-radius: 10em;
+  border: 0 solid rgba(208,208,208,1.000);
+  width: $size;
+  height: $size;
+  margin-right: 20px;
+  box-shadow: 0 ($size * .06) ($size * .07) rgba(0,0,0,.4);
+}
+button:hover {
+    background: linear-gradient(#f5f5f5, #b9b9b9), #c9c5c9 ;
+}
+button:before, button:after {
+  position: absolute;
+  content: " "; 
+}
+  
+button:active {
+  top: ($size * .05);
+  box-shadow: 0 ($size * .02) ($size * .03) rgba(0,0,0,.4);
+}
+
+/* Play */
+.play:before {
+  z-index: 2;
+  top: $size * .22;
+  left: $size * .36;
+  width: 0;
+  height: 0;
+  border: $size * .3 solid transparent;
+    border-left-color: $color;
+  border-left-width: ($size * .45);
+}
+.play:hover:before {
+	border-left-color: $color-dark;
+}
+
+}
+
+div.thumbnail-button {
+ /* @size sets the relative size of the buttons, define before calling the buttons mixin */
+  $size: 8em; 
+  opacity: 0.7; 
+  @include buttons();
+  text-align: center;
+  position: relative;
+}
+
+div.medium {
+ $size: 5em;
+  @include buttons();
+}
+
+div.small {
+  $size: 3em;
+  @include buttons();
+}
+
