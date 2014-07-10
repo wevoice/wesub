@@ -308,23 +308,25 @@ class SubtitlesUploadForm(forms.Form):
         return self.cleaned_data
 
 
-    def _find_title_description(self, language_code):
-        """Find the title and description that should be used.
+    def _find_title_description_metadata(self, language_code):
+        """Find the title, description, and metadata that should be used.
 
-        Uploads have no way to set the title or description, so just set them to
-        the previous version's or the video's.
+        Uploads have no way to set the title, description, and metadata
+        so just set them to the previous version's or the video's.
 
         """
         subtitle_language = self.video.subtitle_language(language_code)
         title, description = self.video.title, self.video.description
+        metadata = self.video.get_metadata()
 
         if subtitle_language:
             previous_version = subtitle_language.get_tip()
+            metadata = subtitle_language.get_metadata()
             if previous_version:
                 title = previous_version.title
                 description = previous_version.description
 
-        return title, description
+        return title, description, metadata
 
     def _find_parents(self, from_language_code):
         """Find the parents that should be used for this upload.
@@ -381,14 +383,14 @@ class SubtitlesUploadForm(forms.Form):
             if self.extension == 'txt':
                 complete = False
 
-        title, description = self._find_title_description(language_code)
+        title, description, metadata = self._find_title_description_metadata(language_code)
         parents = self._find_parents(from_language_code)
 
         version = pipeline.add_subtitles(
             self.video, language_code, subtitles,
             title=title, description=description, author=self.user,
             parents=parents, committer=self.user, complete=complete,
-            origin=ORIGIN_UPLOAD)
+            metadata=metadata, origin=ORIGIN_UPLOAD)
 
         # Handle forking SubtitleLanguages that were translations when
         # a standalone version is uploaded.
