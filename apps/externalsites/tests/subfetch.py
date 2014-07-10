@@ -97,3 +97,26 @@ class SubFetchTestCase(TestCase):
         self.assertEqual(mock_get_subtitles.call_count, 0)
         self.assertEqual(video.subtitle_language('en').get_tip(),
                          existing_version)
+
+    @test_utils.patch_for_test("utils.youtube.get_subtitled_languages")
+    @test_utils.patch_for_test("utils.youtube.get_subtitles")
+    def test_fetch_subs_handles_bcp47_codes(self, mock_get_subtitles,
+                                            mock_get_subtitled_languages):
+        # youtube uses BCP-47 language codes.  Ensure that we use this code
+        # when talking to youtube, but our own internal codes when storing
+        # subtitles.
+        mock_get_subtitled_languages.return_value = ['pt-BR']
+
+        subs = storage.SubtitleSet('pt-br')
+        subs.append_subtitle(100, 200, 'text')
+        mock_get_subtitles.return_value = subs
+
+        video = YouTubeVideoFactory()
+        video_url = video.get_primary_videourl_obj()
+
+        fetch_subs(video_url)
+        mock_get_subtitles.assert_called_with(video_url.videoid, 'pt-BR')
+
+        self.assertEqual(set(l.language_code for l in
+                             video.all_subtitle_languages()),
+                         set(['pt-br']))

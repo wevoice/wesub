@@ -27,7 +27,6 @@ import simplejson as json
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from unilangs import LanguageCode
 import requests
 
 from utils.subtitles import load_subtitles
@@ -259,7 +258,8 @@ def update_video_description(video_id, access_token, description):
 def get_subtitled_languages(video_id):
     """Lookup the languages that have subtitles saved on youtube
 
-    :returns: list of language codes
+    :returns: list of bcp-47 language codes (use unilangs to convert them to
+    our internal codes)
     """
     response = requests.get('http://www.youtube.com/api/timedtext',
                             params={'type': 'list', 'v': video_id})
@@ -278,18 +278,21 @@ def get_subtitled_languages(video_id):
     for lang in tree.xpath('track'):
         lang_code = lang.get('lang_code')
         if lang_code:
-            langs.append(LanguageCode(lang_code, 'bcp47').encode('unisubs'))
+            langs.append(lang_code)
 
     return langs
 
 def get_subtitles(video_id, language_code):
     """Get subtitle data from youtube
 
+    :param video_id: youtube video id
+    :param language_code: bcp-47 language code
+
     :returns: SRT text for the subtitles
     """
     response = requests.get('http://www.youtube.com/api/timedtext', params={
         'v': video_id,
-        'lang': LanguageCode(language_code, 'unisubs').encode('bcp47'),
+        'lang': language_code,
         'fmt': 'srt',
     })
     if response.status_code != 200:

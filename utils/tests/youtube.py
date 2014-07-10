@@ -339,8 +339,8 @@ class FetchSubtitleTest(TestCase):
         with mocker:
             langs = utils.youtube.get_subtitled_languages('test-video-id')
         # check the return value.  Note that the bcp47 language code "ak"
-        # should be converted to "aka" which is the our representation
-        self.assertEqual(set(langs), set(['en', 'fr', 'aka']))
+        # should not be converted to our internal representation
+        self.assertEqual(set(langs), set(['en', 'fr', 'ak']))
 
     def test_get_subititles(self):
         srt_data = """\
@@ -361,22 +361,3 @@ Line 2
             subs = utils.youtube.get_subtitles('test-video-id', 'en')
         self.assertEquals(subs.to_xml(),
                           load_subtitles('en', srt_data, 'srt').to_xml())
-
-    def test_get_subititles_converts_language_code(self):
-        # test that we convert our language codes to bcp47
-        srt_data = """\
-1
-00:00:02,220 --> 00:00:06,220
-Line 1
-
-2
-00:00:50,000 --> 00:00:53,000
-Line 2
-"""
-        mocker = test_utils.RequestsMocker()
-        mocker.expect_request(
-            'get', 'http://www.youtube.com/api/timedtext',
-            { 'v': 'test-video-id', 'lang': 'ak', 'fmt': 'srt' },
-            body=srt_data)
-        with mocker:
-            subs = utils.youtube.get_subtitles('test-video-id', 'aka')

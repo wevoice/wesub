@@ -21,6 +21,8 @@
 
 import logging
 
+from unilangs import LanguageCode
+
 from subtitles.models import ORIGIN_IMPORTED
 from subtitles import pipeline
 from utils import youtube
@@ -44,9 +46,10 @@ def fetch_subs_youtube(video_url):
         video_url.video.newsubtitlelanguage_set.having_versions()
     )
 
-    for language_code in youtube.get_subtitled_languages(video_id):
+    for bcp47_lc in youtube.get_subtitled_languages(video_id):
+        language_code = LanguageCode(bcp47_lc, 'bcp47').encode('unisubs')
         if language_code not in existing_langs:
-            subs = youtube.get_subtitles(video_id, language_code)
+            subs = youtube.get_subtitles(video_id, bcp47_lc)
             pipeline.add_subtitles(video_url.video, language_code, subs,
                                    note="From youtube", complete=True,
                                    origin=ORIGIN_IMPORTED)
