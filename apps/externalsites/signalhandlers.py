@@ -22,6 +22,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 from externalsites import credit
+from externalsites import subfetch
 from externalsites import tasks
 from externalsites.models import (KalturaAccount,
                                   lookup_accounts, lookup_account)
@@ -62,3 +63,5 @@ def on_videourl_save(signal, sender, instance, created, **kwargs):
         account = lookup_account(instance.video, instance)
         if credit.should_add_credit_to_video_url(video_url, account):
             tasks.add_amara_credit.delay(instance.id)
+        if subfetch.should_fetch_subs(video_url):
+            tasks.fetch_subs.delay(video_url.pk)

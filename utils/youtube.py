@@ -19,6 +19,7 @@
 """utils.youtube -- YouTube API handling."""
 
 from collections import namedtuple
+from lxml import etree
 import logging
 import urllib
 import re
@@ -26,8 +27,10 @@ import simplejson as json
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from unilangs import LanguageCode
 import requests
 
+from utils.subtitles import load_subtitles
 from utils.text import fmt
 
 class APIError(StandardError):
@@ -252,3 +255,50 @@ def update_video_description(video_id, access_token, description):
     # send back the snippet with the new description
     snippet['description'] = description
     video_put(access_token, video_id, snippet=snippet)
+
+def get_subtitled_languages(video_id):
+    """Lookup the languages that have subtitles saved on youtube
+
+    :returns: list of language codes
+    """
+    response = requests.get('http://www.youtube.com/api/timedtext',
+                            params={'type': 'list', 'v': video_id})
+    if response.status_code != 200:
+        logger.warn("Bad status code in get_subtitled_languages(): %s (%s)" %
+                    (response.status_code, response.content))
+        return []
+    try:
+        tree = etree.fromstring(response.content)
+    except StandardError, e:
+        logger.warn("Error parsing xml response in "
+                    "get_subtitled_languages() (%s)" % response.content)
+        return []
+
+    langs = []
+    for lang in tree.xpath('track'):
+        lang_code = lang.get('lang_code')
+        if lang_code:
+            langs.append(LanguageCode(lang_code, 'bcp47').encode('unisubs'))
+
+    return langs
+
+def get_subtitles(video_id, language_code):
+    """Get subtitle data from youtube
+
+    :returns: SRT text for the subtitles
+    """
+    response = requests.get('http://www.youtube.com/api/timedtext', params={
+        'v': video_id,
+        'lang': LanguageCode(language_code, 'unisubs').encode('bcp47'),
+        'fmt': 'srt',
+    })
+    if response.status_code != 200:
+        logger.warn("Bad status code in get_subtitles(): %s (%s)" % (
+                    response.status_code, response.content))
+        return []
+    try:
+        return load_subtitles(language_code, response.content, 'srt')
+    except StandardError, e:
+        logger.warn("Error parsing subtitle data in get_subtitles() (%s)" % (
+                    response.content))
+        return None

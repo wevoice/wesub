@@ -37,7 +37,6 @@ from videos.permissions import can_user_edit_video_urls
 from teams.permissions import can_create_and_edit_subtitles
 from videos.tasks import import_videos_from_feed
 from videos.types import video_type_registrar, VideoTypeError
-from videos.types.youtube import yt_service
 from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexField, FeedURLField, ReCaptchaField
 from utils.http import url_exists
 from utils.text import fmt
@@ -200,7 +199,6 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         self.user = user
         super(AddFromFeedForm, self).__init__(*args, **kwargs)
 
-        self.yt_service = yt_service
         self.video_limit_routreach = False
         self.urls = []
 

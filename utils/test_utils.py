@@ -96,7 +96,6 @@ youtube_get_user_info = mock.Mock(return_value=test_video_info)
 youtube_get_new_access_token = mock.Mock(return_value='test-access-token')
 youtube_revoke_auth_token = mock.Mock()
 youtube_update_video_description = mock.Mock()
-youtube_get_subtitled_languages = mock.Mock(return_value=[])
 url_exists = mock.Mock(return_value=True)
 
 current_locks = set()
@@ -108,6 +107,7 @@ invalidate_widget_video_cache = mock.Mock()
 update_subtitles = mock.Mock()
 delete_subtitles = mock.Mock()
 update_all_subtitles = mock.Mock()
+fetch_subs_task = mock.Mock()
 import_videos_from_feed = mock.Mock()
 get_language_facet_counts = mock.Mock(return_value=([], []))
 
@@ -128,8 +128,6 @@ class MonkeyPatcher(object):
             ('utils.youtube.revoke_auth_token', youtube_revoke_auth_token),
             ('utils.youtube.update_video_description',
              youtube_update_video_description),
-            ('videos.types.youtube.YoutubeVideoType.get_subtitled_languages',
-             youtube_get_subtitled_languages),
             ('utils.applock.acquire_lock', acquire_lock),
             ('utils.applock.release_lock', release_lock),
             ('utils.http.url_exists', url_exists),
@@ -138,6 +136,7 @@ class MonkeyPatcher(object):
             ('externalsites.tasks.update_subtitles', update_subtitles),
             ('externalsites.tasks.delete_subtitles', delete_subtitles),
             ('externalsites.tasks.update_all_subtitles', update_all_subtitles),
+            ('externalsites.tasks.fetch_subs', fetch_subs_task),
             ('videos.tasks.import_videos_from_feed', import_videos_from_feed),
             ('search.forms._get_language_facet_counts',
              get_language_facet_counts)
