@@ -132,8 +132,9 @@ def youtube_callback(request):
         account = YouTubeAccount.objects.create_or_update(**account_data)
     except YouTubeAccountExistsError, e:
         messages.error(request, str(e))
-    if 'username' in auth_info.state:
-        account.create_feed()
+    else:
+        if 'username' in auth_info.state:
+            account.create_feed()
 
     return redirect(redirect_url)
 
