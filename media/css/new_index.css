@@ -147,7 +147,7 @@ body#index a:hover {
 #home-right {
     background: #EEE;
     float: right;
-    height: 385px;
+    min-height: 385px;
     width: 460px;
 }
 #benefits {
