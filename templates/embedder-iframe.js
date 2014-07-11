@@ -39,6 +39,8 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
                 updateLoading(e.data.index, true);
 	    if (e.data.videoReady)
                 updateLoading(e.data.index);
+	    if (e.data.thumbnailReady)
+                updateLoading(e.data.index);
 	};
 
 	this.initIframes = function(elements) {
