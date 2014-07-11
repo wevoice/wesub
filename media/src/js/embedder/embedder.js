@@ -302,7 +302,6 @@
             },
 	    initThumbnail: function() {
 		if (this.model.get('thumbnail')) {
-		    console.log("Thumbnail is " + this.model.get('thumbnail'));
 		    this.$thumbnailContainer.css('background', '#000000 url(' +  this.model.get('thumbnail') + ') no-repeat').css('background-size', '100%');
 		    notifyThumbnailLoadedToHost({model: this.model});
 		}
@@ -346,6 +345,14 @@
                 this.$videoDivContainer.height(this.$el.height());
                 this.model.set('height', this.$popContainer.height());
                 this.model.set('width', this.$popContainer.width());
+
+                this.$el.append(this.template({
+                    video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + this.model.get('url'),
+		    original_video_url:  this.model.get('url'),
+		    download_subtitle_url: '',
+                    width: this.model.get('width')
+                }));
+
                 // This is a hack until Popcorn.js supports passing a DOM elem to
                 // its smart() method. See: http://bit.ly/L0Lb7t
                 var id = 'amara-popcorn-' + Math.floor(Math.random() * 100000000);
@@ -364,19 +371,7 @@
                 });
 
                 this.pop.on('loadedmetadata', function() {
-                    // This does not work for html5 videos. The size must be the one set as parameter
-                    // Set the video model's height and width, now that we know it.
-                    /*
-                    that.model.set('height', that.pop.position().height);
-                    that.model.set('width', that.pop.position().width);
-                    */
-                    // Create the actual core DOM for the Amara container.
-                    that.$el.append(that.template({
-                        video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'),
-			original_video_url:  that.model.get('url'),
-			download_subtitle_url: '',
-                        width: that.model.get('width')
-                    }));
+
                     // In case of HTML5 videos, we need to set their dimension directly to the video element
                     _$('video', that.$popContainer).width(that.$popContainer.width()).height(that.$popContainer.height());
 
@@ -384,7 +379,6 @@
                     that.cacheNodes();
 
                     // Setup tracking for the scroll event on the transcript body.
-                    //
                     // TODO: Find a way to get this into the core Backbone events on the Amara view.
                     that.$transcriptBody.on('scroll', function() {
                         that.transcriptScrolled();
@@ -398,7 +392,6 @@
                     // We could just make this a callback on the model's initialize() for
                     // after we get a response, but there may be cases where we want to init
                     // a VideoModel separately from an AmaraView.
-                    that.setCurrentLanguageMessage('Loading…');
                     that.waitUntilVideoIsComplete(
                         function() {
                             // Grab the subtitles for the initial language and do yo' thang.
@@ -566,8 +559,6 @@
 
                 var that = this;
 
-                //this.setCurrentLanguageMessage('Loading…');
-
                 // remove plugins added for previous languages
                 this.pop.removePlugin('code');
 
@@ -726,8 +717,6 @@
                 var apiURL = ''+
                     'http://' + _amaraConf.baseURL + '/api2/partners/videos/' +
                     this.model.get('id') + '/languages/' + language + '/subtitles/';
-
-                this.$amaraCurrentLang.text('Loading…');
 
                 // Make a call to the Amara API to retrieve subtitles for this language.
                 //
@@ -1083,7 +1072,7 @@
                 '            <li><a href="#" class="amara-subtitles-button amara-button" title="Toggle subtitles"></a></li>' +
                 '        </ul>' +
 		'        <div class="dropdown amara-languages">' +
-                '            <a class="amara-current-language" id="dropdownMenu1" role="button" data-toggle="dropdown" data-target="#" href="">Loading&hellip;<span class="caret"></span>' +
+                '            <a class="amara-current-language" id="dropdownMenu1" role="button" data-toggle="dropdown" data-target="#" href="">Loading&hellip;' +
                 '            </a>'+
                 '            <ul id="languages-dropdown" class="dropdown-menu amara-languages-list" role="menu" aria-labelledby="dropdownMenu1"></ul>' +
                 '        </div>' +
