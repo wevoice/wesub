@@ -17,6 +17,7 @@ ADD .docker/setup.sh /tmp/setup.sh
 ADD .docker/build_media.sh /usr/local/bin/build_media
 ADD .docker/run_migrations.sh /usr/local/bin/run_migrations
 ADD .docker/rebuild_index.sh /usr/local/bin/rebuild_index
+ADD .docker/update_index.sh /usr/local/bin/update_index
 ADD .docker/master-worker.sh /usr/local/bin/master-worker
 ADD .docker/worker.sh /usr/local/bin/worker
 ADD .docker/test_app.sh /usr/local/bin/test_app
