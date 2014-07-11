@@ -49,6 +49,11 @@ class SearchTest(TestCase):
         assert_search_querysets_equal(self.get_search_qs(''),
                                       VideoIndex.public().none())
 
+    def test_language_only(self):
+        assert_search_querysets_equal(self.get_search_qs('', video_lang='en'),
+                                      VideoIndex.public()
+                                      .filter(video_language_exact='en'))
+
     def test_video_lang_filter(self):
         # set up fake faceting info so that we can select english as the
         # filter

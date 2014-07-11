@@ -56,7 +56,7 @@ class SearchForm(forms.Form):
         ('month_views', _(u'Views This Month')),
         ('total_views', _(u'Total Views')),
     )
-    q = forms.CharField(label=_(u'query'))
+    q = forms.CharField(label=_(u'query'), required=False)
     sort = forms.ChoiceField(choices=SORT_CHOICES, required=False, initial='score',
                              label=_(u'Sort By'))
     langs = forms.ChoiceField(choices=ALL_LANGUAGES, required=False, label=_(u'Subtitled Into'),
@@ -75,6 +75,11 @@ class SearchForm(forms.Form):
 
         self.fields['langs'].choices = self._make_choices_from_faceting(
             language_facet_counts)
+
+    def has_any_criteria(self):
+        return (self.cleaned_data['q'] or
+                self.cleaned_data['langs'] or
+                self.cleaned_data['video_lang'])
 
     def get_display_views(self):
         if not hasattr(self, 'cleaned_data'):
@@ -122,7 +127,7 @@ class SearchForm(forms.Form):
             return VideoIndex.public()
 
     def queryset(self):
-        if not self.is_valid():
+        if not self.is_valid() or not self.has_any_criteria():
             return self.empty_queryset()
         ordering = self.cleaned_data.get('sort', '')
         langs = self.cleaned_data.get('langs')
