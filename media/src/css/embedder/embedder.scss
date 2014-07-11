@@ -142,7 +142,7 @@ div.amara-embed {
             a.amara-button {
                 display: inline-block;
                 height: 36px;
-                @include opacity(.5);
+                @include opacity(.2);
                 -webkit-transition: opacity .03s linear;
                 -moz-transition: opacity .03s linear;
 
