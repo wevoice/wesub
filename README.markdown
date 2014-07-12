@@ -28,7 +28,7 @@ Amara uses [Docker](http://docker.io).  For ease of development, we use the [Fig
 
 5. Start Amara:
 
-        fig up web
+        fig up app
 
 6. Add `unisubs.example.com` to your hosts file, pointing at `127.0.0.1`.  This
    is necessary for Twitter and Facebook oauth to work correctly.
@@ -50,7 +50,7 @@ Dev Notes
 
 To run a single `manage.py` command:
 
-        fig run --rm web python manage.py <command>
+        fig run --rm app python manage.py <command>
 
 To see running services:
 
@@ -66,4 +66,4 @@ To view logs from a service:
 
 To create an admin user:
 
-        fig run --rm web python manage.py create_admin --username=<username> --password=<password> --settings=dev_settings
+        fig run --rm app python manage.py create_admin --username=<username> --password=<password> --settings=dev_settings
