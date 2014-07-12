@@ -20,7 +20,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from haystack import site
-from teams.models import Team
+from teams.models import Team, TeamVideo
 from videos.models import Video
 import time
 
@@ -37,14 +37,18 @@ class Command(BaseCommand):
             raise CommandError('Team with slug %r not found' % (args[0],))
 
         video_index = site.get_index(Video)
+        team_video_index = site.get_index(TeamVideo)
         self.stdout.write("Fetching videos\n")
-        video_list = list(team.videos.all())
+        video_list = list(TeamVideo.objects
+                          .filter(team=team)
+                          .select_related('video'))
         start_time = time.time()
         self.stdout.write("Indexing")
         self.stdout.flush()
         with transaction.commit_manually():
-            for video in video_list:
-                video_index.update_object(video)
+            for team_video in video_list:
+                video_index.update_object(team_video.video)
+                team_video_index.update_object(team_video)
                 self.stdout.write(".")
                 self.stdout.flush()
                 # commit after each pass to make sure that we aren't keeping

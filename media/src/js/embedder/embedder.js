@@ -21,18 +21,28 @@
 	    if (e.data.fromIframeController) {
 		hostPage = {origin: e.origin, source: e.source, index: e.data.index};
 		hostPage.source.postMessage({initDone: true, index: hostPage.index}, hostPage.origin);
-		sizeUpdated();
 		window.removeEventListener('message', initReceiver, false);
 	    }
 	}
     }
     // Should be triggered whenever the size of the content of the widget changes
-    function sizeUpdated() {
-	if(hostPage.source)
+    function sizeUpdated(model) {
+	if(hostPage.source) {
+	    var width;
+	    if (model && model.get("width"))
+		width = model.get("width");
+	    else
+		width = _$(".amara-tools").width();
+	    var height;
+	    if (model && model.get("height"))
+		height = model.get("height") + 37;
+	    else
+		height = _$(".amara-popcorn").height() + _$(".amara-tools").height();
 	    hostPage.source.postMessage({resize: true, index: hostPage.index,
-					 width: _$(".amara-tools").width(),
-					 height: _$(".amara-popcorn").height() + _$(".amara-tools").height(),
+					 width: width,
+					 height: height,
 					}, hostPage.origin);
+	}
     }
     ////////////////////////////////////////////
 
@@ -52,6 +62,17 @@
 	    hostPage.source.postMessage({resize: false, index: hostPage.index,
 					 videoReady: (error == undefined),
                                          error: error}, hostPage.origin);
+    }
+
+    function notifyThumbnailLoadedToHost(args) {
+	if(hostPage.source) {
+	    hostPage.source.postMessage({resize: false, index: hostPage.index,
+					 thumbnailReady: args && (args.error == undefined),
+                                         error: args && args.error}, hostPage.origin);
+	    if (args && args.model)
+		sizeUpdated(args.model);
+	} else
+            setTimeout(function() { notifyThumbnailLoadedToHost(args && args.error); }, 50);
     }
 
     function regexEscape(str) {
@@ -191,6 +212,7 @@
                             if (resp.objects.length === 1) {
                                 // Set all of the API attrs as attrs on the video model.
                                 video.set(resp.objects[0]);
+				sizeUpdated(video);
 				var visibleLanguages = _$.map(_$.grep(video.get('languages'), function(language) {return language.visible;}),
 							  function(language) {return language.code;});
                                 // Set the initial language to either the one provided by the initial
@@ -211,6 +233,7 @@
 
                         // Mark that the video model has been completely populated.
                         video.set('is_complete', true);
+			video.view.initThumbnail();
                     }
                 });
             }
@@ -278,8 +301,10 @@
                 //'contextmenu a.amara-transcript-line':   'showTranscriptContextMenu'
             },
 	    initThumbnail: function() {
-		if (this.model.get('thumbnail'))
+		if (this.model.get('thumbnail')) {
 		    this.$thumbnailContainer.css('background', '#000000 url(' +  this.model.get('thumbnail') + ') no-repeat').css('background-size', '100%');
+		    notifyThumbnailLoadedToHost({model: this.model});
+		}
 		else
 		    this.$thumbnailContainer.hide();
 	    },
@@ -289,7 +314,6 @@
             render: function() {
 
                 // TODO: Split this monster of a render() into several render()s.
-                
                 var that = this;
                 this.subtitleLines = [];
                 this.currentSearch = '';
@@ -321,6 +345,14 @@
                 this.$videoDivContainer.height(this.$el.height());
                 this.model.set('height', this.$popContainer.height());
                 this.model.set('width', this.$popContainer.width());
+
+                this.$el.append(this.template({
+                    video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + this.model.get('url'),
+		    original_video_url:  this.model.get('url'),
+		    download_subtitle_url: '',
+                    width: this.model.get('width')
+                }));
+
                 // This is a hack until Popcorn.js supports passing a DOM elem to
                 // its smart() method. See: http://bit.ly/L0Lb7t
                 var id = 'amara-popcorn-' + Math.floor(Math.random() * 100000000);
@@ -339,21 +371,7 @@
                 });
 
                 this.pop.on('loadedmetadata', function() {
-                    // This does not work for html5 videos. The size must be the one set as parameter
-                    // Set the video model's height and width, now that we know it.
-                    /*
-                    that.model.set('height', that.pop.position().height);
-                    that.model.set('width', that.pop.position().width);
-                    */
-                    // Create the actual core DOM for the Amara container.
-                    that.$el.append(that.template({
-                        video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'),
-			original_video_url:  that.model.get('url'),
-			download_subtitle_url: '',
-                        width: that.model.get('width')
-                    }));
 
-		    that.initThumbnail();
                     // In case of HTML5 videos, we need to set their dimension directly to the video element
                     _$('video', that.$popContainer).width(that.$popContainer.width()).height(that.$popContainer.height());
 
@@ -361,7 +379,6 @@
                     that.cacheNodes();
 
                     // Setup tracking for the scroll event on the transcript body.
-                    //
                     // TODO: Find a way to get this into the core Backbone events on the Amara view.
                     that.$transcriptBody.on('scroll', function() {
                         that.transcriptScrolled();
@@ -375,7 +392,6 @@
                     // We could just make this a callback on the model's initialize() for
                     // after we get a response, but there may be cases where we want to init
                     // a VideoModel separately from an AmaraView.
-                    that.setCurrentLanguageMessage('Loading…');
                     that.waitUntilVideoIsComplete(
                         function() {
                             // Grab the subtitles for the initial language and do yo' thang.
@@ -412,7 +428,6 @@
                         }
                     );
                 });
-                sizeUpdated();
                 return this;
 
             },
@@ -445,8 +460,10 @@
                 this.hideTranscriptContextMenu();
             },
             thumbnailClicked: function(e) {
-		this.hideThumbnail();
-		this.pop.play();
+		if (this.pop && this.pop.play) {
+		    this.hideThumbnail();
+		    this.pop.play();
+		}
             },
             mouseMoved: function(e) {
                 this.setCursorPosition(e);
@@ -541,8 +558,6 @@
             buildTranscript: function(language) {
 
                 var that = this;
-
-                //this.setCurrentLanguageMessage('Loading…');
 
                 // remove plugins added for previous languages
                 this.pop.removePlugin('code');
@@ -703,8 +718,6 @@
                     'http://' + _amaraConf.baseURL + '/api2/partners/videos/' +
                     this.model.get('id') + '/languages/' + language + '/subtitles/';
 
-                this.$amaraCurrentLang.text('Loading…');
-
                 // Make a call to the Amara API to retrieve subtitles for this language.
                 //
                 // TODO: If we already have subtitles in this language, don't do anything.
@@ -713,7 +726,6 @@
                     dataType: 'jsonp',
                     success: function(resp) {
                         // Save these subtitles to the video's 'subtitles' collection.
-
                         // TODO: Placeholder until we have the API return the language code.
                         resp.language = language;
 
@@ -1060,7 +1072,7 @@
                 '            <li><a href="#" class="amara-subtitles-button amara-button" title="Toggle subtitles"></a></li>' +
                 '        </ul>' +
 		'        <div class="dropdown amara-languages">' +
-                '            <a class="amara-current-language" id="dropdownMenu1" role="button" data-toggle="dropdown" data-target="#" href="">Loading&hellip;<span class="caret"></span>' +
+                '            <a class="amara-current-language" id="dropdownMenu1" role="button" data-toggle="dropdown" data-target="#" href="">Loading&hellip;' +
                 '            </a>'+
                 '            <ul id="languages-dropdown" class="dropdown-menu amara-languages-list" role="menu" aria-labelledby="dropdownMenu1"></ul>' +
                 '        </div>' +
