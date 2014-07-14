@@ -66,4 +66,4 @@ To view logs from a service:
 
 To create an admin user:
 
-        fig run --rm app python manage.py create_admin --username=<username> --password=<password> --settings=dev_settings
+        fig run --rm app python manage.py createsuperuser --settings=dev_settings
