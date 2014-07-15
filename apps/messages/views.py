@@ -28,11 +28,11 @@ from django.utils.http import cookie_date
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.list_detail import object_list
 
-from apps.auth.models import CustomUser as User
-from apps.auth.models import UserLanguage
-from apps.messages.forms import SendMessageForm, NewMessageForm
-from apps.messages.models import Message
-from apps.messages.rpc import MessagesApiClass
+from auth.models import CustomUser as User
+from auth.models import UserLanguage
+from messages.forms import SendMessageForm, NewMessageForm
+from messages.models import Message
+from messages.rpc import MessagesApiClass
 from messages.tasks import send_new_message_notification, send_new_messages_notifications
 from utils import render_to_json, render_to
 from utils.rpc import RpcRouter

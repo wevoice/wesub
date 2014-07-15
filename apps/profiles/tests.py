@@ -19,11 +19,12 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from auth.models import CustomUser as User
-from videos.models import Video, Action
-
+from utils.factories import *
 
 class TestViews(TestCase):
-    fixtures = ['test.json']
+    def setUp(self):
+        self.auth = dict(username='admin', password='admin')
+        self.user = UserFactory(**self.auth)
 
     def _simple_test(self, url_name, args=None, kwargs=None, status=200, data={}):
         response = self.client.get(reverse(url_name, args=args, kwargs=kwargs), data)
@@ -32,10 +33,6 @@ class TestViews(TestCase):
 
     def _login(self):
         self.client.login(**self.auth)
-
-    def setUp(self):
-        self.auth = dict(username='admin', password='admin')
-        self.user = User.objects.get(username=self.auth['username'])
 
     def test_edit_account(self):
         self._simple_test('profiles:account', status=302)
@@ -84,12 +81,3 @@ class TestViews(TestCase):
         data['username'] = other_user.username
         response = self.client.post(reverse('profiles:edit'), data=data)
         self.assertRedirects(response, reverse('profiles:edit'))
-
-    def test_profile_page(self):
-        video = Video.objects.all()[0]
-        video.title = 'new title'
-        video.save()
-        Action.change_title_handler(video, self.user)
-        self.assertTrue(self.user.action_set.exists())
-
-        self._simple_test('profiles:profile', [self.user.id])

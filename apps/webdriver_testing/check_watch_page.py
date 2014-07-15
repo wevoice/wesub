@@ -101,7 +101,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """Search for videos by video language.
  
         """
-        results_pg = self.watch_pg.advanced_search(orig_lang='English')
+        results_pg = self.watch_pg.advanced_search(orig_lang='en')
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
         self.assertEqual(2, len(results_pg.page_videos()))
@@ -110,7 +110,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """Search for videos by translations language.
  
         """
-        results_pg = self.watch_pg.advanced_search(trans_lang='Portuguese')
+        results_pg = self.watch_pg.advanced_search(trans_lang='pt')
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
         self.assertEqual(1, len(results_pg.page_videos()))
@@ -119,7 +119,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """Search for videos by video lang and translations language.
  
         """
-        results_pg = self.watch_pg.advanced_search(orig_lang = 'English', 
+        results_pg = self.watch_pg.advanced_search(orig_lang = 'en', 
             trans_lang='Portuguese')
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
@@ -131,8 +131,8 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """
         self.browser.execute_script("document.getElementsByName('q')[1].value='subs'")
         results_pg = self.watch_pg.advanced_search(
-            orig_lang = 'Arabic', 
-            trans_lang='English')
+            orig_lang = 'ar', 
+            trans_lang='en')
         self.assertTrue(results_pg.page_has_video(
             'original ar with en complete subs'))
         self.assertEqual(1, len(results_pg.page_videos()))

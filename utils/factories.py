@@ -27,15 +27,17 @@ import hashlib
 from django.contrib.auth.hashers import make_password
 from django.template.defaultfilters import slugify
 import factory
+from factory import Factory
 from factory.django import DjangoModelFactory
 
-import accountlinker.models
 import auth.models
+import comments.models
 import externalsites.models
 import subtitles.models
 import teams.models
 import videos.models
 from subtitles import pipeline
+from utils import youtube
 
 class VideoURLFactory(DjangoModelFactory):
     FACTORY_FOR = videos.models.VideoUrl
@@ -72,6 +74,7 @@ class BrightcoveVideoFactory(VideoFactory):
     # generate a video with a brightcove-style URL
     FACTORY_HIDDEN_ARGS = ('brightcove_id', 'player_id')
 
+    brightcove_id = 'abc'
     player_id = '1234'
     video_url__type = 'C'
 
@@ -79,6 +82,15 @@ class BrightcoveVideoFactory(VideoFactory):
     def video_url__url(self):
         return 'http://bcove.me/services/link/bcpid%s/bctid%s' % (
             self.player_id, self.brightcove_id)
+
+class YouTubeVideoFactory(VideoFactory):
+    video_url__type = 'Y'
+    video_url__videoid = factory.Sequence(lambda n: 'video{0}'.format(n))
+
+    @factory.lazy_attribute
+    def video_url__url(self):
+        return ('https://www.youtube.com/watch?v=%s' %
+                self.video_url__videoid)
 
 class UserFactory(DjangoModelFactory):
     FACTORY_FOR = auth.models.CustomUser
@@ -143,6 +155,7 @@ class TeamVideoFactory(DjangoModelFactory):
     def _generate(cls, create, attrs):
         tv = super(TeamVideoFactory, cls)._generate(create, attrs)
         tv.video.user = tv.added_by
+        tv.video.clear_team_video_cache()
         return tv
 
     @factory.lazy_attribute
@@ -200,16 +213,6 @@ class TaskFactory(DjangoModelFactory):
         task.approved = teams.models.Task.APPROVED_IDS['Approved']
         return task.complete()
 
-class ThirdPartyAccountFactory(DjangoModelFactory):
-    FACTORY_FOR = accountlinker.models.ThirdPartyAccount
-    FACTORY_HIDDEN_ARGS = ('video_url',)
-
-    oauth_access_token = '123'
-    oauth_refresh_token = ''
-
-    username = factory.LazyAttribute(lambda tpa: tpa.video_url.owner_username)
-    type = factory.LazyAttribute(lambda tpa: tpa.video_url.type)
-
 class SubtitleLanguageFactory(DjangoModelFactory):
     FACTORY_FOR = subtitles.models.SubtitleLanguage
 
@@ -230,9 +233,30 @@ class OldSubtitleVersionFactory(DjangoModelFactory):
 class BrightcoveAccountFactory(DjangoModelFactory):
     FACTORY_FOR = externalsites.models.BrightcoveAccount
 
-    team = factory.SubFactory(TeamFactory)
     publisher_id = 'publisher'
     write_token = 'write-token'
+
+class YouTubeAccountFactory(DjangoModelFactory):
+    FACTORY_FOR = externalsites.models.YouTubeAccount
+
+    username = factory.Sequence(lambda n: 'youtube-user-%s' % n)
+    channel_id = factory.Sequence(lambda n: 'channel-id-%s' % n)
+    oauth_refresh_token = 'refresh-token'
+
+class CommentFactory(DjangoModelFactory):
+    FACTORY_FOR = comments.models.Comment
+    user = factory.SubFactory(UserFactory)
+    content = "test-content"
+    submit_date = datetime.datetime(2000, 1, 1)
+
+class YouTubeVideoInfoFactory(Factory):
+    FACTORY_FOR = youtube.VideoInfo
+
+    channel_id = 'test-channel-id'
+    title = 'test title'
+    description = 'test description'
+    duration = 100
+    thumbnail_url = 'http://example.com/thumbnail.png'
 
 def bulk_subs(sub_data):
     """Create a bunch of videos/languages/versions

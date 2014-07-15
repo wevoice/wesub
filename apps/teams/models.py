@@ -37,19 +37,16 @@ from haystack import site
 from haystack.query import SQ
 
 import teams.moderation_const as MODERATION
-from apps.comments.models import Comment
+from comments.models import Comment
 from auth.models import CustomUser as User
 from auth.providers import get_authentication_provider
 from messages import tasks as notifier
-from apps.subtitles import shims
+from subtitles import shims
 from subtitles.signals import language_deleted
 from teams.moderation_const import WAITING_MODERATION, UNMODERATED, APPROVED
 from teams.permissions_const import (
     TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
     ROLE_CONTRIBUTOR
-)
-from videos.tasks import (
-    upload_subtitles_to_original_service, sync_latest_versions_for_video
 )
 from teams import tasks
 from utils import DEFAULT_PROTOCOL
@@ -176,9 +173,6 @@ class Team(models.Model):
     is_visible = models.BooleanField(_(u'videos public?'), default=True)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
-
-    # these allow unisubs to do things on user's behalf such as uploding subs to Youtub
-    third_party_accounts = models.ManyToManyField("accountlinker.ThirdPartyAccount",  related_name='teams', verbose_name=_('third party accounts'))
 
     points = models.IntegerField(default=0, editable=False)
     applicants = models.ManyToManyField(User, through='Application', related_name='applicated_teams', verbose_name=_('applicants'))
@@ -990,7 +984,6 @@ def team_video_delete(sender, instance, **kwargs):
 
         metadata_manager.update_metadata(video.pk)
         video.update_search_index()
-        sync_latest_versions_for_video.delay(video.pk)
     except Video.DoesNotExist:
         pass
 
@@ -2034,14 +2027,13 @@ class Task(models.Model):
             sv.publish()
 
             # We need to make sure this is updated correctly here.
-            from apps.videos import metadata_manager
+            from videos import metadata_manager
             metadata_manager.update_metadata(self.team_video.video.pk)
 
             if self.workflow.autocreate_translate:
                 # TODO: Switch to autocreate_task?
                 _create_translation_tasks(self.team_video, sv)
 
-            upload_subtitles_to_original_service.delay(sv.pk)
             task = None
         return task
 
@@ -2073,9 +2065,8 @@ class Task(models.Model):
             sv.publish()
 
             # We need to make sure this is updated correctly here.
-            from apps.videos import metadata_manager
+            from videos import metadata_manager
             metadata_manager.update_metadata(self.team_video.video.pk)
-            upload_subtitles_to_original_service.delay(sv.pk)
 
             task = None
 
@@ -2123,7 +2114,6 @@ class Task(models.Model):
 
                 # Notify the appropriate users and external services.
                 notifier.reviewed_and_published.delay(self.pk)
-                upload_subtitles_to_original_service.delay(sv.pk)
             else:
                 # Send the subtitles back for improvement.
                 task = self._send_back()
@@ -2155,8 +2145,6 @@ class Task(models.Model):
             if self.workflow.autocreate_translate:
                 _create_translation_tasks(self.team_video, sv)
 
-            # And send them back to the original service.
-            upload_subtitles_to_original_service.delay(sv.pk)
             task = None
         else:
             # Send the subtitles back for improvement.

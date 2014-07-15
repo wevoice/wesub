@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import time
 from nose.tools import assert_true, assert_false
-from apps.webdriver_testing.pages.site_pages import UnisubsPage
+from webdriver_testing.pages.site_pages import UnisubsPage
 
 class TeamsDirPage(UnisubsPage):
     """

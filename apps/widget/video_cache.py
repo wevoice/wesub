@@ -75,7 +75,7 @@ def invalidate_cache(video_id):
     cache.delete(_video_urls_key(video_id))
 
     try:
-        from apps.videos.models import Video
+        from videos.models import Video
         video = Video.objects.get(video_id=video_id)
         for l in video.newsubtitlelanguage_set.all():
             cache.delete(_subtitles_dict_key(video_id, l.pk))
@@ -221,7 +221,7 @@ def get_subtitles_dict(video_id, language_pk, version_number,
     return cached_value
 
 def get_video_languages(video_id):
-    from apps.widget.rpc import language_summary
+    from widget.rpc import language_summary
 
     cache_key = _video_languages_key(video_id)
     value = cache.get(cache_key)

@@ -19,8 +19,8 @@
 
 from babelsubs.storage import SubtitleSet
 
-from apps.videos.models import Video
-from apps.subtitles.models import SubtitleLanguage
+from videos.models import Video
+from subtitles.models import SubtitleLanguage
 
 VIDEO_URL = 'http://youtu.be/heKK95DAKms'
 VIDEO_URL_2 = 'http://youtu.be/e4MSN6IImpI'

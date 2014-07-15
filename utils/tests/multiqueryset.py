@@ -23,8 +23,6 @@ from videos.models import Video
 from utils.multi_query_set import MultiQuerySet
 
 class MultiQuerySetTest(TestCase):
-    fixtures = ['test.json']
-
     def test_full(self):
         self.assertEqual(list(Video.objects.all()),
                          list(MultiQuerySet(Video.objects.all())),

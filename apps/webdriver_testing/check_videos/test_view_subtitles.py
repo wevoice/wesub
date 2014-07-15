@@ -8,7 +8,6 @@ from webdriver_testing import data_helpers
 from webdriver_testing.data_factories import UserFactory
 from webdriver_testing.data_factories import VideoUrlFactory
 from webdriver_testing.pages.editor_pages import subtitle_editor
-from webdriver_testing.pages.editor_pages import unisubs_menu 
 
 
 class TestCaseViewSubtitles(WebdriverTestCase):
@@ -19,8 +18,6 @@ class TestCaseViewSubtitles(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseViewSubtitles, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
-        cls.menu = unisubs_menu.UnisubsMenu(cls)
-
         cls.user = UserFactory.create()
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)

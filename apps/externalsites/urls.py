@@ -20,4 +20,7 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('externalsites.views',
     url(r'^resync/(?P<video_url_id>\d+)/(?P<language_code>[\w-]+)/$', 'resync', name='resync'),
+    url(r'^youtube-add-account/', 'youtube_add_account',
+        name='youtube-add-account'),
+    url(r'^youtube-callback/', 'youtube_callback', name='youtube-callback'),
 )

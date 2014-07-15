@@ -8,7 +8,7 @@ from haystack.models import SearchResult
 from haystack.query import SearchQuerySet
 from haystack.exceptions import AlreadyRegistered
 
-from apps.subtitles.models import SubtitleLanguage, Collaborator
+from subtitles.models import SubtitleLanguage, Collaborator
 from utils.celery_search_index import CelerySearchIndex
 from videos.models import Video
 

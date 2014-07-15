@@ -27,15 +27,14 @@
                 <fieldset>
                     <h3>{% trans "YouTube Sync" %}</h3>
                     <div class="callout">
-                        {% if third_party %}
-                            {% for account in third_party  %}
-                                <a class="button open-modal reduced" href="{% url profiles:remove-third-party account.pk %}">
-                                    Disconnect
-                                </a>
+                        {% if youtube_accounts %}
+                            {% for account in youtube_accounts  %}
+                            <a class="button reduced" href="{% url profiles:remove-third-party "youtube" account.pk %}">{% trans 'Disconnect' %}</a>
                                 <p>
                                     <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
-                                    <strong>{% trans "Link is active" %}</strong>
-                                    <span> for {{ account.full_name }}.</span>
+                                    {% blocktrans with account.username as username %}
+                                        <strong>link is active</strong> for {{ username }}
+                                    {% endblocktrans %}
                                 </p>
                             {% endfor %}
                         {% else %}
@@ -43,7 +42,7 @@
                                 <span>Connect to</span>
                                 <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
                             </a>
-                            <p>{% trans "Enable Amara crowd subtitles on your personal YouTube channel (beta)" %}</p>
+                            <p>{% trans "Enable Amara crowd subtitles on your personal YouTube channel" %}</p>
                         {% endif %}
                     </div>
                 </fieldset>
@@ -60,7 +59,7 @@
                                 <li>
                                     <h3>Twitter - {{ twitter.username }}</h3>
                                     <ul class="actions">
-                                        <li><a href="{% url profiles:remove-third-party twitter.pk %}?type=twitter" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                        <li><a href="{% url profiles:remove-third-party "twitter" twitter.pk %}" title="Unlink this account">{% trans "Remove" %}</a></li>
                                     </ul>
                                 </li>
                             {% endfor %}
@@ -71,7 +70,7 @@
                                 <li>
                                     <h3>Facebook - {{ fb.uid }}</h3>
                                     <ul class="actions">
-                                        <li><a href="{% url profiles:remove-third-party fb.pk %}?type=facebook" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                        <li><a href="{% url profiles:remove-third-party "facebook" fb.pk %}" title="Unlink this account">{% trans "Remove" %}</a></li>
                                     </ul>
                                 </li>
                             {% endfor %}
@@ -158,12 +157,12 @@
                 <h3>{% trans 'Enable Crowd Subtitles on your Personal YouTube Channel (beta)' %}</h3>
             </div>
 
-                <form method="get" action="{% url profiles:add-third-party %}">
+                <form method="get" action="{% url externalsites:youtube-add-account %}">
 
                     <div class="modal-body">
                         <fieldset>
                             <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube" height="65"/>
-                            <input type="hidden" name="account_type" value="youtube"/>
+                            <input type="hidden" name="username" value="{{ user.username }}"/>
 
                             <h5>{% trans "How We Enable Crowd Subtitles" %}</h5>
                             <ul>

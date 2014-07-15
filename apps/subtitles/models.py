@@ -29,11 +29,11 @@ from django.db.models import query, Q
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
-from apps.subtitles import cache
-from apps.subtitles import shims
-from apps.auth.models import CustomUser as User
-from apps.videos import metadata
-from apps.videos.models import Video, Action
+from subtitles import cache
+from subtitles import shims
+from auth.models import CustomUser as User
+from videos import metadata
+from videos.models import Video, Action
 from babelsubs.storage import SubtitleSet
 from babelsubs.storage import calc_changes
 from babelsubs.generators.html import HTMLGenerator

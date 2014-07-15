@@ -16,9 +16,11 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
+
 from django import template
-from apps.comments.forms import CommentForm
-from apps.comments.models import Comment
+from comments.forms import CommentForm
+from comments.models import Comment
 from django.contrib.contenttypes.models import ContentType
 
 register = template.Library()

@@ -53,7 +53,7 @@ from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
 from utils.subtitles import create_new_subtitles, dfxp_merge
 from utils.text import fmt
-from apps.teams.moderation_const import MODERATION_STATUSES, UNMODERATED
+from teams.moderation_const import MODERATION_STATUSES, UNMODERATED
 from raven.contrib.django.models import client
 
 NO_SUBTITLES, SUBTITLES_FINISHED = range(2)
@@ -490,7 +490,6 @@ class Video(models.Model):
         from types.base import VideoTypeError
         from videos.tasks import (
             save_thumbnail_in_s3,
-            add_amara_description_credit_to_youtube_video
         )
 
         try:
@@ -523,7 +522,7 @@ class Video(models.Model):
                 kwargs = {}
                 if vt.CAN_IMPORT_SUBTITLES:
                     kwargs['fetch_subs_async'] = fetch_subs_async
-                obj = vt.set_values(obj, **kwargs)
+                vt.set_values(obj, **kwargs)
                 if obj.title:
                     obj.slug = slugify(obj.title)
                 obj.user = user
@@ -538,7 +537,8 @@ class Video(models.Model):
                     'original': True,
                     'primary': True,
                     'added_by': user,
-                    'video': obj
+                    'video': obj,
+                    'owner_username': vt.owner_username(),
                 }
                 if vt.video_id:
                     defaults['videoid'] = vt.video_id
@@ -557,15 +557,6 @@ class Video(models.Model):
            video_url_obj.created = timestamp
            video_url_obj.save(updates_timestamp=False)
         user and user.notify_by_message and video.followers.add(user)
-        if not video_url_obj.owner_username:
-            if hasattr(vt, 'username'):
-                video_url_obj.owner_username = vt.username
-                video_url_obj.save()
-
-        if vt.abbreviation == VIDEO_TYPE_YOUTUBE:
-            # Only try to update the Youtube description once we have made sure
-            # that we have set the owner_username.
-            add_amara_description_credit_to_youtube_video.delay(video.video_id)
 
         return video, created
 
@@ -1829,7 +1820,6 @@ class VideoUrl(models.Model):
     # shuch as Youtube or Vimeo username
     owner_username = models.CharField(max_length=255, blank=True, null=True)
 
-
     class Meta:
         ordering = ("video", "-primary",)
 
@@ -1874,6 +1864,24 @@ class VideoUrl(models.Model):
         # set this one to primary
         self.primary = True
         self.save(updates_timestamp=False)
+
+    def fix_owner_username(self):
+        """Workaround for us changing how owner_usernames work.
+
+        At some point we changed how owner_usernames works for youtube videos.
+        Rather than trying to change the owner_usernames attribute for all
+        videos at once in a huge migration, we set them to None.  Then before
+        we need to use the username, we call fix_owner_username() and fix it
+        then.
+        """
+
+        types_to_fix = (
+            VIDEO_TYPE_YOUTUBE,
+        )
+
+        if self.type in types_to_fix and self.owner_username is None:
+            self.owner_username = self.get_video_type().owner_username()
+            self.save()
 
     def get_video_type_class(self):
         try:

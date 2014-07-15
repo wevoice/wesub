@@ -52,8 +52,8 @@ from widget.models import SubtitlingSession
 from libs.bulkops import insert_many
 
 from functools import partial
-from apps.subtitles import pipeline
-from apps.subtitles.models import ORIGIN_LEGACY_EDITOR
+from subtitles import pipeline
+from subtitles.models import ORIGIN_LEGACY_EDITOR
 from babelsubs.storage import SubtitleSet, diff
 
 

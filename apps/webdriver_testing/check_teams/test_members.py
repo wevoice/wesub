@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
-from apps.webdriver_testing.pages.site_pages.teams import members_tab
-from apps.webdriver_testing.pages.site_pages import user_messages_page
-from apps.webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
+from webdriver_testing.pages.site_pages.teams import members_tab
+from webdriver_testing.pages.site_pages import user_messages_page
+from webdriver_testing.data_factories import TeamMemberFactory
 
 
 
-from apps.webdriver_testing.data_factories import TeamProjectFactory
-from apps.webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import TeamProjectFactory
+from webdriver_testing.data_factories import UserFactory
 
 class TestCaseMembersTab(WebdriverTestCase):
     """Verify edit of member roles and restrictions.  """

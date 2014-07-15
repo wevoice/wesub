@@ -47,7 +47,7 @@ def graphite_slugify(s):
 
 @task
 def gauge_statistic_languages():
-    from apps.videos.models import SubtitleLanguage, ALL_LANGUAGES
+    from videos.models import SubtitleLanguage, ALL_LANGUAGES
 
     lang_names = dict(ALL_LANGUAGES)
     lang_names[u''] = 'Unknown'

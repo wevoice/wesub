@@ -24,11 +24,11 @@ import babelsubs
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from apps.auth.models import CustomUser as User
-from apps.subtitles.pipeline import add_subtitles
-from apps.videos.models import Video, SubtitleLanguage, SubtitleVersion
-from apps.videos.tests.data import get_user
-
+from auth.models import CustomUser as User
+from subtitles.pipeline import add_subtitles
+from utils.factories import *
+from videos.models import Video, SubtitleLanguage, SubtitleVersion
+from videos.tests.data import get_user
 
 math_captcha.forms.math_clean = lambda form: None
 
@@ -89,6 +89,11 @@ class WebUseTest(TestCase):
     def _make_objects(self, video_id="S7HMxzLmS9gw"):
         self.user = User.objects.get(username=self.auth['username'])
         self.video = Video.objects.get(video_id=video_id)
+        self.video.followers.add(self.user)
+
+    def _make_objects_with_factories(self):
+        self.user = UserFactory(**self.auth)
+        self.video = VideoFactory()
         self.video.followers.add(self.user)
 
     def _simple_test(self, url_name, args=None, kwargs=None, status=200, data={}):

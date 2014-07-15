@@ -19,11 +19,11 @@
 """Data creation and retrieval functions for the video tests."""
 
 from babelsubs.storage import SubtitleLine
-from apps.auth.models import CustomUser as User
-from apps.videos.models import Video
-from apps.subtitles import pipeline
-from apps.subtitles.models import SubtitleLanguage
-from apps.teams.models import Team, TeamMember, TeamVideo, Workflow
+from auth.models import CustomUser as User
+from videos.models import Video
+from subtitles import pipeline
+from subtitles.models import SubtitleLanguage
+from teams.models import Team, TeamMember, TeamVideo, Workflow
 from teams.permissions_const import (
     ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
 )

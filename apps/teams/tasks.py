@@ -21,12 +21,12 @@ from widget.video_cache import (
 
 from utils.metrics import Timer
 from utils.text import fmt
-from apps.videos.tasks import video_changed_tasks
+from videos.tasks import video_changed_tasks
 
 @task()
 def invalidate_video_caches(team_id):
     """Invalidate all TeamVideo caches for all the given team's videos."""
-    from apps.teams.models import Team
+    from teams.models import Team
     team = Team.objects.get(pk=team_id)
     for video_id in team.teamvideo_set.values_list('video__video_id', flat=True):
         invalidate_video_cache(video_id)
@@ -40,7 +40,7 @@ def invalidate_video_moderation_caches(team):
 @task()
 def update_video_moderation(team):
     """Set the moderated_by field for all the given team's videos."""
-    from apps.videos.models import Video
+    from videos.models import Video
 
     moderated_by = team if team.moderates_videos() else None
     Video.objects.filter(teamvideo__team=team).update(moderated_by=moderated_by)
@@ -52,7 +52,7 @@ def invalidate_video_visibility_caches(team):
 
 @task()
 def update_video_public_field(team_id):
-    from apps.teams.models import Team
+    from teams.models import Team
 
     with Timer("update-video-public-field-time"):
         team = Team.objects.get(pk=team_id)

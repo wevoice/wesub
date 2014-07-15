@@ -21,7 +21,7 @@
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.core.urlresolvers import reverse
-from apps.subtitles.models import (get_lineage, Collaborator, SubtitleLanguage,
+from subtitles.models import (get_lineage, Collaborator, SubtitleLanguage,
                                    SubtitleVersion)
 
 
@@ -84,24 +84,6 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
         ver = sl.get_tip(full=True)
         return ver.version_number if ver else None
     tip.short_description = 'tip version'
-
-    def save_model(self, request, obj, form, change):
-        from videos.tasks import upload_subtitles_to_original_service
-        should_sync_to_youtube = False
-        # cache the old object
-        old_obj = SubtitleLanguage.objects.get(pk=obj.pk)
-        # save it
-        super(SubtitleLanguageAdmin, self).save_model(request, obj, form,
-                                                      change)
-        # refresh new object so that changes are present
-        obj = SubtitleLanguage.objects.get(pk=obj.pk)
-        if change:
-            should_sync_to_youtube = not old_obj.subtitles_complete and obj.subtitles_complete
-
-        if should_sync_to_youtube:
-            tip = obj.get_tip()
-            # don't run on a async:
-            upload_subtitles_to_original_service.run(tip.pk)
 
 class SubtitleVersionChangeList(ChangeList):
     def get_query_set(self, request):

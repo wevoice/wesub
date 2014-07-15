@@ -1,6 +1,7 @@
 import collections
 import functools
 import os
+import simplejson as json
 import urlparse
 
 import mock
@@ -11,12 +12,12 @@ from nose.plugins import Plugin
 from nose.tools import assert_equal
 import mock
 import requests
+import utils.youtube
 
 
 REQUEST_CALLBACKS = []
 
 class Response(dict):
-
     status = 200
     content = ""
 
@@ -87,117 +88,15 @@ save_thumbnail_in_s3 = mock.Mock()
 update_team_video = mock.Mock()
 update_search_index = mock.Mock()
 
-def mock_youtube_get_entry(video_id):
-    # map video ids to (title, description, author, duration) tuples
-    video_id_map = {
-        'e4MSN6IImpI': ('Doodling in Math Class: Binary Trees',
-                        'Vihart', '228'),
-        '2tP_NU9a5pE': ('Universal Subtitles Overview video',
-                        'universalsubtitles', '236'),
-        'cvAZQZa9iWM': ('\xce\x91mara Test Video 1', 'amaratestuser', '4'),
-        'q26umaF242I': ('Amara Test Video 2', 'amaratestuser', '4'),
-        '1GAIwV7eRNQ': ('Amara Test Video 3', 'amaratestuser', '4'),
-        'i_0DXxNeaQ0': ('What is up with Noises? (The Science and Mathematics'
-                        ' of Sound, Frequency, and Pitch)', 'Vihart', '769'),
-        'pQ9qX8lcaBQ': ('The Sea Organ of Zadar', 'M0narchs', '128'),
-        'L4XpSM87VUk': ("Tour of darren's rabbit-centric room.",
-                        'amaratestchannel', '41'),
-        '_ShmidkrcY0': ('\xd0\xa8\xd1\x80\xd0\xb5\xd0\xba 4 HD '
-                        '(\xd1\x80\xd1\x83\xd1\x81\xd1\x81\xd0\xba\xd0\xb8\xd0\xb5 '
-                         '\xd1\x81\xd1\x83\xd0\xb1\xd1\x82\xd0\xb8\xd1\x82\xd1\x80\xd1\x8b)',
-                        'QAZRUS', '79'),
-        'heKK95DAKms': ('Doodling in Math Class: Snakes + Graphs', 'Vihart',
-                        '265'),
-        'iizcw0Sgces': ('Arrasou Viado!', 'Fernando Takai', '9'),
-        'WqJineyEszo': ('X Factor Audition - '
-                        'Stop Looking At My Mom Rap - Brian Bradley',
-                        'clowntownhonkhonk', '121'),
-        'z2U_jf0urVQ': ('Single_Ladies_-_katylene_Ft._Vaness\xc3\xa3o_.wmv',
-                        'Lauragusta', '25'),
-        'zXjPQYgT25Q': ('Shming swimming', 'ChrisSunHwa', '390'),
-        'OFaWxcH6I9E': ('Isogenic Engine: HTML5 Canvas - 250,000 '
-                        'tiles on the map at 93fps...', 'coolbloke1324',
-                        '29'),
-        'Hhgfz0zPmH4': ('Google Goggles', 'Google', '123'),
-        'KXcdfxeeG2w': ('My Video', 'Fernando Takai', '56'),
-        'Cf06WJQ4FnE': ('Evil Hamster', 'DeefHimSelf', '87'),
-        'sXUeO3auRZg': ('\xd0\x9f\xd0\xb5\xd1\x82\xd1\x83\xd1\x85 \xd0\xbe\xd1\x82\xd0\xb6\xd0\xb8\xd0\xb3\xd0\xb0\xd0\xb5\xd1\x82!!!', 'SRPRS3978', '59'),
-        'bNQB7_nJ4Wk': ('Testing', 'Fernando Takai', '518'),
-        '61LB3qfRK1I': ('Testing', 'Fernando Takai', '55'),
-        'z1lbFNXX1ks': ('My Video', 'Fernando Takai', '278'),
-        'g_0lX7aVAL8': ('Teste Nova Ficha', 'Fernando Takai', '137'),
-        'VChlH2KQf0A': ('Amazonia \xc3\xa9 Agora!', 'Fernando Takai', '137'),
-        'ObM9y_tIdXE': ('0', 'Fernando Takai', '137'),
-        'X2YPkjL8fv4': ('Teste: Mais um V\xc3\xaddeo Legal', 'Fernando Takai',
-                        '278'),
-        'rIYAziWA9Zg': ('Teste de video grande', 'Fernando Takai', '278'),
-        'EKSRnuzdJfU': ('V\xc3\xaddeo de Teste', 'Fernando Takai', '55'),
-        'OJC58_mPwZ4': ('Teste de video mov', 'Fernando Takai', '137'),
-        'a2Hn2hNPbX4': ('Teste de video com Library 8', 'Fernando Takai',
-                        '55'),
-        'vrSoZwcyyG8':  ('Teste Reis 3', 'Fernando Takai', '55'),
-        'lgBRD3Hqggw': ('@alvarofreitas e o juramento dos lanternas verdes.',
-                        'Fernando Takai', '75'),
-        '_ZUywElGFLk': ('Ok go - here it goes again', 'Fernando Takai',
-                        '275'),
-        '_9RAPBfZby0': ('Rodrigo Teaser - Smooth Criminal', 'Fernando Takai',
-                         '209'),
-        'sWgyQjh5k7s': ('Status', 'Fernando Takai', '20'),
-        'MJRF8xGzvj4': ('David Bowie/Pat Metheny - This Is Not America '
-                        '(Promo Clip)', 'skytrax1', '214'),
-        'po0jY4WvCIc': ('Michael Jackson Pepsi Generation', 'GiraldiMedia',
-                        '92'),
-        'UOtJUmiUZ08': ('The YouTube Interview with Katy Perry',
-                        'KatyPerryMusic', '1892'),
-        'HaAVZ2yXDBo': ("Breakfast at Ginger's- golden retriever dog eats "
-                        "with hands", 'sawith65', '83'),
-        'woobL2yAxD4': ('Goat yelling like a man', 'latestvideoss', '25'),
-        'tKTZoB2Vjuk': ('Google Python Class Day 1 Part 1',
-                        'GoogleDevelopers', '3097'),
-        'osexbB_hX4g': ('DO YOU SEE THAT??!!', 'otherijustine', '90'),
-        'hPbYnNRw4UM': ('ONN | Documentary - Beginning',
-                        'OccupyNewsNetworkUK', '1971'),
-    }
-    try:
-        title, author, duration = video_id_map[video_id]
-    except KeyError:
-        # We should have data stored for video_id, but we don't.  Run a quick
-        # query so that it's easy to add.
-        from videos.types import youtube, VideoTypeError
-        from gdata.service import RequestError
-        try:
-            entry = youtube.yt_service.GetYouTubeVideoEntry(video_id=str(video_id))
-        except RequestError as e:
-            err = e[0].get('body', 'Undefined error')
-            raise VideoTypeError('Youtube error: %s' % err)
-        raise ValueError("Don't know how to handle youtube video: %s\n"
-                         "query result: (%r, %r, %r)" %
-                         (video_id, entry.media.title.text,
-                          entry.author[0].name.text,
-                          entry.media.duration.seconds))
-    # Youtube descriptions can be very long, just use a mock one for testing
-    # purposes
-    description = "Test Description"
-
-    entry = mock.Mock()
-    mock_author = mock.Mock()
-    mock_author.name.text = author
-    mock_author.uri.text = author
-    entry.author = [mock_author]
-    entry.media.title.text = title
-    entry.media.description.text = description
-    entry.media.duration.seconds = duration
-    entry.media.thumbnail = []
-    for i in range(4):
-        thumb = mock.Mock()
-        thumb.url = 'http://i.ytimg.com/vi/%s/%s.jpg' % (video_id, i)
-        thumb.width = i * 100
-        thumb.height = i * 75
-        entry.media.thumbnail.append(thumb)
-    return entry
-youtube_get_entry = mock.Mock(side_effect=mock_youtube_get_entry)
-youtube_get_subtitled_languages = mock.Mock(return_value=[])
-_add_amara_description_credit_to_youtube_vurl = mock.Mock()
+test_video_info = utils.youtube.VideoInfo(
+    'test-channel-id', 'test-title', 'test-description', 60,
+    'http://example.com/youtube-thumb.png')
+youtube_get_video_info = mock.Mock(return_value=test_video_info)
+youtube_get_user_info = mock.Mock(return_value=test_video_info)
+youtube_get_new_access_token = mock.Mock(return_value='test-access-token')
+youtube_revoke_auth_token = mock.Mock()
+youtube_update_video_description = mock.Mock()
+url_exists = mock.Mock(return_value=True)
 
 current_locks = set()
 acquire_lock = mock.Mock(
@@ -208,7 +107,9 @@ invalidate_widget_video_cache = mock.Mock()
 update_subtitles = mock.Mock()
 delete_subtitles = mock.Mock()
 update_all_subtitles = mock.Mock()
+fetch_subs_task = mock.Mock()
 import_videos_from_feed = mock.Mock()
+get_language_facet_counts = mock.Mock(return_value=([], []))
 
 class MonkeyPatcher(object):
     """Replace a functions with mock objects for the tests.
@@ -220,20 +121,25 @@ class MonkeyPatcher(object):
             ('teams.tasks.update_one_team_video', update_team_video),
             ('utils.celery_search_index.update_search_index',
              update_search_index),
-            ('videos.types.youtube.YoutubeVideoType._get_entry',
-             youtube_get_entry),
-            ('videos.types.youtube.YoutubeVideoType.get_subtitled_languages',
-             youtube_get_subtitled_languages),
-            ('videos.tasks._add_amara_description_credit_to_youtube_vurl',
-             _add_amara_description_credit_to_youtube_vurl),
+            ('utils.youtube.get_video_info', youtube_get_video_info),
+            ('utils.youtube.get_user_info', youtube_get_user_info),
+            ('utils.youtube.get_new_access_token',
+             youtube_get_new_access_token),
+            ('utils.youtube.revoke_auth_token', youtube_revoke_auth_token),
+            ('utils.youtube.update_video_description',
+             youtube_update_video_description),
             ('utils.applock.acquire_lock', acquire_lock),
             ('utils.applock.release_lock', release_lock),
+            ('utils.http.url_exists', url_exists),
             ('widget.video_cache.invalidate_cache',
              invalidate_widget_video_cache),
             ('externalsites.tasks.update_subtitles', update_subtitles),
             ('externalsites.tasks.delete_subtitles', delete_subtitles),
             ('externalsites.tasks.update_all_subtitles', update_all_subtitles),
+            ('externalsites.tasks.fetch_subs', fetch_subs_task),
             ('videos.tasks.import_videos_from_feed', import_videos_from_feed),
+            ('search.forms._get_language_facet_counts',
+             get_language_facet_counts)
         ]
         self.patches = []
         self.initial_side_effects = {}
@@ -246,12 +152,6 @@ class MonkeyPatcher(object):
         self.setup_run_original(mock_obj, patch)
         self.initial_side_effects[mock_obj] = mock_obj.side_effect
         self.patches.append(patch)
-
-        if (not func_name.startswith("apps.") and
-            not func_name.startswith("utils")):
-            # Ugh have to patch the function twice since some modules use
-            # app and some don't
-            self.start_patch('apps.' + func_name, mock_obj)
 
     def setup_run_original(self, mock_obj, patch):
         mock_obj.original_func = patch.temp_original
@@ -300,12 +200,21 @@ class UnisubsTestPlugin(Plugin):
             os.path.join(settings.PROJECT_ROOT, 'libs'),
         ])
 
+    def options(self, parser, env=os.environ):
+        parser.add_option("--with-webdriver",
+                          action="store_true", dest="webdriver",
+                          default=False, help="Enable webdriver tests")
+
     def configure(self, options, conf):
-        super(UnisubsTestPlugin, self).configure(options, conf)
         # force enabled to always be True.  This only gets loaded because we
         # manually specify the plugin in the dev_settings_test.py file.  So
         # it's pretty safe to assume the user wants us enabled.
         self.enabled = True
+        if not options.webdriver:
+            self.directories_to_skip.add(
+                os.path.join(settings.PROJECT_ROOT, 'apps',
+                             'webdriver_testing'),
+            )
 
     def begin(self):
         self.patcher.patch_functions()
@@ -320,6 +229,10 @@ class UnisubsTestPlugin(Plugin):
     def wantDirectory(self, dirname):
         if dirname in self.directories_to_skip:
             return False
+        if dirname == os.path.join(settings.PROJECT_ROOT, 'apps'):
+            # force the tests from the apps directory to be loaded, even
+            # though it's not a package
+            return True
         return None
 
 def patch_for_test(spec):
@@ -350,7 +263,7 @@ def patch_for_test(spec):
 patch_for_test.__test__ = False
 
 ExpectedRequest = collections.namedtuple(
-    "ExpectedRequest", "method url params data body status_code")
+    "ExpectedRequest", "method url params data headers body status_code")
 
 class RequestsMocker(object):
     """Mock code that uses the requests module
@@ -372,10 +285,11 @@ class RequestsMocker(object):
     def __init__(self):
         self.expected_requests = []
 
-    def expect_request(self, method, url, params=None, data=None, body='',
-                       status_code=200):
+    def expect_request(self, method, url, params=None, data=None,
+                       headers=None, body='', status_code=200):
         self.expected_requests.append(
-            ExpectedRequest(method, url, params, data, body, status_code))
+            ExpectedRequest(method, url, params, data, headers, body,
+                            status_code))
 
     def __enter__(self):
         self.setup_patchers()
@@ -387,7 +301,7 @@ class RequestsMocker(object):
 
     def setup_patchers(self):
         self.patchers = []
-        for method in ('get', 'post', 'put', 'delete'):
+        for method in ('get', 'post', 'put', 'delete', 'request'):
             mock_obj = mock.Mock()
             mock_obj.side_effect = getattr(self, 'mock_%s' % method)
             patcher = mock.patch('requests.%s' % method, mock_obj)
@@ -399,36 +313,47 @@ class RequestsMocker(object):
             patcher.stop()
         self.patchers = []
 
-    def mock_get(self, url, params=None, data=None):
-        return self.check_request('get', url, params, data)
+    def mock_get(self, url, params=None, data=None, headers=None):
+        return self.check_request('get', url, params, data, headers)
 
-    def mock_post(self, url, params=None, data=None):
-        return self.check_request('post', url, params, data)
+    def mock_post(self, url, params=None, data=None, headers=None):
+        return self.check_request('post', url, params, data, headers)
 
-    def mock_put(self, url, params=None, data=None):
-        return self.check_request('put', url, params, data)
+    def mock_put(self, url, params=None, data=None, headers=None):
+        return self.check_request('put', url, params, data, headers)
 
-    def mock_delete(self, url, params=None, data=None):
-        return self.check_request('delete', url, params, data)
+    def mock_delete(self, url, params=None, data=None, headers=None):
+        return self.check_request('delete', url, params, data, headers)
 
-    def check_request(self, method, url, params, data):
+    def mock_request(self, method, url, params=None, data=None, headers=None):
+        return self.check_request(method.lower(), url, params, data, headers)
+
+    def check_request(self, method, url, params, data, headers):
         try:
             expected = self.expected_requests.pop(0)
         except IndexError:
             raise AssertionError("RequestsMocker: No more calls expected, "
                                  "but got %s %s %s %s" % 
-                                 (method, url, params, data))
+                                 (method, url, params, data, headers))
 
         assert_equal(method, expected.method)
         assert_equal(url, expected.url)
         assert_equal(params, expected.params)
-        assert_equal(data, expected.data)
-        return self.make_response(expected.status_code, expected.body)
+        if (expected.headers is not None and
+            expected.headers.get('content-type') == 'application/json'):
+            assert_equal(json.loads(data), json.loads(expected.data))
+        else:
+            assert_equal(data, expected.data)
+        assert_equal(headers, expected.headers)
+        request = requests.Request(method=method, url=url, params=params,
+                                   data=data, headers=headers)
+        return self.make_response(request, expected.status_code, expected.body)
 
-    def make_response(self, status_code, body):
+    def make_response(self, request, status_code, body):
         response = requests.Response()
         response._content = body
         response.status_code = status_code
+        response.request = request
         return response
 
     def check_no_more_expected_calls(self):

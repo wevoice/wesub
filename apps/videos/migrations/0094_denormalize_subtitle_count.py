@@ -1,7 +1,7 @@
 # encoding: utf-8
 import datetime
 from south.v2 import DataMigration
-from apps.videos.models import Video
+from videos.models import Video
 
 class Migration(DataMigration):
     

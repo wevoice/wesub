@@ -22,23 +22,19 @@ import json
 
 from django.core.urlresolvers import reverse
 
-from apps.auth.models import CustomUser as User
-from apps.subtitles import pipeline
-from apps.subtitles.models import ORIGIN_UPLOAD
-from apps.videos import metadata_manager
-from apps.videos.models import Video, SubtitleLanguage, Subtitle
-from apps.videos.tasks import video_changed_tasks
-from apps.videos.tests.data import (
+from auth.models import CustomUser as User
+from subtitles import pipeline
+from subtitles.models import ORIGIN_UPLOAD
+from videos import metadata_manager
+from videos.models import Video, SubtitleLanguage, Subtitle
+from videos.tasks import video_changed_tasks
+from videos.tests.data import (
     get_video, get_user, make_subtitle_language
 )
-from apps.videos.tests.videotestutils import (
+from videos.tests.videotestutils import (
     WebUseTest, refresh_obj, _create_trans
 )
-from apps.widget.rpc import Rpc
-from apps.widget.tests import (
-    create_two_sub_dependent_session, create_two_sub_session, RequestMockup,
-    NotAuthenticatedUser
-)
+from widget.rpc import Rpc
 
 up = os.path.dirname
 
@@ -200,10 +196,9 @@ class UploadSubtitlesTest(WebUseTest):
         user2 = get_user(2)
         video = get_video()
         sl_en = make_subtitle_language(video, 'en')
-        request1 = RequestMockup(user1)
 
         # Lock the language for user 1.
-        sl_en.writelock(user1, request1.browser_id)
+        sl_en.writelock(user1, 'test-browser-id')
         self.assertTrue(sl_en.is_writelocked)
 
         # Now try to upload subtitles as user 2.

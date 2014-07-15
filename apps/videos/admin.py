@@ -22,8 +22,7 @@ from videos.models import (
     VideoUrl, SubtitleVersionMetadata, Action, Subtitle
 )
 from videos.tasks import (
-    video_changed_tasks, upload_subtitles_to_original_service,
-    import_videos_from_feed
+    video_changed_tasks, import_videos_from_feed
 )
 
 from django.core.urlresolvers import reverse

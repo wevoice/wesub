@@ -21,8 +21,11 @@ import logging
 from celery.task import task
 from django.core.exceptions import ObjectDoesNotExist
 
-from externalsites.models import get_account
+from externalsites import credit
+from externalsites import subfetch
+from externalsites.models import get_account, lookup_account
 from subtitles.models import SubtitleLanguage, SubtitleVersion
+from utils import youtube
 from videos.models import VideoUrl
 
 celery_logger = logging.getLogger('celery.task')
@@ -105,12 +108,28 @@ def update_all_subtitles(account_type, account_id):
             }
         )
         return
-    team = account.team
-    for video in team.videos.all():
+    if account.team:
+        videos = account.team.videos
+    else:
+        videos = account.user.video_set
+
+    for video in videos.all():
         for video_url in video.get_video_urls():
+            video_url.fix_owner_username()
             if account.is_for_video_url(video_url):
                 _sync_all_languages(account, video_url, video)
 
 def _sync_all_languages(account, video_url, video):
     for language in video.newsubtitlelanguage_set.having_public_versions():
         account.update_subtitles(video_url, language)
+
+@task
+def add_amara_credit(video_url_id):
+    video_url = VideoUrl.objects.get(id=video_url_id)
+    account = lookup_account(video_url.video, video_url)
+    if credit.should_add_credit_to_video_url(video_url, account):
+        credit.add_credit_to_video_url(video_url, account)
+
+@task
+def fetch_subs(video_url_id):
+    subfetch.fetch_subs(VideoUrl.objects.get(id=video_url_id))

@@ -43,7 +43,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_filter = ('highlight', 'is_visible')
     actions = ['highlight', 'unhighlight', 'send_message']
     raw_id_fields = ['video', 'users', 'videos', 'applicants']
-    exclude = ('third_party_accounts', 'users', 'applicants','videos')
+    exclude = ('users', 'applicants','videos')
 
     def thumbnail(self, object):
         return '<img src="%s"/>' % object.logo_thumbnail()

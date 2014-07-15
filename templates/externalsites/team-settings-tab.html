@@ -18,6 +18,27 @@
         <form id="external-accounts" class="settings" method="POST" action="">
             {% csrf_token %}
 
+            <fieldset class="youtube">
+                <legend>{% trans "YouTube" %}</legend>
+                {% if youtube_accounts %}
+                <table>
+                    <tr>
+                        <th colspan=2>{% trans 'Current accounts' %}</th>
+                    </tr>
+                    {% for account in youtube_accounts %}
+                    <tr class="{% cycle 'odd' 'even' %}">
+                        <td>{{ account.get_owner_display }}</td>
+                        <td class="actions"><button class="reduced" name="remove-youtube-account" value="{{ account.id }}" type="submit">{% trans 'remove account' %}</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <p class="no-accounts">{% trans 'No youtube accounts linked yet.' %}</p>
+                {% endif %}
+                <button name="add-youtube-account" value="1" type="submit">{% trans 'Add YouTube account' %}</button>
+            </fieldset>
+
             <fieldset class="kaltura{% if not forms.enabled_accounts.kaltura.value %} disabled{% endif %}">
                 <legend>{% trans "Kaltura" %}</legend>
                 {{ forms.kaltura.non_field_errors }}

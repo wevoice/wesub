@@ -8,10 +8,10 @@ from django.test.client import RequestFactory, Client
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 
-from apps.videos.models import Video
-from apps.testhelpers.views import _create_videos
-from apps.subtitles import pipeline
-from apps.teams.models import TeamMember
+from videos.models import Video
+from testhelpers.views import _create_videos
+from subtitles import pipeline
+from teams.models import TeamMember
 from babelsubs import load_from_file 
 from teams.models import BillingRecord
 

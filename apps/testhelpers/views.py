@@ -5,10 +5,10 @@ from django.conf import settings
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 
-from apps.teams.models import Team, TeamVideo
-from apps.videos.models import Video
+from teams.models import Team, TeamVideo
+from videos.models import Video
 from django.contrib.admin.views.decorators import staff_member_required
-from apps.auth.models import  CustomUser
+from auth.models import  CustomUser
 from django.db import transaction
 
 from subtitles import pipeline

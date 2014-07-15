@@ -66,9 +66,12 @@ class VideoType(object):
         return {
             'allow_community_edits': True
         }
-    
-    def set_values(self, video_obj):
-        return video_obj
+
+    def set_values(self, video):
+        pass
+
+    def owner_username(self):
+        return None
     
     @classmethod
     def format_url(cls, url):

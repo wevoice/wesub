@@ -40,7 +40,7 @@ from subtitles.models import (
 from auth.models import CustomUser as User
 from videos.types import video_type_registrar
 from videos.types import UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
-from apps.videos.types import VideoTypeError
+from videos.types import VideoTypeError
 
 celery_logger = logging.getLogger('celery.task')
 
@@ -130,7 +130,7 @@ def raise_exception(msg, **kwargs):
     raise TypeError(msg)
 
 @task()
-def video_changed_tasks(video_pk, new_version_id=None, skip_third_party_sync=False):
+def video_changed_tasks(video_pk, new_version_id=None):
     from videos import metadata_manager
     from videos.models import Video
 
@@ -138,8 +138,6 @@ def video_changed_tasks(video_pk, new_version_id=None, skip_third_party_sync=Fal
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
         send_new_version_notification(new_version_id)
-        if not skip_third_party_sync:
-            _update_captions_in_original_service(new_version_id)
         try:
             BillingRecord.objects.insert_record(
                 SubtitleVersion.objects.get(pk=new_version_id))
@@ -169,7 +167,6 @@ def subtitles_complete_changed(language_pk):
     from teams.models import TeamVideo, BillingRecord
     language = SubtitleLanguage.objects.get(pk=language_pk)
     version = language.get_tip()
-    _update_captions_in_original_service(version.pk)
     try:
         BillingRecord.objects.insert_record(version)
     except Exception, e:
@@ -214,10 +211,6 @@ def import_videos_from_feed(feed_id):
     new_videos = feed.update()
     if feed.user is not None:
         tasks.videos_imported_message.delay(feed.user.id, len(new_videos))
-
-@task()
-def upload_subtitles_to_original_service(version_pk):
-    _update_captions_in_original_service(version_pk)
 
 def send_new_version_notification(version_id):
     try:
@@ -345,67 +338,6 @@ def notify_for_version(version):
                              context, fail_silently=not settings.DEBUG)
     return True
 
-def _update_captions_in_original_service(version_pk):
-    """Push the latest caption set for this version to the original video provider.
-
-    Only Youtube is supported right now.
-
-    In order for this to work we the version must be published, synced and have
-    a ThirdPartyAccount object for the same service and the username matching
-    the username for the video url.
-
-    """
-    from subtitles.models import SubtitleVersion
-    from accountlinker.models import ThirdPartyAccount
-    try:
-        version = SubtitleVersion.objects.select_related("language", "language__video").get(pk=version_pk)
-    except SubtitleVersion.DoesNotExist:
-        return
-    ThirdPartyAccount.objects.mirror_on_third_party(
-        version.video, version.subtitle_language, UPDATE_VERSION_ACTION, version)
-
-@task
-def delete_captions_in_original_service(language_pk):
-    """Delete the given subtitle language in the original video provider.
-
-    Only Youtube is supported right now.
-
-    In order for this to work we the version must be have a ThirdPartyAccount
-    object for the same service and the username matching the username for the
-    video url.
-
-    """
-    from subtitles.models import SubtitleLanguage
-    from accountlinker.models import ThirdPartyAccount
-    try:
-        language = (SubtitleLanguage.objects.select_related("video")
-                                            .get(pk=language_pk))
-    except SubtitleLanguage.DoesNotExist:
-        return
-
-    ThirdPartyAccount.objects.mirror_on_third_party(
-        language.video, language.language_code, DELETE_LANGUAGE_ACTION)
-
-@task
-def delete_captions_in_original_service_by_code(language_code, video_pk):
-    """ This is used for the case where the language is totally unpublished
-    and we can't get the SubtitleLanguage (but we still know the language_code
-    and the video_pk).
-
-    TODO: maybe we can just use this version?
-    """
-    from videos.models import Video
-    from .videos.types import DELETE_LANGUAGE_ACTION
-    from accountlinker.models import ThirdPartyAccount
-
-    try:
-        video = Video.objects.get(pk=video_pk)
-    except Video.DoesNotExist:
-        return
-
-    ThirdPartyAccount.objects.mirror_on_third_party(
-        video, language_code, DELETE_LANGUAGE_ACTION)
-
 def _save_video_feed(feed_url, user):
     """ Creates or updates a videofeed given some url """
     try:
@@ -431,68 +363,4 @@ def gauge_videos_long():
 def gauge_billing_records():
     from teams.models import BillingRecord
     Gauge('teams.BillingRecord').report(BillingRecord.objects.count())
-
-@task
-def sync_latest_versions_for_video(video_pk):
-    video = Video.objects.get(pk=video_pk)
-
-    for lang in video.newsubtitlelanguage_set.all():
-        # use full, as the final mirror_to_third party will
-        # take care of checking if this version *should* be uplaoded
-        # Else, we'll re-sync the last public version when new
-        # drafts are saved
-        latest = lang.get_tip(full=True)
-        upload_subtitles_to_original_service.delay(latest.pk)
-
-@task
-def _add_amara_description_credit_to_youtube_vurl(vurl_pk):
-    from accountlinker.models import ThirdPartyAccount
-
-    try:
-        vurl = VideoUrl.objects.get(pk=vurl_pk)
-    except VideoUrl.DoesNotExist:
-        celery_logger.error("vurl not found", extra={
-            'vurl_pk': vurl_pk})
-        return
-
-    try:
-        vt = video_type_registrar.video_type_for_url(vurl.url)
-    except VideoTypeError, e:
-        celery_logger.warning("Video type error", extra={
-            "exception_thrown": str(e)})
-        return
-
-
-    account = ThirdPartyAccount.objects.resolve_ownership(vurl)
-
-    if not account or account.is_team_account:
-        return
-
-    bridge = vt._get_bridge(account)
-
-    return bridge.add_credit_to_description(vurl.video)
-
-@task
-def add_amara_description_credit_to_youtube_video(video_id):
-    try:
-        video = Video.objects.get(video_id=video_id)
-    except Video.DoesNotExist:
-        celery_logger.error("video_id not found", extra={
-            'video_id': video_id})
-        return
-
-    if video.get_team_video():
-        celery_logger.info('team video, skipping', extra={
-            'video_id': video_id})
-        return
-
-    youtube_urls = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
-
-    if not youtube_urls.exists():
-        celery_logger.warning("Not a youtube video", extra={
-            'video_id': video_id})
-        return
-
-    for vurl in youtube_urls:
-        _add_amara_description_credit_to_youtube_vurl.delay(vurl.pk)
 

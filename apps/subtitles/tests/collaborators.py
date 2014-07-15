@@ -20,9 +20,9 @@
 from django.db import IntegrityError
 from django.test import TestCase
 
-from apps.auth.models import CustomUser as User
-from apps.subtitles.models import Collaborator
-from apps.subtitles.tests.utils import make_video, make_sl, refresh
+from auth.models import CustomUser as User
+from subtitles.models import Collaborator
+from subtitles.tests.utils import make_video, make_sl, refresh
 
 
 class TestCollaborator(TestCase):

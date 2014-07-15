@@ -853,6 +853,7 @@ MEDIA_BUNDLES = {
 }
 
 
+YOUTUBE_CLIENT_FORCE_HTTPS = True
 EMAIL_BACKEND = "utils.safemail.InternalOnlyBackend"
 EMAIL_FILE_PATH = '/tmp/unisubs-messages'
 # on staging and dev only the emails listed bellow will receive actual mail
@@ -965,3 +966,9 @@ try:
     }
 except ImportError:
     pass
+
+# This needs to run as soon as possible, as soon as the rest of the settings
+# are set up seems like a good time.
+from localeurl import patch_reverse
+patch_reverse()
+

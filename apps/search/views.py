@@ -19,9 +19,9 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.http import urlencode
 
-from apps.search.forms import SearchForm
-from apps.search.rpc import SearchApiClass
-from apps.videos.search_indexes import VideoIndex
+from search.forms import SearchForm
+from search.rpc import SearchApiClass
+from videos.search_indexes import VideoIndex
 from utils import render_to
 from utils.context_processors import current_site
 from utils.rpc import RpcRouter
@@ -54,6 +54,6 @@ def index(request):
         return HttpResponseRedirect(url)
     else:
         return {
-            'form': SearchForm(sqs=VideoIndex.public())
+            'form': SearchForm(),
         }
 

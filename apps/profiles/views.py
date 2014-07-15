@@ -35,15 +35,15 @@ from auth.models import CustomUser as User
 from profiles.forms import (EditUserForm, EditAccountForm, SendMessageForm,
                             EditAvatarForm, AdminProfileForm)
 from profiles.rpc import ProfileApiClass
-from apps.messages.models import Message
+import externalsites.models
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
+from utils.text import fmt
 from teams.models import Task
 from subtitles.models import SubtitleLanguage
 from videos.models import (
     Action, VideoUrl, Video, VIDEO_TYPE_YOUTUBE, VideoFeed
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +191,6 @@ def account(request):
     else:
         form = EditAccountForm(instance=request.user, label_suffix="")
 
-    third_party_accounts = request.user.third_party_accounts.all()
     twitters = request.user.twitteraccount_set.all()
     facebooks = request.user.facebookaccount_set.all()
 
@@ -199,7 +198,8 @@ def account(request):
         'form': form,
         'user_info': request.user,
         'edit_profile_page': True,
-        'third_party': third_party_accounts,
+        'youtube_accounts': (externalsites.models.YouTubeAccount
+                             .objects.for_owner(request.user)),
         'twitters': twitters,
         'facebooks': facebooks,
         'hide_prompt': True
@@ -271,11 +271,6 @@ def add_third_party(request):
     if account_type not in LINKABLE_ACCOUNTS:
         raise Http404
 
-    if account_type == 'youtube':
-        from accountlinker.views import _generate_youtube_oauth_request_link
-        state = json.dumps({'user': request.user.pk})
-        url = _generate_youtube_oauth_request_link(state)
-
     if account_type == 'twitter':
         request.session['no-login'] = True
         url = reverse('thirdpartyaccounts:twitter_login')
@@ -288,65 +283,39 @@ def add_third_party(request):
 
 
 @login_required
-def remove_third_party(request, account_id):
-    from accountlinker.models import ThirdPartyAccount
+def remove_third_party(request, account_type, account_id):
     from thirdpartyaccounts.models import TwitterAccount, FacebookAccount
 
-    account_type = request.GET.get('type', 'generic')
-
-    if account_type == 'generic':
-        account = get_object_or_404(ThirdPartyAccount, pk=account_id)
-        display_type = account.get_type_display()
-        uid = account.full_name
-
-        if account not in request.user.third_party_accounts.all():
-            raise Http404
-    elif account_type == 'twitter':
-        account = get_object_or_404(TwitterAccount, pk=account_id)
-        display_type = 'Twitter'
-        uid = account.username
-
-        if account not in request.user.twitteraccount_set.all():
-            raise Http404
+    if account_type == 'twitter':
+        account = get_object_or_404(request.user.twitteraccount_set.all(),
+                                    pk=account_id)
+        account_type_name = _('Twitter account')
+        account_owner = account.username
     elif account_type == 'facebook':
-        account = get_object_or_404(FacebookAccount, pk=account_id)
-        display_type = 'Facebook'
-        uid = account.uid
-
-        if account not in request.user.facebookaccount_set.all():
-            raise Http404
-
+        account = get_object_or_404(request.user.facebookaccount_set.all(),
+                                    pk=account_id)
+        account_type_name = _('Facebook account')
+        account_owner = account.uid
+    else:
+        # map the account type string from the URL to the externalsites
+        # model
+        account_type_map = {
+            'youtube': externalsites.models.YouTubeAccount
+        }
+        qs = account_type_map[account_type].objects.for_owner(request.user)
+        account = get_object_or_404(qs, id=account_id)
+        account_type_name = account._meta.verbose_name
+        account_owner = account.get_owner_display()
     if request.method == 'POST':
-        if account.type == VIDEO_TYPE_YOUTUBE:
-            # Delete the corresponding VideoFeed
-            username = account.username.replace(' ', '')
-            url = "https://gdata.youtube.com/feeds/api/users/%s/uploads" % username
-            try:
-                feed = VideoFeed.objects.filter(url=url)
-                feed.delete()
-            except VideoFeed.DoesNotExist:
-                logger.error("Feed for youtube account doesn't exist", extra={
-                    "youtube_username": username
-                })
-            # for youtube accounts we might take a while to remove any descriptions
-            #  we've added to videos, so we run that in the background.
-            # the task will access the tpa, and will delete the account once it's
-            # done
-            from accountlinker.tasks import remove_youtube_descriptions_for_tpa
-            remove_youtube_descriptions_for_tpa.delay(account.pk)
-            msg = _("We're tying up loose ends - your account will be removed shortly. Check back after 10 minutes")
-        else:
-            # anything but yt accounts can be deleted right away
-            account.delete()
-            msg = _('Account deleted.')
+        account.delete()
+        msg = _('Account deleted.')
         messages.success(request, msg)
         return redirect('profiles:account')
 
     context = {
         'user_info': request.user,
-        'third_party': account,
-        'type': display_type,
-        'uid': uid
+        'account_type_name': account_type_name,
+        'account_owner': account_owner,
     }
     return direct_to_template(request, 'profiles/remove-third-party.html',
             context)

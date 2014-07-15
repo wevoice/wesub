@@ -41,10 +41,9 @@ from django.utils.encoding import iri_to_uri, force_unicode
 from django.views.generic.list_detail import object_list
 
 import widget
-from apps.auth.models import UserLanguage, CustomUser as User
-from apps.videos.templatetags.paginator import paginate
+from auth.models import UserLanguage, CustomUser as User
+from videos.templatetags.paginator import paginate
 from messages import tasks as notifier
-from accountlinker.models import ThirdPartyAccount
 from teams.forms import (
     CreateTeamForm, AddTeamVideoForm, EditTeamVideoForm,
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
@@ -73,7 +72,7 @@ from teams.tasks import (
     update_video_moderation, update_one_team_video, update_video_public_field,
     invalidate_video_visibility_caches, process_billing_report
 )
-from apps.videos.tasks import video_changed_tasks
+from videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
 from utils.metrics import time as timefn
@@ -86,10 +85,6 @@ from utils.translation import (
 from utils.chunkediter import chunkediter
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
-from videos.tasks import (
-    upload_subtitles_to_original_service, delete_captions_in_original_service,
-    delete_captions_in_original_service_by_code
-)
 from videos.models import Action, VideoUrl, Video, VideoFeed
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
@@ -1665,7 +1660,7 @@ def team_tasks(request, slug, project_slug=None):
         filtered = filtered + 1
 
     widget_settings = {}
-    from apps.widget.rpc import add_general_settings
+    from widget.rpc import add_general_settings
     add_general_settings(request, widget_settings)
 
     Task.add_cached_video_urls(tasks)
@@ -2029,76 +2024,6 @@ def edit_project(request, slug, project_slug):
 
     return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }
 
-@render_to('teams/_third-party-accounts.html')
-@login_required
-def third_party_accounts(request, slug):
-    from accountlinker.views import _generate_youtube_oauth_request_link
-    team = get_object_or_404(Team, slug=slug)
-    if not can_change_team_settings(team, request.user):
-        messages.error(request, _(u'You do not have permission to edit this team.'))
-        return HttpResponseRedirect(team.get_absolute_url())
-
-    new_youtube_url = _generate_youtube_oauth_request_link(
-            json.dumps({'team': team.pk}))
-    linked_accounts = team.third_party_accounts.all()
-    return {
-        "team":team,
-        "new_youtube_url": new_youtube_url,
-        "linked_accounts": linked_accounts,
-    }
-
-@login_required
-def sync_third_party_account(request, slug, account_id):
-    team = get_object_or_404(Team, slug=slug)
-    if not can_change_team_settings(team, request.user):
-        messages.error(request, _(u'You do not have permission to edit this team.'))
-        return HttpResponseRedirect(team.get_absolute_url())
-
-    team.third_party_accounts.get(pk=account_id)
-    for video in team.videos.all():
-        version = video.latest_version()
-        if version is not None:
-            ThirdPartyAccount.objects.mirror_on_third_party(
-                    version.video, version.subtitle_language,
-                    UPDATE_VERSION_ACTION, version)
-    messages.success(request, _(u'Successfully synced subtitles.'))
-    return HttpResponseRedirect(reverse('teams:third-party-accounts',
-        kwargs={'slug': team.slug}))
-
-
-# Unpublishing
-def _propagate_unpublish_to_external_services(language_pk, language_code, video):
-    """Push the 'unpublishing' of subs to third-party providers for the given language.
-
-    The unpublishing must be fully complete before this function is called.
-
-    """
-    try:
-        language = SubtitleLanguage.objects.get(pk=language_pk)
-    except SubtitleLanguage.DoesNotExist:
-        delete_captions_in_original_service_by_code.delay(language_code, video.pk)
-        return
-
-    # Find the latest public version to determine what kind of third-party call
-    # we need to make.
-    latest_version = language.get_tip(public=True)
-
-    if latest_version:
-        # There's a latest version that's still public, so third-party services
-        # should use that one.
-        upload_subtitles_to_original_service.delay(latest_version.pk)
-    else:
-        # There's no latest version that's still public, but we know the
-        # language still exists.
-        #
-        # This means that all of the subs in the language have been unpublished
-        # and are awaiting moderation, or have been deleted.
-        #
-        # In either case we should delete the subs from the external service
-        # entirely, since we know that all the subs we had are bad.
-        delete_captions_in_original_service.delay(language_pk)
-
-
 def _add_task_note(task, note):
     """Add a note to the body of the Task in a nice way.
 
@@ -2404,9 +2329,6 @@ def delete_language(request, slug, lang_id):
                         sublang.save()
 
                     language.nuke_language()
-
-                    _propagate_unpublish_to_external_services(
-                        language.pk, language.language_code, language.video)
 
                     metadata_manager.update_metadata(language.video.pk)
                     update_one_team_video(team_video.pk)

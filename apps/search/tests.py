@@ -17,172 +17,91 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.test import TestCase
-from django.core.management import call_command
+from nose.tools import assert_equal
 
-from videos.models import Video
 from search.forms import SearchForm
-from search.rpc import SearchApiClass
-from auth.models import CustomUser as User
 from utils.rpc import RpcMultiValueDict
-from django.core.urlresolvers import reverse
-from videos.tasks import video_changed_tasks
 from videos.search_indexes import VideoIndex
 from utils import test_utils
-def reset_solr():
-    # cause the default site to load
-    from haystack import site
-    from haystack import backend
-    sb = backend.SearchBackend()
-    sb.clear()
-    call_command('update_index')
 
-class TestSearch(TestCase):
-    fixtures = ['staging_users.json', 'staging_videos.json', 'subtitle_fixtures.json']
-    titles = (
-        u"Kisses in Romania's Food Market - Hairy Bikers Cookbook - BBC",
-        u"Don't believe the hype - A Bit of Stephen Fry & Hugh Laurie - BBC comedy sketch",
-        u"David Attenborough - Animal behaviour of the Australian bowerbird - BBC wildlife",
-        u"JayZ talks about Beyonce - Friday Night with Jonathan Ross - BBC One",
-        u"Amazing! Bird sounds from the lyre bird - David Attenborough  - BBC wildlife",
-        u"Hans Rosling's 200 Countries, 200 Years, 4 Minutes - The Joy of Stats - BBC Four",
-        u"HD: Grizzly Bears Catching Salmon - Nature's Great Events: The Great Salmon Run - BBC One",
-        u"My Blackberry Is Not Working! - The One Ronnie, Preview - BBC One",
-        u"Cher and Dawn French's Lookalikes - The Graham Norton Show preview - BBC One",
-        u"Cute cheetah cub attacked by wild warthog - Cheetahs - BBC Earth"
-    )
+def assert_search_querysets_equal(sqs1, sqs2):
+    assert_equal(type(sqs1), type(sqs2))
+    assert_equal(str(sqs1.query), str(sqs2.query))
 
-    def setUp(self):
-        self.user = User.objects.all()[0]
-        reset_solr()
+class SearchTest(TestCase):
+    def get_search_qs(self, query, **params):
+        form = SearchForm(RpcMultiValueDict(dict(q=query, **params)))
+        return form.queryset()
 
-    def test_query_clean(self):
-        video = Video.objects.all()[0]
-        video.title = u"Cher BBC and Dawn French's Lookalikes"
-        video.save()
-        reset_solr()
-        rpc = SearchApiClass()
+    def test_simple_query(self):
+        assert_search_querysets_equal(self.get_search_qs('foo'),
+                                      VideoIndex.public()
+                                      .auto_query('foo')
+                                      .filter_or(title='foo'))
 
-        rdata = RpcMultiValueDict(dict(q=u'?BBC'))
-        result = rpc.search(rdata, self.user, testing=True)['sqs']
-        self.assertTrue(len(result))
-
-    def test_views(self):
-        url = reverse('search:index')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        url = reverse('search:rpc_api')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_search_index_updating(self):
-        reset_solr()
-        rpc = SearchApiClass()
-
-        for title in self.titles:
-            rdata = RpcMultiValueDict(dict(q=title))
-            video = Video.objects.all()[0]
-            video.title = title
-            video.save()
-            video.update_search_index()
-            test_utils.update_search_index.run_original()
-
-            result = rpc.search(rdata, self.user, testing=True)['sqs']
-            self.assertTrue(video in [item.object for item in result], title)
+    def test_clean_input(self):
+        assert_search_querysets_equal(self.get_search_qs('foo?'),
+                                      VideoIndex.public()
+                                      .auto_query('foo?')
+                                      .filter_or(title='foo\\?'))
 
     def test_empty_query(self):
-        rpc = SearchApiClass()
+        assert_search_querysets_equal(self.get_search_qs(''),
+                                      VideoIndex.public().none())
 
-        rdata = RpcMultiValueDict(dict(q=u''))
-        rpc.search(rdata, self.user, testing=True)['sqs']
+    def test_language_only(self):
+        assert_search_querysets_equal(self.get_search_qs('', video_lang='en'),
+                                      VideoIndex.public()
+                                      .filter(video_language_exact='en'))
 
-        rdata = RpcMultiValueDict(dict(q=u' '))
-        rpc.search(rdata, self.user, testing=True)['sqs']
+    def test_video_lang_filter(self):
+        # set up fake faceting info so that we can select english as the
+        # filter
+        test_utils.get_language_facet_counts.return_value = (
+            [('en', 10)], []
+        )
 
-    def test_filtering(self):
-        self.assertTrue(Video.objects.count())
-        for video in Video.objects.all():
-            video_changed_tasks.delay(video.pk)
+        sqs = self.get_search_qs('foo', video_lang='en')
+        assert_search_querysets_equal(sqs,
+                                      VideoIndex.public()
+                                      .auto_query('foo')
+                                      .filter_or(title='foo')
+                                      .filter(video_language_exact='en'))
 
-        reset_solr()
+    def check_choices(self, field, correct_choices):
+        self.assertEqual([c[0] for c in field.choices],
+                         correct_choices)
 
-        rpc = SearchApiClass()
+    def check_get_language_facet_counts_query(self, correct_queryset):
+        self.assertEqual(test_utils.get_language_facet_counts.call_count, 1)
+        assert_search_querysets_equal(
+            test_utils.get_language_facet_counts.call_args[0][0],
+            correct_queryset)
 
-        rdata = RpcMultiValueDict(dict(q=u' ', video_lang='en'))
-        result = rpc.search(rdata, self.user, testing=True)['sqs']
+    def test_facet_choices(self):
+        video_lang_facet_info = [
+            ('en', 10),
+            ('fr', 20),
+        ]
+        language_facet_info = [
+            ('en', 10),
+            ('es', 7),
+        ]
+        test_utils.get_language_facet_counts.return_value = (
+            video_lang_facet_info, language_facet_info
+        )
+        form = SearchForm(RpcMultiValueDict(dict(q='foo')))
+        # we should always list the blank choice first, then the languages
+        # with facet info, in descending order
+        self.check_choices(form.fields['video_lang'], ['', 'fr', 'en'])
+        self.check_choices(form.fields['langs'], ['', 'en', 'es'])
+        # check that get_language_facet_counts() was presented with the
+        # correct query
+        self.check_get_language_facet_counts_query(VideoIndex.public()
+                                                   .auto_query('foo')
+                                                   .filter_or(title='foo'))
 
-        self.assertTrue(len(result))
-        for video in VideoIndex.public():
-            if video.video_language == 'en':
-                self.assertTrue(video.object in [item.object for item in result])
-
-        rdata = RpcMultiValueDict(dict(q=u' ', langs='en'))
-        result = rpc.search(rdata, self.user, testing=True)['sqs']
-
-        self.assertTrue(len(result))
-        for video in VideoIndex.public():
-            if video.languages and 'en' in video.languages:
-                self.assertTrue(video.object in [item.object for item in result])
-
-    def test_rpc(self):
-        rpc = SearchApiClass()
-        rdata = RpcMultiValueDict(dict(q=u'BBC'))
-
-        for title in self.titles:
-            video = Video.objects.all()[0]
-            video.title = title
-            video.save()
-            reset_solr()
-
-            result = rpc.search(rdata, self.user, testing=True)['sqs']
-            self.assertTrue(video in [item.object for item in result], title)
-
-    def test_search(self):
-        reset_solr()
-        sqs = VideoIndex.public()
-        qs = Video.objects.exclude(title='')
-        self.assertTrue(qs.count())
-
-        for video in qs:
-            result = SearchForm.apply_query(video.title, sqs)
-            self.assertTrue(video in [item.object for item in result])
-
-    def test_search1(self):
-        for title in self.titles:
-            video = Video.objects.all()[0]
-            sqs = VideoIndex.public()
-            video.title = title
-            video.save()
-            reset_solr()
-
-            result = SearchForm.apply_query(video.title, sqs)
-            self.assertTrue(video in [item.object for item in result], u"Failed to find video by title: %s" % title)
-
-            result = SearchForm.apply_query(u'BBC', sqs)
-            self.assertTrue(video in [item.object for item in result], u"Failed to find video by 'BBC' with title: %s" % title)
-
-    def test_search_relevance(self):
-        reset_solr()
-
-        rpc = SearchApiClass()
-        rdata = RpcMultiValueDict(dict(q=u'unique'))
-
-        result = rpc.search(rdata, self.user, testing=True)['sqs']
-        videos = [item.object for item in result]
-
-        # by default, title is more important than description
-        self.assertEquals(videos[0].title, u"This is my unique title")
-        self.assertEquals(videos[1].title, u"Default")
-        self.assertEquals(videos[1].description, u"this is my unique description")
-
-        # when i updated our templates to index subtitle text, this started
-        # failing - probably because one of the videos has a lot of 'unique' on the
-        # text.
-        # TODO: verify this on the front end - shouldn't be hard.
-
-        #rdata = RpcMultiValueDict(dict(q=u'unique', sort="total_views"))
-        #result = rpc.search(rdata, self.user, testing=True)['sqs']
-        #videos = [item.object for item in result]
-
-        #self.assertEquals(videos[0].title, u"Default")
-        #self.assertEquals(videos[1].title, u"This is my unique title")
+    def test_facet_choices_empty_query(self):
+        form = SearchForm(RpcMultiValueDict(dict(q='')))
+        # If we don't have a query, we should use the all videos
+        self.check_get_language_facet_counts_query(VideoIndex.public())

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import time
-from apps.webdriver_testing.pages.site_pages import UnisubsPage
+from webdriver_testing.pages.site_pages import UnisubsPage
 
 
 class CreatePage(UnisubsPage):

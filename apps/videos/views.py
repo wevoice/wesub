@@ -32,7 +32,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from apps.videos.templatetags.paginator import paginate
+from videos.templatetags.paginator import paginate
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import (HttpResponse, Http404, HttpResponseRedirect,
@@ -50,29 +50,29 @@ from vidscraper.errors import Error as VidscraperError
 
 import widget
 from widget import rpc as widget_rpc
-from apps.auth.models import CustomUser as User
-from apps.statistic.models import EmailShareStatistic
-from apps.subtitles import models as sub_models
-from apps.subtitles.forms import SubtitlesUploadForm
-from apps.subtitles.pipeline import rollback_to
-from apps.teams.models import Task
-from apps.teams.permissions import (can_create_and_edit_subtitles,
+from auth.models import CustomUser as User
+from statistic.models import EmailShareStatistic
+from subtitles import models as sub_models
+from subtitles.forms import SubtitlesUploadForm
+from subtitles.pipeline import rollback_to
+from teams.models import Task
+from teams.permissions import (can_create_and_edit_subtitles,
                                     can_create_and_edit_translations)
-from apps.videos import permissions
-from apps.videos.decorators import get_video_revision, get_video_from_code
-from apps.videos.forms import (
+from videos import permissions
+from videos.decorators import get_video_revision, get_video_from_code
+from videos.forms import (
     VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm,
     CreateVideoUrlForm, AddFromFeedForm,
     ChangeVideoOriginalLanguageForm, CreateSubtitlesForm,
 )
-from apps.videos.models import (
+from videos.models import (
     Video, Action, SubtitleLanguage, VideoUrl, AlreadyEditingException
 )
-from apps.videos.rpc import VideosApiClass
-from apps.videos.search_indexes import VideoIndex
-from apps.videos.share_utils import _add_share_panel_context_for_video, _add_share_panel_context_for_history
-from apps.videos.tasks import video_changed_tasks
-from apps.widget.views import base_widget_params
+from videos.rpc import VideosApiClass
+from videos.search_indexes import VideoIndex
+from videos.share_utils import _add_share_panel_context_for_video, _add_share_panel_context_for_history
+from videos.tasks import video_changed_tasks
+from widget.views import base_widget_params
 from externalsites.models import can_sync_videourl
 from utils import send_templated_email
 from utils.basexconverter import base62
@@ -665,7 +665,9 @@ class LanguagePageContextRevisions(LanguagePageContext):
 
 class LanguagePageContextSyncHistory(LanguagePageContext):
     def setup_tab(self, request, video, language, version):
-        self['sync_history'] = language.synchistory_set.order_by('-id').all()
+        self['sync_history'] = (language.synchistory_set
+                                .select_related('version')
+                                .fetch_with_accounts())
         self['current_version'] = language.get_public_tip()
         synced_versions = []
         for video_url in video.get_video_urls():
@@ -956,9 +958,8 @@ def video_staff_delete(request, video_id):
     return HttpResponse("ok")
 
 def video_debug(request, video_id):
-    from apps.widget import video_cache as vc
+    from widget import video_cache as vc
     from django.core.cache import cache
-    from accountlinker.models import youtube_sync
     from videos.models import VIDEO_TYPE_YOUTUBE
 
     video = get_object_or_404(Video, video_id=video_id)
@@ -981,12 +982,6 @@ def video_debug(request, video_id):
     tasks = Task.objects.filter(team_video=video)
 
     is_youtube = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE).count() != 0
-
-    if request.method == 'POST' and request.POST.get('action') == 'sync':
-        # Sync video to youtube
-        sync_lang = sub_models.SubtitleLanguage.objects.get(
-                pk=request.POST.get('language'))
-        youtube_sync(video, sync_lang)
 
     return render_to_response("videos/video_debug.html", {
             'video': video,

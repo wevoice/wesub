@@ -20,15 +20,75 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 
-from externalsites.models import BrightcoveAccount
+from externalsites.exceptions import YouTubeAccountExistsError
+from externalsites.models import (BrightcoveAccount, YouTubeAccount,
+                                  lookup_accounts, account_models)
 from videos.models import VideoFeed
-from utils import test_factories
+from utils import test_utils
+from utils.factories import *
+
+class LookupAccountTest(TestCase):
+    def check_lookup_accounts(self, video, account):
+        self.assertEquals(lookup_accounts(video), [
+            (account, video.get_primary_videourl_obj())
+        ])
+
+    def check_lookup_accounts_returns_nothing(self, video):
+        self.assertEquals(lookup_accounts(video), [])
+
+    def check_is_for_video_url(self, account, video, correct_value):
+        video_url = video.get_primary_videourl_obj()
+        self.assertEquals(account.is_for_video_url(video_url), correct_value)
+
+    def test_team_account(self):
+        video = BrightcoveVideoFactory()
+        team_video = TeamVideoFactory(video=video)
+        account = BrightcoveAccountFactory(team=team_video.team)
+        self.check_lookup_accounts(video, account)
+
+    def test_user_account(self):
+        user = UserFactory()
+        video = BrightcoveVideoFactory(user=user)
+        account = BrightcoveAccountFactory(user=user)
+        self.check_lookup_accounts(video, account)
+
+    def test_user_account_ignored_for_team_videos(self):
+        user = UserFactory()
+        video = BrightcoveVideoFactory(user=user)
+        account = BrightcoveAccountFactory(user=user)
+        team_video = TeamVideoFactory(video=video)
+
+        self.check_lookup_accounts_returns_nothing(video)
+
+    def test_youtube(self):
+        team = TeamFactory()
+        account1 = YouTubeAccountFactory(channel_id='user1', team=team)
+        account2 = YouTubeAccountFactory(channel_id='user2', team=team)
+        video1 = YouTubeVideoFactory(video_url__owner_username='user1')
+        video2 = YouTubeVideoFactory(video_url__owner_username='user2')
+        # video for a user that we don't have an account for
+        video3 = YouTubeVideoFactory(video_url__owner_username='user3')
+        # video without a username set
+        video4 = YouTubeVideoFactory(video_url__owner_username='')
+        for video in (video1, video2, video3):
+            TeamVideoFactory(video=video, team=team)
+
+        self.check_lookup_accounts(video1, account1)
+        self.check_lookup_accounts(video2, account2)
+        self.check_lookup_accounts_returns_nothing(video3)
+        self.check_lookup_accounts_returns_nothing(video4)
+        # test ExternalAccount.is_for_video_url() which works in the reverse
+        # direction
+        self.check_is_for_video_url(account1, video1, True)
+        self.check_is_for_video_url(account1, video2, False)
+        self.check_is_for_video_url(account1, video3, False)
+        self.check_is_for_video_url(account1, video4, False)
 
 class BrightcoveAccountTest(TestCase):
     def setUp(self):
-        self.team = test_factories.create_team()
-        self.account = BrightcoveAccount.objects.create(
-            team=self.team, publisher_id='123', write_token='789')
+        self.team = TeamFactory()
+        self.account = BrightcoveAccountFactory.create(team=self.team,
+                                                       publisher_id='123')
         self.player_id = '456'
 
     def check_feed(self, feed_url):
@@ -81,3 +141,54 @@ class BrightcoveAccountTest(TestCase):
 
         account = BrightcoveAccount.objects.get(id=self.account.id)
         self.assertEquals(account.import_feed, None)
+
+class YoutubeAccountTest(TestCase):
+    def test_revoke_token_on_delete(self):
+        account = YouTubeAccountFactory(user=UserFactory())
+        account.delete()
+        self.assertEquals(test_utils.youtube_revoke_auth_token.call_count, 1)
+        test_utils.youtube_revoke_auth_token.assert_called_with(
+            account.oauth_refresh_token)
+
+    def test_create_feed(self):
+        account = YouTubeAccountFactory(user=UserFactory(),
+                                        channel_id='test-channel-id')
+        self.assertEqual(account.import_feed, None)
+        account.create_feed()
+        self.assertNotEqual(account.import_feed, None)
+        self.assertEqual(account.import_feed.url,
+                         'https://gdata.youtube.com/'
+                         'feeds/api/users/test-channel-id/uploads')
+
+    def test_delete_feed_on_account_delete(self):
+        account = YouTubeAccountFactory(user=UserFactory(),
+                                        channel_id='test-channel-id')
+        account.create_feed()
+        self.assertEqual(VideoFeed.objects.count(), 1)
+        account.delete()
+        self.assertEqual(VideoFeed.objects.count(), 0)
+
+    def test_create_or_update(self):
+        # if there are no other accounts for a channel_id, create_or_update()
+        # should create the account and return it
+        user = UserFactory()
+        auth_info = {
+            'username': 'YouTubeUser',
+            'channel_id': 'test-channel-id',
+            'oauth_refresh_token':
+            'test-refresh-token',
+        }
+        self.assertEquals(YouTubeAccount.objects.all().count(), 0)
+        YouTubeAccount.objects.create_or_update(user=user, **auth_info)
+        self.assertEquals(YouTubeAccount.objects.all().count(), 1)
+
+        # Now that there is an account, it should update the existing account
+        # and throw a YouTubeAccountExistsError
+        team = TeamFactory()
+        auth_info['oauth_refresh_token'] = 'test-refresh-token2'
+        self.assertRaises(YouTubeAccountExistsError,
+                          YouTubeAccount.objects.create_or_update, team=team,
+                          **auth_info)
+        self.assertEquals(YouTubeAccount.objects.all().count(), 1)
+        account = YouTubeAccount.objects.all().get()
+        self.assertEquals(account.oauth_refresh_token, 'test-refresh-token2')

@@ -30,96 +30,77 @@ from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
 from vidscraper.sites import blip
 
-from apps.auth.models import CustomUser as User
-from apps.subtitles import pipeline
-from apps.teams.models import Task
-from apps.teams.permissions_const import ROLE_ADMIN
-from apps.videos.share_utils import _make_email_url
-from apps.videos.tasks import video_changed_tasks
-from apps.videos.templatetags.subtitles_tags import format_sub_time
-from apps.videos.tests.videotestutils import (
+from auth.models import CustomUser as User
+from subtitles import pipeline
+from teams.models import Task
+from teams.permissions_const import ROLE_ADMIN
+from videos.share_utils import _make_email_url
+from videos.tasks import video_changed_tasks
+from videos.templatetags.subtitles_tags import format_sub_time
+from videos.tests.videotestutils import (
     WebUseTest, create_langs_and_versions
 )
-from apps.videos import views
-from apps.videos.models import (
+from videos import views
+from videos.models import (
     Video, VideoUrl, Action, VIDEO_TYPE_YOUTUBE, SubtitleVersion,
     SubtitleLanguage, Subtitle, UserTestResult
 )
-from apps.videos.tests.data import (
+from videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version
 )
-from apps.widget import video_cache
-from apps.widget.tests import create_two_sub_session, RequestMockup
+from widget import video_cache
 from utils import test_utils
 from utils.factories import *
 
 class TestViews(WebUseTest):
-    fixtures = ['test.json', 'subtitle_fixtures.json']
-
     def setUp(self):
-        self._make_objects("iGzkk7nwWX8F")
+        self._make_objects_with_factories()
         cache.clear()
-
-    def tearDown(self):
         mail.outbox = []
 
-    def test_video_url_make_primary(self):
+    def test_video_url_create(self):
         self._login()
-        v = Video.objects.get(video_id='iGzkk7nwWX8F')
-        self.assertNotEqual(len(VideoUrl.objects.filter(video=v)), 0)
+        self.assertEqual(self.video.videourl_set.count(), 1)
+        primary_url = self.video.get_primary_videourl_obj().url
         # add another url
-        secondary_url = 'http://www.youtube.com/watch?v=po0jY4WvCIc'
+        secondary_url = 'http://www.example.com/video2.ogv'
         data = {
             'url': secondary_url,
-            'video': v.pk
+            'video': self.video.pk
         }
         url = reverse('videos:video_url_create')
         response = self.client.post(url, data)
-        self.assertNotIn('errors', json.loads(response.content))
-        vid_url = 'http://www.youtube.com/watch?v=rKnDgT73v8s'
-        # test make primary
-        vu = VideoUrl.objects.filter(video=v)
-        vu[0].make_primary()
-        self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, vid_url)
-        # check for activity
-        self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 1)
-        vu[1].make_primary()
-        self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, secondary_url)
-        # check for activity
-        self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 2)
-        # assert correct VideoUrl is retrieved
-        self.assertEqual(VideoUrl.objects.filter(video=v)[0].url, secondary_url)
+        self.assertNotIn('errors', response.json())
+        self.assertEquals(
+            set([vu.url for vu in self.video.get_video_urls()]),
+            set([primary_url, secondary_url]))
 
-    def test_video_url_make_primary_team_video(self):
-        v = Video.objects.get(video_id='KKQS8EDG1P4')
-        self.assertNotEqual(VideoUrl.objects.filter(video=v).count(), 0)
-        # add another url
-        secondary_url = 'http://www.youtube.com/watch?v=tKTZoB2Vjuk'
+    def test_videourl_create_with_team_video(self):
+        team_video = TeamVideoFactory()
+        video = team_video.video
+        self.assertEqual(video.videourl_set.count(), 1)
+        # get ready to add another url
+        secondary_url = 'http://example.com/video2.ogv'
         data = {
             'url': secondary_url,
-            'video': v.pk
+            'video': video.pk
         }
         url = reverse('videos:video_url_create')
+        # this shouldn't work without logging in
         response = self.client.post(url, data)
-        # before logging in, this should not work
-        self.assertEqual(302, response.status_code)
-        self.client.login(**self.auth)
+        self.assertEqual(video.videourl_set.count(), 1)
+        # this shouldn't work without if logged in as a non-team member
+        non_team_member = UserFactory()
+        self._login(non_team_member)
         response = self.client.post(url, data)
-        self.assertNotIn('errors', json.loads(response.content))
-        vid_url = 'http://www.youtube.com/watch?v=KKQS8EDG1P4'
-        # test make primary
-        vu = VideoUrl.objects.filter(video=v)
-        self.assertTrue(vu.count() > 1)
-        vu[0].make_primary()
-        self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, vid_url)
-        # check for activity
-        self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 1)
-        vu[1].make_primary()
-        self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, secondary_url)
-        # check for activity
-        self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 2)
-        # assert correct VideoUrl is retrieved
-        self.assertEqual(VideoUrl.objects.filter(video=v)[0].url, secondary_url)
+        self.assertEqual(video.videourl_set.count(), 1)
+        # this should work when logged in as a team member
+        member = UserFactory()
+        TeamMemberFactory(user=member, team=team_video.team,
+                          role=ROLE_ADMIN)
+        self._login(member)
+        response = self.client.post(url, data)
+        self.assertEqual(video.videourl_set.count(), 2)
 
     def test_index(self):
         self._simple_test('videos.views.index')
@@ -193,42 +174,31 @@ class TestViews(WebUseTest):
     def test_video_url_remove(self):
         test_utils.invalidate_widget_video_cache.run_original_for_test()
         self._login()
-        v = Video.objects.get(video_id='iGzkk7nwWX8F')
-        # add another url since primary can't be removed
-        data = {
-            'url': 'http://www.youtube.com/watch?v=po0jY4WvCIc',
-            'video': v.pk
-        }
-        url = reverse('videos:video_url_create')
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200)
-        vid_urls = VideoUrl.objects.filter(video=v)
-        self.assertEqual(len(vid_urls), 2)
-        vurl_id = vid_urls[1].id
-        # check cache
-        self.assertEqual(len(video_cache.get_video_urls(v.video_id)), 2)
-        response = self.client.get(reverse('videos:video_url_remove'), {'id': vurl_id})
+        secondary_vurl = VideoURLFactory(video=self.video)
+        self.assertEqual(self.video.videourl_set.count(), 2)
         # make sure get is not allowed
+        url = reverse('videos:video_url_remove')
+        data = {'id': secondary_vurl.id}
+        response = self.client.get(url, data)
         self.assertEqual(response.status_code, 405)
         # check post
-        response = self.client.post(reverse('videos:video_url_remove'), {'id': vurl_id})
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(VideoUrl.objects.filter(video=v)), 1)
-        self.assertEqual(len(Action.objects.filter(video=v, \
-            action_type=Action.DELETE_URL)), 1)
+        self.assertEqual(self.video.videourl_set.count(), 1)
+        delete_actions = self.video.action_set.filter(
+            action_type=Action.DELETE_URL)
+        self.assertEqual(delete_actions.count(), 1)
         # assert cache is invalidated
-        self.assertEqual(len(video_cache.get_video_urls(v.video_id)), 1)
+        cached_video_urls = video_cache.get_video_urls(self.video.video_id)
+        self.assertEqual(len(cached_video_urls), 1)
 
     def test_video_url_deny_remove_primary(self):
         self._login()
-        v = Video.objects.get(video_id='iGzkk7nwWX8F')
-        vurl_id = VideoUrl.objects.filter(video=v)[0].id
+        video_url = self.video.get_primary_videourl_obj()
         # make primary
-        vu = VideoUrl.objects.filter(video=v)
-        vu[0].make_primary()
-        response = self.client.post(reverse('videos:video_url_remove'), {'id': vurl_id})
+        response = self.client.post(reverse('videos:video_url_remove'),
+                                    {'id': video_url.id})
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(len(VideoUrl.objects.filter(video=v)), 1)
 
     def test_video(self):
         self.video.title = 'title'
@@ -290,11 +260,10 @@ class TestViews(WebUseTest):
         self.assertEqual(response.status_code, 200)
 
     def test_history(self):
-        sl = self.video.subtitlelanguage_set.all()[:1].get()
-        sl.language = 'en'
-        sl.save()
+        v = pipeline.add_subtitles(self.video, 'en', None)
+        sl = v.subtitle_language
         self._simple_test('videos:translation_history',
-            [self.video.video_id, sl.language, sl.id])
+            [self.video.video_id, sl.language_code, sl.id])
 
     def _test_rollback(self):
         #TODO: Seems like roll back is not getting called (on models)

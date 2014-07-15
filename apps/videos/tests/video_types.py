@@ -38,15 +38,11 @@ from videos.types.htmlfive import HtmlFiveVideoType
 from videos.types.kaltura import KalturaVideoType
 from videos.types.mp3 import Mp3VideoType
 from videos.types.vimeo import VimeoVideoType
-from videos.types.youtube import (
-    YoutubeVideoType,
-    _prepare_subtitle_data_for_version, add_credit, should_add_credit
-)
+from videos.types.youtube import YoutubeVideoType
 from utils import test_utils
+from utils import youtube
 
 class YoutubeVideoTypeTest(TestCase):
-    fixtures = ['test.json']
-
     def setUp(self):
         self.vt = YoutubeVideoType
         self.data = [{
@@ -64,16 +60,22 @@ class YoutubeVideoTypeTest(TestCase):
         }]
         self.shorter_url = "http://youtu.be/HaAVZ2yXDBo"
 
-    def test_set_values(self):
-        youtbe_url = 'http://www.youtube.com/watch?v=_ShmidkrcY0'
+    @test_utils.patch_for_test('utils.youtube.get_video_info')
+    def test_set_values(self, mock_get_video_info):
+        video_info = youtube.VideoInfo('test-channel-id', 'title',
+                                       'description', 100,
+                                       'http://example.com/thumb.png')
+        mock_get_video_info.return_value = video_info
 
-        video, created = Video.get_or_create_for_url(youtbe_url)
+        video, created = Video.get_or_create_for_url(
+            'http://www.youtube.com/watch?v=_ShmidkrcY0')
         vu = video.videourl_set.all()[:1].get()
 
         self.assertEqual(vu.videoid, '_ShmidkrcY0')
-        self.assertTrue(video.title)
-        self.assertEqual(video.duration, 79)
-        self.assertTrue(video.thumbnail)
+        self.assertEqual(video.title, video_info.title)
+        self.assertEqual(video.description, video_info.description)
+        self.assertEqual(video.duration, video_info.duration)
+        self.assertEqual(video.thumbnail, video_info.thumbnail_url)
 
     def test_matches_video_url(self):
         for item in self.data:
@@ -92,21 +94,6 @@ class YoutubeVideoTypeTest(TestCase):
         vt = self.vt(self.shorter_url)
         self.assertTrue(vt)
         self.assertEqual(vt.video_id , self.shorter_url.split("/")[-1])
-
-    def test_data_prep(self):
-        video = Video.objects.all()[0]
-        subs = [
-            (0, 1000, 'Hi'),
-            (2000, 3000, 'How are you?'),
-        ]
-        new_sv = pipeline.add_subtitles(video, 'en', subs)
-        content, t, code = _prepare_subtitle_data_for_version(new_sv)
-
-        srt = "1\r\n00:00:00,000 --> 00:00:01,000\r\nHi\r\n\r\n2\r\n00:00:02,000 --> 00:00:03,000\r\nHow are you?\r\n\r\n3\r\n00:01:52,000 --> 00:01:55,000\r\nSubtitles by the Amara.org community\r\n"
-        self.assertEquals(srt, content)
-
-        self.assertEquals('', t)
-        self.assertEquals('en', code)
 
 class HtmlFiveVideoTypeTest(TestCase):
     def setUp(self):
@@ -320,125 +307,6 @@ class BrightcoveVideoTypeTest(TestCase):
             'http://link.brightcove.com/'
             'services/link/bcpid{player_id}/bctid{video_id}')
         self.check_url('http://bcove.me/shortpath')
-
-class CreditTest(TestCase):
-
-    def setUp(self):
-        original_video , created = Video.get_or_create_for_url("http://www.example.com/original.mp4")
-        original_video.duration  = 10
-        original_video.save()
-        self.original_video = original_video
-        self.language = SubtitleLanguage.objects.create(
-            video=original_video, language_code='en', is_forked=True)
-        self.version = pipeline.add_subtitles(
-            self.original_video,
-            self.language.language_code,
-            [],
-            created=datetime.datetime.now(),
-        )
-
-    def _sub_list_to_sv(self, subs):
-        sublines = []
-        for sub in subs:
-            sublines.append(SubtitleLine(
-                sub['start'],
-                sub['end'],
-                sub['text'],
-                {},
-            ))
-        user = User.objects.all()[0]
-        new_sv = pipeline.add_subtitles(
-            self.original_video,
-            self.language.language_code,
-            sublines,
-            author=user,
-        )
-        return new_sv
-
-    def _subs_to_sset(self, subs):
-        sset = SubtitleSet(self.language.language_code)
-        for s in subs:
-            sset.append_subtitle(*s)
-        return sset
-
-    def test_last_sub_not_synced(self):
-        subs = [SubtitleLine(
-            2 * 1000,
-            None,
-            'text',
-            {},
-        )]
-
-        last_sub = subs[-1]
-
-        self.assertEquals(last_sub.end_time, None)
-
-        subs = add_credit(self.version, self._subs_to_sset(subs))
-        
-        self.assertEquals(last_sub.text, subs[-1].text)
-
-    def test_straight_up_video(self):
-        subs = [SubtitleLine(
-            2 * 1000,
-            3 * 1000,
-            'text',
-            {},
-        )]
-
-        subs = add_credit(self.version, self._subs_to_sset(subs))
-        last_sub = subs[-1]
-        self.assertEquals(last_sub.text,
-                "Subtitles by the Amara.org community")
-        self.assertEquals(last_sub.start_time, 7000)
-        self.assertEquals(last_sub.end_time, 10 * 1000)
-
-    def test_only_a_second_left(self):
-        subs = [SubtitleLine(
-            2 * 1000,
-            9 * 1000,
-            'text',
-            {},
-        )]
-
-        subs = add_credit(self.version, self._subs_to_sset(subs))
-        last_sub = subs[-1]
-        self.assertEquals(last_sub.text,
-                "Subtitles by the Amara.org community")
-        self.assertEquals(last_sub.start_time, 9000)
-        self.assertEquals(last_sub.end_time, 10 * 1000)
-
-    def test_no_space_left(self):
-        self.original_video.duration = 10
-        self.original_video.save()
-        subs = [SubtitleLine(
-            2 * 1000,
-            10 * 1000,
-            'text',
-            {},
-        )]
-
-        subs = add_credit(self.version, self._subs_to_sset(subs))
-        self.assertEquals(len(subs), 1)
-        last_sub = subs[-1]
-        self.assertEquals(last_sub.text, 'text')
-
-    def test_should_add_credit(self):
-        sv = SubtitleVersion.objects.filter(
-                subtitle_language__video__teamvideo__isnull=True)[0]
-
-        self.assertTrue(should_add_credit(sv))
-
-        video = sv.subtitle_language.video
-        team, created = Team.objects.get_or_create(name='name', slug='slug')
-        user = User.objects.all()[0]
-
-        TeamVideo.objects.create(video=video, team=team, added_by=user)
-
-        sv = SubtitleVersion.objects.filter(
-                subtitle_language__video__teamvideo__isnull=False)[0]
-
-        self.assertFalse(should_add_credit(sv))
-
 
 class KalturaVideoTypeTest(TestCase):
     def test_type(self):
