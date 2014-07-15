@@ -24,6 +24,10 @@ import os
 SITE_ID = 1
 SITE_NAME = 'unisubs-dev'
 
+INSTALLED_APPS += (
+    'sslserver',
+)
+
 BROKER_BACKEND = 'amqplib'
 BROKER_HOST = os.environ.get('QUEUE_1_PORT_5672_TCP_ADDR')
 BROKER_USER = 'guest'

@@ -14,6 +14,22 @@ app:
     - cache
     - search
 
+sslapp:
+  image: amara-app
+  command: python manage.py runsslserver 0.0.0.0:8000
+  environment:
+      DJANGO_SETTINGS_MODULE: dev_settings
+
+  volumes:
+    - .:/opt/apps/unisubs
+  ports:
+    - "8000:8000"
+  links:
+    - db
+    - queue
+    - cache
+    - search
+
 worker:
   image: amara-app
   command: python manage.py celery worker --scheduler=djcelery.schedulers.DatabaseScheduler --loglevel=DEBUG -B -E --settings=dev_settings
