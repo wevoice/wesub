@@ -559,8 +559,7 @@ AWS_ACCESS_KEY_ID = ''
 AWS_SECRET_ACCESS_KEY = ''
 DEFAULT_BUCKET = ''
 AWS_USER_DATA_BUCKET_NAME  = ''
-USE_AMAZON_S3 = AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and DEFAULT_BUCKET
-
+STATIC_MEDIA_USES_S3 = USE_AMAZON_S3 = False
 
 AVATAR_MAX_SIZE = 500*1024
 THUMBNAILS_SIZE = (
@@ -601,7 +600,6 @@ if USE_INTEGRATION:
 # paths from MEDIA URL
 # this needs to run after the integration player has loaded
 MEDIA_BUNDLES = {
-
     "base": {
         "type":"css",
         "files" : (

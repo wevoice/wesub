@@ -84,25 +84,6 @@ form ul li label {
     width: 200px;
 }
 
-form ul li input[type!="checkbox"] {
-    -moz-border-radius: 5px;
-    -moz-box-shadow: 0 1px 0 #FFF, inset 0 2px 0 #DDD;
-    -webkit-border-radius: 5px;
-    -webkit-box-shadow: 0 1px 0 #FFF, inset 0 2px 0 #DDD;
-    background: #FFF;
-    background: -webkit-gradient(linear, left top, left bottom, from(#e3e3e3), to(#FFF));
-    background: -moz-linear-gradient(top,    #e3e3e3,    #FFF) no-repeat;
-    border: 0;
-    border: 1px #d8d8d8 solid !important;
-    border-top: 1px #a3a3a3 solid !important;
-    color: #777 !important;
-    font-size: 14px !important;
-    line-height: 16px !important;
-    margin: 2px 10px 0 0;
-    padding: 8px 10px 8px 10px !important;
-    width: 300px;
-}
-
 form .checkbox-grid {
     padding: 8px 10px 8px 10px !important;
 }
