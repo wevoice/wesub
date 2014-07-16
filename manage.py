@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # setup the python path
     import os
     import sys
-    root_dir = os.path.dirname(__file__)
+    root_dir = os.path.abspath(os.path.dirname(__file__))
     sys.path.insert(0, os.path.join(root_dir, 'apps'))
     sys.path.insert(0, os.path.join(root_dir, 'libs'))
     # hack to make the unisubs package available.  We alter the path so that
@@ -32,6 +32,17 @@ if __name__ == "__main__":
 
     # setup our celery loader
     os.environ.setdefault("CELERY_LOADER", "djcelery.loaders.DjangoLoader")
+
+    # handle the --settings and --python-path options so that django.conf is
+    # setup before we import localeurl.
+    from django.core.management.base import (handle_default_options,
+                                             BaseCommand)
+    from django.core.management import LaxOptionParser, get_version
+    parser = LaxOptionParser(usage="%prog subcommand [options] [args]",
+                             version=get_version(),
+                             option_list=BaseCommand.option_list)
+    options, args = parser.parse_args(sys.argv)
+    handle_default_options(options)
 
     # call patch_reverse()
     from localeurl import patch_reverse
