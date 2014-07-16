@@ -8,7 +8,7 @@ RUN (echo "deb-src http://archive.ubuntu.com/ubuntu precise-updates main univers
 
 RUN apt-get update
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -y install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext build-essential gcc dialog mysql-client firefox flashplugin-installer xvfb
+RUN apt-get -y install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext build-essential gcc dialog mysql-client firefox flashplugin-installer xvfb node-uglify ruby-sass
 # fix PIL
 RUN ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
 RUN ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
@@ -34,11 +34,10 @@ ADD .docker/worker.sh /usr/local/bin/worker
 ADD .docker/test_app.sh /usr/local/bin/test_app
 ADD .docker/update_translations.sh /usr/local/bin/update_translations
 RUN easy_install pip
-RUN pip install mock nose django-nose selenium factory_boy
-RUN (cd $APP_DIR/deploy && pip install -r requirements.txt)
+RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements.txt)
 # this fixes the nose bug (https://github.com/django-nose/django-nose/issues/54)
 RUN rm /usr/local/man
-RUN (cd $APP_DIR/deploy && pip install -r requirements-test.txt)
+RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements-test.txt)
 ADD .docker/run.sh /usr/local/bin/run
 
 WORKDIR /opt/apps/unisubs

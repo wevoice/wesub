@@ -22,15 +22,19 @@ Amara uses [Docker](http://docker.io).  For ease of development, we use the [Fig
 
         fig up -d db worker cache search queue
 
-4. Configure Database:
+4. Build the Amara docker image:
+
+        ./bin/dev_build_images.sh
+
+5. Configure Database:
 
         ./bin/dev_syncdb.sh
 
-5. Start Amara:
+6. Start Amara:
 
         fig up app
 
-6. Add `unisubs.example.com` to your hosts file, pointing at `127.0.0.1`.  This
+7. Add `unisubs.example.com` to your hosts file, pointing at `127.0.0.1`.  This
    is necessary for Twitter and Facebook oauth to work correctly.
 
    You can access the site at <http://unisubs.example.com:8000>.

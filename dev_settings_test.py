@@ -16,23 +16,25 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from settings import *
 from dev_settings import *
+
+INSTALLED_APPS += (
+    'django_nose',
+)
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': "/tmp/django_test_db.sqlite",
-        'USER': "",
-        'PASSWORD': "",
-        'HOST': "",
-        'PORT': ''
-        }
+        'NAME': ':memory:',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
+}
 
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
-DEFAULT_PROTOCOL = 'https'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_PLUGINS = ['utils.test_utils.UnisubsTestPlugin']
 CELERY_ALWAYS_EAGER = True
@@ -47,6 +49,12 @@ PASSWORD_HASHERS = (
 # Let the nose CaptureLogging plugin handle logging.  It doesn't display
 # logging at all, except if there's a test failure.
 del LOGGING
+
+NOSE_ARGS = ['--logging-filter=test_steps, -remote_connection, '
+             '-selenium.webdriver.remote.remote_connection',
+             '--with-xunit',
+             '--xunit-file=nosetests.xml',
+            ]
 
 try:
     from dev_settings_test_local import *

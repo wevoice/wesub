@@ -24,6 +24,10 @@ import os
 SITE_ID = 1
 SITE_NAME = 'unisubs-dev'
 
+INSTALLED_APPS += (
+    'sslserver',
+)
+
 BROKER_BACKEND = 'amqplib'
 BROKER_HOST = os.environ.get('QUEUE_1_PORT_5672_TCP_ADDR')
 BROKER_USER = 'guest'
@@ -73,6 +77,9 @@ VIMEO_API_SECRET = 'bdaeb531298eeee1'
 FACEBOOK_APP_KEY = FACEBOOK_APP_ID = '255603057797860'
 FACEBOOK_SECRET_KEY = '2a18604dac1ad7e9817f80f3aa3a69f2'
 
+YOUTUBE_CLIENT_ID = 'test-youtube-id'
+YOUTUBE_CLIENT_SECRET = 'test-youtube-secret'
+YOUTUBE_API_KEY = 'test-youtube-api-key'
 
 # Celery
 CELERY_ALWAYS_EAGER = True

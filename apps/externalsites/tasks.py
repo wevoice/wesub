@@ -34,7 +34,7 @@ celery_logger = logging.getLogger('celery.task')
 def update_subtitles(account_type, account_id, video_url_id, lang_id):
     """Update a subtitles for a language"""
     celery_logger.info("externalsites.tasks.update_subtitles"
-                       "(%s, %s, %s, %s, %s)", account_type, account_id,
+                       "(%s, %s, %s, %s)", account_type, account_id,
                        video_url_id, lang_id)
     try:
         account = get_account(account_type, account_id)
