@@ -34,7 +34,6 @@ ADD .docker/worker.sh /usr/local/bin/worker
 ADD .docker/test_app.sh /usr/local/bin/test_app
 ADD .docker/update_translations.sh /usr/local/bin/update_translations
 RUN easy_install pip
-RUN pip install mock nose django-nose selenium factory_boy
 RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements.txt)
 # this fixes the nose bug (https://github.com/django-nose/django-nose/issues/54)
 RUN rm /usr/local/man
