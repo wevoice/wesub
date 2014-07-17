@@ -4,22 +4,15 @@ from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 from videos.models import VIDEO_TYPE_YOUTUBE
-from videos.types.youtube import yt_service
 from gdata.service import RequestError
 
 class Migration(DataMigration):
     
     def forwards(self, orm):
-        if not db.dry_run:
-            qs = orm.Video.objects.filter(video_type=VIDEO_TYPE_YOUTUBE)
-            for video in qs:
-                if not video.title:
-                    try:
-                        entry = yt_service.GetYouTubeVideoEntry(video_id=video.youtube_videoid)
-                        video.title = entry.media.title.text
-                        video.save()
-                    except RequestError:
-                        pass
+        # this depended on yt_service, but that's no longer around.  Let's
+        # just make it a no-op since it's unlikely that there's any databases
+        # around that are older than this migration.
+        pass
                 
     def backwards(self, orm):
         "Write your backwards methods here."
