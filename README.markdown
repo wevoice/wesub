@@ -18,13 +18,13 @@ Amara uses [Docker](http://docker.io).  For ease of development, we use the [Fig
 
 2. Install Fig (http://orchardup.github.io/fig/install.html)
 
-3. Start Amara Services:
-
-        fig up -d db worker cache search queue
-
-4. Build the Amara docker image:
+3. Build the Amara docker image:
 
         ./bin/dev_build_images.sh
+
+4. Start Amara Services:
+
+        fig up -d db worker cache search queue
 
 5. Configure Database:
 
