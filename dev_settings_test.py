@@ -39,6 +39,10 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_PLUGINS = ['utils.test_utils.UnisubsTestPlugin']
 CELERY_ALWAYS_EAGER = True
 
+YOUTUBE_CLIENT_ID = 'test-youtube-id'
+YOUTUBE_CLIENT_SECRET = 'test-youtube-secret'
+YOUTUBE_API_KEY = 'test-youtube-api-key'
+
 # Use MD5 password hashing, other algorithms are purposefully slow to increase
 # security.  Also include the SHA1 hasher since some of the tests use it.
 PASSWORD_HASHERS = (
