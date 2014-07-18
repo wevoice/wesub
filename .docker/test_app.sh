@@ -4,7 +4,7 @@ source /usr/local/bin/config_env
 RUN_SELENIUM=${RUN_SELENIUM:-}
 
 cd $APP_DIR/deploy
-$VE_DIR/bin/pip install -r requirements-test.txt
+pip install -r requirements-test.txt
 
 cd $APP_DIR
 cp dev_settings_test.py test_settings.py
@@ -68,7 +68,7 @@ NOSE_ARGS = ['--logging-filter=test_steps, -remote_connection, '
 
 EOF
 
-CMD="$VE_DIR/bin/python manage.py test search subtitles auth comments messages profiles statistic teams videos widget ted cogi apiv2 --settings=test_settings --with-xunit"
+CMD="python manage.py test search subtitles auth comments messages profiles statistic teams videos widget ted cogi apiv2 --settings=test_settings --with-xunit"
 
 if [ ! -z "$RUN_SELENIUM" ] ; then
     echo "Running Selenium tests..."
@@ -76,7 +76,7 @@ if [ ! -z "$RUN_SELENIUM" ] ; then
     DEBIAN_FRONTEND=noninteractive apt-get install -y xvfb python-software-properties dbus-x11 x11-xserver-utils flashplugin-installer
     apt-get install -y firefox
     sleep 5
-    CMD="xvfb-run --auto-servernum --server-args='-screen 0 2048x1600x24' $VE_DIR/bin/python manage.py test webdriver_testing --settings=test_settings --with-xunit"
+    CMD="xvfb-run --auto-servernum --server-args='-screen 0 2048x1600x24' python manage.py test webdriver_testing --settings=test_settings --with-xunit"
 fi
 
 echo "Running Tests..."

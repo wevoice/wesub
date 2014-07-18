@@ -7,8 +7,8 @@ echo "Installing latest Transifex client..."
 pip install transifex-client
 cd $APP_DIR
 echo "Running makemessages"
-$VE_DIR/bin/python manage.py makemessages -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
-$VE_DIR/bin/python manage.py makemessages -d djangojs -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
+python manage.py makemessages -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
+python manage.py makemessages -d djangojs -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
 
 echo "Uploading to transifex"
 tx push --source
@@ -17,8 +17,7 @@ echo "Pulling from transifex"
 tx pull -a -f
 
 echo "Compiling messages"
-$VE_DIR/bin/python manage.py compilemessages
-
+python manage.py compilemessages
 
 echo "Committing and pushing to repository"
 git add locale/*/LC_MESSAGES/django.*o

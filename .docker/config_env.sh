@@ -5,8 +5,6 @@ S3_PASSPHRASE=${S3_PASSPHRASE:-}
 APP_NAME=unisubs
 APP_ROOT=/opt/apps
 APP_DIR=$APP_ROOT/$APP_NAME
-VE_ROOT=/opt/ve
-VE_DIR=$VE_ROOT/$APP_NAME
 REV=${REVISION:-staging}
 SETTINGS_REV=${SETTINGS_REVISION:-$REV}
 SMTP_HOST=${SMTP_HOST:-smtp.sendgrid.net}
@@ -107,9 +105,6 @@ python ./deploy/create_commit_file.py
 if [ "$UPDATE_VIRTUALENV" ]; then
     cd deploy
     # install dependencies
-    $VE_DIR/bin/pip install -r requirements.txt
-    # fix m2crypto
-    rm -rf $VE_DIR/lib/python2.7/site-packages/M2Crypto
-    ln -s /usr/lib/python2.7/dist-packages/M2Crypto $VE_DIR/lib/python2.7/site-packages/M2Crypto
+    pip install -r requirements.txt
     cd $APP_DIR
 fi
