@@ -20,9 +20,17 @@ from django.http import HttpResponse, Http404
 
 from staticmedia import bundles
 
-def bundle(request, bundle_name):
+def js_bundle(request, bundle_name):
+    return _bundle(request, bundle_name, bundles.JavascriptBundle)
+
+def css_bundle(request, bundle_name):
+    return _bundle(request, bundle_name, bundles.CSSBundle)
+
+def _bundle(request, bundle_name, correct_type):
     try:
         bundle = bundles.get_bundle(bundle_name)
     except KeyError:
+        raise Http404()
+    if not isinstance(bundle, correct_type):
         raise Http404()
     return HttpResponse(bundle.get_contents(), bundle.mime_type)

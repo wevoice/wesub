@@ -431,6 +431,7 @@ INSTALLED_APPS = (
     'profiles',
     'search',
     'startup',
+    'staticmedia',
     'statistic',
     'streamer',
     'teams',
@@ -600,9 +601,8 @@ if USE_INTEGRATION:
 # paths from MEDIA URL
 # this needs to run after the integration player has loaded
 MEDIA_BUNDLES = {
-    "base": {
-        "type":"css",
-        "files" : (
+    "base.css": {
+        "files": (
             "css/jquery.jgrowl.css",
             "css/jquery.alerts.css",
             "css/960.css",
@@ -632,54 +632,19 @@ MEDIA_BUNDLES = {
             "css/watch.css",
             "css/v1.css",
             "css/bootstrap.css",
-          ),
-        },
-    "video_history":{
-        "type":"css",
-        "files":(
-               "css/unisubs-widget.css" ,
-               "css/dev.css"
-         ),
-        },
-
-    "jquery-ui":{
-        "type":"css",
-        "files":(
-               "css/jquery-ui/jquery-ui-1.8.16.custom.css",
-         ),
-        },
-
-    "home":{
-        "type":"css",
-        "files":(
-            "css/unisubs-widget.css",
-         ),
-        },
-     "new_home":{
-         "type":"css",
-         "files":(
+        ),
+    },
+    "home.css": {
+        "files": (
             "css/new_index.css",
-             "css/unisubs-widget.css",
-          ),
-         },
-    "widget-css":{
-         "type":"css",
-         "files":(
-             "css/unisubs-widget.css",
-          ),
-        },
-    "unisubs-offsite-compiled":{
+        ),
+    },
+    "unisubs-offsite-compiled": {
         "type": "js",
         "files": JS_OFFSITE,
         "use_closure": True,
-        },
-
-    "unisubs-onsite-compiled":{
-        "type": "js",
-        "files": JS_ONSITE,
-        "use_closure": True,
-     },
-    "unisubs-widgetizer":{
+    },
+    "unisubs-widgetizer": {
         "type": "js",
         "use_closure": True,
         "closure_deps": "js/closure-dependencies.js",
@@ -690,109 +655,26 @@ MEDIA_BUNDLES = {
             "render_bootloader": True
         }
     },
-    "unisubs-widgetizer-sumo": {
-        "type": "js",
-        "use_closure": True,
-        "closure_deps": "js/closure-dependencies.js",
-        "files": ["js/config.js"] + JS_WIDGETIZER,
-        "extra_defines": {"unisubs.REPORT_ANALYTICS": "false"},
-        "bootloader": { 
-            "template": "widget/widgetizerbootloader.js",
-            "gatekeeper": "UnisubsWidgetizerLoaded",
-            "render_bootloader": True
-        }
+    "site.js": {
+        "files": (
+            "js/jquery-1.4.3.js",
+            "js/jquery-ui-1.8.16.custom.min.js",
+            "js/jgrowl/jquery.jgrowl.js",
+            "js/jalerts/jquery.alerts.js",
+            "js/jquery.form.js",
+            "js/jquery.metadata.js",
+            "js/jquery.mod.js",
+            "js/jquery.rpc.js",
+            "js/jquery.input_replacement.min.js",
+            "js/messages.js",
+            "js/escape.js",
+            "js/libs/chosen.jquery.min.js",
+            "js/libs/chosen.ajax.jquery.js",
+            "js/libs/jquery.cookie.js",
+            "js/unisubs.site.js",
+        ),
     },
-    "unisubs-widgetizer-debug": {
-        "type": "js",
-        "files": ["js/config.js" ] + JS_WIDGETIZER  ,
-        "use_closure": True,
-        "closure_deps": "js/closure-dependencies.js",
-        "debug": True,
-        "bootloader": { 
-            "template": "widget/widgetizerbootloader.js",
-            "gatekeeper": "UnisubsWidgetizerLoaded",
-            "render_bootloader": True
-        }
-     },
-    "unisubs-statwidget":{
-        "type": "js",
-        "use_closure": True,
-        "closure_deps": "js/closure-stat-dependencies.js",
-        "include_flash_deps": False,
-        "files": [
-            'js/unisubs.js',
-            'js/rpc.js',
-            'js/loadingdom.js',
-            'js/statwidget/statwidgetconfig.js',
-            'js/statwidget/statwidget.js'],
-     },
-
-    "unisubs-api":{
-        "type": "js",
-        "use_closure": True,
-        "files": ["js/config.js"] + JS_API,
-        "bootloader": { 
-            "gatekeeper": "UnisubsApiLoaded", 
-            "render_bootloader": False
-        }
-     },
-    "js-base-dependencies":{
-        "type":"js",
-        "use_closure": True,
-        "optimizations": "WHITESPACE_ONLY",
-        "files": JS_BASE_DEPENDENCIES,
-     },
-    "js-onsite-dialog": {
-        "type":"js",
-        "use_closure": True,
-        "files": ["js/config.js"]  + JS_DIALOG  ,
-    },
-    "site_base_js":{
-        "type": "js",
-        "files":[
-              "js/jquery-1.4.3.js",
-              "js/jquery-ui-1.8.16.custom.min.js",
-              "js/jgrowl/jquery.jgrowl.js",
-              "js/jalerts/jquery.alerts.js",
-              "js/jquery.form.js",
-              "js/jquery.metadata.js",
-              "js/jquery.mod.js",
-              "js/jquery.rpc.js",
-              "js/jquery.input_replacement.min.js",
-              "js/messages.js",
-              "js/escape.js",
-              "js/libs/chosen.jquery.min.js",
-              "js/libs/chosen.ajax.jquery.js",
-              "js/libs/jquery.cookie.js",
-              "js/unisubs.site.js",
-            ],
-        },
-    "js-jqueryui-datepicker":{
-        "type":"js",
-        "files":[
-              "js/jquery-ui-1.8.16.custom.datepicker.min.js",
-            ],
-        },
-    "js-testing-base":{
-        "type": "js",
-        "files": [
-                 'js/widget/testing/stubvideoplayer.js',
-                 'js/widget/testing/events.js',
-                "js/subtracker.js" ,
-                "js/unitofwork.js",
-                "js/testing/testing.js",
-                "js/testing/timerstub.js",
-            ]
-    },
-    "css-teams-settings-panel":{
-        "type":"css",
-        "files":(
-            "css/chosen.css",
-            "css/unisubs-widget.css",
-         ),
-    },
-    "js-teams":{
-        "type": "js",
+    "teams.js": {
         "files": (
             "js/libs/ICanHaz.js",
             "js/libs/classy.js",
@@ -837,12 +719,6 @@ MEDIA_BUNDLES = {
         "include_flash_deps": False,
         "output": 'release/public/embedder.css',
         "release_url": True,
-    },
-    "debug-embed-js": {
-        "type": "js",
-        "use_closure": True,
-        "optimizations": "WHITESPACE_ONLY",
-        "files": JS_BASE_DEPENDENCIES + JS_OFFSITE[:-1]
     },
     'subtitle-editor':  {
         'type': 'js',

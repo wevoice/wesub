@@ -1,14 +1,9 @@
 {% extends "teams/base.html" %}
 
-{% load i18n teams_tags widget media_compressor form_helpers %}
+{% load i18n teams_tags widget form_helpers %}
 
 {% block title %}
     {% trans 'Team video' %} | Amara
-{% endblock %}
-
-{% block css %}
-    {{ block.super }}
-     {% include_bundle "widget-css"%}
 {% endblock %}
 
 {% block view_content %}

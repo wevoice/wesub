@@ -801,21 +801,6 @@ def diffing(request, first_version, second_pk):
     return render_to_response('videos/diffing.html', context,
                               context_instance=RequestContext(request))
 
-def test_form_page(request):
-    if request.method == 'POST':
-        form = UserTestResultForm(request.POST)
-        if form.is_valid():
-            form.save(request)
-            messages.success(request, 'Thanks for your feedback.  It\'s a huge help to us as we improve the site.')
-            return redirect('videos:test_form_page')
-    else:
-        form = UserTestResultForm()
-    context = {
-        'form': form
-    }
-    return render_to_response('videos/test_form_page.html', context,
-                              context_instance=RequestContext(request))
-
 @login_required
 def stop_notification(request, video_id):
     user_id = request.GET.get('u')

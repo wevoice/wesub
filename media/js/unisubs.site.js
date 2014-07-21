@@ -693,24 +693,6 @@ var Site = function(Site) {
             tabLoader.addLinks('.tabs');
             tabLoader.addLinks('.pagination');
 
-            $('#add_subtitles').click( function() {
-                widget_widget_div.selectMenuItem(
-                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
-                return false;
-            });
-            $('.add-translation-behavior').click( function(e) {
-                e.preventDefault();
-                widget_widget_div.selectMenuItem(
-                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
-                return false;
-            });
-            $('.time_link').click( function() {
-                widget_widget_div.playAt(parseFloat(
-                $(this).find('.data').text()));
-                return false;
-            });
-            var SL_ID = window.LANGUAGE_ID;
-            unisubs.messaging.simplemessage.displayPendingMessages();
             $('#edit_subtitles_button').click( function(e) {
                 if (!(localStorage && localStorage.getItem)) {
                     alert("Sorry, you'll need to upgrade your browser to use the subtitling dialog.");
@@ -725,21 +707,10 @@ var Site = function(Site) {
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
-            $('.add-subtitles, .add-translation').click( function(evt) {
-                evt.preventDefault();
-                var $body = $('body');
-                var op = new unisubs.widget.SubtitleDialogOpener(
-                    $body.data('video-id'), $body.data('video-url'));
-                op.showStartDialog(null);
-                return false;
-            });
-            unisubs.widget.WidgetController.makeGeneralSettings(
-                    window.WIDGET_SETTINGS);
             var tabLoader = new AHAHTabLoader(function($container) {
                 that.setupModalDialogs($container);
             });
             tabLoader.addLinks('.tabs');
-            unisubs.messaging.simplemessage.displayPendingMessages();
         },
         video_set_language: function() {
             that.Utils.chosenify();
@@ -831,7 +802,6 @@ var Site = function(Site) {
                 $('input#id_task').val($(this).data('task'));
             });
 
-            unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             that.Utils.resetLangFilter($('select#id_task_language'));
             that.Utils.resetProjFilter();
             that.callOnPageShow(function() {

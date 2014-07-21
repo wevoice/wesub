@@ -1,30 +1,12 @@
 {% extends "teams/base.html" %}
 
-{% load i18n utils_tags teams_tags paginator profiles_tags markup media_compressor %}
+{% load i18n utils_tags teams_tags paginator profiles_tags markup %}
 
 {% block title %}
     {% trans 'Videos' %} - {{ team }} | Amara
 {% endblock %}
 
 {% block html_attrs %}id="move_videos"{% endblock %}
-
-{% block css %}
-    {{ block.super }}
-    {% include_bundle "widget-css"%}
-{% endblock %}
-
-{% block scripts %}
-    {{ block.super }}
-    {% include_bundle "unisubs-onsite-compiled" %}
-    <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
-    <script type="text/javascript">
-        window.GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
-        window.REQUEST_GET_LANG = '{{ request.GET.lang }}';
-        window.REQUEST_GET_PROJECT = '{{ request.GET.project }}';
-        window.TEAM_SLUG = '{{ team.slug }}';
-    </script>
-    {% include "teams/_search_js.html" %}
-{% endblock %}
 
 {% block select_language_dialog %}
     {% select_language_dialog %}

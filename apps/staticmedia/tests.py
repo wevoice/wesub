@@ -45,12 +45,14 @@ class TestGetBundle(TestCase):
         js_bundle = bundles.get_bundle('test.js')
         self.assertEqual(type(js_bundle), bundles.JavascriptBundle)
         self.assertEqual(js_bundle.name, 'test.js')
+        self.assertEqual(js_bundle.bundle_type, 'js')
         self.assertEqual(js_bundle.config['files'], ('foo.js', 'bar.js'))
         self.assertEqual(js_bundle.mime_type, 'text/javascript')
 
     def test_get_css_bundle(self):
         css_bundle = bundles.get_bundle('test.css')
         self.assertEqual(css_bundle.name, 'test.css')
+        self.assertEqual(css_bundle.bundle_type, 'css')
         self.assertEqual(type(css_bundle), bundles.CSSBundle)
         self.assertEqual(css_bundle.config['files'], ('foo.css', 'bar.css'))
         self.assertEqual(css_bundle.mime_type, 'text/css')

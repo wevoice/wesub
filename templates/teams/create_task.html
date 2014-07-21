@@ -1,17 +1,11 @@
 {% extends "base.html" %}
 
-{% load i18n teams_tags widget media_compressor form_helpers %}
+{% load i18n teams_tags widget media_bundle form_helpers %}
 
 {% block body_attrs %}id="teams" class="v1 create-task"{% endblock %}
 
 {% block title %}
     {% trans "Create a Task" %} | Amara
-{% endblock %}
-
-{% block css %}
-    {{ block.super }}
-    {% include_bundle "widget-css"%}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/chosen.css">
 {% endblock %}
 
 {% block scripts %}
@@ -23,7 +17,7 @@
         var subtitlable = {{ subtitlable|safe }};
     </script>
 
-    {% include_bundle "js-teams" %}
+    {% media_bundle "teams.js" %}
 {% endblock %}
 
 {% block main_content %}

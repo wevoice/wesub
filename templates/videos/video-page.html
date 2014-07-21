@@ -3,28 +3,7 @@
 {% block body_attrs %}id="video_profile" class="v1 video_view" data-video-id="{{ video.video_id}}" data-video-url="{{ video.get_video_url|safe }}"{% endblock %}
 {% block html_attrs %}id="video_view"{% endblock %}
 
-{% load comments i18n subtitles_tags teams_tags videos_tags media_compressor %}
-
-{% block css %}
-{{ block.super }}
-{% include_bundle "video_history" %}
-{% include_bundle "widget-css"%}
-{% endblock %}
-
-{% block scripts %}
-{{ block.super }}
-{% include_bundle "unisubs-onsite-compiled" %}
-<script src="{% url videos:rpc_api %}" type="text/javascript"></script>
-{% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
-<script type="text/javascript">
-    {% if team.workflow_enabled %}
-    window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
-{% else %}
-window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
-{% endif %}
-window.WIDGET_SETTINGS = {{ widget_settings|safe }};
-</script>
-{% endblock %}
+{% load comments i18n subtitles_tags teams_tags videos_tags %}
 
 {% block title %}{{ page_title }}{% endblock %}
 

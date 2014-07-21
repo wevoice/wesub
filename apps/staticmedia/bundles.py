@@ -34,6 +34,7 @@ import time
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 
 def static_root():
     return settings.STATIC_ROOT
@@ -55,6 +56,7 @@ class Bundle(object):
     """Represents a single media bundle."""
 
     mime_type = NotImplemented
+    bundle_type = NotImplemented
 
     def __init__(self, name, config):
         self.name = name
@@ -75,6 +77,22 @@ class Bundle(object):
         :returns: string representing the bundle
         """
         raise NotImplementedError()
+
+    def get_url(self):
+        """Get an URL that points to this bundle."""
+        if settings.STATIC_MEDIA_USES_S3:
+            return self.get_s3_url()
+        else:
+            return self.get_local_server_url()
+
+    def get_s3_url(self):
+        raise NotImplementedError()
+
+    def get_local_server_url(self):
+        view_name = 'staticmedia:%s_bundle' % self.bundle_type
+        return reverse(view_name, kwargs={
+            'bundle_name': self.name,
+        })
 
     def modified_since(self, since):
         """Check if any of our files has been modified after a certain time
@@ -110,6 +128,7 @@ class JavascriptBundle(Bundle):
     """
 
     mime_type = 'text/javascript'
+    bundle_type = 'js'
 
     def build_contents(self):
         return _run_command(['uglifyjs'], stdin=self.concatinate_files())
@@ -128,6 +147,7 @@ class CSSBundle(Bundle):
     """
 
     mime_type = 'text/css'
+    bundle_type = 'css'
 
     def build_contents(self):
         return _run_command([

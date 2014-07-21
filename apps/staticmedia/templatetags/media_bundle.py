@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2013 Participatory Culture Foundation
+# Copyright (C) 2014 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,25 +16,23 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
+
 from django import template
+from django.conf import settings
+from django.core.urlresolvers import reverse
+
+from staticmedia import bundles
 
 register = template.Library()
 
-@register.inclusion_tag('streamer/_transcript-paragraph.html')
-def render_transcript(video, subs):
-    """
-    Groups subs by paragraphs and render subs inside them as set by
-    <Subtitle>.start_of_paragraph
-    """
-    paragraphs = []
-    current_p = []
-    for i,s in enumerate(subs):
-        if i == 0 or s.start_of_paragraph:
-            current_p = []
-            paragraphs.append(current_p)
-        current_p.append(s)
-    return {
-        'video': video,
-        'paragraphs': paragraphs
-    }
-
+@register.simple_tag
+def media_bundle(bundle_name):
+    bundle = bundles.get_bundle(bundle_name)
+    url = bundle.get_url()
+    if isinstance(bundle, bundles.CSSBundle):
+        return '<link href="%s" rel="stylesheet" type="text/css" />' % url
+    elif isinstance(bundle, bundles.JavascriptBundle):
+        return '<script src="%s"></script>' % url
+    else:
+        raise TypeError("Unknown bundle type: %s" % bundle)

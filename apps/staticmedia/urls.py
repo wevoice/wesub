@@ -16,14 +16,23 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import os
+
 from django.conf import settings
 from django.conf.urls.defaults import patterns, url
+from django.conf.urls.static import static
 
 if settings.STATIC_MEDIA_USES_S3:
     # don't serve up the media from the local server if we're using S3
     urlpatterns = patterns('staticmedia.views')
 else:
+    # mimic the S3 directory structure using views from the local server
     urlpatterns = patterns(
         'staticmedia.views',
-        url(r'^(?P<bundle_name>[\w\.-]+)$', 'bundle', name='bundle'),
+        url(r'^css/(?P<bundle_name>[\w\.-]+)$', 'css_bundle', name='css_bundle'),
+        url(r'^js/(?P<bundle_name>[\w\.-]+)$', 'js_bundle', name='js_bundle'),
+    ) + static(
+        '/images/', document_root=os.path.join(settings.STATIC_ROOT, 'images')
+    ) + static(
+        '/fonts/', document_root=os.path.join(settings.STATIC_ROOT, 'fonts')
     )
