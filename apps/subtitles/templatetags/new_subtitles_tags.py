@@ -24,8 +24,27 @@ from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from babelsubs.generators import HTMLGenerator
+from subtitles.forms import SubtitlesUploadForm
 
 register = template.Library()
+
+@register.inclusion_tag('subtitles/_upload_subtitles.html', takes_context=True)
+def upload_subtitles(context, video):
+    context['video'] = video
+    initial = {}
+
+    current_language = context.get('language')
+    if current_language:
+        initial['language_code'] = current_language.language_code
+
+    if video.primary_audio_language_code:
+        initial['primary_audio_language_code'] = video.primary_audio_language_code
+
+
+    context['form'] = SubtitlesUploadForm(context['user'], video,
+                                          initial=initial)
+
+    return context
 
 @register.filter
 def visibility_display(subtitle_version):

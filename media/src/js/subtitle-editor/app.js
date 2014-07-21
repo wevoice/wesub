@@ -159,6 +159,12 @@ var angular = angular || null;
                      $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
 
+        $scope.showUploadSubtitlesModal = function($event) {
+            $scope.dialogManager.open('upload-subtitles');
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
+
         $scope.showCopyTimingModal = function($event) {
             $scope.dialogManager.openDialog('confirmCopyTiming', {
                 continueButton: $scope.copyTimingOver
