@@ -41,14 +41,14 @@ var angular = angular || null;
         'ngCookies'
     ]);
 
-    module.config(function($compileProvider, $interpolateProvider) {
+    module.config(["$compileProvider", "$interpolateProvider", function($compileProvider, $interpolateProvider) {
         // instead of using {{ }} for variables, use [[ ]]
         // so as to avoid conflict with django templating
         $interpolateProvider.startSymbol('[[');
         $interpolateProvider.endSymbol(']]');
         // Allow blob: urls
         $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|blob):/);
-    });
+    }]);
 
     module.constant('MIN_DURATION', 250); // 0.25 seconds
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
@@ -279,7 +279,7 @@ var angular = angular || null;
      * FIXME: this can probably be moved to a service to keep the app module
      * lean and mean.
      */
-    module.controller("AppControllerLocking", function($sce, $scope, $timeout, $window, EditorData, LockService) {
+    module.controller("AppControllerLocking", ["$sce", "$scope", "$timeout", "$window", "EditorData", "LockService", function($sce, $scope, $timeout, $window, EditorData, LockService) {
         var regainLockTimer;
 
         $scope.minutesIdle = 0;
@@ -389,9 +389,9 @@ var angular = angular || null;
         $window.onunload = function() {
             releaseLock();
         }
-    });
+    }]);
 
-    module.controller("AppControllerEvents", function($scope, VideoPlayer) {
+    module.controller("AppControllerEvents", ["$scope", "VideoPlayer", function($scope, VideoPlayer) {
         function insertAndEditSubtitle() {
             var sub = $scope.workingSubtitles.subtitleList.insertSubtitleBefore(null);
             $scope.currentEdit.start(sub);
@@ -463,9 +463,9 @@ var angular = angular || null;
             $scope.minutesIdle = 0;
             $scope.$root.$emit("app-click");
         };
-    });
+    }]);
 
-    module.controller("AppControllerSubtitles", function($scope, $timeout,
+    module.controller("AppControllerSubtitles", ["$scope", "$timeout", "EditorData", "SubtitleStorage", "CurrentEditManager", "SubtitleBackupStorage", "SubtitleVersionManager", function($scope, $timeout,
                 EditorData, SubtitleStorage, CurrentEditManager,
                 SubtitleBackupStorage, SubtitleVersionManager) {
         var video = EditorData.video;
@@ -538,6 +538,6 @@ var angular = angular || null;
         $scope.$watch('workingSubtitles.metadata', watchSubtitleAttributes,
                 true);
 
-    });
+    }]);
 
 }).call(this);

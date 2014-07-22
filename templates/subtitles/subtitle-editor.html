@@ -1,4 +1,4 @@
-{% load i18n media_compressor %}
+{% load i18n media_bundle %}
 <!DOCTYPE html>
 <html ng-app="amara.SubtitleEditor"
     subtitle-editor
@@ -15,8 +15,7 @@
         {% endblocktrans %}
     </title>
 
-    <link rel="stylesheet" href="{{ STATIC_URL }}src/css/third-party/reset.css" type="text/css" media="screen" charset="utf-8">
-    <link rel="stylesheet" href="{{ STATIC_URL }}src/css/subtitle-editor/subtitle-editor-dev.css" type="text/css" media="screen" charset="utf-8">
+    {% media_bundle "editor.css" %}
 
     <script type="text/javascript">
         var editorData = {{ editor_data|safe }}
@@ -750,7 +749,7 @@
       </form>
     </aside>
 
-    {% include_bundle "subtitle-editor" %}
+    {% media_bundle "editor.js" %}
     {# include bold style too #}
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <div id="modal-overlay" ng-class="dialogManager.overlayCSSClass()"></div>

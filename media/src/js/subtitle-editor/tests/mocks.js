@@ -18,7 +18,7 @@
         ]);
     });
 
-    module.factory('SubtitleStorage', function($q) {
+    module.factory('SubtitleStorage', ["$q", function($q) {
         var methodNames = [
             'approveTask',
             'updateTaskNotes',
@@ -37,7 +37,7 @@
             SubtitleStorage.deferreds[methodName] = deferred;
         });
         return SubtitleStorage;
-    });
+    }]);
 
     module.factory('DomWindow', function() {
         var mockObject = jasmine.createSpyObj('DomWindow', [

@@ -87,7 +87,7 @@ var angular = angular || null;
     }
     module.value('Workflow', Workflow);
 
-    module.controller('WorkflowProgressionController', function($scope, $sce, EditorData, VideoPlayer) {
+    module.controller('WorkflowProgressionController', ["$scope", "$sce", "EditorData", "VideoPlayer", function($scope, $sce, EditorData, VideoPlayer) {
 
         $scope.$root.$on("video-playback-changes", function() {$scope.workflow.appActionDone();});
         $scope.$root.$on("app-click", function() {$scope.workflow.appActionDone();});
@@ -136,7 +136,7 @@ var angular = angular || null;
             evt.preventDefault();
             evt.stopPropagation();
         }
-    });
+    }]);
 
 
 })(this);

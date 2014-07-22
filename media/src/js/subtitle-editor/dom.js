@@ -21,7 +21,7 @@ var angular = angular || null;
 (function() {
     var module = angular.module('amara.SubtitleEditor.dom', []);
 
-    module.directive('autosizeBind', function($parse) {
+    module.directive('autosizeBind', ["$parse", function($parse) {
         return function link(scope, elm, attrs) {
             var getter = $parse(attrs.autosizeBind);
             // set the value before calling autosize, otherwise we don't size
@@ -37,9 +37,9 @@ var angular = angular || null;
                 });
             });
         }
-    });
+    }]);
 
-    module.directive('fixsizeBind', function($parse) {
+    module.directive('fixsizeBind', ["$parse", function($parse) {
         return function link(scope, elm, attrs) {
             var getter = $parse(attrs.fixsizeBind);
             // set the value before calling autosize, otherwise we don't size
@@ -54,7 +54,7 @@ var angular = angular || null;
                 });
             });
         }
-    });
+    }]);
 
     module.factory('DomUtil', function() {
         return {
@@ -78,7 +78,7 @@ var angular = angular || null;
      * controllers because it makes them hard to test.
      */
 
-    module.factory('DomWindow', function($window) {
+    module.factory('DomWindow', ["$window", function($window) {
         var document = $($window.document);
         return {
             caretPos: function() {
@@ -91,6 +91,6 @@ var angular = angular || null;
                 document.off(eventName);
             },
         };
-    });
+    }]);
 }).call(this);
 

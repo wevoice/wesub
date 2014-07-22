@@ -21,7 +21,7 @@ var angular = angular || null;
 (function() {
     var module = angular.module('amara.SubtitleEditor.blob', []);
 
-    module.factory('Blob', function($window) {
+    module.factory('Blob', ["$window", function($window) {
         var BlobBuilder = $window.BlobBuilder || $window.MozBlobBuilder || $window.WebKitBlobBuilder || $window.MSBlobBuilder;
         var Blob = $window.Blob;
         var URL = $window.URL || $window.webkitURL;
@@ -40,7 +40,7 @@ var angular = angular || null;
                 }
             }
         }
-    });
+    }]);
 
 }).call(this);
 

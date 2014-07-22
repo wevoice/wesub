@@ -93,7 +93,7 @@ var angular = angular || null;
     }
 
 
-    module.directive('timelineTiming', function(displayTimeSecondsFilter) {
+    module.directive('timelineTiming', ["displayTimeSecondsFilter", function(displayTimeSecondsFilter) {
         return function link(scope, elem, attrs) {
             var canvas = $(elem);
             var canvasElt = elem[0];
@@ -187,9 +187,9 @@ var angular = angular || null;
             // Okay, finally done defining functions, let's draw the canvas.
             scope.redrawCanvas();
         }
-    });
+    }]);
 
-    module.directive('timelineSubtitles', function(VideoPlayer, MIN_DURATION,
+    module.directive('timelineSubtitles', ["VideoPlayer", "MIN_DURATION", "DEFAULT_DURATION", function(VideoPlayer, MIN_DURATION,
                 DEFAULT_DURATION) {
         return function link(scope, elem, attrs) {
             var timelineDiv = $(elem);
@@ -590,5 +590,5 @@ var angular = angular || null;
             // Redraw them now as well
             scope.redrawSubtitles();
         }
-    });
+    }]);
 })();

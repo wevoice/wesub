@@ -20,7 +20,7 @@
 
     var module = angular.module('amara.SubtitleEditor.collab', []);
 
-    module.controller('CollabController', function($scope, $sce, $timeout, EditorData) {
+    module.controller('CollabController', ["$scope", "$sce", "$timeout", "EditorData", function($scope, $sce, $timeout, EditorData) {
 
         // Some modules can be opened and closed. These are the default states.
         $scope.modulesOpen = {
@@ -62,5 +62,5 @@
             }
             return null;
         }
-    });
+    }]);
 }).call(this);

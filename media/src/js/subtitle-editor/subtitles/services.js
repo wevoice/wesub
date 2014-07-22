@@ -80,7 +80,7 @@ var angular = angular || null;
         }
     }
 
-    module.factory('SubtitleStorage', function($http, EditorData) {
+    module.factory('SubtitleStorage', ["$http", "EditorData", function($http, EditorData) {
 
         // Map language codes to Language objects
         var languageMap = {};
@@ -245,8 +245,8 @@ var angular = angular || null;
                 return promise;
             }
         };
-    });
-    module.factory('SubtitleBackupStorage', function($window) {
+    }]);
+    module.factory('SubtitleBackupStorage', ["$window", function($window) {
         /**
          * Get the editor data that was passed to us from python
          *
@@ -307,12 +307,12 @@ var angular = angular || null;
                 $window.localStorage.removeItem(storageKey);
             },
         };
-    });
-    module.factory('EditorData', function($window) {
+    }]);
+    module.factory('EditorData', ["$window", function($window) {
         /**
          * Get the editor data that was passed to us from python
          *
          */
         return $window.editorData;
-    });
+    }]);
 }).call(this);

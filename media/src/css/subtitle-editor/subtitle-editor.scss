@@ -1,8 +1,8 @@
 @charset "UTF-8";
-@import "../../../css/modules/colors";
-@import "../../../css/modules/fonts";
-@import "../../../css/modules/mixins";
-@import "../../../css/partials/dialogs";
+@import "modules/colors";
+@import "modules/fonts";
+@import "modules/mixins";
+@import "partials/dialogs";
 
 /* It would be nice to put this in the fonts module, but it's not really
  * possible at this moment because the font urls are relative to the url of
@@ -11,10 +11,10 @@
 $CodePro: 'CodeProLC', $OpenSans;
 @font-face {
     font-family: 'CodeProLC';
-    src: url('../../../fonts/CodeProLC.eot');
-    src: url('../../../fonts/CodeProLC.eot?#iefix') format('embedded-opentype'),
-         url('../../../fonts/CodeProLC.woff') format('woff'),
-         url('../../../fonts/CodeProLC.ttf') format('truetype');
+    src: url('../fonts/CodeProLC.eot');
+    src: url('../fonts/CodeProLC.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/CodeProLC.woff') format('woff'),
+         url('../fonts/CodeProLC.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -347,7 +347,7 @@ section.main {
         position: relative;
 
         a.scroll-lock {
-            background: #414243 url('../../../images/editor/icons.png') center center no-repeat;
+            background: #414243 url('../images/editor/icons.png') center center no-repeat;
             bottom: 11px;
             height: 25px;
             position: absolute;
@@ -813,7 +813,7 @@ section.main {
             position: relative;
 
             div.select {
-                background: transparent url('../../../images/down-arrow-offset.png') center right no-repeat;
+                background: transparent url('../images/down-arrow-offset.png') center right no-repeat;
                 border-right: 1px solid #DADBDC;
                 float: left;
                 overflow: hidden;
@@ -867,7 +867,7 @@ section.main {
                 display: block;
                 div {
                 ul {
-                    list-style-image: url('../../../images/subtitle-editor/glyphicons_halflings_006_star.png');
+                    list-style-image: url('../images/subtitle-editor/glyphicons_halflings_006_star.png');
                     margin-left: 25px;
                 }
                 margin: 35px 40px 0px 40px;
@@ -951,11 +951,11 @@ section.main {
 
                 li.play-pause a {
                     width: 48px;
-                    background: url('../../../images/editor/play-button.png') center center no-repeat;
+                    background: url('../images/editor/play-button.png') center center no-repeat;
                 }
 
                 li.play-pause.playing a {
-                    background-image: url('../../../images/editor/pause-button.png');
+                    background-image: url('../images/editor/pause-button.png');
                 }
 
                 li.time {
@@ -964,7 +964,7 @@ section.main {
 
                 li.volume a {
                     width: 40px;
-                    background: url('../../../images/editor/volume-icon.png') center center no-repeat;
+                    background: url('../images/editor/volume-icon.png') center center no-repeat;
                 }
                 
                 li.progress {
@@ -987,27 +987,27 @@ section.main {
                     .slice-left {
                         float: left;
                         width: 14px;
-                        background-image: url('../../../images/editor/progress-background-left.png');
+                        background-image: url('../images/editor/progress-background-left.png');
                         div {
-                            background-image: url('../../../images/editor/progress-bar-left.png');
+                            background-image: url('../images/editor/progress-bar-left.png');
                             width: 0px;
                         }
                     }
                     .slice-right {
                         float: right;
                         width: 14px;
-                        background-image: url('../../../images/editor/progress-background-right.png');
+                        background-image: url('../images/editor/progress-background-right.png');
                         div {
-                            background-image: url('../../../images/editor/progress-bar-right.png');
+                            background-image: url('../images/editor/progress-bar-right.png');
                             width: 0px;
                         }
                     }
                     .slice-mid {
                         float: none;
-                        background-image: url('../../../images/editor/progress-background-middle.png');
+                        background-image: url('../images/editor/progress-background-middle.png');
                         margin: 0px 14px;
                         div {
-                            background-image: url('../../../images/editor/progress-bar-middle.png');
+                            background-image: url('../images/editor/progress-bar-middle.png');
                             width: 0px;
                         }
                     }
@@ -1019,7 +1019,7 @@ section.main {
                 height: 110px;
                 bottom: 33px;
                 right: 85px;
-                background: url('../../../images/editor/volume-background.png') center center no-repeat;
+                background: url('../images/editor/volume-background.png') center center no-repeat;
                 padding: 10px 0 5px;
                 div {
                     width: 40px;
@@ -1027,13 +1027,13 @@ section.main {
                     background: transparent center top repeat-y;
                 }
                 div.slice1 {
-                    background-image: url('../../../images/editor/volume-bar-top.png');
+                    background-image: url('../images/editor/volume-bar-top.png');
                 }
                 div.slice2 {
-                    background-image: url('../../../images/editor/volume-bar-middle.png');
+                    background-image: url('../images/editor/volume-bar-middle.png');
                 }
                 div.slice3 {
-                    background-image: url('../../../images/editor/volume-bar-bottom.png');
+                    background-image: url('../images/editor/volume-bar-bottom.png');
                 }
             }
         }
@@ -1110,19 +1110,19 @@ section.main {
                            padding-left: 28px;
                            text-decoration: none;
                            &.copyover {
-                             background: url('../../../images/subtitle-editor/glyphicons_358_file_import.png') 10px no-repeat;
+                             background: url('../images/subtitle-editor/glyphicons_358_file_import.png') 10px no-repeat;
                            }
                            &.show-timeline {
-                             background: url('../../../images/subtitle-editor/glyphicons_054_clock.png') 10px no-repeat;
+                             background: url('../images/subtitle-editor/glyphicons_054_clock.png') 10px no-repeat;
                            }
                            &.clear-timing {
-                             background: url('../../../images/subtitle-editor/glyphicons_057_history.png') 10px no-repeat;
+                             background: url('../images/subtitle-editor/glyphicons_057_history.png') 10px no-repeat;
                            }
                            &.clear-text {
-                             background: url('../../../images/subtitle-editor/glyphicons_207_remove_2.png') 10px no-repeat;
+                             background: url('../images/subtitle-editor/glyphicons_207_remove_2.png') 10px no-repeat;
                            }
                            &.revert-saved {
-                             background: url('../../../images/subtitle-editor/glyphicons_085_repeat.png') 10px no-repeat;
+                             background: url('../images/subtitle-editor/glyphicons_085_repeat.png') 10px no-repeat;
                            }
                            &:hover {
                               background: #C5C5C5;
@@ -1136,7 +1136,7 @@ section.main {
                 float: right;
 
                 a {
-                    background: transparent url('../../../images/editor/icons.png') top left no-repeat;
+                    background: transparent url('../images/editor/icons.png') top left no-repeat;
                     color: #7A7B7C;
                     display: inline-block;
                     padding: 10px;
@@ -1186,14 +1186,14 @@ section.main {
                             @include big-button;
                             margin-top: 10px;
                             &.endorse {
-                                background: $light-blue url('../../../images/thumbs-up.png') 10px center no-repeat;
+                                background: $light-blue url('../images/thumbs-up.png') 10px center no-repeat;
                                 padding-left: 40px;
                             }
                         }
                     }
 
                     &.done {
-                        background: transparent url('../../../images/checkmark.gif') center right no-repeat;
+                        background: transparent url('../images/checkmark.gif') center right no-repeat;
                         color: #949596;
                     }
                     &:last-of-type {
@@ -1208,7 +1208,7 @@ section.collab {
     a.toggle-pane {
         z-index:1000;
         cursor: pointer;
-        background: #333333 url('../../../images/arrow-left.png') center center no-repeat;
+        background: #333333 url('../images/arrow-left.png') center center no-repeat;
         color: transparent;
         display: block;
         height: 30px;
@@ -1229,7 +1229,7 @@ section.collab {
         z-index: 52;
 
         a.toggle-pane {
-            background: #333333 url('../../../images/arrow-right.png') center center no-repeat;
+            background: #333333 url('../images/arrow-right.png') center center no-repeat;
             left: -24px;
             position: absolute;
             top: 61px;

@@ -25,7 +25,7 @@ var angular = angular || null;
         return '/en/subtitles/editor/' + videoId + '/' + languageCode + '/' + type + "/";
     }
 
-    module.factory('LockService', function($http, $cookies){
+    module.factory('LockService', ["$http", "$cookies", function($http, $cookies){
         return {
 
             makeLockRequest: function(videoId, languageCode, type){
@@ -43,6 +43,6 @@ var angular = angular || null;
                 return this.makeLockRequest(videoId, languageCode, 'release')
             }
         }
-    });
+    }]);
 
 }).call(this);

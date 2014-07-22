@@ -685,6 +685,15 @@ MEDIA_BUNDLES = {
             "js/teams/create-task.js",
          ),
     },
+    'editor.js':  {
+        'files': SUBTITLE_EDITOR_JS,
+    },
+    'editor.css':  {
+        'files': (
+            'src/css/third-party/reset.css',
+            'src/css/subtitle-editor/subtitle-editor.scss',
+        ),
+    },
     "embedder":{
         "type":"js",
         "files": (
@@ -719,10 +728,6 @@ MEDIA_BUNDLES = {
         "include_flash_deps": False,
         "output": 'release/public/embedder.css',
         "release_url": True,
-    },
-    'subtitle-editor':  {
-        'type': 'js',
-        'files': SUBTITLE_EDITOR_JS,
     },
 }
 

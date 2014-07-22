@@ -21,7 +21,7 @@ var angular = angular || null;
 (function() {
     var module = angular.module('amara.SubtitleEditor.session', []);
 
-    module.controller('SessionBackend', function($scope, $q, EditorData, SubtitleStorage) {
+    module.controller('SessionBackend', ["$scope", "$q", "EditorData", "SubtitleStorage", function($scope, $q, EditorData, SubtitleStorage) {
         /* SessionControllerBackend handles the low-level details for
          * SessionController.  This includes things like saving the subtitles,
          * approving/recting tasks, etc.
@@ -54,9 +54,9 @@ var angular = angular || null;
                         $scope.collab.notes);
             },
         };
-    });
+    }]);
 
-    module.controller('SessionController', function($scope, $sce, $q, $window, EditorData) {
+    module.controller('SessionController', ["$scope", "$sce", "$q", "$window", "EditorData", function($scope, $sce, $q, $window, EditorData) {
         /*
          * SessionController handles the high-level issues involved with
          * sending the user's work back to the server.  SessionController
@@ -225,5 +225,5 @@ var angular = angular || null;
               return null;
             }
         };
-    });
+    }]);
 }).call(this);
