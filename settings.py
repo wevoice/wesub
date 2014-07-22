@@ -630,7 +630,7 @@ MEDIA_BUNDLES = {
             "css/services.css", 
             "css/solutions.css",
             "css/watch.css",
-            "css/v1.css",
+            "css/v1.scss",
             "css/bootstrap.css",
         ),
     },
