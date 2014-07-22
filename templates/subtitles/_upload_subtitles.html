@@ -1,6 +1,5 @@
 {% load i18n %}
 <aside modal-dialog="upload-subtitles" allow-close class="modal" tabindex="-1" role="dialog">
-    <a href="#close" class="close">{% trans "Close" %}</a>
     <h3>{% trans 'Upload Subtitles' %}</h3>
     <div class="msg_modal">
         {% if user.is_authenticated %}
@@ -43,9 +42,10 @@
                         <input type="checkbox" name="complete" id="upload-subtitles-form-complete" checked="checked"/>
                         <label for="upload-subtitles-form-complete">{% trans "This subtitle file is 100% complete" %}</label>
                     </div>
-                    <div style="margin: 5px 0 15px 0;">
-                        <button class="green_button small upload-subtitles-submit-button-" style="margin: 0 0 15px 0; float: right">{% trans "Upload" %}</button>
-                    </div>
+		    <footer class="buttons">
+		      <button ng-click="dialogManager.onCloseClick($event)">{% trans "Cancel" %}</button>
+		      <button class="upload-subtitles-submit-button-">{% trans "Upload" %}</button>
+		    </footer>
                 </form>
             </div>
         {% else %}
