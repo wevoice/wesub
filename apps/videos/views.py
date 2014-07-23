@@ -167,10 +167,11 @@ class LanguageList(object):
         return len(self.items)
 
 def index(request):
-    context = widget.add_onsite_js_files({})
-    context['all_videos'] = Video.objects.count()
-    context['popular_videos'] = VideoIndex.get_popular_videos("-today_views")[:VideoIndex.IN_ROW]
-    context['featured_videos'] = VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW]
+    context = {
+        'all_videos': Video.objects.count(),
+        'popular_videos': VideoIndex.get_popular_videos("-today_views")[:VideoIndex.IN_ROW],
+        'featured_videos': VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW],
+    }
     return render_to_response('index.html', context,
                               context_instance=RequestContext(request))
 
@@ -319,7 +320,6 @@ class VideoPageContext(dict):
         else:
             metadata = video.get_metadata()
 
-        self.update(widget.add_onsite_js_files({}))
         self['page_title'] = self.page_title(video)
         self['metadata'] = metadata.convert_for_display()
         self['language_list'] = LanguageList(video)
@@ -580,8 +580,6 @@ class LanguagePageContext(dict):
     def setup(self, request, video, language, version):
         """Setup context variables."""
 
-        self.update(widget.add_onsite_js_files({}))
-
         self['revision_count'] = language.version_count()
         self['language_list'] = LanguageList(video)
         self['page_title'] = self.page_title(language)
@@ -782,13 +780,14 @@ def diffing(request, first_version, second_pk):
     diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles())
     team_video = video.get_team_video()
 
-    context = widget.add_onsite_js_files({})
-    context['video'] = video
-    context['diff_data'] = diff_data
-    context['language'] = language
-    context['first_version'] = first_version
-    context['second_version'] = second_version
-    context['latest_version'] = language.get_tip()
+    context = {
+        'video': video,
+        'diff_data': diff_data,
+        'language': language,
+        'first_version': first_version,
+        'second_version': second_version,
+        'latest_version': language.get_tip(),
+    }
     if team_video and not can_rollback_language(request.user, language):
         context['rollback_allowed'] = False
     else:

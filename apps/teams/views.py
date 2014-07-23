@@ -469,8 +469,7 @@ def detail(request, slug, project_slug=None, languages=None):
     qs = _get_videos_for_detail_page(team, request.user, query, project,
                                      language_code, language_mode, sort)
 
-    extra_context = widget.add_onsite_js_files({})
-    extra_context.update({
+    extra_context = {
         'team': team,
         'member': member,
         'project':project,
@@ -484,7 +483,7 @@ def detail(request, slug, project_slug=None, languages=None):
         'can_edit_videos': can_add_video(team, request.user, project),
         'filtered': filtered,
         'all_videos_count': team.get_videos_for_user(request.user).count(),
-    })
+    }
 
     if extra_context['can_add_video'] or extra_context['can_edit_videos']:
         # Cheat and reduce the number of videos on the page if we're dealing
@@ -652,8 +651,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
     # the performance issues there
     if not can_sort_by_primary_language(team, request.user):
         primary_audio_language_filter = None
-    extra_context = widget.add_onsite_js_files({})
-    extra_context.update({
+    extra_context = {
         'team': team,
         'member': member,
         'project':project,
@@ -670,7 +668,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
         'all_videos_count': team.get_videos_for_user(request.user).count(),
         'form': form,
         'projects': managed_projects_choices
-    })
+    }
 
     if extra_context['can_add_video'] or extra_context['can_edit_videos']:
         # Cheat and reduce the number of videos on the page if we're dealing
@@ -833,16 +831,13 @@ def team_video(request, team_video_pk):
         messages.success(request, _('Video has been updated.'))
         return redirect(team_video)
 
-    context = widget.add_onsite_js_files({})
-
-    context.update({
+    return {
         'team': team_video.team,
         'team_video': team_video,
         'form': form,
         'user': request.user,
         'widget_params': base_widget_params(request, {'video_url': team_video.video.get_video_url(), 'base_state': {}})
-    })
-    return context
+    }
 
 @render_to_json
 @login_required
@@ -972,8 +967,9 @@ def detail_members(request, slug, role=None):
     elif sort == '-joined':
         qs = qs.order_by('-created')
 
-    extra_context = widget.add_onsite_js_files({})
-    extra_context['filtered'] = filtered
+    extra_context = {
+        'filtered': filtered,
+    }
 
     team_member_list, pagination_info = paginate(qs, MEMBERS_ON_PAGE, request.GET.get('page'))
     extra_context.update(pagination_info)
