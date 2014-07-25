@@ -137,7 +137,11 @@ class JavascriptBundle(Bundle):
             return content
 
     def build_contents(self):
-        return utils.run_command(['uglifyjs'], stdin=self.concatinate_files())
+        source_code = self.concatinate_files()
+        if settings.STATIC_MEDIA_COMPRESSED:
+            return utils.run_command(['uglifyjs'], stdin=source_code)
+        else:
+            return source_code
 
 class CSSBundle(Bundle):
     """Bundle CSS files
@@ -156,11 +160,15 @@ class CSSBundle(Bundle):
     bundle_type = 'css'
 
     def build_contents(self):
-        return utils.run_command([
-            'sass', '-t', 'compressed',
-            '--load-path', os.path.join(static_root(), 'css'),
-            '--scss', '--stdin',
-        ], stdin=self.concatinate_files())
+        source_css = self.concatinate_files()
+        if settings.STATIC_MEDIA_COMPRESSED:
+            return utils.run_command([
+                'sass', '-t', 'compressed',
+                '--load-path', os.path.join(static_root(), 'css'),
+                '--scss', '--stdin',
+            ], stdin=source_css)
+        else:
+            return source_css
 
 _type_to_bundle_class = {
     'js': JavascriptBundle,

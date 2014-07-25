@@ -75,6 +75,10 @@ False
 
 STATIC_MEDIA_USES_S3 is usually True for production and False for development.
 
+STATIC_MEDIA_COMPRESSED
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set to False to disable compressing/minifying javascript/CSS
 
 Compilation & Minification
 --------------------------

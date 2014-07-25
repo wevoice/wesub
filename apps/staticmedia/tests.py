@@ -16,6 +16,8 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
+
 import os
 
 from django.conf import settings
@@ -58,7 +60,7 @@ class TestGetBundle(TestCase):
         self.assertEqual(css_bundle.mime_type, 'text/css')
 
 class TestBuildBundle(TestCase):
-    @test_utils.patch_for_test('staticmedia.bundles._run_command')
+    @test_utils.patch_for_test('staticmedia.utils.run_command')
     @test_utils.patch_for_test('staticmedia.bundles.static_root')
     def setUp(self, mock_media_root, mock_run_command):
         self.mock_run_command = mock_run_command
@@ -101,6 +103,28 @@ class TestBuildBundle(TestCase):
             ['uglifyjs'],
             stdin=self.read_and_combine_files(js_paths))
         self.assertEquals(result, 'test-compressed-output')
+
+    @override_settings(STATIC_MEDIA_COMPRESSED=False)
+    def test_build_css_uncompressed(self):
+        css_paths = ['foo.css', 'bar.css']
+        css_bundle = bundles.CSSBundle('bundle.css', {
+            'files': css_paths,
+        })
+
+        result = css_bundle.build_contents()
+        self.assertEquals(self.mock_run_command.call_count, 0)
+        self.assertEquals(result, self.read_and_combine_files(css_paths))
+
+    @override_settings(STATIC_MEDIA_COMPRESSED=False)
+    def test_build_js_uncompressed(self):
+        js_paths = ['foo.js', 'bar.js']
+        js_bundle = bundles.JavascriptBundle('bundle.js', {
+            'files': js_paths,
+        })
+
+        result = js_bundle.build_contents()
+        self.assertEquals(self.mock_run_command.call_count, 0)
+        self.assertEquals(result, self.read_and_combine_files(js_paths))
 
 class TestCaching(TestCase):
     def setUp(self):
