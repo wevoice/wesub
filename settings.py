@@ -496,6 +496,17 @@ MEDIA_BUNDLES = {
             "src/css/embedder/embedder.scss",
         ),
     },
+    # used by the old embedder -- hopefully going away soon
+    'unisubs-offsite-compiled.js': {
+        'files': (
+            'legacy-js/unisubs-offsite-compiled.js',
+        ),
+    },
+    "widget.css":{
+        "files":(
+            "css/unisubs-widget.css",
+        ),
+    },
 }
 
 

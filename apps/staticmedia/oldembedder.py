@@ -16,27 +16,21 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from __future__ import absolute_import
+"""staticmedia.oldembedder -- Code to handle the old embedder widget"""
 
-from django import template
-from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.contrib.sites.models import Site
+from django.template.loader import render_to_string
 
 from staticmedia import bundles
+from staticmedia import utils
+import widget
 
-register = template.Library()
-
-@register.simple_tag
-def media_bundle(bundle_name):
-    bundle = bundles.get_bundle(bundle_name)
-    url = bundle.get_url()
-    if isinstance(bundle, bundles.CSSBundle):
-        return '<link href="%s" rel="stylesheet" type="text/css" />' % url
-    elif isinstance(bundle, bundles.JavascriptBundle):
-        return '<script src="%s"></script>' % url
-    else:
-        raise TypeError("Unknown bundle type: %s" % bundle)
-
-@register.simple_tag
-def url_for(bundle_name):
-    return bundles.get_bundle(bundle_name).get_url()
+def js_code():
+    """Build the JS for the old embed.js file """
+    bundle = bundles.get_bundle('unisubs-offsite-compiled.js')
+    context = {
+        'current_site': Site.objects.get_current(),
+        'STATIC_URL': utils.static_url(),
+        "js_file": bundle.get_url(),
+    }
+    return render_to_string('widget/embed.js', context)

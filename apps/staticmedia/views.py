@@ -17,8 +17,11 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.http import HttpResponse, Http404
+from django.shortcuts import render
 
 from staticmedia import bundles
+from staticmedia import oldembedder
+from staticmedia import utils
 
 def js_bundle(request, bundle_name):
     return _bundle(request, bundle_name, bundles.JavascriptBundle)
@@ -34,3 +37,11 @@ def _bundle(request, bundle_name, correct_type):
     if not isinstance(bundle, correct_type):
         raise Http404()
     return HttpResponse(bundle.get_contents(), bundle.mime_type)
+
+def old_embedder_js(request):
+    return HttpResponse(oldembedder.js_code(), 'text/javascript')
+
+def old_embedder_test(request):
+    return render(request, 'staticmedia/old-embedder-test.html', {
+        'old_embedder_url': utils.static_url() + 'embed.js',
+    })

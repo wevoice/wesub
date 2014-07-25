@@ -31,8 +31,18 @@ else:
         'staticmedia.views',
         url(r'^css/(?P<bundle_name>[\w\.-]+)$', 'css_bundle', name='css_bundle'),
         url(r'^js/(?P<bundle_name>[\w\.-]+)$', 'js_bundle', name='js_bundle'),
+        # embed.js is a weird file, but we want to continue support for a
+        # while
+        url(r'^embed.js$', 'old_embedder_js', name='old_embedder_js'),
     ) + static(
         '/images/', document_root=os.path.join(settings.STATIC_ROOT, 'images')
     ) + static(
         '/fonts/', document_root=os.path.join(settings.STATIC_ROOT, 'fonts')
+    )
+
+if settings.DEBUG:
+    urlpatterns += patterns(
+        'staticmedia.views',
+        url(r'^test/old-embedder/$', 'old_embedder_test',
+            name='old_embedder_test'),
     )
