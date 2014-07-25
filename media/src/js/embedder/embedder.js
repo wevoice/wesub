@@ -573,7 +573,8 @@
                 this.pop.data.trackEvents.startIndex = 0;
 
                 // Get the subtitle sets for this language.
-		this.$transcriptBody.attr("dir", this.model.languages_dir[language]);
+                this.$transcriptBody.attr("dir", this.model.languages_dir[language]);
+                this.$popContainer.attr("dir", this.model.languages_dir[language]);
                 var subtitleSets = this.model.subtitles.where({'language': language});
                 if (subtitleSets.length) {
                     var subtitleSet = subtitleSets[0];
