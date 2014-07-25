@@ -168,7 +168,11 @@ class CSSBundle(Bundle):
                 '--scss', '--stdin',
             ], stdin=source_css)
         else:
-            return source_css
+            return utils.run_command([
+                'sass', '-t', 'expanded',
+                '--load-path', os.path.join(static_root(), 'css'),
+                '--scss', '--stdin',
+            ], stdin=source_css)
 
 _type_to_bundle_class = {
     'js': JavascriptBundle,

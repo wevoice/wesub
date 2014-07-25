@@ -74,6 +74,7 @@ class TestBuildBundle(TestCase):
             for p in relative_paths
         ])
 
+    @override_settings(STATIC_MEDIA_COMPRESSED=True)
     def test_build_css(self):
         css_paths = ['foo.css', 'bar.css']
         css_bundle = bundles.CSSBundle('bundle.css', {
@@ -91,6 +92,7 @@ class TestBuildBundle(TestCase):
         ], stdin=self.read_and_combine_files(css_paths))
         self.assertEquals(result, 'test-compressed-output')
 
+    @override_settings(STATIC_MEDIA_COMPRESSED=True)
     def test_build_js(self):
         js_paths = ['foo.js', 'bar.js']
         js_bundle = bundles.JavascriptBundle('bundle.js', {
@@ -112,8 +114,15 @@ class TestBuildBundle(TestCase):
         })
 
         result = css_bundle.build_contents()
-        self.assertEquals(self.mock_run_command.call_count, 0)
-        self.assertEquals(result, self.read_and_combine_files(css_paths))
+        self.assertEquals(self.mock_run_command.call_count, 1)
+        self.mock_run_command.assert_called_with([
+            'sass',
+            '-t', 'expanded',
+            '--load-path', os.path.join(self.static_root, 'css'),
+            '--scss',
+            '--stdin',
+        ], stdin=self.read_and_combine_files(css_paths))
+        self.assertEquals(result, 'test-compressed-output')
 
     @override_settings(STATIC_MEDIA_COMPRESSED=False)
     def test_build_js_uncompressed(self):
