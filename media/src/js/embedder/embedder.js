@@ -1160,15 +1160,6 @@
         // init() gets called as soon as the embedder has finished loading.
         // Simply processes the existing _amara queue if we have one.
         this.init = function() {
-            // Load the Amara CSS.
-            var tag = document.getElementsByTagName('script')[0];
-            var style = document.createElement('link');
-            style.rel = 'stylesheet';
-            style.type = 'text/css';
-
-            style.href = _amaraConf.staticURL + 'release/public/embedder.css';
-            tag.parentNode.insertBefore(style, tag);
-
             // Change the template delimiter for Underscore templates.
             __.templateSettings = { interpolate : /\{\{(.+?)\}\}/g };
 
@@ -1208,7 +1199,9 @@
 
     };
 
-    window._amara = new Amara();
-    window._amara.init();
+    _$(document).ready(function() {
+        window._amara = new Amara();
+        window._amara.init();
+    });
 
 }(window, document));

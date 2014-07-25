@@ -81,10 +81,6 @@ DATABASES = {
     }
 }
 
-# 'embed{0}.js'.format(EMBED_JS_VERSION) gives the current embed script file name.
-EMBED_JS_VERSION = ''
-PREVIOUS_EMBED_JS_VERSIONS = []
-
 CSS_USE_COMPILED = True
 
 COMPRESS_YUI_BINARY = "java -jar ./css-compression/yuicompressor-2.4.6.jar"
@@ -478,14 +474,12 @@ MEDIA_BUNDLES = {
             'src/css/subtitle-editor/subtitle-editor.scss',
         ),
     },
-    "embedder":{
-        "type":"js",
+    "embedder.js":{
         "files": (
             "src/js/third-party/json2.min.js",
             'src/js/third-party/underscore.min.js',
             'src/js/third-party/jquery-1.8.3.min.js',
             'src/js/third-party/backbone.min.js',
-            'src/js/embedder/conf.js',
             'src/js/third-party/popcorn.js',
             'src/js/third-party/popcorn.brightcove.js',
             'src/js/popcorn/popcorn.flash-fallback.js',
@@ -494,24 +488,13 @@ MEDIA_BUNDLES = {
             'src/js/popcorn/popcorn.amarasubtitle.js',
             'src/js/embedder/embedder.js'
         ),
-        "release_url": True,
-        "bootloader": {
-            "gatekeeper": "_amaraEmbedderLoaded",
-            "file": 'src/js/embedder/embedder.js',
-        },
-        "output": 'release/public/embedder.js',
-
+        'add_amara_conf': True,
     },
-    "embedder-css":{
-        "type":"css",
+    "embedder.css":{
         "files": (
             "src/css/embedder/jquery.mCustomScrollbar.css",
-            "src/css/embedder/embedder-dev.css",
+            "src/css/embedder/embedder.scss",
         ),
-        "include_js_base_dependencies": False,
-        "include_flash_deps": False,
-        "output": 'release/public/embedder.css',
-        "release_url": True,
     },
 }
 

@@ -131,13 +131,13 @@ div.amara-embed {
             @include vertical-gradient(#1B1C1D, #212223);
 
             a.amara-logo {
-                background: transparent url('../../images/embedder/amara-sprites.png') 0 0 no-repeat;
+                background: transparent url('../images/embedder/amara-sprites.png') 0 0 no-repeat;
             }
             a.amara-transcript-button {
-                background: transparent url('../../images/glyphicons_029_notes_2.png') 0 7px no-repeat;
+                background: transparent url('../images/glyphicons_029_notes_2.png') 0 7px no-repeat;
             }
             a.amara-subtitles-button {
-                background: transparent url('../../images/cc-icon-amara-18px.png') 10px 11px no-repeat;
+                background: transparent url('../images/cc-icon-amara-18px.png') 10px 11px no-repeat;
             }
             a.amara-button {
                 display: inline-block;
@@ -220,7 +220,7 @@ div.amara-embed {
                 width: 21%;
                 min-width: 100px;
                 .amara-current-language {
-                    background: transparent url('../../images/embedder/amara-sprites.png') right -187px no-repeat;
+                    background: transparent url('../images/embedder/amara-sprites.png') right -187px no-repeat;
                     color: #DEDEDE;
                     display: block;
                     font: normal 12px;
@@ -415,19 +415,19 @@ div.amara-context-menu {
     }
 }
 .dropdown-menu .unisubs-subtitle-homepage {
-     background: url("../../images/glyphicons_318_more_items.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+     background: url("../images/glyphicons_318_more_items.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
 }
 .dropdown-menu .unisubs-download-subtitles {
-     background: url("../../images/glyphicons_212_down_arrow.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+     background: url("../images/glyphicons_212_down_arrow.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
 }
 .dropdown-menu .currently-selected-item {
-     background: url("../../images/glyphicons_206_ok_2.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+     background: url("../images/glyphicons_206_ok_2.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
 }
 .dropdown-menu .unisubs-embed-link {
-     background: url("../../images/glyphicons_117_embed.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+     background: url("../images/glyphicons_117_embed.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
 }
 .dropdown-menu .unisubs-order-subtitles {
-     background: url("../../images/glyphicons_065_tag.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+     background: url("../images/glyphicons_065_tag.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
 }
 .pre-small {
     font-size: 0.75em;

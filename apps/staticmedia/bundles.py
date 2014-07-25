@@ -29,28 +29,18 @@ See the bundle_* functions for exactly what we do for various media types.
 """
 
 import os
-import subprocess
 import time
 
+from django.contrib.sites.models import Site
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.template.loader import render_to_string
+
+from staticmedia import utils
 
 def static_root():
     return settings.STATIC_ROOT
-
-def _run_command(commandline, stdin=None):
-    p = subprocess.Popen(commandline, stdin=subprocess.PIPE,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
-    stdout, stderr = p.communicate(stdin)
-    if stderr:
-        raise ValueError("Got error from %s: %s" % (commandline, stderr))
-    elif p.returncode != 0:
-        raise ValueError("Got error code from %s: %s" % (commandline,
-                                                         p.returncode))
-    else:
-        return stdout
 
 class Bundle(object):
     """Represents a single media bundle."""
@@ -130,8 +120,24 @@ class JavascriptBundle(Bundle):
     mime_type = 'text/javascript'
     bundle_type = 'js'
 
+    def should_add_amara_conf(self):
+        return self.config.get('add_amara_conf', False)
+
+    def generate_amara_conf(self):
+        return render_to_string('staticmedia/amara-conf.js', {
+            'base_url': Site.objects.get_current().domain,
+            'static_url': utils.static_url(),
+        })
+
+    def concatinate_files(self):
+        content = Bundle.concatinate_files(self)
+        if self.should_add_amara_conf():
+            return self.generate_amara_conf() + content
+        else:
+            return content
+
     def build_contents(self):
-        return _run_command(['uglifyjs'], stdin=self.concatinate_files())
+        return utils.run_command(['uglifyjs'], stdin=self.concatinate_files())
 
 class CSSBundle(Bundle):
     """Bundle CSS files
@@ -150,7 +156,7 @@ class CSSBundle(Bundle):
     bundle_type = 'css'
 
     def build_contents(self):
-        return _run_command([
+        return utils.run_command([
             'sass', '-t', 'compressed',
             '--load-path', os.path.join(static_root(), 'css'),
             '--scss', '--stdin',
