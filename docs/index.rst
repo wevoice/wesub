@@ -13,7 +13,7 @@ Contents:
 
    running-amara
    development
-   static-files
+   static-media
    deployment-guide
    permissions
    i18n
