@@ -45,4 +45,5 @@ if settings.DEBUG:
         'staticmedia.views',
         url(r'^test/old-embedder/$', 'old_embedder_test',
             name='old_embedder_test'),
+        url(r'^test/embedder/$', 'embedder_test', name='embedder_test'),
     )

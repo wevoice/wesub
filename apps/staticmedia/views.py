@@ -41,6 +41,9 @@ def _bundle(request, bundle_name, correct_type):
 def old_embedder_js(request):
     return HttpResponse(oldembedder.js_code(), 'text/javascript')
 
+def embedder_test(request):
+    return render(request, 'staticmedia/embedder-test.html')
+
 def old_embedder_test(request):
     return render(request, 'staticmedia/old-embedder-test.html', {
         'old_embedder_url': utils.static_url() + 'embed.js',

@@ -128,3 +128,4 @@ you can use these tags:
 - ``media_bundle`` -- include a CSS/JS media bundle (generates the entire
   script/link tag)
 - ``url_for`` -- Get the URL to a media bundle.
+- ``static_url`` -- Get the base URL for static media.

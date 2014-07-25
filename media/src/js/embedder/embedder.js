@@ -194,7 +194,7 @@
             initialize: function() {
 
                 var video = this;
-                var apiURL = 'http://' + _amaraConf.baseURL + '/api2/partners/videos/?&video_url=';
+                var apiURL = '//' + _amaraConf.baseURL + '/api2/partners/videos/?&video_url=';
 
                 this.subtitles = new that.Subtitles();
 
@@ -347,7 +347,7 @@
                 this.model.set('width', this.$popContainer.width());
 
                 this.$el.append(this.template({
-                    video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + this.model.get('url'),
+                    video_url: '//' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + this.model.get('url'),
 		    original_video_url:  this.model.get('url'),
 		    download_subtitle_url: '',
                     width: this.model.get('width')
@@ -400,8 +400,8 @@
                                 // Build the language selection dropdown menu.
                                 that.buildLanguageSelector();
                                 // update the view on amara button
-                                that.$viewOnAmaraButton.attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
-                                _$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/subtitles/editor/' + that.model.get('id') + '/en/');
+                                that.$viewOnAmaraButton.attr('href', '//' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
+                                _$('#amara-video-link').attr('href', '//' + _amaraConf.baseURL + '/subtitles/editor/' + that.model.get('id') + '/en/');
                                 // Make the request to fetch the initial subtitles.
                                 // TODO: This needs to be an option.
                                 that.loadSubtitles(that.model.get('initial_language'));
@@ -415,9 +415,9 @@
 				    _$(".amara-languages").hide();
 				_$(".amara-languages").css('min-width', "130px").css({"border-left-color": "#2B2C2D", "border-left-width":"1px", "border-left-style":"solid"});
 				if (that.model.get('is_on_amara'))
-                                    that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
+                                    that.$amaraCurrentLang.attr("href", '//' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
 				else
-                                    that.$amaraCurrentLang.attr("href", 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'));
+                                    that.$amaraCurrentLang.attr("href", '//' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'));
                                 that.$amaraCurrentLang.attr("target", '_blank');
                                 that.$amaraCurrentLang.removeAttr("data-toggle");
                                 that.setCurrentLanguageMessage('subtitle me');
@@ -478,7 +478,7 @@
 		});
                 var video_url = this.model.get('url');
                 this.$amaraLanguagesList.append(this.templateVideo({
-                        video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
+                        video_url: '//' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
 		}));
 		if (this.model.get('show_order_subtitles') ||
 		    this.model.get('show_download_subtitles') ||
@@ -696,8 +696,8 @@
 			_$('ul.amara-languages-list a').removeClass('currently-selected');
 			this.$amaraLanguagesList.find("[data-language='" + language + "']").addClass('currently-selected');
 			this.$amaraCurrentLang.text(languageName);
-			_$('#amara-download-subtitles').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
-			_$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/subtitles/editor/' + this.model.get('id') + '/' + languageCode);
+			_$('#amara-download-subtitles').attr('href', '//' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
+			_$('#amara-video-link').attr('href', '//' + _amaraConf.baseURL + '/subtitles/editor/' + this.model.get('id') + '/' + languageCode);
 			_$('ul.amara-languages-list li').removeClass('currently-selected-item');
 			_$('.currently-selected').parent().addClass('currently-selected-item');
                     } else {
@@ -715,7 +715,7 @@
                 var that = this;
 
                 var apiURL = ''+
-                    'http://' + _amaraConf.baseURL + '/api2/partners/videos/' +
+                    '//' + _amaraConf.baseURL + '/api2/partners/videos/' +
                     this.model.get('id') + '/languages/' + language + '/subtitles/';
 
                 // Make a call to the Amara API to retrieve subtitles for this language.
@@ -1060,7 +1060,7 @@
                 (this.model.get('show_improve_subtitles') ? '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="Improve these subtitles on amara.org">Improve these Subtitles</a></li>' : '') +
                 (this.model.get('show_embed_code') ? '<li role="presentation" class="unisubs-embed-link"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embed code">Get Embed Code</a></li>' : '') +
                 (this.model.get('show_download_subtitles') ? '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>' : '') +
-		(this.model.get('show_order_subtitles') ? '<li role="presentation" class="unisubs-order-subtitles"><a role="menuitem" tabindex="-1" href="http://pro.amara.org/ondemand" target="blank" title="Order Captions or Subtitles">Order Captions or Subtitles</a></li>' : '');
+		(this.model.get('show_order_subtitles') ? '<li role="presentation" class="unisubs-order-subtitles"><a role="menuitem" tabindex="-1" href="//pro.amara.org/ondemand" target="blank" title="Order Captions or Subtitles">Order Captions or Subtitles</a></li>' : '');
 	    },
 	    templateHTML: function() {
 		return '' +
@@ -1097,15 +1097,15 @@
                 '        </div>' +
                 '    </div>' +
                 '</div>' +
-		'<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">' +
-	        '<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>' +
+		'<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">' +
+	        '<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>' +
                 '    <div class="modal fade" id="embed-code-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +
 		'        <div class="modal-dialog">' +
 		'            <div class="modal-content">' +
 		'                <div class="modal-body">' +    
 		'                    <p>Step 1: paste this anywhere in your document:</p>' +
                 '                        <pre class="pre-small">' +
-                '&lt;script type="text/javascript" src="http://amara.org/embedder-iframe"&gt;\n' +
+                '&lt;script type="text/javascript" src="//amara.org/embedder-iframe"&gt;\n' +
                 '&lt;/script&gt;' +
                 '                        </pre>' +
                 '                        <p>Step 2: paste this somewhere inside your HTML body, wherever you would like your widgets to appear, with the height, width and options of your choosing:</p>' +

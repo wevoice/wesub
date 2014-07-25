@@ -23,6 +23,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from staticmedia import bundles
+from staticmedia import utils
 
 register = template.Library()
 
@@ -40,3 +41,7 @@ def media_bundle(bundle_name):
 @register.simple_tag
 def url_for(bundle_name):
     return bundles.get_bundle(bundle_name).get_url()
+
+@register.simple_tag
+def static_url():
+    return utils.static_url()
