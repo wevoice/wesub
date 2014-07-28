@@ -125,8 +125,9 @@ def widgetizerbootloader(request):
 def onsite_widget(request):
     """Used for subtitle dialog"""
 
-    context = widget.add_config_based_js_files(
-        {}, settings.JS_API, 'unisubs-api.js')
+    #context = widget.add_config_based_js_files(
+        #{}, settings.JS_API, 'unisubs-api.js')
+    context = {}
     config = request.GET.get('config', '{}')
     # strip any query string parama as that chokes the json string
     match = re.search(r'(?P<qs>}\?.*)', config)
