@@ -5,5 +5,5 @@ django-nose==1.2
 pylint
 mock==1.0.1
 # selenium test suite
-selenium==2.33
+selenium
 factory_boy==2.4.1
