@@ -3,9 +3,12 @@ app:
   command: python manage.py runserver 0.0.0.0:8000
   environment:
       DJANGO_SETTINGS_MODULE: dev_settings
+      DJANGO_LIVE_TEST_SERVER_ADDRESS: 'localhost:8081,8090-8100,9000-9200' 
 
   volumes:
     - .:/opt/apps/unisubs
+
+  hostname: 'unisubs.example.com'
   ports:
     - "8000:8000"
   links:
