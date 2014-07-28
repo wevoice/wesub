@@ -5,7 +5,8 @@ RUN (echo "deb http://archive.ubuntu.com/ubuntu precise main universe multiverse
 RUN (echo "deb-src http://archive.ubuntu.com/ubuntu precise main universe multiverse" >> /etc/apt/sources.list)
 RUN (echo "deb http://archive.ubuntu.com/ubuntu precise-updates main universe multiverse" >> /etc/apt/sources.list)
 RUN (echo "deb-src http://archive.ubuntu.com/ubuntu precise-updates main universe multiverse" >> /etc/apt/sources.list)
-
+RUN (echo "deb http://ppa.launchpad.net/mozillateam/firefox-next/ubuntu precise main" >> /etc/apt/sources.list)
+RUN (echo "deb-src http://ppa.launchpad.net/mozillateam/firefox-next/ubuntu precise main" >> /etc/apt/sources.list)
 RUN apt-get update
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -y install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext build-essential gcc dialog mysql-client firefox flashplugin-installer xvfb node-uglify ruby-sass
