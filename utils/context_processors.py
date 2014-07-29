@@ -21,14 +21,6 @@ from django.contrib.sites.models import Site
 from utils.translation import get_user_languages_from_request
 
 
-def media(request):
-    """Add media-related context variables to the context."""
-    return {
-        'MEDIA_URL': settings.MEDIA_URL, 
-        'STATIC_URL': settings.STATIC_URL, 
-        'STATIC_URL_BASE': settings.STATIC_URL_BASE,
-        'COMPRESS_MEDIA': settings.COMPRESS_MEDIA }
-
 def run_locally(request):
     return {"RUN_LOCALLY": getattr(settings, "RUN_LOCALLY", False)}
 

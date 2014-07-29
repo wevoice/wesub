@@ -155,7 +155,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'utils.context_processors.run_locally',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.i18n',
-    'utils.context_processors.media',
+    'staticmedia.context_processors.staticmedia',
 )
 
 INSTALLED_APPS = (

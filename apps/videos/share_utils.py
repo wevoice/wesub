@@ -39,7 +39,6 @@ def _add_share_panel_context(context, facebook_url, twitter_url, embed_params,
         'STATIC_URL_BASE': settings.STATIC_URL_BASE,
     }
     
-    context["share_panel_embed_code"] = render_to_string('videos/_offsite_widget.html', ec_context)
     context["share_panel_email_url"] = email_url
     context["share_panel_permalink"] = permalink
 
