@@ -23,7 +23,6 @@ Example
 
 ::
 
-  STATIC_MEDIA_USES_S3 = False
   MEDIA_BUNDLES = {
       "base.css": {
           "files": (
@@ -38,6 +37,13 @@ Example
           ),
       },
   }
+  STATIC_MEDIA_COMPRESSED = True
+
+  STATIC_MEDIA_USES_S3 = True
+  AWS_ACCESS_KEY_ID = 'abcdef'
+  AWS_SECRET_ACCESS_KEY = 'abcdef
+  STATIC_MEDIA_S3_BUCKET = 'bucket.name'
+  STATIC_MEDIA_S3_URL_BASE = '//s3.amazonaws.com/bucket.name'
 
 MEDIA_BUNDLES
 ^^^^^^^^^^^^^
@@ -62,6 +68,10 @@ these properties:
   - baseURL: base URL for the amara website
   - staticURL: base URL to the static media
 
+STATIC_MEDIA_COMPRESSED
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set to False to disable compressing/minifying javascript/CSS
 
 STATIC_MEDIA_USES_S3
 ^^^^^^^^^^^^^^^^^^^^
@@ -73,12 +83,15 @@ True
 False
   Serve media files from the local server.
 
-STATIC_MEDIA_USES_S3 is usually True for production and False for development.
+``STATIC_MEDIA_USES_S3`` is usually True for production and False for
+development.
 
-STATIC_MEDIA_COMPRESSED
-^^^^^^^^^^^^^^^^^^^^^^^^^
+If ``STATIC_MEDIA_USES_S3`` is True, the following settings are available:
 
-Set to False to disable compressing/minifying javascript/CSS
+- ``AWS_ACCESS_KEY_ID``: S3 access key.
+- ``AWS_SECRET_ACCESS_KEY``: S3 secret key.
+- ``STATIC_MEDIA_S3_BUCKET``: S3 bucket to store media in.
+- ``STATIC_MEDIA_S3_URL_BASE``: Base URL for S3 media.
 
 Compilation & Minification
 --------------------------

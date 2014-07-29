@@ -20,6 +20,20 @@ import subprocess
 
 from django.conf import settings
 
+import commit
+
+def s3_subdirectory():
+    """Get the subdirectory to store media in for S3
+
+    We want to have the subdirectory change each time we deploy.  This does a
+    couple things:
+        - We can upload the media for our next deploy without messing with the
+        media for our current one.
+        - We can set the HTTP cache headers so that servers cache the content
+        forever without worrying about stale media files.
+    """
+    return commit.LAST_COMMIT_GUID.split('/')[1]
+
 def static_url():
     """Get the base URL for static media
 
@@ -33,8 +47,9 @@ def static_url():
     """
     if not settings.STATIC_MEDIA_USES_S3:
         return "/media/"
-
-    raise NotImplemented()
+    else:
+        return "%s%s/" % (settings.STATIC_MEDIA_S3_URL_BASE,
+                          s3_subdirectory())
 
 def run_command(commandline, stdin=None):
     """Run a command and return the results.

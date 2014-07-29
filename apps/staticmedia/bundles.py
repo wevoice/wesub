@@ -76,7 +76,7 @@ class Bundle(object):
             return self.get_local_server_url()
 
     def get_s3_url(self):
-        raise NotImplementedError()
+        return "%s%s/%s" % (utils.static_url(), self.bundle_type, self.name)
 
     def get_local_server_url(self):
         view_name = 'staticmedia:%s_bundle' % self.bundle_type
