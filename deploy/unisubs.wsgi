@@ -23,6 +23,10 @@ for item in new_sys_path:
     sys.path.remove(item)
 sys.path[:0] = new_sys_path
 
+# setup patch_reverse()
+from localeurl import patch_reverse
+patch_reverse()
+
 import django.core.handlers.wsgi
 os.environ['DJANGO_SETTINGS_MODULE'] = 'unisubs.unisubs_settings'
 os.environ["CELERY_LOADER"] = "django"
