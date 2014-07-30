@@ -7,6 +7,7 @@
 
 {% block scripts %}
     {{ block.super }}
+    <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         window.DIFFING_URL = '{% block diffing_link %}{% url videos:diffing 11111 22222 %}{% endblock %}';
         window.SELECT_REVISIONS_TRANS = '{% trans "Select two revisions to compare, please" %}';
