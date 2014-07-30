@@ -4,16 +4,15 @@ Static Media
 Static media files are handled by the staticmedia app.  This app has several
 goals:
 
-- Combine multiple files into a single "media bundle".  Linking to a single JS
-  file results in faster page loads than linking to multiple files.
-- Compress JS/CSS code.
-- Support preprocessors like SASS.
-- Allow media files to either be served up from the local server or uploaded
-  to S3 and served from their.
-- When uploading to S3, ensure that media files have a name that is unique for
-  each deploy.  This allows us to the set the expire header to the far future,
-  meaning that it will be aggressively cached.  It also prevents browsers from
-  using a cached media file from a previous deploy.
+- **Combine multiple files into a single "media bundle".**  Linking to a
+  single JS file results in faster page loads than linking to multiple files.
+- **Compress JS/CSS code.**
+- **Support preprocessors like SASS.**
+- **Support media files served from the local server or S3**
+- **Store media files on S3 in a unique location for each deploy.**  This
+  allows us to upload media for our next deploy without affecting our current
+  one.  It also allows us to the set the expire header to the far future which
+  is good for caching.
 
 Settings
 --------
@@ -65,28 +64,23 @@ these properties:
     If True, we will prepend javascript code to the source JS files.  THis
     will create global object called ``_amaraConf`` with these properties:
 
-  - baseURL: base URL for the amara website
-  - staticURL: base URL to the static media
+  - ``baseURL``: base URL for the amara website
+  - ``staticURL``: base URL to the static media
 
 STATIC_MEDIA_COMPRESSED
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Set to False to disable compressing/minifying javascript/CSS
+Set to False to disable compressing/minifying Javascript and CSS
 
 STATIC_MEDIA_USES_S3
 ^^^^^^^^^^^^^^^^^^^^
 
-True
-  Serve media files from amazon S3.  This will change the URLs that our
-  template tags create for links to the media bundles.
-
-False
-  Serve media files from the local server.
-
+If True we Will Serve media files from amazon S3.  This will change the URLs
+that our template tags create for links to the media bundles.
 ``STATIC_MEDIA_USES_S3`` is usually True for production and False for
 development.
 
-If ``STATIC_MEDIA_USES_S3`` is True, the following settings are available:
+If ``STATIC_MEDIA_USES_S3`` is enabled, the following settings are available:
 
 - ``AWS_ACCESS_KEY_ID``: S3 access key.
 - ``AWS_SECRET_ACCESS_KEY``: S3 secret key.
@@ -112,10 +106,11 @@ instance, we structure the files the same way:
 - images/ - Image files
 - fonts/ - font files
 
-When serving media from the local server, the base URL will be "/media/".
+When serving media from the local server, the root URL for media files
+will be ``/media/``.
 
-When serving media from S3, the base URL will be
-``http://s3.amazonaws.com/<s3-bucket-name>/<deploy-git-id>/``
+When serving media from S3, the root URL for media files will be
+``<STATIC_MEDIA_S3_URL_BASE><git-commit-id/``
 
 Development, Media Bundles, and Caching
 ---------------------------------------
