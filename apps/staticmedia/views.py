@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.shortcuts import render
 
@@ -45,6 +46,10 @@ def embedder_test(request):
     return render(request, 'staticmedia/embedder-test.html')
 
 def old_embedder_test(request):
+    if not settings.STATIC_MEDIA_USES_S3:
+        old_embedder_url = "/media/embed.js"
+    else:
+        old_embedder_url = settings.STATIC_MEDIA_S3_URL_BASE + 'embed.js'
     return render(request, 'staticmedia/old-embedder-test.html', {
-        'old_embedder_url': utils.static_url() + 'embed.js',
+        'old_embedder_url': old_embedder_url,
     })
