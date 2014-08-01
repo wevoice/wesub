@@ -1,0 +1,10 @@
+PATH_BEFORE_ACTIVATE=$PATH
+PATH=$PATH:"$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+function deactivate() {
+  PATH=$PATH_BEFORE_ACTIVATE
+  unset PATH_BEFORE_ACTIVATE
+  unset -f deactivate
+}
+
+echo "Unisubs dev activated.  Run deactivate() to stop"

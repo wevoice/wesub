@@ -1,2 +1,4 @@
-#!/bin/sh
+#!/bin/bash
+
+cd "$( unisubs-root )"
 fig run --rm app python manage.py "$@"

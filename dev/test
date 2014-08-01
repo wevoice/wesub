@@ -1,0 +1,3 @@
+#!/bin/bash
+
+manage test --settings=dev_settings_test "$@"

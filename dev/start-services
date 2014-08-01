@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd "$( unisubs-root )"
+fig up -d db worker cache search queue
