@@ -77,6 +77,27 @@ class YoutubeVideoTypeTest(TestCase):
         self.assertEqual(video.duration, video_info.duration)
         self.assertEqual(video.thumbnail, video_info.thumbnail_url)
 
+    @test_utils.patch_for_test('utils.youtube.get_video_info')
+    def test_get_video_info_exception(self, mock_get_video_info):
+        video_info = youtube.VideoInfo('test-channel-id', 'title',
+                                       'description', 100,
+                                       'http://example.com/thumb.png')
+        mock_get_video_info.side_effect = youtube.APIError()
+
+        video, created = Video.get_or_create_for_url(
+            'http://www.youtube.com/watch?v=_ShmidkrcY0')
+        vu = video.videourl_set.all()[:1].get()
+
+        self.assertEqual(vu.videoid, '_ShmidkrcY0')
+        self.assertEqual(video.title, '')
+        self.assertEqual(video.description, '')
+        self.assertEqual(video.duration, None)
+        self.assertEqual(video.thumbnail, '')
+        # since get_video_info failed, we don't know the channel id of our
+        # video URL.  We should use a dummy value to make it easier to fix the
+        # issue in the future
+        self.assertEqual(vu.owner_username, None)
+
     def test_matches_video_url(self):
         for item in self.data:
             self.assertTrue(self.vt.matches_video_url(item['url']))
