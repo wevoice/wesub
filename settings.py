@@ -236,10 +236,11 @@ BROKER_POOL_LIMIT = 10
 
 import re
 LOCALE_INDEPENDENT_PATHS = (
-    re.compile('^/widget'),
-    re.compile('^/api'),
-    re.compile('^/api2'),
-    re.compile('^/jstest'),
+    re.compile('^/media/'),
+    re.compile('^/widget/'),
+    re.compile('^/api/'),
+    re.compile('^/api2/'),
+    re.compile('^/jstest/'),
     re.compile('^/sitemap.*.xml'),
     re.compile('^/accountlinker/youtube-oauth-callback/'),
     re.compile('^/crossdomain.xml'),
