@@ -801,6 +801,31 @@
                 <button ng-click="onClose($event)">{% trans "Close Editor" %}
             </footer>
         </aside>
+
+	<aside modal-dialog="upload-subtitles" allow-close class="modal" tabindex="-1" role="dialog">
+	  <h3>{% trans 'Upload Subtitles' %}</h3>
+	  <p>
+            {% blocktrans %}
+            Our site accepts SRT, SSA, SBV, DFXP, TXT, and VTT format.
+            Only files ending in .srt, .ssa, .sbv, .dfxp, .txt, .vtt or .xml 
+            (for dfxp) are accepted.
+            {% endblocktrans %}
+          </p>
+	  <form method="post" id="upload-subtitles-form" action="{% url videos:upload_subtitles %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="video" value="{{ video.id }}" />
+            <div style="visibility: hidden">
+              {{ form.language_code }}
+            </div>
+            <div>
+              <input type="file" name="draft" id="subtitles-file-field" />
+            </div>
+	    <footer class="buttons">
+	      <button ng-click="dialogManager.onCloseClick($event)">{% trans "Cancel" %}</button>
+	      <button class="upload-subtitles-submit-button-">{% trans "Upload" %}</button>
+	    </footer>
+          </form>
+	</aside>
 	{% upload_subtitles video %}
         <aside modal-dialog="resume-error" class="modal">
         <h3>{% trans "Error resuming session" %}</h3>

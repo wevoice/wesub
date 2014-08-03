@@ -154,13 +154,41 @@ var angular = angular || null;
             // that if anything changed
             $scope.$root.$emit('work-done');
 	}
-        $scope.copyTimingEnabled = function() {
+
+	$scope.copyTimingEnabled = function() {
             return ($scope.workingSubtitles.subtitleList.length() > 0 &&
                      $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
 
         $scope.showUploadSubtitlesModal = function($event) {
             $scope.dialogManager.open('upload-subtitles');
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
+
+        jQuery.extend({
+	    handleError: function( s, xhr, status, e ) {
+		// If a local callback was specified, fire it
+		if ( s.error )
+			s.error( xhr, status, e );
+		// If we have some XML response text (e.g. from an AJAX call) then log it in the console
+		else if(xhr.responseText)
+			console.log(xhr.responseText);
+	    }
+        });
+
+        $('#upload-subtitles-form').ajaxForm({
+              dataType: 'json',
+              success: function(data, status, xhr, $form){
+		  console.log("Submit success");
+              },
+              beforeSubmit: function(formData, $Form, options) {
+		  console.log("Before submit");
+              }
+          });
+
+        $scope.submitUploadForm = function($event) {
+	    $('#upload-subtitles-form').ajaxSubmit();
             $event.stopPropagation();
             $event.preventDefault();
         };
