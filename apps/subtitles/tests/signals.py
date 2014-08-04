@@ -53,6 +53,10 @@ class SignalsTest(TestCase):
         self.assertEquals(mock_signal.send.call_args[0][0], language)
         self.assertEquals(mock_signal.send.call_args[1]['version'], version)
 
+    def check_subtitles_complete_changed(self, mock_signal, language):
+        self.assertEquals(mock_signal.send.call_count, 1)
+        self.assertEquals(mock_signal.send.call_args[0], (language,))
+
     @patch_for_test('subtitles.signals.language_deleted')
     @patch_for_test('subtitles.signals.public_tip_changed')
     def test_public_tip_changed(self, mock_signal,
@@ -88,3 +92,41 @@ class SignalsTest(TestCase):
         v1.unpublish()
         self.assertEquals(mock_signal.send.call_count, 0)
         mock_language_deleted_signal.send.assert_called_once_with(language)
+
+    @patch_for_test('subtitles.signals.subtitles_complete_changed')
+    def test_subtitles_complete_changed(self, mock_subtitle_complete_changed):
+        # initial version with complete=False should result in no signal
+        v = pipeline.add_subtitles(self.video, 'en', None, complete=False)
+        language = v.subtitle_language
+        self.assertEquals(mock_subtitle_complete_changed.send.call_count, 0)
+        # initial version with complete=True should result in a signal
+        v = pipeline.add_subtitles(self.video, 'es', None, complete=True)
+        language_es = v.subtitle_language
+        self.check_subtitles_complete_changed(mock_subtitle_complete_changed,
+                                              language_es)
+        mock_subtitle_complete_changed.reset_mock()
+        # adding a new version with a different value of subtitles_complete
+        # should result in a signal
+        pipeline.add_subtitles(self.video, 'en', None, complete=True)
+        self.check_subtitles_complete_changed(mock_subtitle_complete_changed,
+                                              language)
+        mock_subtitle_complete_changed.reset_mock()
+        # adding a new version with the same value of subtitles_complete
+        # should result in no signal
+        pipeline.add_subtitles(self.video, 'en', None, complete=True)
+        self.assertEquals(mock_subtitle_complete_changed.send.call_count, 0)
+        # adding a new version with the subtitles_complete=None
+        # should result in no signal
+        pipeline.add_subtitles(self.video, 'en', None, complete=None)
+        self.assertEquals(mock_subtitle_complete_changed.send.call_count, 0)
+        # changing the subtitles_complete attribute and saving the model
+        # should also result in a signal
+        language.subtitles_complete = True
+        language.save()
+        self.check_subtitles_complete_changed(mock_subtitle_complete_changed,
+                                              language)
+        mock_subtitle_complete_changed.reset_mock()
+        # A save with no change to subtitles_complete should result in no
+        # signal
+        language.save()
+        self.assertEquals(mock_subtitle_complete_changed.send.call_count, 0)
