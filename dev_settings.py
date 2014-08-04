@@ -36,6 +36,7 @@ BROKER_PORT = os.environ.get('QUEUE_1_PORT_5672_TCP_PORT')
 EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 
 JS_USE_COMPILED = True
+RUN_LOCALLY = True
 
 debug = True
 
