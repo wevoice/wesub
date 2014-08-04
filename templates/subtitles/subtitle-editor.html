@@ -811,6 +811,9 @@
             (for dfxp) are accepted.
             {% endblocktrans %}
           </p>
+	  <p ng-show="uploadError">
+	    {% trans "Upload failed" %}
+	  </p>
 	  <form method="post" id="upload-subtitles-form" action="{% url videos:upload_subtitles %}" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="video" value="{{ video.id }}" />
@@ -822,7 +825,16 @@
             </div>
 	    <footer class="buttons">
 	      <button ng-click="dialogManager.onCloseClick($event)">{% trans "Cancel" %}</button>
-	      <button ng-click="submitUploadForm($event)" class="upload-subtitles-submit-button-">{% trans "Upload" %}</button>
+	      <button ng-click="submitUploadForm($event)" class="upload-subtitles-submit-button-" ng-disabled="uploading">
+		<ng-switch on="uploading">
+		  <span ng-switch-when="true">
+		    {% trans "Uploading..." %}
+		  </span>
+		  <span ng-switch-default>
+		    {% trans "Upload" %}
+		  </span>
+		</ng-switch>
+	      </button>
 	    </footer>
           </form>
 	</aside>
