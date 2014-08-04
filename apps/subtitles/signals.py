@@ -21,3 +21,4 @@ from django import dispatch
 
 language_deleted = dispatch.Signal()
 public_tip_changed = dispatch.Signal()
+subtitles_complete_changed = dispatch.Signal()

@@ -40,7 +40,8 @@ from utils.test_utils import patch_for_test
 import utils.youtube
 import subtitles.signals
 
-class SignalHandlingTest(TestCase):
+class SyncingTriggerTest(TestCase):
+    # Test that we sync subtitles at the correct times
     @patch_for_test('externalsites.tasks.update_all_subtitles')
     @patch_for_test('externalsites.tasks.update_subtitles')
     @patch_for_test('externalsites.tasks.delete_subtitles')
@@ -60,15 +61,43 @@ class SignalHandlingTest(TestCase):
         self.mock_update_subtitles.reset_mock()
         self.mock_delete_subtitles.reset_mock()
 
-    def test_update_subtitles_on_public_tip_changed(self):
+    def test_update_subtitles_on_complete_changed(self):
         lang = self.video.subtitle_language('en')
-        tip = lang.get_tip()
-        subtitles.signals.public_tip_changed.send(
-            sender=lang, version=tip)
+        lang.subtitles_complete = True
+        subtitles.signals.subtitles_complete_changed.send(sender=lang)
         self.assertEqual(self.mock_update_subtitles.delay.call_count, 1)
         self.mock_update_subtitles.delay.assert_called_with(
             KalturaAccount.account_type, self.account.id, self.video_url.id,
             lang.id)
+
+    def test_dont_update_when_incomplete(self):
+        lang = self.video.subtitle_language('en')
+        lang.subtitles_complete = False
+        subtitles.signals.subtitles_complete_changed.send(sender=lang)
+        self.assertEqual(self.mock_update_subtitles.delay.call_count, 0)
+
+    def test_update_subtitles_new_public_tip(self):
+        lang = self.video.subtitle_language('en')
+        lang.subtitles_complete = True
+        lang.save()
+        version = pipeline.add_subtitles(self.video, 'en', None)
+        self.mock_update_subtitles.reset_mock()
+        subtitles.signals.public_tip_changed.send(sender=lang,
+                                                  version=version)
+        self.assertEqual(self.mock_update_subtitles.delay.call_count, 1)
+        self.mock_update_subtitles.delay.assert_called_with(
+            KalturaAccount.account_type, self.account.id, self.video_url.id,
+            lang.id)
+
+    def test_dont_update_on_new_incomplete_version(self):
+        lang = self.video.subtitle_language('en')
+        lang.subtitles_complete = False
+        lang.save()
+        version = pipeline.add_subtitles(self.video, 'en', None)
+        self.mock_update_subtitles.reset_mock()
+        subtitles.signals.public_tip_changed.send(sender=lang,
+                                                  version=version)
+        self.assertEqual(self.mock_update_subtitles.delay.call_count, 0)
 
     def test_delete_subititles_on_language_deleted(self):
         lang = self.video.subtitle_language('en')
@@ -94,9 +123,9 @@ class SignalHandlingTest(TestCase):
             KalturaAccount.account_type, self.account.id)
 
     def check_tasks_not_called(self, video):
-        lang = pipeline.add_subtitles(video, 'en', None).subtitle_language
-        subtitles.signals.public_tip_changed.send(
-            sender=lang, version=lang.get_tip())
+        lang = self.video.subtitle_language('en')
+        lang.subtitles_complete = True
+        subtitles.signals.subtitles_complete_changed.send(sender=lang)
         self.assertEquals(self.mock_update_subtitles.call_count, 0)
 
         subtitles.signals.language_deleted.send(lang)
