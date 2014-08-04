@@ -20,6 +20,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -84,7 +85,9 @@ def settings_page_redirect_url(team, data):
         })
 
 def youtube_callback_url():
-    return universal_url('externalsites:youtube-callback')
+    return universal_url(
+        'externalsites:youtube-callback',
+        protocol_override=settings.OAUTH_CALLBACK_PROTOCOL)
 
 def youtube_add_account(request):
     if 'team_slug' in request.GET:
