@@ -804,11 +804,14 @@
 
 	<aside modal-dialog="upload-subtitles" allow-close class="modal" tabindex="-1" role="dialog">
 	  <h3>{% trans 'Upload Subtitles' %}</h3>
+          <p>
+            {% blocktrans %}
+	    Uploading subtitles saves a new (incomplete) version that you can edit and mark as complete when finished editing.
+            {% endblocktrans %}
+          </p>
 	  <p>
             {% blocktrans %}
-            Our site accepts SRT, SSA, SBV, DFXP, TXT, and VTT format.
-            Only files ending in .srt, .ssa, .sbv, .dfxp, .txt, .vtt or .xml 
-            (for dfxp) are accepted.
+	    Supported formats are: SRT, SSA, SBV, DFXP, TXT, and VTT. Only files ending with the correct extension, .srt, .ssa, .sbv, .txt, .vtt, .dfxp or .xml (for dfxp) are accepted.
             {% endblocktrans %}
           </p>
 	  <p ng-show="uploadError">
