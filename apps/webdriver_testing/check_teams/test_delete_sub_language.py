@@ -570,7 +570,7 @@ class TestCaseDeletion(WebdriverTestCase):
 
         self.tasks_tab.perform_task('Approve Italian Subtitles', 
                                                self.video.title)
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
         self.assertEqual(u'Editing Italian\u2026', self.editor_pg.working_language())
 
     def test_perform_forked_review_task(self):
@@ -584,5 +584,5 @@ class TestCaseDeletion(WebdriverTestCase):
 
         self.tasks_tab.perform_task('Review Croatian Subtitles', 
                                                self.video.title)
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
         self.assertEqual(u'Editing Croatian\u2026', self.editor_pg.working_language())
