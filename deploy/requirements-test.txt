@@ -6,4 +6,5 @@ pylint
 mock==1.0.1
 # selenium test suite
 selenium
+xvfbwrapper==0.2.4
 factory_boy==2.4.1
