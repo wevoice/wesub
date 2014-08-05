@@ -4,13 +4,6 @@
 
 {% block body_attrs %}id="faq"{% endblock %}
 
-{% block scripts %}
-{% if not js_use_compiled %}
-  <script type="text/javascript" src="{{ STATIC_URL }}js/closure-library/closure/goog/base.js"></script>
-  <script type="text/javascript" src="{{ STATIC_URL }}js/closure-dependencies.js"></script>
-  <script type="text/javascript" src="{{ STATIC_URL }}js/swfobject.js"></script>
-{% endif %}
-{% endblock %}
 {% block main_content %}
 
 <h2>{% trans 'Frequently Asked Questions' %}</h2>

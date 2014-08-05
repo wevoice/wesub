@@ -492,10 +492,28 @@ MEDIA_BUNDLES = {
         ),
         'add_amara_conf': True,
     },
-    "embedder.css":{
+    "embedder.css": {
         "files": (
             "src/css/embedder/jquery.mCustomScrollbar.css",
             "src/css/embedder/embedder.scss",
+        ),
+    },
+    'ie8.css': {
+        'files': (
+            'css/ie8.css',
+        ),
+    },
+    'ajax-paginator.js': {
+        'files': (
+            'js/jquery.address-1.4.fixed.js',
+            'js/escape.js',
+            'js/jquery.ajax-paginator.js',
+        ),
+    },
+    'prepopulate.js': {
+        'files': (
+            'js/urlify.js',
+            'js/prepopulate.min.js',
         ),
     },
     # used by the old editor

@@ -207,35 +207,6 @@ def popular_videos(request):
     return render_to_response('videos/popular_videos.html', {},
                               context_instance=RequestContext(request))
 
-def volunteer_page(request):
-    # Get the user comfort languages list
-    user_langs = get_user_languages_from_request(request)
-
-    relevant = VideoIndex.public().filter(video_language_exact__in=user_langs) \
-        .filter_or(languages_exact__in=user_langs) \
-        .order_by('-requests_count')
-
-    featured_videos =  relevant.filter(
-        featured__gt=datetime.datetime(datetime.MINYEAR, 1, 1)) \
-        .order_by('-featured')[:5]
-
-    popular_videos = relevant.order_by('-week_views')[:5]
-
-    latest_videos = relevant.order_by('-edited')[:15]
-
-    requested_videos = relevant.filter(requests_exact__in=user_langs)[:5]
-
-    context = {
-        'featured_videos': featured_videos,
-        'popular_videos': popular_videos,
-        'latest_videos': latest_videos,
-        'requested_videos': requested_videos,
-        'user_langs':user_langs,
-    }
-
-    return render_to_response('videos/volunteer.html', context,
-                              context_instance=RequestContext(request))
-
 def volunteer_category(request, category):
     '''
     Display results only for a particular category of video results from
@@ -243,7 +214,6 @@ def volunteer_category(request, category):
     '''
     return render_to_response('videos/volunteer_%s.html' %(category),
                               context_instance=RequestContext(request))
-
 
 def create(request):
     video_form = VideoForm(request.user, request.POST or None)
