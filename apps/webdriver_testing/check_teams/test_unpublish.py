@@ -179,7 +179,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
         task_text = 'Translate Subtitles into Swedish'
         self.tasks_tab.perform_task(task_text, self.video.title)
         self.assertEqual(u'Editing Swedish\u2026', self.editor_pg.working_language())
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
 
     def test_unpublish_revision_not_searchable(self):
         """Unpublished (deleted) revision text doesn't show in search results.
@@ -369,7 +369,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
         task_text = 'Translate Subtitles into Swedish'
         self.tasks_tab.perform_task(task_text, self.video.title)
         self.assertEqual(u'Editing Swedish\u2026', self.editor_pg.working_language())
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
 
 
     def test_delete_revision_not_searchable(self):

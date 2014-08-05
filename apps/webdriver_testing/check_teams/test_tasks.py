@@ -151,7 +151,7 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
         self.tasks_tab.perform_task('Transcribe Subtitles', tv.title)
         self.modal.add_language('English', 'English')
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
 
 
     def test_transcription_save(self):
@@ -166,7 +166,7 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
 
         self.modal.add_language('English', 'English')
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
         self.editor_pg.add_subs_to_the_end()
         self.editor_pg.save('Exit')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&/' 
@@ -185,7 +185,7 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
         self.tasks_tab.perform_task('Transcribe Subtitles', tv.title)
         self.modal.add_language('English', 'English')
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
         self.editor_pg.add_subs_to_the_end()
         self.editor_pg.save('Exit')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me'
@@ -193,7 +193,7 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
         self.tasks_tab.perform_task('Transcribe English Subtitles', 
                                              tv.title)
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
         self.video_pg.open_video_page(tv.video_id)
         self.tasks_tab.handle_js_alert(action='accept')
         en_tag, _ = self.video_pg.language_status('English')
@@ -1112,7 +1112,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.tasks_tab.perform_task('Transcribe English Subtitles', 
                                              tv.title)
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
         self.video_pg.open_video_page(tv.video_id)
         self.tasks_tab.handle_js_alert(action='accept')
         en_tag, _ = self.video_pg.language_status('English')

@@ -427,7 +427,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.dashboard_tab.click_lang_task('Short Birds MP4', 
                                            'Create Russian subtitles')
         self.assertEqual(u'Editing Russian\u2026', self.editor_pg.working_language())
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
         self.assertEqual(self.editor_pg.start_times(), 
                          self.editor_pg.reference_times())
         self.editor_pg.exit()
@@ -444,7 +444,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.dashboard_tab.click_lang_task('jaws.mp4', 
                                            'Create French subtitles')
         self.assertEqual(u'Editing French\u2026', self.editor_pg.working_language())
-        self.assertEqual('French', self.editor_pg.selected_ref_language())
+        self.assertEqual('French (original)', self.editor_pg.selected_ref_language())
         self.editor_pg.exit()
 
     def test_start_subtitles_audio_unknown(self):
@@ -453,13 +453,14 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         """
         #Login user and go to team dashboard page
         self.logger.info('Polly Glott logs in and goes to team dashboard page.')
+        self.dashboard_tab.log_out()
         self.dashboard_tab.log_in(self.polly_glott.username, 'password')
         self.dashboard_tab.open_team_page(self.team.slug)
         self.dashboard_tab.click_lang_task('penguins.webm', 
                                            'Create subtitles')
         self.modal.add_language('French', 'French') 
         self.assertEqual(u'Editing French\u2026', self.editor_pg.working_language())
-        self.assertEqual('French', self.editor_pg.selected_ref_language())
+        self.assertEqual('French (original)', self.editor_pg.selected_ref_language())
         self.editor_pg.exit()
 
     def test_start_review(self):
@@ -553,6 +554,7 @@ class TestCaseLangSuggestion(WebdriverTestCase):
                              team = self.team,
                              added_by = self.user)
 
+
     def test_member_language_suggestion(self):
         """Members with no lang pref see the prompt to set language preference.
 
@@ -566,13 +568,6 @@ class TestCaseLangSuggestion(WebdriverTestCase):
         self.dashboard_tab.open_team_page(self.team.slug)
         self.browser.delete_all_cookies()
         self.dashboard_tab.log_in(mono_glot.username, 'password')
-
-        jaws_vid = self.vid_obj_list[0]  #see setUp for data details.
-
-        task = list(jaws_vid.teamvideo.task_set.filter(language='fr'))[0]
-        task.assignee = mono_glot
-        task.save()
-
         self.dashboard_tab.open_team_page(self.team.slug)
         self.assertTrue(self.dashboard_tab.suggestion_present(
                              suggestion_type='authed_language'))
