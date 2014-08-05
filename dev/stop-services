@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd "$( unisubs-root )"
+fig stop app db worker cache search queue
+
