@@ -480,7 +480,7 @@ LOCALE_INDEPENDENT_PATHS = (
     re.compile('^/api2'),
     re.compile('^/jstest'),
     re.compile('^/sitemap.*.xml'),
-    re.compile('^/accountlinker/youtube-oauth-callback/'),
+    re.compile('^/externalsites/youtube-callback'),
     re.compile('^/crossdomain.xml'),
 )
 
@@ -853,8 +853,11 @@ MEDIA_BUNDLES = {
     },
 }
 
+# Where we should tell OAuth providers to redirect the user to.  We want to
+# use https for production to prevent attackers from seeing the access token.
+# For development, we care less about that so we typically use http
+OAUTH_CALLBACK_PROTOCOL = 'https'
 
-YOUTUBE_CLIENT_FORCE_HTTPS = True
 EMAIL_BACKEND = "utils.safemail.InternalOnlyBackend"
 EMAIL_FILE_PATH = '/tmp/unisubs-messages'
 # on staging and dev only the emails listed bellow will receive actual mail

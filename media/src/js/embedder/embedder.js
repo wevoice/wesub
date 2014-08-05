@@ -183,6 +183,7 @@
             duration: null,
             id: null,
             languages: [],
+	    languages_dir: {},
             original_language: null,
             project: null,
             resource_uri: null,
@@ -215,6 +216,9 @@
 				sizeUpdated(video);
 				var visibleLanguages = _$.map(_$.grep(video.get('languages'), function(language) {return language.visible;}),
 							  function(language) {return language.code;});
+				video.get('languages').forEach(function(lang) {
+				    video.languages_dir[lang.code] = lang.dir;
+				});
                                 // Set the initial language to either the one provided by the initial
                                 // options, or the original language from the API.
                                 video.set('initial_language',
@@ -569,6 +573,8 @@
                 this.pop.data.trackEvents.startIndex = 0;
 
                 // Get the subtitle sets for this language.
+                this.$transcriptBody.attr("dir", this.model.languages_dir[language]);
+                this.$popContainer.attr("dir", this.model.languages_dir[language]);
                 var subtitleSets = this.model.subtitles.where({'language': language});
                 if (subtitleSets.length) {
                     var subtitleSet = subtitleSets[0];
