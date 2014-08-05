@@ -49,7 +49,10 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	    iframeDomain = "http://" + parser.host;
 	    for (var i = 0 ; i < elements.length ; i++) {
 		var currentDiv = elements[i];
+		var noanalytics = false;
                 var loadingDiv = document.createElement("DIV");
+                if (currentDiv.dataset.noanalytics)
+                    noanalytics = true;
                 if (currentDiv.dataset.width)
                     currentDiv.style.width = currentDiv.dataset.width;
                 if (currentDiv.dataset.height)
@@ -68,7 +71,9 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
                 currentDiv.appendChild(loadingDiv); 
 
 		var iframe = document.createElement("IFRAME");
-		iframe.src = "http://" + parser.host + "/embedder-widget-iframe/?data=" +
+		iframe.src = "http://" + parser.host + "/embedder-widget-iframe/";
+		if (noanalytics) iframe.src += "noanalytics/";
+		iframe.src += "?data=" +
 		    encodeURIComponent(JSON.stringify(currentDiv.dataset));
 		iframe.style.border = "none";
 		iframe.style.overflow = "hidden";
