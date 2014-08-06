@@ -419,6 +419,7 @@ class SubtitleLanguage(models.Model):
         super(SubtitleLanguage, self).__init__(*args, **kwargs)
         self._tip_cache = {}
         self._translation_source_version_cache = {}
+        self._original_subtitles_complete = self.subtitles_complete
 
     # Writelocking
     @property
@@ -512,7 +513,12 @@ class SubtitleLanguage(models.Model):
         if creating and not self.created:
             self.created = datetime.now()
 
-        return super(SubtitleLanguage, self).save(*args, **kwargs)
+        super(SubtitleLanguage, self).save(*args, **kwargs)
+        if self._original_subtitles_complete != self.subtitles_complete:
+            self._original_subtitles_complete = self.subtitles_complete
+            signals.subtitles_complete_changed.send(self)
+        elif creating and self.subtitles_complete:
+            signals.subtitles_complete_changed.send(self)
 
     def title_display(self):
         tip = self.get_tip()
