@@ -49,6 +49,7 @@ class Command(BaseCommand):
         self.upload_bundles()
         self.upload_static_dir('images')
         self.upload_static_dir('fonts')
+        self.upload_admin_files()
         self.upload_old_embedder()
 
     def setup_s3_subdir(self, options):
@@ -93,9 +94,20 @@ class Command(BaseCommand):
 
     def upload_static_dir(self, subdir):
         directory = os.path.join(settings.STATIC_ROOT, subdir)
-        for path, dirs, files in os.walk(directory):
+        for dirpath, dirs, files in os.walk(directory):
             for filename in files:
-                self.upload_file(os.path.join(path, filename))
+                path = os.path.join(dirpath, filename)
+                s3_path = os.path.relpath(path, settings.STATIC_ROOT)
+                self.upload_file(path, s3_path)
+
+    def upload_admin_files(self):
+        root_dir = utils.admin_media_root()
+        for dirpath, dirs, files in os.walk(root_dir):
+            for filename in files:
+                path = os.path.join(dirpath, filename)
+                s3_path = os.path.join('admin',
+                                       os.path.relpath(path, root_dir))
+                self.upload_file(path, s3_path)
 
     def upload_old_embedder(self):
         # the old embedder is a little different the the others, since we put
@@ -116,11 +128,10 @@ class Command(BaseCommand):
         key.set_contents_from_string(content, headers, replace=True,
                                      policy='public-read')
 
-    def upload_file(self, path):
-        relpath = os.path.relpath(path, settings.STATIC_ROOT)
+    def upload_file(self, path, s3_path):
         key = Key(bucket=self.bucket)
-        key.name = os.path.join(self.s3_subdirectory, relpath)
-        self.log_upload(relpath, key)
+        key.name = os.path.join(self.s3_subdirectory, s3_path)
+        self.log_upload(s3_path, key)
         key.set_contents_from_filename(path, self.headers_for_file(path),
                                        replace=True, policy='public-read')
 

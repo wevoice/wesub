@@ -22,6 +22,8 @@ from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 from django.conf.urls.static import static
 
+from staticmedia import utils
+
 if settings.STATIC_MEDIA_USES_S3:
     # don't serve up the media from the local server if we're using S3
     urlpatterns = patterns('staticmedia.views')
@@ -38,7 +40,7 @@ else:
         '/images/', document_root=os.path.join(settings.STATIC_ROOT, 'images')
     ) + static(
         '/fonts/', document_root=os.path.join(settings.STATIC_ROOT, 'fonts')
-    )
+    ) + static('/admin/', document_root=utils.admin_media_root())
 
 if settings.DEBUG:
     urlpatterns += patterns(

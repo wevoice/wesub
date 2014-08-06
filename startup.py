@@ -58,3 +58,4 @@ def startup():
     setup_path()
     setup_patch_reverse()
     setup_celery_loader()
+    import staticmedia.startup

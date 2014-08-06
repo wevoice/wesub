@@ -16,9 +16,11 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import os
 import subprocess
 
 from django.conf import settings
+import django.contrib.admin
 
 import commit
 
@@ -68,3 +70,9 @@ def run_command(commandline, stdin=None):
                                                          p.returncode))
     else:
         return stdout
+
+def admin_media_root():
+    """Get the root directory for admin media
+    """
+    admin_root = os.path.dirname(django.contrib.admin.__file__)
+    return os.path.join(admin_root, 'static', 'admin')
