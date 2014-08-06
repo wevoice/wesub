@@ -300,8 +300,6 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
                         .format(cls.team.slug, cls.project1.slug))
         cls.project2_page = ('teams/{0}/videos/?project={1}'
                         .format(cls.team.slug, cls.project2.slug))
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" %self.id())
 
     def test_add_new(self):
         """Submit a new video for the team and assign to a project.

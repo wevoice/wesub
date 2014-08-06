@@ -1,0 +1,4 @@
+#!/bin/bash
+
+manage syncdb --all --noinput
+manage migrate --fake

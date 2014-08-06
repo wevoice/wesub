@@ -36,6 +36,8 @@ from django.utils.encoding import iri_to_uri
 from django.utils.http import cookie_date
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.simple import direct_to_template
+from django.views.decorators.clickjacking import xframe_options_exempt
 from simplejson.decoder import JSONDecodeError
 
 import widget
@@ -50,9 +52,16 @@ from widget.models import SubtitlingSession
 from widget.null_rpc import NullRpc
 from widget.rpc import add_general_settings, Rpc
 
-
 rpc_views = Rpc()
 null_rpc_views = NullRpc()
+
+@xframe_options_exempt
+def embedder_widget(request, analytics):
+    """
+    This serves the new embedder.
+    """
+    return direct_to_template(request, 'embedder-widget.html',
+                              {'noanalytics': analytics == "noanalytics/"})
 
 def embed(request, version_no=''):
     """

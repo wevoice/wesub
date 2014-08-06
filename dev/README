@@ -1,0 +1,4 @@
+This directory contains a bunch of useful scripts for running a dev
+environment.
+
+Run source dev/activate to add the scripts to your path.
