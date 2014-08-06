@@ -814,8 +814,8 @@
 	    Supported formats are: SRT, SSA, SBV, DFXP, TXT, and VTT. Only files ending with the correct extension, .srt, .ssa, .sbv, .txt, .vtt, .dfxp or .xml (for dfxp) are accepted.
             {% endblocktrans %}
           </p>
-	  <p ng-show="uploadError">
-	    {% trans "Upload failed" %}
+	  <p class="error" ng-show="uploadError">
+	    {% trans "Upload failed. The file you uploaded might be invalid or an unsupported format." %}
 	  </p>
 	  <form method="post" id="upload-subtitles-form" action="{% url videos:upload_subtitles %}" enctype="multipart/form-data">
             {% csrf_token %}

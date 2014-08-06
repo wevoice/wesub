@@ -212,12 +212,16 @@ var angular = angular || null;
 	    $('#upload-subtitles-form').ajaxSubmit({
               dataType: 'json',
               success: function(data, status, xhr, $form){
-                  location.reload();
+		  if (data && data.success)
+                      location.reload();
+		  else {
+                      $scope.uploading = false;
+                      $scope.uploadError = true;
+		  }
               },
               error: function(data, status, xhr, $form){
                   $scope.uploading = false;
                   $scope.uploadError = true;
-		  console.log("Submit error");
               }
             });
             $event.stopPropagation();
