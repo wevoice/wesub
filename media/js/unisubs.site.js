@@ -574,6 +574,7 @@ var Site = function(Site) {
                 });
                 if (cookies_are_enabled()) {
                     var $w = $('#language_modal');
+                    var redirect = $w.find('#redirect') && $w.find('#redirect').attr("data-redirect");
                     $w.find('.submit_button').click(function() {
                         var values = {};
                         var has_value = false;
@@ -589,7 +590,10 @@ var Site = function(Site) {
                         } else {
                             $w.html(window.LANGUAGE_SELECT_SAVING);
                             ProfileApi.select_languages(values, function() {
-                                    window.location.reload(true);
+                                    if(redirect)
+                                        window.location = redirect;
+                                    else
+                                        window.location.reload(true);
                                 }, function() {
                                     $w.modClose();
                                 }

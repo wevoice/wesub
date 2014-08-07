@@ -18,9 +18,10 @@
                         {{ team.auth_provider.verbose_name }}
                     </p>
                 {% else %}
-                    <p><a id="join" onclick="return confirm('{% trans "Do you really wish to join this team?" %}')" href="{% url teams:join_team team.slug %}">{% trans "Join our team now!" %}</a></p>
+                    <p><a href="#" data-modal="language_modal" id="lang_select_btn" >{% trans "Join our team now!" %}</a></p>
                 {% endif %}
             {% endif %}
+
             {% if team.is_by_application %}
                 {% if team.auth_provider and user.partner.slug != team.auth_provider.code %}
                     <p><a href="{% url logout %}?next={{ team.auth_provider.url }}">

@@ -25,10 +25,6 @@
     </script>
 {% endblock %}
 
-{% block select_language_dialog %}
-    {% select_language_dialog %}
-{% endblock %}
-
 {% block view_content %}
 
     <div class="grid_8 view omega{% if team.get_workflow.requires_review_or_approval %} moderated{% endif %}{% if team.workflow_enabled %} task-enabled{% endif %}">
@@ -96,6 +92,11 @@
                         {% endblocktrans %}
                     </p>
                     {% include "teams/_join.html" %}
+		    {% block select_language_dialog %}
+		        {% url teams:detail_members slug=team.slug as redirect_url %}
+		        {% select_language_dialog hide_link="True" redirect=redirect_url %}
+		    {% endblock %}
+
                 {% endif %}
             </div>
         {% endif %}

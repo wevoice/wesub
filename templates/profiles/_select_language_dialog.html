@@ -1,9 +1,11 @@
 {% load i18n %}
 
+{% if not hide_link %}
 <div class="language_bar clearfix">
     <span>{% trans "Loading..." %}</span>
     <a href="#" data-modal="language_modal" id="lang_select_btn" >{% trans "Select your Languages" %}</a>
 </div>
+{% endif %}
 
 <script type="text/javascript">
     window.FORCE_ASK = {% if force_ask %}true{% else %}false{% endif %};
@@ -28,6 +30,9 @@
                 </fieldset>
             </form>
         </div>
+	{% if redirect %}
+	<div id="redirect" data-redirect="{{ redirect }}"></div>
+	{% endif %}
         <div class="modal-footer">
             <button class="submit_button btn primary">{% trans "Submit" %}</button>
             <button class="close_button btn cancel">{% trans "Cancel" %}</button>
