@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}src/css/subtitle-editor/subtitle-editor-dev.css" type="text/css" media="screen" charset="utf-8">
 
     <script type="text/javascript">
-        var editorData = {{ editor_data|safe }}
+        var editorData = {{ editor_data|safe }};
         window.Amara = window.Amara || {};
         window.Amara.conf = window.Amara.conf || {};
         window.Amara.conf.STATIC_ROOT_URL = '{{ STATIC_URL }}';
