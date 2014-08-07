@@ -60,7 +60,7 @@ from subtitles.models import (
     SubtitleLanguage, SubtitleVersion, ORIGIN_ROLLBACK, ORIGIN_API,
     ORIGIN_UPLOAD, ORIGIN_WEB_EDITOR
 )
-
+from subtitles import signals
 
 # Utility Functions -----------------------------------------------------------
 def _strip_nones(d):
@@ -411,7 +411,7 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
         # only save if the value has changed
         if is_complete != sl.subtitles_complete:
             sl.subtitles_complete = is_complete
-            sl.save()
+            sl.save(send_subtitles_changed=False)
     _update_video_data(sl, version)
     _update_followers(sl, author)
     _perform_team_operations(version, committer, complete)
@@ -425,6 +425,8 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
         # entire concept of forking.
         sl.fork()
         _fork_dependents(sl)
+
+    signals.subtitles_changed.send(sl)
 
     return version
 

@@ -32,27 +32,18 @@ import subtitles.signals
 
 
 def _update_subtitles_for_language(language):
-    if not language.subtitles_complete:
-        return
     for account, video_url in lookup_accounts(language.video):
         tasks.update_subtitles.delay(account.account_type, account.id,
                                      video_url.id, language.id)
         if credit.should_add_credit_to_video_url(video_url, account):
             tasks.add_amara_credit.delay(video_url.id)
 
-@receiver(subtitles.signals.public_tip_changed)
-def on_public_tip_changed(signal, sender, version, **kwargs):
+@receiver(subtitles.signals.subtitles_changed)
+def on_subtitles_changed(signal, sender, **kwargs):
     if not isinstance(sender, SubtitleLanguage):
         raise ValueError("sender must be a SubtitleLanguage: %s" % sender)
-    if not isinstance(version, SubtitleVersion):
-        raise ValueError("version has wrong type: %s" % version)
-    _update_subtitles_for_language(sender)
-
-@receiver(subtitles.signals.subtitles_complete_changed)
-def on_subtitles_complete_changed(signal, sender, **kwargs):
-    if not isinstance(sender, SubtitleLanguage):
-        raise ValueError("sender must be a SubtitleLanguage: %s" % sender)
-    _update_subtitles_for_language(sender)
+    if sender.subtitles_complete:
+        _update_subtitles_for_language(sender)
 
 @receiver(subtitles.signals.language_deleted)
 def on_language_deleted(signal, sender, **kwargs):
