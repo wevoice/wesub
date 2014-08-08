@@ -16,8 +16,10 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from cStringIO import StringIO
 import datetime
 import email
+import gzip
 import mimetypes
 import time
 import optparse
@@ -40,10 +42,13 @@ class Command(BaseCommand):
         optparse.make_option('--skip-commit-check', dest='skip_commit_check',
                              action='store_true', default=False,
                              help="Don't check the git commit in commit.py"),
+        optparse.make_option('--no-gzip', dest='gzip', action='store_false',
+                             default=True, help="Don't gzip files")
     )
 
     def handle(self, *args, **options):
-        self.setup_s3_subdir(options)
+        self.options = options
+        self.setup_s3_subdir()
         self.setup_connection()
         self.build_bundles()
         self.upload_bundles()
@@ -52,9 +57,9 @@ class Command(BaseCommand):
         self.upload_admin_files()
         self.upload_old_embedder()
 
-    def setup_s3_subdir(self, options):
+    def setup_s3_subdir(self):
         self.s3_subdirectory = utils.s3_subdirectory()
-        if options['skip_commit_check']:
+        if self.options['skip_commit_check']:
             return
         git_commit = get_current_commit_hash(skip_sanity_checks=True)
         if git_commit != self.s3_subdirectory:
@@ -68,12 +73,12 @@ class Command(BaseCommand):
                                  settings.AWS_SECRET_ACCESS_KEY)
         self.bucket = self.conn.get_bucket(settings.STATIC_MEDIA_S3_BUCKET)
 
-    def log_upload(self, path, key):
+    def log_upload(self, key):
         url_base = settings.STATIC_MEDIA_S3_URL_BASE
         if url_base.startswith("//"):
             # add http: for protocol-relative URLs
             url_base = "http:" + url_base
-        self.stdout.write("%s -> %s%s\n" % (path, url_base, key.name))
+        self.stdout.write("-> %s%s\n" % (url_base, key.name))
 
     def build_bundles(self):
         self.built_bundles = []
@@ -90,7 +95,7 @@ class Command(BaseCommand):
             headers = self.cache_forever_headers()
             headers['Content-Type'] = bundle.mime_type
             upload_path = '%s/%s' % (bundle.bundle_type, bundle.name)
-            self.upload_file_from_string(upload_path, contents, headers)
+            self.upload_string(upload_path, contents, headers)
 
     def upload_static_dir(self, subdir):
         directory = os.path.join(settings.STATIC_ROOT, subdir)
@@ -109,31 +114,47 @@ class Command(BaseCommand):
                                        os.path.relpath(path, root_dir))
                 self.upload_file(path, s3_path)
 
+    def should_gzip(self, content_type):
+        if not self.options['gzip']:
+            return False
+        return (content_type.startswith('text/') or
+                content_type == 'application/javascript')
+
+    def compress_string(self, data):
+        zbuf = StringIO()
+        zfile = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
+        zfile.write(data)
+        zfile.close()
+        return zbuf.getvalue()
+
     def upload_old_embedder(self):
         # the old embedder is a little different the the others, since we put
         # it in the root directory of our s3 bucket.  This means that we can't
-        # cache it forever.
+        # cache it forever.  Also we have to pass a slightly weird filename to
+        # upload_string()
         headers = self.no_cache_headers()
-        headers['Content-Type'] = 'text/javascript'
-        key = Key(bucket=self.bucket)
-        key.name = 'embed.js'
-        self.log_upload('embed.js', key)
-        key.set_contents_from_string(self.old_embedder_js_code, headers,
-                                     replace=True, policy='public-read')
+        self.upload_string("embed.js", self.old_embedder_js_code,
+                           self.no_cache_headers(),
+                           store_in_s3_subdirectory=False)
 
-    def upload_file_from_string(self, filename, content, headers):
+    def upload_string(self, filename, content, headers,
+                      store_in_s3_subdirectory=True):
+        content_type = headers.get('Content-Type', 'application/unknown')
+        if self.should_gzip(content_type):
+            content = self.compress_string(content)
+            headers['Content-Encoding'] = 'gzip'
         key = Key(bucket=self.bucket)
-        key.name = os.path.join(self.s3_subdirectory, filename)
-        self.log_upload(filename, key)
+        if store_in_s3_subdirectory:
+            key.name = os.path.join(self.s3_subdirectory, filename)
+        else:
+            key.name = filename
+        self.log_upload(key)
         key.set_contents_from_string(content, headers, replace=True,
                                      policy='public-read')
 
-    def upload_file(self, path, s3_path):
-        key = Key(bucket=self.bucket)
-        key.name = os.path.join(self.s3_subdirectory, s3_path)
-        self.log_upload(s3_path, key)
-        key.set_contents_from_filename(path, self.headers_for_file(path),
-                                       replace=True, policy='public-read')
+    def upload_file(self, source_file, filename):
+        self.upload_string(filename, open(source_file).read(),
+                           self.headers_for_file(source_file))
 
     def http_date(self, time_delta):
         timetuple = (datetime.datetime.now() + time_delta).timetuple()
