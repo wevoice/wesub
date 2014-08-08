@@ -1,6 +1,6 @@
 {% extends "profiles/base.html" %}
 
-{% load i18n auth_tags %}
+{% load i18n auth_tags profiles_tags %}
 
 {% block title %}{% trans "Edit Profile" %} | Amara{% endblock %}
 
@@ -64,6 +64,18 @@
             </button>
         </div>
     </form>
+    <hr>
+    <div id="language_profile">
+      <h3>{% trans "Enter or confirm your language skills" %}</h3>
+      {% block select_language_form %}
+      {% select_language_form %}
+      {% endblock %}
+      <div class="submit">
+	<button class="submit_button button save">
+	  {% trans 'Save Changes' %}
+      </button>
+      </div>
+    </div>
 
 {% endblock %}
 
