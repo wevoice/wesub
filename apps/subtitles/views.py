@@ -179,9 +179,10 @@ def old_editor(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
     language = get_object_or_404(SubtitleLanguage, video=video,
                                  language_code=language_code)
-    return redirect(shims.get_widget_url(language,
-                                         request.GET.get('mode'),
-                                         request.GET.get('task_id')))
+    url_path = shims.get_widget_url(language,
+                                    request.GET.get('mode'),
+                                    request.GET.get('task_id'))
+    return redirect("http://%s%s" % (request.get_host(), url_path))
 
 @login_required
 def subtitle_editor(request, video_id, language_code):
