@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n profiles_tags %}
 
 {% if not hide_link %}
 <div class="language_bar clearfix">
@@ -17,24 +17,11 @@
     <div class="modal" style="display: block;">
         <div class="modal-header">
             <h3>{% trans "What languages do you speak?" %}</h3>
+	    <p>{% trans "Select or confirm the languages you speak." %}</p>
         </div>
-        <div id="language_picker" class="modal-body clearfix">
-            <form action="" method="get">
-                <fieldset>
-                    {{ form.language1 }}
-                    {{ form.language2 }}
-                    {{ form.language3 }}
-                    {{ form.language4 }}
-                    {{ form.language5 }}
-                    {{ form.language6 }}
-                </fieldset>
-            </form>
-        </div>
-	{% if redirect %}
-	<script type="text/javascript">
-	  var redirect = "{{ redirect }}";
-	</script>
-	{% endif %}
+	{% block select_language_form %}
+	{% select_language_form %}
+	{% endblock %}
         <div class="modal-footer">
             <button class="submit_button btn primary">{% trans "Submit" %}</button>
             <button class="close_button btn cancel">{% trans "Cancel" %}</button>

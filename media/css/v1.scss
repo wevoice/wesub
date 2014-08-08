@@ -2484,7 +2484,7 @@ a.truncated-expand {
     div.modal-body {
         div.message {
             max-height: 300px;
-            overflow: scroll;
+            overflow: auto;
 
             &::-webkit-scrollbar {
                 -webkit-appearance: none;

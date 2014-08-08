@@ -1,11 +1,11 @@
-{% load i18n %}
+{% load i18n profiles_tags %}
 
 <p>
     <a id="apply" class="open-modal" href="#apply-modal">{% trans "Apply to Join" %}</a>
 </p>
 
 <div class="bootstrap">
-    <div class="modal" id="apply-modal">
+    <div class="modal modal-wide" id="apply-modal">
         <div class="modal-header">
             <a href="#" class="close action-close">x</a>
             <h3>{% trans "Apply to" %} "{{ team }}"</h3>
@@ -41,18 +41,23 @@
             <div class="form">
                 <textarea></textarea>
             </div>
+	    <h4>{% trans "Enter or confirm your language skills" %}</h4>
+	    {% block select_language_form %}
+	    {% select_language_form %}
+	    {% endblock %}
         </div>
         <div class="modal-footer">
-            <button team_id="{{ team.pk }}">{% trans "Submit Application" %}</button>
+            <button team_id="{{ team.pk }}" class="submit_button">{% trans "Submit Application" %}</button>
         </div>
     </div>
 </div>
 <script type="text/javascript">
-    $('#apply-modal button').click(function(){
+        var submit_application = function(){
         var $t = $('#apply-modal textarea');
+        var team_id = $('#apply-modal button.submit_button').attr('team_id');
 
         if ($.trim($t.val()) !== '') {
-            TeamsApi.create_application($(this).attr('team_id'), $t.val(), function(response){
+            TeamsApi.create_application(team_id, $t.val(), function(response){
                 if (response.error){
                     $.jGrowl.error(response.error);
                 }else{
@@ -67,5 +72,7 @@
             alert('The "About you" field is required in order to apply.');
         }
         return false;
-    });
+    };
+
+    submit_languages_callback = submit_application;
 </script>
