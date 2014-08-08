@@ -505,6 +505,8 @@ class SubtitleLanguage(models.Model):
         )
 
     def save(self, *args, **kwargs):
+        send_subtitles_changed = kwargs.pop('send_subtitles_changed', True)
+
         assert self.language_code in VALID_LANGUAGE_CODES, \
             "Subtitle Language %s should be a valid code." % self.language_code
 
@@ -516,9 +518,7 @@ class SubtitleLanguage(models.Model):
         super(SubtitleLanguage, self).save(*args, **kwargs)
         if self._original_subtitles_complete != self.subtitles_complete:
             self._original_subtitles_complete = self.subtitles_complete
-            signals.subtitles_complete_changed.send(self)
-        elif creating and self.subtitles_complete:
-            signals.subtitles_complete_changed.send(self)
+            signals.subtitles_changed.send(self)
 
     def title_display(self):
         tip = self.get_tip()
@@ -786,8 +786,6 @@ class SubtitleLanguage(models.Model):
 
         cache.invalidate_language_cache(self)
         self.clear_tip_cache()
-        if sv.is_public():
-            signals.public_tip_changed.send(self, version=sv)
         return sv
 
     def get_metadata(self, public=True):
@@ -1766,8 +1764,6 @@ class SubtitleVersion(models.Model):
         self.save()
         if not was_public and self.is_tip():
             self.subtitle_language.set_tip_cache('public', self)
-            signals.public_tip_changed.send(self.subtitle_language,
-                                            version=self)
 
     def unpublish(self, delete=False, signal=True):
         """Unpublish this version.
@@ -1788,10 +1784,7 @@ class SubtitleVersion(models.Model):
         if signal and was_tip:
             self.subtitle_language.clear_tip_cache()
             new_tip = version=self.subtitle_language.get_tip(public=True)
-            if new_tip is not None:
-                signals.public_tip_changed.send(self.subtitle_language,
-                                                version=new_tip)
-            else:
+            if new_tip is None:
                 signals.language_deleted.send(self.subtitle_language)
 
     @models.permalink
