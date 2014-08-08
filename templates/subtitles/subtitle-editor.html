@@ -18,7 +18,7 @@
     {% media_bundle "editor.css" %}
 
     <script type="text/javascript">
-        var editorData = {{ editor_data|safe }}
+        var editorData = {{ editor_data|safe }};
         window.Amara = window.Amara || {};
         window.Amara.conf = window.Amara.conf || {};
         window.Amara.conf.STATIC_ROOT_URL = '{{ STATIC_URL }}';

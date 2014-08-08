@@ -20,4 +20,4 @@
 from django import dispatch
 
 language_deleted = dispatch.Signal()
-public_tip_changed = dispatch.Signal()
+subtitles_changed = dispatch.Signal(providing_args=['version'])
