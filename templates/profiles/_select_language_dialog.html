@@ -31,7 +31,9 @@
             </form>
         </div>
 	{% if redirect %}
-	<div id="redirect" data-redirect="{{ redirect }}"></div>
+	<script type="text/javascript">
+	  var redirect = "{{ redirect }}";
+	</script>
 	{% endif %}
         <div class="modal-footer">
             <button class="submit_button btn primary">{% trans "Submit" %}</button>

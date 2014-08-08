@@ -93,7 +93,7 @@
                     </p>
                     {% include "teams/_join.html" %}
 		    {% block select_language_dialog %}
-		        {% url teams:detail_members slug=team.slug as redirect_url %}
+		        {% url teams:join_team slug=team.slug as redirect_url %}
 		        {% select_language_dialog hide_link="True" redirect=redirect_url %}
 		    {% endblock %}
 

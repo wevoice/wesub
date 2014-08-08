@@ -574,7 +574,6 @@ var Site = function(Site) {
                 });
                 if (cookies_are_enabled()) {
                     var $w = $('#language_modal');
-                    var redirect = $w.find('#redirect') && $w.find('#redirect').attr("data-redirect");
                     $w.find('.submit_button').click(function() {
                         var values = {};
                         var has_value = false;
