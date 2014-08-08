@@ -32,13 +32,6 @@ def _add_share_panel_context(context, facebook_url, twitter_url, embed_params,
     
     context["share_panel_facebook_url"] = facebook_url
     context["share_panel_twitter_url"] = twitter_url
-    
-    ec_context = {
-        'embed_params': json(embed_params),
-        'STATIC_URL': settings.STATIC_URL,
-        'STATIC_URL_BASE': settings.STATIC_URL_BASE,
-    }
-    
     context["share_panel_email_url"] = email_url
     context["share_panel_permalink"] = permalink
 
