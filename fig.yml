@@ -19,7 +19,7 @@ app:
 
 sslapp:
   image: amara-app
-  command: python manage.py runsslserver 0.0.0.0:8000
+  command: python manage.py runsslserver 0.0.0.0:8000 --nostatic
   environment:
       DJANGO_SETTINGS_MODULE: dev_settings
 
