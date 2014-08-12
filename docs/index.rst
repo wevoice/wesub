@@ -27,8 +27,6 @@ Contents:
    model-refactor
    syncing
    youtube-syncing
-   kaltura-syncing
-   brightcove-syncing
    bugs
    languages
 
