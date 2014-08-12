@@ -544,12 +544,6 @@ class Video(models.Model):
                     defaults['videoid'] = vt.video_id
                 video_url_obj, created = VideoUrl.objects.get_or_create(url=vt.convert_to_video_url(),
                                                                         defaults=defaults)
-                try:
-                    assert video_url_obj.video == obj
-                except AssertionError, e:
-                    logger.exception(
-                        "Data integrity error with video_url_obj ")
-                    raise e
                 obj.update_search_index()
                 video, created = obj, True
 
