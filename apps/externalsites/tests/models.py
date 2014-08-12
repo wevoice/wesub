@@ -36,10 +36,6 @@ class LookupAccountTest(TestCase):
     def check_lookup_accounts_returns_nothing(self, video):
         self.assertEquals(lookup_accounts(video), [])
 
-    def check_is_for_video_url(self, account, video, correct_value):
-        video_url = video.get_primary_videourl_obj()
-        self.assertEquals(account.is_for_video_url(video_url), correct_value)
-
     def test_team_account(self):
         video = BrightcoveVideoFactory()
         team_video = TeamVideoFactory(video=video)
@@ -60,29 +56,40 @@ class LookupAccountTest(TestCase):
 
         self.check_lookup_accounts_returns_nothing(video)
 
-    def test_youtube(self):
-        team = TeamFactory()
-        account1 = YouTubeAccountFactory(channel_id='user1', team=team)
-        account2 = YouTubeAccountFactory(channel_id='user2', team=team)
-        video1 = YouTubeVideoFactory(video_url__owner_username='user1')
-        video2 = YouTubeVideoFactory(video_url__owner_username='user2')
-        # video for a user that we don't have an account for
-        video3 = YouTubeVideoFactory(video_url__owner_username='user3')
-        # video without a username set
-        video4 = YouTubeVideoFactory(video_url__owner_username='')
-        for video in (video1, video2, video3):
-            TeamVideoFactory(video=video, team=team)
+    def test_youtube_checks_channel_id(self):
+        # for youtube, lookup_accounts should return any account that matches
+        # the channel id.  It shouldn't matter who owns the video in amara.
+        user = UserFactory()
+        account = YouTubeAccountFactory(channel_id='channel', user=user)
+        # video owned by user and from user's youtube channel
+        video = YouTubeVideoFactory(video_url__owner_username='channel',
+                                    user=user)
+        # video not owned by user but from user's youtube channel
+        video2 = YouTubeVideoFactory(video_url__owner_username='channel',
+                                     user=UserFactory())
+        # video owned by user but not from user's youtube channel
+        video3 = YouTubeVideoFactory(video_url__owner_username='channel2',
+                                     user=user)
+        # video neither owned by user nor from user's youtube channel
+        video4 = YouTubeVideoFactory(video_url__owner_username='channel3',
+                                     user=UserFactory())
 
-        self.check_lookup_accounts(video1, account1)
-        self.check_lookup_accounts(video2, account2)
+        self.check_lookup_accounts(video, account)
+        self.check_lookup_accounts(video2, account)
         self.check_lookup_accounts_returns_nothing(video3)
         self.check_lookup_accounts_returns_nothing(video4)
-        # test ExternalAccount.is_for_video_url() which works in the reverse
-        # direction
-        self.check_is_for_video_url(account1, video1, True)
-        self.check_is_for_video_url(account1, video2, False)
-        self.check_is_for_video_url(account1, video3, False)
-        self.check_is_for_video_url(account1, video4, False)
+
+class YouTubeAccountTest(TestCase):
+    def test_is_for_video_url(self):
+        user = UserFactory()
+        video = YouTubeVideoFactory(video_url__owner_username='channel')
+        video_url = video.get_primary_videourl_obj()
+        account = YouTubeAccountFactory(channel_id='channel', user=user)
+        account2 = YouTubeAccountFactory(channel_id='other-channel',
+                                         user=user)
+
+        self.assertEquals(account.is_for_video_url(video_url), True)
+        self.assertEquals(account2.is_for_video_url(video_url), False)
 
 class BrightcoveAccountTest(TestCase):
     def setUp(self):

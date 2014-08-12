@@ -65,23 +65,13 @@ class ExternalAccountManager(models.Manager):
             raise TypeError("Invalid owner type: %r" % owner)
         return self.filter(type=type_, owner_id=owner.id)
 
-    def for_video_url(self, video_url):
-        """Filter accounts by a VideoUrl
-
-        By default this is a no-op, but subclasses like YouTubeAccount
-        override it.
-        """
-        return self
-
     def lookup(self, video, video_url):
-        qs = self.for_video_url(video_url)
-
         team_video = video.get_team_video()
         if team_video is not None:
-            return qs.get(type=ExternalAccount.TYPE_TEAM,
+            return self.get(type=ExternalAccount.TYPE_TEAM,
                           owner_id=team_video.team_id)
         else:
-            return qs.get(type=ExternalAccount.TYPE_USER,
+            return self.get(type=ExternalAccount.TYPE_USER,
                           owner_id=video.user_id)
 
 class ExternalAccount(models.Model):
@@ -314,11 +304,8 @@ class BrightcoveAccount(ExternalAccount):
 
 
 class YouTubeAccountManager(ExternalAccountManager):
-    def for_video_url(self, video_url):
-        if video_url.owner_username:
-            return self.filter(channel_id=video_url.owner_username)
-        else:
-            return self.none()
+    def lookup(self, video, video_url):
+        return self.get(channel_id=video_url.owner_username)
 
     def create_or_update(self, channel_id, oauth_refresh_token, **data):
         """Create a new YouTubeAccount, if none exists for the channel_id
