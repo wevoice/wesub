@@ -435,6 +435,7 @@ MEDIA_BUNDLES = {
     'editor.js':  {
         'files': (
             'src/js/third-party/jquery-1.10.1.js',
+            'js/jquery.form.js',
             'src/js/third-party/jquery.autosize.js',
             'src/js/third-party/angular.1.2.0.js',
             'src/js/third-party/angular-cookies.js',

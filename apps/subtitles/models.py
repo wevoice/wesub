@@ -518,7 +518,8 @@ class SubtitleLanguage(models.Model):
         super(SubtitleLanguage, self).save(*args, **kwargs)
         if self._original_subtitles_complete != self.subtitles_complete:
             self._original_subtitles_complete = self.subtitles_complete
-            signals.subtitles_changed.send(self)
+            if send_subtitles_changed:
+                signals.subtitles_changed.send(self, version=None)
 
     def title_display(self):
         tip = self.get_tip()

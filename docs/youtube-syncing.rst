@@ -37,6 +37,20 @@ should check if the video's Youtube owner has a linked account on Amara.  If
 so, we should immediately add the Amara link to the video's description on
 Youtube. 
 
+Videos that were submitted to Amara by a user other than the account owner
+should also sync subtitles to youtube if the account owner has their account
+linked.
+
+Syncing
+-------
+
+Subtitles are only synced to youtube when the video language is marked 
+'complete' and the subtitles are 'public'.
+
+If a complete and public language is edited and marked incomplete - 
+the subtitles remain unchanged on youtube.  If the language is later marked
+as complete, the subtitles are synced.
+
 Credits
 -------
 

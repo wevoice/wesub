@@ -36,6 +36,7 @@ from django.template.defaultfilters import urlize, linebreaks, force_escape
 from subtitles import shims
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.templatetags.new_subtitles_tags import visibility
+from subtitles.forms import SubtitlesUploadForm
 from teams.models import Task
 from teams.permissions import can_add_version, can_assign_task
 from utils.text import fmt
@@ -296,7 +297,9 @@ def subtitle_editor(request, video_id, language_code):
         'version': editing_version,
         'translated_from_version': translated_from_version,
         'task': task,
-        'editor_data': json.dumps(editor_data, indent=4)
+        'editor_data': json.dumps(editor_data, indent=4),
+        'upload_subtitles_form': SubtitlesUploadForm(request.user, video,
+                                                     initial={'language_code': editing_language.language_code})
     }, context_instance=RequestContext(request))
 
 def download(request, video_id, language_code, filename, format,

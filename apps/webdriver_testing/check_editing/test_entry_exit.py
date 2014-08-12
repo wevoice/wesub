@@ -5,8 +5,6 @@ import os
 from django.test import TestCase
 from django.core import management
 
-from videos.models import Video
-
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages import video_page
@@ -32,8 +30,8 @@ class TestCaseEntryExit(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.user = UserFactory.create()
         cls.video_pg.open_page('auth/login/')
-        cls.video_pg.log_in(cls.user.username, 'password')
         cls.user = UserFactory.create()
+        cls.video_pg.log_in(cls.user.username, 'password')
 
 
     def test_exit_to_legacy(self):
