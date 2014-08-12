@@ -25,7 +25,10 @@ Contents:
    subtitle-storage
    subtitle-formats
    model-refactor
+   syncing
    youtube-syncing
+   kaltura-syncing
+   brightcove-syncing
    bugs
    languages
 
