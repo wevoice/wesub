@@ -69,6 +69,8 @@ var angular = angular || null;
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
         $scope.scrollingSynced = true;
         $scope.loadingFinished = false;
+        $scope.uploading = false;
+        $scope.uploadError = false;
 	$scope.currentTitle = {};
 	$scope.currentTitle.Edited = false;
 	$scope.titleEdited = function(newValue) {
@@ -154,10 +156,77 @@ var angular = angular || null;
             // that if anything changed
             $scope.$root.$emit('work-done');
 	}
-        $scope.copyTimingEnabled = function() {
+
+	$scope.copyTimingEnabled = function() {
             return ($scope.workingSubtitles.subtitleList.length() > 0 &&
                      $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
+
+        $scope.showUploadSubtitlesModal = function($event) {
+            $scope.dialogManager.open('upload-subtitles');
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
+
+        // Required by ajax plugin but not present in our version of
+        // jQuery
+        jQuery.extend({
+            handleError: function( s, xhr, status, e ) {
+		// If a local callback was specified, fire it
+		if ( s.error )
+			s.error( xhr, status, e );
+		// If we have some XML response text (e.g. from an AJAX call) then log it in the console
+		else if(xhr.responseText)
+			console.log(xhr.responseText);
+	    },
+            httpData: function( xhr, type, s ) {
+                var ct = xhr.getResponseHeader("content-type"),
+                         xml = type == "xml" || !type && ct && ct.indexOf("xml") >= 0,
+                         script = type == "script" || !type && ct && ct.indexOf("script") >= 0,
+                         json = type == "json" || !type && ct && ct.indexOf("json") >= 0,
+                         data = xml ? xhr.responseXML : xhr.responseText;
+
+                if ( xml && data.documentElement.tagName == "parsererror" )
+                    throw "parsererror";
+
+                // Allow a pre-filtering function to sanitize the response
+                // s != null is checked to keep backwards compatibility
+                if( s && s.dataFilter )
+                    data = s.dataFilter( data, type );
+
+                // If the type is "script", eval it in global context
+                if ( script )
+                    jQuery.globalEval( data );
+
+                // Get the JavaScript object, if JSON is used.
+                if ( json )
+                    data = eval("(" + data + ")");
+
+                return data;
+            }
+        });
+
+        $scope.submitUploadForm = function($event) {
+            $scope.uploading = true;
+            $scope.uploadError = false;
+	    $('#upload-subtitles-form').ajaxSubmit({
+              dataType: 'json',
+              success: function(data, status, xhr, $form){
+		  if (data && data.success)
+                      location.reload();
+		  else {
+                      $scope.uploading = false;
+                      $scope.uploadError = true;
+		  }
+              },
+              error: function(data, status, xhr, $form){
+                  $scope.uploading = false;
+                  $scope.uploadError = true;
+              }
+            });
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
 
         $scope.showCopyTimingModal = function($event) {
             $scope.dialogManager.openDialog('confirmCopyTiming', {
