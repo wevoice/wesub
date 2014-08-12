@@ -63,7 +63,7 @@ class SignalsTest(TestCase):
         language = v1.subtitle_language
         self.assertEquals(self.subtitles_changed_handler.call_count, 1)
         self.subtitles_changed_handler.assert_called_with(
-            signal=mock.ANY, sender=language)
+            signal=mock.ANY, sender=language, version=v1)
 
     def test_subtitles_changed_on_language_change(self):
         v1 = pipeline.add_subtitles(self.video, 'en', None)
@@ -75,4 +75,13 @@ class SignalsTest(TestCase):
 
         self.assertEquals(self.subtitles_changed_handler.call_count, 1)
         self.subtitles_changed_handler.assert_called_with(
-            signal=mock.ANY, sender=language)
+            signal=mock.ANY, sender=language, version=None)
+
+    def test_send_subtitles_changed_false(self):
+        v1 = pipeline.add_subtitles(self.video, 'en', None)
+        language = v1.subtitle_language
+        self.subtitles_changed_handler.reset_mock()
+
+        language.subtitles_complete = True
+        language.save(send_subtitles_changed=False)
+        self.assertEquals(self.subtitles_changed_handler.call_count, 0)

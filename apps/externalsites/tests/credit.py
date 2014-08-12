@@ -147,18 +147,13 @@ class AddCreditScheduleTest(BaseCreditTest):
             video.get_primary_videourl_obj().id)
 
     def test_dont_add_credit_without_account(self):
-        # test a creating a new video for a different user
-        video = YouTubeVideoFactory(user=UserFactory())
-        self.assertEqual(self.mock_add_amara_credit.delay.call_count, 0)
-        # adding a public tip shouldn't result in a call either
-        pipeline.add_subtitles(video, 'en', None)
-        self.assertEqual(self.mock_add_amara_credit.delay.call_count, 0)
         # test a video for our user, but not from our youtube account
         self.mock_get_video_info.return_value = YouTubeVideoInfoFactory(
             channel_id='other-channel')
-        video2 = YouTubeVideoFactory(user=self.user)
+        video = YouTubeVideoFactory(user=self.user)
         self.assertEqual(self.mock_add_amara_credit.delay.call_count, 0)
-        pipeline.add_subtitles(video2, 'en', None)
+        # adding a public tip shouldn't result in a call either
+        pipeline.add_subtitles(video, 'en', None)
         self.assertEqual(self.mock_add_amara_credit.delay.call_count, 0)
 
     def test_dont_add_credit_to_non_youtube_videos(self):

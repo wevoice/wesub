@@ -33,6 +33,7 @@ from externalsites.models import (KalturaAccount, SyncedSubtitleVersion,
                                   SyncHistory, lookup_account)
 from externalsites.syncing import kaltura, brightcove
 from subtitles import pipeline
+from subtitles.models import ORIGIN_IMPORTED
 from teams.permissions_const import ROLE_ADMIN
 from utils import test_utils
 from utils.factories import *
@@ -70,6 +71,17 @@ class SyncingTriggerTest(TestCase):
         self.mock_update_subtitles.delay.assert_called_with(
             KalturaAccount.account_type, self.account.id, self.video_url.id,
             self.language.id)
+
+    def test_dont_update_for_imported_versions(self):
+        # if a subtitle version was imported, then don't waste time resyncing
+        # it to the external site (#1646)
+        self.language.subtitles_complete = True
+        version = pipeline.add_subtitles(self.video, 'en', None,
+                                         origin=ORIGIN_IMPORTED)
+        self.mock_update_subtitles.delay.reset_mock()
+        subtitles.signals.subtitles_changed.send(sender=self.language,
+                                                 version=version)
+        self.assertEqual(self.mock_update_subtitles.delay.call_count, 0)
 
     def test_dont_update_when_incomplete(self):
         self.language.subtitles_complete = False

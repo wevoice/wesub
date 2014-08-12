@@ -26,15 +26,25 @@ from externalsites import subfetch
 from externalsites import tasks
 from externalsites.models import (KalturaAccount,
                                   lookup_accounts, lookup_account)
-from subtitles.models import SubtitleLanguage, SubtitleVersion
+from subtitles.models import (SubtitleLanguage, SubtitleVersion,
+                              ORIGIN_IMPORTED)
 from videos.models import Video, VideoUrl
 import subtitles.signals
 
+def _should_update_subtitles(language, version):
+    if not language.subtitles_complete:
+        return False
+    elif version is not None and version.origin == ORIGIN_IMPORTED:
+        # don't waste time re-syncing imported subs (#1646)
+        return False
+    else:
+        return True
 
-def _update_subtitles_for_language(language):
+def _update_subtitles_for_language(language, version):
     for account, video_url in lookup_accounts(language.video):
-        tasks.update_subtitles.delay(account.account_type, account.id,
-                                     video_url.id, language.id)
+        if _should_update_subtitles(language, version):
+            tasks.update_subtitles.delay(account.account_type, account.id,
+                                         video_url.id, language.id)
         if credit.should_add_credit_to_video_url(video_url, account):
             tasks.add_amara_credit.delay(video_url.id)
 
@@ -42,8 +52,7 @@ def _update_subtitles_for_language(language):
 def on_subtitles_changed(signal, sender, **kwargs):
     if not isinstance(sender, SubtitleLanguage):
         raise ValueError("sender must be a SubtitleLanguage: %s" % sender)
-    if sender.subtitles_complete:
-        _update_subtitles_for_language(sender)
+    _update_subtitles_for_language(sender, kwargs.get('version'))
 
 @receiver(subtitles.signals.language_deleted)
 def on_language_deleted(signal, sender, **kwargs):
