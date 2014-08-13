@@ -22,7 +22,8 @@ class Migration(DataMigration):
             "tpa.oauth_refresh_token "
             "FROM auth_customuser_third_party_accounts m2m "
             "JOIN accountlinker_thirdpartyaccount tpa "
-            "ON m2m.thirdpartyaccount_id = tpa.id")
+            "ON m2m.thirdpartyaccount_id = tpa.id "
+            "WHERE tpa.channel_id != ''")
         # link the VideoFeed for user accounts.
         for account in YouTubeAccount.objects.all():
             username = account.username.replace(' ', '')
