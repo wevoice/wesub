@@ -38,6 +38,7 @@ from utils import youtube
 from utils.text import fmt
 from videos.models import VideoUrl, VideoFeed
 import videos.models
+import videos.tasks
 
 def now():
     # define now as a function so it can be patched in the unittests
@@ -370,6 +371,7 @@ class YouTubeAccount(ExternalAccount):
             self.import_feed = VideoFeed.objects.create(url=self.feed_url(),
                                                         user=self.user,
                                                         team=self.team)
+            videos.tasks.update_video_feed.delay(self.import_feed.id)
         else:
             if (existing_feed.user is not None and
                 existing_feed.user != self.user):

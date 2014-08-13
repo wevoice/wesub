@@ -243,6 +243,20 @@ class YoutubeAccountFeedTest(TestCase):
                                 team=TeamFactory())
         self.assertRaises(ValueError, self.team_account.create_feed)
 
+    @test_utils.patch_for_test('videos.tasks.update_video_feed')
+    def test_schedule_update_for_new_feed(self, mock_update_video_feed):
+        self.user_account.create_feed()
+        self.assertEquals(mock_update_video_feed.delay.call_count, 1)
+        mock_update_video_feed.delay.assert_called_with(
+            self.user_account.import_feed.id)
+
+    @test_utils.patch_for_test('videos.tasks.update_video_feed')
+    def test_no_update_for_existing_feeds(self, mock_update_video_feed):
+        feed = VideoFeedFactory(url=self.feed_url(self.user_account),
+                                user=self.user)
+        self.user_account.create_feed()
+        self.assertEquals(mock_update_video_feed.delay.call_count, 0)
+
     def test_delete_feed_on_account_delete(self):
         account = YouTubeAccountFactory(user=UserFactory(),
                                         channel_id='test-channel-id')
