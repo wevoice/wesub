@@ -1,0 +1,41 @@
+{% load i18n media_bundle announcement_tags messages_tags profiles_tags media_compressor auth_tags %}
+
+<header class="navbar navbar-static-top" id="top" role="banner"> 
+       <div class="container">
+                <div class="navbar-header">
+                        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                        </button>
+                        <a href="/"><img class="navbar-brand" src="/site_media/images/dean-home/amara-o.png" /></a>
+                </div><!-- .navbar-header -->
+                <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+                        <span>
+                                <ul class="nav navbar-nav">
+                                        <li id="nav_submit">
+                                          <a href="{% url videos:create %}">{% trans 'Subtitle a Video' %}</a>
+                                        </li>
+                                        <li>
+                                          <a href="http://about.amara.org/volunteer/">{% trans "Join the Community" %}</a>
+                                        </li>
+                                        <li>
+                                          <a href="http://pro.amara.org">{% trans "Pro Services" %}</a>
+                                        </li>
+
+                                        <li><a href="{% url videos:watch_page %}">{% trans 'Search' %}</a></li>
+                                       <li><a href="http://support.universalsubtitles.org/solution/categories/13504">{% trans 'Help' %}</a></li>
+                                </ul><!-- .nav navbar-nav -->
+                                <ul class="nav navbar-nav navbar-right">
+
+                                {% if user.is_authenticated %}
+                                 <li id="me_menu">{% top_user_panel %}</li>
+                                  {% else %}
+                                   <li><a href="{% url auth:login %}?next={{ request.path_info|urlencode }}">{% trans 'Log in &raquo' %}</a></li>
+                    {% endif %}
+                                </ul>
+                        </span>
+                </nav>
+        </div> <!-- .container -->
+</header> <!-- .navbar -->

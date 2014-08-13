@@ -1,0 +1,162 @@
+/* INDEX */
+
+#index-banner {
+	color: #ffffff;
+	min-height: 360px;
+	background: url(../../images/dean-home/index-bg-hands.png) no-repeat center;
+}
+
+#index-banner h1 {
+	margin-top: 20%;
+	width: 90%;
+}
+
+#index-banner h5 {
+	width: 80%;
+}
+
+#index-two-tone {
+	background: #277F6A; /* Old browsers */
+	background: -moz-linear-gradient(left,  #277F6A 50%, #3EA286 50%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, right top, color-stop(50%,#277F6A), color-stop(50%,#3EA286)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(left,  #277F6A 50%,#3EA286 50%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(left,  #277F6A 50%,#3EA286 50%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(left,  #277F6A 50%,#3EA286 50%); /* IE10+ */
+	background: linear-gradient(to right,  #277F6A 50%,#3EA286 50%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#277F6A', endColorstr='#3EA286',GradientType=1 ); /* IE6-9 */
+}
+
+#index-video {
+	min-height: 400px;
+}
+
+.infobox h2 {
+	margin-top: 6.5em;
+}
+
+.infobox h5 {
+	width: 93%;
+	line-height: 1.7em;
+}
+
+.infobox h4 a {
+	display: inline-block;
+	padding: 13px 26px;
+	color: #f2f2f3;
+	text-decoration:none;
+	margin-top: 17.5em;
+}
+
+.infobox h4 a:hover {
+	text-decoration:none;
+}
+
+#index-individuals .container, #index-community .container, #index-pro .container {
+	min-height: 472px;
+}
+
+/*INDEX-INDIVIDUALS*/
+
+#index-individuals {
+	background: url(../../dean-home/index-bg-individuals.png) no-repeat center top #59b297;
+}
+
+#index-individuals .infobox h4 a {
+	background-color: #277F6A;
+}
+
+/*INDEX-COMMUNITY*/
+
+#index-community {
+	background: url(../../images/dean-home/index-bg-community.png) no-repeat center top #3F9B45;
+}
+
+#index-community .infobox h4 a {
+	background-color: #86E200;
+	color: #277F6A;
+	margin-top: 16.5em;
+}
+
+#index-community .infobox p {
+	width: 100%;
+}
+
+#index-community span {
+	width: 90%;
+}
+
+/*INDEX-PRO*/
+
+#index-pro {
+	background: url(../../images/dean-home/index-bg-pro.png) no-repeat center top #297E6A;
+}
+
+#index-pro .infobox h4 a {
+	background-color: #41A184;
+}
+
+/*INDEX-HILLS*/
+
+#index-hills {
+	background: url(../../images/dean-home/index-bg-rolling-hills.png) repeat-x center bottom #31CDAC;
+}
+
+#index-hills img {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top: 52px;
+	width: 100%;
+	max-width: 883px;
+}
+
+/*MOBILE TWEAKS INDEX*/
+
+@media (max-width: 768px) {
+
+	h4, h5, h6 {
+		margin-bottom: 2em;
+		margin-top: 1em;
+	}
+
+	.infobox h4, .infobox h4 a, #index-community .infobox h4 a {
+		margin-top: 0;
+	}
+
+	#index-banner {
+		background-image: none;
+		background-color: #277F6A;
+		height: 160px;
+		min-height: 160px;
+		display: inline;
+	}
+
+	#index-banner h1 {
+		margin-top: 1em;
+	}
+
+	#index-two-tone {
+		background: #277F6A;
+	}
+
+	.infobox h2 {
+		margin-top: 9em;
+	}
+
+#index-community .infobox span {
+	float: left;
+}
+
+	#index-community .infobox h4 {
+		float: right;
+	}
+}
+
+/*BIG SCREEN TWEAKS INDEX*/
+
+@media (min-width: 1200px) {
+
+	#index-banner h1 {
+		width: 65%;
+	}
+}
