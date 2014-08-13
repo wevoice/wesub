@@ -402,6 +402,24 @@ MEDIA_BUNDLES = {
             "css/new_index.css",
         ),
     },
+    "hands_home.css": {
+        "files": (
+            "css/dean/header-footer.css",
+            "css/dean/index.css",
+            "css/dean/main.css",
+            "css/dean/normalize.css",
+         )
+    },
+    "dean.js": {
+        "files": (
+          #  "js/dean-js/bootstrap-hover-dropdown.min.js",
+            "js/dean-js/choose-form-copy.js",
+            "js/dean-js/choose-form",
+            "js/dean-js/plugins.js",
+            "js/dean-js/vendor/jquery-1.10.2.min.js",
+            "js/dean-js/vendor/modernizr-2.6.2.min.js",
+         )
+    },
     "site.js": {
         "files": (
             "js/jquery-1.4.3.js",

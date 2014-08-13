@@ -3,7 +3,7 @@
 #index-banner {
 	color: #ffffff;
 	min-height: 360px;
-	background: url(../../images/dean-home/index-bg-hands.png) no-repeat center;
+	background: url(../images/index-bg-hands.png) no-repeat center;
 }
 
 #index-banner h1 {
@@ -58,7 +58,7 @@
 /*INDEX-INDIVIDUALS*/
 
 #index-individuals {
-	background: url(../../dean-home/index-bg-individuals.png) no-repeat center top #59b297;
+	background: url(../images/index-bg-individuals.png) no-repeat center top #59b297;
 }
 
 #index-individuals .infobox h4 a {
@@ -68,7 +68,7 @@
 /*INDEX-COMMUNITY*/
 
 #index-community {
-	background: url(../../images/dean-home/index-bg-community.png) no-repeat center top #3F9B45;
+	background: url(../images/index-bg-community.png) no-repeat center top #3F9B45;
 }
 
 #index-community .infobox h4 a {
@@ -88,7 +88,7 @@
 /*INDEX-PRO*/
 
 #index-pro {
-	background: url(../../images/dean-home/index-bg-pro.png) no-repeat center top #297E6A;
+	background: url(../images/index-bg-pro.png) no-repeat center top #297E6A;
 }
 
 #index-pro .infobox h4 a {
@@ -98,7 +98,7 @@
 /*INDEX-HILLS*/
 
 #index-hills {
-	background: url(../../images/dean-home/index-bg-rolling-hills.png) repeat-x center bottom #31CDAC;
+	background: url(../images/index-bg-rolling-hills.png) repeat-x center bottom #31CDAC;
 }
 
 #index-hills img {

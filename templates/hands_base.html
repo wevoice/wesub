@@ -5,7 +5,15 @@
 
 <head>
     <title>{% block title %}Amara - {% trans 'Caption, translate, subtitle and transcribe video.' %}{% endblock %}</title>
-        <link href='http://fonts.googleapis.com/css?family=Raleway:500,300,200,100' rel='stylesheet' type='text/css'>
+        <link href='//fonts.googleapis.com/css?family=Raleway:500,300,200,100' rel='stylesheet' type='text/css'>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,15 +22,6 @@
         <meta name="application-name" content="Amara - Buy captions, video translations, transcriptions, and crowd subtitling" />
         <meta name="msapplication-tooltip" content="A platform for collaborative subtitles!" />
         <meta name="title" content="Crowd Subtitles | Amara - Buy captions, video translations, transcriptions, and crowd subtitling" />
-        <link rel="stylesheet" id="custom-css-css" type="text/css" href="/site_media/css/dean/bootstrap.min.css" />
-        <link rel="stylesheet" id="custom-css-css" type="text/css" href="/site_media/css/dean/bootstrap-theme.min.css" />
-        <link rel="stylesheet" id="custom-css-css" type="text/css" href="/site_media/css/dean/main.css" />
-        <link rel="stylesheet" id="custom-css-css" type="text/css" href="/site_media/css/dean/header-footer.css" />
-        <link rel="stylesheet" id="custom-css-css" type="text/css" href="/site_media/css/dean/index.css" />
-        <link rel="stylesheet" id="custom-css-css" type="text/css" href="/site_media/css/dean/normalize.css" />
-        <link href='http://fonts.googleapis.com/css?family=Raleway:500,300,200,100' rel='stylesheet' type='text/css'>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {% if not current_site.name == 'amara-production' %}
         <meta name="robots" content="noindex, nofollow"/>
@@ -46,6 +45,7 @@
     <!--[if lt IE 9]>
         <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    {% media_bundle "hands_home.css" %}
 
     {% media_bundle "site.js" %}
     <script type="text/javascript" src="{% url js_i18n_catalog %}"></script>
@@ -53,14 +53,6 @@
     <script type="text/javascript" src='{% url embedder_iframe %}'>
     </script>
     {% block scripts %}
-        <script src="/site_media/js/dean/vendor/modernizr-2.6.2.min.js"></script>
-        <script src="/site_media/js/dean/vendor/jquery-1.10.2.min.js"></script>
-        <script src="/site_media/js/dean/bootstrap-hover-dropdown.min.js"></script>
-        <script src="/site_media/js/dean/bootstrap.min.js"></script>
-        <script src="/site_media/js/dean/choose-form-copy.js"></script>
-        <script src="/site_media/js/dean/choose-form.js"></script>
-        <script src="/site_media/js/dean/plugins.js"></script>
-        <script src="/site_media/js/dean/vendor/modernizr-2.6.2.min.js"></script>
 {% endblock %}
     <script type="text/javascript">
         window.STATIC_URL = '{{ STATIC_URL }}';
