@@ -73,7 +73,7 @@
                     <li><a href="{% url videos:watch_page %}">{% trans 'Browse' %}</a></li>
                     <li><a href="http://about.amara.org/volunteer/">{% trans "Volunteer" %}</a></li>
                     <li><a href="http://pro.amara.org">{% trans "Pro Services" %}</a></li>
-                    <li><a href="http://support.universalsubtitles.org/solution/categories/13504">{% trans 'Help' %}</a></li>
+                    <li><a href="http://support.amara.org/support/home">{% trans 'Help' %}</a></li>
                     {% if user.is_authenticated %}
                         <li id="me_menu">{% top_user_panel %}</li>
                     {% else %}
@@ -128,7 +128,7 @@
             <a href="http://www.pculture.org/pcf/jobs/">{% trans 'Jobs' %}</a>
             <a href="http://www.facebook.com/Amara.Community/">Facebook</a> 
             <a href="http://twitter.com/amarasubs">Twitter</a>
-            <a href="http://support.universalsubtitles.org/solution/categories/13504/folders/40766/articles/35517--i-have-a-non-technical-question-about-amara">{% trans 'Contact Us' %}</a>
+            <a href="http://support.amara.org/support/solutions/articles/35517--i-have-a-non-technical-question-about-amara">{% trans 'Contact Us' %}</a>
             <a href="http://www.pculture.org/pcf/websites-privacy/">{% trans 'Privacy Policy' %}</a>
             <a href="http://about.amara.org/tos/">{% trans 'Terms of Service' %}</a>
             <a href="{% url security_page %}">{% trans 'Security' %}</a>
