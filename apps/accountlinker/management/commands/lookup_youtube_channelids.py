@@ -89,7 +89,7 @@ class Command(BaseCommand):
         )
         qs = (ThirdPartyAccount.objects.
               filter(channel_id__in=dup_channel_ids)
-              .order_by('id'))
+              .order_by('channel_id', 'id'))
         for account in qs:
             if account.channel_id != current_channel_id:
                 dups.append((account, []))
