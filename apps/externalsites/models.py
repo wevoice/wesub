@@ -171,9 +171,6 @@ class ExternalAccount(models.Model):
 
     class Meta:
         abstract = True
-        unique_together = [
-            ('type', 'owner_id')
-        ]
 
 class KalturaAccount(ExternalAccount):
     account_type = 'K'
@@ -188,6 +185,9 @@ class KalturaAccount(ExternalAccount):
 
     class Meta:
         verbose_name = _('Kaltura account')
+        unique_together = [
+            ('type', 'owner_id')
+        ]
 
     def __unicode__(self):
         return "Kaltura: %s" % (self.partner_id)
@@ -222,6 +222,9 @@ class BrightcoveAccount(ExternalAccount):
 
     class Meta:
         verbose_name = _('Brightcove account')
+        unique_together = [
+            ('type', 'owner_id')
+        ]
 
     def __unicode__(self):
         return "Brightcove: %s" % (self.publisher_id)
@@ -346,6 +349,7 @@ class YouTubeAccount(ExternalAccount):
     oauth_refresh_token = models.CharField(max_length=255)
     import_feed = models.OneToOneField(VideoFeed, null=True,
                                        on_delete=models.SET_NULL)
+    allow_sync_teams = models.ManyToManyField(Team)
 
     objects = YouTubeAccountManager()
 

@@ -25,7 +25,7 @@ User Accounts
 * Users can link to YouTube from account section on their profile page
 * A user can only link 1 YouTube account
 * A YouTube account can only be linked to 1 user
-* We create a video feed and import all videos for the YouTube user.
+* We create a video feed and import all videos for the YouTube channel.
 * All subtitles for a video in that account will be synced
 
 Team Accounts
@@ -33,12 +33,13 @@ Team Accounts
 
 * Teams can link to YouTube from their Settings -> Integrations page
 * A team can link multiple YouTube accounts
-* A YouTube account can only be linked to multiple teams
-* We don't import videos for the YouTube user.
-* Subtitles are only synced for a video if that video is part of one of the
-  linked teams.
+* A YouTube account can only be linked to 1 team, but there is a way to share
+  the account with other teams.
+* Subtitles are normally only synced for the team's videos
+* The linked team can add other teams to the syncing list, any of those team's
+  videos will also be synced.
+* We don't auto-import videos for the YouTube channel.
 * A YouTube account can't be linked to both a team and a user
-
 
 Kaltura
 =======
