@@ -41,14 +41,14 @@ Team Accounts
 
 
 Kaltura
--------
+=======
 
 * Teams can link to Kaltura from their Settings -> Integrations page
 * Once a team links to Kaltura, subtitles on their team videos with their
   Kaltura partner id will be synced back to Kaltura.
 
 Brightcove
-----------
+==========
 * Teams can link to Brightcove from their Settings -> Integrations page
 * Once a team links to Brightcove, subtitles on their team videos with their
   Brightcove publisher id will be synced back to Brightcove.
