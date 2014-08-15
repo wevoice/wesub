@@ -157,24 +157,6 @@ class YoutubeAccountTest(TestCase):
         test_utils.youtube_revoke_auth_token.assert_called_with(
             account.oauth_refresh_token)
 
-    def test_create_feed(self):
-        account = YouTubeAccountFactory(user=UserFactory(),
-                                        channel_id='test-channel-id')
-        self.assertEqual(account.import_feed, None)
-        account.create_feed()
-        self.assertNotEqual(account.import_feed, None)
-        self.assertEqual(account.import_feed.url,
-                         'https://gdata.youtube.com/'
-                         'feeds/api/users/test-channel-id/uploads')
-
-    def test_delete_feed_on_account_delete(self):
-        account = YouTubeAccountFactory(user=UserFactory(),
-                                        channel_id='test-channel-id')
-        account.create_feed()
-        self.assertEqual(VideoFeed.objects.count(), 1)
-        account.delete()
-        self.assertEqual(VideoFeed.objects.count(), 0)
-
     def test_create_or_update(self):
         # if there are no other accounts for a channel_id, create_or_update()
         # should create the account and return it
@@ -199,3 +181,87 @@ class YoutubeAccountTest(TestCase):
         self.assertEquals(YouTubeAccount.objects.all().count(), 1)
         account = YouTubeAccount.objects.all().get()
         self.assertEquals(account.oauth_refresh_token, 'test-refresh-token2')
+
+class YoutubeAccountFeedTest(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.user_account = YouTubeAccountFactory(channel_id='user-channel',
+                                                  user=self.user)
+
+        self.team = TeamFactory()
+        self.team_account = YouTubeAccountFactory(channel_id='team-channel',
+                                                  team=self.team)
+
+    def feed_url(self, account):
+        return ('https://gdata.youtube.com/'
+                'feeds/api/users/%s/uploads' % account.channel_id)
+
+    def check_create_feed(self, account):
+        account.create_feed()
+        self.assertEquals(account.import_feed.url, self.feed_url(account))
+        self.assertEquals(account.import_feed.user, account.user)
+        self.assertEquals(account.import_feed.team, account.team)
+
+    def test_create_feed_for_user(self):
+        self.check_create_feed(self.user_account)
+
+    def test_create_feed_for_team(self):
+        self.check_create_feed(self.team_account)
+
+    def test_create_feed_twice_raises_error(self):
+        self.user_account.create_feed()
+        self.assertRaises(ValueError, self.user_account.create_feed)
+
+    def test_existing_feed_for_user(self):
+        # if there already is an youtube feed created by the user, we should
+        # link it to the youtube account.
+
+        feed = VideoFeedFactory(url=self.feed_url(self.user_account),
+                                user=self.user)
+        self.user_account.create_feed()
+        self.assertEquals(self.user_account.import_feed.pk, feed.pk)
+
+    def test_existing_feed_for_other_user(self):
+        # if there already is an youtube feed created by a different user, we
+        # should raise an error
+        feed = VideoFeedFactory(url=self.feed_url(self.user_account),
+                                user=UserFactory())
+        self.assertRaises(ValueError, self.user_account.create_feed)
+
+    def test_existing_feed_for_team(self):
+        # if there already is an youtube feed created by the team, we should
+        # link it to the youtube account.
+        feed = VideoFeedFactory(url=self.feed_url(self.team_account),
+                                team=self.team)
+        self.team_account.create_feed()
+        self.assertEquals(self.team_account.import_feed.pk, feed.pk)
+
+    def test_existing_feed_for_other_team(self):
+        # if there already is an youtube feed created by a different team, we
+        # should raise an error
+        feed = VideoFeedFactory(url=self.feed_url(self.team_account),
+                                team=TeamFactory())
+        self.assertRaises(ValueError, self.team_account.create_feed)
+
+    @test_utils.patch_for_test('videos.tasks.update_video_feed')
+    def test_schedule_update_for_new_feed(self, mock_update_video_feed):
+        self.user_account.create_feed()
+        self.assertEquals(mock_update_video_feed.delay.call_count, 1)
+        mock_update_video_feed.delay.assert_called_with(
+            self.user_account.import_feed.id)
+
+    @test_utils.patch_for_test('videos.tasks.update_video_feed')
+    def test_no_update_for_existing_feeds(self, mock_update_video_feed):
+        feed = VideoFeedFactory(url=self.feed_url(self.user_account),
+                                user=self.user)
+        self.user_account.create_feed()
+        self.assertEquals(mock_update_video_feed.delay.call_count, 0)
+
+    def test_delete_feed_on_account_delete(self):
+        account = YouTubeAccountFactory(user=UserFactory(),
+                                        channel_id='test-channel-id')
+        account.create_feed()
+        self.assertEqual(VideoFeed.objects.count(), 1)
+        account.delete()
+        self.assertEqual(VideoFeed.objects.count(), 0)
+

@@ -92,6 +92,9 @@ class YouTubeVideoFactory(VideoFactory):
         return ('https://www.youtube.com/watch?v=%s' %
                 self.video_url__videoid)
 
+class VideoFeedFactory(DjangoModelFactory):
+    FACTORY_FOR = videos.models.VideoFeed
+
 class UserFactory(DjangoModelFactory):
     FACTORY_FOR = auth.models.CustomUser
 

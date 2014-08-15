@@ -38,6 +38,7 @@ from utils import youtube
 from utils.text import fmt
 from videos.models import VideoUrl, VideoFeed
 import videos.models
+import videos.tasks
 
 def now():
     # define now as a function so it can be patched in the unittests
@@ -364,8 +365,24 @@ class YouTubeAccount(ExternalAccount):
     def create_feed(self):
         if self.import_feed is not None:
             raise ValueError("Feed already created")
-        self.import_feed = VideoFeed.objects.create(url=self.feed_url(),
-                                                    team=self.team)
+        try:
+            existing_feed = VideoFeed.objects.get(url=self.feed_url())
+        except VideoFeed.DoesNotExist:
+            self.import_feed = VideoFeed.objects.create(url=self.feed_url(),
+                                                        user=self.user,
+                                                        team=self.team)
+            videos.tasks.update_video_feed.delay(self.import_feed.id)
+        else:
+            if (existing_feed.user is not None and
+                existing_feed.user != self.user):
+                raise ValueError("Import feed already created by user %s" %
+                                 existing_feed.user)
+            if (existing_feed.team is not None and
+                existing_feed.team != self.team):
+                raise ValueError("Import feed already created by team %s" %
+                                 existing_feed.team)
+            self.import_feed = existing_feed
+
         self.save()
 
     def get_owner_display(self):
