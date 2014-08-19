@@ -35,9 +35,6 @@ class GetSyncAccountTest(TestCase):
             (account, video.get_primary_videourl_obj())
         ])
 
-    def check_get_sync_accounts_returns_nothing(self, video):
-        self.assertEquals(get_sync_accounts(video), [])
-
     def test_team_account(self):
         video = BrightcoveVideoFactory()
         team_video = TeamVideoFactory(video=video)
@@ -50,36 +47,109 @@ class GetSyncAccountTest(TestCase):
         account = BrightcoveAccountFactory(user=user)
         self.check_get_sync_accounts(video, account)
 
-    def test_user_account_ignored_for_team_videos(self):
+    def test_is_for_video_url(self):
         user = UserFactory()
         video = BrightcoveVideoFactory(user=user)
         account = BrightcoveAccountFactory(user=user)
-        team_video = TeamVideoFactory(video=video)
+        self.assertTrue(account.is_for_video_url(
+            video, video.get_primary_videourl_obj()))
 
-        self.check_get_sync_accounts_returns_nothing(video)
+        video2 = YouTubeVideoFactory(user=user)
+        self.assertFalse(account.is_for_video_url(
+            video2, video2.get_primary_videourl_obj()))
 
-    def test_youtube_checks_channel_id(self):
-        # for youtube, get_sync_accounts should return any account that matches
-        # the channel id.  It shouldn't matter who owns the video in amara.
-        user = UserFactory()
-        account = YouTubeAccountFactory(channel_id='channel', user=user)
-        # video owned by user and from user's youtube channel
-        video = YouTubeVideoFactory(video_url__owner_username='channel',
-                                    user=user)
-        # video not owned by user but from user's youtube channel
-        video2 = YouTubeVideoFactory(video_url__owner_username='channel',
-                                     user=UserFactory())
-        # video owned by user but not from user's youtube channel
-        video3 = YouTubeVideoFactory(video_url__owner_username='channel2',
-                                     user=user)
-        # video neither owned by user nor from user's youtube channel
-        video4 = YouTubeVideoFactory(video_url__owner_username='channel3',
-                                     user=UserFactory())
+class YouTubeGetSyncAccountTestBase(TestCase):
+    def check_get_sync_account_matches_account(self, video):
+        video_url = video.get_primary_videourl_obj()
+        self.assertEquals(get_sync_accounts(video), [
+            (self.account, video_url),
+        ])
+        # also check is_for_video_url
+        self.assertTrue(self.account.is_for_video_url(video, video_url))
 
-        self.check_get_sync_accounts(video, account)
-        self.check_get_sync_accounts(video2, account)
-        self.check_get_sync_accounts_returns_nothing(video3)
-        self.check_get_sync_accounts_returns_nothing(video4)
+    def check_get_sync_account_doesnt_match_account(self, video):
+        video_url = video.get_primary_videourl_obj()
+        self.assertEquals(get_sync_accounts(video), [])
+        # also check is_for_video_url
+        self.assertFalse(self.account.is_for_video_url(video, video_url))
+
+class YouTubeTeamGetSyncAccountTest(YouTubeGetSyncAccountTestBase):
+    # Test get_sync_accounts with team YouTube accounts
+    #
+    # In this case, get_sync_accounts should find accounts that:
+    #   - match the channel id
+    #   - are owned by the same team that the team video is for, or are owned
+    #   by a team in the sync_teams set
+
+    def setUp(self):
+        self.team = TeamFactory()
+        self.account = YouTubeAccountFactory(channel_id='channel',
+                                             team=self.team)
+
+    def make_youtube_team_video(self, team, channel_id):
+        video = YouTubeVideoFactory(channel_id=channel_id)
+        TeamVideoFactory(team=team, video=video)
+        return video
+
+    def test_everything_matches(self):
+        video = self.make_youtube_team_video(self.team,
+                                             self.account.channel_id)
+        self.check_get_sync_account_matches_account(video)
+
+    def test_wrong_channel_id(self):
+        video = self.make_youtube_team_video(self.team, 'other-channel-id')
+        self.check_get_sync_account_doesnt_match_account(video)
+
+    def test_wrong_team(self):
+        other_team = TeamFactory()
+        video = self.make_youtube_team_video(other_team,
+                                             self.account.channel_id)
+        self.check_get_sync_account_doesnt_match_account(video)
+
+    def test_non_team_video(self):
+        video = YouTubeVideoFactory(channel_id=self.account.channel_id)
+        self.check_get_sync_account_doesnt_match_account(video)
+
+    def test_sync_teams(self):
+        other_team = TeamFactory()
+        video = self.make_youtube_team_video(other_team,
+                                             self.account.channel_id)
+        self.check_get_sync_account_doesnt_match_account(video)
+        self.account.sync_teams.add(other_team)
+        self.check_get_sync_account_matches_account(video)
+
+class YouTubeUserGetSyncAccountTest(YouTubeGetSyncAccountTestBase):
+    # Test get_sync_accounts with user YouTube accounts
+    #
+    # In this case, get_sync_accounts should find accounts that match the
+    # channel id.  It doesn't matter what user owns the video, or what team
+    # the video is a part of.
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.account = YouTubeAccountFactory(channel_id='channel',
+                                             user=self.user)
+
+    def check_normal_video_match(self):
+        video = YouTubeVideoFactory(user=self.user,
+                                    channel_id=self.account.channel_id)
+        self.check_get_sync_account_matches_account(video)
+
+    def check_video_not_owned_by_user(self):
+        video = YouTubeVideoFactory(user=UserFactory(),
+                                    channel_id=self.account.channel_id)
+        self.check_get_sync_account_matches_account(video)
+
+    def check_team_video(self):
+        video = YouTubeVideoFactory(user=UserFactory(),
+                                    channel_id=self.account.channel_id)
+        TeamVideoFactory(video=video)
+        self.check_get_sync_account_matches_account(video)
+
+    def check_wrong_channel_id(self):
+        video = YouTubeVideoFactory(user=self.user,
+                                    channel_id='other-channel_id')
+        self.check_get_sync_account_doesnt_match_account(video)
 
 class YouTubeSyncTeamsTest(TestCase):
     def setUp(self):
@@ -121,18 +191,6 @@ class YouTubeSyncTeamsTest(TestCase):
         self.assertRaises(ValueError, user_account.set_sync_teams,
                           self.user, [self.team])
 
-
-class YouTubeAccountTest(TestCase):
-    def test_is_for_video_url(self):
-        user = UserFactory()
-        video = YouTubeVideoFactory(video_url__owner_username='channel')
-        video_url = video.get_primary_videourl_obj()
-        account = YouTubeAccountFactory(channel_id='channel', user=user)
-        account2 = YouTubeAccountFactory(channel_id='other-channel',
-                                         user=user)
-
-        self.assertEquals(account.is_for_video_url(video_url), True)
-        self.assertEquals(account2.is_for_video_url(video_url), False)
 
 class BrightcoveAccountTest(TestCase):
     def setUp(self):

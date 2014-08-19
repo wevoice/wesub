@@ -92,6 +92,15 @@ class YouTubeVideoFactory(VideoFactory):
         return ('https://www.youtube.com/watch?v=%s' %
                 self.video_url__videoid)
 
+    @classmethod
+    def _generate(cls, create, attrs):
+        """Override the default _generate() to handle the channel_id
+        parameteter.
+        """
+        if 'channel_id' in attrs:
+            attrs['video_url__owner_username'] = attrs.pop('channel_id')
+        return super(YouTubeVideoFactory, cls)._generate(create, attrs)
+
 class VideoFeedFactory(DjangoModelFactory):
     FACTORY_FOR = videos.models.VideoFeed
 

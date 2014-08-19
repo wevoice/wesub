@@ -23,7 +23,7 @@ import urlparse
 
 from django.core.exceptions import PermissionDenied
 from django.db import models
-from django.db.models import query
+from django.db.models import query, Q
 from django.utils.translation import ugettext_lazy as _
 import babelsubs
 # because of our insane circular imports we need to import haystack right here
@@ -70,9 +70,15 @@ class ExternalAccountManager(models.Manager):
     def get_sync_account(self, video, video_url):
         team_video = video.get_team_video()
         if team_video is not None:
-            return self.get(type=ExternalAccount.TYPE_TEAM,
-                          owner_id=team_video.team_id)
+            return self._get_sync_account_team_video(team_video, video_url)
         else:
+            return self._get_sync_account_nonteam_video(video, video_url)
+
+    def _get_sync_account_team_video(self, team_video, video_url):
+        return self.get(type=ExternalAccount.TYPE_TEAM,
+                      owner_id=team_video.team_id)
+
+    def _get_sync_account_nonteam_video(self, video, video_url):
             return self.get(type=ExternalAccount.TYPE_USER,
                           owner_id=video.user_id)
 
@@ -106,7 +112,7 @@ class ExternalAccount(models.Model):
         else:
             return None
 
-    def is_for_video_url(self, video_url):
+    def is_for_video_url(self, video, video_url):
         return video_url.type == self.video_url_type
 
     def update_subtitles(self, video_url, language):
@@ -309,8 +315,18 @@ class BrightcoveAccount(ExternalAccount):
 
 
 class YouTubeAccountManager(ExternalAccountManager):
-    def get_sync_account(self, video, video_url):
-        return self.get(channel_id=video_url.owner_username)
+    def _get_sync_account_team_video(self, team_video, video_url):
+        team_q = (Q(owner_id=team_video.team_id) |
+                  Q(sync_teams__id=team_video.team_id))
+
+        return self.get(team_q,
+                        type=ExternalAccount.TYPE_TEAM,
+                        channel_id=video_url.owner_username)
+
+    def _get_sync_account_nonteam_video(self, video, video_url):
+        return self.get(
+            type=ExternalAccount.TYPE_USER,
+            channel_id=video_url.owner_username)
 
     def create_or_update(self, channel_id, oauth_refresh_token, **data):
         """Create a new YouTubeAccount, if none exists for the channel_id
@@ -426,9 +442,26 @@ class YouTubeAccount(ExternalAccount):
         else:
             return _('No username')
 
-    def is_for_video_url(self, video_url):
-        return (video_url.type == self.video_url_type and
-                video_url.owner_username == self.channel_id)
+    def is_for_video_url(self, video, video_url):
+        if not (video_url.type == self.video_url_type and
+                video_url.owner_username == self.channel_id):
+            return False
+        if self.type == ExternalAccount.TYPE_USER:
+            # for user accounts, match any video
+            return True
+        else:
+            # for team accounts, we need additional checks
+            team_video = video.get_team_video()
+            if team_video is None:
+                return False
+            else:
+                return (team_video.team_id == self.owner_id or
+                        self.sync_teams.filter(id=team_video.team_id).exists())
+
+    def _get_sync_account_nonteam_video(self, video, video_url):
+        return self.get(
+            type=ExternalAccount.TYPE_USER,
+            channel_id=video_url.owner_username)
 
     def do_update_subtitles(self, video_url, language, version):
         """Do the work needed to update subititles.

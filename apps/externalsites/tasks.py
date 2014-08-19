@@ -116,7 +116,7 @@ def update_all_subtitles(account_type, account_id):
     for video in videos.all():
         for video_url in video.get_video_urls():
             video_url.fix_owner_username()
-            if account.is_for_video_url(video_url):
+            if account.is_for_video_url(video, video_url):
                 _sync_all_languages(account, video_url, video)
 
 def _sync_all_languages(account, video_url, video):
