@@ -21,6 +21,7 @@ import datetime
 from urllib import quote_plus
 import urlparse
 
+from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import query
 from django.utils.translation import ugettext_lazy as _
@@ -349,7 +350,8 @@ class YouTubeAccount(ExternalAccount):
     oauth_refresh_token = models.CharField(max_length=255)
     import_feed = models.OneToOneField(VideoFeed, null=True,
                                        on_delete=models.SET_NULL)
-    sync_teams = models.ManyToManyField(Team)
+    sync_teams = models.ManyToManyField(
+        Team, related_name='youtube_sync_accounts')
 
     objects = YouTubeAccountManager()
 
@@ -361,6 +363,35 @@ class YouTubeAccount(ExternalAccount):
 
     def __unicode__(self):
         return "YouTube: %s" % (self.username)
+
+    def set_sync_teams(self, user, teams):
+        """Set other teams to sync for
+
+        The default for team youtube accounts is to only sync videos if they
+        are part of that team.  This method allows for syncing other team's
+        videos as well by altering the sync_teams set.
+
+        This method only works for team accounts.  A ValueError will be thrown
+        if called for a user account.
+
+        If user is not an admin for this account's team and all the teams
+        being set, then PermissionDenied will be thrown.
+        """
+        if self.type != ExternalAccount.TYPE_TEAM:
+            raise ValueError("Non-team account: %s" % self)
+        for team in teams:
+            if team == self.team:
+                raise ValueError("Can't add account owner to sync_teams")
+        admin_team_ids = set([m.team_id for m in
+                              user.team_members.admins()])
+        if self.team.id not in admin_team_ids:
+            raise PermissionDenied("%s not an admin for %s" %
+                                   (user, self.team))
+        for team in teams:
+            if team.id not in admin_team_ids:
+                raise PermissionDenied("%s not an admin for %s" %
+                                       (user, team))
+        self.sync_teams = teams
 
     def feed_url(self):
         return 'https://gdata.youtube.com/feeds/api/users/%s/uploads' % (

@@ -19,10 +19,12 @@
 from __future__ import absolute_import
 
 from django.test import TestCase
+from django.core.exceptions import PermissionDenied
 
 from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import (BrightcoveAccount, YouTubeAccount,
                                   lookup_accounts, account_models)
+from teams.models import TeamMember
 from videos.models import VideoFeed
 from utils import test_utils
 from utils.factories import *
@@ -78,6 +80,47 @@ class LookupAccountTest(TestCase):
         self.check_lookup_accounts(video2, account)
         self.check_lookup_accounts_returns_nothing(video3)
         self.check_lookup_accounts_returns_nothing(video4)
+
+class YouTubeSyncTeamsTest(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        teams = [TeamFactory() for i in xrange(5)]
+        for team in teams:
+            TeamMemberFactory(user=self.user, team=team,
+                              role=TeamMember.ROLE_ADMIN)
+        self.team = teams[0]
+        self.account = YouTubeAccountFactory(team=self.team)
+        self.other_teams = teams[1:]
+
+    def test_set_sync_teams(self):
+        self.account.set_sync_teams(self.user, self.other_teams[:2])
+        self.assertEquals(set(self.account.sync_teams.all()),
+                          set(self.other_teams[:2]))
+        # try setting teams again to check removing in addition at adding
+        # teams to the set
+        self.account.set_sync_teams(self.user, self.other_teams[1:3])
+        self.assertEquals(set(self.account.sync_teams.all()),
+                          set(self.other_teams[1:3]))
+
+    def test_set_sync_teams_requires_admin(self):
+        # set_sync_teams() can only be used to set teams that the user is an
+        # admin for
+        account_for_other_team = YouTubeAccountFactory(team=TeamFactory())
+        self.assertRaises(PermissionDenied,
+                          account_for_other_team.set_sync_teams,
+                          self.user, self.other_teams)
+
+    def test_set_sync_teams_forbids_own_team(self):
+        # set_sync_teams() cant set a team as its own sync team
+        self.assertRaises(ValueError, self.account.set_sync_teams,
+                          self.user, [self.team])
+
+    def test_set_sync_teams_for_user_account(self):
+        # set_sync_teams() can't be called for user accounts
+        user_account = YouTubeAccountFactory(user=self.user)
+        self.assertRaises(ValueError, user_account.set_sync_teams,
+                          self.user, [self.team])
+
 
 class YouTubeAccountTest(TestCase):
     def test_is_for_video_url(self):

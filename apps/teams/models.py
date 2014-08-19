@@ -1045,6 +1045,9 @@ class TeamMemberManager(models.Manager):
         tm.save()
         return tm
 
+    def admins(self):
+        return self.filter(role__in=(ROLE_OWNER, ROLE_ADMIN))
+
 class TeamMember(models.Model):
     ROLE_OWNER = ROLE_OWNER
     ROLE_ADMIN = ROLE_ADMIN
