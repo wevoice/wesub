@@ -112,7 +112,7 @@ class ExternalAccount(models.Model):
         else:
             return None
 
-    def is_for_video_url(self, video, video_url):
+    def should_sync_video_url(self, video, video_url):
         return video_url.type == self.video_url_type
 
     def update_subtitles(self, video_url, language):
@@ -442,7 +442,7 @@ class YouTubeAccount(ExternalAccount):
         else:
             return _('No username')
 
-    def is_for_video_url(self, video, video_url):
+    def should_sync_video_url(self, video, video_url):
         if not (video_url.type == self.video_url_type and
                 video_url.owner_username == self.channel_id):
             return False

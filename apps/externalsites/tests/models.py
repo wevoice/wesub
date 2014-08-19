@@ -51,11 +51,11 @@ class GetSyncAccountTest(TestCase):
         user = UserFactory()
         video = BrightcoveVideoFactory(user=user)
         account = BrightcoveAccountFactory(user=user)
-        self.assertTrue(account.is_for_video_url(
+        self.assertTrue(account.should_sync_video_url(
             video, video.get_primary_videourl_obj()))
 
         video2 = YouTubeVideoFactory(user=user)
-        self.assertFalse(account.is_for_video_url(
+        self.assertFalse(account.should_sync_video_url(
             video2, video2.get_primary_videourl_obj()))
 
 class YouTubeGetSyncAccountTestBase(TestCase):
@@ -64,14 +64,14 @@ class YouTubeGetSyncAccountTestBase(TestCase):
         self.assertEquals(get_sync_accounts(video), [
             (self.account, video_url),
         ])
-        # also check is_for_video_url
-        self.assertTrue(self.account.is_for_video_url(video, video_url))
+        # also check should_sync_video_url
+        self.assertTrue(self.account.should_sync_video_url(video, video_url))
 
     def check_get_sync_account_doesnt_match_account(self, video):
         video_url = video.get_primary_videourl_obj()
         self.assertEquals(get_sync_accounts(video), [])
-        # also check is_for_video_url
-        self.assertFalse(self.account.is_for_video_url(video, video_url))
+        # also check should_sync_video_url
+        self.assertFalse(self.account.should_sync_video_url(video, video_url))
 
 class YouTubeTeamGetSyncAccountTest(YouTubeGetSyncAccountTestBase):
     # Test get_sync_accounts with team YouTube accounts
