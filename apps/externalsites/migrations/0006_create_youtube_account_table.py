@@ -20,21 +20,21 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('externalsites', ['YouTubeAccount'])
 
-        # Adding M2M table for field allow_sync_teams on 'YouTubeAccount'
-        db.create_table('externalsites_youtubeaccount_allow_sync_teams', (
+        # Adding M2M table for field sync_teams on 'YouTubeAccount'
+        db.create_table('externalsites_youtubeaccount_sync_teams', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('youtubeaccount', models.ForeignKey(orm['externalsites.youtubeaccount'], null=False)),
             ('team', models.ForeignKey(orm['teams.team'], null=False))
         ))
-        db.create_unique('externalsites_youtubeaccount_allow_sync_teams', ['youtubeaccount_id', 'team_id'])
+        db.create_unique('externalsites_youtubeaccount_sync_teams', ['youtubeaccount_id', 'team_id'])
 
     def backwards(self, orm):
         
         # Deleting model 'YouTubeAccount'
         db.delete_table('externalsites_youtubeaccount')
 
-        # Removing M2M table for field allow_sync_teams on 'YouTubeAccount'
-        db.delete_table('externalsites_youtubeaccount_allow_sync_teams')
+        # Removing M2M table for field sync_teams on 'YouTubeAccount'
+        db.delete_table('externalsites_youtubeaccount_sync_teams')
     
     models = {
         'accountlinker.thirdpartyaccount': {
@@ -144,7 +144,7 @@ class Migration(SchemaMigration):
         },
         'externalsites.youtubeaccount': {
             'Meta': {'unique_together': "[('type', 'owner_id', 'channel_id')]", 'object_name': 'YouTubeAccount'},
-            'allow_sync_teams': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['teams.Team']", 'symmetrical': 'False'}),
+            'sync_teams': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['teams.Team']", 'symmetrical': 'False'}),
             'channel_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'import_feed': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['videos.VideoFeed']", 'unique': 'True', 'null': 'True'}),

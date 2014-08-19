@@ -349,7 +349,7 @@ class YouTubeAccount(ExternalAccount):
     oauth_refresh_token = models.CharField(max_length=255)
     import_feed = models.OneToOneField(VideoFeed, null=True,
                                        on_delete=models.SET_NULL)
-    allow_sync_teams = models.ManyToManyField(Team)
+    sync_teams = models.ManyToManyField(Team)
 
     objects = YouTubeAccountManager()
 

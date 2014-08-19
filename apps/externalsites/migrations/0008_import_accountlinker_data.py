@@ -156,7 +156,7 @@ class Migration(DataMigration):
         },
         'externalsites.youtubeaccount': {
             'Meta': {'unique_together': "[('type', 'owner_id', 'channel_id')]", 'object_name': 'YouTubeAccount'},
-            'allow_sync_teams': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['teams.Team']", 'symmetrical': 'False'}),
+            'sync_teams': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['teams.Team']", 'symmetrical': 'False'}),
             'channel_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'import_feed': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['videos.VideoFeed']", 'unique': 'True', 'null': 'True'}),
