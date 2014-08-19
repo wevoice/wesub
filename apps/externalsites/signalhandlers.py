@@ -25,7 +25,7 @@ from externalsites import credit
 from externalsites import subfetch
 from externalsites import tasks
 from externalsites.models import (KalturaAccount,
-                                  lookup_accounts, lookup_account)
+                                  get_sync_accounts, get_sync_account)
 from subtitles.models import (SubtitleLanguage, SubtitleVersion,
                               ORIGIN_IMPORTED)
 from videos.models import Video, VideoUrl
@@ -41,7 +41,7 @@ def _should_update_subtitles(language, version):
         return True
 
 def _update_subtitles_for_language(language, version):
-    for account, video_url in lookup_accounts(language.video):
+    for account, video_url in get_sync_accounts(language.video):
         if _should_update_subtitles(language, version):
             tasks.update_subtitles.delay(account.account_type, account.id,
                                          video_url.id, language.id)
@@ -59,7 +59,7 @@ def on_language_deleted(signal, sender, **kwargs):
     if not isinstance(sender, SubtitleLanguage):
         raise ValueError("sender must be a SubtitleLanguage: %s" % sender)
     language = sender
-    for account, video_url in lookup_accounts(language.video):
+    for account, video_url in get_sync_accounts(language.video):
         tasks.delete_subtitles.delay(account.account_type, account.id,
                                      video_url.id, language.id)
 
@@ -71,7 +71,7 @@ def on_account_save(signal, sender, instance, **kwargs):
 def on_videourl_save(signal, sender, instance, created, **kwargs):
     video_url = instance
     if created:
-        account = lookup_account(instance.video, instance)
+        account = get_sync_account(instance.video, instance)
         if credit.should_add_credit_to_video_url(video_url, account):
             tasks.add_amara_credit.delay(instance.id)
         if subfetch.should_fetch_subs(video_url):

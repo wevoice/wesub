@@ -23,32 +23,32 @@ from django.core.exceptions import PermissionDenied
 
 from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import (BrightcoveAccount, YouTubeAccount,
-                                  lookup_accounts, account_models)
+                                  get_sync_accounts, account_models)
 from teams.models import TeamMember
 from videos.models import VideoFeed
 from utils import test_utils
 from utils.factories import *
 
-class LookupAccountTest(TestCase):
-    def check_lookup_accounts(self, video, account):
-        self.assertEquals(lookup_accounts(video), [
+class GetSyncAccountTest(TestCase):
+    def check_get_sync_accounts(self, video, account):
+        self.assertEquals(get_sync_accounts(video), [
             (account, video.get_primary_videourl_obj())
         ])
 
-    def check_lookup_accounts_returns_nothing(self, video):
-        self.assertEquals(lookup_accounts(video), [])
+    def check_get_sync_accounts_returns_nothing(self, video):
+        self.assertEquals(get_sync_accounts(video), [])
 
     def test_team_account(self):
         video = BrightcoveVideoFactory()
         team_video = TeamVideoFactory(video=video)
         account = BrightcoveAccountFactory(team=team_video.team)
-        self.check_lookup_accounts(video, account)
+        self.check_get_sync_accounts(video, account)
 
     def test_user_account(self):
         user = UserFactory()
         video = BrightcoveVideoFactory(user=user)
         account = BrightcoveAccountFactory(user=user)
-        self.check_lookup_accounts(video, account)
+        self.check_get_sync_accounts(video, account)
 
     def test_user_account_ignored_for_team_videos(self):
         user = UserFactory()
@@ -56,10 +56,10 @@ class LookupAccountTest(TestCase):
         account = BrightcoveAccountFactory(user=user)
         team_video = TeamVideoFactory(video=video)
 
-        self.check_lookup_accounts_returns_nothing(video)
+        self.check_get_sync_accounts_returns_nothing(video)
 
     def test_youtube_checks_channel_id(self):
-        # for youtube, lookup_accounts should return any account that matches
+        # for youtube, get_sync_accounts should return any account that matches
         # the channel id.  It shouldn't matter who owns the video in amara.
         user = UserFactory()
         account = YouTubeAccountFactory(channel_id='channel', user=user)
@@ -76,10 +76,10 @@ class LookupAccountTest(TestCase):
         video4 = YouTubeVideoFactory(video_url__owner_username='channel3',
                                      user=UserFactory())
 
-        self.check_lookup_accounts(video, account)
-        self.check_lookup_accounts(video2, account)
-        self.check_lookup_accounts_returns_nothing(video3)
-        self.check_lookup_accounts_returns_nothing(video4)
+        self.check_get_sync_accounts(video, account)
+        self.check_get_sync_accounts(video2, account)
+        self.check_get_sync_accounts_returns_nothing(video3)
+        self.check_get_sync_accounts_returns_nothing(video4)
 
 class YouTubeSyncTeamsTest(TestCase):
     def setUp(self):

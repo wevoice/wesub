@@ -67,7 +67,7 @@ class ExternalAccountManager(models.Manager):
             raise TypeError("Invalid owner type: %r" % owner)
         return self.filter(type=type_, owner_id=owner.id)
 
-    def lookup(self, video, video_url):
+    def get_sync_account(self, video, video_url):
         team_video = video.get_team_video()
         if team_video is not None:
             return self.get(type=ExternalAccount.TYPE_TEAM,
@@ -309,7 +309,7 @@ class BrightcoveAccount(ExternalAccount):
 
 
 class YouTubeAccountManager(ExternalAccountManager):
-    def lookup(self, video, video_url):
+    def get_sync_account(self, video, video_url):
         return self.get(channel_id=video_url.owner_username)
 
     def create_or_update(self, channel_id, oauth_refresh_token, **data):
@@ -470,7 +470,7 @@ def get_account(account_type, account_id):
     AccountModel = _account_type_to_model[account_type]
     return AccountModel.objects.get(id=account_id)
 
-def lookup_accounts(video):
+def get_sync_accounts(video):
     """Lookup an external accounts for a given video.
 
     This function examines the team associated with the video and the set of
@@ -481,18 +481,18 @@ def lookup_accounts(video):
     team_video = video.get_team_video()
     rv = []
     for video_url in video.get_video_urls():
-        account = lookup_account(video, video_url)
+        account = get_sync_account(video, video_url)
         if account is not None:
             rv.append((account, video_url))
     return rv
 
-def lookup_account(video, video_url):
+def get_sync_account(video, video_url):
     video_url.fix_owner_username()
     AccountModel = _video_type_to_account_model.get(video_url.type)
     if AccountModel is None:
         return None
     try:
-        return AccountModel.objects.lookup(video, video_url)
+        return AccountModel.objects.get_sync_account(video, video_url)
     except AccountModel.DoesNotExist:
         return None
 

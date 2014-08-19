@@ -30,7 +30,7 @@ import mock
 from externalsites import signalhandlers
 from externalsites.exceptions import SyncingError
 from externalsites.models import (KalturaAccount, SyncedSubtitleVersion,
-                                  SyncHistory, lookup_account)
+                                  SyncHistory, get_sync_account)
 from externalsites.syncing import kaltura, brightcove
 from subtitles import pipeline
 from subtitles.models import ORIGIN_IMPORTED
@@ -895,17 +895,17 @@ class RefetchYoutubeChannelIDTest(TestCase):
         self.account = YouTubeAccountFactory(user=self.user,
                                              channel_id='test-channel-id')
 
-    def test_lookup_account(self):
+    def test_get_sync_account(self):
         # the normal case is that we refetch the channel ID in
-        # lookup_account()
-        account = lookup_account(self.video, self.video_url)
+        # get_sync_account()
+        account = get_sync_account(self.video, self.video_url)
         self.assertEquals(account, self.account)
         self.check_username_fixed()
 
     @patch_for_test('externalsites.models.YouTubeAccount.update_subtitles')
     def test_update_all_subtitles(self, mock_update_subtitles):
         # we also need to refetch the id in update_all_subtitles(), which
-        # bypasses lookup_account()
+        # bypasses get_sync_account()
         test_utils.update_all_subtitles.original_func.apply(
             args=(self.account.account_type, self.account.id))
         mock_update_subtitles.assert_called_with(

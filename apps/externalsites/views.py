@@ -28,7 +28,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from auth.models import CustomUser as User
 from externalsites import forms
 from externalsites.exceptions import YouTubeAccountExistsError
-from externalsites.models import lookup_account, YouTubeAccount
+from externalsites.models import get_sync_account, YouTubeAccount
 from localeurl.utils import universal_url
 from teams.models import Team
 from teams.views import settings_page
@@ -159,7 +159,7 @@ def resync(request, video_url_id, language_code):
     return HttpResponseRedirect(redirect_url + '?tab=sync-history')
 
 def _resync_video(video, video_url, language):
-    account = lookup_account(video, video_url)
+    account = get_sync_account(video, video_url)
     if account is None:
         return
     tip = language.get_public_tip()
