@@ -206,16 +206,47 @@ class AddYoutubeAccountForm(forms.Form):
 class YoutubeAccountForm(forms.Form):
     remove_button = SubmitButtonField(label=ugettext_lazy('Remove account'),
                                       required=False)
+    sync_teams = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple,
+        required=False)
 
-    def __init__(self, account, data=None, **kwargs):
+    def __init__(self, admin_user, account, data=None, **kwargs):
         super(YoutubeAccountForm, self).__init__(data=data, **kwargs)
         self.account = account
+        self.admin_user = admin_user
+        self.setup_sync_teams()
+
+    def setup_sync_teams(self):
+        choices = []
+        initial = []
+        # allow the admin to uncheck any of the current sync teams
+        current_sync_teams = list(self.account.sync_teams.all())
+        for team in current_sync_teams:
+            choices.append((team.id, team.name))
+            initial.append(team.id)
+        # allow the admin to check any of the other teams they're an admin for
+        exclude_team_ids = [t.id for t in current_sync_teams]
+        exclude_team_ids.append(self.account.owner_id)
+        member_qs = (self.admin_user.team_members.admins()
+                     .exclude(id__in=exclude_team_ids)
+                     .select_related('team'))
+        choices.extend((member.team.id, member.team.name)
+                       for member in member_qs)
+        self['sync_teams'].field.choices = choices
+        self['sync_teams'].field.initial = initial
 
     def save(self):
         if not self.is_valid():
             raise ValueError("Form not valid")
         if self.cleaned_data['remove_button']:
             self.account.delete()
+        else:
+            self.account.sync_teams = Team.objects.filter(
+                id__in=self.cleaned_data['sync_teams']
+            )
+
+    def show_sync_teams(self):
+        return len(self['sync_teams'].field.choices) > 0
 
 class AccountFormset(dict):
     """Container for multiple account forms.
@@ -223,8 +254,9 @@ class AccountFormset(dict):
     For each form in form classes we will instatiate it with a unique prefix
     to avoid name collisions.
     """
-    def __init__(self, owner, data=None):
+    def __init__(self, admin_user, owner, data=None):
         super(AccountFormset, self).__init__()
+        self.admin_user = admin_user
         self.data = data
         self.make_forms(owner)
 
@@ -234,7 +266,7 @@ class AccountFormset(dict):
         self.make_form('add_youtube', AddYoutubeAccountForm, owner)
         for account in models.YouTubeAccount.objects.for_owner(owner):
             name = 'youtube_%s' % account.id
-            self.make_form(name, YoutubeAccountForm, account)
+            self.make_form(name, YoutubeAccountForm, self.admin_user, account)
 
     def make_form(self, name, form_class, *args, **kwargs):
         kwargs['prefix'] = name.replace('_', '-')

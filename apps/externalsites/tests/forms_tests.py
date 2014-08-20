@@ -326,29 +326,77 @@ class AddYoutubeAccountFormTest(TestCase):
 
 class YouTubeAccountTest(TestCase):
     def test_remove(self):
-        team = TeamFactory()
+        user = UserFactory()
+        team = TeamFactory(admin=user)
         account = YouTubeAccountFactory(team=team)
         assert_equal(models.YouTubeAccount.objects.count(), 1)
-        form = forms.YoutubeAccountForm(account, {
+        form = forms.YoutubeAccountForm(user, account, {
             'remove_button': True,
         })
         form.save()
         assert_equal(models.YouTubeAccount.objects.count(), 0)
 
     def test_no_remove(self):
-        team = TeamFactory()
+        user = UserFactory()
+        team = TeamFactory(admin=user)
         account = YouTubeAccountFactory(team=team)
         assert_equal(models.YouTubeAccount.objects.count(), 1)
-        form = forms.YoutubeAccountForm(account, {})
+        form = forms.YoutubeAccountForm(user, account, {})
         form.save()
         assert_equal(models.YouTubeAccount.objects.count(), 1)
 
+    def test_sync_teams(self):
+        # test the sync_teams field
+        user = UserFactory()
+        account_team = TeamFactory(admin=user, name='Account Team')
+        account = YouTubeAccountFactory(team=account_team)
+        correct_choices = []
+        correct_initial = []
+        # by default, the choices sync_teams should include all teams the user
+        # is an admin for
+        for i in xrange(5):
+            team = TeamFactory(admin=user, name='Related team %s' % i)
+            correct_choices.append((team.id, unicode(team)))
+            # add one of the teams to the sync_teams set so that we check that
+            # the initial value is correct.
+            if i == 0:
+                account.sync_teams.add(team)
+                correct_initial.append(team.id)
+        # it also should include teams that are currently synced, but the user
+        # isn't an admin for
+        team = TeamFactory(name='Synced team')
+        account.sync_teams.add(team)
+        correct_choices.append((team.id, unicode(team)))
+        correct_initial.append(team.id)
+        # make some other teams that the user isn't an admin for and aren't
+        # currentyl synced.  We shouldn't include these
+        for i in xrange(5):
+            TeamFactory(name='Other team %s' % i)
+        form = forms.YoutubeAccountForm(user, account)
+        assert_items_equal(form['sync_teams'].field.choices, correct_choices)
+        assert_items_equal(form['sync_teams'].field.initial, correct_initial)
+
+    def test_save_sync_teams(self):
+        user = UserFactory()
+        account_team = TeamFactory(admin=user)
+        account = YouTubeAccountFactory(team=account_team)
+        teams = [TeamFactory(admin=user) for i in xrange(5)]
+        account.sync_teams = teams[:2]
+
+        form = forms.YoutubeAccountForm(user, account, {
+            'sync_teams': [t.id for t in teams[3:]],
+        })
+        form.save()
+        account = models.YouTubeAccount.objects.get(id=account.id)
+        assert_items_equal(account.sync_teams.all(), teams[3:])
+
 class AccountFormsetTest(TestCase):
     def test_forms(self):
-        team = TeamFactory()
+        user = UserFactory()
+        team = TeamFactory(admin=user)
         account = YouTubeAccountFactory(team=team, id=1)
         account2 = YouTubeAccountFactory(team=team, id=2)
-        formset = forms.AccountFormset(team)
+        formset = forms.AccountFormset(user, team)
         assert_equal(set(formset.keys()), set([
             'brightcove',
             'kaltura',

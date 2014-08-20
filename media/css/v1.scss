@@ -2454,28 +2454,42 @@ a.truncated-expand {
         }
     }
 
-    table {
+    .youtube-form {
         border: 1px solid $light-grey;
 
-        th, td {
-            border: none;
-            padding: 0.5em 1em;
-        }
+        padding: 0.5em;
 
-        th {
-            font-weight: bold;
-            text-align: center;
-        }
+        .remove-button {
+            float: right;
 
-        td {
-            &.actions {
-                text-align: right;
-
-                button {
-                    margin: 0;
-                }
+            button {
+                margin: 0;
             }
         }
+
+        h3 {
+            padding: 0;
+        }
+
+        h4 {
+            padding: 1em 0 0 0;
+        }
+
+        ul {
+            padding: 0 1em;
+
+            li label {
+                color: inherit;
+                float: none;
+                font-size: inherit;
+                padding: 0;
+                margin: 0.5em 0 0 0;
+            }
+        }
+    }
+
+    button#id_add-youtube-add_button {
+        float: right;
     }
 }
 

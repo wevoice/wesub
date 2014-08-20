@@ -20,21 +20,23 @@
 
             <fieldset class="youtube">
                 <legend>{% trans "YouTube" %}</legend>
-                {% if forms.youtube_forms %}
-                <table>
-                    <tr>
-                        <th colspan=2>{% trans 'Current accounts' %}</th>
-                    </tr>
-                    {% for form in forms.youtube_forms %}
-                    <tr class="{% cycle 'odd' 'even' %}">
-                        <td>{{ form.account.get_owner_display }}</td>
-                        <td class="actions">{{ form.remove_button }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% else %}
+                {% for form in forms.youtube_forms %}
+                <div class="youtube-form">
+                    <div class="remove-button">
+                        {{ form.remove_button }}
+                    </div>
+                    <h3>{% blocktrans with account_name=form.account.get_owner_display %}
+                        Linked Account: {{ account_name }}
+                        {% endblocktrans %}
+                    </h3>
+                    {% if form.show_sync_teams %}
+                        <h4>{% trans "Sync videos from these teams:" %}</h4>
+                        {{ form.sync_teams }}
+                    {% endif %}
+                </div>
+                {% empty %}
                 <p class="no-accounts">{% trans 'No youtube accounts linked yet.' %}</p>
-                {% endif %}
+                {% endfor %}
                 {{ forms.add_youtube.add_button }}
             </fieldset>
 

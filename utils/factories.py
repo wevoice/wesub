@@ -145,6 +145,15 @@ class TeamFactory(DjangoModelFactory):
             team.default_project
         return team
 
+    @factory.post_generation
+    def admin(self, create, extracted, **kwargs):
+        if extracted:
+            assert create
+            TeamMemberFactory.create(
+                user=extracted, team=self,
+                role=teams.models.TeamMember.ROLE_ADMIN,
+            )
+
 class WorkflowFactory(DjangoModelFactory):
     FACTORY_FOR = teams.models.Workflow
     review_allowed = 30 # admin must review

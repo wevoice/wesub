@@ -57,9 +57,9 @@ class AccountFormHandler(object):
 @settings_page
 def team_settings_tab(request, team):
     if request.method == 'POST':
-        formset = forms.AccountFormset(team, request.POST)
+        formset = forms.AccountFormset(request.user, team, request.POST)
     else:
-        formset = forms.AccountFormset(team, None)
+        formset = forms.AccountFormset(request.user, team, None)
 
     if formset.is_valid():
         formset.save()
@@ -72,7 +72,6 @@ def team_settings_tab(request, team):
     return render(request, 'externalsites/team-settings-tab.html', {
         'team': team,
         'forms': formset,
-        'youtube_accounts': YouTubeAccount.objects.for_owner(team),
     })
 
 def settings_page_redirect_url(team, formset):
