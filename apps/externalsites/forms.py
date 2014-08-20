@@ -18,6 +18,7 @@
 
 from django import forms
 from django.core import validators
+from django.core.urlresolvers import reverse
 from django.forms.util import ErrorDict
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
@@ -25,6 +26,7 @@ from django.utils.translation import ugettext_lazy
 from auth.models import CustomUser as User
 from teams.models import Team
 from externalsites import models
+from utils.forms import SubmitButtonField
 import videos.tasks
 
 class AccountForm(forms.ModelForm):
@@ -178,27 +180,70 @@ class BrightcoveAccountForm(AccountForm):
         else:
             return None
 
+class AddYoutubeAccountForm(forms.Form):
+    add_button = SubmitButtonField(label=ugettext_lazy('Add YouTube account'),
+                                   required=False)
+
+    def __init__(self, owner, data=None, **kwargs):
+        super(AddYoutubeAccountForm, self).__init__(data=data, **kwargs)
+        self.owner = owner
+
+    def save(self):
+        pass
+
+    def redirect_path(self):
+        if self.cleaned_data['add_button']:
+            path = reverse('externalsites:youtube-add-account')
+            if isinstance(self.owner, Team):
+                return '%s?team_slug=%s' % (path, self.owner.slug)
+            elif isinstance(self.owner, User):
+                return '%s?username=%s' % (path, self.owner.username)
+            else:
+                raise ValueError("Unknown owner type: %s" % self.owner)
+        else:
+            return None
+
+class YoutubeAccountForm(forms.Form):
+    remove_button = SubmitButtonField(label=ugettext_lazy('Remove account'),
+                                      required=False)
+
+    def __init__(self, account, data=None, **kwargs):
+        super(YoutubeAccountForm, self).__init__(data=data, **kwargs)
+        self.account = account
+
+    def save(self):
+        if not self.is_valid():
+            raise ValueError("Form not valid")
+        if self.cleaned_data['remove_button']:
+            self.account.delete()
+
 class AccountFormset(dict):
-    """dict-like object that contains multiple account forms.
+    """Container for multiple account forms.
 
     For each form in form classes we will instatiate it with a unique prefix
-    to avoid name collisions.  Also we will create another form that controls
-    if the accounts are enabled.
+    to avoid name collisions.
     """
     def __init__(self, owner, data=None):
         super(AccountFormset, self).__init__()
-        for name, FormClass in self._form_classes():
-            self[name] = FormClass(owner, data, prefix=name)
+        self.data = data
+        self.make_forms(owner)
 
-    def _form_classes(self):
-        """Generate all the forms that we will contain.
+    def make_forms(self, owner):
+        self.make_form('kaltura', KalturaAccountForm, owner)
+        self.make_form('brightcove', BrightcoveAccountForm, owner)
+        self.make_form('add_youtube', AddYoutubeAccountForm, owner)
+        for account in models.YouTubeAccount.objects.for_owner(owner):
+            name = 'youtube_%s' % account.id
+            self.make_form(name, YoutubeAccountForm, account)
 
-        :returns: list of (name, FormClass) tuples
-        """
-        return [
-            ('kaltura', KalturaAccountForm),
-            ('brightcove', BrightcoveAccountForm),
-        ]
+    def make_form(self, name, form_class, *args, **kwargs):
+        kwargs['prefix'] = name.replace('_', '-')
+        kwargs['data'] = self.data
+        self[name] = form_class(*args, **kwargs)
+
+    def youtube_forms(self):
+        return [form for name, form in self.items()
+                if name.startswith('youtube_')]
 
     def is_valid(self):
         return all(form.is_valid() for form in self.values())
@@ -206,3 +251,10 @@ class AccountFormset(dict):
     def save(self):
         for form in self.values():
             form.save()
+
+    def redirect_path(self):
+        for form in self.values():
+            if hasattr(form, 'redirect_path'):
+                redirect_path = form.redirect_path()
+                if redirect_path is not None:
+                    return redirect_path

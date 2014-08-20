@@ -67,7 +67,7 @@ def team_settings_tab(request, team):
             account = YouTubeAccount.objects.for_owner(team).get(
                 id=request.POST['remove-youtube-account'])
             account.delete()
-        return redirect(settings_page_redirect_url(team, request.POST))
+        return redirect(settings_page_redirect_url(team, formset))
 
     return render(request, 'externalsites/team-settings-tab.html', {
         'team': team,
@@ -75,10 +75,10 @@ def team_settings_tab(request, team):
         'youtube_accounts': YouTubeAccount.objects.for_owner(team),
     })
 
-def settings_page_redirect_url(team, data):
-    if 'add-youtube-account' in data:
-        return '%s?team_slug=%s' % (
-            reverse('externalsites:youtube-add-account'), team.slug)
+def settings_page_redirect_url(team, formset):
+    redirect_path = formset.redirect_path()
+    if redirect_path is not None:
+        return redirect_path
     else:
         return reverse('teams:settings_externalsites', kwargs={
             'slug': team.slug,
