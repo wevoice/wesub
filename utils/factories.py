@@ -248,6 +248,12 @@ class BrightcoveAccountFactory(DjangoModelFactory):
     publisher_id = 'publisher'
     write_token = 'write-token'
 
+class KalturaAccountFactory(DjangoModelFactory):
+    FACTORY_FOR = externalsites.models.KalturaAccount
+
+    partner_id = 'test-partner-id'
+    secret = 'test-secret'
+
 class YouTubeAccountFactory(DjangoModelFactory):
     FACTORY_FOR = externalsites.models.YouTubeAccount
 

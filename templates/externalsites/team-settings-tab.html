@@ -39,20 +39,20 @@
                 <button name="add-youtube-account" value="1" type="submit">{% trans 'Add YouTube account' %}</button>
             </fieldset>
 
-            <fieldset class="kaltura{% if not forms.enabled_accounts.kaltura.value %} disabled{% endif %}">
+            <fieldset class="kaltura{% if not forms.kaltura.enabled.value %} disabled{% endif %}">
                 <legend>{% trans "Kaltura" %}</legend>
                 {{ forms.kaltura.non_field_errors }}
-                {% include "_form_field.html" with field=forms.enabled_accounts.kaltura widget_type="checkbox" %}
+                {% include "_form_field.html" with field=forms.kaltura.enabled widget_type="checkbox" %}
                 <div class="account-fields">
                     {% include "_form_field.html" with field=forms.kaltura.partner_id %}
                     {% include "_form_field.html" with field=forms.kaltura.secret %}
                 </div>
             </fieldset>
 
-            <fieldset class="brightcove{% if not forms.enabled_accounts.brightcove.value %} disabled{% endif %}">
+            <fieldset class="brightcove{% if not forms.brightcove.enabled.value %} disabled{% endif %}">
                 <legend>{% trans "Brightcove" %}</legend>
                 {{ forms.brightcove.non_field_errors }}
-                {% include "_form_field.html" with field=forms.enabled_accounts.brightcove widget_type="checkbox" %}
+                {% include "_form_field.html" with field=forms.brightcove.enabled widget_type="checkbox" %}
                 <div class="account-fields">
                     {% include "_form_field.html" with field=forms.brightcove.publisher_id %}
                     {% include "_form_field.html" with field=forms.brightcove.write_token %}

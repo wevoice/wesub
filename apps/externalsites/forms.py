@@ -18,6 +18,7 @@
 
 from django import forms
 from django.core import validators
+from django.forms.util import ErrorDict
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
@@ -32,8 +33,12 @@ class AccountForm(forms.ModelForm):
     enabled = forms.BooleanField(required=False)
 
     def __init__(self, owner, data=None, **kwargs):
+        super(AccountForm, self).__init__(data=data,
+                                          instance=self.get_account(owner),
+                                          **kwargs)
         self.owner = owner
-        forms.ModelForm.__init__(self, data, **kwargs)
+        # set initial to be True if an account already exists
+        self.fields['enabled'].initial = (self.instance.pk is not None)
 
     @classmethod
     def get_account(cls, owner):
@@ -43,11 +48,26 @@ class AccountForm(forms.ModelForm):
         except ModelClass.DoesNotExist:
             return None
 
-    def delete_account(self):
-        if self.instance.id is not None:
-            self.instance.delete()
+    def full_clean(self):
+        if not self.find_enabled_value():
+            self.cleaned_data = {
+                'enabled': False,
+            }
+            self._errors = ErrorDict()
+        else:
+            return super(AccountForm, self).full_clean()
+
+    def find_enabled_value(self):
+        widget = self.fields['enabled'].widget
+        return widget.value_from_datadict(self.data, self.files,
+                                          self.add_prefix('enabled'))
 
     def save(self):
+        if not self.is_valid():
+            raise ValueError("form has errors: %s" % self.errors.as_text())
+        if not self.cleaned_data['enabled']:
+            self.delete_account()
+            return
         account = forms.ModelForm.save(self, commit=False)
         if isinstance(self.owner, Team):
             account.type = models.ExternalAccount.TYPE_TEAM
@@ -59,6 +79,10 @@ class AccountForm(forms.ModelForm):
             raise TypeError("Invalid owner type: %s" % self.owner)
         account.save()
         return account
+
+    def delete_account(self):
+        if self.instance.id is not None:
+            self.instance.delete()
 
 class KalturaAccountForm(AccountForm):
     partner_id = forms.IntegerField()
@@ -129,6 +153,8 @@ class BrightcoveAccountForm(AccountForm):
 
     def save(self):
         account = AccountForm.save(self)
+        if not self.cleaned_data['enabled']:
+            return None
         if self.cleaned_data['feed_enabled']:
             feed_changed = account.make_feed(self.cleaned_data['player_id'],
                                              self._calc_feed_tags())
@@ -152,79 +178,31 @@ class BrightcoveAccountForm(AccountForm):
         else:
             return None
 
-class AccountFormset(object):
+class AccountFormset(dict):
     """dict-like object that contains multiple account forms.
 
     For each form in form classes we will instatiate it with a unique prefix
     to avoid name collisions.  Also we will create another form that controls
     if the accounts are enabled.
     """
-    form_classes = {
-        'kaltura': KalturaAccountForm,
-        'brightcove': BrightcoveAccountForm,
-    }
     def __init__(self, owner, data=None):
-        self.is_bound = data is not None
-        existing_accounts = dict(
-            (name, form_class.get_account(owner))
-            for (name, form_class) in self.form_classes.items())
+        super(AccountFormset, self).__init__()
+        for name, FormClass in self._form_classes():
+            self[name] = FormClass(owner, data, prefix=name)
 
-        enabled_accounts = self.make_enabled_accounts(existing_accounts, data)
-        # trigger a full clean on enabled_accounts since we want to use
-        # it's cleaned_data below
-        enabled_accounts.is_valid()
-        self.forms = {
-            'enabled_accounts': enabled_accounts,
-        }
+    def _form_classes(self):
+        """Generate all the forms that we will contain.
 
-        for name, form_class in self.form_classes.items():
-            # if the account is enabled, then we pass it the POST data,
-            # otherwise we leave it unbound
-            if self.is_bound and enabled_accounts.cleaned_data[name]:
-                form_data = data
-            else:
-                form_data = None
-            self.forms[name] = form_class(owner, form_data,
-                                          instance=existing_accounts[name],
-                                          prefix=name)
-
-    def make_enabled_accounts(self, existing_accounts, data):
-        fields = {}
-        for form_name in self.form_classes:
-            fields[form_name] = forms.BooleanField(
-                required=False, label=_('Enabled'),
-                initial=existing_accounts[form_name] is not None)
-        EnabledAccountsForm = type('EnabledAccountsForm', (forms.Form,),
-                                   fields)
-        return EnabledAccountsForm(data, prefix='enabled_accounts')
-
-    def account_forms(self):
-        for form_name, form in self.forms.items():
-            if form_name != 'enabled_accounts':
-                yield form_name, form
-
-    def account_enabled(self, form_name):
-        return self['enabled_accounts'].cleaned_data.get(form_name)
+        :returns: list of (name, FormClass) tuples
+        """
+        return [
+            ('kaltura', KalturaAccountForm),
+            ('brightcove', BrightcoveAccountForm),
+        ]
 
     def is_valid(self):
-        if not self.is_bound:
-            return False
-        return all(form.is_valid()
-                   for (form_name, form) in self.account_forms()
-                   if self.account_enabled(form_name))
+        return all(form.is_valid() for form in self.values())
 
     def save(self):
-        if not self.is_valid():
-            raise ValueError("form not valid")
-        for form_name, form in self.account_forms():
-            if self.account_enabled(form_name):
-                form.save()
-            else:
-                form.delete_account()
-
-    def keys(self):
-        return self.forms.keys()
-
-    def __getitem__(self, form_name):
-        return self.forms[form_name]
-
+        for form in self.values():
+            form.save()
