@@ -352,6 +352,10 @@ class YouTubeAccountTest(TestCase):
         account = YouTubeAccountFactory(team=account_team)
         correct_choices = []
         correct_initial = []
+        # make some random teams that the user isn't an admin for and aren't
+        # currently synced.  We shouldn't include these.
+        for i in xrange(5):
+            TeamFactory(name='Other team %s' % i)
         # by default, the choices sync_teams should include all teams the user
         # is an admin for
         for i in xrange(5):
@@ -368,10 +372,6 @@ class YouTubeAccountTest(TestCase):
         account.sync_teams.add(team)
         correct_choices.append((team.id, unicode(team)))
         correct_initial.append(team.id)
-        # make some other teams that the user isn't an admin for and aren't
-        # currentyl synced.  We shouldn't include these
-        for i in xrange(5):
-            TeamFactory(name='Other team %s' % i)
         form = forms.YoutubeAccountForm(user, account)
         assert_items_equal(form['sync_teams'].field.choices, correct_choices)
         assert_items_equal(form['sync_teams'].field.initial, correct_initial)

@@ -228,7 +228,7 @@ class YoutubeAccountForm(forms.Form):
         exclude_team_ids = [t.id for t in current_sync_teams]
         exclude_team_ids.append(self.account.owner_id)
         member_qs = (self.admin_user.team_members.admins()
-                     .exclude(id__in=exclude_team_ids)
+                     .exclude(team_id__in=exclude_team_ids)
                      .select_related('team'))
         choices.extend((member.team.id, member.team.name)
                        for member in member_qs)
