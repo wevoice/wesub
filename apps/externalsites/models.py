@@ -348,15 +348,7 @@ class YouTubeAccountManager(ExternalAccountManager):
         other_account = self.get(channel_id=channel_id)
         other_account.oauth_refresh_token = oauth_refresh_token
         other_account.save()
-        if other_account.type == ExternalAccount.TYPE_TEAM:
-            msg = fmt(_('That youtube account has already been linked '
-                        'to the %(team)s team'),
-                      team=other_account.team)
-        else:
-            msg = fmt(_('That youtube account has already been linked '
-                        'to the user %(username)s'),
-                      username=other_account.user.username)
-        raise YouTubeAccountExistsError(msg)
+        raise YouTubeAccountExistsError(other_account)
 
 class YouTubeAccount(ExternalAccount):
     """YouTube account to sync to.

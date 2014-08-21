@@ -20,6 +20,7 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 from django.core.exceptions import PermissionDenied
+from nose.tools import *
 
 from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import (BrightcoveAccount, YouTubeAccount,
@@ -277,20 +278,21 @@ class YoutubeAccountTest(TestCase):
             'oauth_refresh_token':
             'test-refresh-token',
         }
-        self.assertEquals(YouTubeAccount.objects.all().count(), 0)
-        YouTubeAccount.objects.create_or_update(user=user, **auth_info)
-        self.assertEquals(YouTubeAccount.objects.all().count(), 1)
+        assert_equals(YouTubeAccount.objects.all().count(), 0)
+        account = YouTubeAccount.objects.create_or_update(user=user,
+                                                          **auth_info)
+        assert_equals(YouTubeAccount.objects.all().count(), 1)
 
         # Now that there is an account, it should update the existing account
         # and throw a YouTubeAccountExistsError
         team = TeamFactory()
         auth_info['oauth_refresh_token'] = 'test-refresh-token2'
-        self.assertRaises(YouTubeAccountExistsError,
-                          YouTubeAccount.objects.create_or_update, team=team,
-                          **auth_info)
-        self.assertEquals(YouTubeAccount.objects.all().count(), 1)
+        with assert_raises(YouTubeAccountExistsError) as cm:
+            YouTubeAccount.objects.create_or_update(team=team, **auth_info)
+        assert_equals(cm.exception.other_account, account)
+        assert_equals(YouTubeAccount.objects.all().count(), 1)
         account = YouTubeAccount.objects.all().get()
-        self.assertEquals(account.oauth_refresh_token, 'test-refresh-token2')
+        assert_equals(account.oauth_refresh_token, 'test-refresh-token2')
 
 class YoutubeAccountFeedTest(TestCase):
     def setUp(self):

@@ -24,6 +24,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import ugettext as _
 
 from auth.models import CustomUser as User
 from externalsites import forms
@@ -31,8 +32,10 @@ from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import get_sync_account, YouTubeAccount
 from localeurl.utils import universal_url
 from teams.models import Team
+from teams.permissions import can_change_team_settings
 from teams.views import settings_page
 from utils import youtube
+from utils.text import fmt
 from videos.models import VideoUrl
 
 logger = logging.getLogger('amara.externalsites.views')
@@ -133,12 +136,33 @@ def youtube_callback(request):
     try:
         account = YouTubeAccount.objects.create_or_update(**account_data)
     except YouTubeAccountExistsError, e:
-        messages.error(request, str(e))
+        messages.error(request,
+                       already_linked_message(request.user, e.other_account))
     else:
         if 'username' in auth_info.state:
             account.create_feed()
 
     return redirect(redirect_url)
+
+def already_linked_message(user, other_account):
+    if other_account.user is not None:
+        return fmt(_('That youtube account has already been linked '
+                     'to the user %(username)s.'),
+                   username=other_account.user.username)
+
+    if can_change_team_settings(other_account.team, user):
+        settings_link = reverse('teams:settings_externalsites', kwargs={
+            'slug': other_account.team.slug,
+        })
+        return fmt(_('That youtube account has already been linked '
+                     'to the %(team)s team '
+                     '(<a href="%(link)s">view settings page</a>).'),
+                   team=other_account.team,
+                   link=settings_link)
+    else:
+        return fmt(_('That youtube account has already been linked '
+                     'to the %(team)s team.'),
+                   team=other_account.team)
 
 @staff_member_required
 def resync(request, video_url_id, language_code):
