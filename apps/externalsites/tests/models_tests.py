@@ -112,10 +112,19 @@ class YouTubeTeamGetSyncAccountTest(YouTubeGetSyncAccountTestBase):
 
     def test_sync_teams(self):
         other_team = TeamFactory()
+        other_team2 = TeamFactory()
+        self.account.sync_teams = [other_team, other_team2]
+
         video = self.make_youtube_team_video(other_team,
                                              self.account.channel_id)
-        self.check_get_sync_account_doesnt_match_account(video)
-        self.account.sync_teams.add(other_team)
+        self.check_get_sync_account_matches_account(video)
+
+        video = self.make_youtube_team_video(other_team2,
+                                             self.account.channel_id)
+        self.check_get_sync_account_matches_account(video)
+
+        video = self.make_youtube_team_video(self.team,
+                                             self.account.channel_id)
         self.check_get_sync_account_matches_account(video)
 
 class YouTubeUserGetSyncAccountTest(YouTubeGetSyncAccountTestBase):

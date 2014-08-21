@@ -316,12 +316,18 @@ class BrightcoveAccount(ExternalAccount):
 
 class YouTubeAccountManager(ExternalAccountManager):
     def _get_sync_account_team_video(self, team_video, video_url):
-        team_q = (Q(owner_id=team_video.team_id) |
-                  Q(sync_teams__id=team_video.team_id))
-
-        return self.get(team_q,
-                        type=ExternalAccount.TYPE_TEAM,
-                        channel_id=video_url.owner_username)
+        query = self.filter(type=ExternalAccount.TYPE_TEAM,
+                            channel_id=video_url.owner_username)
+        where_sql = (
+            'owner_id = %s OR EXISTS ('
+            'SELECT * '
+            'FROM externalsites_youtubeaccount_sync_teams '
+            'WHERE youtubeaccount_id = externalsites_youtubeaccount.id '
+            'AND team_id = %s)'
+        )
+        query = query.extra(where=[where_sql],
+                            params=[team_video.team_id, team_video.team_id])
+        return query.get()
 
     def _get_sync_account_nonteam_video(self, video, video_url):
         return self.get(
