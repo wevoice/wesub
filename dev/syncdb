@@ -1,4 +1,4 @@
 #!/bin/bash
 
-manage syncdb --all --noinput
-manage migrate --fake
+cd "$( unisubs-root )"
+fig run initdb
