@@ -2,7 +2,9 @@ import re
 
 from django import forms
 from django.core import validators
+from django.utils import html
 from django.utils.encoding import force_unicode
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from utils.forms.recapcha import ReCaptchaField
@@ -84,6 +86,30 @@ class UsernameListField(ListField):
     }
     pattern = username_list_re
 
+
+class SubmitButtonWidget(forms.Widget):
+    def render(self, name, value, attrs=None):
+        final_attrs = self.attrs.copy()
+        if attrs is not None:
+            final_attrs.update(attrs)
+        label = final_attrs.pop('label', _('Submit'))
+        final_attrs['name'] = name
+        if value is None:
+            final_attrs['value'] = '1'
+        else:
+            final_attrs['value'] = value
+        attr_string = ' '.join("%s=%s" % (name, html.escape(value))
+                               for name, value in final_attrs.items())
+        return mark_safe('<button %s>%s</button>' % (attr_string, label))
+
+class SubmitButtonField(forms.BooleanField):
+    widget = SubmitButtonWidget
+
+    def widget_attrs(self, widget):
+        attrs = {}
+        if isinstance(widget, SubmitButtonWidget):
+            attrs['label'] = self.label
+        return attrs
 
 class ErrorableModelForm(forms.ModelForm):
     """This class simply adds a single method to the standard one: add_error.

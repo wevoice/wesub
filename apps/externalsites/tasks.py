@@ -23,7 +23,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from externalsites import credit
 from externalsites import subfetch
-from externalsites.models import get_account, lookup_account
+from externalsites.models import get_account, get_sync_account
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from utils import youtube
 from videos.models import VideoUrl
@@ -116,7 +116,7 @@ def update_all_subtitles(account_type, account_id):
     for video in videos.all():
         for video_url in video.get_video_urls():
             video_url.fix_owner_username()
-            if account.is_for_video_url(video_url):
+            if account.should_sync_video_url(video, video_url):
                 _sync_all_languages(account, video_url, video)
 
 def _sync_all_languages(account, video_url, video):
@@ -126,7 +126,7 @@ def _sync_all_languages(account, video_url, video):
 @task
 def add_amara_credit(video_url_id):
     video_url = VideoUrl.objects.get(id=video_url_id)
-    account = lookup_account(video_url.video, video_url)
+    account = get_sync_account(video_url.video, video_url)
     if credit.should_add_credit_to_video_url(video_url, account):
         credit.add_credit_to_video_url(video_url, account)
 

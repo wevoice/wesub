@@ -24,15 +24,18 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import ugettext as _
 
 from auth.models import CustomUser as User
 from externalsites import forms
 from externalsites.exceptions import YouTubeAccountExistsError
-from externalsites.models import lookup_account, YouTubeAccount
+from externalsites.models import get_sync_account, YouTubeAccount
 from localeurl.utils import universal_url
 from teams.models import Team
+from teams.permissions import can_change_team_settings
 from teams.views import settings_page
 from utils import youtube
+from utils.text import fmt
 from videos.models import VideoUrl
 
 logger = logging.getLogger('amara.externalsites.views')
@@ -57,9 +60,9 @@ class AccountFormHandler(object):
 @settings_page
 def team_settings_tab(request, team):
     if request.method == 'POST':
-        formset = forms.AccountFormset(team, request.POST)
+        formset = forms.AccountFormset(request.user, team, request.POST)
     else:
-        formset = forms.AccountFormset(team, None)
+        formset = forms.AccountFormset(request.user, team, None)
 
     if formset.is_valid():
         formset.save()
@@ -67,18 +70,17 @@ def team_settings_tab(request, team):
             account = YouTubeAccount.objects.for_owner(team).get(
                 id=request.POST['remove-youtube-account'])
             account.delete()
-        return redirect(settings_page_redirect_url(team, request.POST))
+        return redirect(settings_page_redirect_url(team, formset))
 
     return render(request, 'externalsites/team-settings-tab.html', {
         'team': team,
         'forms': formset,
-        'youtube_accounts': YouTubeAccount.objects.for_owner(team),
     })
 
-def settings_page_redirect_url(team, data):
-    if 'add-youtube-account' in data:
-        return '%s?team_slug=%s' % (
-            reverse('externalsites:youtube-add-account'), team.slug)
+def settings_page_redirect_url(team, formset):
+    redirect_path = formset.redirect_path()
+    if redirect_path is not None:
+        return redirect_path
     else:
         return reverse('teams:settings_externalsites', kwargs={
             'slug': team.slug,
@@ -134,12 +136,33 @@ def youtube_callback(request):
     try:
         account = YouTubeAccount.objects.create_or_update(**account_data)
     except YouTubeAccountExistsError, e:
-        messages.error(request, str(e))
+        messages.error(request,
+                       already_linked_message(request.user, e.other_account))
     else:
         if 'username' in auth_info.state:
             account.create_feed()
 
     return redirect(redirect_url)
+
+def already_linked_message(user, other_account):
+    if other_account.user is not None:
+        return fmt(_('That youtube account has already been linked '
+                     'to the user %(username)s.'),
+                   username=other_account.user.username)
+
+    if can_change_team_settings(other_account.team, user):
+        settings_link = reverse('teams:settings_externalsites', kwargs={
+            'slug': other_account.team.slug,
+        })
+        return fmt(_('That youtube account has already been linked '
+                     'to the %(team)s team '
+                     '(<a href="%(link)s">view settings page</a>).'),
+                   team=other_account.team,
+                   link=settings_link)
+    else:
+        return fmt(_('That youtube account has already been linked '
+                     'to the %(team)s team.'),
+                   team=other_account.team)
 
 @staff_member_required
 def resync(request, video_url_id, language_code):
@@ -159,7 +182,7 @@ def resync(request, video_url_id, language_code):
     return HttpResponseRedirect(redirect_url + '?tab=sync-history')
 
 def _resync_video(video, video_url, language):
-    account = lookup_account(video, video_url)
+    account = get_sync_account(video, video_url)
     if account is None:
         return
     tip = language.get_public_tip()

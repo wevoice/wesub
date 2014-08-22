@@ -27,10 +27,6 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(seconds=300),
         'task': 'auth.tasks.gauge_auth',
     },
-    'gauge-third-party-accounts': {
-        'task': 'accountlinker.tasks.gauge_tpas',
-        'schedule': timedelta(seconds=300),
-    },
     'gauge-comments': {
         'task': 'comments.tasks.gauge_comments',
         'schedule': timedelta(seconds=300),

@@ -25,8 +25,7 @@ Contents:
    subtitle-storage
    subtitle-formats
    model-refactor
-   syncing
-   youtube-syncing
+   syncing-and-importing
    bugs
    languages
 

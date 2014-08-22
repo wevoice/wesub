@@ -18,12 +18,15 @@
 
 from django import forms
 from django.core import validators
+from django.core.urlresolvers import reverse
+from django.forms.util import ErrorDict
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
 from auth.models import CustomUser as User
 from teams.models import Team
 from externalsites import models
+from utils.forms import SubmitButtonField
 import videos.tasks
 
 class AccountForm(forms.ModelForm):
@@ -32,8 +35,12 @@ class AccountForm(forms.ModelForm):
     enabled = forms.BooleanField(required=False)
 
     def __init__(self, owner, data=None, **kwargs):
+        super(AccountForm, self).__init__(data=data,
+                                          instance=self.get_account(owner),
+                                          **kwargs)
         self.owner = owner
-        forms.ModelForm.__init__(self, data, **kwargs)
+        # set initial to be True if an account already exists
+        self.fields['enabled'].initial = (self.instance.pk is not None)
 
     @classmethod
     def get_account(cls, owner):
@@ -43,11 +50,26 @@ class AccountForm(forms.ModelForm):
         except ModelClass.DoesNotExist:
             return None
 
-    def delete_account(self):
-        if self.instance.id is not None:
-            self.instance.delete()
+    def full_clean(self):
+        if not self.find_enabled_value():
+            self.cleaned_data = {
+                'enabled': False,
+            }
+            self._errors = ErrorDict()
+        else:
+            return super(AccountForm, self).full_clean()
+
+    def find_enabled_value(self):
+        widget = self.fields['enabled'].widget
+        return widget.value_from_datadict(self.data, self.files,
+                                          self.add_prefix('enabled'))
 
     def save(self):
+        if not self.is_valid():
+            raise ValueError("form has errors: %s" % self.errors.as_text())
+        if not self.cleaned_data['enabled']:
+            self.delete_account()
+            return
         account = forms.ModelForm.save(self, commit=False)
         if isinstance(self.owner, Team):
             account.type = models.ExternalAccount.TYPE_TEAM
@@ -59,6 +81,10 @@ class AccountForm(forms.ModelForm):
             raise TypeError("Invalid owner type: %s" % self.owner)
         account.save()
         return account
+
+    def delete_account(self):
+        if self.instance.id is not None:
+            self.instance.delete()
 
 class KalturaAccountForm(AccountForm):
     partner_id = forms.IntegerField()
@@ -129,6 +155,8 @@ class BrightcoveAccountForm(AccountForm):
 
     def save(self):
         account = AccountForm.save(self)
+        if not self.cleaned_data['enabled']:
+            return None
         if self.cleaned_data['feed_enabled']:
             feed_changed = account.make_feed(self.cleaned_data['player_id'],
                                              self._calc_feed_tags())
@@ -152,79 +180,113 @@ class BrightcoveAccountForm(AccountForm):
         else:
             return None
 
-class AccountFormset(object):
-    """dict-like object that contains multiple account forms.
+class AddYoutubeAccountForm(forms.Form):
+    add_button = SubmitButtonField(label=ugettext_lazy('Add YouTube account'),
+                                   required=False)
 
-    For each form in form classes we will instatiate it with a unique prefix
-    to avoid name collisions.  Also we will create another form that controls
-    if the accounts are enabled.
-    """
-    form_classes = {
-        'kaltura': KalturaAccountForm,
-        'brightcove': BrightcoveAccountForm,
-    }
-    def __init__(self, owner, data=None):
-        self.is_bound = data is not None
-        existing_accounts = dict(
-            (name, form_class.get_account(owner))
-            for (name, form_class) in self.form_classes.items())
+    def __init__(self, owner, data=None, **kwargs):
+        super(AddYoutubeAccountForm, self).__init__(data=data, **kwargs)
+        self.owner = owner
 
-        enabled_accounts = self.make_enabled_accounts(existing_accounts, data)
-        # trigger a full clean on enabled_accounts since we want to use
-        # it's cleaned_data below
-        enabled_accounts.is_valid()
-        self.forms = {
-            'enabled_accounts': enabled_accounts,
-        }
+    def save(self):
+        pass
 
-        for name, form_class in self.form_classes.items():
-            # if the account is enabled, then we pass it the POST data,
-            # otherwise we leave it unbound
-            if self.is_bound and enabled_accounts.cleaned_data[name]:
-                form_data = data
+    def redirect_path(self):
+        if self.cleaned_data['add_button']:
+            path = reverse('externalsites:youtube-add-account')
+            if isinstance(self.owner, Team):
+                return '%s?team_slug=%s' % (path, self.owner.slug)
+            elif isinstance(self.owner, User):
+                return '%s?username=%s' % (path, self.owner.username)
             else:
-                form_data = None
-            self.forms[name] = form_class(owner, form_data,
-                                          instance=existing_accounts[name],
-                                          prefix=name)
+                raise ValueError("Unknown owner type: %s" % self.owner)
+        else:
+            return None
 
-    def make_enabled_accounts(self, existing_accounts, data):
-        fields = {}
-        for form_name in self.form_classes:
-            fields[form_name] = forms.BooleanField(
-                required=False, label=_('Enabled'),
-                initial=existing_accounts[form_name] is not None)
-        EnabledAccountsForm = type('EnabledAccountsForm', (forms.Form,),
-                                   fields)
-        return EnabledAccountsForm(data, prefix='enabled_accounts')
+class YoutubeAccountForm(forms.Form):
+    remove_button = SubmitButtonField(label=ugettext_lazy('Remove account'),
+                                      required=False)
+    sync_teams = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple,
+        required=False)
 
-    def account_forms(self):
-        for form_name, form in self.forms.items():
-            if form_name != 'enabled_accounts':
-                yield form_name, form
+    def __init__(self, admin_user, account, data=None, **kwargs):
+        super(YoutubeAccountForm, self).__init__(data=data, **kwargs)
+        self.account = account
+        self.admin_user = admin_user
+        self.setup_sync_teams()
 
-    def account_enabled(self, form_name):
-        return self['enabled_accounts'].cleaned_data.get(form_name)
-
-    def is_valid(self):
-        if not self.is_bound:
-            return False
-        return all(form.is_valid()
-                   for (form_name, form) in self.account_forms()
-                   if self.account_enabled(form_name))
+    def setup_sync_teams(self):
+        choices = []
+        initial = []
+        # allow the admin to uncheck any of the current sync teams
+        current_sync_teams = list(self.account.sync_teams.all())
+        for team in current_sync_teams:
+            choices.append((team.id, team.name))
+            initial.append(team.id)
+        # allow the admin to check any of the other teams they're an admin for
+        exclude_team_ids = [t.id for t in current_sync_teams]
+        exclude_team_ids.append(self.account.owner_id)
+        member_qs = (self.admin_user.team_members.admins()
+                     .exclude(team_id__in=exclude_team_ids)
+                     .select_related('team'))
+        choices.extend((member.team.id, member.team.name)
+                       for member in member_qs)
+        self['sync_teams'].field.choices = choices
+        self['sync_teams'].field.initial = initial
 
     def save(self):
         if not self.is_valid():
-            raise ValueError("form not valid")
-        for form_name, form in self.account_forms():
-            if self.account_enabled(form_name):
-                form.save()
-            else:
-                form.delete_account()
+            raise ValueError("Form not valid")
+        if self.cleaned_data['remove_button']:
+            self.account.delete()
+        else:
+            self.account.sync_teams = Team.objects.filter(
+                id__in=self.cleaned_data['sync_teams']
+            )
 
-    def keys(self):
-        return self.forms.keys()
+    def show_sync_teams(self):
+        return len(self['sync_teams'].field.choices) > 0
 
-    def __getitem__(self, form_name):
-        return self.forms[form_name]
+class AccountFormset(dict):
+    """Container for multiple account forms.
 
+    For each form in form classes we will instatiate it with a unique prefix
+    to avoid name collisions.
+    """
+    def __init__(self, admin_user, owner, data=None):
+        super(AccountFormset, self).__init__()
+        self.admin_user = admin_user
+        self.data = data
+        self.make_forms(owner)
+
+    def make_forms(self, owner):
+        self.make_form('kaltura', KalturaAccountForm, owner)
+        self.make_form('brightcove', BrightcoveAccountForm, owner)
+        self.make_form('add_youtube', AddYoutubeAccountForm, owner)
+        for account in models.YouTubeAccount.objects.for_owner(owner):
+            name = 'youtube_%s' % account.id
+            self.make_form(name, YoutubeAccountForm, self.admin_user, account)
+
+    def make_form(self, name, form_class, *args, **kwargs):
+        kwargs['prefix'] = name.replace('_', '-')
+        kwargs['data'] = self.data
+        self[name] = form_class(*args, **kwargs)
+
+    def youtube_forms(self):
+        return [form for name, form in self.items()
+                if name.startswith('youtube_')]
+
+    def is_valid(self):
+        return all(form.is_valid() for form in self.values())
+
+    def save(self):
+        for form in self.values():
+            form.save()
+
+    def redirect_path(self):
+        for form in self.values():
+            if hasattr(form, 'redirect_path'):
+                redirect_path = form.redirect_path()
+                if redirect_path is not None:
+                    return redirect_path

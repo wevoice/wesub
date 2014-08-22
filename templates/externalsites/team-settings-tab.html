@@ -20,39 +20,40 @@
 
             <fieldset class="youtube">
                 <legend>{% trans "YouTube" %}</legend>
-                {% if youtube_accounts %}
-                <table>
-                    <tr>
-                        <th colspan=2>{% trans 'Current accounts' %}</th>
-                    </tr>
-                    {% for account in youtube_accounts %}
-                    <tr class="{% cycle 'odd' 'even' %}">
-                        <td>{{ account.get_owner_display }}</td>
-                        <td class="actions"><button class="reduced" name="remove-youtube-account" value="{{ account.id }}" type="submit">{% trans 'remove account' %}</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% else %}
+                {% for form in forms.youtube_forms %}
+                <div class="youtube-form">
+                    <div class="remove-button">
+                        {{ form.remove_button }}
+                    </div>
+                    <h3>{% blocktrans with account_name=form.account.get_owner_display %}
+                        Linked Account: {{ account_name }}
+                        {% endblocktrans %}
+                    </h3>
+                    {% if form.show_sync_teams %}
+                        <h4>{% trans "Sync videos from these teams:" %}</h4>
+                        {{ form.sync_teams }}
+                    {% endif %}
+                </div>
+                {% empty %}
                 <p class="no-accounts">{% trans 'No youtube accounts linked yet.' %}</p>
-                {% endif %}
-                <button name="add-youtube-account" value="1" type="submit">{% trans 'Add YouTube account' %}</button>
+                {% endfor %}
+                {{ forms.add_youtube.add_button }}
             </fieldset>
 
-            <fieldset class="kaltura{% if not forms.enabled_accounts.kaltura.value %} disabled{% endif %}">
+            <fieldset class="kaltura{% if not forms.kaltura.enabled.value %} disabled{% endif %}">
                 <legend>{% trans "Kaltura" %}</legend>
                 {{ forms.kaltura.non_field_errors }}
-                {% include "_form_field.html" with field=forms.enabled_accounts.kaltura widget_type="checkbox" %}
+                {% include "_form_field.html" with field=forms.kaltura.enabled widget_type="checkbox" %}
                 <div class="account-fields">
                     {% include "_form_field.html" with field=forms.kaltura.partner_id %}
                     {% include "_form_field.html" with field=forms.kaltura.secret %}
                 </div>
             </fieldset>
 
-            <fieldset class="brightcove{% if not forms.enabled_accounts.brightcove.value %} disabled{% endif %}">
+            <fieldset class="brightcove{% if not forms.brightcove.enabled.value %} disabled{% endif %}">
                 <legend>{% trans "Brightcove" %}</legend>
                 {{ forms.brightcove.non_field_errors }}
-                {% include "_form_field.html" with field=forms.enabled_accounts.brightcove widget_type="checkbox" %}
+                {% include "_form_field.html" with field=forms.brightcove.enabled widget_type="checkbox" %}
                 <div class="account-fields">
                     {% include "_form_field.html" with field=forms.brightcove.publisher_id %}
                     {% include "_form_field.html" with field=forms.brightcove.write_token %}

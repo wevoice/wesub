@@ -962,7 +962,7 @@ var Site = function(Site) {
             }
 
 
-            $('form input[type="checkbox"][name^="enabled_accounts"]').change(function() {
+            $('form input[type="checkbox"][name$="-enabled"]').change(function() {
                 var fieldset = $(this).closest('fieldset');
                 var accountFields = $('div.account-fields', fieldset);
                 if(this.checked) {

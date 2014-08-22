@@ -21,8 +21,9 @@ import datetime
 from urllib import quote_plus
 import urlparse
 
+from django.core.exceptions import PermissionDenied
 from django.db import models
-from django.db.models import query
+from django.db.models import query, Q
 from django.utils.translation import ugettext_lazy as _
 import babelsubs
 # because of our insane circular imports we need to import haystack right here
@@ -38,6 +39,7 @@ from utils import youtube
 from utils.text import fmt
 from videos.models import VideoUrl, VideoFeed
 import videos.models
+import videos.tasks
 
 def now():
     # define now as a function so it can be patched in the unittests
@@ -65,12 +67,18 @@ class ExternalAccountManager(models.Manager):
             raise TypeError("Invalid owner type: %r" % owner)
         return self.filter(type=type_, owner_id=owner.id)
 
-    def lookup(self, video, video_url):
+    def get_sync_account(self, video, video_url):
         team_video = video.get_team_video()
         if team_video is not None:
-            return self.get(type=ExternalAccount.TYPE_TEAM,
-                          owner_id=team_video.team_id)
+            return self._get_sync_account_team_video(team_video, video_url)
         else:
+            return self._get_sync_account_nonteam_video(video, video_url)
+
+    def _get_sync_account_team_video(self, team_video, video_url):
+        return self.get(type=ExternalAccount.TYPE_TEAM,
+                      owner_id=team_video.team_id)
+
+    def _get_sync_account_nonteam_video(self, video, video_url):
             return self.get(type=ExternalAccount.TYPE_USER,
                           owner_id=video.user_id)
 
@@ -104,7 +112,7 @@ class ExternalAccount(models.Model):
         else:
             return None
 
-    def is_for_video_url(self, video_url):
+    def should_sync_video_url(self, video, video_url):
         return video_url.type == self.video_url_type
 
     def update_subtitles(self, video_url, language):
@@ -170,9 +178,6 @@ class ExternalAccount(models.Model):
 
     class Meta:
         abstract = True
-        unique_together = [
-            ('type', 'owner_id')
-        ]
 
 class KalturaAccount(ExternalAccount):
     account_type = 'K'
@@ -187,6 +192,9 @@ class KalturaAccount(ExternalAccount):
 
     class Meta:
         verbose_name = _('Kaltura account')
+        unique_together = [
+            ('type', 'owner_id')
+        ]
 
     def __unicode__(self):
         return "Kaltura: %s" % (self.partner_id)
@@ -221,6 +229,9 @@ class BrightcoveAccount(ExternalAccount):
 
     class Meta:
         verbose_name = _('Brightcove account')
+        unique_together = [
+            ('type', 'owner_id')
+        ]
 
     def __unicode__(self):
         return "Brightcove: %s" % (self.publisher_id)
@@ -304,8 +315,24 @@ class BrightcoveAccount(ExternalAccount):
 
 
 class YouTubeAccountManager(ExternalAccountManager):
-    def lookup(self, video, video_url):
-        return self.get(channel_id=video_url.owner_username)
+    def _get_sync_account_team_video(self, team_video, video_url):
+        query = self.filter(type=ExternalAccount.TYPE_TEAM,
+                            channel_id=video_url.owner_username)
+        where_sql = (
+            'owner_id = %s OR EXISTS ('
+            'SELECT * '
+            'FROM externalsites_youtubeaccount_sync_teams '
+            'WHERE youtubeaccount_id = externalsites_youtubeaccount.id '
+            'AND team_id = %s)'
+        )
+        query = query.extra(where=[where_sql],
+                            params=[team_video.team_id, team_video.team_id])
+        return query.get()
+
+    def _get_sync_account_nonteam_video(self, video, video_url):
+        return self.get(
+            type=ExternalAccount.TYPE_USER,
+            channel_id=video_url.owner_username)
 
     def create_or_update(self, channel_id, oauth_refresh_token, **data):
         """Create a new YouTubeAccount, if none exists for the channel_id
@@ -321,15 +348,7 @@ class YouTubeAccountManager(ExternalAccountManager):
         other_account = self.get(channel_id=channel_id)
         other_account.oauth_refresh_token = oauth_refresh_token
         other_account.save()
-        if other_account.type == ExternalAccount.TYPE_TEAM:
-            msg = fmt(_('That youtube account has already been linked '
-                        'to the %(team)s team'),
-                      team=other_account.team)
-        else:
-            msg = fmt(_('That youtube account has already been linked '
-                        'to the user %(username)s'),
-                      username=other_account.user.username)
-        raise YouTubeAccountExistsError(msg)
+        raise YouTubeAccountExistsError(other_account)
 
 class YouTubeAccount(ExternalAccount):
     """YouTube account to sync to.
@@ -345,6 +364,8 @@ class YouTubeAccount(ExternalAccount):
     oauth_refresh_token = models.CharField(max_length=255)
     import_feed = models.OneToOneField(VideoFeed, null=True,
                                        on_delete=models.SET_NULL)
+    sync_teams = models.ManyToManyField(
+        Team, related_name='youtube_sync_accounts')
 
     objects = YouTubeAccountManager()
 
@@ -357,6 +378,35 @@ class YouTubeAccount(ExternalAccount):
     def __unicode__(self):
         return "YouTube: %s" % (self.username)
 
+    def set_sync_teams(self, user, teams):
+        """Set other teams to sync for
+
+        The default for team youtube accounts is to only sync videos if they
+        are part of that team.  This method allows for syncing other team's
+        videos as well by altering the sync_teams set.
+
+        This method only works for team accounts.  A ValueError will be thrown
+        if called for a user account.
+
+        If user is not an admin for this account's team and all the teams
+        being set, then PermissionDenied will be thrown.
+        """
+        if self.type != ExternalAccount.TYPE_TEAM:
+            raise ValueError("Non-team account: %s" % self)
+        for team in teams:
+            if team == self.team:
+                raise ValueError("Can't add account owner to sync_teams")
+        admin_team_ids = set([m.team_id for m in
+                              user.team_members.admins()])
+        if self.team.id not in admin_team_ids:
+            raise PermissionDenied("%s not an admin for %s" %
+                                   (user, self.team))
+        for team in teams:
+            if team.id not in admin_team_ids:
+                raise PermissionDenied("%s not an admin for %s" %
+                                       (user, team))
+        self.sync_teams = teams
+
     def feed_url(self):
         return 'https://gdata.youtube.com/feeds/api/users/%s/uploads' % (
             self.channel_id)
@@ -364,8 +414,24 @@ class YouTubeAccount(ExternalAccount):
     def create_feed(self):
         if self.import_feed is not None:
             raise ValueError("Feed already created")
-        self.import_feed = VideoFeed.objects.create(url=self.feed_url(),
-                                                    team=self.team)
+        try:
+            existing_feed = VideoFeed.objects.get(url=self.feed_url())
+        except VideoFeed.DoesNotExist:
+            self.import_feed = VideoFeed.objects.create(url=self.feed_url(),
+                                                        user=self.user,
+                                                        team=self.team)
+            videos.tasks.update_video_feed.delay(self.import_feed.id)
+        else:
+            if (existing_feed.user is not None and
+                existing_feed.user != self.user):
+                raise ValueError("Import feed already created by user %s" %
+                                 existing_feed.user)
+            if (existing_feed.team is not None and
+                existing_feed.team != self.team):
+                raise ValueError("Import feed already created by team %s" %
+                                 existing_feed.team)
+            self.import_feed = existing_feed
+
         self.save()
 
     def get_owner_display(self):
@@ -374,9 +440,26 @@ class YouTubeAccount(ExternalAccount):
         else:
             return _('No username')
 
-    def is_for_video_url(self, video_url):
-        return (video_url.type == self.video_url_type and
-                video_url.owner_username == self.channel_id)
+    def should_sync_video_url(self, video, video_url):
+        if not (video_url.type == self.video_url_type and
+                video_url.owner_username == self.channel_id):
+            return False
+        if self.type == ExternalAccount.TYPE_USER:
+            # for user accounts, match any video
+            return True
+        else:
+            # for team accounts, we need additional checks
+            team_video = video.get_team_video()
+            if team_video is None:
+                return False
+            else:
+                return (team_video.team_id == self.owner_id or
+                        self.sync_teams.filter(id=team_video.team_id).exists())
+
+    def _get_sync_account_nonteam_video(self, video, video_url):
+        return self.get(
+            type=ExternalAccount.TYPE_USER,
+            channel_id=video_url.owner_username)
 
     def do_update_subtitles(self, video_url, language, version):
         """Do the work needed to update subititles.
@@ -418,7 +501,7 @@ def get_account(account_type, account_id):
     AccountModel = _account_type_to_model[account_type]
     return AccountModel.objects.get(id=account_id)
 
-def lookup_accounts(video):
+def get_sync_accounts(video):
     """Lookup an external accounts for a given video.
 
     This function examines the team associated with the video and the set of
@@ -429,18 +512,18 @@ def lookup_accounts(video):
     team_video = video.get_team_video()
     rv = []
     for video_url in video.get_video_urls():
-        account = lookup_account(video, video_url)
+        account = get_sync_account(video, video_url)
         if account is not None:
             rv.append((account, video_url))
     return rv
 
-def lookup_account(video, video_url):
+def get_sync_account(video, video_url):
     video_url.fix_owner_username()
     AccountModel = _video_type_to_account_model.get(video_url.type)
     if AccountModel is None:
         return None
     try:
-        return AccountModel.objects.lookup(video, video_url)
+        return AccountModel.objects.get_sync_account(video, video_url)
     except AccountModel.DoesNotExist:
         return None
 
