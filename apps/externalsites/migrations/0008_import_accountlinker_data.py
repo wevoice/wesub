@@ -10,27 +10,86 @@ class Migration(DataMigration):
     
     def forwards(self, orm):
         "Write your forwards methods here."
-        YouTubeAccount = orm['externalsites.YouTubeAccount']
-        VideoFeed = orm['videos.VideoFeed']
 
-        # import user accounts.  Note that we don't care about the type field,
-        # since we never created another type than the youtube type
+        self.orm = orm
+
+        self.import_account_rows()
+        self.link_user_accounts()
+        self.link_team_accounts()
+        self.link_user_video_feeds()
+
+    def import_account_rows(self):
+        """Import rows from the accountlinker_thirdpartyaccount table."""
+        exclude_ids = self.find_accounts_with_duplicate_channel_ids()
+
+        # Notes:
+        #  - We ignore accountlinker_thirdpartyaccount.type, since we never
+        #    created another type than the youtube type
+        #  - We make the id value the same for both tables which simplifies
+        #    things when we're trying to link the new accounts to users/teams
+        #  - For now we set type=owner_id to dummy values.  We will update
+        #    them in link_user_accounts() and link_team_accounts()
         db.execute(
             "INSERT INTO externalsites_youtubeaccount "
-            "(type, owner_id, channel_id, username, oauth_refresh_token) "
-            "SELECT 'U', m2m.customuser_id, tpa.channel_id, tpa.username, "
-            "tpa.oauth_refresh_token "
-            "FROM auth_customuser_third_party_accounts m2m "
-            "JOIN accountlinker_thirdpartyaccount tpa "
-            "ON m2m.thirdpartyaccount_id = tpa.id "
-            "WHERE tpa.channel_id != ''")
-        # link the VideoFeed for user accounts.
-        for account in YouTubeAccount.objects.all():
+            "(id, type, owner_id, channel_id, username, oauth_refresh_token) "
+            "SELECT id, '', 0, channel_id, username, oauth_refresh_token "
+            "FROM accountlinker_thirdpartyaccount tpa "
+            "WHERE channel_id <> '' AND id NOT IN (%s)",
+            params=[','.join(exclude_ids)])
+
+    def find_accounts_with_duplicate_channel_ids(self):
+        """We can only import 1 account for a given channel ID
+
+        Normally this is fine, but sometimes users can link their YT accounts
+        and their G+ accounts, which results in different usernames, but the
+        same channel id.
+
+        This method returns the ids for accounts like this, except the first
+        account, so we can exclude them from the migration.
+        """
+        rv = []
+        rows = db.execute(
+            'SELECT channel_id, MIN(id) '
+            'FROM accountlinker_thirdpartyaccount '
+            'GROUP BY channel_id '
+            'HAVING COUNT(channel_id) > 1'
+        )
+        for channel_id, first_id in rows:
+            rows2 = db.execute('SELECT id '
+                              'FROM accountlinker_thirdpartyaccount '
+                              'WHERE channel_id=%s AND id <> %s',
+                              params=[channel_id, first_id])
+            rv.extend(str(r[0]) for r in rows2)
+        return rv
+
+    def link_user_accounts(self):
+        """Lookup third party accounts that were linked to users and update
+        the externalsites_youtubeaccount table based on that.
+        """
+
+        # Note: the old accountlinker_thirdpartyaccount table could in theory
+        # be linked to multiple user objects, although we prevented that from
+        # the UI.  For the migration we take one and forget about the rest.
+        db.execute("""\
+UPDATE externalsites_youtubeaccount
+SET type="U",
+    owner_id = (SELECT MIN(customuser_id)
+                FROM auth_customuser_third_party_accounts
+                WHERE thirdpartyaccount_id = externalsites_youtubeaccount.id)
+WHERE id IN (SELECT thirdpartyaccount_id
+             FROM auth_customuser_third_party_accounts)""")
+
+    def link_user_video_feeds(self):
+        YouTubeAccount = self.orm['externalsites.YouTubeAccount']
+        VideoFeed = self.orm['videos.VideoFeed']
+
+        for account in YouTubeAccount.objects.filter(type='U'):
             username = account.username.replace(' ', '')
             feed_url = ("https://gdata.youtube.com/"
                         "feeds/api/users/%s/uploads" % username)
             try:
-                feed = VideoFeed.objects.filter(url=feed_url)[:1].get()
+                feed = VideoFeed.objects.filter(
+                    url=feed_url, user_id=account.owner_id)[:1].get()
             except VideoFeed.DoesNotExist:
                 pass
             else:
@@ -40,16 +99,38 @@ class Migration(DataMigration):
                            "SET import_feed_id = %s "
                            "WHERE id = %s", (feed.id, account.id))
 
-        # import team accounts
-        db.execute(
-            "INSERT INTO externalsites_youtubeaccount "
-            "(type, owner_id, channel_id, username, oauth_refresh_token) "
-            "SELECT 'T', m2m.team_id, tpa.channel_id, tpa.username, "
-            "tpa.oauth_refresh_token "
-            "FROM teams_team_third_party_accounts m2m "
-            "JOIN accountlinker_thirdpartyaccount tpa "
-            "ON m2m.thirdpartyaccount_id = tpa.id")
+    def link_team_accounts(self):
+        """Lookup third party accounts that were linked to teams and update
+        the externalsites_youtubeaccount table based on that.
+        """
 
+        # Notes:
+        #
+        #  - We often would link rows in accountlinker_thirdpartyaccount to
+        # multiple teams.  To migrate these, we set link the account to 1 of
+        # the teams and add the others to sync_teams
+        #  - If an account is linked both a user account and a team account,
+        #    this code will overwrite the changes made in
+        #    link_user_accounts().  This is good because we want the team
+        #    account to take precendence.
+
+        db.execute("""\
+UPDATE externalsites_youtubeaccount
+SET type="T",
+    owner_id = (SELECT MIN(team_id)
+                FROM teams_team_third_party_accounts
+                WHERE thirdpartyaccount_id = externalsites_youtubeaccount.id)
+WHERE id IN (SELECT thirdpartyaccount_id
+             FROM teams_team_third_party_accounts)""")
+
+        db.execute("""\
+INSERT INTO externalsites_youtubeaccount_sync_teams
+            (youtubeaccount_id, team_id)
+SELECT m2m.thirdpartyaccount_id, m2m.team_id
+FROM teams_team_third_party_accounts m2m
+JOIN externalsites_youtubeaccount youtubeaccount
+    ON m2m.thirdpartyaccount_id = youtubeaccount.id
+WHERE m2m.team_id <> youtubeaccount.owner_id""")
     
     def backwards(self, orm):
         "Write your backwards methods here."
