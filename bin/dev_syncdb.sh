@@ -1,3 +1,3 @@
 #!/bin/sh
-fig run --rm app python manage.py syncdb --all --noinput
-fig run --rm app python manage.py migrate --fake
+python manage.py syncdb --all --noinput
+python manage.py migrate --fake

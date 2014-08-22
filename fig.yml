@@ -1,17 +1,31 @@
 app:
   image: amara-app
-  command: python manage.py runserver 0.0.0.0:8000
+  working_dir: /opt/apps/unisubs
+  entrypoint: /usr/bin/python
+  command: manage.py runserver 0.0.0.0:8000
   environment:
       DJANGO_SETTINGS_MODULE: dev_settings
-
   volumes:
     - .:/opt/apps/unisubs
   ports:
+    - "8000:8000"
+  expose:
     - "8000:8000"
   links:
     - db
     - queue
     - cache
+    - search
+
+initdb:
+  image: amara-app
+  working_dir: /opt/apps/unisubs
+  entrypoint: /bin/bash
+  command: ./bin/dev_syncdb.sh
+  environment:
+      DJANGO_SETTINGS_MODULE: dev_settings
+  links:
+    - db
     - search
 
 sslapp:
