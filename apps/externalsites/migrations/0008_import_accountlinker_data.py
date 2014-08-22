@@ -34,8 +34,8 @@ class Migration(DataMigration):
             "(id, type, owner_id, channel_id, username, oauth_refresh_token) "
             "SELECT id, '', 0, channel_id, username, oauth_refresh_token "
             "FROM accountlinker_thirdpartyaccount tpa "
-            "WHERE channel_id <> '' AND id NOT IN (%s)",
-            params=[','.join(exclude_ids)])
+            "WHERE channel_id <> '' AND id NOT IN (%s)" %
+           (','.join(exclude_ids),))
 
     def find_accounts_with_duplicate_channel_ids(self):
         """We can only import 1 account for a given channel ID
@@ -51,6 +51,7 @@ class Migration(DataMigration):
         rows = db.execute(
             'SELECT channel_id, MIN(id) '
             'FROM accountlinker_thirdpartyaccount '
+            'WHERE channel_id <> "" '
             'GROUP BY channel_id '
             'HAVING COUNT(channel_id) > 1'
         )
