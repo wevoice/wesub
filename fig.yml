@@ -32,6 +32,30 @@ initdb:
     - db
     - search
 
+bash:
+  image: amara-app
+  # This is a bit weird because our dockerfile uses both entrypoint and
+  # command, so we need to override them both.  Using /usr/bin/env as the
+  # entrypoint works.
+  entrypoint: /usr/bin/env
+  command: /bin/bash
+  environment:
+      DJANGO_SETTINGS_MODULE: dev_settings
+
+  volumes:
+    - .:/opt/apps/unisubs
+
+  hostname: 'unisubs.example.com'
+  ports:
+    - "8000:8000"
+  expose:
+    - "8000:8000"
+  links:
+    - db
+    - queue
+    - cache
+    - search
+
 sslapp:
   image: amara-app
   command: python manage.py runsslserver 0.0.0.0:8000 --nostatic
