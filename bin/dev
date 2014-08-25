@@ -139,6 +139,14 @@ class Test(Command):
     def run_inner(self, args, options):
         run_manage(['test', '--settings=dev_settings_test'] + args)
 
+class JSTest(Command):
+    """Run Javascript unittests."""
+
+    def run_inner(self, args, options):
+        subprocess.call(['docker', 'run', '--rm',
+                         '--volume=/home/ben/unisubs:/opt/unisubs',
+                         'amara/jstest'])
+
 class RunServer(Command):
     """Run the django test server."""
 
