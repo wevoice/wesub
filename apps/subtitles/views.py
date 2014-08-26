@@ -289,7 +289,7 @@ def subtitle_editor(request, video_id, language_code):
     if team_attributes:
         editor_data['teamAttributes'] = team_attributes
 
-    return render_to_response("subtitles/subtitle-editor.html", {
+    return render_to_response("editor/editor.html", {
         'video': video,
         'DEBUG': settings.DEBUG,
         'language': editing_language,
