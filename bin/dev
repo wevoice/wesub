@@ -115,7 +115,7 @@ class Bash(Command):
     """Run a bash script inside the app container."""
 
     def run_inner(self, args, options):
-        subprocess.call(["fig", "run", "--rm", "bash"])
+        subprocess.call(["fig", "run", "--rm", "bash", "/bin/bash"])
 
 class Build(Command):
     """Build the app container."""
@@ -151,15 +151,15 @@ class RunServer(Command):
     """Run the django test server."""
 
     def run_inner(self, args, options):
-        run_manage(['runserver'])
+        subprocess.call(["fig", "up", "app"])
 
 class RunSSLServer(Command):
     """Run the django test server (HTTPS mode)."""
 
     def run_inner(self, args, options):
-        run_manage(['runsslserver'])
+        subprocess.call(["fig", "up", "sslapp"])
 
-class ResetDB(Command):
+class DBReset(Command):
     """Reset the database."""
 
     def run_inner(self, args, options):
@@ -178,7 +178,7 @@ class Stop(Command):
         subprocess.call(['fig', 'stop'])
 
 def run_manage(args):
-    subprocess.call(['fig', 'run', '--rm', 'app', 'manage.py'] + args)
+    subprocess.call(['fig', 'run', '--rm', 'app', 'python', 'manage.py'] + args)
 
 def usage():
     print "Usage %s [command]" % progname()
