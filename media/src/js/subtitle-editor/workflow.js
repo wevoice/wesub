@@ -25,9 +25,8 @@ var angular = angular || null;
      * App-level Workflow object
      */
 
-    Workflow = function(subtitleList, translating, titleEdited) {
+    Workflow = function(subtitleList, translating) {
 	this.translating = translating;
-	this.titleEdited = titleEdited;
 	this.showOverlay = true;
         var self = this;
         this.subtitleList = subtitleList;
@@ -45,14 +44,9 @@ var angular = angular || null;
 
     Workflow.prototype = {
 	appActionDone: function(){
-           if (this.showOverlay) this.showOverlay = false;
+           this.showOverlay = false;
 	},
         switchStage: function(newStage) {
-	    if (newStage == 'title') {
-                this.showOverlay = false; 
-		this.titleEdited(true);
-	    }
-            this.showOverlay = true;
             this.stage = newStage;
         },
         canMoveToNext: function() {
@@ -64,7 +58,7 @@ var angular = angular || null;
                     return this.subtitleList.isComplete();
 
                 case 'title':
-                    return this.titleEdited();
+                    return true;
 
                 case 'review':
                     return false;

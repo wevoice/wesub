@@ -71,12 +71,6 @@ var angular = angular || null;
         $scope.loadingFinished = false;
         $scope.uploading = false;
         $scope.uploadError = false;
-	$scope.currentTitle = {};
-	$scope.currentTitle.Edited = false;
-	$scope.titleEdited = function(newValue) {
-	    if (newValue != undefined) $scope.currentTitle.Edited = newValue;
-	    return $scope.currentTitle.Edited;
-	}
         $scope.translating = function() {
             return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         }
@@ -104,7 +98,7 @@ var angular = angular || null;
                 return true;
             return false; 
         }
-        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating, $scope.titleEdited);
+        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating);
         $scope.timelineShown = ($scope.workflow.stage != 'type' ||
                 EditorData.task_needs_pane);
         $scope.toggleScrollingSynced = function() {
