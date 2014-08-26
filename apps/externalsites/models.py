@@ -129,7 +129,7 @@ class ExternalAccount(models.Model):
 
         try:
             self.do_update_subtitles(video_url, language, version)
-        except StandardError, e:
+        except Exception, e:
             SyncHistory.objects.create_for_error(e, **sync_history_values)
         else:
             SyncHistory.objects.create_for_success(**sync_history_values)
@@ -148,7 +148,7 @@ class ExternalAccount(models.Model):
 
         try:
             self.do_delete_subtitles(video_url, language)
-        except StandardError, e:
+        except Exception, e:
             SyncHistory.objects.create_for_error(e, **sync_history_values)
         else:
             SyncHistory.objects.create_for_success(**sync_history_values)
