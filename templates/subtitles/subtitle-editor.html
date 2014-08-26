@@ -7,7 +7,6 @@
     ng-mousemove="handleAppMouseMove($event)"
     ng-click="handleAppMouseClick($event)">
 <head>
-
     <meta charset="utf-8" />
     <title>
         {% blocktrans with language.get_language_code_display as language %}
@@ -40,825 +39,824 @@
 </head>
 <body ng-class="{ 'timeline-shown': timelineShown, 'loading-finished': loadingFinished }">
     <aside class="freeze-box" id="loading"><h1>{% trans "Loading subtitle editor&hellip;" %}</h1></aside>
-    <header class="main group ng-cloak" ng-cloak>
-        <section class="site left column">
-            <h1>Amara</h1>
-	    <div class="video-title">
-                <a title="{% trans "Edit title and description" %}" href="#" ng-click="onTitleClicked($event)"><img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_030_pencil.png"></img></a>
-                <a title="{% trans "Edit title and description" %}" href="#" ng-click="onTitleClicked($event)">[[ displayedTitle() ]]
-                </a>
-	    </div>
-        </section>
-        <section class="video center column ng-cloak">
-        </section>
-        <section ng-cloak class="ng-cloak session right column group">
-            {% if DEBUG %}
-                <button href="#" ng-click="dialogManager.onOpenClick('debug', $event)">Debug</button>
-            {% endif %}
-            <button class="discard" ng-click="onExitClicked($event)">Exit</button>
-            <button ng-click="onLegacyEditorClicked($event)">Legacy Editor</button>
-            <button class="save" ng-disabled="!session.unsavedChanges()" ng-click="onSaveClicked($event)">Save</button>
-        </section>
-    </header>
-    <section class="main ng-cloak" ng-cloak>
-      <section class="left column">
-        <div class="help-panel" ng-controller="WorkflowProgressionController">
-          <!-- not ready for release just yet
-               <a class="advanced" ng-click="showAdvancedModal()">Advanced &raquo;</a>
-               -->
-	  
-          <h1>{% trans "Keyboard controls" %}&nbsp;&nbsp;&nbsp;<a href="" ng-click="onMoreControlsClicked($event)">{% trans "more commands" %} &#187;</a></h1>
-	  <div ng-show="workflow.stage == 'type'">
-	    <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
-	      <div class="key-pattern">Tab</div>
-	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
-	    </div>
-	    <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
-	      <div class="key-pattern">Shift</div>
-	      <div class="key-pattern small">+</div>
-	      <div class="key-pattern">Tab</div>
-	      <div class="shortcut-desc">{% trans "Skip back" %}</div>
-	    </div>
-	    <div class="instruction-item blue-key">
-	      <div class="key-pattern">Shift</div>
-	      <div class="key-pattern small">+</div>
-	      <div class="key-pattern">Enter</div>
-	      <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
-	    </div>
-	  </div>
-	  <div ng-show="workflow.stage == 'sync'">
-	    <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
-	      <div class="key-pattern">Tab</div>
-	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
-	    </div>
-	    <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
-	      <div class="key-pattern">Shift</div>
-	      <div class="key-pattern small">+</div>
-	      <div class="key-pattern">Tab</div>
-	      <div class="shortcut-desc">{% trans "Skip back" %}</div>
-	    </div>
-	    <div class="key-row">
-	      <div class="instruction-item teal-key clickable" ng-click="handleMouseKeyDown('40')">
-		<div class="key-pattern small">
-		  <img src="{{ STATIC_URL }}images/subtitle-editor/down_arrow.png"></img></div>
-		<div class="shortcut-desc">{% trans "Start subtitle" %}</div>
-	      </div>
-              <div class="instruction-item-small"></div>
-	      <div class="instruction-item blue-key clickable" ng-click="handleMouseKeyDown('38')">
-		<div class="key-pattern small">
-		  <img src="{{ STATIC_URL }}images/subtitle-editor/up_arrow.png"></img></div>
-		<div class="shortcut-desc">{% trans "End subtitle" %}</div>
-	      </div>
-	    </div>
-	  </div>
-	  <div ng-show="(workflow.stage == 'review') || (workflow.stage == 'title')">
-	    <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
-	      <div class="key-pattern">Tab</div>
-	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
-	    </div>
-	    <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
-	      <div class="key-pattern">Shift</div>
-	      <div class="key-pattern small">+</div>
-	      <div class="key-pattern">Tab</div>
-	      <div class="shortcut-desc">{% trans "Skip back" %}</div>
-	    </div>
-	    <div class="instruction-item blue-key">
-	      <div class="key-pattern">Shift</div>
-	      <div class="key-pattern small">+</div>
-	      <div class="key-pattern">Enter</div>
-	      <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
-	    </div>
-	  </div>
-          <ng-switch on="showTeamGuidelines()">
-	    <a class="guidelines-link" ng-switch-when="true" title="" href="" ng-click="onGuidelinesClicked($event)">[[ teamName ]] Guidelines &#187;</a>
-	    <a class="guidelines-link" ng-switch-when="false" title="" href="" ng-click="onGuidelinesClicked($event)">{% trans "Subtitling Guidelines" %} &#187;</a>
-	  </ng-switch>
-	</div>
-        <div class="language-selections group toolbar"
-             language-selector
-             ng-controller="LanguageSelectorController">
-          <div class="select">
-            <select name="language"
-                    ng-model='language'
-                    ng-options="(item.name + (item.isPrimaryAudioLanguage? ' (original)' : '')) for item in languages | orderBy:'name'">
-            </select>
-          </div>
-          <div class="select">
-            <select name="version" class="version-select">
-              <option
-                 ng-repeat='thisVersion in versions'
-                 ng-selected='version == thisVersion'
-                 ng-disabled='thisVersion.visibility != "public"'
-                 value="[[thisVersion.version_no]]">
-                [[thisVersion|versionDropDownDisplay]]</option>
-            </select>
-          </div>
-        </div>
-            <div class="subtitles-wrapper">
-                <div class="reference subtitles" subtitle-scroller="reference-subtitle-set">
-                    <ul class="subtitle-list"
-                        subtitle-repeat="referenceSubtitles.subtitleList"
-                        dir="[[ referenceSubtitles.language.dir ]]"
-                        read-only="yes"></ul>
-
+    <div class="page ng-cloak" ng-cloak>
+        <header class="main group">
+            <section class="site left column">
+                <h1>Amara</h1>
+                <div class="video-title">
+                    <a title="{% trans "Edit title and description" %}" href="#" ng-click="onTitleClicked($event)"><img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_030_pencil.png"></img></a>
+                    <a title="{% trans "Edit title and description" %}" href="#" ng-click="onTitleClicked($event)">[[ displayedTitle() ]]
+                    </a>
                 </div>
-                <a ng-click="toggleScrollingSynced()"
-                   ng-class="{ locked: scrollingSynced, unlocked: !scrollingSynced }"
-                   class="scroll-lock">
-                </a>
+            </section>
+            <section class="video center column">
+            </section>
+            <section class="session right column group">
+                {% if DEBUG %}
+                    <button href="#" ng-click="dialogManager.onOpenClick('debug', $event)">Debug</button>
+                {% endif %}
+                <button class="discard" ng-click="onExitClicked($event)">Exit</button>
+                <button ng-click="onLegacyEditorClicked($event)">Legacy Editor</button>
+                <button class="save" ng-disabled="!session.unsavedChanges()" ng-click="onSaveClicked($event)">Save</button>
+            </section>
+        </header>
+        <section class="main">
+          <section class="left column">
+            <div class="help-panel" ng-controller="WorkflowProgressionController">
+              <!-- not ready for release just yet
+                   <a class="advanced" ng-click="showAdvancedModal()">Advanced &raquo;</a>
+                   -->
+              
+              <h1>{% trans "Keyboard controls" %}&nbsp;&nbsp;&nbsp;<a href="" ng-click="onMoreControlsClicked($event)">{% trans "more commands" %} &#187;</a></h1>
+              <div ng-show="workflow.stage == 'type'">
+                <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
+                  <div class="key-pattern">Tab</div>
+                  <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
+                </div>
+                <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
+                  <div class="key-pattern">Shift</div>
+                  <div class="key-pattern small">+</div>
+                  <div class="key-pattern">Tab</div>
+                  <div class="shortcut-desc">{% trans "Skip back" %}</div>
+                </div>
+                <div class="instruction-item blue-key">
+                  <div class="key-pattern">Shift</div>
+                  <div class="key-pattern small">+</div>
+                  <div class="key-pattern">Enter</div>
+                  <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
+                </div>
+              </div>
+              <div ng-show="workflow.stage == 'sync'">
+                <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
+                  <div class="key-pattern">Tab</div>
+                  <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
+                </div>
+                <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
+                  <div class="key-pattern">Shift</div>
+                  <div class="key-pattern small">+</div>
+                  <div class="key-pattern">Tab</div>
+                  <div class="shortcut-desc">{% trans "Skip back" %}</div>
+                </div>
+                <div class="key-row">
+                  <div class="instruction-item teal-key clickable" ng-click="handleMouseKeyDown('40')">
+                    <div class="key-pattern small">
+                      <img src="{{ STATIC_URL }}images/subtitle-editor/down_arrow.png"></img></div>
+                    <div class="shortcut-desc">{% trans "Start subtitle" %}</div>
+                  </div>
+                  <div class="instruction-item-small"></div>
+                  <div class="instruction-item blue-key clickable" ng-click="handleMouseKeyDown('38')">
+                    <div class="key-pattern small">
+                      <img src="{{ STATIC_URL }}images/subtitle-editor/up_arrow.png"></img></div>
+                    <div class="shortcut-desc">{% trans "End subtitle" %}</div>
+                  </div>
+                </div>
+              </div>
+              <div ng-show="(workflow.stage == 'review') || (workflow.stage == 'title')">
+                <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
+                  <div class="key-pattern">Tab</div>
+                  <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
+                </div>
+                <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
+                  <div class="key-pattern">Shift</div>
+                  <div class="key-pattern small">+</div>
+                  <div class="key-pattern">Tab</div>
+                  <div class="shortcut-desc">{% trans "Skip back" %}</div>
+                </div>
+                <div class="instruction-item blue-key">
+                  <div class="key-pattern">Shift</div>
+                  <div class="key-pattern small">+</div>
+                  <div class="key-pattern">Enter</div>
+                  <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
+                </div>
+              </div>
+              <ng-switch on="showTeamGuidelines()">
+                <a class="guidelines-link" ng-switch-when="true" title="" href="" ng-click="onGuidelinesClicked($event)">[[ teamName ]] Guidelines &#187;</a>
+                <a class="guidelines-link" ng-switch-when="false" title="" href="" ng-click="onGuidelinesClicked($event)">{% trans "Subtitling Guidelines" %} &#187;</a>
+              </ng-switch>
             </div>
-        </section>
-        <section class="center column">
-          <div class="video" ng-controller="VideoController">
-            <div class="video-container" id="video"></div>
-            <div class="subtitle-overlay" dir="{{ language.dir }}" ng-show="showOverlay"><div ng-bind-html="overlayText"></div></div>
-            <ul class="video-controls group">
-              <li class="play-pause" ng-class="{'playing': videoState.playing}">
-                <a href="#" ng-click="playPauseClicked($event)"></a>
-              </li>
-              <li class="time">
-                <span ng-show="videoState.loaded">
-                  [[ videoState.currentTime|displayTimeSeconds]] / [[ videoState.duration|displayTimeSeconds]]
-                </span>
-              </li>
-              <li class="volume" ng-show="videoState.loaded">
-                <a href="#" ng-click="volumeToggleClicked($event)"></a>
-              </li>
-              <li class="progress" progress-bar
-                  ng-mousedown="onProgressMouseDown($event)">
-                <div class="slice-left"><div></div></div>
-                <div class="slice-right"><div></div></div>
-                <div class="slice-mid"><div></div></div>
-              </li>
-            </ul>
-            <div volume-bar class="volume-bar"
-                 ng-mousedown="onVolumeMouseDown($event)"
-                 ng-show="volumeBarVisible">
-              <div class="slice1"></div>
-                <div class="slice2"></div>
-                <div class="slice3"></div>
+            <div class="language-selections group toolbar"
+                 language-selector
+                 ng-controller="LanguageSelectorController">
+              <div class="select">
+                <select name="language"
+                        ng-model='language'
+                        ng-options="(item.name + (item.isPrimaryAudioLanguage? ' (original)' : '')) for item in languages | orderBy:'name'">
+                </select>
+              </div>
+              <div class="select">
+                <select name="version" class="version-select">
+                  <option
+                     ng-repeat='thisVersion in versions'
+                     ng-selected='version == thisVersion'
+                     ng-disabled='thisVersion.visibility != "public"'
+                     value="[[thisVersion.version_no]]">
+                    [[thisVersion|versionDropDownDisplay]]</option>
+                </select>
+              </div>
             </div>
-	    <div class="instructions-overlay" ng-controller="WorkflowProgressionController" ng-show="showOverlay()">
-	      <div ng-show="workflow.stage == 'type'">
-		<h1>{% trans "How to start making subtitles." %}</h1>
-		<ul>
-		  <li>{% trans "Play the video and type what you hear." %}</li>
-		  <li>{% trans "Press Enter to complete a subtitle." %}</li>
-		  <li>{% trans "Use the guide on the right to move to the next step." %}</li>
-		</ul>
-		<h1>{% trans "Press the TAB key to start!" %}</h1>
-	      </div>
-	      <div ng-show="workflow.stage == 'sync'">
-		<h1>{% trans "Subtitle Syncing" %}</h1>
-		<ul>
-		  <li>{% trans "Tap the DOWN arrow to start a subtitle." %}</li>
-		  <li>{% trans "Tap the UP arrow to set the end time (optional)." %}</li>
-		  <li>{% trans "Use the Tools menu to hide the timeline for typing mode." %}</li>
-		</ul>
-		<h1>{% trans "Press the TAB key to start!" %}</h1>
-	      </div>
-	      <div ng-show="workflow.stage == 'title'"></div>
-	      <div ng-show="workflow.stage == 'review'">
-		<h1>{% trans "Review your work" %}</h1>
-		<ul>
-		  <li>{% trans "Watch the video and make corrections." %}</li>
-		  <li>{% trans "Click Complete to sign off on your work." %}</li>
-		  <li>{% trans "Use the Save button to save and finish later." %}</li>
-		</ul>
-		<h1>{% trans "Press the TAB key to start!" %}</h1>
-	      </div>
-	    </div>
-          </div>
-          <div class="workspace-tools group toolbar">
-            <div class="subtitles-language">
-              {% blocktrans with language.get_language_code_display as language %}
-              Editing {{ language }}&hellip;
-              {% endblocktrans %}
-            </div>
-	    <div class="toolbox">
-	      <div class="toolbox-inside">
-		<a href="#"><img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png" alt="Tools"></img></a>
-		<ul class="toolbox-menu">
-		  <li ng-show="copyTimingEnabled()"><a href="#" class="copyover" ng-click="showCopyTimingModal($event)" title="Copy timing and paragraphs from reference language">{% trans "Copy Timing" %}</a></li>
-                  <li><a href="#" ng-click="toggleTimelineShown()" class="show-timeline">
-		      <span ng-show="timelineShown">{% trans "Hide" %}</span>
-		      <span ng-show="!timelineShown">{% trans "Show" %}</span>
-		      {% trans "Timeline" %}
-                  </a></li>
-		  <li><a href="#" class="clear-timing" ng-click="showClearTimingModal($event)" title="Clear timing of all subtitles">{% trans "Clear timing" %}</a></li>
-		  <li><a href="#" class="clear-text" ng-click="showClearTextModal($event)" title="Clear text of all subtitles">{% trans "Clear text" %}</a></li>
-		  <li><a href="#" class="revert-saved" ng-click="showResetModal($event)" title="Revert to last saved version">{% trans "Revert to last saved version" %}</a></li>
-		  <li><a href="#" class="upload-subtitles" ng-click="showUploadSubtitlesModal($event)" title="Upload subtitles">{% trans "Upload subtitles" %}</a></li>
-		</ul>
-	      </div>
-	    </div>
-          </div>
-          <div class="subtitles-wrapper"
-               ng-controller="WorkingSubtitlesController"
-               working-subtitles>
-            <div class="sync-help end">
-              <span class="key">
-		<img src="{{ STATIC_URL }}images/subtitle-editor/up_arrow.png"></img>
-              </span>
-              <div class="text">End now</div>
-            </div>
-	    
-            <div class="sync-help begin">
-              <span class="key">
-		<img src="{{ STATIC_URL }}images/subtitle-editor/down_arrow.png"></img>
-              </span>
-              <div class="text">Start now</div>
-            </div>
-            <div class="info-tray">
-              <table>
-                <tr>
-                  <th>Start</th>
-                  <td><em>[[ currentEdit.draft.storedSubtitle.startTime|displayTime ]]</em></td>
-                </tr>
-                <tr>
-                  <th>End</th>
-                  <td><em>[[ currentEdit.draft.storedSubtitle.endTime|displayTime ]]</em></td>
-                </tr>
-                <tr>
-                            <th>Characters</th>
-                            <td>[[ currentEdit.draft.characterCount() ]]</td>
-                </tr>
-                <tr class="child"
-                    ng-repeat="count in currentEdit.lineCounts() track by $index">
-                  <th>Line [[ $index + 1 ]]</th>
-		  <td>[[ count ]]</td>
-		</tr>
-		<tr class="char-rate" ng-show="currentEdit.draft.isSynced()">
-		  <th>Chars/sec</th>
-		  <td>[[ currentEdit.draft.characterRate() ]]</td>
-		</tr>
-	      </table>
-	    </div>
+                <div class="subtitles-wrapper">
+                    <div class="reference subtitles" subtitle-scroller="reference-subtitle-set">
+                        <ul class="subtitle-list"
+                            subtitle-repeat="referenceSubtitles.subtitleList"
+                            dir="[[ referenceSubtitles.language.dir ]]"
+                            read-only="yes"></ul>
 
-                <div class="working subtitles" subtitle-scroller="working-subtitle-set" />
-                    <ul class="subtitle-list"
-                        subtitle-repeat="workingSubtitles.subtitleList"
-                        dir="[[ workingSubtitles.language.dir ]]"
-                        id="working-subtitle-set"></ul>
+                    </div>
+                    <a ng-click="toggleScrollingSynced()"
+                       ng-class="{ locked: scrollingSynced, unlocked: !scrollingSynced }"
+                       class="scroll-lock">
+                    </a>
+                </div>
+            </section>
+            <section class="center column">
+              <div class="video" ng-controller="VideoController">
+                <div class="video-container" id="video"></div>
+                <div class="subtitle-overlay" dir="{{ language.dir }}" ng-show="showOverlay"><div ng-bind-html="overlayText"></div></div>
+                <ul class="video-controls group">
+                  <li class="play-pause" ng-class="{'playing': videoState.playing}">
+                    <a href="#" ng-click="playPauseClicked($event)"></a>
+                  </li>
+                  <li class="time">
+                    <span ng-show="videoState.loaded">
+                      [[ videoState.currentTime|displayTimeSeconds]] / [[ videoState.duration|displayTimeSeconds]]
+                    </span>
+                  </li>
+                  <li class="volume" ng-show="videoState.loaded">
+                    <a href="#" ng-click="volumeToggleClicked($event)"></a>
+                  </li>
+                  <li class="progress" progress-bar
+                      ng-mousedown="onProgressMouseDown($event)">
+                    <div class="slice-left"><div></div></div>
+                    <div class="slice-right"><div></div></div>
+                    <div class="slice-mid"><div></div></div>
+                  </li>
+                </ul>
+                <div volume-bar class="volume-bar"
+                     ng-mousedown="onVolumeMouseDown($event)"
+                     ng-show="volumeBarVisible">
+                  <div class="slice1"></div>
+                    <div class="slice2"></div>
+                    <div class="slice3"></div>
+                </div>
+                <div class="instructions-overlay" ng-controller="WorkflowProgressionController" ng-show="showOverlay()">
+                  <div ng-show="workflow.stage == 'type'">
+                    <h1>{% trans "How to start making subtitles." %}</h1>
+                    <ul>
+                      <li>{% trans "Play the video and type what you hear." %}</li>
+                      <li>{% trans "Press Enter to complete a subtitle." %}</li>
+                      <li>{% trans "Use the guide on the right to move to the next step." %}</li>
+                    </ul>
+                    <h1>{% trans "Press the TAB key to start!" %}</h1>
+                  </div>
+                  <div ng-show="workflow.stage == 'sync'">
+                    <h1>{% trans "Subtitle Syncing" %}</h1>
+                    <ul>
+                      <li>{% trans "Tap the DOWN arrow to start a subtitle." %}</li>
+                      <li>{% trans "Tap the UP arrow to set the end time (optional)." %}</li>
+                      <li>{% trans "Use the Tools menu to hide the timeline for typing mode." %}</li>
+                    </ul>
+                    <h1>{% trans "Press the TAB key to start!" %}</h1>
+                  </div>
+                  <div ng-show="workflow.stage == 'title'"></div>
+                  <div ng-show="workflow.stage == 'review'">
+                    <h1>{% trans "Review your work" %}</h1>
+                    <ul>
+                      <li>{% trans "Watch the video and make corrections." %}</li>
+                      <li>{% trans "Click Complete to sign off on your work." %}</li>
+                      <li>{% trans "Use the Save button to save and finish later." %}</li>
+                    </ul>
+                    <h1>{% trans "Press the TAB key to start!" %}</h1>
+                  </div>
+                </div>
+              </div>
+              <div class="workspace-tools group toolbar">
+                <div class="subtitles-language">
+                  {% blocktrans with language.get_language_code_display as language %}
+                  Editing {{ language }}&hellip;
+                  {% endblocktrans %}
+                </div>
+                <div class="toolbox">
+                  <div class="toolbox-inside">
+                    <a href="#"><img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png" alt="Tools"></img></a>
+                    <ul class="toolbox-menu">
+                      <li ng-show="copyTimingEnabled()"><a href="#" class="copyover" ng-click="showCopyTimingModal($event)" title="Copy timing and paragraphs from reference language">{% trans "Copy Timing" %}</a></li>
+                      <li><a href="#" ng-click="toggleTimelineShown()" class="show-timeline">
+                          <span ng-show="timelineShown">{% trans "Hide" %}</span>
+                          <span ng-show="!timelineShown">{% trans "Show" %}</span>
+                          {% trans "Timeline" %}
+                      </a></li>
+                      <li><a href="#" class="clear-timing" ng-click="showClearTimingModal($event)" title="Clear timing of all subtitles">{% trans "Clear timing" %}</a></li>
+                      <li><a href="#" class="clear-text" ng-click="showClearTextModal($event)" title="Clear text of all subtitles">{% trans "Clear text" %}</a></li>
+                      <li><a href="#" class="revert-saved" ng-click="showResetModal($event)" title="Revert to last saved version">{% trans "Revert to last saved version" %}</a></li>
+                      <li><a href="#" class="upload-subtitles" ng-click="showUploadSubtitlesModal($event)" title="Upload subtitles">{% trans "Upload subtitles" %}</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="subtitles-wrapper"
+                   ng-controller="WorkingSubtitlesController"
+                   working-subtitles>
+                <div class="sync-help end">
+                  <span class="key">
+                    <img src="{{ STATIC_URL }}images/subtitle-editor/up_arrow.png"></img>
+                  </span>
+                  <div class="text">End now</div>
+                </div>
+                
+                <div class="sync-help begin">
+                  <span class="key">
+                    <img src="{{ STATIC_URL }}images/subtitle-editor/down_arrow.png"></img>
+                  </span>
+                  <div class="text">Start now</div>
+                </div>
+                <div class="info-tray">
+                  <table>
+                    <tr>
+                      <th>Start</th>
+                      <td><em>[[ currentEdit.draft.storedSubtitle.startTime|displayTime ]]</em></td>
+                    </tr>
+                    <tr>
+                      <th>End</th>
+                      <td><em>[[ currentEdit.draft.storedSubtitle.endTime|displayTime ]]</em></td>
+                    </tr>
+                    <tr>
+                                <th>Characters</th>
+                                <td>[[ currentEdit.draft.characterCount() ]]</td>
+                    </tr>
+                    <tr class="child"
+                        ng-repeat="count in currentEdit.lineCounts() track by $index">
+                      <th>Line [[ $index + 1 ]]</th>
+                      <td>[[ count ]]</td>
+                    </tr>
+                    <tr class="char-rate" ng-show="currentEdit.draft.isSynced()">
+                      <th>Chars/sec</th>
+                      <td>[[ currentEdit.draft.characterRate() ]]</td>
+                    </tr>
+                  </table>
+                </div>
 
-                    <div ng-switch="bottomState()">
-                        <a class="end"
-                            id="add-sub-at-end"
-                            href="#"
-                            ng-switch-when="add-button"
-                            ng-click="newSubtitleClicked($event)">+ New subtitle</a>
-                        <span ng-switch-when="edit-help" class="end">
-                            Press ENTER to save subtitle and move to next.<br />
-                        </span>
-                        <a class="end"
-                            id="add-sub-at-end"
-                            href="#"
-                            ng-switch-when="type-shortcuts-help" 
-                            ng-click="newSubtitleClicked($event)">
-                            Press ENTER to add a new subtitle
-                        </a>
+                    <div class="working subtitles" subtitle-scroller="working-subtitle-set" />
+                        <ul class="subtitle-list"
+                            subtitle-repeat="workingSubtitles.subtitleList"
+                            dir="[[ workingSubtitles.language.dir ]]"
+                            id="working-subtitle-set"></ul>
+
+                        <div ng-switch="bottomState()">
+                            <a class="end"
+                                id="add-sub-at-end"
+                                href="#"
+                                ng-switch-when="add-button"
+                                ng-click="newSubtitleClicked($event)">+ New subtitle</a>
+                            <span ng-switch-when="edit-help" class="end">
+                                Press ENTER to save subtitle and move to next.<br />
+                            </span>
+                            <a class="end"
+                                id="add-sub-at-end"
+                                href="#"
+                                ng-switch-when="type-shortcuts-help" 
+                                ng-click="newSubtitleClicked($event)">
+                                Press ENTER to add a new subtitle
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <section class="collab column" ng-controller="CollabController">
-            <a class="toggle-pane"
-               ng-click="toggleDocking('pane')"
-               ng-show="modulesEnabled.pane && !modulesOpen.pane">
-                Open Collab
-            </a>
-            <aside ng-show="modulesEnabled.pane && modulesOpen.pane">
-            <!--
-            2534: always keep the collab panel open when we use it.
-            We should uncomment this when the collab code gets integrated
+            </section>
+            <section class="collab column" ng-controller="CollabController">
                 <a class="toggle-pane"
                    ng-click="toggleDocking('pane')"
-                   ng-show="modulesOpen.pane">
-                    Close Collab
+                   ng-show="modulesEnabled.pane && !modulesOpen.pane">
+                    Open Collab
                 </a>
-                -->
-                <div class="notes module"
-                     ng-show="modulesEnabled.notes"
-                     ng-class="{open: modulesOpen.notes}">
-                    <a class="title" ng-click="toggleDocking('notes')">Notes</a>
-                    <div class="content" ng-show="modulesOpen.notes">
-                        <textarea ng-model="collab.notes" ng-change="session.notesChanged()"></textarea>
+                <aside ng-show="modulesEnabled.pane && modulesOpen.pane">
+                <!--
+                2534: always keep the collab panel open when we use it.
+                We should uncomment this when the collab code gets integrated
+                    <a class="toggle-pane"
+                       ng-click="toggleDocking('pane')"
+                       ng-show="modulesOpen.pane">
+                        Close Collab
+                    </a>
+                    -->
+                    <div class="notes module"
+                         ng-show="modulesEnabled.notes"
+                         ng-class="{open: modulesOpen.notes}">
+                        <a class="title" ng-click="toggleDocking('notes')">Notes</a>
+                        <div class="content" ng-show="modulesOpen.notes">
+                            <textarea ng-model="collab.notes" ng-change="session.notesChanged()"></textarea>
+                        </div>
                     </div>
-                </div>
-                <div class="approval module" ng-show="modulesEnabled.approval">
-                    <div class="content">
-                        <button class="send-back" ng-click="session.rejectTask()">Send Back</button>
-                        <button ng-disabled="!canApprove()" class="approve" ng-click="session.approveTask()">Accept</button>
+                    <div class="approval module" ng-show="modulesEnabled.approval">
+                        <div class="content">
+                            <button class="send-back" ng-click="session.rejectTask()">Send Back</button>
+                            <button ng-disabled="!canApprove()" class="approve" ng-click="session.approveTask()">Accept</button>
+                        </div>
                     </div>
+                    <p ng-show="errorMessage()" class="error">[[ errorMessage() ]]</p>
+                </aside>
+            </section>
+            <section class="right column">
+                <div class="steps-container"
+                    ng-controller="WorkflowProgressionController">
+                    <ul class="steps">
+                        <li ng-class="{done: workflow.stageDone('type')}">
+                        {% trans "1. Type what you hear" %}
+                            <div class="substeps" ng-show="workflow.stage == 'type'">
+                                <p>{% trans "Is all the content subtitled?" %}</p>
+                                <button class="next-step" ng-click="onNextClicked($event)">
+                                  <ng-switch on="translating()">
+                                    <div ng-switch-when="true">{% trans "Yes, translate the title" %}</div>
+                                    <div ng-switch-when="false">{% trans "Yes, start syncing" %}</div>
+                                  </ng-switch>
+                                </button>
+                        </div>
+                        </li>
+                        <li ng-show="translating()" ng-class="{done: workflow.stageDone('title')}">
+                            {% trans "2. Translate title" %}
+                            <div class="substeps"
+                                ng-show="workflow.stage == 'title'">
+                                <ng-switch on="workflow.canMoveToNext()">
+                                    <p ng-switch-when="false">
+                                        {% trans "Title and description were not edited yet." %}
+                                    </p>
+                                    <div ng-switch-when="true">
+                                        <p>{% trans "Title and description have been edited." %}</p>
+                                        <button class="next-step" ng-click="onNextClicked($event)">
+                                            {% trans "Start syncing" %}
+                                        </button>
+                                    </div>
+                                </ng-switch>
+                            </div>
+                        </li>
+                        <li ng-class="{done: workflow.stageDone('sync')}">
+                            <ng-switch on="translating()">
+                                <div ng-switch-when="false">{% trans "2. Sync Timing" %}</div>
+                                <div ng-switch-when="true">{% trans "3. Sync Timing" %}</div>
+                            </ng-switch>
+                            <div class="substeps" ng-show="workflow.stage == 'sync'">
+                                <ng-switch on="workflow.canMoveToNext()">
+                                    <p ng-switch-when="false">
+                                        {% trans "Not all lines are completed." %}
+                                    </p>
+                                    <div ng-switch-when="true">
+                                        <p>{% trans "All lines are completed." %}</p>
+                                        <button ng-click="onNextClicked($event)">
+                                          {% trans "Start reviewing" %}
+                                        </button>
+                                    </div>
+                                </ng-switch>
+                            </div>
+                        </li>
+                        <li>
+                            <ng-switch on="translating()">
+                                <div ng-switch-when="false">{% trans "3. Review and complete" %}</div>
+                                <div ng-switch-when="true">{% trans "4. Review and complete" %}</div>
+                            </ng-switch>
+                            <div class="substeps"
+                                ng-show="workflow.stage == 'review'">
+                                <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}</p>
+                                <button class="endorse" ng-click="session.endorse()">
+                                    {% trans "Complete" %}
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-                <p ng-show="errorMessage()" class="error">[[ errorMessage() ]]</p>
-            </aside>
+            </section>
         </section>
-        <section class="right column">
-            <div class="steps-container"
-                ng-controller="WorkflowProgressionController">
-                <ul class="steps">
-                    <li ng-class="{done: workflow.stageDone('type')}">
-                    {% trans "1. Type what you hear" %}
-                        <div class="substeps" ng-show="workflow.stage == 'type'">
-                            <p>{% trans "Is all the content subtitled?" %}</p>
-                            <button class="next-step" ng-click="onNextClicked($event)">
-                              <ng-switch on="translating()">
-                                <div ng-switch-when="true">{% trans "Yes, translate the title" %}</div>
-                                <div ng-switch-when="false">{% trans "Yes, start syncing" %}</div>
-                              </ng-switch>
-                            </button>
-                    </div>
-                    </li>
-                    <li ng-show="translating()" ng-class="{done: workflow.stageDone('title')}">
-                        {% trans "2. Translate title" %}
-                        <div class="substeps"
-                            ng-show="workflow.stage == 'title'">
-                            <ng-switch on="workflow.canMoveToNext()">
-                                <p ng-switch-when="false">
-                                    {% trans "Title and description were not edited yet." %}
-                                </p>
-                                <div ng-switch-when="true">
-                                    <p>{% trans "Title and description have been edited." %}</p>
-                                    <button class="next-step" ng-click="onNextClicked($event)">
-                                        {% trans "Start syncing" %}
-                                    </button>
-                                </div>
-                            </ng-switch>
-                        </div>
-                    </li>
-                    <li ng-class="{done: workflow.stageDone('sync')}">
-                        <ng-switch on="translating()">
-                            <div ng-switch-when="false">{% trans "2. Sync Timing" %}</div>
-                            <div ng-switch-when="true">{% trans "3. Sync Timing" %}</div>
-                        </ng-switch>
-                        <div class="substeps" ng-show="workflow.stage == 'sync'">
-                            <ng-switch on="workflow.canMoveToNext()">
-                                <p ng-switch-when="false">
-                                    {% trans "Not all lines are completed." %}
-                                </p>
-                                <div ng-switch-when="true">
-                                    <p>{% trans "All lines are completed." %}</p>
-                                    <button ng-click="onNextClicked($event)">
-				      {% trans "Start reviewing" %}
-                                    </button>
-                                </div>
-                            </ng-switch>
-                        </div>
-                    </li>
-                    <li>
-                        <ng-switch on="translating()">
-                            <div ng-switch-when="false">{% trans "3. Review and complete" %}</div>
-                            <div ng-switch-when="true">{% trans "4. Review and complete" %}</div>
-                        </ng-switch>
-                        <div class="substeps"
-                            ng-show="workflow.stage == 'review'">
-                            <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}</p>
-                            <button class="endorse" ng-click="session.endorse()">
-                                {% trans "Complete" %}
-                            </button>
-                        </div>
-                    </li>
-                </ul>
+        <section ng-controller="TimelineController" class="timeline" ng-show="timelineShown">
+            <div class="current-time-marker"></div>
+            <canvas class="timing" width="100" height="65" timeline-timing></canvas>
+            <div timeline-subtitles class="subtitles-container" dir="{{ language.dir }}">
+            </div>
+            <div class="nextSubSticker" ng-show="showUpcomingUnsyncedSubtitle">
+              <div class="subtitle">
+                <span class="handle left"></span><span class="upcomingUnsyncedSubtitleText"></span>
+              </div>
             </div>
         </section>
-    </section>
-    <section ng-controller="TimelineController"
-        class="timeline ng-cloak"
-        ng-show="timelineShown"
-        ng-cloak>
-        <div class="current-time-marker"></div>
-        <canvas class="timing" width="100" height="65" timeline-timing></canvas>
-        <div timeline-subtitles class="subtitles-container" dir="{{ language.dir }}">
-        </div>
-	<div class="nextSubSticker" ng-show="showUpcomingUnsyncedSubtitle">
-	  <div class="subtitle">
-	    <span class="handle left"></span><span class="upcomingUnsyncedSubtitleText"></span>
-	  </div>
-	</div>
-    </section>
-    <aside modal-dialog="guidelines" allow-close class="modal" role="dialog" id="guidelines-modal" tabindex="-1" aria-labeledby="guidelines-heading" dir="[[ workingSubtitles.language.dir ]]">
-      <ng-switch on="showTeamGuidelines()">
-	<h3 ng-switch-when="true">[[ teamName ]] Guidelines</h3>
-	<h3 id="guidelines-heading" ng-switch-when="false">{% trans "Amara Style Guidelines" %}</h3>
-      </ng-switch>
-      <div class="modal-content" ng-show="!teamGuidelines">
-	<table>
-	  <tr>
-	    <td>{% trans "Subtitle line length" %}</td>
-	    <td>{% trans "Keep subtitle length to about 42 characters;" %}<br/>
-	      {% trans "avoid more than 2 lines per subtitle." %}</td>
-	  </tr>
-	  <tr>
-	    <td>{% trans "Minimum duration" %}</td>
-	    <td>{% trans "Subtitles should not be less than 1 second." %}</td>
-	  </tr>
-	  <tr>
-	    <td>{% trans "Maximum duration" %}</td>
-	    <td>{% trans "Split subtitles lasting more than 7 seconds." %}</td>
-	  </tr>
-	  <tr>
-	    <td>{% trans "Reading speed" %}</td>
-	    <td>{% trans "8-25 characters/second is recommended;" %}<br/>
-	      {% trans "8-16 characters/second for children." %}</td>
-	  </tr>
-	  <tr>
-	    <td>{% trans "Sounds" %}</td>
-	    <td>{% trans "Describe meaningful sounds that are relevant to the plot." %}<br/>
-	      {% trans "ex: (water dripping)" %}</td>
-	  </tr>
-	  <tr>
-	    <td>{% trans "Music" %}</td>
-	    <td>{% trans "Describe relevant music which does not have relevant lyrics." %}<br/>
-	      {% trans "ex: ♪ (jazz music) ♪" %}</td>
-	  </tr>
-	  <tr>
-	    <td>{% trans "Speaker Identification" %}</td>
-	    <td>{% trans "Use parenthesis to indicate when someone is speaking off-screen." %}<br/>
-	      {% trans "ex: (Michael) Wait for me!" %}</td>
-	  </tr>
-	</table>
-	<a class="expand-link" href="" ng-click="showAdvancedGuidelines = true" ng-init="showAdvancedGuidelines=false" ng-show="!showAdvancedGuidelines">{% trans "Show Advanced Guidelines" %} &#x25B6;</a>
-	<a class="expand-link" href="" ng-click="showAdvancedGuidelines = false" ng-show="showAdvancedGuidelines">{% trans "Hide Advanced Guidelines" %} &#x25BC;</a>
-	<div ng-show="showAdvancedGuidelines" id="advanced-guidelines">
-	  <table>
-	    <tr>
-	      <td>{% trans "Translate the whole idea" %}</td>
-	      <td>{% trans "Translations don't need to be word for word. Look at the context." %}<br/>
-		{% trans "Make sure you are using the correct punctuation for the whole unit of text." %}
-	      </td>
-	    </tr>
-	    <tr>
-	      <td>{% trans "Maximum timing offset" %}</td>
-	      <td>{% trans "Subtitles shouldn't start more than 0.5 seconds before or after the audio begins." %}</td>
-	    </tr>
-	    <tr>
-	      <td>{% trans "On-screen texts" %}</td>
-	      <td>{% trans "Translate the texts on the video that are relevant to the plot." %}</td>
-	    </tr>
-	    <tr>
-	      <td>{% trans "Use meaningful speech" %}</td>
-	      <td>{% trans "Exclude things like “um” “ah” and other disfluencies." %}</td>
-	    </tr>
-	    <tr>
-	      <td>{% trans "Indicate inaudible parts" %}</td>
-	      <td>{% trans "If the audio is inaudible, it should be marked as [inaudible]." %}</td>
-	    </tr>
-	    <tr>
-	      <td>{% trans "Lyrics" %}</td>
-	      <td>{% trans "Wrap relevant lyrics in musical notes." %}<br/>
-		{% trans "ex ♪ Tell me dear Billy, ♪" %}
-	      </td>
-	    </tr>
-	    <tr>
-	      <td>{% trans "Speaker identification" %}</td>
-	      <td>{% trans "Identify off-screen and unclear speakers in parentheses." %}<br/>
-		{% trans "ex: (Michael) Wait for me!" %}
-	      </td>
-	    </tr>
-	    <tr>
-	      <td>{% trans "Foreign language" %}</td>
-	      <td>{% trans "Identify relevant speech in foreign language. " %}<br/>
-		{% trans "ex: (Russian): Thank you." %}
-	      </td>
-	    </tr>
-	    <tr>
-	      <td>{% trans "Simultaneous dialogue" %}</td>
-	      <td>{% trans "Used exclusively when two speakers talk in the same subtitle. " %}<br/>
-		{% trans "Each speaker should have one line, and both lines should have an hyphen. " %}<br/>
-		{% trans "- Sir, you are no gentleman." %}<br/>
-		{% trans "- Rhett Butler: And you, Miss, are no lady." %}
-	      </td>
-	    </tr>
-	  </table>
-	</div>
-      </div>
-      <div class="modal-content" ng-show="teamGuidelines">
-	<div ng-show="teamTaskType() == 'subtitle'" ng-bind-html="teamGuidelines['subtitle']"></div>
-	<div ng-show="teamTaskType() == 'translate'" ng-bind-html="teamGuidelines['translate']"></div>
-	<div ng-show="teamTaskType() == 'review'" ng-bind-html="teamGuidelines['review']"></div>
-	<a class="expand-link" href="" ng-click="showAllTeamGuidelines = true"
-           ng-init="showAllTeamGuidelines=false" ng-show="!showAllTeamGuidelines">
-	  {% trans "Show All Guidelines" %} &#x25B6;
-	</a>
-	<a class="expand-link" href="" ng-click="showAllTeamGuidelines = false"
-	   ng-show="showAllTeamGuidelines">
-	  {% trans "Hide All Guidelines" %} &#x25BC;
-	</a>
-	<div class="team-all-guidelines" ng-show="showAllTeamGuidelines" id="all-team-guidelines">
-	  <h1>{% trans "Transcribing Guidelines" %}</h1>
-	  <div ng-bind-html="teamGuidelines['subtitle']"></div>
-	  <h1>{% trans "Translating Guidelines" %}</h1>
-	  <div ng-bind-html="teamGuidelines['translate']"></div>
-	  <h1>{% trans "Reviewing Guidelines" %}</h1>
-	  <div ng-bind-html="teamGuidelines['review']"></div>
-	</div>
-      </div>
-      <footer class="buttons">
-	<button ng-click="dialogManager.onCloseClick($event)">
-	  {% trans "Close" %}
-	</button>
-      </footer>
-    </aside>
-    <aside modal-dialog="more-controls" allow-close class="modal" role="dialog" id="more-controls-modal" tabindex="-1" aria-labeledby="more-controls-heading" dir="[[ workingSubtitles.language.dir ]]">
-      <h3 id="more-controls-heading">{% trans "Keyboard Shortcuts" %}</h3>
-      <div class="modal-content">
-	<table>
-	  <thead>
-	    <tr>
-	      <th>{% trans "Action" %}</th>
-	      <th>{% trans "Windows / Linux" %}</th>
-	      <th>{% trans "OS X" %}</th>
-	    </tr>
-	  </thead>
-	  <tbody>
-	    <tr>
-	      <td> {% trans "Play / Pause video" %}</td>
-	      <td> {% trans "Tab" %}</td>
-	      <td> {% trans "Tab" %}</td>
-	    </tr>
-	    <tr>
-	      <td> {% trans "Skip back 2 seconds" %}</td>
-	      <td> {% trans "Shift + Tab" %}</td>
-	      <td> {% trans "Shift + Tab" %}</td>
-	    </tr>
-	    <tr>
-	      <td> {% trans "Skip back 4 seconds" %}</td>
-	      <td> {% trans "Ctrl + Shift + ," %}</td>
-	      <td> {% trans "CMD + Shift + ," %}</td>
-	    </tr>
-	    <tr>
-	      <td> {% trans "Skip forward 4 seconds" %}</td>
-	      <td> {% trans "Ctrl + Shift + ." %}</td>
-	      <td> {% trans "CMD + Shift + ." %}</td>
-	    </tr>
-	    <tr>
-	      <td> {% trans "Navigate to the next subtitle" %}</td>
-	      <td> {% trans "ENTER" %}</td>
-	      <td> {% trans "ENTER" %}</td>
-	    </tr>
-	    <tr>
-	      <td> {% trans "Insert line break" %}</td>
-	      <td> {% trans "Shift + ENTER" %}</td>
-	      <td> {% trans "Shift + ENTER" %}</td>
-	    </tr>
-	    <tr>
-	      <td> {% trans "Delete empty subtitle" %}</td>
-	      <td> {% trans "ESC" %}</td>
-	      <td> {% trans "ESC" %}</td>
-	    </tr>
-	    <tr>
-	      <td> {% trans "Exit edit mode of current subtitle" %}</td>
-	      <td> {% trans "ESC" %}</td>
-	      <td> {% trans "ESC" %}</td>
-	    </tr>
-	  </tbody>
-	</table>
-	<a class="expand-link" href="" ng-click="showBrowserShortcuts = true" ng-init="showBrowserShortcuts=false" ng-show="!showBrowserShortcuts">{% trans "Show Browser Shortcuts" %} &#x25B6;</a>
-	<a class="expand-link" href="" ng-click="showBrowserShortcuts = false" ng-show="showBrowserShortcuts">{% trans "Hide Browser Shortcuts" %} &#x25BC;</a>
-	<div ng-show="showBrowserShortcuts" id="browser-shortcuts">
-	  <h3> {% trans "Browser Defaults that should work" %}</h3>
-	  <table>
-	    <thead>
-	      <tr>
-		<th> {% trans "Action" %}</th>
-		<th> {% trans "Windows / Linux" %}</th>
-		<th> {% trans "OS X" %}</th>
-	      </tr>
-	    </thead>
-	    <tbody>
-	      <tr>
-		<td> {% trans "Jump to the next whole word" %}</td>
-		<td> {% trans "CTRL + RIGHT Arrow" %}</td>
-		<td> {% trans "ALT + RIGHT Arrow" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Jump to the previous whole word" %}</td>
-		<td> {% trans "CTRL + LEFT Arrow" %}</td>
-		<td> {% trans "ALT + LEFT Arrow" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Jump to the start of the subtitle" %}</td>
-		<td> {% trans "Fn + RIGHT Arrow" %}</td>
-		<td> {% trans "CMD + RIGHT Arrow" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Jump to the end of the subtitle" %}</td>
-		<td> {% trans "Fn + LEFT Arrow" %}</td>
-		<td> {% trans "CMD + LEFT Arrow" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Delete last complete word" %}</td>
-		<td> {% trans "CTRL + Backspace" %}</td>
-		<td> {% trans "CMD + Backspace" %}</td>
-	      </tr>
-	    </tbody>
-	  </table>
-	  <h3> {% trans "Proposed Shortcuts (not yet implemented)" %}</h3>
-	  <p>See the <a target="_blank" href="http://support.amara.org/categories/6573/forums/74605/topics/78937">Keyboard shortcuts forum page</a> to offer your opinion.</p>
-	  <table>
-	    <thead>
-	      <tr>
-		<th> {% trans "Action" %}</th>
-		<th> {% trans "Windows / Linux" %}</th>
-		<th> {% trans "OS X" %}</th>
-	      </tr>
-	    </thead>
-	    <tbody>
-	      <tr>
-		<td> {% trans "Insert subtitle (above)" %}</td>
-		<td> {% trans "Alt + i" %}</td>
-		<td> {% trans "Alt + i" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Insert subtitle (below)" %}</td>
-		<td> {% trans "Alt + Shift + i" %}</td>
-		<td> {% trans "Alt + Shift + i" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Delete current subtitle" %}</td>
-		<td> {% trans "Alt + Delete (or Backspace)" %}</td>
-		<td> {% trans "Alt + Delete (or Backspace)" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Navigate to the previous line" %}</td>
-		<td> {% trans "Alt + UP Arrow" %}</td>
-		<td> {% trans "Alt + UP Arrow" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Undo last action" %}</td>
-		<td> {% trans "CTRL + z" %}</td>
-		<td> {% trans "CMD + z" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Redo last action" %}</td>
-		<td> {% trans "CTRL + Shift + z" %}</td>
-		<td> {% trans "CMD + Shift + z" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Save a version" %}</td>
-		<td> {% trans "CTRL + s" %}</td>
-		<td> {% trans "CMD + s" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Italics formatting" %}</td>
-		<td> {% trans "CTRL + i" %}</td>
-		<td> {% trans "CMD + i" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Bold formatting" %}</td>
-		<td> {% trans "CTRL + b" %}</td>
-		<td> {% trans "CMD + b" %}</td>
-	      </tr>
-	      <tr>
-		<td> {% trans "Timeline toggle" %}</td>
-		<td> {% trans "CTRL + t" %}</td>
-		<td> {% trans "CMD + t" %}</td>
-	      </tr>
-	    </tbody>
-	  </table>
-	</div>
-      </div>
-      <footer class="buttons">
-	<button ng-click="dialogManager.onCloseClick($event)">
-	  {% trans "Close" %}
-	</button>
-      </footer>
-    </aside>
-    <aside modal-dialog="metadata" allow-close id="set-title-modal" class="modal" tabindex="-1" role="dialog" aria-labeledby="set-title-heading" ng-controller="SubtitleMetadataController" dir="[[ workingSubtitles.language.dir ]]">
-      <form>
-        <h3 id="set-title-heading">{% trans "Edit title and description" %}</h3>
-        <label>{% trans "Title" %}</label>
-        <textarea rows="1" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.getTitle() ]]</textarea>
-        <textarea rows="1" placeholder="{% trans 'Enter Title' %}" fixsize-bind="currentSubtitles.title"></textarea>
-        <div ng-repeat="(key, value) in currentSubtitles.metadata" ng-if="key == 'speaker-name'">
-          <label>[[ key | metadataTypeName ]]</label>
-          <textarea rows="1" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.metadata[key] ]]</textarea>
-          <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
-        </div>
-        <label>{% trans "Description" %}</label>
-        <textarea rows="4" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.getDescription() ]]</textarea>
-        <textarea rows="8" placeholder="{% trans 'Enter Description' %}" fixsize-bind="currentSubtitles.description"></textarea>
-        <div ng-repeat="(key, value) in currentSubtitles.metadata" ng-if="key != 'speaker-name'">
-          <label>[[ key | metadataTypeName ]]</label>
-          <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
-        </div>
-        <footer class="buttons">
-          <button ng-click="update(currentSubtitles)">Done</button>
-          <button ng-click="reset()">Cancel</button>
-        </footer>
-      </form>
-    </aside>
-
-    {% media_bundle "editor.js" %}
-    {# include bold style too #}
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <div id="modal-overlay" ng-class="dialogManager.overlayCSSClass()"></div>
-    <aside class="freeze-box" ng-class="dialogManager.freezeBoxCSSClass()">
-        <h1 ng-bind-html="dialogManager.freezeBoxText"></h1>
-    </aside>
-    <aside modal-dialog="generic" class="modal">
-        <h3>[[ dialogManager.generic.title ]]</h3>
-        <p ng-show="dialogManager.generic.text">[[ dialogManager.generic.text ]]</p>
-        <footer class="buttons">
-            <button ng-repeat="button in dialogManager.generic.buttons" ng-click="dialogManager.onButtonClicked(button, $event)" ng-class="button.cssClass">[[ button.text ]]</button>
-        </footer>
-    </aside>
-    {% if DEBUG %}
-    <aside modal-dialog='debug' allow-close class="modal">
-        <h3>{% trans "Debugging Tools" %}</h3>
-        <p>
-        <label>
-            <input type="checkbox" ng-model="overrides.forceSaveError"> Force Error on Save
-        </label>
-        </p>
-        <p>
-            <button ng-click="saveAutoBackup()">Save auto-backup</button>
-            <button ng-click="showIdleModal()">Idle dialog</button>
-            <button ng-click="showResumeSessionErrorModal()">Resume Session Error Dialog</button>
-        </p>
-        <footer class="buttons">
-            <button ng-click="dialogManager.onCloseClick($event)">Close</button>
-        </footer>
-    </aside>
-    {% endif %}
-    <div ng-controller="SaveErrorModalController">
-        <aside modal-dialog="save-error" class="modal">
-            <h3>{% trans "Error saving subtitles" %}</h3>
-            <ng-switch on="canUseBlobURL()">
-                <div ng-switch-when="true">
-                    <p>{% trans "There was an error saving your subtitles. Save your subtitles using the download button below and upload them to the system later." %}</p>
-                    <p>{% trans "To avoid data corruption, please do not open the or edit the subtitles in any text editor." %}</p>
-                </div>
-                <div ng-switch-when="false">
-                    <p>{% trans "There was an error saving your subtitles.  Copy the subtitles above and save them to your computer as subtitle_backup.dfxp. You can upload them later." %}</p>
-                    <textarea class="dfxp-string">[[ dfxpString ]]</textarea>
-                </div>
-            </ng-switch>
-            <footer class="buttons">
-                <button ng-if="canUseBlobURL()" ng-click="onDownload($event)">{% trans "Download Subtitles" %}
-                <button ng-click="onClose($event)">{% trans "Close Editor" %}
-            </footer>
+        <aside modal-dialog="guidelines" allow-close class="modal" role="dialog" id="guidelines-modal" tabindex="-1" aria-labeledby="guidelines-heading" dir="[[ workingSubtitles.language.dir ]]">
+          <ng-switch on="showTeamGuidelines()">
+            <h3 ng-switch-when="true">[[ teamName ]] Guidelines</h3>
+            <h3 id="guidelines-heading" ng-switch-when="false">{% trans "Amara Style Guidelines" %}</h3>
+          </ng-switch>
+          <div class="modal-content" ng-show="!teamGuidelines">
+            <table>
+              <tr>
+                <td>{% trans "Subtitle line length" %}</td>
+                <td>{% trans "Keep subtitle length to about 42 characters;" %}<br/>
+                  {% trans "avoid more than 2 lines per subtitle." %}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Minimum duration" %}</td>
+                <td>{% trans "Subtitles should not be less than 1 second." %}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Maximum duration" %}</td>
+                <td>{% trans "Split subtitles lasting more than 7 seconds." %}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Reading speed" %}</td>
+                <td>{% trans "8-25 characters/second is recommended;" %}<br/>
+                  {% trans "8-16 characters/second for children." %}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Sounds" %}</td>
+                <td>{% trans "Describe meaningful sounds that are relevant to the plot." %}<br/>
+                  {% trans "ex: (water dripping)" %}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Music" %}</td>
+                <td>{% trans "Describe relevant music which does not have relevant lyrics." %}<br/>
+                  {% trans "ex: ♪ (jazz music) ♪" %}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Speaker Identification" %}</td>
+                <td>{% trans "Use parenthesis to indicate when someone is speaking off-screen." %}<br/>
+                  {% trans "ex: (Michael) Wait for me!" %}</td>
+              </tr>
+            </table>
+            <a class="expand-link" href="" ng-click="showAdvancedGuidelines = true" ng-init="showAdvancedGuidelines=false" ng-show="!showAdvancedGuidelines">{% trans "Show Advanced Guidelines" %} &#x25B6;</a>
+            <a class="expand-link" href="" ng-click="showAdvancedGuidelines = false" ng-show="showAdvancedGuidelines">{% trans "Hide Advanced Guidelines" %} &#x25BC;</a>
+            <div ng-show="showAdvancedGuidelines" id="advanced-guidelines">
+              <table>
+                <tr>
+                  <td>{% trans "Translate the whole idea" %}</td>
+                  <td>{% trans "Translations don't need to be word for word. Look at the context." %}<br/>
+                    {% trans "Make sure you are using the correct punctuation for the whole unit of text." %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{% trans "Maximum timing offset" %}</td>
+                  <td>{% trans "Subtitles shouldn't start more than 0.5 seconds before or after the audio begins." %}</td>
+                </tr>
+                <tr>
+                  <td>{% trans "On-screen texts" %}</td>
+                  <td>{% trans "Translate the texts on the video that are relevant to the plot." %}</td>
+                </tr>
+                <tr>
+                  <td>{% trans "Use meaningful speech" %}</td>
+                  <td>{% trans "Exclude things like “um” “ah” and other disfluencies." %}</td>
+                </tr>
+                <tr>
+                  <td>{% trans "Indicate inaudible parts" %}</td>
+                  <td>{% trans "If the audio is inaudible, it should be marked as [inaudible]." %}</td>
+                </tr>
+                <tr>
+                  <td>{% trans "Lyrics" %}</td>
+                  <td>{% trans "Wrap relevant lyrics in musical notes." %}<br/>
+                    {% trans "ex ♪ Tell me dear Billy, ♪" %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{% trans "Speaker identification" %}</td>
+                  <td>{% trans "Identify off-screen and unclear speakers in parentheses." %}<br/>
+                    {% trans "ex: (Michael) Wait for me!" %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{% trans "Foreign language" %}</td>
+                  <td>{% trans "Identify relevant speech in foreign language. " %}<br/>
+                    {% trans "ex: (Russian): Thank you." %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{% trans "Simultaneous dialogue" %}</td>
+                  <td>{% trans "Used exclusively when two speakers talk in the same subtitle. " %}<br/>
+                    {% trans "Each speaker should have one line, and both lines should have an hyphen. " %}<br/>
+                    {% trans "- Sir, you are no gentleman." %}<br/>
+                    {% trans "- Rhett Butler: And you, Miss, are no lady." %}
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div class="modal-content" ng-show="teamGuidelines">
+            <div ng-show="teamTaskType() == 'subtitle'" ng-bind-html="teamGuidelines['subtitle']"></div>
+            <div ng-show="teamTaskType() == 'translate'" ng-bind-html="teamGuidelines['translate']"></div>
+            <div ng-show="teamTaskType() == 'review'" ng-bind-html="teamGuidelines['review']"></div>
+            <a class="expand-link" href="" ng-click="showAllTeamGuidelines = true"
+               ng-init="showAllTeamGuidelines=false" ng-show="!showAllTeamGuidelines">
+              {% trans "Show All Guidelines" %} &#x25B6;
+            </a>
+            <a class="expand-link" href="" ng-click="showAllTeamGuidelines = false"
+               ng-show="showAllTeamGuidelines">
+              {% trans "Hide All Guidelines" %} &#x25BC;
+            </a>
+            <div class="team-all-guidelines" ng-show="showAllTeamGuidelines" id="all-team-guidelines">
+              <h1>{% trans "Transcribing Guidelines" %}</h1>
+              <div ng-bind-html="teamGuidelines['subtitle']"></div>
+              <h1>{% trans "Translating Guidelines" %}</h1>
+              <div ng-bind-html="teamGuidelines['translate']"></div>
+              <h1>{% trans "Reviewing Guidelines" %}</h1>
+              <div ng-bind-html="teamGuidelines['review']"></div>
+            </div>
+          </div>
+          <footer class="buttons">
+            <button ng-click="dialogManager.onCloseClick($event)">
+              {% trans "Close" %}
+            </button>
+          </footer>
         </aside>
-
-	<aside modal-dialog="upload-subtitles" allow-close class="modal" tabindex="-1" role="dialog">
-	  <h3>{% trans 'Upload Subtitles' %}</h3>
-          <p>
-            {% blocktrans %}
-	    Uploading subtitles saves a new (incomplete) version that you can edit and save or complete when finished. Uploaded subtitles keep their existing timecodes. You can use the Copy timing option from the Tools menu if you want to apply timing from a reference language.
-            {% endblocktrans %}
-          </p>
-	  <p>
-            {% blocktrans %}
-	    Supported formats are: SRT, SSA, SBV, DFXP, TXT, and VTT. Only files ending with the correct extension, .srt, .ssa, .sbv, .txt, .vtt, .dfxp or .xml (for dfxp) are accepted.
-            {% endblocktrans %}
-          </p>
-	  <p class="error" ng-show="uploadError">
-	    {% trans "Upload failed. The file you uploaded might be invalid or an unsupported format." %}
-	  </p>
-	  <form method="post" id="upload-subtitles-form" action="{% url videos:upload_subtitles %}" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="hidden" name="video" value="{{ video.id }}" />
-            <div style="visibility: hidden">
-              {{ upload_subtitles_form.language_code }}
+        <aside modal-dialog="more-controls" allow-close class="modal" role="dialog" id="more-controls-modal" tabindex="-1" aria-labeledby="more-controls-heading" dir="[[ workingSubtitles.language.dir ]]">
+          <h3 id="more-controls-heading">{% trans "Keyboard Shortcuts" %}</h3>
+          <div class="modal-content">
+            <table>
+              <thead>
+                <tr>
+                  <th>{% trans "Action" %}</th>
+                  <th>{% trans "Windows / Linux" %}</th>
+                  <th>{% trans "OS X" %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td> {% trans "Play / Pause video" %}</td>
+                  <td> {% trans "Tab" %}</td>
+                  <td> {% trans "Tab" %}</td>
+                </tr>
+                <tr>
+                  <td> {% trans "Skip back 2 seconds" %}</td>
+                  <td> {% trans "Shift + Tab" %}</td>
+                  <td> {% trans "Shift + Tab" %}</td>
+                </tr>
+                <tr>
+                  <td> {% trans "Skip back 4 seconds" %}</td>
+                  <td> {% trans "Ctrl + Shift + ," %}</td>
+                  <td> {% trans "CMD + Shift + ," %}</td>
+                </tr>
+                <tr>
+                  <td> {% trans "Skip forward 4 seconds" %}</td>
+                  <td> {% trans "Ctrl + Shift + ." %}</td>
+                  <td> {% trans "CMD + Shift + ." %}</td>
+                </tr>
+                <tr>
+                  <td> {% trans "Navigate to the next subtitle" %}</td>
+                  <td> {% trans "ENTER" %}</td>
+                  <td> {% trans "ENTER" %}</td>
+                </tr>
+                <tr>
+                  <td> {% trans "Insert line break" %}</td>
+                  <td> {% trans "Shift + ENTER" %}</td>
+                  <td> {% trans "Shift + ENTER" %}</td>
+                </tr>
+                <tr>
+                  <td> {% trans "Delete empty subtitle" %}</td>
+                  <td> {% trans "ESC" %}</td>
+                  <td> {% trans "ESC" %}</td>
+                </tr>
+                <tr>
+                  <td> {% trans "Exit edit mode of current subtitle" %}</td>
+                  <td> {% trans "ESC" %}</td>
+                  <td> {% trans "ESC" %}</td>
+                </tr>
+              </tbody>
+            </table>
+            <a class="expand-link" href="" ng-click="showBrowserShortcuts = true" ng-init="showBrowserShortcuts=false" ng-show="!showBrowserShortcuts">{% trans "Show Browser Shortcuts" %} &#x25B6;</a>
+            <a class="expand-link" href="" ng-click="showBrowserShortcuts = false" ng-show="showBrowserShortcuts">{% trans "Hide Browser Shortcuts" %} &#x25BC;</a>
+            <div ng-show="showBrowserShortcuts" id="browser-shortcuts">
+              <h3> {% trans "Browser Defaults that should work" %}</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th> {% trans "Action" %}</th>
+                    <th> {% trans "Windows / Linux" %}</th>
+                    <th> {% trans "OS X" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td> {% trans "Jump to the next whole word" %}</td>
+                    <td> {% trans "CTRL + RIGHT Arrow" %}</td>
+                    <td> {% trans "ALT + RIGHT Arrow" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Jump to the previous whole word" %}</td>
+                    <td> {% trans "CTRL + LEFT Arrow" %}</td>
+                    <td> {% trans "ALT + LEFT Arrow" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Jump to the start of the subtitle" %}</td>
+                    <td> {% trans "Fn + RIGHT Arrow" %}</td>
+                    <td> {% trans "CMD + RIGHT Arrow" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Jump to the end of the subtitle" %}</td>
+                    <td> {% trans "Fn + LEFT Arrow" %}</td>
+                    <td> {% trans "CMD + LEFT Arrow" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Delete last complete word" %}</td>
+                    <td> {% trans "CTRL + Backspace" %}</td>
+                    <td> {% trans "CMD + Backspace" %}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h3> {% trans "Proposed Shortcuts (not yet implemented)" %}</h3>
+              <p>See the <a target="_blank" href="http://support.amara.org/categories/6573/forums/74605/topics/78937">Keyboard shortcuts forum page</a> to offer your opinion.</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th> {% trans "Action" %}</th>
+                    <th> {% trans "Windows / Linux" %}</th>
+                    <th> {% trans "OS X" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td> {% trans "Insert subtitle (above)" %}</td>
+                    <td> {% trans "Alt + i" %}</td>
+                    <td> {% trans "Alt + i" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Insert subtitle (below)" %}</td>
+                    <td> {% trans "Alt + Shift + i" %}</td>
+                    <td> {% trans "Alt + Shift + i" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Delete current subtitle" %}</td>
+                    <td> {% trans "Alt + Delete (or Backspace)" %}</td>
+                    <td> {% trans "Alt + Delete (or Backspace)" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Navigate to the previous line" %}</td>
+                    <td> {% trans "Alt + UP Arrow" %}</td>
+                    <td> {% trans "Alt + UP Arrow" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Undo last action" %}</td>
+                    <td> {% trans "CTRL + z" %}</td>
+                    <td> {% trans "CMD + z" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Redo last action" %}</td>
+                    <td> {% trans "CTRL + Shift + z" %}</td>
+                    <td> {% trans "CMD + Shift + z" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Save a version" %}</td>
+                    <td> {% trans "CTRL + s" %}</td>
+                    <td> {% trans "CMD + s" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Italics formatting" %}</td>
+                    <td> {% trans "CTRL + i" %}</td>
+                    <td> {% trans "CMD + i" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Bold formatting" %}</td>
+                    <td> {% trans "CTRL + b" %}</td>
+                    <td> {% trans "CMD + b" %}</td>
+                  </tr>
+                  <tr>
+                    <td> {% trans "Timeline toggle" %}</td>
+                    <td> {% trans "CTRL + t" %}</td>
+                    <td> {% trans "CMD + t" %}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div>
-              <input type="file" name="draft" id="subtitles-file-field" />
+          </div>
+          <footer class="buttons">
+            <button ng-click="dialogManager.onCloseClick($event)">
+              {% trans "Close" %}
+            </button>
+          </footer>
+        </aside>
+        <aside modal-dialog="metadata" allow-close id="set-title-modal" class="modal" tabindex="-1" role="dialog" aria-labeledby="set-title-heading" ng-controller="SubtitleMetadataController" dir="[[ workingSubtitles.language.dir ]]">
+          <form>
+            <h3 id="set-title-heading">{% trans "Edit title and description" %}</h3>
+            <label>{% trans "Title" %}</label>
+            <textarea rows="1" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.getTitle() ]]</textarea>
+            <textarea rows="1" placeholder="{% trans 'Enter Title' %}" fixsize-bind="currentSubtitles.title"></textarea>
+            <div ng-repeat="(key, value) in currentSubtitles.metadata" ng-if="key == 'speaker-name'">
+              <label>[[ key | metadataTypeName ]]</label>
+              <textarea rows="1" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.metadata[key] ]]</textarea>
+              <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
             </div>
-	    <footer class="buttons">
-	      <button ng-click="dialogManager.onCloseClick($event)">{% trans "Cancel" %}</button>
-	      <button ng-click="submitUploadForm($event)" class="upload-subtitles-submit-button-" ng-disabled="uploading">
-		<ng-switch on="uploading">
-		  <span ng-switch-when="true">
-		    {% trans "Uploading..." %}
-		  </span>
-		  <span ng-switch-default>
-		    {% trans "Upload" %}
-		  </span>
-		</ng-switch>
-	      </button>
-	    </footer>
+            <label>{% trans "Description" %}</label>
+            <textarea rows="4" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.getDescription() ]]</textarea>
+            <textarea rows="8" placeholder="{% trans 'Enter Description' %}" fixsize-bind="currentSubtitles.description"></textarea>
+            <div ng-repeat="(key, value) in currentSubtitles.metadata" ng-if="key != 'speaker-name'">
+              <label>[[ key | metadataTypeName ]]</label>
+              <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
+            </div>
+            <footer class="buttons">
+              <button ng-click="update(currentSubtitles)">Done</button>
+              <button ng-click="reset()">Cancel</button>
+            </footer>
           </form>
-	</aside>
-        <aside modal-dialog="resume-error" class="modal">
-        <h3>{% trans "Error resuming session" %}</h3>
-            <ng-switch on="canUseBlobURL()">
-                <div ng-switch-when="true">
-                    <p>{% trans "There was an error resuming your session. Save your subtitles using the download button below and upload them to the system later." %}</p>
-                    <p>{% trans "To avoid data corruption, please do not open the or edit the subtitles in any text editor." %}</p>
-                </div>
-                <div ng-switch-when="false">
-                    <p>{% trans "There was an error resuming your session.  Copy the subtitles above and save them to your computer as subtitle_backup.dfxp. You can upload them later." %}</p>
-                    <textarea class="dfxp-string">[[ dfxpString ]]</textarea>
-                </div>
-            </ng-switch>
+        </aside>
+
+        {% media_bundle "editor.js" %}
+        {# include bold style too #}
+        <link href='//fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <div id="modal-overlay" ng-class="dialogManager.overlayCSSClass()"></div>
+        <aside class="freeze-box" ng-class="dialogManager.freezeBoxCSSClass()">
+            <h1 ng-bind-html="dialogManager.freezeBoxText"></h1>
+        </aside>
+        <aside modal-dialog="generic" class="modal">
+            <h3>[[ dialogManager.generic.title ]]</h3>
+            <p ng-show="dialogManager.generic.text">[[ dialogManager.generic.text ]]</p>
             <footer class="buttons">
-                <button ng-if="canUseBlobURL()" ng-click="onDownload($event)">{% trans "Download Subtitles" %}
-                <button ng-click="onClose($event)">{% trans "Close Editor" %}
+                <button ng-repeat="button in dialogManager.generic.buttons" ng-click="dialogManager.onButtonClicked(button, $event)" ng-class="button.cssClass">[[ button.text ]]</button>
             </footer>
         </aside>
-    </div>
+        {% if DEBUG %}
+        <aside modal-dialog='debug' allow-close class="modal">
+            <h3>{% trans "Debugging Tools" %}</h3>
+            <p>
+            <label>
+                <input type="checkbox" ng-model="overrides.forceSaveError"> Force Error on Save
+            </label>
+            </p>
+            <p>
+                <button ng-click="saveAutoBackup()">Save auto-backup</button>
+                <button ng-click="showIdleModal()">Idle dialog</button>
+                <button ng-click="showResumeSessionErrorModal()">Resume Session Error Dialog</button>
+            </p>
+            <footer class="buttons">
+                <button ng-click="dialogManager.onCloseClick($event)">Close</button>
+            </footer>
+        </aside>
+        {% endif %}
+        <div ng-controller="SaveErrorModalController">
+            <aside modal-dialog="save-error" class="modal">
+                <h3>{% trans "Error saving subtitles" %}</h3>
+                <ng-switch on="canUseBlobURL()">
+                    <div ng-switch-when="true">
+                        <p>{% trans "There was an error saving your subtitles. Save your subtitles using the download button below and upload them to the system later." %}</p>
+                        <p>{% trans "To avoid data corruption, please do not open the or edit the subtitles in any text editor." %}</p>
+                    </div>
+                    <div ng-switch-when="false">
+                        <p>{% trans "There was an error saving your subtitles.  Copy the subtitles above and save them to your computer as subtitle_backup.dfxp. You can upload them later." %}</p>
+                        <textarea class="dfxp-string">[[ dfxpString ]]</textarea>
+                    </div>
+                </ng-switch>
+                <footer class="buttons">
+                    <button ng-if="canUseBlobURL()" ng-click="onDownload($event)">{% trans "Download Subtitles" %}
+                    <button ng-click="onClose($event)">{% trans "Close Editor" %}
+                </footer>
+            </aside>
 
-    {% include "_analytics.html" %}
+            <aside modal-dialog="upload-subtitles" allow-close class="modal" tabindex="-1" role="dialog">
+              <h3>{% trans 'Upload Subtitles' %}</h3>
+              <p>
+                {% blocktrans %}
+                Uploading subtitles saves a new (incomplete) version that you can edit and save or complete when finished. Uploaded subtitles keep their existing timecodes. You can use the Copy timing option from the Tools menu if you want to apply timing from a reference language.
+                {% endblocktrans %}
+              </p>
+              <p>
+                {% blocktrans %}
+                Supported formats are: SRT, SSA, SBV, DFXP, TXT, and VTT. Only files ending with the correct extension, .srt, .ssa, .sbv, .txt, .vtt, .dfxp or .xml (for dfxp) are accepted.
+                {% endblocktrans %}
+              </p>
+              <p class="error" ng-show="uploadError">
+                {% trans "Upload failed. The file you uploaded might be invalid or an unsupported format." %}
+              </p>
+              <form method="post" id="upload-subtitles-form" action="{% url videos:upload_subtitles %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="video" value="{{ video.id }}" />
+                <div style="visibility: hidden">
+                  {{ upload_subtitles_form.language_code }}
+                </div>
+                <div>
+                  <input type="file" name="draft" id="subtitles-file-field" />
+                </div>
+                <footer class="buttons">
+                  <button ng-click="dialogManager.onCloseClick($event)">{% trans "Cancel" %}</button>
+                  <button ng-click="submitUploadForm($event)" class="upload-subtitles-submit-button-" ng-disabled="uploading">
+                    <ng-switch on="uploading">
+                      <span ng-switch-when="true">
+                        {% trans "Uploading..." %}
+                      </span>
+                      <span ng-switch-default>
+                        {% trans "Upload" %}
+                      </span>
+                    </ng-switch>
+                  </button>
+                </footer>
+              </form>
+            </aside>
+            <aside modal-dialog="resume-error" class="modal">
+            <h3>{% trans "Error resuming session" %}</h3>
+                <ng-switch on="canUseBlobURL()">
+                    <div ng-switch-when="true">
+                        <p>{% trans "There was an error resuming your session. Save your subtitles using the download button below and upload them to the system later." %}</p>
+                        <p>{% trans "To avoid data corruption, please do not open the or edit the subtitles in any text editor." %}</p>
+                    </div>
+                    <div ng-switch-when="false">
+                        <p>{% trans "There was an error resuming your session.  Copy the subtitles above and save them to your computer as subtitle_backup.dfxp. You can upload them later." %}</p>
+                        <textarea class="dfxp-string">[[ dfxpString ]]</textarea>
+                    </div>
+                </ng-switch>
+                <footer class="buttons">
+                    <button ng-if="canUseBlobURL()" ng-click="onDownload($event)">{% trans "Download Subtitles" %}
+                    <button ng-click="onClose($event)">{% trans "Close Editor" %}
+                </footer>
+            </aside>
+        </div>
+
+        {% include "_analytics.html" %}
+    </div>
 </body>
 </html>
