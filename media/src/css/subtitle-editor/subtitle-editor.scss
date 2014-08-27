@@ -26,7 +26,10 @@ $CodePro: 'CodeProLC', $OpenSans;
  */
 
 
+$header-height: 38px;
+$top-section-height: 290px;
 $video-height: 258px;
+$timeline-height: 65px;
 $sync-help-height: 54px;
 $span-key-height: 32px;
 $text-color: #565758;
@@ -141,7 +144,7 @@ strong {
     font-weight: bold;
 }
 
-// Modules
+// Modals
 div.modal {
     background: rgba(black, .6);
     height: 100%;
@@ -191,34 +194,81 @@ div.modal {
     }
 }
 
-.column {
-    float: left;
+/* General page layout */
 
-    // Note: there's a bug in Chrome Linux that prevents proper rendering of
-    // percentage-based widths. See https://code.google.com/p/chromium/issues/detail?id=162117
-    //
-    // Thus, the following does not add up to 100%.
-    &.left {
-        min-width: 300px;
-        width: 37%;
+header.main {
+    position: absolute;
+    top: 0;
+    height: $header-height;
+    left: 0;
+    right: 0;
+}
+
+div.help-panel {
+    position: absolute;
+    top: $header-height;
+    height: $top-section-height - $header-height;
+    left: 0;
+    width: 37%;
+}
+
+div.video {
+    position: absolute;
+    top: 0;
+    height: $top-section-height;
+    left: 37%;
+    width: 37%;
+}
+
+div.steps-container {
+    position: absolute;
+
+    top: $header-height;
+    height: $top-section-height - $header-height;
+    left: 74%;
+    right: 0;
+}
+
+div.timeline {
+    position: absolute;
+    top: $top-section-height;
+    height: $timeline-height;
+    left: 0;
+    right: 0;
+}
+
+div.subtitle-area {
+    position: absolute;
+    top: $top-section-height;
+    bottom: 0;
+    width: 37%;
+
+    body.timeline-shown & {
+        top: $top-section-height + $timeline-height;
     }
-    &.center {
-        min-width: 300px;
-        width: 37%;
+
+    &.reference {
+        left: 0;
     }
-    &.right {
-        width: 26%;
+
+    &.work {
+        left: 37%;
+        @include box-shadow(0, 0, 20px, rgba(0, 0, 0, 0.23));
     }
 }
+
+
+/* Element styling */
+
 header.main {
     background: $dark-grey;
     border-bottom: 1px solid #474849;
     @include multi-box-shadow(0, -1px, 0, #151617, 0, 5px, 8px, #D7D8D9);
 
-    section.column {
-        height: 38px;
-    }
-    section.site {
+    div.site {
+        float: left;
+        width: 37%;
+
         h1 {
             color: #949596;
             font: normal 18px $CodePro;
@@ -248,26 +298,7 @@ header.main {
             }
         }
     }
-    section.video {
-        border-left: 1px solid #2B2C2D;
-        border-right: 1px solid #2B2C2D;
-        padding: 10px;
-
-        span.video-title {
-            color: #D0D1D2;
-            display: block;
-            font: normal 13px $OpenSans;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            width: 100%;
-            span.sep {
-                display: inline-block;
-                margin: 0 5px;
-            }
-        }
-    }
-    section.session {
+    div.session {
         text-align: right;
         background: black;
 
@@ -301,30 +332,6 @@ header.main {
         }
     }
 }
-section.main {
-    /*
-     * Don't ask.
-     *
-     * Actually, do.
-     * Do ask.
-     *
-     */
-    word-spacing: -3px;
-    * {
-        word-spacing: normal;
-    }
-
-    .column {
-        display: inline-block;
-        float: none;
-        vertical-align: top;
-    }
-}
-
-section.center {
-    @include box-shadow(0, 0, 20px, rgba(0, 0, 0, 0.23));
-}
-
 
 span.key {
     background: white;
@@ -688,11 +695,9 @@ div.subtitles {
 div.help-panel {
     color: $dark-grey;
     font-size: 12px;
-    height: 242px;
-    width: 87%;
     display: table;
-    margin: 10px 0px 0px 30px;
-    padding: 5px;
+    padding: 15px 70px 5px 35px;
+
     a {
         color: $text-color;
         font: normal 12px $OpenSans;
@@ -855,19 +860,17 @@ div.language-selections {
 }
 
 div.video {
-    height: 290px;
     position: relative;
-    // We move it upwards, covering the header
-    margin-top: -38px;
     background: none repeat scroll 0 0 $dark-grey;
+
     div.instructions-overlay {
         position: absolute;
         top: 0;
+        right: 0;
         left: 0;
+        bottom: 0;
         background: none repeat scroll 0 0 $dark-grey;
         opacity: 0.95;
-        width: 100%;
-        height: $video-height;
         display: block;
         div {
         ul {
@@ -1167,9 +1170,6 @@ div.workspace-tools {
 }
 
 div.steps-container {
-    height: 250px;
-    position: relative;
-
     ul.steps {
         left: 0;
         position: absolute;
@@ -1210,13 +1210,9 @@ div.steps-container {
 }
 
 // Timeline mode
-section.timeline {
+div.timeline {
     background: $dark-grey;
-    height: 65px;
     overflow: hidden;
-    position: absolute;
-    top: 290px;
-    width: 100%;
     z-index: 51;
     div.subtitle {
         background: #DADBDC;
@@ -1295,14 +1291,14 @@ section.timeline {
         background: #FC0D1B;
         content: "";
         display: block;
-        height: 65px;
+        height: $timeline-height;
         left: 50%;
         position: absolute;
         width: 1px;
         z-index: 54;
     }
     div.subtitles-container {
-        height: 65px;
+        height: $timeline-height;
         position: absolute;
         top: 0;
         width: 100%;
@@ -1322,13 +1318,8 @@ section.timeline {
         position: absolute;
         top: 0;
         left: 0;
-        height: 65px;
+        height: $timeline-height;
         width: 100px;
-    }
-}
-body.timeline-shown {
-    div.workspace-tools, div.language-selections {
-        margin-top: 65px;
     }
 }
 

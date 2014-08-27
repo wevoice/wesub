@@ -41,20 +41,19 @@
 <aside class="freeze-box" id="loading"><h1>{% trans "Loading subtitle editor&hellip;" %}</h1></aside>
 <div class="page ng-cloak" ng-cloak>
     {% include 'editor/header.html' %}
-    <section class="main">
-        <section class="left column">
-            {% include 'editor/help.html' %}
-            {% include 'editor/reference-subtitles.html' %}
-        </section>
-        <section class="center column">
-            {% include 'editor/video.html' %}
-            {% include 'editor/working-subtitles.html' %}
-        </section>
-        <section class="right column">
-            {% include 'editor/workflow.html' %}
-        </section>
-    </section>
+
+    {% include 'editor/help.html' %}
+    {% include 'editor/video.html' %}
+    {% include 'editor/workflow.html' %}
+
     {% include 'editor/timeline.html' %}
+
+    <div class="subtitle-area reference">
+        {% include 'editor/reference-subtitles.html' %}
+    </div>
+    <div class="subtitle-area work">
+        {% include 'editor/working-subtitles.html' %}
+    </div>
 </div>
 {% include 'editor/dialogs.html' %}
 {% media_bundle "editor.js" %}

@@ -1,4 +1,4 @@
-<section ng-controller="TimelineController" class="timeline" ng-show="timelineShown">
+<div ng-controller="TimelineController" class="timeline" ng-show="timelineShown">
     <div class="current-time-marker"></div>
     <canvas class="timing" width="100" height="65" timeline-timing></canvas>
     <div timeline-subtitles class="subtitles-container" dir="{{ language.dir }}">
@@ -8,4 +8,4 @@
             <span class="handle left"></span><span class="upcomingUnsyncedSubtitleText"></span>
         </div>
     </div>
-</section>
+</div>
