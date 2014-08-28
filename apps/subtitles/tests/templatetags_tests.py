@@ -15,18 +15,20 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
+
+from __future__ import absolute_import
+
 from django.test import TestCase
 from subtitles.pipeline import  add_subtitles
 from subtitles.templatetags.new_subtitles_tags import visibility_display
-from subtitles.tests.utils import (
-    make_video, make_subtitle_set
-)
+
+from utils.factories import *
 
 class TestVisibilityDisplay(TestCase):
 
     def setUp(self):
-        video = make_video()
-        sset = make_subtitle_set('en', 10)
+        video = TeamVideoFactory().video
+        sset = SubtitleSetFactory(num_subs=10)
         self.sv = add_subtitles(video, 'en', subtitles=sset)
 
     def test_public(self):
