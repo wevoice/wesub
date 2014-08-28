@@ -25,9 +25,7 @@ var angular = angular || null;
      * App-level Workflow object
      */
 
-    Workflow = function(subtitleList, translating) {
-	this.translating = translating;
-	this.showOverlay = true;
+    Workflow = function(subtitleList) {
         var self = this;
         this.subtitleList = subtitleList;
         if(this.subtitleList.isComplete()) {
@@ -43,9 +41,6 @@ var angular = angular || null;
     }
 
     Workflow.prototype = {
-	appActionDone: function(){
-           this.showOverlay = false;
-	},
         switchStage: function(newStage) {
             this.stage = newStage;
         },
@@ -83,8 +78,13 @@ var angular = angular || null;
 
     module.controller('WorkflowProgressionController', ["$scope", "$sce", "EditorData", "VideoPlayer", function($scope, $sce, EditorData, VideoPlayer) {
 
-        $scope.$root.$on("video-playback-changes", function() {$scope.workflow.appActionDone();});
-        $scope.$root.$on("app-click", function() {$scope.workflow.appActionDone();});
+        $scope.showOverlay = true;
+        $scope.$root.$on("video-playback-changes", function() {
+            $scope.showOverlay = false;
+        });
+        $scope.$root.$on("app-click", function() {
+            $scope.showOverlay = false;
+        });
 
         // If a blank list of subs start, we autimatically start edition
         if ($scope.workflow.subtitleList.length() == 0) {
@@ -94,9 +94,6 @@ var angular = angular || null;
 
         var notATask = !EditorData.task_needs_pane;
 
-        $scope.showOverlay = function() {
-            return (notATask && $scope.workflow.showOverlay);
-        }
 
         function rewindPlayback() {
             VideoPlayer.pause();

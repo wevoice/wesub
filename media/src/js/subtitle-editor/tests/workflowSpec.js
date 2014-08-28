@@ -4,11 +4,6 @@ function insertSyncedAndCompletedSubtitle(subtitleList) {
     subtitleList.updateSubtitleTime(sub, 500, 1000);
 }
 
-function makeWorkflow(Workflow, subtitleList) {
-    var translatingSpy = jasmine.createSpy().andReturn(false);
-    return new Workflow(subtitleList, translatingSpy);
-}
-
 
 describe('The Workflow class', function() {
     var subtitleList = null;
@@ -23,7 +18,7 @@ describe('The Workflow class', function() {
     beforeEach(inject(function(SubtitleList, Workflow) {
         subtitleList = new SubtitleList();
         subtitleList.loadEmptySubs('en');
-        workflow = makeWorkflow(Workflow, subtitleList);
+        workflow = new Workflow(subtitleList);
     }));
 
     it('starts in the type stage', function() {
@@ -56,7 +51,6 @@ describe('The Workflow class', function() {
     it('can move past the title stage at any point', function() {
         workflow.switchStage('sync');
         insertSyncedAndCompletedSubtitle(subtitleList);
-        workflow.translating.andReturn(true);
         workflow.switchStage('title');
         expect(workflow.canMoveToNext()).toBeTruthy();
     });
@@ -96,7 +90,7 @@ describe('The Workflow class', function() {
         var sub = subtitleList.insertSubtitleBefore(null);
         subtitleList.updateSubtitleContent(sub, 'sub text');
         subtitleList.updateSubtitleTime(sub, 100, 200);
-        workflow = makeWorkflow(Workflow, subtitleList);
+        workflow = new Workflow(subtitleList);
         expect(workflow.stage).toBe('review');
     }));
 });
@@ -125,7 +119,7 @@ describe('WorkflowProgressionController', function() {
         };
         subtitleList.loadEmptySubs('en');
         $scope.workingSubtitles = { subtitleList: subtitleList };
-        $scope.workflow = makeWorkflow(Workflow, subtitleList);
+        $scope.workflow = new Workflow(subtitleList);
         spyOn($scope, '$emit');
         $controller('WorkflowProgressionController', {
             $scope: $scope,
