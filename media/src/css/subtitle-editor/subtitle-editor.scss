@@ -1228,6 +1228,14 @@ div.workflow {
         margin: 0;
     }
 
+    a {
+        color: $blue;
+        &.visited {
+            color: $blue;
+        }
+
+    }
+
     .actions {
         padding-left: 26px;
 

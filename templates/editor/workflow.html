@@ -42,10 +42,10 @@
         <li ng-class="workflow.stageCSSClass('review')">
             <div class="content">
                 <h3>{% trans "Review" %}</h3>
-                <p>{% trans "Check all work, check/translate title and description" %}</p>
-                <button class="edit-metadata">
-                    {% trans "edit title and description" %}
-                </button>
+                <p>
+                    {% trans "Check all work." %}
+                    <a href="#" ng-click="onEditTitleClicked($event)">{% trans "Edit title and description." %}</a>
+                </p>
             </div>
         </li>
 

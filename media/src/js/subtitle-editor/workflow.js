@@ -90,6 +90,12 @@ var angular = angular || null;
             $scope.showOverlay = false;
         });
 
+        $scope.onEditTitleClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dialogManager.open('metadata');
+        }
+
         // If a blank list of subs start, we automatically start editing
         if ($scope.workflow.subtitleList.length() == 0) {
             var newSub = $scope.workflow.subtitleList.insertSubtitleBefore(null);
