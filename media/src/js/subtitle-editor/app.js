@@ -21,7 +21,6 @@ var angular = angular || null;
 
     var module = angular.module('amara.SubtitleEditor', [
         'amara.SubtitleEditor.blob',
-        'amara.SubtitleEditor.collab',
         'amara.SubtitleEditor.help',
         'amara.SubtitleEditor.modal',
         'amara.SubtitleEditor.dom',
