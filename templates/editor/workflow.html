@@ -50,9 +50,19 @@
         </li>
 
     </ul>
-    <div class="actions">
-        <button ng-disabled="workflow.stage != 'review'" class="endorse" ng-click="session.endorse()">
-            {% trans "Publish" %}
-        </button>
+    <div ng-switch="taskButtons">
+        <div ng-switch-when="false" class="actions">
+            <button ng-disabled="workflow.stage != 'review'" class="endorse" ng-click="session.endorse()">
+                {% trans "Publish" %}
+            </button>
+        </div>
+        <div ng-switch-when="true" class="actions">
+            <button ng-click="session.rejectTask()">
+                {% trans "Send Back" %}
+            </button>
+            <button ng-disabled="workflow.stage != 'review'" class="endorse" ng-click="session.approveTask()">
+                {% trans "Approve" %}
+            </button>
+        </div>
     </div>
 </div>

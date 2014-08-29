@@ -139,6 +139,10 @@ var angular = angular || null;
             rewindPlayback();
         });
 
+        // Hack to make task buttons work, we should replace this when #1667
+        // is implemented
+        $scope.taskButtons = Boolean(EditorData.task_needs_pane);
+
     }]);
 
 
