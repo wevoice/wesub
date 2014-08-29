@@ -169,7 +169,7 @@ var angular = angular || null;
             },
             endorse: function() {
                 $scope.dialogManager.showFreezeBox(
-                        $sce.trustAsHtml('Completing subtitles&hellip;'));
+                        $sce.trustAsHtml('Publishing subtitles&hellip;'));
                 if(EditorData.task_id) {
                     var promise = saveSubtitles(true)
                         .then($scope.sessionBackend.approveTask);

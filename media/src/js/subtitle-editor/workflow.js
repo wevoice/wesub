@@ -26,51 +26,55 @@ var angular = angular || null;
      */
 
     Workflow = function(subtitleList) {
-        var self = this;
         this.subtitleList = subtitleList;
+        this.stageOrder = [ 'typing', 'syncing', 'review' ];
         if(this.subtitleList.isComplete()) {
             this.stage = 'review';
         } else {
-            this.stage = 'type';
+            this.stage = 'typing';
         }
-        this.subtitleList.addChangeCallback(function() {
-            if(self.stage == 'review' && !self.subtitleList.isComplete()) {
-                self.stage = 'sync';
-            }
-        });
     }
 
     Workflow.prototype = {
-        switchStage: function(newStage) {
-            this.stage = newStage;
-        },
-        canMoveToNext: function() {
-            switch(this.stage) {
-                case 'type':
-                    return true;
-                    
-                case 'sync':
-                    return this.subtitleList.isComplete();
-
-                case 'title':
-                    return true;
-
-                case 'review':
-                    return false;
-
-                default:
-                    throw "invalid value for Workflow.stage: " + this.stage;
+        stageIndex: function(stage) {
+            var stageIndex = this.stageOrder.indexOf(stage);
+            if(stageIndex == -1) {
+                throw "invalid stage: " + stage;
             }
+            return stageIndex;
         },
-        stageDone: function(stageName) {
-            if(stageName == 'type') {
-                return (this.stage == 'review' || this.stage == 'title' || this.stage == 'sync');
-            } else if(stageName == 'sync') {
-                return this.stage == 'review';
-            } else if(stageName == 'title') {
-                return (this.stage == 'review' || this.stage == 'sync');
+        stageCSSClass: function(stage) {
+            return this.stage == stage ? 'active' : 'inactive';
+        },
+        canCompleteStage: function(stage) {
+            if(stage == 'typing') {
+                return (this.subtitleList.length() > 0 &&
+                        !this.subtitleList.needsAnyTranscribed());
+            } else if(stage == 'syncing') {
+                return this.subtitleList.isComplete();
             } else {
                 return false;
+            }
+        },
+        typingCheckboxChanged: function(checked) {
+            if(checked) {
+                this.stage = 'syncing';
+            } else {
+                this.stage = 'typing';
+            }
+        },
+        syncingCheckboxChanged: function(checked) {
+            if(checked) {
+                this.stage = 'review';
+            } else {
+                this.stage = 'syncing';
+            }
+        },
+        checkSubtitleListChanges: function() {
+            if(this.stage != 'typing' && this.subtitleList.length() == 0) {
+                this.stage = 'typing';
+            } else if(this.stage == 'review' && !this.subtitleList.isComplete()) {
+                this.stage = 'syncing';
             }
         },
     }
@@ -86,47 +90,55 @@ var angular = angular || null;
             $scope.showOverlay = false;
         });
 
-        // If a blank list of subs start, we autimatically start edition
+        // If a blank list of subs start, we automatically start editing
         if ($scope.workflow.subtitleList.length() == 0) {
             var newSub = $scope.workflow.subtitleList.insertSubtitleBefore(null);
             $scope.currentEdit.start(newSub);
         }
+        $scope.workflow.subtitleList.addChangeCallback(function() {
+            $scope.workflow.checkSubtitleListChanges();
+            $scope.setCheckboxesForWorkflowStage();
 
-        var notATask = !EditorData.task_needs_pane;
-
+        });
 
         function rewindPlayback() {
             VideoPlayer.pause();
             VideoPlayer.seek(0);
         }
 
-        $scope.onNextClicked = function(evt) {
-            if ($scope.workflow.stage == 'title') {
-                $scope.workflow.switchStage('sync');
-                if(!$scope.timelineShown) {
-                    $scope.toggleTimelineShown();
-                }
-                rewindPlayback();
-	    }
-	    else if ($scope.workflow.stage == 'sync') {
-                $scope.workflow.switchStage('review');
-                rewindPlayback();
+        $scope.setCheckboxesForWorkflowStage = function() {
+            if($scope.workflow.stage == 'review') {
+                $scope.typingChecked = $scope.syncingChecked = true;
+            } else if($scope.workflow.stage == 'syncing') {
+                $scope.typingChecked = true;
+                $scope.syncingChecked = false;
+            } else if($scope.workflow.stage == 'typing') {
+                $scope.typingChecked = $scope.syncingChecked = false;
             }
-	    else if ($scope.workflow.stage == 'type') {
-		if ($scope.translating()) {
-                    $scope.dialogManager.open('metadata');
-                    $scope.workflow.switchStage('title');
-                } else {
-                    $scope.workflow.switchStage('sync');
-                    if(!$scope.timelineShown) {
-                        $scope.toggleTimelineShown();
-                    }
-                }
-                rewindPlayback();
-            }
-            evt.preventDefault();
-            evt.stopPropagation();
         }
+        $scope.setCheckboxesForWorkflowStage();
+
+        $scope.typingCheckboxChanged = function() {
+            if(!$scope.typingChecked && $scope.syncingChecked) {
+                $scope.syncingChecked = false;
+            }
+            $scope.workflow.typingCheckboxChanged($scope.typingChecked);
+        }
+
+        $scope.syncingCheckboxChanged = function() {
+            if(!$scope.typingChecked && $scope.syncingChecked) {
+                $scope.typingChecked = true;
+            }
+            $scope.workflow.syncingCheckboxChanged($scope.syncingChecked);
+        }
+
+        $scope.$watch('workflow.stage', function(newStage) {
+            if(newStage == 'syncing' && !$scope.timelineShown) {
+                $scope.toggleTimelineShown();
+            }
+            rewindPlayback();
+        });
+
     }]);
 
 

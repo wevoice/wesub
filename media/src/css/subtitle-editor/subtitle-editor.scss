@@ -220,7 +220,7 @@ div.video {
     width: 37%;
 }
 
-div.steps-container {
+div.workflow {
     position: absolute;
 
     top: $header-height;
@@ -1169,41 +1169,80 @@ div.workspace-tools {
     }
 }
 
-div.steps-container {
-    ul.steps {
-        left: 0;
-        position: absolute;
-        bottom: 0;
+div.workflow {
+    li {
+        border-bottom: 1px solid #DADBDC;
+        padding: 12px 10px;
+        position: relative;
 
-        > li {
-            border-bottom: 1px solid #DADBDC;
+        &.active {
+
             color: #313233;
-            font-size: 14px;
-            padding: 12px 0 12px 10px;
-            max-width: 250px;
 
-            div.substeps {
-                margin: 10px 0 0 16px;
-                p {
-                    color: #767879;
-                    font-size: 11px;
-                }
-                button {
-                    @include big-button;
-                    margin-top: 10px;
-                    &.endorse {
-                        background: $light-blue url('../images/thumbs-up.png') 10px center no-repeat;
-                        padding-left: 40px;
-                    }
-                }
+            h3 {
+                color: #222;
             }
 
-            &.done {
-                background: transparent url('../images/checkmark.gif') center right no-repeat;
-                color: #949596;
+            p {
+                color: #767879;
             }
-            &:last-of-type {
-                border-bottom: 0;
+        }
+
+        &.inactive {
+            color: #767879;
+
+            p, .stats, button.edit-metadata {
+                visibility: hidden;
+            }
+        }
+
+        &:last-of-type {
+            .content {
+                margin-left: 26px;
+            }
+        }
+    }
+
+    input[type=checkbox] {
+        float: left;
+        height: 16px;
+        width: 16px;
+        margin: 3px 10px 0 0;
+    }
+
+    .content {
+        overflow: hidden; // Create a block formatting context
+    }
+
+    h3 {
+        font-size: 16px;
+        line-height: 1.2em;
+        margin-bottom: 0.3em;
+
+    }
+
+    .stats, button.edit-metadata {
+        position: absolute;
+        top: 12px;
+        right: 10px;
+        margin: 0;
+    }
+
+    .actions {
+        padding-left: 26px;
+
+        button {
+            @include big-button;
+            margin-top: 10px;
+            &.endorse {
+                background: $light-blue url('../images/thumbs-up.png') 10px center no-repeat;
+                padding-left: 40px;
+            }
+
+            &[disabled] {
+                background-color: $semi-dark-grey;
+                border-color: $semi-dark-grey;
+                cursor: default;
             }
         }
     }

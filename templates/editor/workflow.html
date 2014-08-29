@@ -1,67 +1,58 @@
 {% load i18n %}
-<div class="steps-container"
-    ng-controller="WorkflowProgressionController">
-    <ul class="steps">
-        <li ng-class="{done: workflow.stageDone('type')}">
-        {% trans "1. Type what you hear" %}
-        <div class="substeps" ng-show="workflow.stage == 'type'">
-            <p>{% trans "Is all the content subtitled?" %}</p>
-            <button class="next-step" ng-click="onNextClicked($event)">
-                <ng-switch on="translating()">
-                <div ng-switch-when="true">{% trans "Yes, translate the title" %}</div>
-                <div ng-switch-when="false">{% trans "Yes, start syncing" %}</div>
-                </ng-switch>
-            </button>
-        </div>
+<div class="workflow" ng-controller="WorkflowProgressionController">
+    <ul>
+        <li ng-class="workflow.stageCSSClass('typing')">
+            <input type="checkbox" ng-model="typingChecked"
+               id="workflow-typing-checkbox"
+               ng-disabled="!workflow.canCompleteStage('typing')"
+               ng-change="typingCheckboxChanged()"
+            />
+            <div class="content">
+                <label for="workflow-typing-checkbox">
+                    <h3>{% trans "Typing" %}</h3>
+                </label>
+                <p>{% trans "Create subtitles for all video content" %}</p>
+            </div>
+            <span class="stats">
+                {% blocktrans with "[[ workflow.subtitleList.length() ]]" as count %}
+                subtitle count: {{ count }}
+                {% endblocktrans %}
+            </span>
         </li>
-        <li ng-show="translating()" ng-class="{done: workflow.stageDone('title')}">
-        {% trans "2. Translate title" %}
-        <div class="substeps"
-            ng-show="workflow.stage == 'title'">
-            <ng-switch on="workflow.canMoveToNext()">
-            <p ng-switch-when="false">
-            {% trans "Title and description were not edited yet." %}
-            </p>
-            <div ng-switch-when="true">
-                <p>{% trans "Title and description have been edited." %}</p>
-                <button class="next-step" ng-click="onNextClicked($event)">
-                    {% trans "Start syncing" %}
+
+        <li ng-class="workflow.stageCSSClass('syncing')">
+            <input type="checkbox" ng-model="syncingChecked"
+               id="workflow-syncing-checkbox"
+               ng-disabled="!workflow.canCompleteStage('syncing')"
+               ng-change="syncingCheckboxChanged()"
+            />
+            <div class="content">
+                <label for="workflow-syncing-checkbox">
+                    <h3>{% trans "Syncing" %}</h3>
+                </label>
+                <p>{% trans "Add timings for all subtitles" %}</p>
+            </div>
+            <span class="stats">
+                {% blocktrans with "[[ workflow.subtitleList.syncedCount]]" as count and "[[ workflow.subtitleList.length() ]]" as total %}
+                synced subtitles: {{ count }} / {{ total }}
+                {% endblocktrans %}
+            </span>
+        </li>
+
+        <li ng-class="workflow.stageCSSClass('review')">
+            <div class="content">
+                <h3>{% trans "Review" %}</h3>
+                <p>{% trans "Check all work, check/translate title and description" %}</p>
+                <button class="edit-metadata">
+                    {% trans "edit title and description" %}
                 </button>
             </div>
-            </ng-switch>
-        </div>
         </li>
-        <li ng-class="{done: workflow.stageDone('sync')}">
-        <ng-switch on="translating()">
-        <div ng-switch-when="false">{% trans "2. Sync Timing" %}</div>
-        <div ng-switch-when="true">{% trans "3. Sync Timing" %}</div>
-        </ng-switch>
-        <div class="substeps" ng-show="workflow.stage == 'sync'">
-            <ng-switch on="workflow.canMoveToNext()">
-            <p ng-switch-when="false">
-            {% trans "Not all lines are completed." %}
-            </p>
-            <div ng-switch-when="true">
-                <p>{% trans "All lines are completed." %}</p>
-                <button ng-click="onNextClicked($event)">
-                    {% trans "Start reviewing" %}
-                </button>
-            </div>
-            </ng-switch>
-        </div>
-        </li>
-        <li>
-        <ng-switch on="translating()">
-        <div ng-switch-when="false">{% trans "3. Review and complete" %}</div>
-        <div ng-switch-when="true">{% trans "4. Review and complete" %}</div>
-        </ng-switch>
-        <div class="substeps"
-            ng-show="workflow.stage == 'review'">
-            <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}</p>
-            <button class="endorse" ng-click="session.endorse()">
-                {% trans "Complete" %}
-            </button>
-        </div>
-        </li>
+
     </ul>
+    <div class="actions">
+        <button ng-disabled="workflow.stage != 'review'" class="endorse" ng-click="session.endorse()">
+            {% trans "Publish" %}
+        </button>
+    </div>
 </div>
