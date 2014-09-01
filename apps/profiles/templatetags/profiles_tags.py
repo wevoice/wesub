@@ -38,11 +38,20 @@ def require_email_dialog(context):
     return context
 
 @register.inclusion_tag('profiles/_select_language_dialog.html', takes_context=True)
-def select_language_dialog(context, option=None, hide_link=False, redirect=None):
+def select_language_dialog(context, option=None, hide_link=False, redirect=None, display_only=False, show_current=False):
+
+    user_langs = get_user_languages_from_request(context['request'], readable=True)
+    current = {}
+
+    for i, l in enumerate(user_langs):
+        current['language%s' % (i+1)] = l
+
     return {
+        'current': current,
         'force_ask': (option == 'force') and _user_needs_languages(context),
         'hide_link': hide_link,
         'redirect': redirect,
+        'show_current': show_current,
         'request':context['request']
     }
 

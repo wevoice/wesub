@@ -27,6 +27,17 @@
             </div>
         </fieldset>
 
+	<h3>{% trans "Languages you can caption or translate" %}</h3>
+	<fieldset>
+	  <div>
+	    <a href="#" data-modal="language_modal" id="lang_select_btn">{% trans "Specify or update your languages" %}</a>
+	  </div>
+	  <div>
+	    {% block select_language_dialog %}
+	    {% select_language_dialog hide_link="True" show_current="True" %}
+	    {% endblock %}
+	  </div>
+	</fieldset>
         <h3>{% trans "About you" %}</h3>
         <div class="grid_4 alpha">
             <fieldset>
@@ -57,25 +68,12 @@
             </fieldset>             
         </div>
 
-
         <div class="submit">
             <button class="button save" type="submit" value="Save">
                 {% trans 'Save Changes' %}
             </button>
         </div>
     </form>
-    <hr>
-    <div id="language_profile">
-      <h3>{% trans "Enter or confirm your language skills" %}</h3>
-      {% block select_language_form %}
-      {% select_language_form %}
-      {% endblock %}
-      <div class="submit">
-	<button class="submit_button button save">
-	  {% trans 'Save Changes' %}
-      </button>
-      </div>
-    </div>
 
 {% endblock %}
 

@@ -575,7 +575,6 @@ var Site = function(Site) {
                 if (cookies_are_enabled()) {
 		    var $w = $('#language_modal, #apply-modal, #language_profile');
 		    [$('#language_modal'), $('#apply-modal'), $('#language_profile')].forEach(function($w) {
-			console.log($w);
                         if($w.length)
                             $w.find('.submit_button').click(function() {
                                 var values = {};

@@ -3100,3 +3100,9 @@ a.truncated-expand {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.v1 .current-languages {
+    padding-top: 30px;
+    span {
+        padding-right: 15px;
+    }
+}

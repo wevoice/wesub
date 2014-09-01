@@ -60,7 +60,7 @@ def get_language_label(code):
     return u'%s' % _(lc.name())
 
 
-def get_user_languages_from_request(request):
+def get_user_languages_from_request(request, readable=False):
     """Return a list of our best guess at languages that request.user speaks."""
     languages = []
 
@@ -69,8 +69,10 @@ def get_user_languages_from_request(request):
 
     if not languages:
         languages = languages_from_request(request)
-
-    return _only_supported_languages(languages)
+    if readable:
+        return map(get_language_label, _only_supported_languages(languages))
+    else:
+        return _only_supported_languages(languages)
 
 def set_user_languages_to_cookie(response, languages):
     max_age = 60*60*24

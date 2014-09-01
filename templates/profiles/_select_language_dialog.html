@@ -12,7 +12,16 @@
     window.LANGUAGE_SELECT_ERROR = '{% trans "Select at least one language." %}';
     window.LANGUAGE_SELECT_SAVING = '{% trans "Saving your language settings..." %}';
 </script>
-
+{% if show_current and current.language1 or current.language2 or current.language3 or current.language4 or current.language5 or current.language6 %}
+<div class="current-languages">
+  <span>{{ current.language1 }}</span>
+  <span>{{ current.language2 }}</span>
+  <span>{{ current.language3 }}</span>
+  <span>{{ current.language4 }}</span>
+  <span>{{ current.language5 }}</span>
+  <span>{{ current.language6 }}</span>
+</div>
+{% endif %}
 <div id="language_modal" style="display: none" class="clearfix bootstrap">
     <div class="modal" style="display: block;">
         <div class="modal-header">
