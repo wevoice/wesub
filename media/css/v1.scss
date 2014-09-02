@@ -3106,3 +3106,8 @@ a.truncated-expand {
         padding-right: 15px;
     }
 }
+
+.v1 #apply-modal.modal {
+    overflow: auto;
+    max-height: 750px;
+}
