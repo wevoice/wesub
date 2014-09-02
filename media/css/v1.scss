@@ -3111,3 +3111,8 @@ a.truncated-expand {
     overflow: auto;
     max-height: 750px;
 }
+
+.v1 div.jGrowl {
+    // Default value is smaller than bootstrap modal
+    z-index: 12000;
+}
