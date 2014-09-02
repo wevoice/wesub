@@ -56,26 +56,9 @@ var angular = angular || null;
                 return false;
             }
         },
-        typingCheckboxChanged: function(checked) {
-            if(checked) {
-                this.stage = 'syncing';
-            } else {
-                this.stage = 'typing';
-            }
-        },
-        syncingCheckboxChanged: function(checked) {
-            if(checked) {
-                this.stage = 'review';
-            } else {
-                this.stage = 'syncing';
-            }
-        },
-        checkSubtitleListChanges: function() {
-            if(this.stage != 'typing' && this.subtitleList.length() == 0) {
-                this.stage = 'typing';
-            } else if(this.stage == 'review' && !this.subtitleList.isComplete()) {
-                this.stage = 'syncing';
-            }
+        completeStage: function(stage) {
+            var stageIndex = this.stageOrder.indexOf(stage);
+            this.stage = this.stageOrder[stageIndex+1];
         },
     }
     module.value('Workflow', Workflow);
@@ -101,41 +84,10 @@ var angular = angular || null;
             var newSub = $scope.workflow.subtitleList.insertSubtitleBefore(null);
             $scope.currentEdit.start(newSub);
         }
-        $scope.workflow.subtitleList.addChangeCallback(function() {
-            $scope.workflow.checkSubtitleListChanges();
-            $scope.setCheckboxesForWorkflowStage();
-
-        });
 
         function rewindPlayback() {
             VideoPlayer.pause();
             VideoPlayer.seek(0);
-        }
-
-        $scope.setCheckboxesForWorkflowStage = function() {
-            if($scope.workflow.stage == 'review') {
-                $scope.typingChecked = $scope.syncingChecked = true;
-            } else if($scope.workflow.stage == 'syncing') {
-                $scope.typingChecked = true;
-                $scope.syncingChecked = false;
-            } else if($scope.workflow.stage == 'typing') {
-                $scope.typingChecked = $scope.syncingChecked = false;
-            }
-        }
-        $scope.setCheckboxesForWorkflowStage();
-
-        $scope.typingCheckboxChanged = function() {
-            if(!$scope.typingChecked && $scope.syncingChecked) {
-                $scope.syncingChecked = false;
-            }
-            $scope.workflow.typingCheckboxChanged($scope.typingChecked);
-        }
-
-        $scope.syncingCheckboxChanged = function() {
-            if(!$scope.typingChecked && $scope.syncingChecked) {
-                $scope.typingChecked = true;
-            }
-            $scope.workflow.syncingCheckboxChanged($scope.syncingChecked);
         }
 
         $scope.$watch('workflow.stage', function(newStage) {
@@ -148,7 +100,6 @@ var angular = angular || null;
         // Hack to make task buttons work, we should replace this when #1667
         // is implemented
         $scope.taskButtons = Boolean(EditorData.task_needs_pane);
-
     }]);
 
 

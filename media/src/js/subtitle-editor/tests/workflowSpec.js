@@ -36,6 +36,7 @@ describe('The Workflow class', function() {
     });
 
     it('can complete the syncing stage once subs are complete and synced', function() {
+        workflow.stage = 'syncing';
         expect(workflow.canCompleteStage('syncing')).toBeFalsy();
 
         var sub = subtitleList.insertSubtitleBefore(null);
@@ -48,73 +49,30 @@ describe('The Workflow class', function() {
         expect(workflow.canCompleteStage('syncing')).toBeTruthy();
     });
 
+    it('moves to the syncing stage after typing', function() {
+        var sub = subtitleList.insertSubtitleBefore(null);
+        subtitleList.updateSubtitleContent(sub, 'content');
+        subtitleList.updateSubtitleTime(sub, 500, 1000);
+
+        workflow.completeStage('typing');
+        expect(workflow.stage).toEqual('syncing');
+    });
+
+    it('moves to the review stage after syncing', function() {
+        var sub = subtitleList.insertSubtitleBefore(null);
+        subtitleList.updateSubtitleContent(sub, 'content');
+        subtitleList.updateSubtitleTime(sub, 500, 1000);
+
+        workflow.completeStage('typing');
+        workflow.completeStage('syncing');
+        expect(workflow.stage).toEqual('review');
+    });
+
     it('handles the active/inactive CSS states', function() {
         workflow.stage = 'review';
         expect(workflow.stageCSSClass('typing')).toEqual('inactive');
         expect(workflow.stageCSSClass('syncing')).toEqual('inactive');
         expect(workflow.stageCSSClass('review')).toEqual('active');
-    });
-
-    describe('checkbox handling', function() {
-        // Insert a synced subtitle.  We don't want to worry about checking
-        // if changing the checkboxes should be valid, the above tests handle
-        // that
-        beforeEach(function() {
-            var sub = subtitleList.insertSubtitleBefore(null);
-            subtitleList.updateSubtitleContent(sub, 'content');
-            subtitleList.updateSubtitleTime(sub, 500, 1000);
-        });
-
-        it('handles typing checked', function() {
-            workflow.stage = 'typing';
-            workflow.typingCheckboxChanged(true);
-            expect(workflow.stage).toEqual('syncing');
-        });
-
-        it('handles typing unchecked', function() {
-            workflow.stage = 'syncing';
-            workflow.typingCheckboxChanged(false);
-            expect(workflow.stage).toEqual('typing');
-        });
-
-        it('handles typing unchecked from review stage', function() {
-            workflow.stage = 'review';
-            workflow.typingCheckboxChanged(false);
-            expect(workflow.stage).toEqual('typing');
-        });
-
-        it('handles syncing checked', function() {
-            workflow.stage = 'syncing';
-            workflow.syncingCheckboxChanged(true);
-            expect(workflow.stage).toEqual('review');
-        });
-
-        it('handles syncing checked from typing stage', function() {
-            workflow.stage = 'typing';
-            workflow.syncingCheckboxChanged(true);
-            expect(workflow.stage).toEqual('review');
-        });
-
-        it('handles syncing unchecked', function() {
-            workflow.stage = 'review';
-            workflow.syncingCheckboxChanged(false);
-            expect(workflow.stage).toEqual('syncing');
-        });
-    });
-
-    it('moves back to syncing with unsynced subs', function() {
-        var sub = subtitleList.insertSubtitleBefore(null);
-        workflow.stage = 'review';
-        // Workflow stage is review, but we have an unsynced subtitle.
-        workflow.checkSubtitleListChanges();
-        expect(workflow.stage).toBe('syncing');
-    });
-
-    it('moves back to typing when all subs are deleted', function() {
-        workflow.stage = 'review';
-        // Workflow stage is review, but no subtitles are in the list.
-        workflow.checkSubtitleListChanges();
-        expect(workflow.stage).toBe('typing');
     });
 });
 
@@ -152,58 +110,6 @@ describe('WorkflowProgressionController', function() {
         var sub = subtitleList.insertSubtitleBefore(null);
         subtitleList.updateSubtitleTime(sub, 500, 1000);
     }));
-
-    it('checks checkboxes when starting in review stage ', function() {
-        $scope.workflow.stage = 'review';
-        $scope.setCheckboxesForWorkflowStage();
-        expect($scope.typingChecked).toBeTruthy();
-        expect($scope.syncingChecked).toBeTruthy();
-    });
-
-    it('calls typingChecked() on changes', function() {
-        spyOn($scope.workflow, 'typingCheckboxChanged');
-        $scope.typingChecked = true;
-        $scope.typingCheckboxChanged();
-        expect($scope.workflow.typingCheckboxChanged).toHaveBeenCalled();
-    });
-
-    it('calls syncingChecked() on changes', function() {
-        spyOn($scope.workflow, 'syncingCheckboxChanged');
-        $scope.syncingChecked = true;
-        $scope.syncingCheckboxChanged();
-        expect($scope.workflow.syncingCheckboxChanged).toHaveBeenCalled();
-    });
-
-    it('checks typing when syncing is checked', function() {
-        $scope.typingChecked = false;
-        $scope.syncingChecked = true;
-        $scope.syncingCheckboxChanged();
-        expect($scope.typingChecked).toBeTruthy();
-    });
-
-    it('unchecks syncing when typing is unchecked', function() {
-        $scope.typingChecked = false;
-        $scope.syncingChecked = true;
-        $scope.typingCheckboxChanged();
-        expect($scope.syncingChecked).toBeFalsy();
-    });
-
-    it('calls checkSubtitleListChanges on changes', function() {
-        spyOn($scope.workflow, 'checkSubtitleListChanges');
-        subtitleList.insertSubtitleBefore(null);
-        expect($scope.workflow.checkSubtitleListChanges).toHaveBeenCalled();
-    });
-
-    it('updates checkboxes on changes', function() {
-        spyOn($scope.workflow, 'checkSubtitleListChanges');
-        $scope.workflow.checkSubtitleListChanges.andCallFake(function() {
-            $scope.workflow.stage = 'review';
-        });
-        subtitleList.insertSubtitleBefore(null);
-
-        expect($scope.typingChecked).toBeTruthy();
-        expect($scope.syncingChecked).toBeTruthy();
-    });
 
     it('shows the timeline for the sync step', function() {
         expect($scope.toggleTimelineShown.callCount).toBe(0);

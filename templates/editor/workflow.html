@@ -1,68 +1,49 @@
 {% load i18n %}
 <div class="workflow" ng-controller="WorkflowProgressionController">
-    <ul>
+    <ol>
         <li ng-class="workflow.stageCSSClass('typing')">
-            <input type="checkbox" ng-model="typingChecked"
-               id="workflow-typing-checkbox"
-               ng-disabled="!workflow.canCompleteStage('typing')"
-               ng-change="typingCheckboxChanged()"
-            />
-            <div class="content">
-                <label for="workflow-typing-checkbox">
-                    <h3>{% trans "Typing" %}</h3>
-                </label>
-                <p>{% trans "Create subtitles for all video content" %}</p>
-            </div>
-            <span class="stats">
-                {% blocktrans with "[[ workflow.subtitleList.length() ]]" as count %}
-                subtitle count: {{ count }}
-                {% endblocktrans %}
-            </span>
+            <h3>{% trans "Type what you hear" %}</h3>
+            <button ng-disabled="!workflow.canCompleteStage('typing')"
+                ng-click="workflow.completeStage('typing')">
+                {% trans "Start syncing" %}
+            </button>
         </li>
 
         <li ng-class="workflow.stageCSSClass('syncing')">
-            <input type="checkbox" ng-model="syncingChecked"
-               id="workflow-syncing-checkbox"
-               ng-disabled="!workflow.canCompleteStage('syncing')"
-               ng-change="syncingCheckboxChanged()"
-            />
-            <div class="content">
-                <label for="workflow-syncing-checkbox">
-                    <h3>{% trans "Syncing" %}</h3>
-                </label>
-                <p>{% trans "Add timings for all subtitles" %}</p>
-            </div>
-            <span class="stats">
+            <h3>{% trans "Sync Timing" %}</h3>
+            <p class="stats">
                 {% blocktrans with "[[ workflow.subtitleList.syncedCount]]" as count and "[[ workflow.subtitleList.length() ]]" as total %}
                 synced subtitles: {{ count }} / {{ total }}
                 {% endblocktrans %}
-            </span>
+            </p class="stats">
+            <button ng-disabled="!workflow.canCompleteStage('syncing')"
+                ng-click="workflow.completeStage('syncing')">
+                {% trans "Start syncing" %}
+            </button>
         </li>
 
         <li ng-class="workflow.stageCSSClass('review')">
-            <div class="content">
-                <h3>{% trans "Review" %}</h3>
-                <p>
-                    {% trans "Check all work." %}
-                    <a href="#" ng-click="onEditTitleClicked($event)">{% trans "Edit title and description." %}</a>
-                </p>
+            <h3>{% trans "Review and complete" %}</h3>
+            <p>
+                {% trans "Check all work." %}
+                <a href="#" ng-click="onEditTitleClicked($event)">{% trans "Edit title and description." %}</a>
+            </p>
+
+            <div ng-switch="taskButtons">
+                <div ng-switch-when="false" class="actions">
+                    <button ng-disabled="workflow.stage != 'review'" class="endorse" ng-click="session.endorse()">
+                        {% trans "Publish" %}
+                    </button>
+                </div>
+                <div ng-switch-when="true" class="actions">
+                    <button ng-click="session.rejectTask()">
+                        {% trans "Send Back" %}
+                    </button>
+                    <button ng-disabled="workflow.stage != 'review'" class="endorse" ng-click="session.approveTask()">
+                        {% trans "Approve" %}
+                    </button>
+                </div>
             </div>
         </li>
-
-    </ul>
-    <div ng-switch="taskButtons">
-        <div ng-switch-when="false" class="actions">
-            <button ng-disabled="workflow.stage != 'review'" class="endorse" ng-click="session.endorse()">
-                {% trans "Publish" %}
-            </button>
-        </div>
-        <div ng-switch-when="true" class="actions">
-            <button ng-click="session.rejectTask()">
-                {% trans "Send Back" %}
-            </button>
-            <button ng-disabled="workflow.stage != 'review'" class="endorse" ng-click="session.approveTask()">
-                {% trans "Approve" %}
-            </button>
-        </div>
-    </div>
+    </ol>
 </div>

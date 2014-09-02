@@ -1170,62 +1170,43 @@ div.workspace-tools {
 }
 
 div.workflow {
+    ol {
+        list-style: decimal;
+        margin-left: 2em;
+        font-size: 16px;
+        padding: 0.5em 0;
+    }
+
     li {
-        border-bottom: 1px solid #DADBDC;
-        padding: 12px 10px;
+        padding: 0.75em 0;
         position: relative;
 
         &.active {
-
             color: #313233;
+            border-bottom: 1px solid #DADBDC;
 
             h3 {
                 color: #222;
-            }
-
-            p {
-                color: #767879;
             }
         }
 
         &.inactive {
             color: #767879;
 
-            p, .stats, button.edit-metadata {
-                visibility: hidden;
+            p, button {
+                display: none;
             }
         }
-
-        &:last-of-type {
-            .content {
-                margin-left: 26px;
-            }
-        }
-    }
-
-    input[type=checkbox] {
-        float: left;
-        height: 16px;
-        width: 16px;
-        margin: 3px 10px 0 0;
-    }
-
-    .content {
-        overflow: hidden; // Create a block formatting context
     }
 
     h3 {
         font-size: 16px;
         line-height: 1.2em;
         margin-bottom: 0.3em;
-
     }
 
-    .stats, button.edit-metadata {
-        position: absolute;
-        top: 12px;
-        right: 10px;
-        margin: 0;
+    p {
+        font-size: 12px;
     }
 
     a {
@@ -1233,25 +1214,24 @@ div.workflow {
         &.visited {
             color: $blue;
         }
-
     }
 
-    .actions {
-        padding-left: 26px;
+    button {
+        @include big-button;
+        margin-top: 10px;
+        background: $light-blue;
 
-        button {
-            @include big-button;
-            margin-top: 10px;
-            &.endorse {
-                background: $light-blue url('../images/thumbs-up.png') 10px center no-repeat;
-                padding-left: 40px;
-            }
+        &.endorse {
+            background-image: url('../images/thumbs-up.png');
+            background-position: 10px center;
+            background-repeat: no-repeat;
+            padding-left: 40px;
+        }
 
-            &[disabled] {
-                background-color: $semi-dark-grey;
-                border-color: $semi-dark-grey;
-                cursor: default;
-            }
+        &[disabled] {
+            background-color: $semi-dark-grey;
+            border-color: $semi-dark-grey;
+            cursor: default;
         }
     }
 }
