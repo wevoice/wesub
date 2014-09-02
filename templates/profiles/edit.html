@@ -14,6 +14,17 @@
         {% include 'profiles/_tabs.html' %}
     {% endwith %}
 
+	<h4>{% trans "Languages you can caption or translate" %}</h4>
+	<fieldset>
+	  <div>
+	    <a href="#" data-modal="language_modal" id="lang_select_btn">{% trans "Specify or update your languages" %}</a>
+	  </div>
+	  <div>
+	    {% block select_language_dialog %}
+	    {% select_language_dialog hide_link="True" show_current="True" %}
+	    {% endblock %}
+	  </div>
+	</fieldset>
     <form class="edit_profile" action="." method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.non_field_errors }}
@@ -26,18 +37,6 @@
                 {% include "_form_field.html" with field=form.last_name %}
             </div>
         </fieldset>
-
-	<h3>{% trans "Languages you can caption or translate" %}</h3>
-	<fieldset>
-	  <div>
-	    <a href="#" data-modal="language_modal" id="lang_select_btn">{% trans "Specify or update your languages" %}</a>
-	  </div>
-	  <div>
-	    {% block select_language_dialog %}
-	    {% select_language_dialog hide_link="True" show_current="True" %}
-	    {% endblock %}
-	  </div>
-	</fieldset>
         <h3>{% trans "About you" %}</h3>
         <div class="grid_4 alpha">
             <fieldset>

@@ -3094,14 +3094,20 @@ a.truncated-expand {
     padding: 30px 0 10px 0;
 }
 
+.v1 div.view h4 {
+    padding-top: 55px;
+    padding-bottom: 10px;
+}
+
 .v1 .one-line-summary {
     max-width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .v1 .current-languages {
-    padding-top: 30px;
+    padding-top: 15px;
     span {
         padding-right: 15px;
     }
