@@ -60,15 +60,16 @@ def get_language_label(code):
     return u'%s' % _(lc.name())
 
 
-def get_user_languages_from_request(request, readable=False):
+def get_user_languages_from_request(request, readable=False, guess=True):
     """Return a list of our best guess at languages that request.user speaks."""
     languages = []
 
     if request.user.is_authenticated():
         languages = [l.language for l in request.user.get_languages()]
 
-    if not languages:
+    if guess and not languages:
         languages = languages_from_request(request)
+
     if readable:
         return map(get_language_label, _only_supported_languages(languages))
     else:
