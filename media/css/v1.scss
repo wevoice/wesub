@@ -3094,11 +3094,6 @@ a.truncated-expand {
     padding: 30px 0 10px 0;
 }
 
-.v1 div.view h4 {
-    padding-top: 55px;
-    padding-bottom: 10px;
-}
-
 .v1 .one-line-summary {
     max-width: 200px;
     white-space: nowrap;
@@ -3115,10 +3110,14 @@ a.truncated-expand {
 
 .v1 #apply-modal.modal {
     overflow: auto;
-    max-height: 750px;
+    max-height: 680px;
 }
 
 .v1 div.jGrowl {
     // Default value is smaller than bootstrap modal
     z-index: 12000;
+}
+
+.v1 h3.tab-heading {
+    padding-top: 55px;
 }
