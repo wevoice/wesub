@@ -375,12 +375,6 @@ class TestViews(WebUseTest):
     def test_search(self):
         self._simple_test('search:index')
 
-    def test_test_mp4_page(self):
-        self._simple_test('test-mp4-page')
-
-    def test_test_ogg_page(self):
-        self._simple_test('test-ogg-page')
-
     def test_opensubtitles2010_page(self):
         self._simple_test('opensubtitles2010_page')
 
