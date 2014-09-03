@@ -194,7 +194,6 @@ INSTALLED_APPS = (
     'startup',
     'staticmedia',
     'statistic',
-    'streamer',
     'teams',
     'testhelpers',
     'thirdpartyaccounts',

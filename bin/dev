@@ -49,7 +49,7 @@ def progname():
 
 class Command(object):
     options = []
-    takes_positional_args = False
+    raw_args = False
 
     @classmethod
     def name(cls):
@@ -70,10 +70,10 @@ class Command(object):
 
     def usage_header(self):
         header = "usage: %s %s" % (progname(), self.name())
+        if self.raw_args:
+            return header + " [args]"
         if self.options:
             header += " [options]"
-        if self.takes_positional_args:
-            header += " [args]"
         return header
 
     def usage_detail(self):
@@ -86,8 +86,12 @@ class Command(object):
         self.make_option_parser().print_help()
 
     def run(self, command_args):
-        parser = self.make_option_parser()
-        (options, args) = parser.parse_args(command_args)
+        if self.raw_args:
+            options = {}
+            args = command_args
+        else:
+            parser = self.make_option_parser()
+            (options, args) = parser.parse_args(command_args)
         return self.run_inner(args, options)
 
     def run_inner(self, args, options):
@@ -126,7 +130,7 @@ class Build(Command):
 class Manage(Command):
     """Run manage.py inside the app container."""
 
-    takes_positional_args = True
+    raw_args = True
 
     def run_inner(self, args, options):
         run_manage(args)
@@ -134,7 +138,7 @@ class Manage(Command):
 class Test(Command):
     """Run unittests."""
 
-    takes_positional_args = True
+    raw_args = True
 
     def run_inner(self, args, options):
         run_manage(['test', '--settings=dev_settings_test'] + args)
