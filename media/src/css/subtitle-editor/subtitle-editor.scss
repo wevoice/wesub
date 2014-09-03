@@ -1179,14 +1179,15 @@ div.workspace-tools {
 
 div.workflow {
     ol {
-        list-style: decimal inside;
-        font-size: 16px;
+        list-style: decimal outside;
         padding: 0.5em 0;
     }
 
     li {
-        padding: 0.75em 0 0.75em 1em;
+        padding: 0.75em 0;
+        margin: 0 2em;
         border-bottom: 1px solid #DADBDC;
+        font-size: 16px;
 
         &:last-of-type {
             border-bottom: none;
@@ -1211,15 +1212,20 @@ div.workflow {
 
     h3 {
         font-size: 16px;
-        line-height: 1.2em;
-        margin-bottom: 0.3em;
     }
 
     p {
         font-size: 12px;
+        line-height: 150%;
+        margin-top: 0.5em;
+
+        &.error {
+            color: $reddish-pink;
+        }
     }
 
-    a {
+    a.edit-metadata {
+        margin-top: 0.5em;
         color: $blue;
         &.visited {
             color: $blue;
