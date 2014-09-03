@@ -31,6 +31,7 @@ from factory import Factory
 from factory.django import DjangoModelFactory
 
 import auth.models
+import babelsubs.storage
 import comments.models
 import externalsites.models
 import subtitles.models
@@ -284,6 +285,16 @@ class YouTubeVideoInfoFactory(Factory):
     description = 'test description'
     duration = 100
     thumbnail_url = 'http://example.com/thumbnail.png'
+
+class SubtitleSetFactory(Factory):
+    FACTORY_FOR = babelsubs.storage.SubtitleSet
+
+    language_code = 'en'
+
+    @factory.post_generation
+    def num_subs(self, create, extracted, **kwargs):
+        for i in xrange(extracted):
+            self.append_subtitle(i*1000, i*1000 - 1, "Sub %s" % i)
 
 def bulk_subs(sub_data):
     """Create a bunch of videos/languages/versions

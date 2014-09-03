@@ -4,6 +4,7 @@ from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages.teams import ATeamPage 
 from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from webdriver_testing.pages.site_pages.teams import members_tab
+from webdriver_testing.pages.site_pages import site_modals
 from webdriver_testing.data_factories import *
 from teams.models import TeamMember
 
@@ -22,7 +23,8 @@ class TestCaseOpenTeamPage(WebdriverTestCase):
             user = cls.team_owner).team
         cls.a_team_pg = ATeamPage(cls)
         cls.a_team_pg.open_team_page(cls.team.slug)
-
+        cls.modal = site_modals.SiteModals(cls) 
+        cls.default_langs = ['English', 'French']
 
     def test_join_guest(self):
         """Guest user sees Sign in message when visiting a team page.
@@ -41,6 +43,7 @@ class TestCaseOpenTeamPage(WebdriverTestCase):
         self.a_team_pg.log_in(user.username, 'password')
         self.a_team_pg.open_team_page(self.team.slug)
         self.a_team_pg.join()
+        self.modal.select_spoken_languages(self.default_langs)
 
         # Verify team page displays
         self.assertTrue(self.a_team_pg.is_team(self.team.name))
@@ -85,6 +88,8 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         self.a_team_pg.log_in(test_joiner.username, 'password')
         self.a_team_pg.open_team_page(self.team.slug)
         self.a_team_pg.apply()
+        #Check that language selection choices are present
+        self.a_team_pg.application_languages()
         self.a_team_pg.submit_application()
         user_app = ApplicationFactory.build(
             team=self.team,
