@@ -556,7 +556,7 @@ var Site = function(Site) {
                 $.mod();
                 $.metadata.setType("attr", "data");
             }
-            if ($('#language_modal').length) {
+            if ($('#language_modal').length || $('#apply-modal').length || $('#language_profile').length) {
                 var cookies_are_enabled = function() {
                     document.cookie = 'testcookie';
                     return (document.cookie.indexOf('testcookie') != -1) ? true : false;
@@ -573,29 +573,38 @@ var Site = function(Site) {
                     $('.language_bar a').before('<span class="selected_language">' + h.slice(0,-2) + '</span>');
                 });
                 if (cookies_are_enabled()) {
-                    var $w = $('#language_modal');
-                    $w.find('.submit_button').click(function() {
-                        var values = {};
-                        var has_value = false;
-                        $('select', $w).each(function(i, item) {
-                            var $item = $(item);
-                            values[$item.attr('name')] = $item.val();
-                            if (!has_value && $item.val()) {
-                                has_value = true;
-                            }
-                        });
-                        if (!has_value) {
-                            $.jGrowl.error(window.LANGUAGE_SELECT_ERROR);
-                        } else {
-                            $w.html(window.LANGUAGE_SELECT_SAVING);
-                            ProfileApi.select_languages(values, function() {
-                                    window.location.reload(true);
-                                }, function() {
-                                    $w.modClose();
+		    var $w = $('#language_modal, #apply-modal, #language_profile');
+		    [$('#language_modal'), $('#apply-modal'), $('#language_profile')].forEach(function($w) {
+                        if($w.length)
+                            $w.find('.submit_button').click(function() {
+                                var values = {};
+                                var has_value = false;
+                                $('select', $w).each(function(i, item) {
+                                    var $item = $(item);
+                                    values[$item.attr('name')] = $item.val();
+                                    if (!has_value && $item.val()) {
+                                        has_value = true;
+                                    }
+                                });
+                                if (!has_value) {
+                                    $.jGrowl.error(window.LANGUAGE_SELECT_ERROR);
+                                } else {
+                                    if (typeof submit_languages_callback === "undefined")
+                                        $w.html(window.LANGUAGE_SELECT_SAVING);
+                                    ProfileApi.select_languages(values, function() {
+                                            if (typeof submit_languages_callback != "undefined")
+        					submit_languages_callback();
+                                            else if (typeof redirect != "undefined")
+                                                window.location = redirect;
+                                            else
+                                                window.location.reload(true);
+                                        }, function() {
+                                            $w.modClose();
+                                        }
+                                    );
                                 }
-                            );
-                        }
-                        return false;
+                                return false;
+                        });
                     });
                     $w.find('.close_button').click(function() {
                         $w.modClose();

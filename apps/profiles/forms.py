@@ -145,6 +145,7 @@ class EditUserEmailForm(forms.ModelForm):
 class EditUserForm(forms.ModelForm):
     class Meta:
         model = User
+        widgets = {'biography': forms.Textarea(attrs={'cols': 37})}
         fields = ('first_name', 'last_name', 'homepage', 'biography',
                   'pay_rate_code')
 

@@ -1952,6 +1952,14 @@
   width: 560px;
   z-index: 11000;
 }
+
+.bootstrap .modal.modal-wide {
+  margin: -350px 0 0 -280px;
+  width: 710px;
+}
+
+
+
 .bootstrap .modal .popover, .bootstrap .modal .twipsy {
   z-index: 12000;
 }
