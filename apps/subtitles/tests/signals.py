@@ -77,6 +77,45 @@ class SignalsTest(TestCase):
         self.subtitles_changed_handler.assert_called_with(
             signal=mock.ANY, sender=language, version=None)
 
+    def test_subtitles_changed_on_publish(self):
+        # we should emit subtitles_changed if we publish a version and that
+        # creates a new public tip for the language
+        v1 = pipeline.add_subtitles(self.video, 'en', None,
+                                    visibility='private')
+        language = v1.subtitle_language
+        self.subtitles_changed_handler.reset_mock()
+
+        v1.publish()
+        self.assertEquals(self.subtitles_changed_handler.call_count, 1)
+        self.subtitles_changed_handler.assert_called_with(
+            signal=mock.ANY, sender=v1.subtitle_language, version=v1)
+
+    def test_subtitles_changed_on_unpublish(self):
+        # we should emit subtitles_changed if we unpublish the tip for a
+        # language
+        v1 = pipeline.add_subtitles(self.video, 'en', None)
+        language = v1.subtitle_language
+        self.subtitles_changed_handler.reset_mock()
+
+        v1.unpublish()
+        self.assertEquals(self.subtitles_changed_handler.call_count, 1)
+        self.subtitles_changed_handler.assert_called_with(
+            signal=mock.ANY, sender=v1.subtitle_language, version=v1)
+
+    def test_subtitles_changed_not_sent_for_non_tip_publish(self):
+        # we should not emit subtitles_changed if we publish/unpublish a
+        # version, but the tip stays the same
+        v1 = pipeline.add_subtitles(self.video, 'en', None,
+                                    visibility='private')
+        v2 = pipeline.add_subtitles(self.video, 'en', None)
+        self.subtitles_changed_handler.reset_mock()
+
+        # The subtitles_changed signal should only be emitted if the public
+        # tip changes.  Altering the visibility of v1 doesn't affect that.
+        v1.publish()
+        v1.unpublish()
+        self.assertEquals(self.subtitles_changed_handler.call_count, 0)
+
     def test_send_subtitles_changed_false(self):
         v1 = pipeline.add_subtitles(self.video, 'en', None)
         language = v1.subtitle_language

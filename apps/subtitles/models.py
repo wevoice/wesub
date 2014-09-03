@@ -1538,19 +1538,19 @@ class SubtitleVersion(models.Model):
             return '%.0f%%' % (self._text_change * 100)
 
     def is_tip(self, public=True):
-        qs = SubtitleVersion.objects.filter(
-            subtitle_language_id=self.subtitle_language_id,
-            version_number__gt=self.version_number)
-        if public:
-            visibility_is_public = (Q(visibility=public) &
-                                    Q(visibility_override__isnull=True))
-            override_is_public = Q(visibility_override='public')
+        if public and not self.is_public():
+            return False
+        elif self.is_deleted():
+            return False
 
-            qs = qs.filter(visibility_is_public | override_is_public)
+        if public:
+            qs = SubtitleVersion.objects.public()
         else:
-            qs = qs.exclude(Q(visibility='deleted') |
-                           Q(visibility_override='deleted'))
-        return not qs.exists()
+            qs = SubtitleVersion.objects.extant()
+
+        return not qs.filter(
+            subtitle_language_id=self.subtitle_language_id,
+            version_number__gt=self.version_number).exists()
 
     def is_private(self):
         if self.visibility_override in ('public', 'deleted'):
@@ -1765,6 +1765,8 @@ class SubtitleVersion(models.Model):
         self.save()
         if not was_public and self.is_tip():
             self.subtitle_language.set_tip_cache('public', self)
+            signals.subtitles_changed.send(self.subtitle_language,
+                                           version=self)
 
     def unpublish(self, delete=False, signal=True):
         """Unpublish this version.
@@ -1787,6 +1789,8 @@ class SubtitleVersion(models.Model):
             new_tip = version=self.subtitle_language.get_tip(public=True)
             if new_tip is None:
                 signals.language_deleted.send(self.subtitle_language)
+            signals.subtitles_changed.send(self.subtitle_language,
+                                           version=self)
 
     @models.permalink
     def get_absolute_url(self):

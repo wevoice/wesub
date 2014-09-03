@@ -154,12 +154,16 @@ class TestSubtitleLanguage(TestCase):
         versions = []
 
         def _assert_tip(public, version_number):
+            if version_number is None:
+                self.assertEqual(sl.get_tip(public=public), None)
+                return
+
             tip = sl.get_tip(public=public)
-            if tip:
-                self.assertEqual(tip.version_number, version_number)
-                self.assertEqual(tip.is_tip(public), True)
-            else:
-                self.assertEqual(tip, None)
+            self.assertEqual(tip.version_number, version_number)
+            self.assertEqual(tip.is_tip(public=public), True)
+
+            for other_version in sl.subtitleversion_set.exclude(pk=tip.pk):
+                self.assertEqual(other_version.is_tip(public=public), False)
 
         def add_version(**kwargs):
             versions.append(sl.add_version(**kwargs))
