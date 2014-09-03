@@ -13,7 +13,7 @@ Contents:
 
    running-amara
    development
-   static-files
+   static-media
    deployment-guide
    permissions
    i18n
@@ -25,7 +25,7 @@ Contents:
    subtitle-storage
    subtitle-formats
    model-refactor
-   youtube-syncing
+   syncing-and-importing
    bugs
    languages
 

@@ -372,31 +372,8 @@ class TestViews(WebUseTest):
             else:
                 self.assertEquals(len(time_changes), 0)
 
-    def test_test_form_page(self):
-        self._simple_test('videos:test_form_page')
-
-        data = {
-            'email': 'test@test.ua',
-            'task1': 'test1',
-            'task2': 'test2',
-            'task3': 'test3'
-        }
-        response = self.client.post(reverse('videos:test_form_page'), data)
-        self.assertEqual(response.status_code, 302)
-
-        try:
-            UserTestResult.objects.get(**data)
-        except UserTestResult.DoesNotExist:
-            self.fail()
-
     def test_search(self):
         self._simple_test('search:index')
-
-    def test_test_mp4_page(self):
-        self._simple_test('test-mp4-page')
-
-    def test_test_ogg_page(self):
-        self._simple_test('test-ogg-page')
 
     def test_opensubtitles2010_page(self):
         self._simple_test('opensubtitles2010_page')

@@ -68,7 +68,7 @@ class EditorPage(UnisubsPage):
 
     #RIGHT COLUMN
 
-    _NEXT_STEP = 'div.substeps button'
+    _NEXT_STEP = 'button.next-step'
     _ENDORSE = 'div.substeps button.endorse' #when completing subtitling.
 
     # COLLAB PANEL
@@ -288,11 +288,12 @@ class EditorPage(UnisubsPage):
 
     def copy_timings(self):
         menu_items = self.tools_menu_items()
-        if menu_items['copyover']['display'] == 'ng-show':
-            return 'Element not displayed'
-        else:
+        if menu_items['copyover']['element'].is_displayed():
            menu_items['copyover']['element'].click()
- 
+           self.click_by_css("aside.shown footer.buttons button")
+        else:
+            return 'Element not displayed'
+
     def toggle_paragraph(self, position):
         """Toggles the paragraph marker on or off. """
 
@@ -357,8 +358,21 @@ class EditorPage(UnisubsPage):
         active_modal = self.is_element_present(self._ACTIVE_MODAL)
         if active_modal:
             buttons = active_modal.find_elements_by_css_selector(self._MODAL_BUTTONS)
-            [x.click() for x in buttons if 'Exit' in x.text]
+            try:
+                [x.click() for x in buttons if 'Exit' in x.text]
+            except:
+                pass
         self.handle_js_alert('accept')
+
+    def close_edit_title(self):
+        
+        active_modal = self.is_element_present(self._ACTIVE_MODAL)
+        if active_modal:
+            buttons = active_modal.find_elements_by_css_selector(self._MODAL_BUTTONS)
+            try:
+                [x.click() for x in buttons if 'Done' in x.text]
+            except:
+                pass
 
     def collab_panel_displayed(self):
         return self.is_element_visible(self._COLLAB_PANEL)
@@ -403,11 +417,11 @@ class EditorPage(UnisubsPage):
         time.sleep(10)
 
     def start_next_step(self):
-        els = self.get_elements_list(self._NEXT_STEP)
-        for el in els:
-            if el.is_displayed():
-                el.click()
-                return
+        self.wait_for_element_visible(self._NEXT_STEP)
+        self.click_by_css(self._NEXT_STEP)
+
+    def start_sync(self):
+        self.click_by_css('div.substeps div button.next-step')
 
     def endorse_subs(self):
         self.click_by_css(self._ENDORSE, self._ACTIVE_MODAL)
@@ -425,7 +439,7 @@ class EditorPage(UnisubsPage):
 
     def sync(self, num_subs, sub_length=3, sub_space=None):
         """Sync subs a given number of times. """
-        self.wait_for_element_visible(self._SYNC_HELP)
+        #self.wait_for_element_visible(self._SYNC_HELP)
         for x in range(num_subs):
             self.type_special_key('ARROW_DOWN', element='body')
             time.sleep(sub_length)

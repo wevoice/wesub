@@ -272,7 +272,7 @@
         for(var p in params)
            query.push(encodeURIComponent(p) + "=" + encodeURIComponent(params[p]));
         query = query.join("&");
-        src = 'http://c.brightcove.com/services/viewer/federated_f9?' + query;
+        src = '//c.brightcove.com/services/viewer/federated_f9?' + query;
         
         // Player parameters
         playerVars = {
@@ -463,9 +463,9 @@
       function loadScript() {
         if ( !window.brightcove && !loading ) {
           loading = true;
-          Popcorn.getScript( "http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js", function(){
-            Popcorn.getScript( "http://admin.brightcove.com/js/BrightcoveExperiences.js", function(){
-              Popcorn.getScript( "http://admin.brightcove.com/js/APIModules_all.js", function(){
+          Popcorn.getScript( "//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js", function(){
+            Popcorn.getScript( "//admin.brightcove.com/js/BrightcoveExperiences.js", function(){
+              Popcorn.getScript( "//admin.brightcove.com/js/APIModules_all.js", function(){
                 scriptReady();
               });
             });

@@ -25,8 +25,6 @@ urlpatterns = patterns(
     url(r'^watch/featured/$', 'featured_videos', name='featured_videos'),
     url(r'^watch/latest/$', 'latest_videos', name='latest_videos'),
     url(r'^watch/popular/$', 'popular_videos', name='popular_videos'),
-    # temporarily commented: see https://www.pivotaltracker.com/story/show/17619883
-    # url(r'^volunteer/$', 'volunteer_page', name='volunteer_page'),
     url(r'^volunteer/(?P<category>\w+)/$', 'volunteer_category', name='volunteer_category'),
     url(r'^test_celery/$', 'test_celery'),
     url(r'^test_celery_exception/$', 'test_celery_exception'),
@@ -43,7 +41,6 @@ urlpatterns = patterns(
     url(r'^stop_notification/(?P<video_id>(\w|-)+)/$', 'stop_notification', name='stop_notification'),
     url(r'^(?P<video_id>(\w|-)+/)?rollback/(?P<pk>\d+)/$', 'rollback', name='rollback'),
     url(r'^(?P<video_id>(\w|-)+/)?diffing/(?P<pk>\d+)/(?P<second_pk>\d+)/$', 'diffing', name='diffing'),
-    url(r'^test/$', 'test_form_page', name='test_form_page'),
     url(r'^video_url_make_primary/$', 'video_url_make_primary', name='video_url_make_primary'),
     url(r'^video_url_create/$', 'video_url_create', name='video_url_create'),
     url(r'^video_url_remove/$', 'video_url_remove', name='video_url_remove'),

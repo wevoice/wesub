@@ -237,6 +237,13 @@ def _parse_8601_duration(duration):
     return rv
 
 def get_video_info(video_id):
+    try:
+        return _get_video_info(video_id)
+    except APIError, e:
+        logger.error("Youtube API Error: %s", e)
+        raise
+
+def _get_video_info(video_id):
     response = video_get(None, video_id, ['snippet', 'contentDetails'])
     snippet = response.json['items'][0]['snippet']
     content_details = response.json['items'][0]['contentDetails']

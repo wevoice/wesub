@@ -19,6 +19,7 @@
 import os
 import logging
 import time
+
 from django.test import LiveServerTestCase
 from django.test.testcases import (TestCase)
 from selenium import webdriver
@@ -27,8 +28,9 @@ from django.contrib.sites.models import Site
 from urlparse import urlparse
 from django.core import management
 
-class WebdriverTestCase(LiveServerTestCase, TestCase):
+from utils import test_utils
 
+class WebdriverTestCase(LiveServerTestCase, TestCase):
     # Subclasses can set this to False to reuse the same browser from test-case
     # to test-case.
     NEW_BROWSER_PER_TEST_CASE = True
@@ -80,6 +82,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
 
     @classmethod
     def create_browser(cls, suite_or_test):
+        test_utils.start_xvfb()
         #If running on sauce config values are from env vars 
         cls.use_sauce = os.environ.get('USE_SAUCE', False)
         if cls.use_sauce: 

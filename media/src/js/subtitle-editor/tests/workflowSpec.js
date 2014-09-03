@@ -5,9 +5,8 @@ function insertSyncedAndCompletedSubtitle(subtitleList) {
 }
 
 function makeWorkflow(Workflow, subtitleList) {
-    var titleEditedSpy = jasmine.createSpy();
     var translatingSpy = jasmine.createSpy().andReturn(false);
-    return new Workflow(subtitleList, translatingSpy, titleEditedSpy);
+    return new Workflow(subtitleList, translatingSpy);
 }
 
 
@@ -54,13 +53,11 @@ describe('The Workflow class', function() {
         expect(workflow.canMoveToNext()).toBeTruthy();
     });
 
-    it('can never move to the review stage in translation mode once the title has been translated', function() {
+    it('can move past the title stage at any point', function() {
         workflow.switchStage('sync');
         insertSyncedAndCompletedSubtitle(subtitleList);
         workflow.translating.andReturn(true);
         workflow.switchStage('title');
-        expect(workflow.canMoveToNext()).toBeFalsy();
-        workflow.titleEdited.andReturn(true);
         expect(workflow.canMoveToNext()).toBeTruthy();
     });
 

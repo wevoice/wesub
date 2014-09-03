@@ -22,7 +22,7 @@ var angular = angular || null;
 
     var module = angular.module('amara.SubtitleEditor.video.services', []);
 
-    module.factory('VideoPlayer', function($rootScope, SubtitleStorage) {
+    module.factory('VideoPlayer', ["$rootScope", "SubtitleStorage", function($rootScope, SubtitleStorage) {
         var videoURLs = [];
         var pop = null;
         var playing = false;
@@ -146,5 +146,5 @@ var angular = angular || null;
                 pop.play();
             },
         };
-    });
+    }]);
 }).call(this);

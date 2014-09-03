@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+from datetime import datetime, timedelta
 import logging
 
 from celery.schedules import crontab, timedelta
@@ -94,8 +95,10 @@ def save_thumbnail_in_s3(video_id):
         video.s3_thumbnail.save(video.thumbnail.split('/')[-1], content)
 
 @task
-def update_from_feed(*args, **kwargs):
-    for feed in VideoFeed.objects.all():
+def update_from_feed():
+    qs = VideoFeed.objects.exclude(last_update__gt=datetime.now()-
+                                   timedelta(hours=1))
+    for feed in qs:
         update_video_feed.delay(feed.pk)
 
 @task

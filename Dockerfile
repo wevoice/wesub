@@ -5,7 +5,8 @@ RUN (echo "deb http://archive.ubuntu.com/ubuntu precise main universe multiverse
 RUN (echo "deb-src http://archive.ubuntu.com/ubuntu precise main universe multiverse" >> /etc/apt/sources.list)
 RUN (echo "deb http://archive.ubuntu.com/ubuntu precise-updates main universe multiverse" >> /etc/apt/sources.list)
 RUN (echo "deb-src http://archive.ubuntu.com/ubuntu precise-updates main universe multiverse" >> /etc/apt/sources.list)
-
+RUN (echo "deb http://ppa.launchpad.net/mozillateam/firefox-next/ubuntu precise main" >> /etc/apt/sources.list)
+RUN (echo "deb-src http://ppa.launchpad.net/mozillateam/firefox-next/ubuntu precise main" >> /etc/apt/sources.list)
 RUN apt-get update
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -y install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext build-essential gcc dialog mysql-client firefox flashplugin-installer xvfb node-uglify ruby-sass
@@ -32,15 +33,18 @@ ADD .docker/master-worker.sh /usr/local/bin/master-worker
 ADD .docker/worker.sh /usr/local/bin/worker
 ADD .docker/test_app.sh /usr/local/bin/test_app
 ADD .docker/update_translations.sh /usr/local/bin/update_translations
+ADD .docker/entry.sh /usr/local/bin/entry
 RUN easy_install pip
 RUN pip install uwsgi
 RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements.txt)
 # this fixes the nose bug (https://github.com/django-nose/django-nose/issues/54)
 RUN rm /usr/local/man
 RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements-test.txt)
+RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements-doc.txt)
 ADD .docker/run.sh /usr/local/bin/run
 
 WORKDIR /opt/apps/unisubs
 VOLUME /opt/apps/unisubs
 EXPOSE 8000
-CMD ["/bin/bash", "/usr/local/bin/run"]
+ENTRYPOINT ["/usr/local/bin/entry"]
+CMD ["app"]

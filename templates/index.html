@@ -1,19 +1,13 @@
 {% extends "base.html" %}
-{% load i18n media_compressor feedback recent_activity widget i18n announcement_tags messages_tags profiles_tags teams_tags %}
+{% load i18n media_bundle feedback recent_activity widget i18n announcement_tags messages_tags profiles_tags teams_tags %}
 {% block body_attrs %}id="index"{% endblock %}
 
 {% block css %}
-{% include_bundle "base" %}
-{% include_bundle "new_home" %}
+{% media_bundle "base.css" %}
+{% media_bundle "home.css" %}
 {% endblock %}
 
-{% block scripts %}
-{% include_bundle "unisubs-onsite-compiled" %}
-<script src="{% url videos:rpc_api %}" type="text/javascript"></script>
-</script>
-{% endblock %}
-
-{% block amara-pro %} 
+{% block amara-pro %}
   <a href="//pro.amara.org">
     <div id="banner-ondemand">
         <h2>{% trans "Need professional subtitles?" %}</h2>
@@ -67,7 +61,7 @@
         {% blocktrans %}
             Help organizations and deaf and hard of hearing viewers make videos accessible around the world.
         {% endblocktrans %}
-        <a href="http://blog.universalsubtitles.org/volunteer/">{% trans "Take a Look." %}</a>
+        <a href="//blog.universalsubtitles.org/volunteer/">{% trans "Take a Look." %}</a>
         </p>
     </div>
     <div>
@@ -76,71 +70,71 @@
         {% blocktrans %}
             Revolutionize how you create subtitles and reach viewers. Increase viewership with transcription, captioning, and translation services, and flexible API and integration options.
         {% endblocktrans %}
-        <a href="http://pro.amara.org/">{% trans "See our pro services." %}</a>
+        <a href="//pro.amara.org/">{% trans "See our pro services." %}</a>
         </p>
     </div>
 </div>
 
 <div id="home-right">
-  <div class="amara-embed" data-hide-subtitle-me="true" data-hide-logo="true" data-height="348px" data-width="460px" data-url="http://vimeo.com/39734142" data-show-subtitles-default="true" data-noanalytics="true">
+  <div class="amara-embed" data-hide-subtitle-me="true" data-hide-logo="true" data-height="348px" data-width="460px" data-url="//vimeo.com/39734142" data-show-subtitles-default="true" data-noanalytics="true">
   </div>
 </div>
 <div class="clearfix"></div>
 <div id="benefits" class="clearfix">
-    <a class="button" href="http://pro.amara.org/">{% trans "Pro Services" %}</a>
+    <a class="button" href="//pro.amara.org/">{% trans "Pro Services" %}</a>
     <h2>{% trans "See how these companies use Amara to caption and subtitle more effectively." %}</h2>
 </div>
 <div id="partners">
     <ul class="clearfix">
         <li>
-            <a target="_blank" title="TED" href="http://amara.org/en/teams/ted/">
+            <a target="_blank" title="TED" href="//amara.org/en/teams/ted/">
                 <span style="padding-top:32px;"><img src="{{ STATIC_URL }}images/partners/ted.png" alt="{% trans 'TED' %}"/></span>
             </a>
-            <a class="button" href="http://amara.org/en/teams/ted/">{% trans "TED Community" %}</a>
+            <a class="button" href="//amara.org/en/teams/ted/">{% trans "TED Community" %}</a>
         </li>
         <li>
-            <a target="_blank" title="Mozilla" href="http://amara.org/en/teams/mozilla/">
+            <a target="_blank" title="Mozilla" href="//amara.org/en/teams/mozilla/">
                 <span><img src="{{ STATIC_URL }}images/partners/mozilla.png" alt="{% trans 'Mozilla' %}"/></span>
             </a>
-            <a class="button" href="http://amara.org/en/teams/mozilla/">{% trans "Mozilla Community" %}</a>
+            <a class="button" href="//amara.org/en/teams/mozilla/">{% trans "Mozilla Community" %}</a>
         </li>
         <li>
-            <a target="_blank" title="Netflix" href="http://eepurl.com/n24oH">
+            <a target="_blank" title="Netflix" href="//eepurl.com/n24oH">
                 <span style="padding-top:22px;"><img src="{{ STATIC_URL }}images/partners/netflix.png" alt="{% trans 'Netflix' %}"/></span>
             </a>
-            <a class="button" href="http://eepurl.com/n24oH">{% trans "Netflix Community" %}</a>
+            <a class="button" href="//eepurl.com/n24oH">{% trans "Netflix Community" %}</a>
         </li>
         <li>
-            <a target="_blank" title="ERB" href="http://amara.org/en/teams/erb/">
+            <a target="_blank" title="ERB" href="//amara.org/en/teams/erb/">
                 <span style="padding-top:24px;"><img src="{{ STATIC_URL }}images/partners/erb.png" alt="ERB"/></span>
             </a>
-            <a class="button" href="http://amara.org/en/teams/erb/">{% trans "ERB Community" %}</a>
+            <a class="button" href="//amara.org/en/teams/erb/">{% trans "ERB Community" %}</a>
         </li>
     </ul>
     <ul class="clearfix" style="margin-top:24px;">
         <li>
-            <a target="_blank" title="Twitter" href="http://amara.org/en/teams/twitter/">
+            <a target="_blank" title="Twitter" href="//amara.org/en/teams/twitter/">
                 <span><img src="{{ STATIC_URL }}images/partners/twitter.png" alt="{% trans 'Twitter' %}"/></span>
             </a>
-            <a class="button" href="http://amara.org/en/teams/twitter/">{% trans "Twitter Community" %}</a>
+            <a class="button" href="//amara.org/en/teams/twitter/">{% trans "Twitter Community" %}</a>
         </li>
         <li>
-            <a target="_blank" title="Udacity" href="http://amara.org/en/teams/udacity/">
+            <a target="_blank" title="Udacity" href="//amara.org/en/teams/udacity/">
                 <span><img src="{{ STATIC_URL }}images/partners/udacity.png" alt="{% trans 'Udacity' %}"/></span>
             </a>
-            <a class="button" href="http://amara.org/en/teams/udacity/">{% trans "Udacity Community" %}</a>
+            <a class="button" href="//amara.org/en/teams/udacity/">{% trans "Udacity Community" %}</a>
         </li>
         <li>
-            <a target="_blank" title="ro*co films" href="http://www.rocofilms.com ">
+            <a target="_blank" title="ro*co films" href="//www.rocofilms.com ">
                 <span><img src="{{ STATIC_URL }}images/partners/roco.png" alt="{% trans 'Roco Films' %}" style="padding-top:30px;"/></span>
             </a>
-            <a class="button" href="http://www.rocofilms.com ">{% trans "Roco Films" %}</a>
+            <a class="button" href="//www.rocofilms.com ">{% trans "Roco Films" %}</a>
         </li>
         <li>
-            <a target="_blank" title="PBS Newshour" href="http://amara.org/en/teams/newshour/">
+            <a target="_blank" title="PBS Newshour" href="//amara.org/en/teams/newshour/">
                 <span><img src="{{ STATIC_URL }}images/partners/new_partner_pbs.png" alt="{% trans 'PBS Newshour' %}"/></span>
             </a>
-            <a class="button" href="http://amara.org/en/teams/newshour/">{% trans "PBS Newshour Community" %}</a>
+            <a class="button" href="//amara.org/en/teams/newshour/">{% trans "PBS Newshour Community" %}</a>
         </li>
     </ul>
 </div>
@@ -169,18 +163,18 @@
     <div class="grid_6 alpha">
         <ul class="press">
             <li>
-                <a href="http://www.forbes.com/sites/jamesmarshallcrotty/2012/08/31/amaras-wiki-style-translation-platform-enables-global-expansion-of-education-startups/">
-                    <img alt="" src="http://amarasubs.files.wordpress.com/2012/12/forbes.png?w=625"><br>
+                <a href="//www.forbes.com/sites/jamesmarshallcrotty/2012/08/31/amaras-wiki-style-translation-platform-enables-global-expansion-of-education-startups/">
+                    <img alt="" src="//amarasubs.files.wordpress.com/2012/12/forbes.png?w=625"><br>
                     <blockquote><p>Amara’s Wiki-Style Translation Platform Enables Global Growth Of Education Startups</p></blockquote>
                 </a>
-                <p><a href="http://www.forbes.com/sites/jamesmarshallcrotty/2012/08/31/amaras-wiki-style-translation-platform-enables-global-expansion-of-education-startups/"></a></p>
+                <p><a href="//www.forbes.com/sites/jamesmarshallcrotty/2012/08/31/amaras-wiki-style-translation-platform-enables-global-expansion-of-education-startups/"></a></p>
             </li>
             <li>
-                <a href="http://gigaom.com/video/netflix-amara-closed-captions-crowdsourcing/">
-                    <img alt="" src="http://amarasubs.files.wordpress.com/2012/12/gigaom.png?w=625"><br>
+                <a href="//gigaom.com/video/netflix-amara-closed-captions-crowdsourcing/">
+                    <img alt="" src="//amarasubs.files.wordpress.com/2012/12/gigaom.png?w=625"><br>
                     <blockquote><p>Netflix experiments with crowd-sourced captioning</p></blockquote>
                 </a>
-                <p><a href="http://gigaom.com/video/netflix-amara-closed-captions-crowdsourcing/"></a></p>
+                <p><a href="//gigaom.com/video/netflix-amara-closed-captions-crowdsourcing/"></a></p>
             </li>
         </ul>
     </div>
@@ -208,7 +202,7 @@
         var idl = document.createElement('script');
         idl.type = 'text/javascript';
         idl.async = true;
-        idl.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'members.internetdefenseleague.org/include/?url=' + (_idl.url || '') + '&campaign=' + (_idl.campaign || '') + '&variant=' + (_idl.variant || 'modal');
+        idl.src = '//members.internetdefenseleague.org/include/?url=' + (_idl.url || '') + '&campaign=' + (_idl.campaign || '') + '&variant=' + (_idl.variant || 'modal');
         document.getElementsByTagName('body')[0].appendChild(idl);
     })();
 </script>

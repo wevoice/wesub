@@ -104,7 +104,6 @@ def send_templated_email(to, subject, body_template, body_dict,
             to.append(recipient)
     if not from_email: from_email = settings.DEFAULT_FROM_EMAIL
 
-    body_dict['STATIC_URL_BASE'] = settings.STATIC_URL_BASE
     body_dict['domain'] = Site.objects.get_current().domain
     body_dict['url_base'] = "%s://%s" % (DEFAULT_PROTOCOL,  Site.objects.get_current().domain)
     message = render_to_string(body_template, body_dict)

@@ -142,7 +142,7 @@ var USER_IDLE_MINUTES = 15;
         };
     });
 
-    module.directive('subtitleScroller', function($window) {
+    module.directive('subtitleScroller', ["$window", function($window) {
         var window = $($window);
 	var scrollingPrevious = [];
 	$('div.subtitles').each(function(index) {
@@ -217,9 +217,9 @@ var USER_IDLE_MINUTES = 15;
                 });
             }
         }
-    });
+    }]);
 
-    module.directive('subtitleRepeat', function($interpolate, $filter, $parse,
+    module.directive('subtitleRepeat', ["$interpolate", "$filter", "$parse", "DomUtil", "EditorData", function($interpolate, $filter, $parse,
                 DomUtil, EditorData) {
         /* Specialized repeat directive to work with subtitleList
          *
@@ -445,9 +445,9 @@ var USER_IDLE_MINUTES = 15;
                 });
             }
         }
-    });
+    }]);
 
-    module.directive('languageSelector', function(SubtitleStorage) {
+    module.directive('languageSelector', ["SubtitleStorage", function(SubtitleStorage) {
         return {
             compile: function compile(elm, attrs, transclude) {
                 return {
@@ -469,5 +469,5 @@ var USER_IDLE_MINUTES = 15;
                 };
             }
         };
-    });
+    }]);
 })();

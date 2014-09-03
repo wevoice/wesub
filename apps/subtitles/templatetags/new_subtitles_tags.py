@@ -24,6 +24,7 @@ from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from babelsubs.generators import HTMLGenerator
+from subtitles.forms import SubtitlesUploadForm
 
 register = template.Library()
 

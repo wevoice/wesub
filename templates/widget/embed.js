@@ -1,4 +1,4 @@
-{% load media_compressor %}
+{% load media_bundle %}
 
 // Amara, universalsubtitles.org
 // 
@@ -116,11 +116,7 @@
         var css = $c('link');
         css.type = 'text/css';
         css.rel = 'stylesheet';
-{% if COMPRESS_MEDIA %}
-        css.href = '{{STATIC_URL}}{% url_for "widget-css" %}';
-{% else %}
-        css.href = '{{STATIC_URL}}css/unisubs-widget.css';
-{% endif %}
+        css.href = '{% url_for "widget.css" %}';
         css.media = 'screen';
         head.appendChild(css);
     }

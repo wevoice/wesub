@@ -1,0 +1,61 @@
+{% load i18n %}
+<div class="video" ng-controller="VideoController">
+    <div class="video-container" id="video"></div>
+    <div class="subtitle-overlay" dir="{{ language.dir }}" ng-show="showOverlay"><div ng-bind-html="overlayText"></div></div>
+    <ul class="video-controls group">
+        <li class="play-pause" ng-class="{'playing': videoState.playing}">
+        <a href="#" ng-click="playPauseClicked($event)"></a>
+        </li>
+        <li class="time">
+        <span ng-show="videoState.loaded">
+            [[ videoState.currentTime|displayTimeSeconds]] / [[ videoState.duration|displayTimeSeconds]]
+        </span>
+        </li>
+        <li class="volume" ng-show="videoState.loaded">
+        <a href="#" ng-click="volumeToggleClicked($event)"></a>
+        </li>
+        <li class="progress" progress-bar
+        ng-mousedown="onProgressMouseDown($event)">
+        <div class="slice-left"><div></div></div>
+        <div class="slice-right"><div></div></div>
+        <div class="slice-mid"><div></div></div>
+        </li>
+    </ul>
+    <div volume-bar class="volume-bar"
+        ng-mousedown="onVolumeMouseDown($event)"
+        ng-show="volumeBarVisible">
+        <div class="slice1"></div>
+        <div class="slice2"></div>
+        <div class="slice3"></div>
+    </div>
+    <div class="instructions-overlay" ng-controller="WorkflowProgressionController" ng-show="showOverlay()">
+        <div ng-show="workflow.stage == 'type'">
+            <h1>{% trans "How to start making subtitles." %}</h1>
+            <ul>
+                <li>{% trans "Play the video and type what you hear." %}</li>
+                <li>{% trans "Press Enter to complete a subtitle." %}</li>
+                <li>{% trans "Use the guide on the right to move to the next step." %}</li>
+            </ul>
+            <h1>{% trans "Press the TAB key to start!" %}</h1>
+        </div>
+        <div ng-show="workflow.stage == 'sync'">
+            <h1>{% trans "Subtitle Syncing" %}</h1>
+            <ul>
+                <li>{% trans "Tap the DOWN arrow to start a subtitle." %}</li>
+                <li>{% trans "Tap the UP arrow to set the end time (optional)." %}</li>
+                <li>{% trans "Use the Tools menu to hide the timeline for typing mode." %}</li>
+            </ul>
+            <h1>{% trans "Press the TAB key to start!" %}</h1>
+        </div>
+        <div ng-show="workflow.stage == 'title'"></div>
+        <div ng-show="workflow.stage == 'review'">
+            <h1>{% trans "Review your work" %}</h1>
+            <ul>
+                <li>{% trans "Watch the video and make corrections." %}</li>
+                <li>{% trans "Click Complete to sign off on your work." %}</li>
+                <li>{% trans "Use the Save button to save and finish later." %}</li>
+            </ul>
+            <h1>{% trans "Press the TAB key to start!" %}</h1>
+        </div>
+    </div>
+</div>

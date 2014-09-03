@@ -17,22 +17,12 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import os
+import sys
+
+import startup
+
 if __name__ == "__main__":
-    # setup the python path
-    import os
-    import sys
-    root_dir = os.path.abspath(os.path.dirname(__file__))
-    sys.path.insert(0, os.path.join(root_dir, 'apps'))
-    sys.path.insert(0, os.path.join(root_dir, 'libs'))
-    # hack to make the unisubs package available.  We alter the path so that
-    # it's there, then change the path back
-    sys.path.append(os.path.dirname(root_dir))
-    import unisubs
-    sys.path.pop()
-
-    # setup our celery loader
-    os.environ.setdefault("CELERY_LOADER", "djcelery.loaders.DjangoLoader")
-
     # handle the --settings and --python-path options so that django.conf is
     # setup before we import localeurl.
     from django.core.management.base import (handle_default_options,
@@ -44,9 +34,7 @@ if __name__ == "__main__":
     options, args = parser.parse_args(sys.argv)
     handle_default_options(options)
 
-    # call patch_reverse()
-    from localeurl import patch_reverse
-    patch_reverse()
+    startup.startup()
 
     # start the management command
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")

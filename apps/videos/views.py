@@ -167,10 +167,11 @@ class LanguageList(object):
         return len(self.items)
 
 def index(request):
-    context = widget.add_onsite_js_files({})
-    context['all_videos'] = Video.objects.count()
-    context['popular_videos'] = VideoIndex.get_popular_videos("-today_views")[:VideoIndex.IN_ROW]
-    context['featured_videos'] = VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW]
+    context = {
+        'all_videos': Video.objects.count(),
+        'popular_videos': VideoIndex.get_popular_videos("-today_views")[:VideoIndex.IN_ROW],
+        'featured_videos': VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW],
+    }
     return render_to_response('index.html', context,
                               context_instance=RequestContext(request))
 
@@ -206,35 +207,6 @@ def popular_videos(request):
     return render_to_response('videos/popular_videos.html', {},
                               context_instance=RequestContext(request))
 
-def volunteer_page(request):
-    # Get the user comfort languages list
-    user_langs = get_user_languages_from_request(request)
-
-    relevant = VideoIndex.public().filter(video_language_exact__in=user_langs) \
-        .filter_or(languages_exact__in=user_langs) \
-        .order_by('-requests_count')
-
-    featured_videos =  relevant.filter(
-        featured__gt=datetime.datetime(datetime.MINYEAR, 1, 1)) \
-        .order_by('-featured')[:5]
-
-    popular_videos = relevant.order_by('-week_views')[:5]
-
-    latest_videos = relevant.order_by('-edited')[:15]
-
-    requested_videos = relevant.filter(requests_exact__in=user_langs)[:5]
-
-    context = {
-        'featured_videos': featured_videos,
-        'popular_videos': popular_videos,
-        'latest_videos': latest_videos,
-        'requested_videos': requested_videos,
-        'user_langs':user_langs,
-    }
-
-    return render_to_response('videos/volunteer.html', context,
-                              context_instance=RequestContext(request))
-
 def volunteer_category(request, category):
     '''
     Display results only for a particular category of video results from
@@ -242,7 +214,6 @@ def volunteer_category(request, category):
     '''
     return render_to_response('videos/volunteer_%s.html' %(category),
                               context_instance=RequestContext(request))
-
 
 def create(request):
     video_form = VideoForm(request.user, request.POST or None)
@@ -319,7 +290,6 @@ class VideoPageContext(dict):
         else:
             metadata = video.get_metadata()
 
-        self.update(widget.add_onsite_js_files({}))
         self['page_title'] = self.page_title(video)
         self['metadata'] = metadata.convert_for_display()
         self['language_list'] = LanguageList(video)
@@ -580,8 +550,6 @@ class LanguagePageContext(dict):
     def setup(self, request, video, language, version):
         """Setup context variables."""
 
-        self.update(widget.add_onsite_js_files({}))
-
         self['revision_count'] = language.version_count()
         self['language_list'] = LanguageList(video)
         self['page_title'] = self.page_title(language)
@@ -782,13 +750,14 @@ def diffing(request, first_version, second_pk):
     diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles())
     team_video = video.get_team_video()
 
-    context = widget.add_onsite_js_files({})
-    context['video'] = video
-    context['diff_data'] = diff_data
-    context['language'] = language
-    context['first_version'] = first_version
-    context['second_version'] = second_version
-    context['latest_version'] = language.get_tip()
+    context = {
+        'video': video,
+        'diff_data': diff_data,
+        'language': language,
+        'first_version': first_version,
+        'second_version': second_version,
+        'latest_version': language.get_tip(),
+    }
     if team_video and not can_rollback_language(request.user, language):
         context['rollback_allowed'] = False
     else:
@@ -799,21 +768,6 @@ def diffing(request, first_version, second_pk):
     context['video_url'] = video.get_video_url()
 
     return render_to_response('videos/diffing.html', context,
-                              context_instance=RequestContext(request))
-
-def test_form_page(request):
-    if request.method == 'POST':
-        form = UserTestResultForm(request.POST)
-        if form.is_valid():
-            form.save(request)
-            messages.success(request, 'Thanks for your feedback.  It\'s a huge help to us as we improve the site.')
-            return redirect('videos:test_form_page')
-    else:
-        form = UserTestResultForm()
-    context = {
-        'form': form
-    }
-    return render_to_response('videos/test_form_page.html', context,
                               context_instance=RequestContext(request))
 
 @login_required

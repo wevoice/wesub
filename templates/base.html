@@ -1,4 +1,4 @@
-{% load i18n announcement_tags messages_tags profiles_tags media_compressor auth_tags %}
+{% load i18n announcement_tags messages_tags profiles_tags media_bundle auth_tags %}
 
 {% get_current_language_bidi as LANGUAGE_BIDI %}
 
@@ -20,13 +20,13 @@
 
     <link rel="shortcut icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
     <link rel="icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
-    {% block css %}{% include_bundle "base" %}{% endblock %}
+    {% block css %}{% media_bundle "base.css" %}{% endblock %}
 
     <!--[if IE]>
         <style type="text/css"> .group { display: block; zoom: 1; } </style>
     <![endif]-->
     <!--[if gte IE 8]>
-        <link href="{{ STATIC_URL }}css/ie8.css" media="all" type="text/css" rel="stylesheet" />
+        {% media_bundle "ie8.css" %}
     <![endif]-->
     <!--[if IE 8]>
         <style> .notIE { display: none !important ; } </style>
@@ -35,7 +35,7 @@
         <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    {% include_bundle "site_base_js" %}
+    {% media_bundle "site.js" %}
     <script type="text/javascript" src="{% url js_i18n_catalog %}"></script>
     <script src="{% url profiles:rpc_api %}" type="text/javascript"></script>  
     <script type="text/javascript" src='{% url embedder_iframe %}'>
@@ -73,7 +73,7 @@
                     <li><a href="{% url videos:watch_page %}">{% trans 'Browse' %}</a></li>
                     <li><a href="http://about.amara.org/volunteer/">{% trans "Volunteer" %}</a></li>
                     <li><a href="http://pro.amara.org">{% trans "Pro Services" %}</a></li>
-                    <li><a href="http://support.universalsubtitles.org/solution/categories/13504">{% trans 'Help' %}</a></li>
+                    <li><a href="http://support.amara.org/support/home" target="_blank">{% trans 'Help' %}</a></li>
                     {% if user.is_authenticated %}
                         <li id="me_menu">{% top_user_panel %}</li>
                     {% else %}
@@ -126,7 +126,7 @@
             <a href="http://www.pculture.org/pcf/jobs/">{% trans 'Jobs' %}</a>
             <a href="http://www.facebook.com/Amara.Community/">Facebook</a> 
             <a href="http://twitter.com/amarasubs">Twitter</a>
-            <a href="http://support.universalsubtitles.org/solution/categories/13504/folders/40766/articles/35517--i-have-a-non-technical-question-about-amara">{% trans 'Contact Us' %}</a>
+            <a href="http://support.amara.org/support/solutions/articles/35517--i-have-a-non-technical-question-about-amara">{% trans 'Contact Us' %}</a>
             <a href="http://www.pculture.org/pcf/websites-privacy/">{% trans 'Privacy Policy' %}</a>
             <a href="http://about.amara.org/tos/">{% trans 'Terms of Service' %}</a>
             <a href="{% url security_page %}">{% trans 'Security' %}</a>

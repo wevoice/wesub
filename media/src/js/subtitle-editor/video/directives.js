@@ -21,7 +21,7 @@ var angular = angular || null;
 (function() {
     var module = angular.module('amara.SubtitleEditor.video.directives', []);
 
-    module.directive('volumeBar', function(VideoPlayer) {
+    module.directive('volumeBar', ["VideoPlayer", function(VideoPlayer) {
         return function link($scope, elem, attrs) {
             elem = $(elem);
             var canvas = elem[0];
@@ -81,8 +81,8 @@ var angular = angular || null;
 
             drawBar();
         }
-    });
-    module.directive('progressBar', function(VideoPlayer) {
+    }]);
+    module.directive('progressBar', ["VideoPlayer", function(VideoPlayer) {
         return function link($scope, elem, attrs) {
             elem = $(elem);
             var sliceLeft = $('div.slice-left div', elem);
@@ -143,6 +143,6 @@ var angular = angular || null;
             };
         }
 
-    });
+    }]);
 })();
 

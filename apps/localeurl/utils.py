@@ -21,12 +21,15 @@ def is_locale_independent(path):
     """
     Returns whether the path is locale-independent.
 
-    A path is independent if it starts with MEDIA_URL or it is matched by any
-    pattern from LOCALE_INDEPENDENT_PATHS.
+    We only want to prepend the locale part to URLs that we want to localize.
+    We don't want to do this for things like static media files, API urls,
+    etc.
+
+    We use the LOCALE_INDEPENDENT_PATHS setting to check this.
+    LOCALE_INDEPENDENT_PATHS should be a list of regular expressions to match
+    against the path.
     """
-    if settings.MEDIA_URL and path.startswith(settings.MEDIA_URL) or path.startswith(settings.STATIC_URL) :
-        return True
-    for re in localeurl.settings.LOCALE_INDEPENDENT_PATHS:
+    for re in settings.LOCALE_INDEPENDENT_PATHS:
         if re.search(path):
             return True
     return False

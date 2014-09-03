@@ -32,10 +32,12 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template.defaultfilters import urlize, linebreaks, force_escape
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from subtitles import shims
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.templatetags.new_subtitles_tags import visibility
+from subtitles.forms import SubtitlesUploadForm
 from teams.models import Task
 from teams.permissions import can_add_version, can_assign_task
 from utils.text import fmt
@@ -179,10 +181,12 @@ def old_editor(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
     language = get_object_or_404(SubtitleLanguage, video=video,
                                  language_code=language_code)
-    return redirect(shims.get_widget_url(language,
-                                         request.GET.get('mode'),
-                                         request.GET.get('task_id')))
+    url_path = shims.get_widget_url(language,
+                                    request.GET.get('mode'),
+                                    request.GET.get('task_id'))
+    return redirect("http://%s%s" % (request.get_host(), url_path))
 
+@xframe_options_exempt
 @login_required
 def subtitle_editor(request, video_id, language_code):
     '''
@@ -287,7 +291,7 @@ def subtitle_editor(request, video_id, language_code):
     if team_attributes:
         editor_data['teamAttributes'] = team_attributes
 
-    return render_to_response("subtitles/subtitle-editor.html", {
+    return render_to_response("editor/editor.html", {
         'video': video,
         'DEBUG': settings.DEBUG,
         'language': editing_language,
@@ -295,7 +299,9 @@ def subtitle_editor(request, video_id, language_code):
         'version': editing_version,
         'translated_from_version': translated_from_version,
         'task': task,
-        'editor_data': json.dumps(editor_data, indent=4)
+        'editor_data': json.dumps(editor_data, indent=4),
+        'upload_subtitles_form': SubtitlesUploadForm(request.user, video,
+                                                     initial={'language_code': editing_language.language_code})
     }, context_instance=RequestContext(request))
 
 def download(request, video_id, language_code, filename, format,

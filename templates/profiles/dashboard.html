@@ -1,11 +1,6 @@
 {% extends "base.html" %}
 
-{% load to_json i18n messages_tags media_compressor recent_activity auth_tags profiles_tags teams_tags query_string videos_tags %}
-
-{% block css %}
-    {{ block.super }}
-    {% include_bundle "widget-css"%}
-{% endblock %}
+{% load to_json i18n messages_tags media_bundle recent_activity auth_tags profiles_tags teams_tags query_string videos_tags %}
 
 {% block body_attrs %}class="v1 dashboard"{% endblock %}
 {% block html_attrs %}id="user_dashboard"{% endblock %}
@@ -14,8 +9,7 @@
 
 {% block scripts %}
     {{ block.super }}
-    {% include_bundle "unisubs-offsite-compiled" %}
-    {% include_bundle "js-teams" %}
+    {% media_bundle "teams.js" %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         window.WIDGET_SETTINGS = {{ widget_settings|to_json|safe }};

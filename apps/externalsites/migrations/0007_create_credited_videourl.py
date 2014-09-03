@@ -102,7 +102,7 @@ class Migration(SchemaMigration):
             'video_url': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.VideoUrl']", 'primary_key': 'True'})
         },
         'externalsites.kalturaaccount': {
-            'Meta': {'object_name': 'KalturaAccount'},
+            'Meta': {'unique_together': "[('type', 'owner_id')]", 'object_name': 'KalturaAccount'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'owner_id': ('django.db.models.fields.IntegerField', [], {}),
             'partner_id': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -133,8 +133,10 @@ class Migration(SchemaMigration):
         },
         'externalsites.youtubeaccount': {
             'Meta': {'unique_together': "[('type', 'owner_id', 'channel_id')]", 'object_name': 'YouTubeAccount'},
-            'channel_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'sync_teams': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['teams.Team']", 'symmetrical': 'False'}),
+            'channel_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'import_feed': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['videos.VideoFeed']", 'unique': 'True', 'null': 'True'}),
             'oauth_refresh_token': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'owner_id': ('django.db.models.fields.IntegerField', [], {}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),

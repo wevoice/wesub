@@ -1,14 +1,9 @@
 {% extends "teams/base.html" %}
 
-{% load i18n teams_tags widget media_compressor %}
+{% load i18n teams_tags widget %}
 
 {% block title %}
     {% trans 'Invite Members' %} | Amara
-{% endblock %}
-
-{% block css %}
-    {{ block.super }}
-     {% include_bundle "widget-css"%}
 {% endblock %}
 
 {% block view_content %}

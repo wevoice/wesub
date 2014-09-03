@@ -25,9 +25,8 @@ var angular = angular || null;
      * App-level Workflow object
      */
 
-    Workflow = function(subtitleList, translating, titleEdited) {
+    Workflow = function(subtitleList, translating) {
 	this.translating = translating;
-	this.titleEdited = titleEdited;
 	this.showOverlay = true;
         var self = this;
         this.subtitleList = subtitleList;
@@ -45,14 +44,9 @@ var angular = angular || null;
 
     Workflow.prototype = {
 	appActionDone: function(){
-           if (this.showOverlay) this.showOverlay = false;
+           this.showOverlay = false;
 	},
         switchStage: function(newStage) {
-	    if (newStage == 'title') {
-                this.showOverlay = false; 
-		this.titleEdited(true);
-	    }
-            this.showOverlay = true;
             this.stage = newStage;
         },
         canMoveToNext: function() {
@@ -64,7 +58,7 @@ var angular = angular || null;
                     return this.subtitleList.isComplete();
 
                 case 'title':
-                    return this.titleEdited();
+                    return true;
 
                 case 'review':
                     return false;
@@ -87,7 +81,7 @@ var angular = angular || null;
     }
     module.value('Workflow', Workflow);
 
-    module.controller('WorkflowProgressionController', function($scope, $sce, EditorData, VideoPlayer) {
+    module.controller('WorkflowProgressionController', ["$scope", "$sce", "EditorData", "VideoPlayer", function($scope, $sce, EditorData, VideoPlayer) {
 
         $scope.$root.$on("video-playback-changes", function() {$scope.workflow.appActionDone();});
         $scope.$root.$on("app-click", function() {$scope.workflow.appActionDone();});
@@ -136,7 +130,7 @@ var angular = angular || null;
             evt.preventDefault();
             evt.stopPropagation();
         }
-    });
+    }]);
 
 
 })(this);

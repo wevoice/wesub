@@ -22,7 +22,7 @@
         'amara.SubtitleEditor.subtitles.services',
         ]);
 
-    module.controller('SaveErrorModalController', function($scope, Blob) {
+    module.controller('SaveErrorModalController', ["$scope", "Blob", function($scope, Blob) {
         // Controller for the save-error dialog and resume-error dialog
 
         $scope.dfxpString = '';
@@ -55,7 +55,7 @@
             $event.preventDefault();
             $scope.exitToVideoPage();
         }
-    })
+    }])
 
     // Buttons/Dialogs are dicts of button/dialog definitions that are used by
     // dialogManager.openDialog.  See that function for more details.
@@ -137,7 +137,7 @@
         }
     });
 
-    module.controller('DialogController', function($scope, Buttons, Dialogs, VideoPlayer) {
+    module.controller('DialogController', ["$scope", "Buttons", "Dialogs", "VideoPlayer", function($scope, Buttons, Dialogs, VideoPlayer) {
         // Stores the names of all dialogs currently open in oldest-to-newest
         // order.  The last item in the list is the currently displayed
         // dialog.
@@ -288,9 +288,9 @@
             });
             return dialog;
         }
-    });
+    }]);
 
-    module.directive('modalDialog', function($document) {
+    module.directive('modalDialog', ["$document", function($document) {
         return function link($scope, elm, attrs) {
             var dialogName = attrs.modalDialog;
             function allowClose() {
@@ -336,5 +336,5 @@
                 }
             });
         };
-    });
+    }]);
 }).call(this);

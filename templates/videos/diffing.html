@@ -3,13 +3,10 @@
 {% block body_attrs %}id="video"{% endblock %}
 {% block html_attrs %}id="diffing"{% endblock %}
 
-{% load widget i18n media_compressor subtitles_tags%}
-
-
+{% load widget i18n subtitles_tags%}
 
 {% block css %}
   {{ block.super }}
-  {% include_bundle "widget-css"%}
   <style>
     div.unisubs-widget {
         position: relative;
@@ -60,7 +57,6 @@
             });
         });
     </script>
-    {% include_bundle "unisubs-onsite-compiled" 0 %}
 {% endblock %}
 
 {% block main_content %}

@@ -357,7 +357,7 @@ class Video(models.Model):
         if self.thumbnail:
             return self.thumbnail
         if fallback:
-            return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL_BASE
+            return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
     def get_small_thumbnail(self):
         """Return a URL to a small version of this video's thumbnail, or '' if there isn't one.
@@ -371,7 +371,7 @@ class Video(models.Model):
 
         if self.small_thumbnail:
             return self.small_thumbnail
-        return "%simages/video-no-thumbnail-small.png" % settings.STATIC_URL_BASE
+        return "%simages/video-no-thumbnail-small.png" % settings.STATIC_URL
 
     def get_medium_thumbnail(self):
         """Return a URL to a medium version of this video's thumbnail, or '' if there isn't one.
@@ -544,12 +544,6 @@ class Video(models.Model):
                     defaults['videoid'] = vt.video_id
                 video_url_obj, created = VideoUrl.objects.get_or_create(url=vt.convert_to_video_url(),
                                                                         defaults=defaults)
-                try:
-                    assert video_url_obj.video == obj
-                except AssertionError, e:
-                    logger.exception(
-                        "Data integrity error with video_url_obj ")
-                    raise e
                 obj.update_search_index()
                 video, created = obj, True
 

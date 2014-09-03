@@ -753,7 +753,7 @@ class TeamVideo(models.Model):
         if video_thumb:
             return video_thumb
 
-        return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL_BASE
+        return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
     def _original_language(self):
         if not hasattr(self, 'original_language_code'):
@@ -1044,6 +1044,9 @@ class TeamMemberManager(models.Manager):
         tm = TeamMember(team=team, user=user, role=ROLE_OWNER)
         tm.save()
         return tm
+
+    def admins(self):
+        return self.filter(role__in=(ROLE_OWNER, ROLE_ADMIN))
 
 class TeamMember(models.Model):
     ROLE_OWNER = ROLE_OWNER

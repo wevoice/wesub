@@ -25,30 +25,41 @@ from externalsites import credit
 from externalsites import subfetch
 from externalsites import tasks
 from externalsites.models import (KalturaAccount,
-                                  lookup_accounts, lookup_account)
-from subtitles.models import SubtitleLanguage, SubtitleVersion
+                                  get_sync_accounts, get_sync_account)
+from subtitles.models import (SubtitleLanguage, SubtitleVersion,
+                              ORIGIN_IMPORTED)
 from videos.models import Video, VideoUrl
 import subtitles.signals
 
-@receiver(subtitles.signals.public_tip_changed)
-def on_public_tip_changed(signal, sender, version, **kwargs):
-    if not isinstance(sender, SubtitleLanguage):
-        raise ValueError("sender must be a SubtitleLanguage: %s" % sender)
-    if not isinstance(version, SubtitleVersion):
-        raise ValueError("version has wrong type: %s" % version)
-    language = sender
-    for account, video_url in lookup_accounts(language.video):
-        tasks.update_subtitles.delay(account.account_type, account.id,
-                                     video_url.id, language.id)
+def _should_update_subtitles(language, version):
+    if not language.subtitles_complete:
+        return False
+    elif version is not None and version.origin == ORIGIN_IMPORTED:
+        # don't waste time re-syncing imported subs (#1646)
+        return False
+    else:
+        return True
+
+def _update_subtitles_for_language(language, version):
+    for account, video_url in get_sync_accounts(language.video):
+        if _should_update_subtitles(language, version):
+            tasks.update_subtitles.delay(account.account_type, account.id,
+                                         video_url.id, language.id)
         if credit.should_add_credit_to_video_url(video_url, account):
             tasks.add_amara_credit.delay(video_url.id)
+
+@receiver(subtitles.signals.subtitles_changed)
+def on_subtitles_changed(signal, sender, **kwargs):
+    if not isinstance(sender, SubtitleLanguage):
+        raise ValueError("sender must be a SubtitleLanguage: %s" % sender)
+    _update_subtitles_for_language(sender, kwargs.get('version'))
 
 @receiver(subtitles.signals.language_deleted)
 def on_language_deleted(signal, sender, **kwargs):
     if not isinstance(sender, SubtitleLanguage):
         raise ValueError("sender must be a SubtitleLanguage: %s" % sender)
     language = sender
-    for account, video_url in lookup_accounts(language.video):
+    for account, video_url in get_sync_accounts(language.video):
         tasks.delete_subtitles.delay(account.account_type, account.id,
                                      video_url.id, language.id)
 
@@ -60,7 +71,7 @@ def on_account_save(signal, sender, instance, **kwargs):
 def on_videourl_save(signal, sender, instance, created, **kwargs):
     video_url = instance
     if created:
-        account = lookup_account(instance.video, instance)
+        account = get_sync_account(instance.video, instance)
         if credit.should_add_credit_to_video_url(video_url, account):
             tasks.add_amara_credit.delay(instance.id)
         if subfetch.should_fetch_subs(video_url):
