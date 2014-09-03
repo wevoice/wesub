@@ -1179,19 +1179,21 @@ div.workspace-tools {
 
 div.workflow {
     ol {
-        list-style: decimal;
-        margin-left: 2em;
+        list-style: decimal inside;
         font-size: 16px;
         padding: 0.5em 0;
     }
 
     li {
-        padding: 0.75em 0;
-        position: relative;
+        padding: 0.75em 0 0.75em 1em;
+        border-bottom: 1px solid #DADBDC;
+
+        &:last-of-type {
+            border-bottom: none;
+        }
 
         &.active {
             color: #313233;
-            border-bottom: 1px solid #DADBDC;
 
             h3 {
                 color: #222;
