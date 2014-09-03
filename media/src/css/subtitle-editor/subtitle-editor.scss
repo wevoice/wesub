@@ -98,9 +98,9 @@ $semi-dark-grey: #888;
     font: normal 12px $OpenSans;
     background: $light-blue;
     color: #FFFFFF;
-    padding: 12px 10px;
+    padding: 13px 11px;
     cursor: pointer;
-    border: 1px solid $light-blue;
+    border: none;
     border-radius: 3px;
 }
 
@@ -1230,6 +1230,14 @@ div.workflow {
         @include big-button;
         margin-top: 10px;
         background: $light-blue;
+
+        &.send-back {
+            background-color: #d24655;
+            background-image: url("../images/thumbs-down.png");
+            background-position: 10px center;
+            background-repeat: no-repeat;
+            padding-left: 40px;
+        }
 
         &.endorse {
             background-image: url('../images/thumbs-up.png');

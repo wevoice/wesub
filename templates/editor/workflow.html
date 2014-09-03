@@ -36,11 +36,11 @@
                     </button>
                 </div>
                 <div ng-switch-when="true" class="actions">
-                    <button ng-click="session.rejectTask()">
+                    <button class="send-back" ng-click="session.rejectTask()">
                         {% trans "Send Back" %}
                     </button>
                     <button ng-disabled="workflow.stage != 'review'" class="endorse" ng-click="session.approveTask()">
-                        {% trans "Approve" %}
+                        {% trans "Accept" %}
                     </button>
                 </div>
             </div>
