@@ -1,67 +1,38 @@
 {% load i18n %}
-<div class="steps-container"
-    ng-controller="WorkflowProgressionController">
-    <ul class="steps">
-        <li ng-class="{done: workflow.stageDone('type')}">
-        {% trans "1. Type what you hear" %}
-        <div class="substeps" ng-show="workflow.stage == 'type'">
+<div class="workflow" ng-controller="WorkflowProgressionController">
+    <ol>
+        <li ng-class="workflow.stageCSSClass('typing')">
+            <h3>{% trans "Type what you hear" %}</h3>
             <p>{% trans "Is all the content subtitled?" %}</p>
-            <button class="next-step" ng-click="onNextClicked($event)">
-                <ng-switch on="translating()">
-                <div ng-switch-when="true">{% trans "Yes, translate the title" %}</div>
-                <div ng-switch-when="false">{% trans "Yes, start syncing" %}</div>
-                </ng-switch>
+            <button ng-disabled="!workflow.canCompleteStage('typing')"
+                ng-click="workflow.completeStage('typing')">
+                {% trans "Yes, start syncing" %}
             </button>
-        </div>
         </li>
-        <li ng-show="translating()" ng-class="{done: workflow.stageDone('title')}">
-        {% trans "2. Translate title" %}
-        <div class="substeps"
-            ng-show="workflow.stage == 'title'">
-            <ng-switch on="workflow.canMoveToNext()">
-            <p ng-switch-when="false">
-            {% trans "Title and description were not edited yet." %}
+
+        <li ng-class="workflow.stageCSSClass('syncing')">
+            <h3>{% trans "Sync Timing" %}</h3>
+            <p class="stats">
+                {% blocktrans with "[[ workflow.subtitleList.syncedCount]]" as count and "[[ workflow.subtitleList.length() ]]" as total %}
+                synced subtitles: {{ count }} / {{ total }}
+                {% endblocktrans %}
             </p>
-            <div ng-switch-when="true">
-                <p>{% trans "Title and description have been edited." %}</p>
-                <button class="next-step" ng-click="onNextClicked($event)">
-                    {% trans "Start syncing" %}
-                </button>
-            </div>
-            </ng-switch>
-        </div>
-        </li>
-        <li ng-class="{done: workflow.stageDone('sync')}">
-        <ng-switch on="translating()">
-        <div ng-switch-when="false">{% trans "2. Sync Timing" %}</div>
-        <div ng-switch-when="true">{% trans "3. Sync Timing" %}</div>
-        </ng-switch>
-        <div class="substeps" ng-show="workflow.stage == 'sync'">
-            <ng-switch on="workflow.canMoveToNext()">
-            <p ng-switch-when="false">
-            {% trans "Not all lines are completed." %}
-            </p>
-            <div ng-switch-when="true">
-                <p>{% trans "All lines are completed." %}</p>
-                <button ng-click="onNextClicked($event)">
-                    {% trans "Start reviewing" %}
-                </button>
-            </div>
-            </ng-switch>
-        </div>
-        </li>
-        <li>
-        <ng-switch on="translating()">
-        <div ng-switch-when="false">{% trans "3. Review and complete" %}</div>
-        <div ng-switch-when="true">{% trans "4. Review and complete" %}</div>
-        </ng-switch>
-        <div class="substeps"
-            ng-show="workflow.stage == 'review'">
-            <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}</p>
-            <button class="endorse" ng-click="session.endorse()">
-                {% trans "Complete" %}
+            <button ng-disabled="!workflow.canCompleteStage('syncing')"
+                ng-click="workflow.completeStage('syncing')">
+                {% trans "Start review" %}
             </button>
-        </div>
         </li>
-    </ul>
+
+        <li ng-class="workflow.stageCSSClass('review')">
+            <h3>{% trans "Review and complete" %}</h3>
+            <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}<br>
+            <a class="edit-metadata" href="#" ng-click="onEditTitleClicked($event)">{% trans "Edit title and description." %}</a>
+            </p>
+            <p class="error" ng-show="!workflow.subtitleList.isComplete()">{% trans "Not all lines completed" %}</p>
+
+            <button ng-disabled="!workflow.subtitleList.isComplete()" class="endorse" ng-click="session.endorse()">
+                {% trans "Publish" %}
+            </button>
+        </li>
+    </ol>
 </div>

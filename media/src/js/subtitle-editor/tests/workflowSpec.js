@@ -1,15 +1,3 @@
-function insertSyncedAndCompletedSubtitle(subtitleList) {
-    var sub = subtitleList.insertSubtitleBefore(null);
-    subtitleList.updateSubtitleContent(sub, 'content');
-    subtitleList.updateSubtitleTime(sub, 500, 1000);
-}
-
-function makeWorkflow(Workflow, subtitleList) {
-    var translatingSpy = jasmine.createSpy().andReturn(false);
-    return new Workflow(subtitleList, translatingSpy);
-}
-
-
 describe('The Workflow class', function() {
     var subtitleList = null;
     var workflow = null;
@@ -17,78 +5,16 @@ describe('The Workflow class', function() {
     beforeEach(function() {
         module('amara.SubtitleEditor.subtitles.models');
         module('amara.SubtitleEditor.workflow');
-        module('amara.SubtitleEditor.mocks');
     });
 
     beforeEach(inject(function(SubtitleList, Workflow) {
         subtitleList = new SubtitleList();
         subtitleList.loadEmptySubs('en');
-        workflow = makeWorkflow(Workflow, subtitleList);
+        workflow = new Workflow(subtitleList);
     }));
 
-    it('starts in the type stage', function() {
-        expect(workflow.stage).toBe('type');
-    });
-
-    it('can move to the sync stage anytime', function() {
-        workflow.switchStage('sync');
-        expect(workflow.stage).toBe('sync');
-    });
-
-    it('can move to the the review/title stage once subs are complete and synced', function() {
-        workflow.switchStage('sync');
-        expect(workflow.canMoveToNext()).toBeFalsy();
-        var sub = subtitleList.insertSubtitleBefore(null);
-        expect(workflow.canMoveToNext()).toBeFalsy();
-        subtitleList.updateSubtitleContent(sub, 'content');
-        expect(workflow.canMoveToNext()).toBeFalsy();
-        subtitleList.updateSubtitleTime(sub, 500, 1000);
-        expect(workflow.canMoveToNext()).toBeTruthy();
-
-        var sub2 = subtitleList.insertSubtitleBefore(null);
-        expect(workflow.canMoveToNext()).toBeFalsy();
-        subtitleList.updateSubtitleTime(sub2, 1500, 2000);
-        expect(workflow.canMoveToNext()).toBeFalsy();
-        subtitleList.updateSubtitleContent(sub2, 'content');
-        expect(workflow.canMoveToNext()).toBeTruthy();
-    });
-
-    it('can move past the title stage at any point', function() {
-        workflow.switchStage('sync');
-        insertSyncedAndCompletedSubtitle(subtitleList);
-        workflow.translating.andReturn(true);
-        workflow.switchStage('title');
-        expect(workflow.canMoveToNext()).toBeTruthy();
-    });
-
-    it('can never move paste the review stage', function() {
-        workflow.switchStage('sync');
-        insertSyncedAndCompletedSubtitle(subtitleList);
-        workflow.switchStage('review');
-        expect(workflow.canMoveToNext()).toBeFalsy();
-    });
-
-    it('moves back to sync if new unsynced subs are added', function() {
-        workflow.switchStage('sync');
-        insertSyncedAndCompletedSubtitle(subtitleList);
-        expect(workflow.canMoveToNext()).toBeTruthy();
-        workflow.switchStage('review');
-        expect(workflow.stage).toBe('review');
-
-        subtitleList.insertSubtitleBefore(null);
-        expect(workflow.stage).toBe('sync');
-    });
-
-    it('knows which stages are done', function() {
-        expect(workflow.stageDone('type')).toBeFalsy();
-        expect(workflow.stageDone('sync')).toBeFalsy();
-        workflow.switchStage('sync');
-        expect(workflow.stageDone('type')).toBeTruthy();
-        expect(workflow.stageDone('sync')).toBeFalsy();
-        insertSyncedAndCompletedSubtitle(subtitleList);
-        workflow.switchStage('review');
-        expect(workflow.stageDone('type')).toBeTruthy();
-        expect(workflow.stageDone('sync')).toBeTruthy();
+    it('starts in the typing stage', function() {
+        expect(workflow.stage).toBe('typing');
     });
 
     it('starts in the review stage if we already have subs',
@@ -96,9 +22,58 @@ describe('The Workflow class', function() {
         var sub = subtitleList.insertSubtitleBefore(null);
         subtitleList.updateSubtitleContent(sub, 'sub text');
         subtitleList.updateSubtitleTime(sub, 100, 200);
-        workflow = makeWorkflow(Workflow, subtitleList);
+        workflow = new Workflow(subtitleList);
         expect(workflow.stage).toBe('review');
     }));
+
+    it('can complete the typing stage once there is a subtitle with content', function() {
+        expect(workflow.canCompleteStage('typing')).toBeFalsy();
+        var sub = subtitleList.insertSubtitleBefore(null);
+        expect(workflow.canCompleteStage('typing')).toBeFalsy();
+
+        subtitleList.updateSubtitleContent(sub, 'content');
+        expect(workflow.canCompleteStage('typing')).toBeTruthy();
+    });
+
+    it('can complete the syncing stage once subs are complete and synced', function() {
+        workflow.stage = 'syncing';
+        expect(workflow.canCompleteStage('syncing')).toBeFalsy();
+
+        var sub = subtitleList.insertSubtitleBefore(null);
+        expect(workflow.canCompleteStage('syncing')).toBeFalsy();
+
+        subtitleList.updateSubtitleContent(sub, 'content');
+        expect(workflow.canCompleteStage('syncing')).toBeFalsy();
+
+        subtitleList.updateSubtitleTime(sub, 500, 1000);
+        expect(workflow.canCompleteStage('syncing')).toBeTruthy();
+    });
+
+    it('moves to the syncing stage after typing', function() {
+        var sub = subtitleList.insertSubtitleBefore(null);
+        subtitleList.updateSubtitleContent(sub, 'content');
+        subtitleList.updateSubtitleTime(sub, 500, 1000);
+
+        workflow.completeStage('typing');
+        expect(workflow.stage).toEqual('syncing');
+    });
+
+    it('moves to the review stage after syncing', function() {
+        var sub = subtitleList.insertSubtitleBefore(null);
+        subtitleList.updateSubtitleContent(sub, 'content');
+        subtitleList.updateSubtitleTime(sub, 500, 1000);
+
+        workflow.completeStage('typing');
+        workflow.completeStage('syncing');
+        expect(workflow.stage).toEqual('review');
+    });
+
+    it('handles the active/inactive CSS states', function() {
+        workflow.stage = 'review';
+        expect(workflow.stageCSSClass('typing')).toEqual('inactive');
+        expect(workflow.stageCSSClass('syncing')).toEqual('inactive');
+        expect(workflow.stageCSSClass('review')).toEqual('active');
+    });
 });
 
 describe('WorkflowProgressionController', function() {
@@ -125,41 +100,28 @@ describe('WorkflowProgressionController', function() {
         };
         subtitleList.loadEmptySubs('en');
         $scope.workingSubtitles = { subtitleList: subtitleList };
-        $scope.workflow = makeWorkflow(Workflow, subtitleList);
+        $scope.workflow = new Workflow(subtitleList);
         spyOn($scope, '$emit');
         $controller('WorkflowProgressionController', {
             $scope: $scope,
         });
+
+        // Create a subtitle so we can move to the next stage
+        var sub = subtitleList.insertSubtitleBefore(null);
+        subtitleList.updateSubtitleTime(sub, 500, 1000);
     }));
 
-    describe('The click handling', function() {
-        it('changes the workflow stage', function() {
-            var evt = {
-                preventDefault: jasmine.createSpy(),
-                stopPropagation: jasmine.createSpy(),
-            };
-            $scope.onNextClicked(evt);
-            expect($scope.workflow.stage).toBe('sync')
-            expect(evt.preventDefault).toHaveBeenCalled();
-            expect(evt.stopPropagation).toHaveBeenCalled();
-            insertSyncedAndCompletedSubtitle(subtitleList);
-            $scope.onNextClicked(evt);
-            expect($scope.workflow.stage).toBe('review')
-        });
-
-        it('shows the timeline for the sync step', inject(function(MockEvents) {
-            expect($scope.toggleTimelineShown.callCount).toBe(0);
-            $scope.onNextClicked(MockEvents.click());
-            expect($scope.workflow.stage).toBe('sync')
-            expect($scope.toggleTimelineShown.callCount).toBe(1);
-        }));
-
-        it('restarts video playback when switching steps', inject(function(MockEvents, VideoPlayer) {
-            $scope.onNextClicked(MockEvents.click());
-            expect(VideoPlayer.pause).toHaveBeenCalled();
-            expect(VideoPlayer.seek).toHaveBeenCalledWith(0);
-        }));
+    it('shows the timeline for the sync step', function() {
+        expect($scope.toggleTimelineShown.callCount).toBe(0);
+        $scope.$apply('workflow.stage="syncing"');
+        expect($scope.toggleTimelineShown.callCount).toBe(1);
     });
+
+    it('restarts video playback when switching steps', inject(function(VideoPlayer) {
+        $scope.$apply('workflow.stage="syncing"');
+        expect(VideoPlayer.pause).toHaveBeenCalled();
+        expect(VideoPlayer.seek).toHaveBeenCalledWith(0);
+    }));
 });
 
 describe('when up and down sync subtitles', function() {

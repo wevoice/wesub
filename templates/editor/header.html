@@ -14,6 +14,6 @@
         {% endif %}
         <button class="discard" ng-click="onExitClicked($event)">Exit</button>
         <button ng-click="onLegacyEditorClicked($event)">Legacy Editor</button>
-        <button class="save" ng-disabled="!session.unsavedChanges()" ng-click="onSaveClicked($event)">Save</button>
+        <button class="save" ng-disabled="!session.unsavedChanges()" ng-click="onSaveClicked($event)">{% trans "Save Draft" %}</button>
     </div>
 </header>

@@ -1,7 +1,7 @@
 {% load i18n %}
 <div class="video" ng-controller="VideoController">
     <div class="video-container" id="video"></div>
-    <div class="subtitle-overlay" dir="{{ language.dir }}" ng-show="showOverlay"><div ng-bind-html="overlayText"></div></div>
+    <div class="subtitle-overlay" dir="{{ language.dir }}"><div ng-bind-html="overlayText"></div></div>
     <ul class="video-controls group">
         <li class="play-pause" ng-class="{'playing': videoState.playing}">
         <a href="#" ng-click="playPauseClicked($event)"></a>
@@ -28,8 +28,8 @@
         <div class="slice2"></div>
         <div class="slice3"></div>
     </div>
-    <div class="instructions-overlay" ng-controller="WorkflowProgressionController" ng-show="showOverlay()">
-        <div ng-show="workflow.stage == 'type'">
+    <div class="instructions-overlay" ng-controller="WorkflowProgressionController" ng-show="showOverlay">
+        <div ng-show="workflow.stage == 'typing'">
             <h1>{% trans "How to start making subtitles." %}</h1>
             <ul>
                 <li>{% trans "Play the video and type what you hear." %}</li>
@@ -38,7 +38,7 @@
             </ul>
             <h1>{% trans "Press the TAB key to start!" %}</h1>
         </div>
-        <div ng-show="workflow.stage == 'sync'">
+        <div ng-show="workflow.stage == 'syncing'">
             <h1>{% trans "Subtitle Syncing" %}</h1>
             <ul>
                 <li>{% trans "Tap the DOWN arrow to start a subtitle." %}</li>
@@ -47,7 +47,6 @@
             </ul>
             <h1>{% trans "Press the TAB key to start!" %}</h1>
         </div>
-        <div ng-show="workflow.stage == 'title'"></div>
         <div ng-show="workflow.stage == 'review'">
             <h1>{% trans "Review your work" %}</h1>
             <ul>

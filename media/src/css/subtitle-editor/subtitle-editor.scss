@@ -98,9 +98,9 @@ $semi-dark-grey: #888;
     font: normal 12px $OpenSans;
     background: $light-blue;
     color: #FFFFFF;
-    padding: 12px 10px;
+    padding: 13px 11px;
     cursor: pointer;
-    border: 1px solid $light-blue;
+    border: none;
     border-radius: 3px;
 }
 
@@ -196,6 +196,14 @@ div.modal {
 
 /* General page layout */
 
+.page {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
 header.main {
     position: absolute;
     top: 0;
@@ -220,7 +228,7 @@ div.video {
     width: 37%;
 }
 
-div.steps-container {
+div.workflow {
     position: absolute;
 
     top: $header-height;
@@ -1169,42 +1177,85 @@ div.workspace-tools {
     }
 }
 
-div.steps-container {
-    ul.steps {
-        left: 0;
-        position: absolute;
-        bottom: 0;
+div.workflow {
+    ol {
+        list-style: decimal outside;
+        padding: 0.5em 0;
+    }
 
-        > li {
-            border-bottom: 1px solid #DADBDC;
+    li {
+        padding: 0.75em 0;
+        margin: 0 2em;
+        border-bottom: 1px solid #DADBDC;
+        font-size: 16px;
+
+        &:last-of-type {
+            border-bottom: none;
+        }
+
+        &.active {
             color: #313233;
-            font-size: 14px;
-            padding: 12px 0 12px 10px;
-            max-width: 250px;
 
-            div.substeps {
-                margin: 10px 0 0 16px;
-                p {
-                    color: #767879;
-                    font-size: 11px;
-                }
-                button {
-                    @include big-button;
-                    margin-top: 10px;
-                    &.endorse {
-                        background: $light-blue url('../images/thumbs-up.png') 10px center no-repeat;
-                        padding-left: 40px;
-                    }
-                }
+            h3 {
+                color: #222;
             }
+        }
 
-            &.done {
-                background: transparent url('../images/checkmark.gif') center right no-repeat;
-                color: #949596;
+        &.inactive {
+            color: #767879;
+
+            p, button {
+                display: none;
             }
-            &:last-of-type {
-                border-bottom: 0;
-            }
+        }
+    }
+
+    h3 {
+        font-size: 16px;
+    }
+
+    p {
+        font-size: 12px;
+        line-height: 150%;
+        margin-top: 0.5em;
+
+        &.error {
+            color: $reddish-pink;
+        }
+    }
+
+    a.edit-metadata {
+        margin-top: 0.5em;
+        color: $blue;
+        &.visited {
+            color: $blue;
+        }
+    }
+
+    button {
+        @include big-button;
+        margin-top: 10px;
+        background: $light-blue;
+
+        &.send-back {
+            background-color: #d24655;
+            background-image: url("../images/thumbs-down.png");
+            background-position: 10px center;
+            background-repeat: no-repeat;
+            padding-left: 40px;
+        }
+
+        &.endorse {
+            background-image: url('../images/thumbs-up.png');
+            background-position: 10px center;
+            background-repeat: no-repeat;
+            padding-left: 40px;
+        }
+
+        &[disabled] {
+            background-color: $semi-dark-grey;
+            border-color: $semi-dark-grey;
+            cursor: default;
         }
     }
 }
