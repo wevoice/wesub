@@ -550,6 +550,17 @@ div.subtitles {
                 line-height: 25px;
             }
 
+            span.warning {
+                color: #ff6000;
+                display: block;
+                font-size: 10px;
+                position: absolute;
+                right: 20px;
+                top: 20px;
+                line-height: 25px;
+                font-weight: bold;
+            }
+
             .new-paragraph {
                 display: none;
                 position: absolute;
@@ -1132,7 +1143,7 @@ div.workspace-tools {
                      background: url('../images/subtitle-editor/glyphicons_085_repeat.png') 10px no-repeat;
                    }
                    &.upload-subtitles {
-                     background: url('../../../images/subtitle-editor/glyphicons_419_disk_export.png') 10px no-repeat;
+                     background: url('../images/subtitle-editor/glyphicons_419_disk_export.png') 10px no-repeat;
                    }
                    &:hover {
                       background: #C5C5C5;
