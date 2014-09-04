@@ -10,5 +10,7 @@ codebase.
 
    workflow
    testing
+   editor
    permissions
    i18n
+   behaviors

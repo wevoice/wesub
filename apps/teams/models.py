@@ -242,6 +242,9 @@ class Team(models.Model):
     def __unicode__(self):
         return self.name or self.slug
 
+    def is_tasks_team(self):
+        return self.workflow_enabled
+
     def get_tasks_page_url(self):
         return reverse('teams:team_tasks', kwargs={
             'slug': self.slug,
@@ -1839,6 +1842,18 @@ class Task(models.Model):
         """
         return datetime.datetime.now()
 
+    def is_subtitle_task(self):
+        return self.type == Task.TYPE_IDS['Subtitle']
+
+    def is_translate_task(self):
+        return self.type == Task.TYPE_IDS['Translate']
+
+    def is_review_task(self):
+        return self.type == Task.TYPE_IDS['Review']
+
+    def is_approve_task(self):
+        return self.type == Task.TYPE_IDS['Approve']
+
     @property
     def workflow(self):
         '''Return the most specific workflow for this task's TeamVideo.'''
@@ -3109,3 +3124,4 @@ class Partner(models.Model):
 # we know that models.py is always loaded, import signalhandlers to ensure it
 # gets loaded as well
 import teams.signalhandlers
+import teams.editor
