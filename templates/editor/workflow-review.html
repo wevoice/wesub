@@ -1,0 +1,19 @@
+{% load i18n %}
+<div ng-switch-when="review">
+    <h2>[[ workMode.heading ]]</h2>
+
+    <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}<br>
+    <a class="edit-metadata" href="#" ng-click="onEditTitleClicked($event)">{% trans "Edit title and description." %}</a>
+    </p>
+    <p class="error" ng-show="!workflow.subtitleList.isComplete()">{% trans "Not all lines completed" %}</p>
+
+    <div class="actions">
+        <button class="send-back" ng-click="session.rejectTask()">
+            {% trans "Send Back" %}
+        </button>
+
+        <button ng-disabled="!session.canEndorse()" class="endorse" ng-click="session.approveTask()">
+            {% trans "Approve" %}
+        </button>
+    </div>
+</div>

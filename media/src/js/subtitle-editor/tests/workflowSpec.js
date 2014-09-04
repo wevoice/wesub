@@ -76,7 +76,7 @@ describe('The Workflow class', function() {
     });
 });
 
-describe('WorkflowProgressionController', function() {
+describe('NormalWorkflowController', function() {
     var $scope = null;
     var subtitleList = null;
 
@@ -102,7 +102,7 @@ describe('WorkflowProgressionController', function() {
         $scope.workingSubtitles = { subtitleList: subtitleList };
         $scope.workflow = new Workflow(subtitleList);
         spyOn($scope, '$emit');
-        $controller('WorkflowProgressionController', {
+        $controller('NormalWorkflowController', {
             $scope: $scope,
         });
 
@@ -202,61 +202,41 @@ describe('when the enter key creates a new subtitle', function() {
     }));
 });
 
-describe('when enter creates a new subtitle', function() {
-    var keyCodeForEnter = 13;
-    var $scope;
-    var subtitleList;
-    var MockEvents;
+describe('The WorkflowController', function() {
+    // Create a mock NormalWorkflowController and ReviewWorkflowController.
+    //
+    // All they do is set a scope variable that says that they were created.
+    // This is used to test that the WorkflowController creates the correct
+    // subcontroller based on the work_mode.
+    angular.module('MockWorkflowSubControllers', [])
+        .controller('NormalWorkflowController', function($scope) {
+            $scope.subController = 'NormalWorkflowController';
+        })
+    .controller('ReviewWorkflowController', function($scope) {
+        $scope.subController = 'ReviewWorkflowController';
+    });
 
     beforeEach(function() {
-        module('amara.SubtitleEditor');
-        module('amara.SubtitleEditor.subtitles.models');
         module('amara.SubtitleEditor.mocks');
+        module('amara.SubtitleEditor.workflow');
+        module('MockWorkflowSubControllers');
     });
 
-    beforeEach(inject(function($rootScope, $controller, $injector,
-                CurrentEditManager, SubtitleList) {
-        MockEvents = $injector.get('MockEvents');
-        $scope = $rootScope;
-        $scope.timelineShown = false;
-        $scope.currentEdit = new CurrentEditManager();
-        subtitleList = new SubtitleList();
-        subtitleList.loadEmptySubs('en');
-        $scope.workingSubtitles = { subtitleList: subtitleList };
-        $controller("AppControllerEvents", {
-            $scope: $scope,
-        });
-        spyOn(subtitleList, 'insertSubtitleBefore').andCallThrough();
+    it('creates a NormalWorkflowController for normal work mode', inject(function($controller, EditorData) {
+        EditorData.work_mode = { type: 'normal' };
+        $scope = {};
+        $controller('WorkflowController', { $scope: $scope, });
+
+        expect($scope.subController).toEqual('NormalWorkflowController');
+        expect($scope.workMode.type).toEqual('normal');
     }));
 
-    it('creates a new subtitle', function() {
-        $scope.handleAppKeyDown(MockEvents.keydown(keyCodeForEnter));
-        expect(subtitleList.insertSubtitleBefore).toHaveBeenCalled();
-    });
+    it('creates a ReviewWorkflowController for normal work mode', inject(function($controller, EditorData) {
+        EditorData.work_mode = { type: 'review' };
+        $scope = {};
 
-    it('calls preventDefault', function() {
-        var evt = MockEvents.keydown(keyCodeForEnter);
-        $scope.handleAppKeyDown(evt);
-        expect(evt.preventDefault).toHaveBeenCalled();
-    });
-
-    it('starts editing the new subtitle', function() {
-        $scope.handleAppKeyDown(MockEvents.keydown(keyCodeForEnter));
-        expect($scope.currentEdit.draft).not.toBe(null);
-    });
-
-    it('does not creates a new subtitle if its inside a textarea', function() {
-        $scope.handleAppKeyDown(MockEvents.keydown(keyCodeForEnter, {
-            'target': {
-                'type': 'textarea',
-            },
-        }));
-        expect(subtitleList.insertSubtitleBefore).not.toHaveBeenCalled();
-    });
-
-    it('does not creates a new subtitle if the timeline is shown', function() {
-        $scope.timelineShown = true;
-        $scope.handleAppKeyDown(MockEvents.keydown(keyCodeForEnter));
-        expect(subtitleList.insertSubtitleBefore).not.toHaveBeenCalled();
-    });
+        $controller('WorkflowController', { $scope: $scope, });
+        expect($scope.subController).toEqual('ReviewWorkflowController');
+        expect($scope.workMode.type).toEqual('review');
+    }));
 });

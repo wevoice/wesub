@@ -180,6 +180,9 @@ var angular = angular || null;
                     redirectToVideoPage();
                 });
             },
+            canEndorse: function() {
+                return $scope.workingSubtitles.subtitleList.isComplete();
+            },
             approveTask: function() {
                 $scope.dialogManager.showFreezeBox(
                         $sce.trustAsHtml('Accepting subtitles&hellip;'));

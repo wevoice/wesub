@@ -63,21 +63,7 @@ var angular = angular || null;
     }
     module.value('Workflow', Workflow);
 
-    module.controller('WorkflowProgressionController', ["$scope", "$sce", "EditorData", "VideoPlayer", function($scope, $sce, EditorData, VideoPlayer) {
-
-        $scope.showOverlay = true;
-        $scope.$root.$on("video-playback-changes", function() {
-            $scope.showOverlay = false;
-        });
-        $scope.$root.$on("app-click", function() {
-            $scope.showOverlay = false;
-        });
-
-        $scope.onEditTitleClicked = function($event) {
-            $event.preventDefault();
-            $event.stopPropagation();
-            $scope.dialogManager.open('metadata');
-        }
+    module.controller('NormalWorkflowController', ["$scope", "$sce", "EditorData", "VideoPlayer", function($scope, $sce, EditorData, VideoPlayer) {
 
         // If a blank list of subs start, we automatically start editing
         if ($scope.workflow.subtitleList.length() == 0) {
@@ -102,5 +88,30 @@ var angular = angular || null;
         $scope.taskButtons = Boolean(EditorData.task_needs_pane);
     }]);
 
+    module.controller('ReviewWorkflowController', ["$scope", function($scope) {
+        $scope.heading = $scope.workMode.heading;
+    }]);
+
+    module.controller('WorkflowController', ["$scope", "$controller", 'EditorData',
+            function($scope, $controller, EditorData) {
+        $scope.workMode = EditorData.work_mode;
+
+        if($scope.workMode.type == 'normal') {
+            $controller('NormalWorkflowController', {
+                $scope: $scope
+            });
+        } else if($scope.workMode.type == 'review') {
+            $controller('ReviewWorkflowController', {
+                $scope: $scope
+            });
+        }
+
+        $scope.onEditTitleClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dialogManager.open('metadata');
+        }
+
+    }]);
 
 })(this);

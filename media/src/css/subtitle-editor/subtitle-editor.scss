@@ -1178,6 +1178,47 @@ div.workspace-tools {
 }
 
 div.workflow {
+    h2 {
+        font-size: 20px;
+        margin-bottom: 1em;
+    }
+
+    h3 {
+        font-size: 16px;
+    }
+
+    p {
+        font-size: 12px;
+        line-height: 150%;
+        margin-top: 0.5em;
+
+        &.error {
+            color: $reddish-pink;
+        }
+    }
+
+    a.edit-metadata {
+        margin-top: 0.5em;
+        color: $blue;
+    }
+
+    &.review {
+        background: #333;
+        color: #E6E6E6;
+        padding: 2em;
+
+        a.edit-metadata {
+            color: $lighter-blue;
+        }
+
+        .actions {
+            position: absolute;
+            bottom: 1em;
+            left: 2em;
+            right: 2em;
+        }
+    }
+
     ol {
         list-style: decimal outside;
         padding: 0.5em 0;
@@ -1210,33 +1251,18 @@ div.workflow {
         }
     }
 
-    h3 {
-        font-size: 16px;
-    }
-
-    p {
-        font-size: 12px;
-        line-height: 150%;
-        margin-top: 0.5em;
-
-        &.error {
-            color: $reddish-pink;
-        }
-    }
-
-    a.edit-metadata {
-        margin-top: 0.5em;
-        color: $blue;
-        &.visited {
-            color: $blue;
-        }
-    }
 
     button {
         @include big-button;
         margin-top: 10px;
         background: $light-blue;
+    }
 
+    &.review button {
+        padding: 10px;
+    }
+
+    button {
         &.send-back {
             background-color: #d24655;
             background-image: url("../images/thumbs-down.png");
@@ -1258,6 +1284,9 @@ div.workflow {
             cursor: default;
         }
     }
+
+
+
 }
 
 // Timeline mode
