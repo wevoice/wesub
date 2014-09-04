@@ -11,6 +11,7 @@ codebase.
    workflow
    testing
    editor
+   subtitle-actions
    permissions
    i18n
    behaviors
