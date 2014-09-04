@@ -1,7 +1,6 @@
-Here's a quick guide for getting up to speed on how subtitle formats work currently on Amara.
-
 Babelsubs
------------
+=========
+
 We've split the subtitle handling into it's own separate project, `Babelsubs <https://github.com/pculture/babelsubs/>`_. Anything that has do to with parsing, generating and formatting subtitles should be handled over there. The main unisubs repo should only make calls to babelsubs with the desired operations / data.
 
 Storage

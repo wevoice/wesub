@@ -1,5 +1,5 @@
-Development Guide
-=================
+Development Workflow
+====================
 
 This guide describes the development workflow for Amara.
 
