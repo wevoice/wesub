@@ -64,9 +64,9 @@
             </tr>
         </table>
 	<div class="warning-text">
-	  <p ng-show="isWarning(currentEdit.draft, 'lines', $index)">{% trans "Subtitles with more than one line break are often hard to read" %}</p>
-	  <p ng-show="isWarning(currentEdit.draft, 'timing', $index)">{% trans "Briefly displayed subtitles are hard to read" %}</p>
-	  <p ng-show="isWarning(currentEdit.draft, 'characterRate', $index)">{% trans "Long subtitles should be displayed long enough or they are hard to read " %}</p>
+	  <p ng-show="isWarning(currentEdit.draft, 'lines')">{% trans "Subtitles with more than one line break are often hard to read" %}</p>
+	  <p ng-show="isWarning(currentEdit.draft, 'timing')">{% trans "Briefly displayed subtitles are hard to read" %}</p>
+	  <p ng-show="isWarning(currentEdit.draft, 'characterRate')">{% trans "Long subtitles should be displayed long enough or they are hard to read " %}</p>
 	</div>
     </div>
 
