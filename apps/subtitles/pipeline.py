@@ -60,6 +60,7 @@ from subtitles.models import (
     SubtitleLanguage, SubtitleVersion, ORIGIN_ROLLBACK, ORIGIN_API,
     ORIGIN_UPLOAD, ORIGIN_WEB_EDITOR
 )
+from subtitles import actions
 from subtitles import signals
 
 # Utility Functions -----------------------------------------------------------
@@ -386,7 +387,7 @@ def _timings_changed(subtitle_language, new_version):
 def _add_subtitles(video, language_code, subtitles, title, description, author,
                    visibility, visibility_override, parents,
                    rollback_of_version_number, committer, complete, created,
-                   note, origin, metadata):
+                   note, origin, metadata, action):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
@@ -406,6 +407,14 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
     _strip_nones(data)
 
     version = sl.add_version(subtitles=subtitles, **data)
+    if action:
+        action = actions.lookup_action(author, sl.video, language_code,
+                                       action)
+        if complete is None:
+            complete = action.complete
+        elif complete != action.complete:
+            raise ValueError("complete and action.complete dont match")
+
     if complete != None:
         is_complete = complete and version.get_subtitles().fully_synced
         # only save if the value has changed
@@ -427,6 +436,8 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
         _fork_dependents(sl)
 
     signals.subtitles_changed.send(sl, version=version)
+    if action:
+        action.handle(author, sl.video, language_code, version)
 
     return version
 
@@ -447,6 +458,7 @@ def _rollback_to(video, language_code, version_number, rollback_author):
         'complete': None,
         'committer': None,
         'created': None,
+        'action': None,
         'note': target.note,
         'metadata': target.get_metadata(),
         'origin': ORIGIN_ROLLBACK,
@@ -508,7 +520,8 @@ def add_subtitles(video, language_code, subtitles,
                   title=None, description=None, author=None,
                   visibility=None, visibility_override=None,
                   parents=None, committer=None, complete=None,
-                  created=None, note=None, origin=None, metadata=None):
+                  created=None, note=None, origin=None, metadata=None,
+                  action=None):
     """Add subtitles in the language to the video.  It all starts here.
 
     This function is your main entry point to the subtitle pipeline.
@@ -551,6 +564,9 @@ def add_subtitles(video, language_code, subtitles,
     subtitles_complete attribute will be set appropriately.  If omitted, it will
     not be adjusted.
 
+    action can be given as an action string.  If given, we will perform that
+    action using the saved version.
+
     Created should be a datetime that will set the "created" date for the
     resulting version.  If not given it will default to today.
 
@@ -560,8 +576,7 @@ def add_subtitles(video, language_code, subtitles,
                               description, author, visibility,
                               visibility_override, parents, None, committer,
                               complete, created, note, origin,
-                              metadata)
-
+                              metadata, action)
 
 def unsafe_rollback_to(video, language_code, version_number,
                        rollback_author=None):

@@ -19,16 +19,22 @@
 
 """Tests for the subtitle pipeline implementation."""
 
+from __future__ import absolute_import
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from nose.tools import *
 
 from babelsubs.storage import SubtitleSet, SubtitleLine
 
 from auth.models import CustomUser as User
 from subtitles import pipeline
+from subtitles.actions import Action
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.tests.utils import make_video, make_video_2
-
+from subtitles.tests.actions_tests import TestAction
+from utils.factories import *
+from utils import test_utils
 
 class TestHelperFunctions(TestCase):
     def setUp(self):
@@ -131,7 +137,6 @@ class TestBasicAdding(TestCase):
         users = User.objects.all()
         (self.u1, self.u2) = users[:2]
         self.anon = User.get_anonymous()
-
 
     def test_add_empty_versions(self):
         # Start with no SubtitleLanguages.
@@ -612,6 +617,40 @@ class TestBasicAdding(TestCase):
         # tell it's complete, but it isn't really:
         _add(True, [(100,200, "hey"), (None, None, "there")])
         self.assertFalse(_get_sl_completion())
+
+    @test_utils.patch_for_test('subtitles.actions.get_actions')
+    def test_action(self, mock_get_actions):
+        user = UserFactory()
+        test_action = TestAction('action')
+        mock_get_actions.return_value = [ test_action ]
+        version = pipeline.add_subtitles(self.video, 'en', None,
+                                         author=user, action='action')
+        test_action.handle.assert_called_with(user, self.video, 'en', version)
+
+    @test_utils.patch_for_test('subtitles.actions.get_actions')
+    def test_action_completes_subtitles(self, mock_get_actions):
+        user = UserFactory()
+        test_action = TestAction('action', True)
+        mock_get_actions.return_value = [ test_action ]
+        version = pipeline.add_subtitles(self.video, 'en',
+                                         SubtitleSetFactory(num_subs=10),
+                                         author=user, action='action')
+
+        self.assertEqual(version.subtitle_language.subtitles_complete, True)
+        test_action.handle.assert_called_with(user, self.video, 'en', version)
+
+    @test_utils.patch_for_test('subtitles.actions.get_actions')
+    def test_complete_mismatch(self, mock_get_actions):
+        # test an action that has complete set to a value, but the
+        # pipeline.add_subtitles call has complete set to a different value.
+        user = UserFactory()
+        test_action = TestAction('action', True)
+        mock_get_actions.return_value = [ test_action ]
+        with assert_raises(ValueError):
+            version = pipeline.add_subtitles(self.video, 'en',
+                                             SubtitleSetFactory(num_subs=10),
+                                             complete=False, author=user,
+                                             action='action')
 
 class TestRollbacks(TestCase):
     def setUp(self):
