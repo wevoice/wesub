@@ -186,6 +186,7 @@ INSTALLED_APPS = (
     'accountlinker',
     'amaradotorg',
     'amaracelery',
+    'api',
     'comments',
     'externalsites',
     'messages',
@@ -230,6 +231,13 @@ BROKER_USER = AWS_ACCESS_KEY_ID = ""
 BROKER_PASSWORD = AWS_SECRET_ACCESS_KEY = ""
 BROKER_HOST = "localhost"
 BROKER_POOL_LIMIT = 10
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'api.auth.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    )
+}
 
 #################
 
