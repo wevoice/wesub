@@ -317,14 +317,7 @@ var USER_IDLE_MINUTES = 15;
                 elt.data('subtitle', subtitle);
                 return elt;
             }
-	    function warning(subtitle, elt) {
-		var output = {};
-		if ($('br',$('span.subtitle-text', elt)).length > 1)
-		    output["lines"] = true;
-		if ((subtitle.startTime > -1) && (subtitle.endTime > -1) && (subtitle.endTime - subtitle.startTime < 700))
-		    output["timing"] = true;
-		return (output);
-	    }
+
             function renderSubtitle(subtitle, elt) {
                 var content = subtitle.content();
                 var classes = [];
@@ -344,7 +337,7 @@ var USER_IDLE_MINUTES = 15;
                 elt.prop('className', classes.join(' '));
                 $('span.subtitle-text', elt).html(content);
                 $('span.timing', elt).text(displayTime(subtitle.startTime));
-                $('span.warning', elt).toggle(! $.isEmptyObject(warning(subtitle, elt)));
+		$('span.warning', elt).hide();
             }
 
             function findSubtitleData(node) {

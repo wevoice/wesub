@@ -35,6 +35,7 @@ $span-key-height: 32px;
 $text-color: #565758;
 $reddish-pink: #d24655;
 $lighter-blue: #29b0bf;
+$warning-color: #ff6000;
 $blue: #126295;
 $teal: #15998e;
 
@@ -442,9 +443,12 @@ div.subtitles-wrapper {
         border-top: 1px solid #e6e7e8;
         border-right: 1px solid #e6e7e8;
         border-bottom: 1px solid #e6e7e8;
-        table {
-            width: 100%;
+        table, div {
+            width: 80%;
             margin: 0px 15px 25px 15px;
+        }
+	div.warning-text {
+	    color: $warning-color;
         }
         td, th {
             text-align: left;
@@ -551,9 +555,7 @@ div.subtitles {
             }
 
             span.warning {
-                color: #ff6000;
                 display: block;
-                font-size: 10px;
                 position: absolute;
                 right: 20px;
                 top: 20px;
@@ -1488,4 +1490,9 @@ aside.modal#guidelines-modal {
             padding: 15px 0;
         }
     }
+}
+
+span.warning {
+    color: $warning-color;
+    font-size: 10px;
 }

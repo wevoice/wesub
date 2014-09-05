@@ -207,6 +207,27 @@ var angular = angular || null;
             $scope.currentEdit.start(newSub);
         }
 
+	$scope.isWarning = function(subtitle, type, data) {
+	    if(subtitle) {
+		switch(type) {
+		case "lines":
+		    return (subtitle.lineCount() > 2);
+		case "characterRate":
+		    return (subtitle.characterRate() > 21);
+		case "timing":
+		    return ((subtitle.startTime > -1) && (subtitle.endTime > -1) && (subtitle.endTime - subtitle.startTime < 700));
+		case "longline":
+		    if (data != undefined)
+			return (subtitle.characterCountPerLine()[data] > 42);
+		    else
+			return ((subtitle.characterCountPerLine().length == 1) && (subtitle.characterCountPerLine()[0] > 42));
+		default:
+		    return false;
+		}
+	    }
+	    return false;
+	};
+
         $scope.onSubtitleClick = function(evt, subtitle, action) {
             var madeChange = false;
             switch(action) {
