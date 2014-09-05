@@ -337,7 +337,7 @@ var USER_IDLE_MINUTES = 15;
                 elt.prop('className', classes.join(' '));
                 $('span.subtitle-text', elt).html(content);
                 $('span.timing', elt).text(displayTime(subtitle.startTime));
-		$('span.warning', elt).toggle(subtitle.hasWarning());
+		$('span.warning', elt).toggle($scope.warningsShown && subtitle.hasWarning());
             }
 
             function findSubtitleData(node) {

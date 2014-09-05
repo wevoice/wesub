@@ -1147,6 +1147,9 @@ div.workspace-tools {
                    &.upload-subtitles {
                      background: url('../images/subtitle-editor/glyphicons_419_disk_export.png') 10px no-repeat;
                    }
+                   &.show-warnings {
+                     background: url('../images/subtitle-editor/glyphicons_196_circle_exclamation_mark.png') 10px no-repeat;
+                   }
                    &:hover {
                       background: #C5C5C5;
                       color: $dark-grey;

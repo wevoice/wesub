@@ -207,8 +207,8 @@ var angular = angular || null;
             $scope.currentEdit.start(newSub);
         }
 
-	$scope.isWarning = function(subtitle, type, data) {
-	    if(subtitle)
+	$scope.showWarning = function(subtitle, type, data) {
+	    if(subtitle && $scope.warningsShown)
 		return subtitle.hasWarning(type, data);
 	    return false;
 	};
