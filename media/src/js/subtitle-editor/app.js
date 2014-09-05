@@ -52,6 +52,14 @@ var angular = angular || null;
     module.constant('MIN_DURATION', 250); // 0.25 seconds
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
 
+    module.factory('EditorData', ["$window", function($window) {
+        /**
+         * Get the editor data that was passed to us from python
+         *
+         */
+        return $window.editorData;
+    }]);
+
     module.controller("AppController", ['$scope', '$sce', '$controller', 
                       '$window', 'EditorData', 'VideoPlayer', 'Workflow',
                       function($scope, $sce, $controller, $window, EditorData,

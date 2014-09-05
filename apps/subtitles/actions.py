@@ -54,6 +54,10 @@ class Action(object):
     label = NotImplemented
     """human-friendly label.  Strings should be run through ugettext_lazy()
     """
+    in_progress_text = NotImplemented
+    """text to display in the editor while this action is being performed.
+    Strings should be run through ugettext_lazy()
+    """
 
     visual_class = None
     """
@@ -95,6 +99,8 @@ class Publish(Action):
     """
     name = 'publish'
     label = ugettext_lazy('Publish')
+    in_progress_text = ugettext_lazy('Saving')
+    visual_class = 'endorse'
     complete = True
 
     def handle(self, user, video, language_code, saved_version):
@@ -155,3 +161,21 @@ def can_perform_action(user, video, language_code, action_name):
     subtitle_language = video.subtitle_language(language_code)
     action = _lookup_action(user, video, language_code, action_name)
     return _check_can_perform(action, subtitle_language) is None
+
+def editor_actions(user, video, language_code):
+    """Get the list of actions to send to the editor.
+
+    Returns:
+        the actions from get_actions() serialized into dicts to add to the
+        javascript object editor_data.
+    """
+    data = []
+    for action in get_actions(user, video, language_code):
+        data.append({
+            'name': action.name,
+            'label': unicode(action.label),
+            'in_progress_text': unicode(action.in_progress_text),
+            'class': action.visual_class,
+            'complete': action.complete,
+        })
+    return data

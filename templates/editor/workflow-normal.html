@@ -29,8 +29,8 @@
         </p>
         <p class="error" ng-show="!workflow.subtitleList.isComplete()">{% trans "Not all lines completed" %}</p>
 
-        <button ng-disabled="!session.canEndorse()" class="endorse" ng-click="session.endorse()">
-            {% trans "Publish" %}
+        <button ng-repeat="action in actions" ng-disabled="!action.canPerform()" ng-class="action.class" ng-click="action.perform()">
+            [[ action.label ]]
         </button>
     </li>
 </ol>

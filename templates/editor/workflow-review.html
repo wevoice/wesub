@@ -8,12 +8,8 @@
     <p class="error" ng-show="!workflow.subtitleList.isComplete()">{% trans "Not all lines completed" %}</p>
 
     <div class="actions">
-        <button class="send-back" ng-click="session.rejectTask()">
-            {% trans "Send Back" %}
-        </button>
-
-        <button ng-disabled="!session.canEndorse()" class="endorse" ng-click="session.approveTask()">
-            {% trans "Approve" %}
+        <button ng-repeat="action in actions" ng-disabled="!action.canPerform()" ng-class="action.class" ng-click="action.perform()">
+            [[ action.label ]]
         </button>
     </div>
 </div>

@@ -3125,3 +3125,4 @@ class Partner(models.Model):
 # gets loaded as well
 import teams.signalhandlers
 import teams.editor
+import teams.subtitle_actions

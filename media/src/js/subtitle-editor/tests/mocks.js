@@ -20,13 +20,11 @@
 
     module.factory('SubtitleStorage', ["$q", function($q) {
         var methodNames = [
-            'approveTask',
-            'updateTaskNotes',
             'getLanguages',
             'getLanguage',
             'getSubtitles',
-            'sendBackTask',
             'saveSubtitles',
+            'performAction',
         ];
         var SubtitleStorage = {
             deferreds: {},

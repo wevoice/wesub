@@ -47,79 +47,52 @@ describe('The SessionBackend', function() {
     }
 
     it('saves subtitles', function() {
-        var callback = jasmine.createSpy();
-        $scope.sessionBackend.saveSubtitles(true).then(callback);
+        $scope.sessionBackend.saveSubtitles(true);
         expect(SubtitleStorage.saveSubtitles).toHaveBeenCalledWith(
-            EditorData.video.id,
-            $scope.workingSubtitles.language.code,
             $scope.workingSubtitles.subtitleList.toXMLString(),
             $scope.workingSubtitles.title,
             $scope.workingSubtitles.description,
             $scope.workingSubtitles.metadata,
-            true);
+            true, null);
+    });
+
+    it('saves subtitles with actions', function() {
+        $scope.sessionBackend.saveSubtitlesWithAction('action');
+        expect(SubtitleStorage.saveSubtitles).toHaveBeenCalledWith(
+            $scope.workingSubtitles.subtitleList.toXMLString(),
+            $scope.workingSubtitles.title,
+            $scope.workingSubtitles.description,
+            $scope.workingSubtitles.metadata,
+            null, 'action');
+    });
+
+    if('updates the version number after saving', function() {
+        $scope.sessionBackend.saveSubtitles(true);
         // Once the SubtitleStorage.saveSubtitles completes, then we should
         // update the version number and the promise returned by
         // sessionBackend.saveSubtitles() should also complete
-        expect(callback).not.toHaveBeenCalled();
         SubtitleStorage.deferreds.saveSubtitles.resolve(
             saveSubtitlesResponse(initialVersion+1));
         $rootScope.$digest();
         expect($scope.workingSubtitles.versionNumber).toEqual(initialVersion+1);
-        expect(callback).toHaveBeenCalled();
     });
 
-    it('saves notes', function() {
+    it('calls back our callback after saving', function() {
         var callback = jasmine.createSpy();
-        $scope.sessionBackend.saveNotes().then(callback);
-        expect(SubtitleStorage.updateTaskNotes).toHaveBeenCalledWith(
-            $scope.collab.notes);
-        // Once updateTaskNotes() completes, saveNotes() should complete
+        $scope.sessionBackend.saveSubtitles(true).then(callback);
         expect(callback).not.toHaveBeenCalled();
-        SubtitleStorage.deferreds.updateTaskNotes.resolve(true);
-        $rootScope.$digest();
-        expect(callback).toHaveBeenCalled();
-    });
-
-    it('approves tasks', function() {
-        var callback = jasmine.createSpy();
-        $scope.sessionBackend.approveTask().then(callback);
-        expect(SubtitleStorage.approveTask).toHaveBeenCalledWith(
-            initialVersion, $scope.collab.notes);
-        // Once SubtitleStorage.approveTask() completes,
-        // sessionBackend.approveTask() should complete
-        expect(callback).not.toHaveBeenCalled();
-        SubtitleStorage.deferreds.approveTask.resolve(true);
-        $rootScope.$digest();
-        expect(callback).toHaveBeenCalled();
-    });
-
-    it('sends tasks back', function() {
-        var callback = jasmine.createSpy();
-        $scope.sessionBackend.sendBackTask().then(callback);
-        expect(SubtitleStorage.sendBackTask).toHaveBeenCalledWith(
-            initialVersion, $scope.collab.notes);
-        // Once SubtitleStorage.sendBackTask() completes,
-        // sessionBackend.sendBackTask() should complete
-        expect(callback).not.toHaveBeenCalled();
-        SubtitleStorage.deferreds.sendBackTask.resolve(true);
-        $rootScope.$digest();
-        expect(callback).toHaveBeenCalled();
-    });
-
-    it('sends tasks the update version number', function() {
-        // This is just checking a particular case that may be tricky.  If we
-        // save subtitles and approve a task, we should send the new version
-        // number to SubtitleStorage.approveTask
-        $scope.sessionBackend.saveSubtitles(true)
-            .then($scope.sessionBackend.approveTask);
         SubtitleStorage.deferreds.saveSubtitles.resolve(
             saveSubtitlesResponse(initialVersion+1));
         $rootScope.$digest();
-        expect(SubtitleStorage.approveTask).toHaveBeenCalledWith(
-            initialVersion+1, $scope.collab.notes);
+        expect(callback).toHaveBeenCalled();
     });
-});
 
+    it('performs actions', function() {
+        $scope.sessionBackend.performAction('action');
+        expect(SubtitleStorage.performAction).toHaveBeenCalledWith('action');
+    });
+
+});
 
 describe('The SessionController', function() {
     var $sce;
@@ -131,6 +104,7 @@ describe('The SessionController', function() {
     var backendMethodsCalled;
     var simulateSaveError;
     var markAsCompleteArg = null;
+    var actionArg = null;
 
     beforeEach(function() {
         module('amara.SubtitleEditor.mocks');
@@ -142,6 +116,26 @@ describe('The SessionController', function() {
         $sce = $injector.get('$sce');
         $rootScope = $injector.get('$rootScope');
         EditorData = $injector.get('EditorData');
+        EditorData.actions = [
+            {
+                name: 'action1',
+                label: 'Action 1',
+                in_progress_text: 'Doing Action 1',
+                complete: true
+            },
+            {
+                name: 'action2',
+                label: 'Action 2',
+                in_progress_text: 'Doing Action 2',
+                complete: false
+            },
+            {
+                name: 'action3',
+                label: 'Action 3',
+                in_progress_text: 'Doing Action 3',
+                complete: null
+            },
+        ];
         $scope = $rootScope.$new();
         $scope.overrides = {
             forceSaveError: false
@@ -160,14 +154,18 @@ describe('The SessionController', function() {
     beforeEach(inject(function($q) {
         backendMethodsCalled = [];
         simulateSaveError = false;
-        var backendMethods = [ 'saveSubtitles', 'saveNotes', 'approveTask',
-            'sendBackTask'
+        var backendMethods = [ 
+            'saveSubtitles',
+            'saveSubtitlesWithAction',
+            'performAction',
         ];
         $scope.sessionBackend = {};
         _.each(backendMethods, function(methodName) {
             var spy = jasmine.createSpy().andCallFake(function(arg) {
                 if(methodName == 'saveSubtitles') {
                     markAsCompleteArg = arg;
+                } else if(methodName == 'saveSubtitlesWithAction' || methodName == 'performAction') {
+                    actionArg = arg;
                 }
                 backendMethodsCalled.push(methodName);
                 var deferred = $q.defer();
@@ -180,6 +178,8 @@ describe('The SessionController', function() {
             });
             $scope.sessionBackend[methodName] = spy;
         });
+        $scope.sessionBackend.subtitlesComplete =
+            jasmine.createSpy().andReturn(true);
     }));
 
     beforeEach(function() {
@@ -222,34 +222,15 @@ describe('The SessionController', function() {
     });
 
     it('shows the unsaved changes dialog', function() {
-        session.subtitlesChanged();
+        session.subtitlesChanged = true;
         session.exit();
         expectNoRedirect();
         expect($scope.dialogManager.openDialog).toHaveBeenCalledWith(
             'unsavedWork', jasmine.any(Object));
-    });
-
-    it('shows the unsaved changes dialog for note changes', function() {
-        session.notesChanged();
-        session.exit();
-        expectNoRedirect();
-        expect($scope.dialogManager.openDialog).toHaveBeenCalledWith(
-            'unsavedWork', jasmine.any(Object));
-    });
-
-
-    it('skips the unsaved changes dialog if resetChanges() is called', function() {
-        for(var i=0; i < 10; i ++) {
-            session.subtitlesChanged();
-            session.notesChanged();
-        }
-        session.resetChanges();
-        session.exit();
-        expectRedirectToVideoPage();
     });
 
     it('handles the exit button on the unsaved work dialog', function() {
-        session.subtitlesChanged();
+        session.subtitlesChanged = true;
         session.exit();
         var callbacks = $scope.dialogManager.openDialog.mostRecentCall.args[1];
         callbacks.exit();
@@ -262,7 +243,7 @@ describe('The SessionController', function() {
     });
 
     it('shows the unsaved changes dialog when exiting to the legacy editor', function() {
-        session.subtitlesChanged();
+        session.subtitlesChanged = true;
         session.exitToLegacyEditor();
         expectNoRedirect();
         expect($scope.dialogManager.openDialog).toHaveBeenCalledWith(
@@ -270,7 +251,7 @@ describe('The SessionController', function() {
     });
 
     it('handles the exit button on the legacy editor unsaved work dialog', function() {
-        session.subtitlesChanged();
+        session.subtitlesChanged = true;
         session.exitToLegacyEditor();
         var callbacks = $scope.dialogManager.openDialog.mostRecentCall.args[1];
         callbacks.discardChangesAndOpenLegacyEditor();
@@ -278,7 +259,7 @@ describe('The SessionController', function() {
     });
 
     it('handles saving subtitles', function() {
-        session.subtitlesChanged();
+        session.subtitlesChanged = true;
         session.save();
         // While the save is in-progress we should show a freeze box
         expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Saving&hellip;');
@@ -292,37 +273,8 @@ describe('The SessionController', function() {
             'changesSaved', jasmine.any(Object));
     });
 
-    it('handles saving notes', function() {
-        session.notesChanged();
-        session.save();
-        // While the save is in-progress we should show a freeze box
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Saving&hellip;');
-        // After the save is complete, we should close the freezebox and show
-        // the subtitles saved dialog
-        $rootScope.$digest();
-        expect(backendMethodsCalled).toEqual(['saveNotes']);
-        expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
-        expect($scope.dialogManager.openDialog).toHaveBeenCalledWith(
-            'changesSaved', jasmine.any(Object));
-    });
-
-    it('handles saving subtitles and notes', function() {
-        session.subtitlesChanged();
-        session.notesChanged();
-        session.save();
-        // While the save is in-progress we should show a freeze box
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Saving&hellip;');
-        // After the save is complete, we should close the freezebox and show
-        // the subtitles saved dialog
-        $rootScope.$digest();
-        expect(backendMethodsCalled).toEqual(['saveSubtitles', 'saveNotes']);
-        expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
-        expect($scope.dialogManager.openDialog).toHaveBeenCalledWith(
-            'changesSaved', jasmine.any(Object));
-    });
-
     it('handles the exit button after saving subtitles', function() {
-        session.subtitlesChanged();
+        session.subtitlesChanged = true;
         session.save();
         $rootScope.$digest();
         var callbacks = $scope.dialogManager.openDialog.mostRecentCall.args[1];
@@ -332,117 +284,79 @@ describe('The SessionController', function() {
 
     it('handles errors while saving subtitles', function() {
         simulateSaveError = true;
-        session.subtitlesChanged();
+        session.subtitlesChanged = true;
         session.save();
         $rootScope.$digest();
         expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
         expect($scope.dialogManager.open).toHaveBeenCalledWith('save-error');
     });
 
-    it('calculates if there unsaved changes', function() {
-        expect(session.unsavedChanges()).toBeFalsy();
-        session.subtitlesChanged();
-        expect(session.unsavedChanges()).toBeTruthy();
-        session.resetChanges();
-        expect(session.unsavedChanges()).toBeFalsy();
-        session.notesChanged();
-        expect(session.unsavedChanges()).toBeTruthy();
-        session.subtitlesChanged();
-        expect(session.unsavedChanges()).toBeTruthy();
-        session.save();
-        $rootScope.$digest();
-        expect(session.unsavedChanges()).toBeFalsy();
+    it('lists actions', function() {
+        expect($scope.actions[0].label).toEqual('Action 1');
+        expect($scope.actions[1].label).toEqual('Action 2');
+        expect($scope.actions[2].label).toEqual('Action 3');
+        expect($scope.actions.length).toEqual(3);
     });
 
-    it('handles endorsing subtitles', function() {
-        session.subtitlesChanged();
-        session.endorse();
+    it('handles performing actions', function() {
+        $scope.actions[0].perform();
+        // While the save is in-progress we should show a freeze box
+        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Doing Action 1&hellip;');
+        // After the save is complete, we should close the freezebox and show
+        // the subtitles saved dialog
         $rootScope.$digest();
-        expect(backendMethodsCalled).toEqual(['saveSubtitles']);
-        expect(markAsCompleteArg).toBe(true);
-        // when endorse is clicked, we should exit the editor
+        expect(backendMethodsCalled).toEqual(['performAction']);
+        expect(actionArg).toEqual(EditorData.actions[0].name);
+        expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
         expectRedirectToVideoPage();
     });
 
-    it('handles endorsing tasks', function() {
-        EditorData.task_id = 123;
-        session.subtitlesChanged();
-        session.notesChanged();
-        session.endorse();
+    it('handles errors while performing actions', function() {
+        simulateSaveError = true;
+        $scope.actions[0].perform();
         $rootScope.$digest();
-        // Note: even though the notes have changed, we shouldn't call
-        // updateTaskNotes().  approveTask will handle that.
-        expect(backendMethodsCalled).toEqual(['saveSubtitles', 'approveTask']);
-        expect(markAsCompleteArg).toBe(true);
-        // when endorse is clicked, we should exit the editor
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Exiting&hellip;');
+        expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
+        expect($scope.dialogManager.open).toHaveBeenCalledWith('save-error');
+    });
+
+    it('handles performing actions with subtitle changes', function() {
+        session.subtitlesChanged = true;
+        $scope.actions[0].perform();
+        // While the save is in-progress we should show a freeze box
+        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Doing Action 1&hellip;');
+        // After the save is complete, we should close the freezebox and show
+        // the subtitles saved dialog
+        $rootScope.$digest();
+        expect(backendMethodsCalled).toEqual(['saveSubtitlesWithAction']);
+        expect(actionArg).toEqual(EditorData.actions[0].name);
+        expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
         expectRedirectToVideoPage();
     });
 
-    it('handles endorsing tasks with no subtitle changes', function() {
-        EditorData.task_id = 123;
-        session.notesChanged();
-        session.endorse();
-        $rootScope.$digest();
-        // Even though no changes have been made, we should still call
-        // saveSubtitles, because we want to mark them as complete
-        expect(backendMethodsCalled).toEqual(['saveSubtitles', 'approveTask']);
-        expect(markAsCompleteArg).toBe(true);
-        // when endorse is clicked, we should exit the editor
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Exiting&hellip;');
-        expectRedirectToVideoPage();
+    it('prevents actions with complete=true to be performed with incomplete subtitles', function() {
+        $scope.sessionBackend.subtitlesComplete.andReturn(false);
+        expect($scope.actions[0].canPerform()).toBeFalsy();
     });
 
-    it('can approve tasks', function() {
-        EditorData.task_id = 123;
-        session.notesChanged();
-        session.approveTask();
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Accepting subtitles&hellip;');
-        $rootScope.$digest();
-        expect(backendMethodsCalled).toEqual(['approveTask']);
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Exiting&hellip;');
-        expectRedirectToVideoPage();
+    it('allows actions with complete=true to be performed with complete subtitles', function() {
+        $scope.sessionBackend.subtitlesComplete.andReturn(true);
+        expect($scope.actions[0].canPerform()).toBeTruthy();
     });
 
-    it('can approve tasks with changes made', function() {
-        EditorData.task_id = 123;
-        session.subtitlesChanged();
-        session.notesChanged();
-        session.approveTask();
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Accepting subtitles&hellip;');
-        $rootScope.$digest();
-        expect(backendMethodsCalled).toEqual(['saveSubtitles', 'approveTask']);
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Exiting&hellip;');
-        expectRedirectToVideoPage();
+    it('always allows actions with complete=false to be performed', function() {
+        $scope.sessionBackend.subtitlesComplete.andReturn(false);
+        expect($scope.actions[1].canPerform()).toBeTruthy();
     });
 
-    it('can reject tasks', function() {
-        EditorData.task_id = 123;
-        session.notesChanged();
-        session.rejectTask();
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Sending subtitles back&hellip;');
-        $rootScope.$digest();
-        expect(backendMethodsCalled).toEqual(['sendBackTask']);
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Exiting&hellip;');
-        expectRedirectToVideoPage();
-    });
-
-    it('can reject tasks with changes made', function() {
-        EditorData.task_id = 123;
-        session.subtitlesChanged();
-        session.notesChanged();
-        session.rejectTask();
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Sending subtitles back&hellip;');
-        $rootScope.$digest();
-        expect(backendMethodsCalled).toEqual(['saveSubtitles', 'sendBackTask']);
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Exiting&hellip;');
-        expectRedirectToVideoPage();
+    it('always allows actions with complete=null to be performed', function() {
+        $scope.sessionBackend.subtitlesComplete.andReturn(false);
+        expect($scope.actions[2].canPerform()).toBeTruthy();
     });
 
     it('prevents closing the window with unsaved changes', function() {
         // No changes yet
         expect($window.onbeforeunload()).toBe(null);
-        session.subtitlesChanged();
+        session.subtitlesChanged = true;
         expect($window.onbeforeunload()).toBeTruthy();
         session.save()
         $rootScope.$digest();

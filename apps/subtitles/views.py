@@ -35,6 +35,7 @@ from django.template.defaultfilters import urlize, linebreaks, force_escape
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from subtitles import shims
+from subtitles.actions import editor_actions
 from subtitles.editorworkmodes import editor_work_data
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.templatetags.new_subtitles_tags import visibility
@@ -226,6 +227,7 @@ def subtitle_editor(request, video_id, language_code):
         'canSync': bool(request.GET.get('canSync', True)),
         'canAddAndRemove': bool(request.GET.get('canAddAndRemove', True)),
         'work_mode': editor_work_data(request.user, video, language_code),
+        'actions': editor_actions(request.user, video, language_code),
         # front end needs this to be able to set the correct
         # api headers for saving subs
         'authHeaders': {
