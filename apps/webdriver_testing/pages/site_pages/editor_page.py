@@ -14,7 +14,7 @@ class EditorPage(UnisubsPage):
     _URL = "subtitles/editor/{0}/{1}/"  # (video_id, lang_code)
     EXIT_BUTTON = 'div.exit'
     _EXIT = 'button.discard'
-    _SESSION_BUTTONS = 'section.session button'
+    _SESSION_BUTTONS = 'div.session button'
 
     _SAVE = 'button.save'
     _SAVE_OPTIONS = 'div button'
@@ -38,11 +38,11 @@ class EditorPage(UnisubsPage):
     _REF_METADATA_EXPANDER = 'div.reference div.metadata a'
 
     #CENTER COLUMN
-    _VIDEO_TITLE = "div.video-title a"
+    _VIDEO_TITLE = "div.video-title a:nth-child(2)"
     _PLAYER = "div#player"
     _EMBEDDED_VIDEO = "div#video"
     _VIDEO_SUBTITLE = 'div.subtitle-overlay div'
-    _WORKING_LANGUAGE = 'section.center div.subtitles-language'
+    _WORKING_LANGUAGE = 'div.work div.subtitles-language'
     _ADD_SUBTITLE = 'button.insert-subtitle'
     _SYNC_HELP = 'div.sync-help'
     _INFO_TRAY = 'div.info-tray'
@@ -234,7 +234,7 @@ class EditorPage(UnisubsPage):
     def video_title(self):
         """Return the text displayed for the video title. """
 
-        return self.get_element_attribute(self._VIDEO_TITLE, "title")
+        return self.get_text_by_css(self._VIDEO_TITLE)
 
     def click_working_sub_line(self, line):
         """Click in a subline of the working text. """
@@ -407,7 +407,7 @@ class EditorPage(UnisubsPage):
 
     def toggle_playback(self):
         self.wait_for_element_present(self._EMBEDDED_VIDEO)
-        self.type_special_key('SPACE', modifier='SHIFT', element='body')
+        self.type_special_key('TAB', modifier='SHIFT', element='body')
 
     def buffer_up_subs(self):
         self.toggle_playback()

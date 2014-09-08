@@ -213,9 +213,9 @@ class TestCaseEditing(WebdriverTestCase):
         self.editor_pg.start_next_step()
         self.editor_pg.close_edit_title()
         self.editor_pg.start_sync()
+        time.sleep(2)
         self.editor_pg.buffer_up_subs()
         self.editor_pg.toggle_playback()
-        time.sleep(2)
         self.editor_pg.sync(8, 6)
         self.editor_pg.toggle_playback()
         self.editor_pg.save("Resume Editing")
@@ -225,6 +225,7 @@ class TestCaseEditing(WebdriverTestCase):
         diffs = [(dt.strptime(x, '%M:%S.%f') - dt.strptime(y, '%M:%S.%f')) 
                   for (x, y) in zip(times[1:], times[:-1])]
         self.logger.info(diffs)
+        self.browser.get_screenshot_as_file("user-data/%s.png" % self.id())
         for x in diffs:
             self.assertGreater(x.seconds, 3)
         self.editor_pg.exit()
