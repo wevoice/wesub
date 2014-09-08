@@ -35,8 +35,7 @@ from django.template.defaultfilters import urlize, linebreaks, force_escape
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from subtitles import shims
-from subtitles.actions import editor_actions
-from subtitles.editorworkmodes import editor_work_data
+from subtitles.workflows import get_workflow
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.templatetags.new_subtitles_tags import visibility
 from subtitles.forms import SubtitlesUploadForm
@@ -226,8 +225,6 @@ def subtitle_editor(request, video_id, language_code):
     editor_data = {
         'canSync': bool(request.GET.get('canSync', True)),
         'canAddAndRemove': bool(request.GET.get('canAddAndRemove', True)),
-        'work_mode': editor_work_data(request.user, video, language_code),
-        'actions': editor_actions(request.user, video, language_code),
         # front end needs this to be able to set the correct
         # api headers for saving subs
         'authHeaders': {
@@ -258,6 +255,9 @@ def subtitle_editor(request, video_id, language_code):
         }),
         'staticURL': settings.STATIC_URL,
     }
+
+    workflow = get_workflow(video, language_code)
+    editor_data.update(workflow.editor_data(request.user))
 
     if task:
         editor_data['task_id'] = task.id

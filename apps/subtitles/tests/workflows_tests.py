@@ -21,20 +21,20 @@ from django.test import TestCase
 from nose.tools import *
 import mock
 
-from subtitles import actions
+from subtitles import workflows
 from subtitles import pipeline
+from subtitles.exceptions import ActionError
 from utils.factories import *
 from utils import test_utils
 
-class TestAction(actions.Action):
+class TestAction(workflows.Action):
     def __init__(self, name, complete=None):
         self.name = self.label = name
         self.complete = complete
-        self.handle = mock.Mock()
+        self.do_perform = mock.Mock()
 
 class ActionsTest(TestCase):
-    @test_utils.patch_for_test('subtitles.actions.get_actions')
-    def setUp(self, mock_get_actions):
+    def setUp(self):
         self.user = UserFactory()
         self.video = VideoFactory()
         pipeline.add_subtitles(self.video, 'en',
@@ -43,50 +43,36 @@ class ActionsTest(TestCase):
 
         self.action1 = TestAction('action1', True)
         self.action2 = TestAction('action2', False)
-        mock_get_actions.return_value = [ self.action1, self.action2 ]
-
+        self.workflow = workflows.Workflow(self.video, 'en')
+        self.workflow.get_actions = mock.Mock(return_value=[
+            self.action1, self.action2
+        ])
 
     def perform_action(self, action_name, saved_version=None):
-        actions.perform_action(self.user, self.video, 'en', action_name,
-                               saved_version)
-
-    def can_perform_action(self, action_name):
-        return actions.can_perform_action(self.user, self.video, 'en',
-                                          action_name)
+        self.workflow.perform_action(self.user, action_name, saved_version)
 
     def test_perform_action(self):
+        version = pipeline.add_subtitles(self.video, 'en',
+                                         SubtitleSetFactory(num_subs=10))
         self.perform_action('action1')
-        self.action1.handle.assert_called_with(
-            self.user, self.subtitle_language, None)
+        self.action1.do_perform.assert_called_with(
+            self.user, self.video, version.subtitle_language, None)
 
     def test_perform_action_with_version(self):
         version = pipeline.add_subtitles(self.video, 'en',
                                          SubtitleSetFactory(num_subs=10))
         self.perform_action('action1', version)
-        self.action1.handle.assert_called_with(
-            self.user, self.subtitle_language, version)
+        self.action1.do_perform.assert_called_with(
+            self.user, self.video, version.subtitle_language, version)
 
     def test_perform_with_invalid_action(self):
-        with assert_raises(ValueError):
+        with assert_raises(LookupError):
             self.perform_action('other-action')
 
-    def test_set_subtitles_complete_flag(self):
-        # when we run an action with complete=True, it should set
-        # subtitles_complete to True
-        self.subtitle_language.subtitles_complete = False
-        self.perform_action('action1', None)
-        assert_equals(self.subtitle_language.subtitles_complete, True)
-
-    def test_unset_subtitles_complete_flag(self):
-        self.subtitle_language.subtitles_complete = True
-        self.perform_action('action2', None)
-        assert_equals(self.subtitle_language.subtitles_complete, False)
-
-    def test_complete_set_requires_completed_subs(self):
+    def test_needs_complete_subtitles(self):
         # With 0 subtitles, we shouldn't be able to perform an action with
         # complete=True
         pipeline.add_subtitles(self.video, 'en',
                                SubtitleSetFactory(num_subs=0))
-        assert_false(self.can_perform_action('action1'))
-        with assert_raises(ValueError):
+        with assert_raises(ActionError):
             self.perform_action('action1', None)

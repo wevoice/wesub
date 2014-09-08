@@ -60,8 +60,8 @@ from subtitles.models import (
     SubtitleLanguage, SubtitleVersion, ORIGIN_ROLLBACK, ORIGIN_API,
     ORIGIN_UPLOAD, ORIGIN_WEB_EDITOR
 )
-from subtitles import actions
 from subtitles import signals
+from subtitles import workflows
 
 # Utility Functions -----------------------------------------------------------
 def _strip_nones(d):
@@ -74,7 +74,7 @@ def _strip_nones(d):
 
 
 # Private Implementation ------------------------------------------------------
-def _perform_team_operations(version, committer, complete):
+def _perform_team_operations(version, committer, action):
     """Perform any teams-based operations that need to happen to this version.
 
     If the version is not on a video from a team, does nothing.
@@ -83,10 +83,14 @@ def _perform_team_operations(version, committer, complete):
     appease the teams system gods.
 
     """
+    from teams import subtitle_workflows
+
     team_video = version.video.get_team_video()
 
     if not team_video:
         return
+
+    complete = isinstance(action, subtitle_workflows.Complete)
 
     _record_workflow_origin(team_video, version)
     _update_visibility_and_tasks(team_video, version, committer, complete)
@@ -386,13 +390,12 @@ def _timings_changed(subtitle_language, new_version):
 
 def _add_subtitles(video, language_code, subtitles, title, description, author,
                    visibility, visibility_override, parents,
-                   rollback_of_version_number, committer, complete, created,
-                   note, origin, metadata, action):
+                   rollback_of_version_number, committer, created, note,
+                   origin, metadata, action):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
-    add_subtitles and unsafe_add_subtitles are thin wrappers around this.
-
+    add_subtitles is a thin wrappers around this.
     """
     sl, language_needs_save = _get_language(video, language_code)
     if language_needs_save:
@@ -408,22 +411,11 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
 
     version = sl.add_version(subtitles=subtitles, **data)
     if action:
-        action = actions.lookup_action(author, sl.video, language_code,
-                                       action)
-        if complete is None:
-            complete = action.complete
-        elif complete != action.complete:
-            raise ValueError("complete and action.complete dont match")
+        action.perform(author, video, sl, version)
 
-    if complete != None:
-        is_complete = complete and version.get_subtitles().fully_synced
-        # only save if the value has changed
-        if is_complete != sl.subtitles_complete:
-            sl.subtitles_complete = is_complete
-            sl.save(send_subtitles_changed=False)
     _update_video_data(sl, version)
     _update_followers(sl, author)
-    _perform_team_operations(version, committer, complete)
+    _perform_team_operations(version, committer, action)
 
     if origin in (ORIGIN_UPLOAD, ORIGIN_API):
         _fork_dependents(sl)
@@ -436,8 +428,6 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
         _fork_dependents(sl)
 
     signals.subtitles_changed.send(sl, version=version)
-    if action:
-        action.handle(author, sl.video, language_code, version)
 
     return version
 
@@ -455,7 +445,6 @@ def _rollback_to(video, language_code, version_number, rollback_author):
         'title': target.title,
         'description': target.description,
         'visibility_override': None,
-        'complete': None,
         'committer': None,
         'created': None,
         'action': None,
@@ -495,27 +484,6 @@ def _rollback_to(video, language_code, version_number, rollback_author):
 
 
 # Public API ------------------------------------------------------------------
-def unsafe_add_subtitles(video, language_code, subtitles,
-                         title=None, description=None, author=None,
-                         visibility=None, visibility_override=None,
-                         parents=None, committer=None, complete=None,
-                         created=None, note=None, origin=None,
-                         metadata=None):
-    """Add subtitles in the language to the video without a transaction.
-
-    You probably want to use add_subtitles instead, but if you're already inside
-    a transaction that will rollback on exceptions you can use this instead of
-    dealing with nested transactions.
-
-    For more information see the docstring for add_subtitles.  Aside from the
-    transaction handling this function works exactly the same way.
-
-    """
-    return _add_subtitles(video, language_code, subtitles, title, description,
-                          author, visibility, visibility_override, parents,
-                          None, committer, complete, created, note, origin,
-                          metadata)
-
 def add_subtitles(video, language_code, subtitles,
                   title=None, description=None, author=None,
                   visibility=None, visibility_override=None,
@@ -560,9 +528,9 @@ def add_subtitles(video, language_code, subtitles,
     permission checks will be skipped, as if a "superuser" were adding the
     subtitles.
 
-    Complete can be given as a boolean.  If given, the SubtitleLanguage's
-    subtitles_complete attribute will be set appropriately.  If omitted, it will
-    not be adjusted.
+    Complete is a deprecated param that is needed for the API.  It alters how
+    we handle the subtitles_complete attribute on the language.  New code
+    should use action instead.
 
     action can be given as an action string.  If given, we will perform that
     action using the saved version.
@@ -571,12 +539,35 @@ def add_subtitles(video, language_code, subtitles,
     resulting version.  If not given it will default to today.
 
     """
+    # complete and action do similar things.  In _add_subtitles _add_subtitles
+    # we only want to deal with action, not complete.  this 
+
+    action = _calc_action_for_add_subtitles(video, language_code, author,
+                                            complete, action)
     with transaction.commit_on_success():
         return _add_subtitles(video, language_code, subtitles, title,
                               description, author, visibility,
                               visibility_override, parents, None, committer,
-                              complete, created, note, origin,
-                              metadata, action)
+                              created, note, origin, metadata, action)
+
+def _calc_action_for_add_subtitles(video, language_code, author, complete,
+                                   action_name):
+    # complete and action do similar things.  In _add_subtitles _add_subtitles
+    # we only want to deal with action, not complete.  this 
+
+    if action_name and complete is not None:
+        raise ValueError("Both action and complete set")
+
+    if not action_name:
+        if complete is None:
+            return None
+        elif complete:
+            return workflows.APIComplete()
+        else:
+            return workflows.Unpublish()
+
+    workflow = workflows.get_workflow(video, language_code)
+    return workflow.lookup_action(author, action_name)
 
 def unsafe_rollback_to(video, language_code, version_number,
                        rollback_author=None):

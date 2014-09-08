@@ -29,10 +29,9 @@ from babelsubs.storage import SubtitleSet, SubtitleLine
 
 from auth.models import CustomUser as User
 from subtitles import pipeline
-from subtitles.actions import Action
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.tests.utils import make_video, make_video_2
-from subtitles.tests.actions_tests import TestAction
+from subtitles.tests.workflows_tests import TestAction
 from utils.factories import *
 from utils import test_utils
 
@@ -618,16 +617,17 @@ class TestBasicAdding(TestCase):
         _add(True, [(100,200, "hey"), (None, None, "there")])
         self.assertFalse(_get_sl_completion())
 
-    @test_utils.patch_for_test('subtitles.actions.get_actions')
+    @test_utils.patch_for_test('subtitles.workflows.DefaultWorkflow.get_actions')
     def test_action(self, mock_get_actions):
         user = UserFactory()
         test_action = TestAction('action')
         mock_get_actions.return_value = [ test_action ]
         version = pipeline.add_subtitles(self.video, 'en', None,
                                          author=user, action='action')
-        test_action.handle.assert_called_with(user, self.video, 'en', version)
+        test_action.do_perform.assert_called_with(
+            user, self.video, version.subtitle_language, version)
 
-    @test_utils.patch_for_test('subtitles.actions.get_actions')
+    @test_utils.patch_for_test('subtitles.workflows.DefaultWorkflow.get_actions')
     def test_action_completes_subtitles(self, mock_get_actions):
         user = UserFactory()
         test_action = TestAction('action', True)
@@ -637,10 +637,11 @@ class TestBasicAdding(TestCase):
                                          author=user, action='action')
 
         self.assertEqual(version.subtitle_language.subtitles_complete, True)
-        test_action.handle.assert_called_with(user, self.video, 'en', version)
+        test_action.do_perform.assert_called_with(
+            user, self.video, version.subtitle_language, version)
 
-    @test_utils.patch_for_test('subtitles.actions.get_actions')
-    def test_complete_mismatch(self, mock_get_actions):
+    @test_utils.patch_for_test('subtitles.workflows.DefaultWorkflow.get_actions')
+    def test_complete_and_action_set(self, mock_get_actions):
         # test an action that has complete set to a value, but the
         # pipeline.add_subtitles call has complete set to a different value.
         user = UserFactory()

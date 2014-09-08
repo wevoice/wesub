@@ -22,7 +22,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from videos.models import Video
-from subtitles import actions
+from subtitles import workflows
+from subtitles.exceptions import ActionError
 
 class ActionsSerializer(serializers.Serializer):
     name = serializers.CharField()
@@ -32,7 +33,8 @@ class ActionsSerializer(serializers.Serializer):
 class Actions(APIView):
     def get(self, request, video_id, language_code, format=None):
         video = get_object_or_404(Video, video_id=video_id)
-        action_list = actions.get_actions(request.user, video, language_code)
+        workflow = workflows.get_workflow(video, language_code)
+        action_list = workflow.get_actions(request.user)
         serializer = ActionsSerializer(action_list, many=True)
         return Response(serializer.data)
 
@@ -42,10 +44,10 @@ class Actions(APIView):
         except KeyError:
             return Response('no action', status=status.HTTP_400_BAD_REQUEST)
         video = get_object_or_404(Video, video_id=video_id)
+        workflow = workflows.get_workflow(video, language_code)
         try:
-            actions.perform_action(request.user, video, language_code, action,
-                                   None)
-        except ValueError, e:
+            workflow.perform_action(request.user, action, None)
+        except (ActionError, LookupError), e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
         return Response('')

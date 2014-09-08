@@ -22,14 +22,13 @@ from django.test.client import Client
 from nose.tools import *
 import mock
 
-from subtitles import actions
 from subtitles import pipeline
-from subtitles.tests.actions_tests import TestAction
+from subtitles.tests.workflows_tests import TestAction
 from utils import test_utils
 from utils.factories import *
 
 class TestActionsAPI(TestCase):
-    @test_utils.patch_for_test('subtitles.actions.get_actions')
+    @test_utils.patch_for_test('subtitles.workflows.DefaultWorkflow.get_actions')
     def setUp(self, mock_get_actions):
         self.mock_get_actions = mock_get_actions
         self.setup_actions()
@@ -74,7 +73,7 @@ class TestActionsAPI(TestCase):
             'action': 'action1',
         })
         assert_equal(response.status_code, 200, response.content)
-        assert_equal(self.action1.handle.call_count, 1)
+        assert_equal(self.action1.do_perform.call_count, 1)
 
     def test_perform_with_bad_data(self):
         response = self.client.post(self.api_path, {})

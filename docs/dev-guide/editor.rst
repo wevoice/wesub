@@ -10,10 +10,6 @@ using several components in a couple different areas:
   - We save subtitles using the API code (currently in a private repository,
     but we plan to merge it in to the main one soon)
 
-.. automodule:: subtitles.editorworkmodes
+.. seealso::
 
-Editor Buttons / Subtitle Actions
----------------------------------
-
-The buttons in the workflow section are controlled by the
-:doc:`subtitle-actions` system.  Each action gets mapped to a button.
+    :doc:`subtitle-workflows`

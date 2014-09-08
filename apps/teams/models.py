@@ -3124,5 +3124,4 @@ class Partner(models.Model):
 # we know that models.py is always loaded, import signalhandlers to ensure it
 # gets loaded as well
 import teams.signalhandlers
-import teams.editor
-import teams.subtitle_actions
+import teams.subtitle_workflows
