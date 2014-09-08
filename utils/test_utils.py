@@ -195,7 +195,7 @@ _xvfb = None
 def start_xvfb():
     global _xvfb
     if _xvfb is None:
-        _xvfb = Xvfb()
+        _xvfb = Xvfb(width=1920, height=1080)
         _xvfb.start()
 
 def stop_xvfb():
