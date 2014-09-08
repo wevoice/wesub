@@ -21,6 +21,7 @@ from django.utils.translation import ugettext_lazy
 
 from subtitles import workflows
 from teams.models import Task
+from teams.permissions import can_create_and_edit_subtitles
 from utils.behaviors import DONT_OVERRIDE
 from videos.tasks import video_changed_tasks
 
@@ -115,10 +116,11 @@ class TaskTeamWorkflow(workflows.Workflow):
             return [Complete()]
 
     def user_can_view_private_subtitles(self, user):
-        raise NotImplementedError()
+        return self.team_video.team.is_member(user)
 
     def user_can_edit_subtitles(self, user):
-        raise NotImplementedError()
+        return can_create_and_edit_subtitles(user, self.team_video,
+                                             self.language_code)
 
 @workflows.get_workflow.override
 def get_task_team_workflow(video, language_code):
