@@ -225,7 +225,6 @@ class TestCaseEditing(WebdriverTestCase):
         diffs = [(dt.strptime(x, '%M:%S.%f') - dt.strptime(y, '%M:%S.%f')) 
                   for (x, y) in zip(times[1:], times[:-1])]
         self.logger.info(diffs)
-        self.browser.get_screenshot_as_file("user-data/%s.png" % self.id())
         for x in diffs:
             self.assertGreater(x.seconds, 3)
         self.editor_pg.exit()
