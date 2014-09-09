@@ -445,7 +445,7 @@ div.subtitles-wrapper {
         border-bottom: 1px solid #e6e7e8;
         table, div {
             width: 80%;
-            margin: 0px 15px 25px 15px;
+            margin: 0px 15px 15px 15px;
         }
 	div.warning-text {
 	    color: $warning-color;
@@ -454,7 +454,7 @@ div.subtitles-wrapper {
             text-align: left;
             width: 50%;
             font-size: 12px;
-            padding-top: 15px;
+            padding-top: 7px;
             color: #a3a4a5;
             em {
                 color: #838485;
@@ -465,7 +465,7 @@ div.subtitles-wrapper {
         }
         tr.child {
             td, th {
-                padding-top: 8px;
+                padding-top: 3px;
             }
             th {
                 padding-left: 20px;
