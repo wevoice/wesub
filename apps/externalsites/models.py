@@ -499,7 +499,16 @@ _account_type_choices = [
 
 def get_account(account_type, account_id):
     AccountModel = _account_type_to_model[account_type]
-    return AccountModel.objects.get(id=account_id)
+    try:
+        return AccountModel.objects.get(id=account_id)
+    except AccountModel.DoesNotExist:
+        return None
+
+def account_display(account):
+    if account is None:
+        return _('deleted account')
+    else:
+        return unicode(account)
 
 def get_sync_accounts(video):
     """Lookup an external accounts for a given video.
@@ -576,7 +585,7 @@ class SyncedSubtitleVersion(models.Model):
             self.language.video.video_id,
             self.language.language_code,
             self.version.version_number,
-            self.get_account())
+            account_display(self.get_account()))
 
     objects = SyncedSubtitleVersionManager()
 
@@ -603,8 +612,8 @@ class SyncHistoryQuerySet(query.QuerySet):
                 account_map[account_type, account.id] = account
         # call cache_account for each result
         for result in results:
-            result.cache_account(account_map[result.account_type,
-                                             result.account_id])
+            result.cache_account(account_map.get((result.account_type,
+                                                  result.account_id)))
         return results
 
 class SyncHistoryManager(models.Manager):
@@ -678,7 +687,7 @@ class SyncHistory(models.Model):
         return "SyncHistory: %s - %s for %s (%s)" % (
             self.datetime.date(),
             self.get_action_display(),
-            self.get_account(),
+            account_display(self.get_account()),
             self.get_result_display())
 
     def get_account(self):
