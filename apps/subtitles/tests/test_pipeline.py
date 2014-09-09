@@ -31,7 +31,7 @@ from auth.models import CustomUser as User
 from subtitles import pipeline
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.tests.utils import make_video, make_video_2
-from subtitles.tests.workflows_tests import TestAction
+from subtitles.tests.test_workflows import TestAction
 from utils.factories import *
 from utils import test_utils
 

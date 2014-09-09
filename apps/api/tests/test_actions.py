@@ -23,7 +23,7 @@ from nose.tools import *
 import mock
 
 from subtitles import pipeline
-from subtitles.tests.workflows_tests import TestAction
+from subtitles.tests.test_workflows import TestAction
 from utils import test_utils
 from utils.factories import *
 
