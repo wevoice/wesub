@@ -319,11 +319,11 @@ class YouTubeAccountManager(ExternalAccountManager):
         query = self.filter(type=ExternalAccount.TYPE_TEAM,
                             channel_id=video_url.owner_username)
         where_sql = (
-            'owner_id = %s OR EXISTS ('
+            '(owner_id = %s OR EXISTS ('
             'SELECT * '
             'FROM externalsites_youtubeaccount_sync_teams '
             'WHERE youtubeaccount_id = externalsites_youtubeaccount.id '
-            'AND team_id = %s)'
+            'AND team_id = %s))'
         )
         query = query.extra(where=[where_sql],
                             params=[team_video.team_id, team_video.team_id])
