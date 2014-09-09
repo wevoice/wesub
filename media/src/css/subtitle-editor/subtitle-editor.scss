@@ -459,6 +459,10 @@ div.subtitles-wrapper {
             font-size: 12px;
             padding-top: 7px;
             color: #a3a4a5;
+
+            em.warning {
+                color: $warning-color;
+            }
             em {
                 color: #838485;
             }
