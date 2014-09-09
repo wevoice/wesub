@@ -459,6 +459,9 @@ div.subtitles-wrapper {
             em {
                 color: #838485;
             }
+            &.warning, &.warning-bang {
+                color: $warning-color;
+            }
         }
         tr.child {
             td, th {
@@ -1495,7 +1498,11 @@ aside.modal#guidelines-modal {
     }
 }
 
-span.warning {
+.warning, .warning-bang {
     color: $warning-color;
     font-size: 10px;
+}
+
+.warning-bang:after {
+  content: '!';
 }
