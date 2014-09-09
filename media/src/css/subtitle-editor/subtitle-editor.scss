@@ -449,6 +449,9 @@ div.subtitles-wrapper {
         }
 	div.warning-text {
 	    color: $warning-color;
+            p {
+                padding-bottom: 6px;
+            }
         }
         td, th {
             text-align: left;
@@ -459,7 +462,7 @@ div.subtitles-wrapper {
             em {
                 color: #838485;
             }
-            &.warning, &.warning-bang {
+            &.warning {
                 color: $warning-color;
             }
         }
@@ -1498,11 +1501,7 @@ aside.modal#guidelines-modal {
     }
 }
 
-.warning, .warning-bang {
+.warning {
     color: $warning-color;
     font-size: 10px;
-}
-
-.warning-bang:after {
-  content: '!';
 }

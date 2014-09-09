@@ -56,22 +56,22 @@
             </tr>
             <tr>
                 <th>Characters</th>
-                <td ng-class="{'warning-bang': showWarning(currentEdit.draft, 'longline')}">[[ currentEdit.draft.characterCount() ]]</td>
+                <td ng-class="{'warning': showWarning(currentEdit.draft, 'longline')}">[[ currentEdit.draft.characterCount() ]]</td>
             </tr>
             <tr class="child"
                 ng-repeat="count in currentEdit.lineCounts() track by $index">
                 <th>Line [[ $index + 1 ]]</th>
-                <td ng-class="{'warning-bang': showWarning(currentEdit.draft, 'longline', $index)}">[[ count ]]</td>
+                <td ng-class="{'warning': showWarning(currentEdit.draft, 'longline', $index)}">[[ count ]]</td>
             </tr>
             <tr class="char-rate" ng-show="currentEdit.draft.isSynced()">
                 <th>Chars/sec</th>
-                <td ng-class="{'warning-bang': showWarning(currentEdit.draft, 'characterRate')}">[[ currentEdit.draft.characterRate() ]]</td>
+                <td ng-class="{'warning': showWarning(currentEdit.draft, 'characterRate')}">[[ currentEdit.draft.characterRate() ]]</td>
             </tr>
         </table>
 	<div class="warning-text">
 	  <p ng-show="showWarning(currentEdit.draft, 'lines')">{% trans "Avoid more than 2 lines per subtitle; split the subtitle into two." %}</p>
 	  <p ng-show="showWarning(currentEdit.draft, 'timing')">{% trans "Briefly displayed subtitles are hard to read; the duration should be more than 700ms." %}</p>
-	  <p ng-show="showWarning(currentEdit.draft, 'characterRate') && !(showWarning(currentEdit.draft, 'timing'))">{% trans "The reading rate should be kept below 21 characters / second; lengthen the duration or split the subtitles." %}</p>
+	  <p ng-show="showWarning(currentEdit.draft, 'characterRate') && !(showWarning(currentEdit.draft, 'timing'))">{% trans "The reading rate should be kept below 22 characters / second; lengthen the duration or split the subtitles." %}</p>
 	  <p ng-show="showWarning(currentEdit.draft, 'longline')">{% trans "Keep subtitle line length less than 42 characters; Add a line break if necessary." %}</p>
 	</div>
     </div>
