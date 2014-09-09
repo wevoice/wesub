@@ -51,6 +51,17 @@ def setup_celery_loader():
     os.environ.setdefault("CELERY_LOADER",
                           "amaracelery.loaders.AmaraCeleryLoader")
 
+def run_startup_modules():
+    """For all django apps, try to run the startup module.  """
+
+    from django.conf import settings
+
+    for app in settings.INSTALLED_APPS:
+        try:
+            __import__('%s.startup' % app)
+        except ImportError:
+            pass
+
 def startup():
     """Set up the amara environment.  This should be called before running any
     other code.
@@ -58,4 +69,4 @@ def startup():
     setup_path()
     setup_patch_reverse()
     setup_celery_loader()
-    import staticmedia.startup
+    run_startup_modules()

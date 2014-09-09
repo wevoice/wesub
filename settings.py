@@ -192,7 +192,6 @@ INSTALLED_APPS = (
     'messages',
     'profiles',
     'search',
-    'startup',
     'staticmedia',
     'statistic',
     'teams',
