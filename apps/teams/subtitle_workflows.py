@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
@@ -23,6 +24,7 @@ from subtitles import workflows
 from teams.models import Task
 from teams.permissions import can_create_and_edit_subtitles
 from utils.behaviors import DONT_OVERRIDE
+from utils.text import fmt
 from videos.tasks import video_changed_tasks
 
 class Complete(workflows.Action):
@@ -88,12 +90,12 @@ class SendBack(workflows.Action):
                        Task.APPROVED_IDS['Rejected'])
 
 class TaskTeamWorkflow(workflows.Workflow):
-    def __init__(self, team_video, language_code):
-        workflows.Workflow.__init__(self, team_video.video, language_code)
+    def __init__(self, team_video):
+        workflows.Workflow.__init__(self, team_video.video)
         self.team_video = team_video
 
-    def get_work_mode(self, user):
-        task = self.team_video.get_task_for_editor(self.language_code)
+    def get_work_mode(self, user, language_code):
+        task = self.team_video.get_task_for_editor(language_code)
         if task is not None:
             if task.is_approve_task():
                 heading = _("Approve Work")
@@ -106,8 +108,8 @@ class TaskTeamWorkflow(workflows.Workflow):
         else:
             return workflows.NormalWorkMode()
 
-    def get_actions(self, user):
-        task = self.team_video.get_task_for_editor(self.language_code)
+    def get_actions(self, user, language_code):
+        task = self.team_video.get_task_for_editor(language_code)
         if task is not None:
             # review/approve task
             return [SendBack(), Approve()]
@@ -115,16 +117,24 @@ class TaskTeamWorkflow(workflows.Workflow):
             # subtitle/translate task
             return [Complete()]
 
-    def user_can_view_private_subtitles(self, user):
+    def get_add_language_mode(self, user):
+        if self.team_video.team.is_member(user):
+            return mark_safe(
+                _(fmt('View <a href="%(url)s">tasks for this video</a>.',
+                      url=self.team_video.get_tasks_page_url())))
+        else:
+            return None
+
+    def user_can_view_private_subtitles(self, user, language_code):
         return self.team_video.team.is_member(user)
 
-    def user_can_edit_subtitles(self, user):
+    def user_can_edit_subtitles(self, user, language_code):
         return can_create_and_edit_subtitles(user, self.team_video,
-                                             self.language_code)
+                                             language_code)
 
 @workflows.get_workflow.override
-def get_task_team_workflow(video, language_code):
+def get_task_team_workflow(video):
     team_video = video.get_team_video()
     if team_video is None or not team_video.team.is_tasks_team():
         return DONT_OVERRIDE
-    return TaskTeamWorkflow(team_video, language_code)
+    return TaskTeamWorkflow(team_video)

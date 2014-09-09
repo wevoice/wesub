@@ -57,6 +57,7 @@ from subtitles.permissions import (user_can_view_private_subtitles,
                                    user_can_edit_subtitles)
 from subtitles.forms import SubtitlesUploadForm
 from subtitles.pipeline import rollback_to
+from subtitles.workflows import get_workflow
 from teams.models import Task
 from videos import permissions
 from videos.decorators import get_video_revision, get_video_from_code
@@ -284,6 +285,7 @@ class VideoPageContext(dict):
         self.setup_tab(request, video, video_url, tab)
 
     def setup(self, request, video, video_url):
+        self.workflow = get_workflow(video)
         language_for_locale = video.subtitle_language(request.LANGUAGE_CODE)
         if language_for_locale:
             metadata = language_for_locale.get_metadata()
@@ -296,8 +298,8 @@ class VideoPageContext(dict):
         self['shows_widget_sharing'] = video.can_user_see(request.user)
         self['widget_settings'] = json.dumps(
             widget_rpc.get_general_settings(request))
-        self['can_create_subs'] = user_can_edit_subtitles(request.user, video,
-                                                          language)
+        self['add_language_mode'] = self.workflow.get_add_language_mode(
+            request.user)
 
         _add_share_panel_context_for_video(self, video)
         self['task'] =  _get_related_task(request)

@@ -20,11 +20,11 @@ from subtitles import workflows
 def user_can_view_private_subtitles(user, video, language_code):
     if user.is_staff:
         return True
-    workflow = workflows.get_workflow(video, language_code)
-    return workflow.user_can_view_private_subtitles(user)
+    workflow = workflows.get_workflow(video)
+    return workflow.user_can_view_private_subtitles(user, language_code)
 
 def user_can_edit_subtitles(user, video, language_code):
     if user.is_staff:
         return True
-    workflow = workflows.get_workflow(video, language_code)
-    return workflow.user_can_edit_subtitles(user)
+    workflow = workflows.get_workflow(video)
+    return workflow.user_can_edit_subtitles(user, language_code)

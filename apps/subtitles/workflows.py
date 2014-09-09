@@ -23,14 +23,14 @@ Subtitle workflows control how subtitle sets get edited and published.  In
 particular they control:
 
 - Work Modes -- Tweak the subtitle editor behavior (for example review mode)
-- Actions -- User actions that can be done to subtitle sets (Publish, 
+- Actions -- User actions that can be done to subtitle sets (Publish,
   Approve, Send back, etc).
 - Permissions -- Who can edit subtitles, who can view private subtitles
 
 .. autoclass:: Workflow
-    :members: get_work_mode, get_actions, user_can_edit_subtitles,
-              user_can_view_private_subtitles
-.. autofunction:: get_workflow(video, language_code)
+    :members: get_work_mode, get_actions, get_add_language_mode,
+        user_can_edit_subtitles, user_can_view_private_subtitles
+.. autofunction:: get_workflow(video)
 
 Work Modes
 ----------
@@ -68,49 +68,67 @@ class Workflow(object):
 
     By default, we use a workflow that makes sense for public videos -- Anyone
     can edit, the only action is Publish, etc.  However, other components can
-    create custom workflows for specific videos/languages by:
+    create custom workflows for specific videos by:
 
     - Creating a Workflow subclass
     - Overriding :func:`get_workflow` and returning a custom workflow object
     """
-    def __init__(self, video, language_code):
-        self.video = video
-        self.language_code = language_code
 
-    def get_work_mode(self, user):
-        """Get the editor work mode to use
+    def __init__(self, video):
+        self.video = video
+
+    def get_work_mode(self, user, language_code):
+        """Get the work mode to use for an editing session
 
         Args:
-            user (User) -- user who is editing
+            user (User): user who is editing
+            language_code (str): language being edited
 
         Returns:
             :class:`WorkMode` object to use
         """
         raise NotImplementedError()
 
-    def get_actions(self, user):
+    def get_actions(self, user, language_code):
         """Get available actions for a user
 
         Args:
-            user (User) -- user who is editing
+            user (User): user who is editing
+            language_code (str): language being edited
 
         Returns:
             list of :class:`Action` objects that are available to the user.
         """
         raise NotImplementedError()
 
-    def lookup_action(self, user, action_name):
-        for action in self.get_actions(user):
+    def get_add_language_mode(self, user):
+        """Control the add new language section of the video page
+
+        Args:
+            user (User): user viewing the page
+
+        Returns:
+            - None/False: Don't display anything
+            - "<standard>": Use the standard behavior -- a link that opens
+              the create subtitles dialog.
+            - any other string: Render this in the section.  You probably want
+              to send the string through mark_safe() to avoid escaping HTML
+              tags.
+        """
+        return "<standard>"
+
+    def lookup_action(self, user, language_code, action_name):
+        for action in self.get_actions(user, language_code):
             if action.name == action_name:
                 return action
         raise LookupError("No action: %s" % action_name)
 
-    def perform_action(self, user, action_name, saved_version):
-        action = self.lookup_action(user, action_name)
-        subtitle_language = self.video.subtitle_language(self.language_code)
+    def perform_action(self, user, language_code, action_name, saved_version):
+        action = self.lookup_action(user, language_code, action_name)
+        subtitle_language = self.video.subtitle_language(language_code)
         action.perform(user, self.video, subtitle_language, saved_version)
 
-    def user_can_view_private_subtitles(self, user):
+    def user_can_view_private_subtitles(self, user, language_code):
         """Check if a user can view private subtitles
 
         Private subtitles are subtitles with visibility or visibility_override
@@ -122,23 +140,23 @@ class Workflow(object):
         """
         raise NotImplementedError()
 
-    def user_can_edit_subtitles(self, user):
+    def user_can_edit_subtitles(self, user, language_code):
         """Check if a user can edit subtitles
 
         Returns:
             True/False
         """
 
-    def editor_data(self, user):
+    def editor_data(self, user, language_code):
         """Get data to pass to the editor for this workflow."""
         return {
-            'work_mode': self.get_work_mode(user).editor_data(),
+            'work_mode': self.get_work_mode(user, language_code).editor_data(),
             'actions': [action.editor_data() for action in
-                        self.get_actions(user) ]
+                        self.get_actions(user, language_code)]
         }
 
 @behavior
-def get_workflow(video, language_code):
+def get_workflow(video):
     """Get the workflow to use for a subtitle set
 
     This method uses the :doc:`behaviors <behaviors>` module, to allow
@@ -146,7 +164,7 @@ def get_workflow(video, language_code):
     subtitles sets.  A typical example is the tasks system which creates a
     custom workflow for videos owned by tasks teams.
     """
-    return DefaultWorkflow(video, language_code)
+    return DefaultWorkflow(video)
 
 class WorkMode(object):
     """
@@ -334,10 +352,10 @@ class APIComplete(Action):
             subtitle_language.subtitles_complete = True
 
 class DefaultWorkflow(Workflow):
-    def get_work_mode(self, user):
+    def get_work_mode(self, user, language_code):
         return NormalWorkMode()
 
-    def get_actions(self, user):
+    def get_actions(self, user, language_code):
         return [Publish()]
 
     def user_can_view_private_subtitles(self, user):

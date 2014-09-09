@@ -566,8 +566,8 @@ def _calc_action_for_add_subtitles(video, language_code, author, complete,
         else:
             return workflows.Unpublish()
 
-    workflow = workflows.get_workflow(video, language_code)
-    return workflow.lookup_action(author, action_name)
+    workflow = workflows.get_workflow(video)
+    return workflow.lookup_action(author, language_code, action_name)
 
 def unsafe_rollback_to(video, language_code, version_number,
                        rollback_author=None):

@@ -256,8 +256,8 @@ def subtitle_editor(request, video_id, language_code):
         'staticURL': settings.STATIC_URL,
     }
 
-    workflow = get_workflow(video, language_code)
-    editor_data.update(workflow.editor_data(request.user))
+    workflow = get_workflow(video)
+    editor_data.update(workflow.editor_data(request.user, language_code))
 
     if task:
         editor_data['task_id'] = task.id

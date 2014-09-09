@@ -43,13 +43,14 @@ class ActionsTest(TestCase):
 
         self.action1 = TestAction('action1', True)
         self.action2 = TestAction('action2', False)
-        self.workflow = workflows.Workflow(self.video, 'en')
+        self.workflow = workflows.Workflow(self.video)
         self.workflow.get_actions = mock.Mock(return_value=[
             self.action1, self.action2
         ])
 
     def perform_action(self, action_name, saved_version=None):
-        self.workflow.perform_action(self.user, action_name, saved_version)
+        self.workflow.perform_action(self.user, 'en', action_name,
+                                     saved_version)
 
     def test_perform_action(self):
         version = pipeline.add_subtitles(self.video, 'en',
