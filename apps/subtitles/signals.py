@@ -20,4 +20,4 @@
 from django import dispatch
 
 language_deleted = dispatch.Signal()
-subtitles_changed = dispatch.Signal(providing_args=['version'])
+subtitles_published = dispatch.Signal(providing_args=['version'])

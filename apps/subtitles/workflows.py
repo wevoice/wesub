@@ -54,6 +54,7 @@ them.
 
 from django.utils.translation import ugettext_lazy
 
+from subtitles import signals
 from subtitles.exceptions import ActionError
 from utils.behaviors import behavior
 
@@ -123,10 +124,16 @@ class Workflow(object):
                 return action
         raise LookupError("No action: %s" % action_name)
 
-    def perform_action(self, user, language_code, action_name, saved_version):
+    def perform_action(self, user, language_code, action_name):
+        """Perform an action on a subtitle set
+
+        This method is used to perform an action by itself, without new
+        subtitles being added.
+        """
         action = self.lookup_action(user, language_code, action_name)
         subtitle_language = self.video.subtitle_language(language_code)
-        action.perform(user, self.video, subtitle_language, saved_version)
+        action.perform(user, self.video, subtitle_language, None)
+        action.send_signals(subtitle_language, None)
 
     def user_can_view_private_subtitles(self, user, language_code):
         """Check if a user can view private subtitles
@@ -289,6 +296,17 @@ class Action(object):
         """
         raise NotImplementedError()
 
+    def send_signals(self, subtitle_language, version):
+        """Send signals after an action
+
+        This is called at the end of perform() and pipeline.add_subtitles().
+
+        Args:
+            subtitle_language (SubtitleLanguage): changed language
+            version (SubtitleVersion): new subtitle version or None
+        """
+        pass
+
     def editor_data(self):
         """Get a dict of data to pass to the editor for this action."""
         return {
@@ -311,8 +329,11 @@ class Publish(Action):
     complete = True
 
     def do_perform(self, user, video, subtitle_language, saved_version):
-        # complete=True causes all the work to be done
+        # complete=True causes all the work to be done.
         pass
+
+    def send_signals(self, subtitle_language, version):
+        signals.subtitles_published.send(subtitle_language, version=version)
 
 class Unpublish(Action):
     """Unpublish action
@@ -350,6 +371,11 @@ class APIComplete(Action):
             subtitle_language.subtitles_complete = False
         else:
             subtitle_language.subtitles_complete = True
+
+    def send_signals(self, subtitle_language, version):
+        if subtitle_language.subtitles_complete:
+            signals.subtitles_published.send(subtitle_language,
+                                             version=version)
 
 class DefaultWorkflow(Workflow):
     def get_work_mode(self, user, language_code):

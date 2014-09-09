@@ -21,13 +21,21 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
 from subtitles import workflows
+from subtitles.signals import subtitles_published
 from teams.models import Task
 from teams.permissions import can_create_and_edit_subtitles
 from utils.behaviors import DONT_OVERRIDE
 from utils.text import fmt
 from videos.tasks import video_changed_tasks
 
-class Complete(workflows.Action):
+class TaskAction(workflows.Action):
+    def send_signals(self, subtitle_language, version):
+        # If we perform any action and it results in a public version, then we
+        # should send the subtitles_published signal.
+        if subtitle_language.get_tip(public=True):
+            subtitles_published.send(subtitle_language, version=version)
+
+class Complete(TaskAction):
     """Used when the initial transcriber/translator completes their work """
     name = 'complete'
     label = ugettext_lazy('Complete')
@@ -67,7 +75,7 @@ def _complete_task(user, video, subtitle_language, saved_version, approved):
             version_id = saved_version.id
             video_changed_tasks.delay(team_video.video_id, version_id)
 
-class Approve(workflows.Action):
+class Approve(TaskAction):
     name = 'approve'
     label = ugettext_lazy('Approve')
     in_progress_text = ugettext_lazy('Approving')
@@ -78,7 +86,7 @@ class Approve(workflows.Action):
         _complete_task(user, video, subtitle_language, saved_version,
                        Task.APPROVED_IDS['Approved'])
 
-class SendBack(workflows.Action):
+class SendBack(TaskAction):
     name = 'send-back'
     label = ugettext_lazy('Send Back')
     in_progress_text = ugettext_lazy('Sending back')

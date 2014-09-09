@@ -48,9 +48,8 @@ class ActionsTest(TestCase):
             self.action1, self.action2
         ])
 
-    def perform_action(self, action_name, saved_version=None):
-        self.workflow.perform_action(self.user, 'en', action_name,
-                                     saved_version)
+    def perform_action(self, action_name):
+        self.workflow.perform_action(self.user, 'en', action_name)
 
     def test_perform_action(self):
         version = pipeline.add_subtitles(self.video, 'en',
@@ -59,10 +58,13 @@ class ActionsTest(TestCase):
         self.action1.do_perform.assert_called_with(
             self.user, self.video, version.subtitle_language, None)
 
-    def test_perform_action_with_version(self):
+    def test_add_subtitles_with_action(self):
+        action = self.workflow.lookup_action(self.user, 'en', 'action1')
         version = pipeline.add_subtitles(self.video, 'en',
-                                         SubtitleSetFactory(num_subs=10))
-        self.perform_action('action1', version)
+                                         SubtitleSetFactory(num_subs=10),
+                                         action=None)
+        action.perform(self.user, self.video, version.subtitle_language,
+                       version)
         self.action1.do_perform.assert_called_with(
             self.user, self.video, version.subtitle_language, version)
 
@@ -73,7 +75,10 @@ class ActionsTest(TestCase):
     def test_needs_complete_subtitles(self):
         # With 0 subtitles, we shouldn't be able to perform an action with
         # complete=True
-        pipeline.add_subtitles(self.video, 'en',
-                               SubtitleSetFactory(num_subs=0))
+        action = self.workflow.lookup_action(self.user, 'en', 'action1')
+        version = pipeline.add_subtitles(self.video, 'en',
+                                         SubtitleSetFactory(num_subs=0),
+                                         action=None)
         with assert_raises(ActionError):
-            self.perform_action('action1', None)
+            action.perform(self.user, self.video, version.subtitle_language,
+                           version)

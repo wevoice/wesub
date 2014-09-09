@@ -427,7 +427,8 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
         sl.fork()
         _fork_dependents(sl)
 
-    signals.subtitles_changed.send(sl, version=version)
+    if action:
+        action.send_signals(sl, version)
 
     return version
 

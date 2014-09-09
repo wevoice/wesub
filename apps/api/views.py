@@ -46,7 +46,7 @@ class Actions(APIView):
         video = get_object_or_404(Video, video_id=video_id)
         workflow = workflows.get_workflow(video)
         try:
-            workflow.perform_action(request.user, language_code, action, None)
+            workflow.perform_action(request.user, language_code, action)
         except (ActionError, LookupError), e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 

@@ -57,37 +57,20 @@ class SyncingTriggerTest(TestCase):
         self.team = team_video.team
         self.account = KalturaAccount.objects.create(
             team=self.team, partner_id=1234, secret='abcd')
-        self.version = pipeline.add_subtitles(self.video, 'en', None)
+        self.version = pipeline.add_subtitles(self.video, 'en',
+                                              SubtitleSetFactory())
         self.language = self.version.subtitle_language
         self.mock_update_all_subtitles.reset_mock()
         self.mock_update_subtitles.reset_mock()
         self.mock_delete_subtitles.reset_mock()
 
-    def test_update_subtitles_on_change(self):
-        self.language.subtitles_complete = True
-        subtitles.signals.subtitles_changed.send(sender=self.language,
-                                                 version=self.version)
+    def test_update_subtitles_on_publish(self):
+        subtitles.signals.subtitles_published.send(
+            sender=self.language, version=self.version)
         self.assertEqual(self.mock_update_subtitles.delay.call_count, 1)
         self.mock_update_subtitles.delay.assert_called_with(
             KalturaAccount.account_type, self.account.id, self.video_url.id,
-            self.language.id)
-
-    def test_dont_update_for_imported_versions(self):
-        # if a subtitle version was imported, then don't waste time resyncing
-        # it to the external site (#1646)
-        self.language.subtitles_complete = True
-        version = pipeline.add_subtitles(self.video, 'en', None,
-                                         origin=ORIGIN_IMPORTED)
-        self.mock_update_subtitles.delay.reset_mock()
-        subtitles.signals.subtitles_changed.send(sender=self.language,
-                                                 version=version)
-        self.assertEqual(self.mock_update_subtitles.delay.call_count, 0)
-
-    def test_dont_update_when_incomplete(self):
-        self.language.subtitles_complete = False
-        subtitles.signals.subtitles_changed.send(sender=self.language,
-                                                 version=self.version)
-        self.assertEqual(self.mock_update_subtitles.delay.call_count, 0)
+            self.version.subtitle_language_id)
 
     def test_delete_subititles_on_language_deleted(self):
         lang = self.video.subtitle_language('en')

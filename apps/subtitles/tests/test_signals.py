@@ -22,105 +22,78 @@
 from __future__ import absolute_import
 
 from django.test import TestCase
+from nose.tools import *
 import mock
+
+from babelsubs.storage import SubtitleSet
 from utils.factories import *
 from utils.test_utils import patch_for_test
 from subtitles import signals
 from subtitles import pipeline
+from subtitles import workflows
 
-class SignalsTest(TestCase):
+class DeleteLanguageTest(TestCase):
     def setUp(self):
-        self.team_video = TeamVideoFactory()
-        self.video = self.team_video.video
-        self.team = self.team_video.team
-        self.member = self.team.get_member(self.team_video.added_by)
-        self.subtitles_changed_handler = mock.Mock()
-        signals.subtitles_changed.connect(self.subtitles_changed_handler,
-                                          weak=False)
-        self.addCleanup(signals.subtitles_changed.disconnect,
-                        self.subtitles_changed_handler)
+        self.video = TeamVideoFactory().video
         self.language_deleted_handler = mock.Mock()
         signals.language_deleted.connect(self.language_deleted_handler,
                                          weak=False)
-        self.addCleanup(signals.subtitles_changed.disconnect,
+        self.addCleanup(signals.language_deleted.disconnect,
                         self.language_deleted_handler)
 
     def test_language_deleted(self):
         v1 = pipeline.add_subtitles(self.video, 'en', None)
-        self.subtitles_changed_handler.reset_mock()
         language = v1.subtitle_language
         language.nuke_language()
         self.assertEquals(self.language_deleted_handler.call_count, 1)
         self.language_deleted_handler.assert_called_with(signal=mock.ANY,
                                                          sender=language)
-        # deleting the language shouldn't result in the subtitles_changed
-        # signal being emitted
-        self.assertEquals(self.subtitles_changed_handler.call_count, 0)
 
-    def test_subtitles_changed_on_new_version(self):
-        # adding a version should result in the signal being sent
-        v1 = pipeline.add_subtitles(self.video, 'en', None)
-        language = v1.subtitle_language
-        self.assertEquals(self.subtitles_changed_handler.call_count, 1)
-        self.subtitles_changed_handler.assert_called_with(
-            signal=mock.ANY, sender=language, version=v1)
+class SubtitlesPublishedTest(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.video = VideoFactory()
+        self.subtitles_published_handler = mock.Mock()
+        signals.subtitles_published.connect(self.subtitles_published_handler,
+                                            weak=False)
+        self.addCleanup(signals.subtitles_published.disconnect,
+                        self.subtitles_published_handler)
 
-    def test_subtitles_changed_on_language_change(self):
-        v1 = pipeline.add_subtitles(self.video, 'en', None)
-        language = v1.subtitle_language
-        self.subtitles_changed_handler.reset_mock()
+    def test_publish_action(self):
+        # test the publish action by itself
+        pipeline.add_subtitles(self.video, 'en', SubtitleSetFactory())
+        self.subtitles_published_handler.reset_mock()
+        workflow = workflows.get_workflow(self.video)
+        workflow.perform_action(self.user, 'en', 'publish')
+        self.subtitles_published_handler.assert_called_with(
+            signal=mock.ANY, sender=self.video.subtitle_language('en'),
+            version=None)
 
-        language.subtitles_complete = True
-        language.save()
+    def test_add_subtitles_with_publish(self):
+        # test adding subtitles with the publish action
+        v = pipeline.add_subtitles(self.video, 'en', SubtitleSetFactory(),
+                                   action='publish')
+        self.subtitles_published_handler.assert_called_with(
+            signal=mock.ANY, sender=v.subtitle_language, version=v)
 
-        self.assertEquals(self.subtitles_changed_handler.call_count, 1)
-        self.subtitles_changed_handler.assert_called_with(
-            signal=mock.ANY, sender=language, version=None)
+    def test_add_subtitles_without_publish(self):
+        # test adding subtitles without the publish action
+        pipeline.add_subtitles(self.video, 'en', SubtitleSetFactory(),
+                               action=None)
+        assert_equal(self.subtitles_published_handler.call_count, 0)
 
-    def test_subtitles_changed_on_publish(self):
-        # we should emit subtitles_changed if we publish a version and that
-        # creates a new public tip for the language
-        v1 = pipeline.add_subtitles(self.video, 'en', None,
-                                    visibility='private')
-        language = v1.subtitle_language
-        self.subtitles_changed_handler.reset_mock()
+    def test_add_subtitles_with_complete_true(self):
+        # test adding subtitles with complete=True
+        v = pipeline.add_subtitles(self.video, 'en', SubtitleSetFactory(),
+                                   complete=True)
+        self.subtitles_published_handler.assert_called_with(
+            signal=mock.ANY, sender=v.subtitle_language, version=v)
 
-        v1.publish()
-        self.assertEquals(self.subtitles_changed_handler.call_count, 1)
-        self.subtitles_changed_handler.assert_called_with(
-            signal=mock.ANY, sender=v1.subtitle_language, version=v1)
-
-    def test_subtitles_changed_on_unpublish(self):
-        # we should emit subtitles_changed if we unpublish the tip for a
-        # language
-        v1 = pipeline.add_subtitles(self.video, 'en', None)
-        language = v1.subtitle_language
-        self.subtitles_changed_handler.reset_mock()
-
-        v1.unpublish()
-        self.assertEquals(self.subtitles_changed_handler.call_count, 1)
-        self.subtitles_changed_handler.assert_called_with(
-            signal=mock.ANY, sender=v1.subtitle_language, version=v1)
-
-    def test_subtitles_changed_not_sent_for_non_tip_publish(self):
-        # we should not emit subtitles_changed if we publish/unpublish a
-        # version, but the tip stays the same
-        v1 = pipeline.add_subtitles(self.video, 'en', None,
-                                    visibility='private')
-        v2 = pipeline.add_subtitles(self.video, 'en', None)
-        self.subtitles_changed_handler.reset_mock()
-
-        # The subtitles_changed signal should only be emitted if the public
-        # tip changes.  Altering the visibility of v1 doesn't affect that.
-        v1.publish()
-        v1.unpublish()
-        self.assertEquals(self.subtitles_changed_handler.call_count, 0)
-
-    def test_send_subtitles_changed_false(self):
-        v1 = pipeline.add_subtitles(self.video, 'en', None)
-        language = v1.subtitle_language
-        self.subtitles_changed_handler.reset_mock()
-
-        language.subtitles_complete = True
-        language.save(send_subtitles_changed=False)
-        self.assertEquals(self.subtitles_changed_handler.call_count, 0)
+    def test_add_subtitles_with_complete_true_but_unsynced_subs(self):
+        # test adding subtitles with complete=True, but the subtitles
+        # themseleves aren't complete.  For this corner case, we should not
+        # emit subtitles_published.
+        subs = SubtitleSet(language_code='en')
+        subs.append_subtitle(None, None, 'content')
+        pipeline.add_subtitles(self.video, 'en', subs, complete=True)
+        assert_equal(self.subtitles_published_handler.call_count, 0)
