@@ -245,8 +245,11 @@ def get_video_info(video_id):
 
 def _get_video_info(video_id):
     response = video_get(None, video_id, ['snippet', 'contentDetails'])
-    snippet = response.json['items'][0]['snippet']
-    content_details = response.json['items'][0]['contentDetails']
+    try:
+        snippet = response.json['items'][0]['snippet']
+        content_details = response.json['items'][0]['contentDetails']
+    except StandardError, e:
+        raise APIError("get_video_info: Unexpected content: %s" % e)
 
     return VideoInfo(snippet['channelId'],
                      snippet['title'],

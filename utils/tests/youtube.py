@@ -22,6 +22,7 @@ import simplejson as json
 
 from django.conf import settings
 from django.test import TestCase
+from nose.tools import *
 
 from utils import test_utils
 from utils.subtitles import load_subtitles
@@ -154,6 +155,36 @@ class YouTubeTestCase(TestCase):
         self.assertEqual(video_info.description, 'test-description')
         self.assertEqual(video_info.duration, 610)
         self.assertEqual(video_info.thumbnail_url, 'test-thumbnail-url')
+
+    def test_get_video_invalid_body(self):
+        mocker = test_utils.RequestsMocker()
+        mocker.expect_request(
+            'get', 'https://www.googleapis.com/youtube/v3/videos', params={
+                'part': 'snippet,contentDetails',
+                'id': 'test-video-id',
+                'key': settings.YOUTUBE_API_KEY,
+            }, body="Invalid body")
+        utils.youtube.get_video_info.run_original_for_test()
+        with mocker:
+            with assert_raises(utils.youtube.APIError):
+                utils.youtube.get_video_info('test-video-id')
+
+    def test_get_video_info_no_items(self):
+        mocker = test_utils.RequestsMocker()
+        mocker.expect_request(
+            'get', 'https://www.googleapis.com/youtube/v3/videos', params={
+                'part': 'snippet,contentDetails',
+                'id': 'test-video-id',
+                'key': settings.YOUTUBE_API_KEY,
+            }, body=json.dumps({
+                'items': [
+                ]
+            })
+        )
+        utils.youtube.get_video_info.run_original_for_test()
+        with mocker:
+            with assert_raises(utils.youtube.APIError):
+                utils.youtube.get_video_info('test-video-id')
 
     def test_update_video_description(self):
         mocker = test_utils.RequestsMocker()
