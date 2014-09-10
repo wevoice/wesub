@@ -248,6 +248,7 @@ var USER_IDLE_MINUTES = 15;
             templateLI.append('<span class="timing" />');
             templateLI.append('<span class="subtitle-text" />');
             if(!readOnly) {
+		templateLI.append('<span class="warning">!</span>');
                 templateLI.append(makeImageButton('remove-subtitle',
                     'images/editor/remove-subtitle.gif'));
                 templateLI.append(makeImageButton('insert-subtitle',
@@ -336,6 +337,7 @@ var USER_IDLE_MINUTES = 15;
                 elt.prop('className', classes.join(' '));
                 $('span.subtitle-text', elt).html(content);
                 $('span.timing', elt).text(displayTime(subtitle.startTime));
+		$('span.warning', elt).toggle($scope.warningsShown && subtitle.hasWarning());
             }
 
             function findSubtitleData(node) {

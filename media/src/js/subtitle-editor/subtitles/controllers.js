@@ -207,6 +207,12 @@ var angular = angular || null;
             $scope.currentEdit.start(newSub);
         }
 
+	$scope.showWarning = function(subtitle, type, data) {
+	    if(subtitle && $scope.warningsShown)
+		return subtitle.hasWarning(type, data);
+	    return false;
+	};
+
         $scope.onSubtitleClick = function(evt, subtitle, action) {
             var madeChange = false;
             switch(action) {

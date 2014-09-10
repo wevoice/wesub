@@ -106,12 +106,17 @@ var angular = angular || null;
             return false; 
         }
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
+        $scope.warningsShown = true;
         $scope.timelineShown = $scope.workflow.stage != 'typing';
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
         }
         $scope.toggleTimelineShown = function() {
-            $scope.timelineShown = !$scope.timelineShown
+            $scope.timelineShown = !$scope.timelineShown;
+        }
+        $scope.toggleWarningsShown = function() {
+            $scope.warningsShown = !$scope.warningsShown;
+	    $scope.workingSubtitles.subtitleList.emitChange("reload", null);
         }
         $scope.keepHeaderSizeSync = function() {
             var newHeaderSize = Math.max($('div.subtitles.reference .content').outerHeight(),
