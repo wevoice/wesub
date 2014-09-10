@@ -70,6 +70,26 @@ var angular = angular || null;
         }
     }
 
+    Subtitle.prototype.hasWarning = function(type, data) {
+	if ((type == "lines" || type == undefined) && (this.lineCount() > 2))
+	    return true;
+	if ((type == "characterRate" || type == undefined) && (this.characterRate() > 21))
+	    return true;
+	if ((type == "timing" || type == undefined) && ((this.startTime > -1) && (this.endTime > -1) && (this.endTime - this.startTime < 700)))
+	    return true;
+	if (type == "longline" || type == undefined) {
+	    if (type == "longline" && (data == undefined) && ((this.characterCountPerLine().length == 1) && (this.characterCountPerLine()[0] > 42)))
+		return true;
+	    var from = (data == undefined) ? 0 : data;
+	    var to = (data == undefined) ? (this.characterCountPerLine().length) : (data + 1);
+	    for (var i = from ; i < to ; i++) {
+		if (this.characterCountPerLine()[i] > 42)
+		    return true;
+	    }
+	}
+	return false;
+    }
+
     Subtitle.prototype.content = function() {
         /* Get the content of this subtitle as HTML */
         return dfxp.markdownToHTML(this.markdown);
