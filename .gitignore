@@ -91,3 +91,7 @@ node_modules/
 frontend-unit-tests-results.xml
 /docker-dev-environment/cidfiles
 .deploy_keys
+dev_settings_local.py
+babelsubs
+babelsubs-git
+/amara-enterprise
