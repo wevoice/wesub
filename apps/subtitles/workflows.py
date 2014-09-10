@@ -28,8 +28,9 @@ particular they control:
 - Permissions -- Who can edit subtitles, who can view private subtitles
 
 .. autoclass:: Workflow
-    :members: get_work_mode, get_actions, get_add_language_mode,
-        user_can_edit_subtitles, user_can_view_private_subtitles
+    :members: get_work_mode, get_actions, action_for_add_subtitles,
+        get_add_language_mode, user_can_edit_subtitles,
+        user_can_view_private_subtitles
 .. autofunction:: get_workflow(video)
 
 Work Modes
@@ -101,6 +102,34 @@ class Workflow(object):
             list of :class:`Action` objects that are available to the user.
         """
         raise NotImplementedError()
+
+    def action_for_add_subtitles(self, user, language_code, complete):
+        """Get an action to use for add_subtitles()
+
+        This is used when pipeline.add_subtitles() is called, but not passed
+        an action.  This happens for a couple reasons:
+
+        - User saves a draft (in which case complete will be None)
+        - User is adding subtitles via the API (complete can be True, False,
+          or None)
+
+        Subclasses can override this method if they want to use different
+        actions to handle this case.
+
+        Args:
+            user (User): user adding subtitles
+            language_code (str): language being edited
+            complete (bool or None): complete arg from add_subtitles()
+
+        Returns:
+            Action object or None.
+        """
+        if complete is None:
+            return None
+        elif complete:
+            return APIComplete()
+        else:
+            return Unpublish()
 
     def get_add_language_mode(self, user):
         """Control the add new language section of the video page
@@ -243,6 +272,11 @@ class Action(object):
         - True -- this action sets subtitles_complete
         - False -- this action unsets subtitles_complete
         - None (default) - this action doesn't change subtitles_complete
+    """
+
+    subtitle_visibility = 'public'
+    """
+    Visibility value for newly created SubtitleVerisons.
     """
 
     CLASS_ENDORSE = 'endorse'

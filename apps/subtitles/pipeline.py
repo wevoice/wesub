@@ -545,6 +545,8 @@ def add_subtitles(video, language_code, subtitles,
 
     action = _calc_action_for_add_subtitles(video, language_code, author,
                                             complete, action)
+    if action:
+        visibility = action.subtitle_visibility
     with transaction.commit_on_success():
         return _add_subtitles(video, language_code, subtitles, title,
                               description, author, visibility,
@@ -559,16 +561,12 @@ def _calc_action_for_add_subtitles(video, language_code, author, complete,
     if action_name and complete is not None:
         raise ValueError("Both action and complete set")
 
-    if not action_name:
-        if complete is None:
-            return None
-        elif complete:
-            return workflows.APIComplete()
-        else:
-            return workflows.Unpublish()
-
     workflow = workflows.get_workflow(video)
-    return workflow.lookup_action(author, language_code, action_name)
+    if action_name:
+        return workflow.lookup_action(author, language_code, action_name)
+    else:
+        return workflow.action_for_add_subtitles(author, language_code,
+                                                 complete)
 
 def unsafe_rollback_to(video, language_code, version_number,
                        rollback_author=None):
