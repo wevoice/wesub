@@ -21,6 +21,11 @@
 import os, sys
 from datetime import datetime
 
+from django.conf import global_settings
+from unilangs import get_language_code_mapping
+
+import optionalapps
+
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 DEFAULT_PROTOCOL  = 'http'
 
@@ -28,8 +33,6 @@ def rel(*x):
     return os.path.join(PROJECT_ROOT, *x)
 
 # Rebuild the language dicts to support more languages.
-from django.conf import global_settings
-from unilangs import get_language_code_mapping
 
 # We use a custom format for our language labels:
 # Translated Language Name (Native Name)
@@ -352,21 +355,11 @@ ROSETTA_EXCLUDED_APPLICATIONS = (
     'rosetta'
 )
 
-
-INTEGRATION_PATH = os.path.join(PROJECT_ROOT, 'unisubs-integration')
-USE_INTEGRATION = os.path.exists(INTEGRATION_PATH)
-if USE_INTEGRATION:
-    sys.path.append(INTEGRATION_PATH)
-
-if USE_INTEGRATION:
-    for dirname in os.listdir(INTEGRATION_PATH):
-        if os.path.isfile(os.path.join(INTEGRATION_PATH, dirname, '__init__.py')):
-            INSTALLED_APPS += (dirname,)
-    
-    try:
-        from integration_settings import *
-    except ImportError:
-        pass
+INSTALLED_APPS += optionalapps.get_apps()
+try:
+    from integration_settings import *
+except ImportError:
+    pass
 # paths from MEDIA URL
 # this needs to run after the integration player has loaded
 MEDIA_BUNDLES = {

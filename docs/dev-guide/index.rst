@@ -13,5 +13,6 @@ codebase.
    editor
    subtitle-workflows
    permissions
+   optional-apps
    i18n
    behaviors

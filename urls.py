@@ -26,6 +26,8 @@ from sitemaps import sitemaps, sitemap_view, sitemap_index
 from socialauth.models import AuthMeta, OpenidProfile
 from django.views.decorators.clickjacking import xframe_options_exempt
 
+import optionalapps
+
 admin.autodiscover()
 
 # these really should be unregistred but while in development the dev server
@@ -165,23 +167,7 @@ urlpatterns = patterns('',
     url(r'^v/(?P<encoded_pk>\w+)/$', 'videos.views.shortlink', name='shortlink')
 )
 
-if settings.USE_INTEGRATION:
-    from services import urls
-    urlpatterns += patterns('',
-        (r'^unisubservices/', include('services.urls', namespace='services')),
-    )
-
-    from servicesauth import urls
-    urlpatterns += patterns('', (r'^unisubservicesauth/',
-        include('servicesauth.urls', namespace='servicesauth')),)
-    # FIXME: api v1 is not being imported until we're sure it needs to be
-    # ported to DRM
-    #from api import urls
-    #urlpatterns += patterns('', url(r'^api/', include('api.urls', 'api')),)
-
-    from apiv2 import urls as api2urls
-    urlpatterns += patterns('', url(r'^api2/', include('apiv2.urls',
-        namespace=api2urls.URL_NAMESPACE),),)
+urlpatterns += optionalapps.get_urlpatterns()
 
 if settings.DEBUG:
     urlpatterns += patterns('',

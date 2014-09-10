@@ -35,6 +35,9 @@ def setup_path():
     root_dir = os.path.abspath(os.path.dirname(__file__))
     sys.path.insert(0, os.path.join(root_dir, 'apps'))
     sys.path.insert(0, os.path.join(root_dir, 'libs'))
+    # add paths from optional repositories
+    import optionalapps
+    sys.path.extend(optionalapps.get_repository_paths())
     # hack to make the unisubs package available.  We alter the path so that
     # we can import it, then undo the changes.  We don't want to be able to
     # import any other python modules that happen to live in the directory
