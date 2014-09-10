@@ -248,14 +248,14 @@ def _get_video_info(video_id):
     try:
         snippet = response.json['items'][0]['snippet']
         content_details = response.json['items'][0]['contentDetails']
+        return VideoInfo(snippet['channelId'],
+                         snippet['title'],
+                         snippet['description'],
+                         _parse_8601_duration(content_details['duration']),
+                         snippet['thumbnails']['high']['url'])
     except StandardError, e:
         raise APIError("get_video_info: Unexpected content: %s" % e)
 
-    return VideoInfo(snippet['channelId'],
-                     snippet['title'],
-                     snippet['description'],
-                     _parse_8601_duration(content_details['duration']),
-                     snippet['thumbnails']['high']['url'])
 
 def update_video_description(video_id, access_token, description):
     # get the current snippet for the video
