@@ -384,8 +384,8 @@ class DefaultWorkflow(Workflow):
     def get_actions(self, user, language_code):
         return [Publish()]
 
-    def user_can_view_private_subtitles(self, user):
+    def user_can_view_private_subtitles(self, user, language_code):
         return user.is_staff
 
-    def user_can_edit_subtitles(self, user):
+    def user_can_edit_subtitles(self, user, language_code):
         return True
