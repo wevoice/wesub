@@ -157,8 +157,8 @@ class TaskTeamWorkflow(TeamWorkflow):
     def get_add_language_mode(self, user):
         if self.team_video.team.is_member(user):
             return mark_safe(
-                fmt(_('View <a href="%(url)s">tasks for this video</a>.',
-                      url=self.team_video.get_tasks_page_url())))
+                fmt(_('View <a href="%(url)s">tasks for this video</a>.'),
+                      url=self.team_video.get_tasks_page_url()))
         else:
             return None
 
