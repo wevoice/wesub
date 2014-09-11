@@ -133,6 +133,15 @@ class TaskTeamWorkflow(workflows.Workflow):
         else:
             return None
 
+    def action_for_add_subtitles(self, user, language_code, complete):
+        tasks = self.team_video.task_set
+        if (complete == True and
+            tasks.incomplete_subtitle_or_translate().exists()):
+            return Complete()
+        else:
+            return super(self).action_for_add_subtitles(user, language_code,
+                                                        complete)
+
     def user_can_view_private_subtitles(self, user, language_code):
         return self.team_video.team.is_member(user)
 
