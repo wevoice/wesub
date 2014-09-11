@@ -161,17 +161,6 @@ def old_editor(request, video_id, language_code):
                                     request.GET.get('task_id'))
     return redirect("http://%s%s" % (request.get_host(), url_path))
 
-def fake_editor_notes():
-    from datetime import datetime, timedelta
-    notes = []
-    for i in xrange(10):
-        notes.append({
-            'user': 'User',
-            'created': (datetime.now() - timedelta(hours=i)).strftime("%c"),
-            'body': 'Note %s' % i,
-        })
-    return notes
-
 @xframe_options_exempt
 @login_required
 def subtitle_editor(request, video_id, language_code):
@@ -267,7 +256,6 @@ def subtitle_editor(request, video_id, language_code):
         }),
         'staticURL': settings.STATIC_URL,
         'notesHeading': 'Editor Notes',
-        'notes': fake_editor_notes(),
     }
 
     workflow = get_workflow(video)

@@ -29,9 +29,13 @@ particular they control:
 
 .. autoclass:: Workflow
     :members: get_work_mode, get_actions, action_for_add_subtitles,
-        get_add_language_mode, user_can_edit_subtitles,
+        get_editor_notes, get_add_language_mode, user_can_edit_subtitles,
         user_can_view_private_subtitles
 .. autofunction:: get_workflow(video)
+
+Editor Notes
+------------
+.. autoclass:: EditorNotes
 
 Work Modes
 ----------
@@ -53,10 +57,13 @@ them.
 
 """
 
+from datetime import datetime, timedelta
+
 from django.utils.translation import ugettext_lazy
 
 from subtitles import signals
 from subtitles.exceptions import ActionError
+from subtitles.models import SubtitleNote
 from utils.behaviors import behavior
 
 class Workflow(object):
@@ -147,6 +154,14 @@ class Workflow(object):
         """
         return "<standard>"
 
+    def get_editor_notes(self, language_code):
+        """Get notes to display in the editor
+
+        Returns:
+            :class:`EditorNotes` object
+        """
+        return EditorNotes(self.video, language_code)
+
     def lookup_action(self, user, language_code, action_name):
         for action in self.get_actions(user, language_code):
             if action.name == action_name:
@@ -185,10 +200,13 @@ class Workflow(object):
 
     def editor_data(self, user, language_code):
         """Get data to pass to the editor for this workflow."""
+        editor_notes = self.get_editor_notes(language_code)
         return {
             'work_mode': self.get_work_mode(user, language_code).editor_data(),
             'actions': [action.editor_data() for action in
-                        self.get_actions(user, language_code)]
+                        self.get_actions(user, language_code)],
+            'notesHeading': editor_notes.heading,
+            'notes': editor_notes.note_editor_data(),
         }
 
 @behavior
@@ -410,6 +428,57 @@ class APIComplete(Action):
         if subtitle_language.subtitles_complete:
             signals.subtitles_published.send(subtitle_language,
                                              version=version)
+
+class EditorNotes(object):
+    """Manage notes for the subtitle editor.
+
+    EditorNotes handles fetching notes for the editor and posting new ones.
+
+    Attributes:
+        heading: heading for the editor section
+        notes: list of SubtitleNotes for the editor
+
+    .. automethod:: post
+    """
+
+    def __init__(self, video, language_code):
+        self.video = video
+        self.language_code = language_code
+        self.heading = 'Subtitle Notes'
+        self.notes = list(SubtitleNote.objects
+                          .filter(video=video, language_code=language_code)
+                          .order_by('created')
+                          .select_related('user'))
+
+    def post(self, user, body):
+        """Add a new note.
+
+        Args:
+            user (CustomUser): user adding the note
+            body (unicode): note text
+        """
+        SubtitleNote.objects.create(video=self.video,
+                                    language_code=self.language_code,
+                                    user=user, body=body)
+
+    def format_created(self, created, now):
+        if created > now - timedelta(hours=12):
+            format_str = '{d:%l}:{d.minute:02} {d:%p}'
+        elif created > now - timedelta(days=6):
+            format_str = '{d:%a}, {d:%l}:{d.minute:02} {d:%p}'
+        else:
+            format_str = ('{d:%b} {d.day} {d.year}, '
+                          '{d:%l}:{d.minute:02} {d:%p}')
+        return format_str.format(d=created)
+
+    def note_editor_data(self):
+        now = datetime.now()
+        return [
+            dict(user=note.user.username,
+                 created=self.format_created(note.created, now),
+                 body=note.body)
+            for note in self.notes
+        ]
 
 class DefaultWorkflow(Workflow):
     def get_work_mode(self, user, language_code):
