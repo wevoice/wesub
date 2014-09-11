@@ -25,6 +25,7 @@ var angular = angular || null;
         'amara.SubtitleEditor.modal',
         'amara.SubtitleEditor.dom',
         'amara.SubtitleEditor.lock',
+        'amara.SubtitleEditor.notes',
         'amara.SubtitleEditor.session',
         'amara.SubtitleEditor.workflow',
         'amara.SubtitleEditor.subtitles.controllers',

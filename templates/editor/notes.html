@@ -1,0 +1,14 @@
+{% load i18n %}
+<div class="notes" ng-controller="NotesController">
+    <h3>Notes</h3>
+    <ul class="notes" note-scroller>
+        <li ng-repeat="note in notes">
+            <p>[[ note.body ]]</p>
+            <p class="byline">[[ note.user ]] - [[ note.created ]]</p>
+        </li>
+    </ul>
+    <div class="new-note">
+        <textarea ng-model="newNoteText"></textarea>
+        <button ng-click="postNote()">Post New Note</button>
+    </div>
+</div>
