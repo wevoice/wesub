@@ -21,12 +21,13 @@ var angular = angular || null;
 (function() {
     var module = angular.module('amara.SubtitleEditor.notes', []);
 
-    module.controller('NotesController', ["$scope", "$timeout", "EditorData", function($scope, $timeout, EditorData) {
+    module.controller('NotesController', ["$scope", "$timeout", "EditorData", "SubtitleStorage", function($scope, $timeout, EditorData, SubtitleStorage) {
         $scope.heading = EditorData.notesHeading;
         $scope.notes = EditorData.notes;
         $scope.newNoteText = "";
 
         $scope.postNote = function() {
+            SubtitleStorage.postNote($scope.newNoteText);
             $scope.notes.push({
                 user: EditorData.username,
                 created: 'Just now',

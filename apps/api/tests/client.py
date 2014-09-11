@@ -15,14 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.conf.urls import patterns, url
-from api import views
+from django.test.client import Client
 
-urlpatterns = patterns('',
-    url(r'^videos/(?P<video_id>[\w\d_.-]+)'
-        '/languages/(?P<language_code>[\w\d-]+)/subtitles/actions/',
-        views.Actions.as_view()),
-    url(r'^videos/(?P<video_id>[\w\d_.-]+)'
-        '/languages/(?P<language_code>[\w\d-]+)/subtitles/notes/',
-        views.NotesList.as_view()),
-)
+class APIClient(Client):
+    def __init__(self):
+        self.auth_headers = {}
+        Client.__init__(self)
+
+    def set_auth_headers(self, user):
+        if user is None:
+            self.auth_headers = {}
+        else:
+            self.auth_headers = {
+                'HTTP_X_API_USERNAME': user.username,
+                'HTTP_X_APIKEY': user.get_api_key(),
+            }
+
+    def request(self, **request):
+        request.update(self.auth_headers)
+        return Client.request(self, **request)

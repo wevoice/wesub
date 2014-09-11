@@ -18,10 +18,10 @@
 import json
 
 from django.test import TestCase
-from django.test.client import Client
 from nose.tools import *
 import mock
 
+from api.tests.client import APIClient
 from subtitles import pipeline
 from subtitles.tests.test_workflows import TestAction
 from utils import test_utils
@@ -34,8 +34,8 @@ class TestActionsAPI(TestCase):
         self.setup_actions()
         self.setup_video()
         self.user = UserFactory()
-        self.client = Client()
-        self.client.login(username=self.user, password='password')
+        self.client = APIClient()
+        self.client.set_auth_headers(self.user)
 
     def setup_actions(self):
         self.action1 = TestAction('action1', False)

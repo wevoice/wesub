@@ -1,5 +1,6 @@
 describe('The Notes Controller', function() {
     var EditorData;
+    var SubtitleStorage;
     var $scope;
     var $timeout;
 
@@ -23,6 +24,7 @@ describe('The Notes Controller', function() {
             }
         ];
         EditorData.notesHeading = 'Note heading';
+        SubtitleStorage = $injector.get('SubtitleStorage');
 
         $controller('NotesController', {
             $scope: $scope,
@@ -37,7 +39,13 @@ describe('The Notes Controller', function() {
         expect($scope.notes).toEqual(EditorData.notes);
     });
 
-    it('adds new notes', function() {
+    it('posts notes to the API', function() {
+        $scope.newNoteText = 'new note';
+        $scope.postNote();
+        expect(SubtitleStorage.postNote).toHaveBeenCalledWith('new note');
+    });
+
+    it('adds new notes to the list', function() {
         $scope.newNoteText = 'new note';
         $scope.postNote();
         expect($scope.notes.length).toEqual(2);

@@ -457,9 +457,9 @@ class EditorNotes(object):
             user (CustomUser): user adding the note
             body (unicode): note text
         """
-        SubtitleNote.objects.create(video=self.video,
-                                    language_code=self.language_code,
-                                    user=user, body=body)
+        return SubtitleNote.objects.create(video=self.video,
+                                           language_code=self.language_code,
+                                           user=user, body=body)
 
     def format_created(self, created, now):
         if created > now - timedelta(hours=12):

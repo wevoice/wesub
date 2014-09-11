@@ -25,6 +25,7 @@
             'getSubtitles',
             'saveSubtitles',
             'performAction',
+            'postNote'
         ];
         var SubtitleStorage = {
             deferreds: {},
