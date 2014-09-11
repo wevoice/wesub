@@ -54,6 +54,7 @@ class Command(BaseCommand):
         self.upload_bundles()
         self.upload_static_dir('images')
         self.upload_static_dir('fonts')
+        self.upload_static_dir('flowplayer')
         self.upload_admin_files()
         self.upload_old_embedder()
 
