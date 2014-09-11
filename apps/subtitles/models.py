@@ -1825,12 +1825,18 @@ class SubtitleVersionMetadata(models.Model):
         else:
             return self.data
 
-class SubtitleNote(models.Model):
+class SubtitleNoteBase(models.Model):
     video = models.ForeignKey(Video, related_name='+')
     language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
-    user = models.ForeignKey(User, related_name='subtitle_notes')
+    user = models.ForeignKey(User, related_name='+')
     body = models.TextField()
     created = models.DateTimeField(default=datetime.now)
+
+    class Meta:
+        abstract = True
+
+class SubtitleNote(SubtitleNoteBase):
+    pass
 
 # Collaborators ---------------------------------------------------------------
 class CollaboratorManager(models.Manager):

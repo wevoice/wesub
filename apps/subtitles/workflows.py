@@ -60,6 +60,7 @@ them.
 from datetime import datetime, timedelta
 
 from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext as _
 
 from subtitles import signals
 from subtitles.exceptions import ActionError
@@ -436,7 +437,8 @@ class EditorNotes(object):
 
     Attributes:
         heading: heading for the editor section
-        notes: list of SubtitleNotes for the editor
+        notes: list of SubtitleNotes for the editor (or any model that
+            inherits from SubtitleNoteBase)
 
     .. automethod:: post
     """
@@ -444,7 +446,7 @@ class EditorNotes(object):
     def __init__(self, video, language_code):
         self.video = video
         self.language_code = language_code
-        self.heading = 'Subtitle Notes'
+        self.heading = _('Subtitle Notes')
         self.notes = list(SubtitleNote.objects
                           .filter(video=video, language_code=language_code)
                           .order_by('created')

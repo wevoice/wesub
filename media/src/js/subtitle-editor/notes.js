@@ -40,6 +40,11 @@ var angular = angular || null;
             });
         }
 
+        $scope.onPostClicked = function($event) {
+            $scope.postNote();
+            $event.preventDefault();
+        }
+
         $timeout(function() {
             $scope.scrollToBottom();
         });

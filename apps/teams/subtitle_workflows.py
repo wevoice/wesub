@@ -22,7 +22,7 @@ from django.utils.translation import ugettext_lazy
 
 from subtitles import workflows
 from subtitles.signals import subtitles_published
-from teams.models import Task
+from teams.models import Task, TeamSubtitleNote
 from teams.permissions import can_create_and_edit_subtitles
 from utils.behaviors import DONT_OVERRIDE
 from utils.text import fmt
@@ -97,11 +97,40 @@ class SendBack(TaskAction):
         _complete_task(user, video, subtitle_language, saved_version,
                        Task.APPROVED_IDS['Rejected'])
 
-class TaskTeamWorkflow(workflows.Workflow):
+class TeamEditorNotes(workflows.EditorNotes):
+    def __init__(self, team_video, language_code):
+        self.team = team_video.team
+        self.video = team_video.video
+        self.language_code = language_code
+        self.heading = fmt(_('%(team)s Team Subtitle Notes'),
+                           team=self.team)
+        self.notes = list(TeamSubtitleNote.objects
+                          .filter(video=self.video, team=self.team,
+                                  language_code=language_code)
+                          .order_by('created')
+                          .select_related('user'))
+
+    def post(self, user, body):
+        return TeamSubtitleNote.objects.create(
+            team=self.team, video=self.video,
+            language_code=self.language_code,
+            user=user, body=body)
+
+class TeamWorkflow(workflows.Workflow):
     def __init__(self, team_video):
         workflows.Workflow.__init__(self, team_video.video)
         self.team_video = team_video
 
+    def get_editor_notes(self, language_code):
+        return TeamEditorNotes(self.team_video, language_code)
+
+    def user_can_view_private_subtitles(self, user, language_code):
+        return self.team_video.team.is_member(user)
+
+    def user_can_edit_subtitles(self, user, language_code):
+        return can_create_and_edit_subtitles(user, self.team_video,
+                                             language_code)
+class TaskTeamWorkflow(TeamWorkflow):
     def get_work_mode(self, user, language_code):
         task = self.team_video.get_task_for_editor(language_code)
         if task is not None:
@@ -128,7 +157,7 @@ class TaskTeamWorkflow(workflows.Workflow):
     def get_add_language_mode(self, user):
         if self.team_video.team.is_member(user):
             return mark_safe(
-                _(fmt('View <a href="%(url)s">tasks for this video</a>.',
+                fmt(_('View <a href="%(url)s">tasks for this video</a>.',
                       url=self.team_video.get_tasks_page_url())))
         else:
             return None
@@ -142,16 +171,12 @@ class TaskTeamWorkflow(workflows.Workflow):
             return super(TaskTeamWorkflow, self).action_for_add_subtitles(
                 user, language_code, complete)
 
-    def user_can_view_private_subtitles(self, user, language_code):
-        return self.team_video.team.is_member(user)
-
-    def user_can_edit_subtitles(self, user, language_code):
-        return can_create_and_edit_subtitles(user, self.team_video,
-                                             language_code)
-
 @workflows.get_workflow.override
-def get_task_team_workflow(video):
+def get_team_workflow(video):
     team_video = video.get_team_video()
-    if team_video is None or not team_video.team.is_tasks_team():
+    if team_video is None:
         return DONT_OVERRIDE
-    return TaskTeamWorkflow(team_video)
+    if team_video.team.is_tasks_team():
+        return TaskTeamWorkflow(team_video)
+    else:
+        return TeamWorkflow(team_video)

@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="notes" ng-controller="NotesController">
-    <h3>Notes</h3>
+    <h3>[[ heading ]]</h3>
     <ul class="notes" note-scroller>
         <li ng-repeat="note in notes">
             <p>[[ note.body ]]</p>
@@ -9,6 +9,6 @@
     </ul>
     <div class="new-note">
         <textarea ng-model="newNoteText"></textarea>
-        <button ng-click="postNote()">Post New Note</button>
+        <button ng-click="onPostClicked($event);">Post New Note</button>
     </div>
 </div>
