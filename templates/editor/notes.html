@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="notes" ng-controller="NotesController">
-    <h3>[[ heading ]]</h3>
+    <div class="heading"><h3>[[ heading ]]</h3></div>
     <ul class="notes" note-scroller>
         <li ng-repeat="note in notes">
             <p ng-bind-html="note.body"></p>

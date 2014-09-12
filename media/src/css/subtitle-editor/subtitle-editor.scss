@@ -853,29 +853,35 @@ div.notes {
     background: $dark-grey;
     color: #ddd;
 
-    h3 {
+    .heading {
         position: absolute;
         top: 1em;
-        left: 2em;
-        right: 2em;
+        left: 3em;
+        right: 3em;
 
-        font-size: 150%;
-        color: $off-white;
+        h3 {
+            font-size: 150%;
+            color: $off-white;
+        }
     }
 
     ul.notes {
         position: absolute;
         top: 3.5em;
         bottom: 10em;
-        left: 2em;
-        right: 2em;
+        left: 3em;
+        right: 3em;
         overflow: auto;
 
         li {
             background: $semi-dark-grey;
             padding: 5px 20px;
             border-radius: 10px;
-            margin: 1em 0;
+            margin-bottom: 1em;
+
+            &:last-of-type {
+                margin-bottom: 0;
+            }
         }
 
         p.byline {
@@ -890,8 +896,8 @@ div.notes {
 
         height: 9em;
         bottom: 1em;
-        left: 2em;
-        right: 2em;
+        left: 3em;
+        right: 3em;
 
         textarea {
             background: #ececec;
