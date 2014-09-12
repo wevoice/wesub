@@ -59,17 +59,18 @@ class TestTaskTeamNotes(TestCase):
         editor_notes = workflow.get_editor_notes('en')
         assert_is_instance(editor_notes, TaskTeamEditorNotes)
 
-    def check_send_email(self, mock_send_emails, note, recipients):
-        assert_equals(mock_send_emails.call_count, 1)
-        args, kwargs = mock_send_emails.call_args
+    def check_send_messages(self, mock_send_messages, note, recipients):
+        assert_equals(mock_send_messages.call_count, 1)
+        args, kwargs = mock_send_messages.call_args
         assert_equals(args[0], note)
         assert_items_equal(args[1], recipients)
         assert_equals(len(args), 2)
         assert_equals(len(kwargs), 0)
-        mock_send_emails.reset_mock()
+        mock_send_messages.reset_mock()
 
-    @test_utils.patch_for_test('teams.subtitle_workflows.TaskTeamEditorNotes.send_emails')
-    def test_emails(self, mock_send_emails):
+    @test_utils.patch_for_test('teams.subtitle_workflows'
+                               '.TaskTeamEditorNotes.send_messages')
+    def test_emails(self, mock_send_messages):
         subtitler = UserFactory()
         reviewer = UserFactory()
         approver = UserFactory()
@@ -85,10 +86,10 @@ class TestTaskTeamNotes(TestCase):
         # users should be sent emails.
         editor_notes = TaskTeamEditorNotes(self.team_video, 'en')
         note = editor_notes.post(subtitler, 'note')
-        self.check_send_email(mock_send_emails, note, [reviewer, approver])
+        self.check_send_messages(mock_send_messages, note, [reviewer, approver])
 
         note2 = editor_notes.post(reviewer, 'note')
-        self.check_send_email(mock_send_emails, note2, [subtitler, approver])
+        self.check_send_messages(mock_send_messages, note2, [subtitler, approver])
 
         note3 = editor_notes.post(approver, 'note')
-        self.check_send_email(mock_send_emails, note3, [subtitler, reviewer])
+        self.check_send_messages(mock_send_messages, note3, [subtitler, reviewer])

@@ -17,10 +17,12 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.conf import settings
+from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
+from messages.models import Message
 from subtitles import workflows
 from subtitles.signals import subtitles_published
 from teams.models import Task, TeamSubtitleNote
@@ -122,7 +124,7 @@ class TaskTeamEditorNotes(TeamEditorNotes):
     def post(self, user, body):
         note = super(TaskTeamEditorNotes, self).post(user, body)
         email_to = [u for u in self.all_assignees() if u != note.user]
-        self.send_emails(note, email_to)
+        self.send_messages(note, email_to)
         return note
 
     def all_assignees(self):
@@ -131,19 +133,26 @@ class TaskTeamEditorNotes(TeamEditorNotes):
                    .select_related('assignee'))
         return set(task.assignee for task in task_qs)
 
-    def send_emails(self, note, user_list):
+    def send_messages(self, note, user_list):
         subject = fmt(
             _(u'%(user)s added a note while editing %(title)s'),
             user=unicode(note.user), title=self.video.title_display())
-        template = "messages/email/task-team-editor-note-notifiction.html"
         data = {
             'note_user': unicode(note.user),
             'body': note.body,
+            'tasks_url': self.team_video.get_tasks_page_url(),
         }
+        email_template = ("messages/email/"
+                          "task-team-editor-note-notifiction.html")
+        message_template = 'messages/task-team-editor-note.html'
 
         for user in user_list:
-            send_templated_email(user, subject, template, data,
+            send_templated_email(user, subject, email_template, data,
                                  fail_silently=not settings.DEBUG)
+
+            Message.objects.create(
+                user=user, subject=subject,
+                content=render_to_string(message_template, data))
 
 class TeamWorkflow(workflows.DefaultWorkflow):
     def __init__(self, team_video):
