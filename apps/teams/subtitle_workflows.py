@@ -120,7 +120,7 @@ class TeamEditorNotes(workflows.EditorNotes):
 
 class TaskTeamEditorNotes(TeamEditorNotes):
     def post(self, user, body):
-        note = super(TeamEditorNotes, self).post(user, body)
+        note = super(TaskTeamEditorNotes, self).post(user, body)
         email_to = [u for u in self.all_assignees() if u != note.user]
         self.send_emails(note, email_to)
         return note
