@@ -1,6 +1,7 @@
 describe('The Notes Controller', function() {
     var EditorData;
     var SubtitleStorage;
+    var $sce;
     var $scope;
     var $timeout;
 
@@ -15,6 +16,7 @@ describe('The Notes Controller', function() {
         $scope.fadeInLastNote = jasmine.createSpy('fadeInLastNote');
 
         $timeout = $injector.get('$timeout');
+        $sce = $injector.get('$sce');
         EditorData = $injector.get('EditorData');
         EditorData.notes = [
             {
@@ -36,7 +38,14 @@ describe('The Notes Controller', function() {
     });
 
     it('gets the notes from EditorData', function() {
-        expect($scope.notes).toEqual(EditorData.notes);
+        var noteData = _.map($scope.notes, function(note) {
+            return {
+                user: note.user,
+                created: note.created,
+                body: $sce.getTrustedHtml(note.body)
+            }
+        });
+        expect(noteData).toEqual(EditorData.notes);
     });
 
     it('posts notes to the API', function() {
@@ -45,12 +54,26 @@ describe('The Notes Controller', function() {
         expect(SubtitleStorage.postNote).toHaveBeenCalledWith('new note');
     });
 
+    it('converts linebreaks to <br>s', function() {
+        $scope.newNoteText = 'line 1\nline2';
+        $scope.postNote();
+        var lastNote = $scope.notes[$scope.notes.length-1];
+        expect($sce.getTrustedHtml(lastNote.body)).toEqual('line 1<br />line2');
+    });
+
+    it('escapes html', function() {
+        $scope.newNoteText = '<script>';
+        $scope.postNote();
+        var lastNote = $scope.notes[$scope.notes.length-1];
+        expect($sce.getTrustedHtml(lastNote.body)).toEqual('&lt;script&gt;');
+    });
+
     it('adds new notes to the list', function() {
         $scope.newNoteText = 'new note';
         $scope.postNote();
         expect($scope.notes.length).toEqual(2);
         // the note should be added to the end of the list
-        expect($scope.notes[1].body).toEqual('new note');
+        expect($sce.getTrustedHtml($scope.notes[1].body)).toEqual('new note');
         expect($scope.notes[1].user).toEqual(EditorData.username);
         expect($scope.notes[1].created).toEqual('Just now');
     });

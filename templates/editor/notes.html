@@ -3,7 +3,7 @@
     <h3>[[ heading ]]</h3>
     <ul class="notes" note-scroller>
         <li ng-repeat="note in notes">
-            <p>[[ note.body ]]</p>
+            <p ng-bind-html="note.body"></p>
             <p class="byline">[[ note.user ]] - [[ note.created ]]</p>
         </li>
     </ul>

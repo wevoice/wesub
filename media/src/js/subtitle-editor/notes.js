@@ -21,17 +21,29 @@ var angular = angular || null;
 (function() {
     var module = angular.module('amara.SubtitleEditor.notes', []);
 
-    module.controller('NotesController', ["$scope", "$timeout", "EditorData", "SubtitleStorage", function($scope, $timeout, EditorData, SubtitleStorage) {
+    module.controller('NotesController', ["$sce", "$scope", "$timeout", "EditorData", "SubtitleStorage", function($sce, $scope, $timeout, EditorData, SubtitleStorage) {
         $scope.heading = EditorData.notesHeading;
-        $scope.notes = EditorData.notes;
         $scope.newNoteText = "";
+        $scope.notes = _.map(EditorData.notes, function(note) {
+            return {
+                user: note.user,
+                created: note.created,
+                body: convertBody(note.body)
+            }
+        });
+
+        function convertBody(body) {
+            body = _.escape(body);
+            body = body.replace("\n", "<br />");
+            return $sce.trustAsHtml(body);
+        }
 
         $scope.postNote = function() {
             SubtitleStorage.postNote($scope.newNoteText);
             $scope.notes.push({
                 user: EditorData.username,
                 created: 'Just now',
-                body: $scope.newNoteText
+                body: convertBody($scope.newNoteText)
             });
             $scope.newNoteText = "";
             $timeout(function() {
@@ -48,6 +60,8 @@ var angular = angular || null;
         $timeout(function() {
             $scope.scrollToBottom();
         });
+
+
     }]);
 
     module.directive('noteScroller', function() {
