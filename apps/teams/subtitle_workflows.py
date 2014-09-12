@@ -25,6 +25,7 @@ from subtitles import workflows
 from subtitles.signals import subtitles_published
 from teams.models import Task, TeamSubtitleNote
 from teams.permissions import can_create_and_edit_subtitles
+from utils import send_templated_email
 from utils.behaviors import DONT_OVERRIDE
 from utils.text import fmt
 from videos.tasks import video_changed_tasks
@@ -102,6 +103,7 @@ class TeamEditorNotes(workflows.EditorNotes):
     def __init__(self, team_video, language_code):
         self.team = team_video.team
         self.video = team_video.video
+        self.team_video = team_video
         self.language_code = language_code
         self.heading = _('Team Notes')
         self.notes = list(TeamSubtitleNote.objects
@@ -115,6 +117,33 @@ class TeamEditorNotes(workflows.EditorNotes):
             team=self.team, video=self.video,
             language_code=self.language_code,
             user=user, body=body)
+
+class TaskTeamEditorNotes(TeamEditorNotes):
+    def post(self, user, body):
+        note = super(TeamEditorNotes, self).post(user, body)
+        email_to = [u for u in self.all_assignees() if u != note.user]
+        self.send_emails(note, email_to)
+        return note
+
+    def all_assignees(self):
+        task_qs = (self.team_video.task_set
+                   .filter(assignee__isnull=False)
+                   .select_related('assignee'))
+        return set(task.assignee for task in task_qs)
+
+    def send_emails(self, note, user_list):
+        subject = fmt(
+            _(u'%(user)s added a note while editing %(title)s'),
+            user=unicode(note.user), title=self.video.title_display())
+        template = "messages/email/task-team-editor-note-notifiction.html"
+        data = {
+            'note_user': unicode(note.user),
+            'body': note.body,
+        }
+
+        for user in user_list:
+            send_templated_email(user, subject, template, data,
+                                 fail_silently=not settings.DEBUG)
 
 class TeamWorkflow(workflows.DefaultWorkflow):
     def __init__(self, team_video):
@@ -153,6 +182,9 @@ class TaskTeamWorkflow(TeamWorkflow):
         else:
             # subtitle/translate task
             return [Complete()]
+
+    def get_editor_notes(self, language_code):
+        return TaskTeamEditorNotes(self.team_video, language_code)
 
     def get_add_language_mode(self, user):
         if self.team_video.team.is_member(user):
