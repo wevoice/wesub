@@ -20,10 +20,14 @@
 
     var module = angular.module('amara.SubtitleEditor.video.controllers', []);
 
-    module.controller('VideoController', ['$scope', '$sce', 'VideoPlayer', function($scope, $sce, VideoPlayer) {
+    module.controller('VideoController', ['$scope', '$sce', 'EditorData', 'VideoPlayer', function($scope, $sce, EditorData, VideoPlayer) {
         $scope.subtitleText = null;
         $scope.showSubtitle = false;
-        $scope.showOverlay = true;
+        if(EditorData.work_mode.type == 'normal') {
+            $scope.showOverlay = true;
+        } else {
+            $scope.showOverlay = false;
+        }
 
         $scope.videoState = {
             loaded: false,

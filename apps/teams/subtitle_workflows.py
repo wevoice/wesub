@@ -16,14 +16,19 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.conf import settings
+from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
+from messages.models import Message
 from subtitles import workflows
 from subtitles.signals import subtitles_published
-from teams.models import Task
+from teams.models import Task, TeamSubtitleNote
 from teams.permissions import can_create_and_edit_subtitles
+from utils import send_templated_email
+from utils import translation
 from utils.behaviors import DONT_OVERRIDE
 from utils.text import fmt
 from videos.tasks import video_changed_tasks
@@ -97,18 +102,83 @@ class SendBack(TaskAction):
         _complete_task(user, video, subtitle_language, saved_version,
                        Task.APPROVED_IDS['Rejected'])
 
-class TaskTeamWorkflow(workflows.Workflow):
+class TeamEditorNotes(workflows.EditorNotes):
+    def __init__(self, team_video, language_code):
+        self.team = team_video.team
+        self.video = team_video.video
+        self.team_video = team_video
+        self.language_code = language_code
+        self.heading = _('Team Notes')
+        self.notes = list(TeamSubtitleNote.objects
+                          .filter(video=self.video, team=self.team,
+                                  language_code=language_code)
+                          .order_by('created')
+                          .select_related('user'))
+
+    def post(self, user, body):
+        return TeamSubtitleNote.objects.create(
+            team=self.team, video=self.video,
+            language_code=self.language_code,
+            user=user, body=body)
+
+class TaskTeamEditorNotes(TeamEditorNotes):
+    def post(self, user, body):
+        note = super(TaskTeamEditorNotes, self).post(user, body)
+        email_to = [u for u in self.all_assignees() if u != note.user]
+        self.send_messages(note, email_to)
+        return note
+
+    def all_assignees(self):
+        task_qs = (self.team_video.task_set
+                   .filter(assignee__isnull=False)
+                   .select_related('assignee'))
+        return set(task.assignee for task in task_qs)
+
+    def send_messages(self, note, user_list):
+        subject = fmt(
+            _(u'%(user)s added a note while editing %(title)s'),
+            user=unicode(note.user), title=self.video.title_display())
+        data = {
+            'note_user': unicode(note.user),
+            'body': note.body,
+            'tasks_url': self.team_video.get_tasks_page_url()+'&assignee=me',
+            'video': self.video.title_display(),
+            'language': translation.get_language_label(self.language_code),
+        }
+        email_template = ("messages/email/"
+                          "task-team-editor-note-notifiction.html")
+        message_template = 'messages/task-team-editor-note.html'
+
+        for user in user_list:
+            send_templated_email(user, subject, email_template, data,
+                                 fail_silently=not settings.DEBUG)
+
+            Message.objects.create(
+                user=user, subject=subject,
+                content=render_to_string(message_template, data))
+
+class TeamWorkflow(workflows.DefaultWorkflow):
     def __init__(self, team_video):
-        workflows.Workflow.__init__(self, team_video.video)
+        workflows.DefaultWorkflow.__init__(self, team_video.video)
         self.team_video = team_video
 
+    def get_editor_notes(self, language_code):
+        return TeamEditorNotes(self.team_video, language_code)
+
+    def user_can_view_private_subtitles(self, user, language_code):
+        return self.team_video.team.is_member(user)
+
+    def user_can_edit_subtitles(self, user, language_code):
+        return can_create_and_edit_subtitles(user, self.team_video,
+                                             language_code)
+class TaskTeamWorkflow(TeamWorkflow):
     def get_work_mode(self, user, language_code):
         task = self.team_video.get_task_for_editor(language_code)
         if task is not None:
             if task.is_approve_task():
-                heading = _("Approve Work")
+                heading = _("Approve")
             elif task.is_review_task():
-                heading = _("Review Work")
+                heading = _("Review")
             else:
                 # get_task_for_editor should only return approve/review tasks
                 raise ValueError("Wrong task type: %s" % task)
@@ -125,11 +195,18 @@ class TaskTeamWorkflow(workflows.Workflow):
             # subtitle/translate task
             return [Complete()]
 
+    def get_editor_notes(self, language_code):
+        return TaskTeamEditorNotes(self.team_video, language_code)
+
     def get_add_language_mode(self, user):
         if self.team_video.team.is_member(user):
             return mark_safe(
-                _(fmt('View <a href="%(url)s">tasks for this video</a>.',
-                      url=self.team_video.get_tasks_page_url())))
+                fmt(_(
+                    '<a class="icon" href="%(url)s">'
+                    '<img src="%(static_url)simages/edit-subtitles.png"></a>'
+                    'View <a href="%(url)s">tasks for this video</a>.'),
+                    url=self.team_video.get_tasks_page_url(),
+                    static_url=settings.STATIC_URL))
         else:
             return None
 
@@ -142,16 +219,12 @@ class TaskTeamWorkflow(workflows.Workflow):
             return super(TaskTeamWorkflow, self).action_for_add_subtitles(
                 user, language_code, complete)
 
-    def user_can_view_private_subtitles(self, user, language_code):
-        return self.team_video.team.is_member(user)
-
-    def user_can_edit_subtitles(self, user, language_code):
-        return can_create_and_edit_subtitles(user, self.team_video,
-                                             language_code)
-
 @workflows.get_workflow.override
-def get_task_team_workflow(video):
+def get_team_workflow(video):
     team_video = video.get_team_video()
-    if team_video is None or not team_video.team.is_tasks_team():
+    if team_video is None:
         return DONT_OVERRIDE
-    return TaskTeamWorkflow(team_video)
+    if team_video.team.is_tasks_team():
+        return TaskTeamWorkflow(team_video)
+    else:
+        return TeamWorkflow(team_video)

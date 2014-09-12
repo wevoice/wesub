@@ -57,6 +57,7 @@ from videos.models import Video, VideoUrl, SubtitleVersion, SubtitleLanguage
 from subtitles.models import (
     SubtitleVersion as NewSubtitleVersion,
     SubtitleLanguage as NewSubtitleLanguage,
+    SubtitleNoteBase,
     ORIGIN_IMPORTED
 )
 from subtitles import pipeline
@@ -1211,6 +1212,8 @@ class MembershipNarrowing(models.Model):
 
         return super(MembershipNarrowing, self).save(*args, **kwargs)
 
+class TeamSubtitleNote(SubtitleNoteBase):
+    team = models.ForeignKey(Team, related_name='+')
 
 class ApplicationInvalidException(Exception):
     pass

@@ -19,11 +19,13 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 from nose.tools import *
+from datetime import datetime, timedelta
 import mock
 
 from subtitles import workflows
 from subtitles import pipeline
 from subtitles.exceptions import ActionError
+from subtitles.models import SubtitleNote
 from utils.factories import *
 from utils import test_utils
 
@@ -82,3 +84,54 @@ class ActionsTest(TestCase):
         with assert_raises(ActionError):
             action.perform(self.user, self.video, version.subtitle_language,
                            version)
+
+class SubtitleNotesTest(TestCase):
+    def setUp(self):
+        self.video = VideoFactory()
+        self.user1 = UserFactory()
+        self.user2 = UserFactory()
+        SubtitleNote.objects.create(
+            video=self.video,
+            language_code='en',
+            user=self.user1,
+            body='note 1',
+            created=datetime(2000, 1, 1, 12))
+        SubtitleNote.objects.create(
+            video=self.video,
+            language_code='en',
+            user=self.user2,
+            body='note 2',
+            created=datetime(2000, 1, 1, 13))
+        self.editor_notes = workflows.EditorNotes(self.video, 'en')
+
+    def test_heading(self):
+        assert_equal(self.editor_notes.heading, 'Subtitle Notes')
+
+    def test_notes_list(self):
+        assert_equal(len(self.editor_notes.notes), 2)
+        assert_equal(self.editor_notes.notes[0].body, 'note 1')
+        assert_equal(self.editor_notes.notes[1].body, 'note 2')
+
+    def test_post(self):
+        self.editor_notes.post(self.user2, 'posted note')
+        last_note = SubtitleNote.objects.order_by('-id')[0]
+        assert_equal(last_note.body, 'posted note')
+
+    def check_format_created(self, note_created, now, correct_value):
+        assert_equal(self.editor_notes.format_created(note_created, now),
+                     correct_value)
+
+    def test_format_created_very_recent(self):
+        self.check_format_created(datetime(2014, 1, 1, 10, 30),
+                                  datetime(2014, 1, 1, 12),
+                                  '10:30 AM')
+
+    def test_format_created_somewhat_recent(self):
+        self.check_format_created(datetime(2014, 1, 1, 10, 30),
+                                  datetime(2014, 1, 5, 12),
+                                  'Wed, 10:30 AM')
+
+    def test_format_created_old(self):
+        self.check_format_created(datetime(2014, 1, 1, 10, 30),
+                                  datetime(2014, 2, 1, 12),
+                                  'Jan 1 2014, 10:30 AM')

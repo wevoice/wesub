@@ -231,6 +231,7 @@ def subtitle_editor(request, video_id, language_code):
             'x-api-username': request.user.username,
             'x-apikey': request.user.get_api_key()
         },
+        'username': request.user.username,
         'video': {
             'id': video.video_id,
             'title': video.title,
@@ -254,6 +255,7 @@ def subtitle_editor(request, video_id, language_code):
             'language_code': editing_language.language_code,
         }),
         'staticURL': settings.STATIC_URL,
+        'notesHeading': 'Editor Notes',
     }
 
     workflow = get_workflow(video)

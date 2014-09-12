@@ -6,6 +6,7 @@ describe('The SubtitleStorage service', function() {
     var SubtitleStorage;
     var subtitlesURL;
     var actionsURL;
+    var notesURL;
 
 
     beforeEach(function() {
@@ -23,6 +24,7 @@ describe('The SubtitleStorage service', function() {
         subtitlesURL = ('/api2/partners/videos/' + videoId + '/languages/' +
             languageCode + '/subtitles/');
         actionsURL = subtitlesURL + 'actions/';
+        notesURL = subtitlesURL + 'notes/';
     }));
 
     afterEach(function() {
@@ -73,6 +75,15 @@ describe('The SubtitleStorage service', function() {
         SubtitleStorage.performAction('action-name');
         $httpBackend.expectPOST(actionsURL, {
             'action': 'action-name'
+        }).respond('200', '');
+        $rootScope.$digest();
+        $httpBackend.flush();
+    });
+
+    it('posts notes', function() {
+        SubtitleStorage.postNote('note text');
+        $httpBackend.expectPOST(notesURL, {
+            'body': 'note text'
         }).respond('200', '');
         $rootScope.$digest();
         $httpBackend.flush();

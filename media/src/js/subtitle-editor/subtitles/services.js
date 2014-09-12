@@ -50,6 +50,10 @@ var angular = angular || null;
         return getSubtitleSaveAPIUrl(videoId, languageCode) + 'actions/';
     };
 
+    var getNoteAPIUrl = function(videoId, languageCode) {
+        return getSubtitleSaveAPIUrl(videoId, languageCode) + 'notes/';
+    };
+
     /*
      * Language object that we return from getLanguage()
      */
@@ -164,6 +168,14 @@ var angular = angular || null;
                         EditorData.editingVersion.languageCode);
 
                 return $http.post(url, { action: actionName }, {
+                    headers: authHeaders()
+                });
+            },
+            postNote: function(body) {
+                var url = getNoteAPIUrl(EditorData.video.id,
+                        EditorData.editingVersion.languageCode);
+
+                return $http.post(url, { body: body }, {
                     headers: authHeaders()
                 });
             },

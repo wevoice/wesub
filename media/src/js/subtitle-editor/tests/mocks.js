@@ -25,6 +25,7 @@
             'getSubtitles',
             'saveSubtitles',
             'performAction',
+            'postNote'
         ];
         var SubtitleStorage = {
             deferreds: {},
@@ -81,6 +82,7 @@
 
     module.factory('EditorData', function() {
         return {
+            "username": "testuser",
             "canSync": true,
             "canAddAndRemove": true,
             "languageCode": "en",
@@ -108,6 +110,7 @@
                     "name": "English"
                 },
             ],
+            'notes': [],
             'staticURL': 'http://example.com/'
         };
     });
