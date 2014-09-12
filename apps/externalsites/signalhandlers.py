@@ -31,28 +31,18 @@ from subtitles.models import (SubtitleLanguage, SubtitleVersion,
 from videos.models import Video, VideoUrl
 import subtitles.signals
 
-def _should_update_subtitles(language, version):
-    if not language.subtitles_complete:
-        return False
-    elif version is not None and version.origin == ORIGIN_IMPORTED:
-        # don't waste time re-syncing imported subs (#1646)
-        return False
-    else:
-        return True
-
-def _update_subtitles_for_language(language, version):
+def _update_subtitles_for_language(language):
     for account, video_url in get_sync_accounts(language.video):
-        if _should_update_subtitles(language, version):
-            tasks.update_subtitles.delay(account.account_type, account.id,
-                                         video_url.id, language.id)
+        tasks.update_subtitles.delay(account.account_type, account.id,
+                                     video_url.id, language.id)
         if credit.should_add_credit_to_video_url(video_url, account):
             tasks.add_amara_credit.delay(video_url.id)
 
-@receiver(subtitles.signals.subtitles_changed)
-def on_subtitles_changed(signal, sender, **kwargs):
+@receiver(subtitles.signals.subtitles_published)
+def on_subtitles_published(signal, sender, version=None, **kwargs):
     if not isinstance(sender, SubtitleLanguage):
         raise ValueError("sender must be a SubtitleLanguage: %s" % sender)
-    _update_subtitles_for_language(sender, kwargs.get('version'))
+    _update_subtitles_for_language(sender)
 
 @receiver(subtitles.signals.language_deleted)
 def on_language_deleted(signal, sender, **kwargs):

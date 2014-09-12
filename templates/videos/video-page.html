@@ -67,18 +67,12 @@
                     {% endblocktrans %}
                 </p>
             {% endif %}
-            {% if team.workflow_enabled and user_is_team_member %}
-            <a class="icon" href="{{ team_video.get_tasks_page_url }}"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
-            <p>
-                {% blocktrans with team_video.get_tasks_page_url as url %}
-                View <a href="{{ url }}">tasks for this video</a>.
-                {% endblocktrans %}
-            </p>
-            {% elif can_create_subs %}
+            {% if add_language_mode == '<standard>' %}
                 <a href="#create-subtitles-modal" class="icon open-modal"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
                     <p><a href="#create-subtitles-modal" class="open-modal">{% trans 'Add a new language!' %}</a></p>
                 {% upload_subtitles video %}
-            </p>
+            {% elif add_language_mode %}
+                <p>{{ add_language_mode }}</p>
             {% endif %}
         </div>
         {% include 'videos/_language-list.html' %}

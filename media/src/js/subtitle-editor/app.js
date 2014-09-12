@@ -52,6 +52,14 @@ var angular = angular || null;
     module.constant('MIN_DURATION', 250); // 0.25 seconds
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
 
+    module.factory('EditorData', ["$window", function($window) {
+        /**
+         * Get the editor data that was passed to us from python
+         *
+         */
+        return $window.editorData;
+    }]);
+
     module.controller("AppController", ['$scope', '$sce', '$controller', 
                       '$window', 'EditorData', 'VideoPlayer', 'Workflow',
                       function($scope, $sce, $controller, $window, EditorData,
@@ -97,10 +105,9 @@ var angular = angular || null;
                 return true;
             return false; 
         }
-        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating);
+        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
         $scope.warningsShown = true;
-        $scope.timelineShown = ($scope.workflow.stage != 'type' ||
-                EditorData.task_needs_pane);
+        $scope.timelineShown = $scope.workflow.stage != 'typing';
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
         }

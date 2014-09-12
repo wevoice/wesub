@@ -242,6 +242,9 @@ class Team(models.Model):
     def __unicode__(self):
         return self.name or self.slug
 
+    def is_tasks_team(self):
+        return self.workflow_enabled
+
     def get_tasks_page_url(self):
         return reverse('teams:team_tasks', kwargs={
             'slug': self.slug,
@@ -873,6 +876,35 @@ class TeamVideo(models.Model):
             api_teamvideo_new.send(self)
             video_moved_from_team_to_team.send(sender=self,
                                                destination_team=new_team, video=self.video)
+
+    def get_task_for_editor(self, language_code):
+        if not hasattr(self, '_editor_task'):
+            self._editor_task = self._get_task_for_editor(language_code)
+        return self._editor_task
+
+    def _get_task_for_editor(self, language_code):
+        task_set = self.task_set.incomplete().filter(language=language_code)
+        # 2533: We can get 2 review tasks if we include translate/transcribe
+        # tasks in the results.  This is because when we have a task id and
+        # the user clicks endorse, we do the following:
+        #    - save the subtitles
+        #    - save the task, setting subtitle_version to the version that we
+        #      just saved
+        #
+        # However, the task code creates a task on both of those steps.  I'm not
+        # sure exactly what the old editor does to make this not happen, but
+        # it's safest to just not send task_id in that case
+        task_set = task_set.filter(type__in=(Task.TYPE_IDS['Review'],
+                                             Task.TYPE_IDS['Approve']))
+        # This assumes there is only 1 incomplete tasks at once, hopefully
+        # that's a good enough assumption to hold until we dump tasks for the
+        # collab model.
+        tasks = list(task_set[:1])
+        if tasks:
+            return tasks[0]
+        else:
+            return None
+
 
 class TeamVideoMigration(models.Model):
     from_team = models.ForeignKey(Team, related_name='+')
@@ -1809,6 +1841,18 @@ class Task(models.Model):
         This lets us patch it in the unittests.
         """
         return datetime.datetime.now()
+
+    def is_subtitle_task(self):
+        return self.type == Task.TYPE_IDS['Subtitle']
+
+    def is_translate_task(self):
+        return self.type == Task.TYPE_IDS['Translate']
+
+    def is_review_task(self):
+        return self.type == Task.TYPE_IDS['Review']
+
+    def is_approve_task(self):
+        return self.type == Task.TYPE_IDS['Approve']
 
     @property
     def workflow(self):
@@ -3076,7 +3120,3 @@ class Partner(models.Model):
 
     def is_admin(self, user):
         return user in self.admins.all()
-
-# we know that models.py is always loaded, import signalhandlers to ensure it
-# gets loaded as well
-import teams.signalhandlers

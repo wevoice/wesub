@@ -35,6 +35,7 @@ from django.template.defaultfilters import urlize, linebreaks, force_escape
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from subtitles import shims
+from subtitles.workflows import get_workflow
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.templatetags.new_subtitles_tags import visibility
 from subtitles.forms import SubtitlesUploadForm
@@ -151,32 +152,6 @@ def get_team_attributes_for_editor(video):
     else:
         return None
 
-def get_task_for_editor(video, language_code):
-    team_video = video.get_team_video()
-    if team_video is None:
-        return None
-    task_set = team_video.task_set.incomplete().filter(language=language_code)
-    # 2533: We can get 2 review tasks if we include translate/transcribe tasks
-    # in the results.  This is because when we have a task id and the user
-    # clicks endorse, we do the following:
-    #    - save the subtitles
-    #    - save the task, setting subtitle_version to the version that we just
-    #    saved
-    #
-    # However, the task code creates a task on both of those steps.  I'm not
-    # sure exactly what the old editor does to make this not happen, but it's
-    # safest to just not send task_id in that case
-    task_set = task_set.filter(type__in=(Task.TYPE_IDS['Review'],
-                                         Task.TYPE_IDS['Approve']))
-    # This assumes there is only 1 incomplete tasks at once, hopefully that's
-    # a good enough assumption to hold until we dump tasks for the collae
-    # model.
-    tasks = list(task_set[:1])
-    if tasks:
-        return tasks[0]
-    else:
-        return None
-
 def old_editor(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
     language = get_object_or_404(SubtitleLanguage, video=video,
@@ -220,7 +195,11 @@ def subtitle_editor(request, video_id, language_code):
     if error_message:
         messages.error(request, error_message)
         return redirect(video)
-    task = get_task_for_editor(video, language_code)
+    team_video = video.get_team_video()
+    if team_video is not None:
+        task = team_video.get_task_for_editor(language_code)
+    else:
+        task = None
     check_result = can_add_version(request.user, video, language_code)
     if not check_result:
         messages.error(request, check_result.message)
@@ -276,6 +255,9 @@ def subtitle_editor(request, video_id, language_code):
         }),
         'staticURL': settings.STATIC_URL,
     }
+
+    workflow = get_workflow(video)
+    editor_data.update(workflow.editor_data(request.user, language_code))
 
     if task:
         editor_data['task_id'] = task.id

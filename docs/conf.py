@@ -19,6 +19,9 @@ import sphinx_rtd_theme
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 sys.path.insert(0, os.path.abspath('../apps'))
+sys.path.insert(0, os.path.abspath('../'))
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
 # -- General configuration -----------------------------------------------------
 
@@ -30,6 +33,7 @@ sys.path.insert(0, os.path.abspath('../apps'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinxcontrib.httpdomain',
+    'sphinxcontrib.napoleon',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -84,6 +88,8 @@ exclude_patterns = []
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
 #show_authors = False
+
+autodoc_member_order = 'bysource'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'

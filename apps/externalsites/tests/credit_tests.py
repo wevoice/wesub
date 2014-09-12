@@ -142,7 +142,8 @@ class AddCreditScheduleTest(BaseCreditTest):
     def test_add_credit_on_new_public_tip(self):
         video = YouTubeVideoFactory(user=self.user)
         self.mock_add_amara_credit.delay.reset_mock()
-        pipeline.add_subtitles(video, 'en', None)
+        pipeline.add_subtitles(video, 'en', SubtitleSetFactory(),
+                               action='publish')
         self.mock_add_amara_credit.delay.assert_called_with(
             video.get_primary_videourl_obj().id)
 
@@ -153,7 +154,8 @@ class AddCreditScheduleTest(BaseCreditTest):
         video = YouTubeVideoFactory(user=self.user)
         self.assertEqual(self.mock_add_amara_credit.delay.call_count, 0)
         # adding a public tip shouldn't result in a call either
-        pipeline.add_subtitles(video, 'en', None)
+        pipeline.add_subtitles(video, 'en', SubtitleSetFactory(),
+                               action='publish')
         self.assertEqual(self.mock_add_amara_credit.delay.call_count, 0)
 
     def test_dont_add_credit_to_non_youtube_videos(self):

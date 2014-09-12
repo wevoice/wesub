@@ -10,5 +10,9 @@ codebase.
 
    workflow
    testing
+   editor
+   subtitle-workflows
    permissions
+   optional-apps
    i18n
+   behaviors
