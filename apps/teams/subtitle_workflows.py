@@ -28,6 +28,7 @@ from subtitles.signals import subtitles_published
 from teams.models import Task, TeamSubtitleNote
 from teams.permissions import can_create_and_edit_subtitles
 from utils import send_templated_email
+from utils import translation
 from utils.behaviors import DONT_OVERRIDE
 from utils.text import fmt
 from videos.tasks import video_changed_tasks
@@ -140,7 +141,9 @@ class TaskTeamEditorNotes(TeamEditorNotes):
         data = {
             'note_user': unicode(note.user),
             'body': note.body,
-            'tasks_url': self.team_video.get_tasks_page_url(),
+            'tasks_url': self.team_video.get_tasks_page_url()+'&assignee=me',
+            'video': self.video.title_display(),
+            'language': translation.get_language_label(self.language_code),
         }
         email_template = ("messages/email/"
                           "task-team-editor-note-notifiction.html")
