@@ -14,7 +14,7 @@ class EditorPage(UnisubsPage):
     _URL = "subtitles/editor/{0}/{1}/"  # (video_id, lang_code)
     EXIT_BUTTON = 'div.exit'
     _EXIT = 'button.discard'
-    _SESSION_BUTTONS = 'section.session button'
+    _SESSION_BUTTONS = 'div.session button'
 
     _SAVE = 'button.save'
     _SAVE_OPTIONS = 'div button'
@@ -38,11 +38,11 @@ class EditorPage(UnisubsPage):
     _REF_METADATA_EXPANDER = 'div.reference div.metadata a'
 
     #CENTER COLUMN
-    _VIDEO_TITLE = "div.video-title a"
+    _VIDEO_TITLE = "div.video-title a:nth-child(2)"
     _PLAYER = "div#player"
     _EMBEDDED_VIDEO = "div#video"
     _VIDEO_SUBTITLE = 'div.subtitle-overlay div'
-    _WORKING_LANGUAGE = 'section.center div.subtitles-language'
+    _WORKING_LANGUAGE = 'div.work div.subtitles-language'
     _ADD_SUBTITLE = 'button.insert-subtitle'
     _SYNC_HELP = 'div.sync-help'
     _INFO_TRAY = 'div.info-tray'
@@ -68,14 +68,16 @@ class EditorPage(UnisubsPage):
 
     #RIGHT COLUMN
 
-    _NEXT_STEP = 'div.substeps button'
+    _NEXT_STEP = 'button.next-step'
     _ENDORSE = 'div.substeps button.endorse' #when completing subtitling.
 
     # COLLAB PANEL
-    _COLLAB_PANEL = 'section.collab'
+    _COLLAB_PANEL = 'div.workflow'
     _SEND_BACK = 'button.send-back'
     _APPROVE = 'button.approve'
-    _NOTES = 'textarea[ng-model="collab.notes"]'
+    _NEW_NOTE = 'div.new-note textarea'
+    _SAVE_NOTE = 'div.new-note button'
+    _NOTES = 'ul.notes li p'
 
     def open_editor_page(self, video_id, lang, restore=False):
         self.open_page(self._URL.format(video_id, lang))
@@ -234,7 +236,7 @@ class EditorPage(UnisubsPage):
     def video_title(self):
         """Return the text displayed for the video title. """
 
-        return self.get_element_attribute(self._VIDEO_TITLE, "title")
+        return self.get_text_by_css(self._VIDEO_TITLE)
 
     def click_working_sub_line(self, line):
         """Click in a subline of the working text. """
@@ -288,11 +290,12 @@ class EditorPage(UnisubsPage):
 
     def copy_timings(self):
         menu_items = self.tools_menu_items()
-        if menu_items['copyover']['display'] == 'ng-show':
-            return 'Element not displayed'
-        else:
+        if menu_items['copyover']['element'].is_displayed():
            menu_items['copyover']['element'].click()
- 
+           self.click_by_css("aside.shown footer.buttons button")
+        else:
+            return 'Element not displayed'
+
     def toggle_paragraph(self, position):
         """Toggles the paragraph marker on or off. """
 
@@ -357,8 +360,21 @@ class EditorPage(UnisubsPage):
         active_modal = self.is_element_present(self._ACTIVE_MODAL)
         if active_modal:
             buttons = active_modal.find_elements_by_css_selector(self._MODAL_BUTTONS)
-            [x.click() for x in buttons if 'Exit' in x.text]
+            try:
+                [x.click() for x in buttons if 'Exit' in x.text]
+            except:
+                pass
         self.handle_js_alert('accept')
+
+    def close_edit_title(self):
+        
+        active_modal = self.is_element_present(self._ACTIVE_MODAL)
+        if active_modal:
+            buttons = active_modal.find_elements_by_css_selector(self._MODAL_BUTTONS)
+            try:
+                [x.click() for x in buttons if 'Done' in x.text]
+            except:
+                pass
 
     def collab_panel_displayed(self):
         return self.is_element_visible(self._COLLAB_PANEL)
@@ -372,7 +388,8 @@ class EditorPage(UnisubsPage):
         self.wait_for_element_not_present(self._SEND_BACK)
        
     def add_note(self, note_text):
-        self.type_by_css(self._NOTES, note_text)
+        self.type_by_css(self._NEW_NOTE, note_text)
+        self.click_by_css(self._SAVE_NOTE)
     
     def current_notes(self):
         return self.get_text_by_css(self._NOTES)
@@ -393,7 +410,7 @@ class EditorPage(UnisubsPage):
 
     def toggle_playback(self):
         self.wait_for_element_present(self._EMBEDDED_VIDEO)
-        self.type_special_key('SPACE', modifier='SHIFT', element='body')
+        self.type_special_key('TAB', modifier='SHIFT', element='body')
 
     def buffer_up_subs(self):
         self.toggle_playback()
@@ -403,11 +420,11 @@ class EditorPage(UnisubsPage):
         time.sleep(10)
 
     def start_next_step(self):
-        els = self.get_elements_list(self._NEXT_STEP)
-        for el in els:
-            if el.is_displayed():
-                el.click()
-                return
+        self.wait_for_element_visible(self._NEXT_STEP)
+        self.click_by_css(self._NEXT_STEP)
+
+    def start_sync(self):
+        self.click_by_css('div.substeps div button.next-step')
 
     def endorse_subs(self):
         self.click_by_css(self._ENDORSE, self._ACTIVE_MODAL)
@@ -425,7 +442,7 @@ class EditorPage(UnisubsPage):
 
     def sync(self, num_subs, sub_length=3, sub_space=None):
         """Sync subs a given number of times. """
-        self.wait_for_element_visible(self._SYNC_HELP)
+        #self.wait_for_element_visible(self._SYNC_HELP)
         for x in range(num_subs):
             self.type_special_key('ARROW_DOWN', element='body')
             time.sleep(sub_length)

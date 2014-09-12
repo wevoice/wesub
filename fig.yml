@@ -1,12 +1,16 @@
 app:
   image: amara-app
-  working_dir: /opt/apps/unisubs
-  entrypoint: /usr/bin/python
-  command: manage.py runserver 0.0.0.0:8000
+  entrypoint: /usr/bin/env
+  command: /usr/bin/python manage.py runserver 0.0.0.0:8000
   environment:
       DJANGO_SETTINGS_MODULE: dev_settings
+      DJANGO_LIVE_TEST_SERVER_ADDRESS: 'localhost:8081,8090-8100,9000-9200' 
+      LANG: en_US.UTF-8
+
   volumes:
     - .:/opt/apps/unisubs
+
+  hostname: 'unisubs.example.com'
   ports:
     - "8000:8000"
   expose:
@@ -19,7 +23,6 @@ app:
 
 initdb:
   image: amara-app
-  working_dir: /opt/apps/unisubs
   entrypoint: /bin/bash
   command: ./bin/dev_syncdb.sh
   environment:
@@ -28,9 +31,34 @@ initdb:
     - db
     - search
 
+bash:
+  image: amara-app
+  # This is a bit weird because our dockerfile uses both entrypoint and
+  # command, so we need to override them both.  Using /usr/bin/env as the
+  # entrypoint works.
+  entrypoint: /usr/bin/env
+  command: /bin/bash
+  environment:
+      DJANGO_SETTINGS_MODULE: dev_settings
+
+  volumes:
+    - .:/opt/apps/unisubs
+
+  hostname: 'unisubs.example.com'
+  ports:
+    - "8000:8000"
+  expose:
+    - "8000:8000"
+  links:
+    - db
+    - queue
+    - cache
+    - search
+
 sslapp:
   image: amara-app
-  command: python manage.py runsslserver 0.0.0.0:8000
+  entrypoint: /usr/bin/env
+  command: /usr/bin/python manage.py runserverssl 0.0.0.0:8000 --nostatic
   environment:
       DJANGO_SETTINGS_MODULE: dev_settings
 
@@ -46,7 +74,8 @@ sslapp:
 
 worker:
   image: amara-app
-  command: python manage.py celery worker --scheduler=djcelery.schedulers.DatabaseScheduler --loglevel=DEBUG -B -E --settings=dev_settings
+  entrypoint: /usr/bin/env
+  command: /usr/bin/python manage.py celery worker --scheduler=djcelery.schedulers.DatabaseScheduler --loglevel=DEBUG -B -E --settings=dev_settings
   volumes:
     - .:/opt/apps/unisubs
   links:

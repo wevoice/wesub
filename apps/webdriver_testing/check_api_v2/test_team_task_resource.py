@@ -76,7 +76,6 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
 
     @classmethod
     def create_tv_with_original_subs(cls, lc, user, team, complete=True):
-        sub_file = 'apps/webdriver_testing/subtitle_data/Timed_text.en.srt'
         video = cls.data_utils.create_video()
         tv = TeamVideoFactory.create(
             team=team, 
@@ -85,7 +84,8 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
 
         data = {
                     'language_code': lc,
-                    'complete': complete, 
+                    'complete': None,
+                    'action': 'complete', 
                     'visibility': 'private',
                     'committer': user,
                     'video': video
@@ -98,7 +98,8 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
     def add_translation(cls, lc, video, user, complete=False):
         data = {
                     'language_code': lc,
-                    'complete': complete, 
+                    'complete': None,
+                    'action': 'complete', 
                     'visibility': 'private',
                     'committer': user,
                     'video': video

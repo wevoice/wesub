@@ -107,11 +107,11 @@ class DashboardTab(ATeamPage):
         langs = video_el.find_elements_by_css_selector(self._VIDEO_LANGS)
         if 'languages need your help' in langs[0].text:
             show_el = video_el.find_element_by_css_selector(self._SHOW_LANGS)
-            self.hover_by_el(show_el)            
+            self.hover_by_el(show_el) 
             els = self.get_elements_list(self._LANG_LIST)
             for el in els:
                 if language in el.text:
-                    el.click()
+                    self.open_page(el.get_attribute("href"))
         else:
             assert language in langs[0].text
             langs[0].click()

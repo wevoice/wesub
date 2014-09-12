@@ -20,7 +20,6 @@ a:link {
 } 
 
 a:hover,a:focus {
-  color: #;
   text-decoration: none;
   outline: none !important;
   -moz-outline: none !important;

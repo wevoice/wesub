@@ -21,7 +21,7 @@ var angular = angular || null;
 (function() {
     var module = angular.module('amara.SubtitleEditor.session', []);
 
-    module.controller('SessionBackend', function($scope, $q, EditorData, SubtitleStorage) {
+    module.controller('SessionBackend', ["$scope", "$q", "EditorData", "SubtitleStorage", function($scope, $q, EditorData, SubtitleStorage) {
         /* SessionControllerBackend handles the low-level details for
          * SessionController.  This includes things like saving the subtitles,
          * approving/recting tasks, etc.
@@ -29,51 +29,47 @@ var angular = angular || null;
         $scope.sessionBackend = {
             saveSubtitles: function(markComplete) {
                 return SubtitleStorage.saveSubtitles(
-                    EditorData.video.id,
-                    $scope.workingSubtitles.language.code,
                     $scope.workingSubtitles.subtitleList.toXMLString(),
                     $scope.workingSubtitles.title,
                     $scope.workingSubtitles.description,
                     $scope.workingSubtitles.metadata,
-                    markComplete).then(function onSuccess(response) {
-                        $scope.workingSubtitles.versionNumber = response.data.version_number;
-                        return true;
-                });
+                    markComplete, null).then(this.afterSaveSubtitles);
             },
-            saveNotes: function() {
-                return SubtitleStorage.updateTaskNotes($scope.collab.notes);
+            saveSubtitlesWithAction: function(action) {
+                return SubtitleStorage.saveSubtitles(
+                    $scope.workingSubtitles.subtitleList.toXMLString(),
+                    $scope.workingSubtitles.title,
+                    $scope.workingSubtitles.description,
+                    $scope.workingSubtitles.metadata,
+                    null, action).then(this.afterSaveSubtitles);
             },
-            approveTask: function() {
-                return SubtitleStorage.approveTask(
-                        $scope.workingSubtitles.versionNumber,
-                        $scope.collab.notes);
+            performAction: function(action) {
+                return SubtitleStorage.performAction(action);
             },
-            sendBackTask: function() {
-                return SubtitleStorage.sendBackTask(
-                        $scope.workingSubtitles.versionNumber,
-                        $scope.collab.notes);
+            afterSaveSubtitles: function(response) {
+                $scope.workingSubtitles.versionNumber = response.data.version_number;
+                return true;
+            },
+            subtitlesComplete: function() {
+                return $scope.workingSubtitles.subtitleList.isComplete();
             },
         };
-    });
+    }]);
 
-    module.controller('SessionController', function($scope, $sce, $q, $window, EditorData) {
+    module.controller('SessionController', ["$scope", "$sce", "$q", "$window", "EditorData", function($scope, $sce, $q, $window, EditorData) {
         /*
          * SessionController handles the high-level issues involved with
          * sending the user's work back to the server.  SessionController
          * works on the AppController's scope and creates a session object
          * there.  That object is responsible for:
          *   - Saving, approving/rejecting tasks, exiting, etc.
-         *   - Tracking user changes to the subtitles, task notes, etc.
+         *   - Tracking user changes to the subtitles
          *   - Popping up confirmation dialogs if the user wants to exit while
          *     there are outstanding changes
          *   - Popping up freeze boxes while we are waiting for the server to
          *     respond to our requests.
          */
 
-        var changes = {
-            subtitles: false,
-            notes: false
-        };
         var exiting = false;
 
         function redirectTo(location) {
@@ -95,10 +91,10 @@ var angular = angular || null;
                 var deferred = $q.defer();
                 deferred.reject('Simulated Error');
                 return deferred.promise;
-             }else if(changes.subtitles || markComplete !== undefined) {
+             } else if($scope.session.subtitlesChanged || markComplete !== undefined) {
                 return $scope.sessionBackend.saveSubtitles(markComplete)
                     .then(function() {
-                        changes.subtitles = false;
+                        $scope.session.subtitlesChanged = false;
                     });
             } else {
                 // No changes need to be saved, just return a dummy promise.
@@ -108,35 +104,9 @@ var angular = angular || null;
             }
         }
 
-        function saveChanges(markComplete) {
-            var promise = saveSubtitles(markComplete);
-            if(changes.notes) {
-                promise = promise.then($scope.sessionBackend.saveNotes)
-                    .then(function() {
-                    changes.notes = false;
-                });
-            }
-            return promise;
-        }
-
         $scope.session = {
-            subtitlesChanged: function() {
-                changes.subtitles = true;
-            },
-            notesChanged: function() {
-                changes.notes = true;
-            },
-            resetChanges: function() {
-                changes = {
-                    subtitles: false,
-                    notes: false
-                };
-            },
-            unsavedChanges: function() {
-                return changes.subtitles || changes.notes;
-            },
             exit: function() {
-                if(!this.unsavedChanges()) {
+                if(!$scope.session.subtitlesChanged) {
                     redirectToVideoPage();
                 } else {
                     $scope.dialogManager.openDialog('unsavedWork', {
@@ -145,7 +115,7 @@ var angular = angular || null;
                 }
             },
             exitToLegacyEditor: function() {
-                if(!this.unsavedChanges()) {
+                if(!$scope.session.subtitlesChanged) {
                     redirectToLegacyEditor();
                 } else {
                     $scope.dialogManager.openDialog('legacyEditorUnsavedWork', {
@@ -155,9 +125,8 @@ var angular = angular || null;
             },
             save: function() {
                 var msg = $sce.trustAsHtml('Saving&hellip;');
-                $scope.dialogManager.showFreezeBox(
-                        $sce.trustAsHtml('Saving&hellip;'));
-                saveChanges().then(function onSuccess() {
+                $scope.dialogManager.showFreezeBox(msg);
+                saveSubtitles().then(function onSuccess() {
                     $scope.dialogManager.closeFreezeBox();
                     $scope.dialogManager.openDialog('changesSaved', {
                         exit: redirectToVideoPage
@@ -167,34 +136,57 @@ var angular = angular || null;
                     $scope.dialogManager.open('save-error');
                 });
             },
+            /*
             endorse: function() {
                 $scope.dialogManager.showFreezeBox(
-                        $sce.trustAsHtml('Completing subtitles&hellip;'));
+                        $sce.trustAsHtml('Publishing subtitles&hellip;'));
                 if(EditorData.task_id) {
                     var promise = saveSubtitles(true)
                         .then($scope.sessionBackend.approveTask);
                 } else {
-                    var promise = saveChanges(true);
+                    var promise = saveSubtitles(true);
                 }
                 promise.then(function() {
                     redirectToVideoPage();
                 });
             },
-            approveTask: function() {
-                $scope.dialogManager.showFreezeBox(
-                        $sce.trustAsHtml('Accepting subtitles&hellip;'));
-                saveSubtitles()
-                    .then($scope.sessionBackend.approveTask)
-                    .then(redirectToVideoPage);
-            },
-            rejectTask: function() {
-                $scope.dialogManager.showFreezeBox(
-                        $sce.trustAsHtml('Sending subtitles back&hellip;'));
-                saveSubtitles()
-                    .then($scope.sessionBackend.sendBackTask)
-                    .then(redirectToVideoPage);
-            }
+            */
         };
+
+        $scope.actions = _.map(EditorData.actions, function(action) {
+            var sessionAction = {
+                label: action.label,
+                class: action.class,
+                canPerform: function() {
+                    if(action.complete === true) {
+                        return $scope.sessionBackend.subtitlesComplete();
+                    } else {
+                        return true;
+                    }
+                },
+                perform: function() {
+                    var msg = $sce.trustAsHtml(action.in_progress_text + '&hellip;');
+                    $scope.dialogManager.showFreezeBox(msg);
+                    if($scope.session.subtitlesChanged) {
+                        var promise = $scope.sessionBackend.saveSubtitlesWithAction(action.name);
+                    } else {
+                        var promise = $scope.sessionBackend.performAction(action.name);
+                    }
+
+                    promise.then(
+                        function onSuccess() {
+                            $scope.dialogManager.closeFreezeBox();
+                            redirectToVideoPage();
+                        },
+                        function onError() {
+                            $scope.dialogManager.closeFreezeBox();
+                            $scope.dialogManager.open('save-error');
+                        });
+                }
+            };
+
+            return sessionAction;
+        });
 
         $scope.onExitClicked = function($event) {
             $event.preventDefault();
@@ -208,22 +200,22 @@ var angular = angular || null;
             $scope.session.exitToLegacyEditor();
         }
 
-        $scope.onSaveClicked = function($event) {
+        $scope.onSaveDraftClicked = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
             $scope.session.save();
         }
 
         $scope.$root.$on('work-done', function() {
-            $scope.session.subtitlesChanged();
+            $scope.session.subtitlesChanged = true;
         });
 
         $window.onbeforeunload = function() {
-            if($scope.session.unsavedChanges() && !exiting) {
+            if($scope.session.subtitlesChanged && !exiting) {
               return "You have unsaved work";
             } else {
               return null;
             }
         };
-    });
+    }]);
 }).call(this);

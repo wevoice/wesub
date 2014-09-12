@@ -22,7 +22,7 @@ var angular = angular || null;
 
     var module = angular.module('amara.SubtitleEditor.subtitles.controllers', []);
 
-    module.controller('LanguageSelectorController', function($scope) {
+    module.controller('LanguageSelectorController', ["$scope", function($scope) {
         /**
          * This controller is responsible for the language and version selector
          * widget.  The widget allows the user to select a reference language and
@@ -137,9 +137,9 @@ var angular = angular || null;
             $scope.languageChanged();
         });
         $scope.$watch('versionNumber', $scope.versionNumberChanged);
-    });
+    }]);
 
-    module.controller('WorkingSubtitlesController', function($scope, DomWindow) {
+    module.controller('WorkingSubtitlesController', ["$scope", "DomWindow", function($scope, DomWindow) {
         /**
          * Handles the subtitles the user is working on.
          */
@@ -206,6 +206,12 @@ var angular = angular || null;
             var newSub = subtitleList.insertSubtitleBefore(before);
             $scope.currentEdit.start(newSub);
         }
+
+	$scope.showWarning = function(subtitle, type, data) {
+	    if(subtitle && $scope.warningsShown)
+		return subtitle.hasWarning(type, data);
+	    return false;
+	};
 
         $scope.onSubtitleClick = function(evt, subtitle, action) {
             var madeChange = false;
@@ -286,9 +292,9 @@ var angular = angular || null;
                 return 'type-shortcuts-help'
             }
         }
-    });
+    }]);
 
-    module.controller("SubtitleMetadataController", function($scope) {
+    module.controller("SubtitleMetadataController", ["$scope", function($scope) {
         $scope.currentSubtitles = {
             title: $scope.workingSubtitles.getTitle(),
             description: $scope.workingSubtitles.getDescription(),
@@ -308,5 +314,5 @@ var angular = angular || null;
             $scope.currentSubtitles = _.clone(backupSubtitles);
             $scope.dialogManager.close();
         };
-    });
+    }]);
 }).call(this);

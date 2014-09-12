@@ -26,7 +26,7 @@
         return API_BASE_PATH + teamSlug + "/tasks/" + taskId; 
     }
 
-    module.factory("TaskService", function($http){
+    module.factory("TaskService", ["$http", function($http){
 
         var authHeaders = cachedData.authHeaders;
 
@@ -46,6 +46,6 @@
                 });
             }
         }
-    });
+    }]);
 
 }).call(this);

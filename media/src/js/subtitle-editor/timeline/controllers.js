@@ -20,7 +20,7 @@
 
     var module = angular.module('amara.SubtitleEditor.timeline.controllers', []);
 
-    module.controller('TimelineController', function($scope, $timeout, VideoPlayer, MIN_DURATION) {
+    module.controller('TimelineController', ["$scope", "$timeout", "VideoPlayer", "MIN_DURATION", function($scope, $timeout, VideoPlayer, MIN_DURATION) {
         // Controls the scale of the timeline, currently we just set this to
         // 1.0 and leave it.
         $scope.scale = 1.0;
@@ -274,5 +274,5 @@
         // entirely synced to avoid having half-synced subs in the timeline
         $scope.$root.$on('video-playback-changes', setEndSubtitleOnlyUnsync);
         $scope.$root.$on('sync-next-end-time', setEndSubtitleAll);
-    });
+    }]);
 }).call(this);

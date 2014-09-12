@@ -59,7 +59,6 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         super(TestCaseWatchPageSearch, self).setUp()
         self.watch_pg.open_watch_page()
         
-
     def test_search__simple(self):
         """Search for text contained in video title.
 
@@ -120,7 +119,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
  
         """
         results_pg = self.watch_pg.advanced_search(orig_lang = 'en', 
-            trans_lang='Portuguese')
+            trans_lang='pt')
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
         self.assertEqual(1, len(results_pg.page_videos()))

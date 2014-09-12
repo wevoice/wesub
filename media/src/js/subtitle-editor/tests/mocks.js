@@ -18,15 +18,14 @@
         ]);
     });
 
-    module.factory('SubtitleStorage', function($q) {
+    module.factory('SubtitleStorage', ["$q", function($q) {
         var methodNames = [
-            'approveTask',
-            'updateTaskNotes',
             'getLanguages',
             'getLanguage',
             'getSubtitles',
-            'sendBackTask',
             'saveSubtitles',
+            'performAction',
+            'postNote'
         ];
         var SubtitleStorage = {
             deferreds: {},
@@ -37,7 +36,7 @@
             SubtitleStorage.deferreds[methodName] = deferred;
         });
         return SubtitleStorage;
-    });
+    }]);
 
     module.factory('DomWindow', function() {
         var mockObject = jasmine.createSpyObj('DomWindow', [
@@ -83,6 +82,7 @@
 
     module.factory('EditorData', function() {
         return {
+            "username": "testuser",
             "canSync": true,
             "canAddAndRemove": true,
             "languageCode": "en",
@@ -110,6 +110,7 @@
                     "name": "English"
                 },
             ],
+            'notes': [],
             'staticURL': 'http://example.com/'
         };
     });

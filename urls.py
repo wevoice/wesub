@@ -26,6 +26,8 @@ from sitemaps import sitemaps, sitemap_view, sitemap_index
 from socialauth.models import AuthMeta, OpenidProfile
 from django.views.decorators.clickjacking import xframe_options_exempt
 
+import optionalapps
+
 admin.autodiscover()
 
 # these really should be unregistred but while in development the dev server
@@ -98,16 +100,10 @@ urlpatterns = patterns('',
         name='onsite_widget_resume'),
     url(r'^widget/', include('widget.urls', namespace='widget',
         app_name='widget')),
-    url(r'^jstest/(\w+)',
-        'jstesting.views.jstest'),
     url(r'^jsdemo/(\w+)',
         'jsdemo.views.jsdemo'),
-    url(r'^pagedemo/(\w+)?$',
-            'pagedemo.views.pagedemo', name="pagedemo"),
     url(r'^statistic/',
         include('statistic.urls', namespace='statistic')),
-    url(r'^streamer/',
-        include('streamer.urls', namespace='streamer')),
     url(r'^search/',
         include('search.urls', 'search')),
     url(r'^uslogging/',
@@ -153,46 +149,27 @@ urlpatterns = patterns('',
     url(r"helpers/",
         include('testhelpers.urls', namespace='helpers')),
     url(r'^videos/', include('videos.urls', namespace='videos',
-        app_name='videos')), url(r'^teams/', include('teams.urls',
-        namespace='teams', app_name='teams')),
+        app_name='videos')),
+    url(r'^teams/', include('teams.urls', namespace='teams',
+        app_name='teams')),
     url(r'^profiles/', include('profiles.urls', namespace='profiles',
         app_name='profiles')),
     url(r'^externalsites/', include('externalsites.urls',
                                     namespace='externalsites',
                                     app_name='externalsites')),
+    url(r'^media/', include('staticmedia.urls',
+                            namespace='staticmedia',
+                            app_name='staticmedia')),
     url(r'^auth/', include('auth.urls', namespace='auth', app_name='auth')),
     url(r'^auth/', include('thirdpartyaccounts.urls', namespace='thirdpartyaccounts', app_name='thirdpartyaccounts')),
+    url(r'^api2/partners/', include('api.urls', namespace='api')),
     ## Video shortlinks
     url(r'^v/(?P<encoded_pk>\w+)/$', 'videos.views.shortlink', name='shortlink')
 )
 
-if settings.USE_INTEGRATION:
-    from services import urls
-    urlpatterns += patterns('',
-        (r'^unisubservices/', include('services.urls', namespace='services')),
-    )
-
-    from servicesauth import urls
-    urlpatterns += patterns('', (r'^unisubservicesauth/',
-        include('servicesauth.urls', namespace='servicesauth')),)
-    # FIXME: api v1 is not being imported until we're sure it needs to be
-    # ported to DRM
-    #from api import urls
-    #urlpatterns += patterns('', url(r'^api/', include('api.urls', 'api')),)
-
-    from apiv2 import urls as api2urls
-    urlpatterns += patterns('', url(r'^api2/', include('apiv2.urls',
-        namespace=api2urls.URL_NAMESPACE),),)
+urlpatterns += optionalapps.get_urlpatterns()
 
 if settings.DEBUG:
-    if hasattr(settings, 'EXTRA_STATIC_URLS'):
-        for pattern, directory in settings.EXTRA_STATIC_URLS:
-            urlpatterns += patterns('', (
-                pattern, 'django.views.static.serve', {
-                    'document_root': directory,
-                    'show_indexes': True,
-                }),
-            )
     urlpatterns += patterns('',
         (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
          {'document_root': settings.STATIC_ROOT, 'show_indexes': True}),

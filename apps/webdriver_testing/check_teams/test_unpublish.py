@@ -252,7 +252,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
         cls.logger.info('Setting visibility override on v3 to private')
         cls.en = cls.video.subtitle_language('en')
         en_v3 = cls.en.get_tip(full=True)
-        en_v3.visibility_override = 'deleted'
+        en_v3.visibility_override = 'private'
         en_v3.save() 
         cls.en.clear_tip_cache() 
 

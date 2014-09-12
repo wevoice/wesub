@@ -4,19 +4,6 @@
 
 {% block body_attrs %}id="about"{% endblock %}
 
-{% block scripts %}
-    {% if not js_use_compiled %}
-        <script type="text/javascript" src="{{ STATIC_URL }}js/closure-library/closure/goog/base.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}js/closure-dependencies.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}js/swfobject.js"></script>
-    {% endif %}
-    <style>
-        h2 {
-            padding: 0px;
-        }
-    </style>
-{% endblock %}
-
 {% block main_content %}
     <div class="grid_6 alpha">
         {% blocktrans %}

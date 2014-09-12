@@ -8,7 +8,6 @@ pip-log.txt
 deploy/src/*
 *.sqlite3
 *calcdeps.js
-*compiled.js
 .DS_Store
 .venv
 closure-library
@@ -91,3 +90,8 @@ node_modules/
 /src
 frontend-unit-tests-results.xml
 /docker-dev-environment/cidfiles
+.deploy_keys
+dev_settings_local.py
+babelsubs
+babelsubs-git
+/amara-enterprise

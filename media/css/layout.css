@@ -395,7 +395,7 @@ font-size: 11px;
 
 text-decoration: none !important;
 -moz-box-shadow:inset 0 1px 0px #fff;
--webkit-box-shadowinset 0 1px 0px #fff;
+-webkit-box-shadow: inset 0 1px 0px #fff;
 box-shadow:inset 0 1px 0px #fff;
 
 border: 1px solid #a7c3c9;

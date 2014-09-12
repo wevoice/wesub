@@ -22,7 +22,7 @@ var angular = angular || null;
 
     var module = angular.module('amara.SubtitleEditor.video.services', []);
 
-    module.factory('VideoPlayer', function($rootScope, SubtitleStorage) {
+    module.factory('VideoPlayer', ["$rootScope", "SubtitleStorage", function($rootScope, SubtitleStorage) {
         var videoURLs = [];
         var pop = null;
         var playing = false;
@@ -43,12 +43,13 @@ var angular = angular || null;
             pop.on('canplay', function() {
                 emitSignal('video-update');
             }).on('playing', function() {
-                if (!playing) emitSignal('video-playback-changes');
+                wasPlaying = playing;
                 playing = true;
+                if (!wasPlaying) emitSignal('video-playback-changes');
                 emitSignal('video-update');
             }).on('pause', function() {
-                emitSignal('video-playback-changes');
                 playing = false;
+                emitSignal('video-playback-changes');
                 emitSignal('video-update');
             }).on('ended', function() {
                 playing = false;
@@ -146,5 +147,5 @@ var angular = angular || null;
                 pop.play();
             },
         };
-    });
+    }]);
 }).call(this);

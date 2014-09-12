@@ -1,39 +1,23 @@
-import sys, site, os
-from os.path import join
-
-PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..')
-DEFAULT_LANGUAGE = 'en'
-
-def rel(*x):
-    return os.path.join(PROJECT_ROOT, *x)
-
-prev_sys_path = list(sys.path)
-
-site.addsitedir(rel('env/lib/python2.6/site-packages'))
-
-sys.path.append(PROJECT_ROOT)
-sys.path.append(rel('unisubs'))
-sys.path.append(rel('unisubs', 'libs'))
-sys.path.append(rel('unisubs', 'apps'))
-
-sys.stdout = sys.stderr
-
-new_sys_path = [p for p in sys.path if p not in prev_sys_path]
-for item in new_sys_path:
-    sys.path.remove(item)
-sys.path[:0] = new_sys_path
-
-# setup patch_reverse()
-from localeurl import patch_reverse
-patch_reverse()
+import sys
+import os
 
 import django.core.handlers.wsgi
+
+import startup
+
+DEFAULT_LANGUAGE = 'en'
+
+sys.stdout = sys.stderr
 os.environ['DJANGO_SETTINGS_MODULE'] = 'unisubs.unisubs_settings'
-os.environ["CELERY_LOADER"] = "django"
+
+startup.startup()
+
+PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 application = django.core.handlers.wsgi.WSGIHandler()
 
 handler = django.core.handlers.wsgi.WSGIHandler()
-disabled_file_path = rel('unisubs', 'disabled')
+
+disabled_file_path = os.path.join(PROJECT_ROOT, 'disabled')
 
 # instrumenting for tracelytics
 try:

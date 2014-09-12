@@ -342,7 +342,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
                                  % self.team.slug)
 
         self.tasks_tab.perform_task('Transcribe English Subtitles', tv.title)
-        self.editor_pg.start_next_step()
         self.editor_pg.endorse_subs()
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
@@ -378,7 +377,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
                                  % self.team.slug)
         self.tasks_tab.perform_task('Translate Subtitles into ' 
                                                'Russian', tv.title)
-        self.editor_pg.start_next_step()
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=ru' 
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Translate Subtitles into '

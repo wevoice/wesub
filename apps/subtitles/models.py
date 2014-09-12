@@ -419,7 +419,6 @@ class SubtitleLanguage(models.Model):
         super(SubtitleLanguage, self).__init__(*args, **kwargs)
         self._tip_cache = {}
         self._translation_source_version_cache = {}
-        self._original_subtitles_complete = self.subtitles_complete
 
     # Writelocking
     @property
@@ -505,8 +504,6 @@ class SubtitleLanguage(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        send_subtitles_changed = kwargs.pop('send_subtitles_changed', True)
-
         assert self.language_code in VALID_LANGUAGE_CODES, \
             "Subtitle Language %s should be a valid code." % self.language_code
 
@@ -516,10 +513,6 @@ class SubtitleLanguage(models.Model):
             self.created = datetime.now()
 
         super(SubtitleLanguage, self).save(*args, **kwargs)
-        if self._original_subtitles_complete != self.subtitles_complete:
-            self._original_subtitles_complete = self.subtitles_complete
-            if send_subtitles_changed:
-                signals.subtitles_changed.send(self, version=None)
 
     def title_display(self):
         tip = self.get_tip()
@@ -1765,8 +1758,6 @@ class SubtitleVersion(models.Model):
         self.save()
         if not was_public and self.is_tip():
             self.subtitle_language.set_tip_cache('public', self)
-            signals.subtitles_changed.send(self.subtitle_language,
-                                           version=self)
 
     def unpublish(self, delete=False, signal=True):
         """Unpublish this version.
@@ -1789,8 +1780,6 @@ class SubtitleVersion(models.Model):
             new_tip = version=self.subtitle_language.get_tip(public=True)
             if new_tip is None:
                 signals.language_deleted.send(self.subtitle_language)
-            signals.subtitles_changed.send(self.subtitle_language,
-                                           version=self)
 
     @models.permalink
     def get_absolute_url(self):
@@ -1836,6 +1825,18 @@ class SubtitleVersionMetadata(models.Model):
         else:
             return self.data
 
+class SubtitleNoteBase(models.Model):
+    video = models.ForeignKey(Video, related_name='+')
+    language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
+    user = models.ForeignKey(User, related_name='+')
+    body = models.TextField()
+    created = models.DateTimeField(default=datetime.now)
+
+    class Meta:
+        abstract = True
+
+class SubtitleNote(SubtitleNoteBase):
+    pass
 
 # Collaborators ---------------------------------------------------------------
 class CollaboratorManager(models.Manager):

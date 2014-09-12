@@ -9,6 +9,7 @@ class ATeamPage(UnisubsPage):
     """Defines the actions for specific teams pages like 'unisubs test team' (default) or others.
     """
 
+
     _URL = 'teams/%s/'
     _TEAM_NAME = ".main-title a"
     _DASHBOARD_WELCOME = "div.get-started p"
@@ -41,6 +42,7 @@ class ATeamPage(UnisubsPage):
     _APPLICATION = "div#apply-modal"
     _CUSTOM_APPLICATION_MESSAGE = "div.message"
     _APPLICATION_TEXT = "div#apply-modal div.form textarea"
+    _APPLICATION_LANG_SELECT = "div#language_picker"
     _SUBMIT_APPLICATION = "div#apply-modal button"
 
     _REPLACEMENT_TEXT = 'div.join p.action-replacement'
@@ -96,6 +98,9 @@ class ATeamPage(UnisubsPage):
     def application_displayed(self):
         assert_true(self.is_element_present(self._APPLICATION))
 
+    def application_languages(self):
+        assert_true(self.is_element_present(self._APPLICATION_LANG_SELECT))
+
     def application_custom_message(self):
         return self.get_text_by_css(self._CUSTOM_APPLICATION_MESSAGE) 
 
@@ -109,8 +114,6 @@ class ATeamPage(UnisubsPage):
 
     def join(self, logged_in=True):
         self.click_by_css(self._JOIN_TEAM)
-        if logged_in == True:
-            self.handle_js_alert(action='accept')
 
     def join_text(self):
         return self.get_text_by_css(self._JOIN_TEAM)

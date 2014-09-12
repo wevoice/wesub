@@ -1,17 +1,11 @@
 {% extends "teams/base.html" %}
-{% load to_json i18n teams_tags paginator media_compressor verbatim_templatetag query_string utils_tags videos_tags %}
-
-{% block css %}
-    {{ block.super }}
-    {% include_bundle "widget-css" %}
-{% endblock %}
+{% load to_json i18n teams_tags paginator media_bundle verbatim_templatetag query_string utils_tags videos_tags %}
 
 {% block html_attrs %}id="team_tasks"{% endblock %}
 
 {% block scripts %}
     {{ block.super }}
-    {% include_bundle "unisubs-offsite-compiled" %}
-    {% include_bundle "js-teams" %}
+    {% media_bundle "teams.js" %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         window.WIDGET_SETTINGS = {{ widget_settings|to_json|safe }};
@@ -178,11 +172,9 @@
         </p>
     {% endif %}
 
-    {% if user.is_authenticated and not user.get_languages %}
+    {% if not tasks and user.is_authenticated and not user.get_languages %}
         <p class="prompt">
-            <strong><a href="#" data-modal="language_modal"
-                       id="lang_select_btn">{% trans 'Tell us what languages you speak' %}</a> {% trans "and we'll narrow this list for you" %}
-            </strong>
+          <strong>{% trans "Use the filter to view tasks in a specific language" %}</strong>
         </p>
     {% else %}
         {% if not filtered %}
@@ -355,13 +347,6 @@
                             <li>
                                 <a href="#download-draft-{{ task.id }}"
                                    class="open-modal upload-draft-button">{% trans 'Download draft' %}</a>
-                            </li>
-                        {% endif %}
-                        {% if not has_max_tasks or task.assignee == user %}
-                            <li>
-                                <a href="#upload-draft-{{ task.id }}"
-                                   class="open-modal upload-draft-button"
-                                   data-task="{{ task.pk }}">Upload draft</a>
                             </li>
                         {% endif %}
                         </ul>

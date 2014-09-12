@@ -1,3 +1,4 @@
+{% load media_bundle %}
 // This must be done when the js file is first loaded
 var scriptFiles = document.getElementsByTagName("script");
 var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
@@ -46,7 +47,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	this.initIframes = function(elements) {
 	    var parser = document.createElement('a');
 	    parser.href = THIS_JS_FILE;
-	    iframeDomain = "http://" + parser.host;
+	    iframeDomain = parser.protocol + '//' + parser.host;
 	    for (var i = 0 ; i < elements.length ; i++) {
 		var currentDiv = elements[i];
 		var noanalytics = false;
@@ -66,12 +67,12 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		loadingDiv.style.paddingLeft = loadingDiv.style.paddingRight = "50px";
                 loadingDiv.style.textAlign = "center";
                 loadingImg = document.createElement("IMG");
-                loadingImg.src = "{{ static_url }}images/embedder/loading.gif";
+                loadingImg.src = "{% static_url %}images/embedder/loading.gif";
                 loadingDiv.appendChild(loadingImg);
                 currentDiv.appendChild(loadingDiv); 
 
 		var iframe = document.createElement("IFRAME");
-		iframe.src = "http://" + parser.host + "/embedder-widget-iframe/";
+		iframe.src = "//" + parser.host + "/embedder-widget-iframe/";
 		if (noanalytics) iframe.src += "noanalytics/";
 		iframe.src += "?data=" +
 		    encodeURIComponent(JSON.stringify(currentDiv.dataset));

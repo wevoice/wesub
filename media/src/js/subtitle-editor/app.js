@@ -21,11 +21,11 @@ var angular = angular || null;
 
     var module = angular.module('amara.SubtitleEditor', [
         'amara.SubtitleEditor.blob',
-        'amara.SubtitleEditor.collab',
         'amara.SubtitleEditor.help',
         'amara.SubtitleEditor.modal',
         'amara.SubtitleEditor.dom',
         'amara.SubtitleEditor.lock',
+        'amara.SubtitleEditor.notes',
         'amara.SubtitleEditor.session',
         'amara.SubtitleEditor.workflow',
         'amara.SubtitleEditor.subtitles.controllers',
@@ -41,17 +41,25 @@ var angular = angular || null;
         'ngCookies'
     ]);
 
-    module.config(function($compileProvider, $interpolateProvider) {
+    module.config(["$compileProvider", "$interpolateProvider", function($compileProvider, $interpolateProvider) {
         // instead of using {{ }} for variables, use [[ ]]
         // so as to avoid conflict with django templating
         $interpolateProvider.startSymbol('[[');
         $interpolateProvider.endSymbol(']]');
         // Allow blob: urls
         $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|blob):/);
-    });
+    }]);
 
     module.constant('MIN_DURATION', 250); // 0.25 seconds
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
+
+    module.factory('EditorData', ["$window", function($window) {
+        /**
+         * Get the editor data that was passed to us from python
+         *
+         */
+        return $window.editorData;
+    }]);
 
     module.controller("AppController", ['$scope', '$sce', '$controller', 
                       '$window', 'EditorData', 'VideoPlayer', 'Workflow',
@@ -69,12 +77,8 @@ var angular = angular || null;
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
         $scope.scrollingSynced = true;
         $scope.loadingFinished = false;
-	$scope.currentTitle = {};
-	$scope.currentTitle.Edited = false;
-	$scope.titleEdited = function(newValue) {
-	    if (newValue != undefined) $scope.currentTitle.Edited = newValue;
-	    return $scope.currentTitle.Edited;
-	}
+        $scope.uploading = false;
+        $scope.uploadError = false;
         $scope.translating = function() {
             return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         }
@@ -102,14 +106,18 @@ var angular = angular || null;
                 return true;
             return false; 
         }
-        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating, $scope.titleEdited);
-        $scope.timelineShown = ($scope.workflow.stage != 'type' ||
-                EditorData.task_needs_pane);
+        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
+        $scope.warningsShown = true;
+        $scope.timelineShown = $scope.workflow.stage != 'typing';
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
         }
         $scope.toggleTimelineShown = function() {
-            $scope.timelineShown = !$scope.timelineShown
+            $scope.timelineShown = !$scope.timelineShown;
+        }
+        $scope.toggleWarningsShown = function() {
+            $scope.warningsShown = !$scope.warningsShown;
+	    $scope.workingSubtitles.subtitleList.emitChange("reload", null);
         }
         $scope.keepHeaderSizeSync = function() {
             var newHeaderSize = Math.max($('div.subtitles.reference .content').outerHeight(),
@@ -154,10 +162,77 @@ var angular = angular || null;
             // that if anything changed
             $scope.$root.$emit('work-done');
 	}
-        $scope.copyTimingEnabled = function() {
+
+	$scope.copyTimingEnabled = function() {
             return ($scope.workingSubtitles.subtitleList.length() > 0 &&
                      $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
+
+        $scope.showUploadSubtitlesModal = function($event) {
+            $scope.dialogManager.open('upload-subtitles');
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
+
+        // Required by ajax plugin but not present in our version of
+        // jQuery
+        jQuery.extend({
+            handleError: function( s, xhr, status, e ) {
+		// If a local callback was specified, fire it
+		if ( s.error )
+			s.error( xhr, status, e );
+		// If we have some XML response text (e.g. from an AJAX call) then log it in the console
+		else if(xhr.responseText)
+			console.log(xhr.responseText);
+	    },
+            httpData: function( xhr, type, s ) {
+                var ct = xhr.getResponseHeader("content-type"),
+                         xml = type == "xml" || !type && ct && ct.indexOf("xml") >= 0,
+                         script = type == "script" || !type && ct && ct.indexOf("script") >= 0,
+                         json = type == "json" || !type && ct && ct.indexOf("json") >= 0,
+                         data = xml ? xhr.responseXML : xhr.responseText;
+
+                if ( xml && data.documentElement.tagName == "parsererror" )
+                    throw "parsererror";
+
+                // Allow a pre-filtering function to sanitize the response
+                // s != null is checked to keep backwards compatibility
+                if( s && s.dataFilter )
+                    data = s.dataFilter( data, type );
+
+                // If the type is "script", eval it in global context
+                if ( script )
+                    jQuery.globalEval( data );
+
+                // Get the JavaScript object, if JSON is used.
+                if ( json )
+                    data = eval("(" + data + ")");
+
+                return data;
+            }
+        });
+
+        $scope.submitUploadForm = function($event) {
+            $scope.uploading = true;
+            $scope.uploadError = false;
+	    $('#upload-subtitles-form').ajaxSubmit({
+              dataType: 'json',
+              success: function(data, status, xhr, $form){
+		  if (data && data.success)
+                      location.reload();
+		  else {
+                      $scope.uploading = false;
+                      $scope.uploadError = true;
+		  }
+              },
+              error: function(data, status, xhr, $form){
+                  $scope.uploading = false;
+                  $scope.uploadError = true;
+              }
+            });
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
 
         $scope.showCopyTimingModal = function($event) {
             $scope.dialogManager.openDialog('confirmCopyTiming', {
@@ -279,7 +354,7 @@ var angular = angular || null;
      * FIXME: this can probably be moved to a service to keep the app module
      * lean and mean.
      */
-    module.controller("AppControllerLocking", function($sce, $scope, $timeout, $window, EditorData, LockService) {
+    module.controller("AppControllerLocking", ["$sce", "$scope", "$timeout", "$window", "EditorData", "LockService", function($sce, $scope, $timeout, $window, EditorData, LockService) {
         var regainLockTimer;
 
         $scope.minutesIdle = 0;
@@ -389,9 +464,9 @@ var angular = angular || null;
         $window.onunload = function() {
             releaseLock();
         }
-    });
+    }]);
 
-    module.controller("AppControllerEvents", function($scope, VideoPlayer) {
+    module.controller("AppControllerEvents", ["$scope", "VideoPlayer", function($scope, VideoPlayer) {
         function insertAndEditSubtitle() {
             var sub = $scope.workingSubtitles.subtitleList.insertSubtitleBefore(null);
             $scope.currentEdit.start(sub);
@@ -463,9 +538,9 @@ var angular = angular || null;
             $scope.minutesIdle = 0;
             $scope.$root.$emit("app-click");
         };
-    });
+    }]);
 
-    module.controller("AppControllerSubtitles", function($scope, $timeout,
+    module.controller("AppControllerSubtitles", ["$scope", "$timeout", "EditorData", "SubtitleStorage", "CurrentEditManager", "SubtitleBackupStorage", "SubtitleVersionManager", function($scope, $timeout,
                 EditorData, SubtitleStorage, CurrentEditManager,
                 SubtitleBackupStorage, SubtitleVersionManager) {
         var video = EditorData.video;
@@ -538,6 +613,6 @@ var angular = angular || null;
         $scope.$watch('workingSubtitles.metadata', watchSubtitleAttributes,
                 true);
 
-    });
+    }]);
 
 }).call(this);

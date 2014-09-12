@@ -65,7 +65,7 @@ LANGUAGES_MAP = dict(ALL_LANGUAGES)
 def get_general_settings(request):
     general_settings = {
         'writelock_expiration' : models.WRITELOCK_EXPIRATION,
-        'embed_version': settings.EMBED_JS_VERSION,
+        'embed_version': '',
         'languages': ALL_LANGUAGES,
         'metadata_languages': settings.METADATA_LANGUAGES
     }

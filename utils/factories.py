@@ -31,6 +31,7 @@ from factory import Factory
 from factory.django import DjangoModelFactory
 
 import auth.models
+import babelsubs.storage
 import comments.models
 import externalsites.models
 import subtitles.models
@@ -196,7 +197,7 @@ class TaskFactory(DjangoModelFactory):
     type = teams.models.Task.TYPE_IDS['Subtitle']
 
     @classmethod
-    def create_review(cls, team_video, language_code, user, **kwargs):
+    def create_review(cls, team_video, language_code, subtitler, **kwargs):
         """Create a task, then move it to the review stage
 
         assumptions:
@@ -212,25 +213,28 @@ class TaskFactory(DjangoModelFactory):
         version = pipeline.add_subtitles(team_video.video, language_code,
                                          sub_data, complete=False,
                                          visibility='private')
-        task.assignee = user
+        task.assignee = subtitler
         task.new_subtitle_version = version
         return task.complete()
 
     @classmethod
-    def create_approve(cls, team_video, language_code, user, **kwargs):
+    def create_approve(cls, team_video, language_code, reviewer,
+                       subtitler=None, **kwargs):
         """Create a task, then move it to the approval stage
 
         assumptions:
             - there are no Tasks or SubtitleVersions for this video+language
             - approve is enabled for the team
         """
-        task = cls.create_review(team_video, language_code, user)
+        if subtitler is None:
+            subtitler = reviewer
+        task = cls.create_review(team_video, language_code, subtitler, **kwargs)
         if task.type == teams.models.Task.TYPE_IDS['Approve']:
             # review isn't enabled, but approve is.  Just return the task
             # early
             return task
 
-        task.assignee = user
+        task.assignee = reviewer
         task.approved = teams.models.Task.APPROVED_IDS['Approved']
         return task.complete()
 
@@ -284,6 +288,18 @@ class YouTubeVideoInfoFactory(Factory):
     description = 'test description'
     duration = 100
     thumbnail_url = 'http://example.com/thumbnail.png'
+
+class SubtitleSetFactory(Factory):
+    FACTORY_FOR = babelsubs.storage.SubtitleSet
+
+    language_code = 'en'
+
+    @factory.post_generation
+    def num_subs(self, create, extracted, **kwargs):
+        if extracted is None:
+            extracted = 10
+        for i in xrange(extracted):
+            self.append_subtitle(i*1000, i*1000 + 999, "Sub %s" % i)
 
 def bulk_subs(sub_data):
     """Create a bunch of videos/languages/versions

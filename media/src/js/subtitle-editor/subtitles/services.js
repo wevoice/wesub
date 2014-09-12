@@ -46,6 +46,13 @@ var angular = angular || null;
     var getVideoLangAPIUrl = function(videoId) {
         return API_BASE_PATH_VIDEOS + videoId + '/languages/';
     };
+    var getActionAPIUrl = function(videoId, languageCode) {
+        return getSubtitleSaveAPIUrl(videoId, languageCode) + 'actions/';
+    };
+
+    var getNoteAPIUrl = function(videoId, languageCode) {
+        return getSubtitleSaveAPIUrl(videoId, languageCode) + 'notes/';
+    };
 
     /*
      * Language object that we return from getLanguage()
@@ -80,7 +87,7 @@ var angular = angular || null;
         }
     }
 
-    module.factory('SubtitleStorage', function($http, EditorData) {
+    module.factory('SubtitleStorage', ["$http", "EditorData", function($http, EditorData) {
 
         // Map language codes to Language objects
         var languageMap = {};
@@ -156,6 +163,22 @@ var angular = angular || null;
 
                 return promise;
             },
+            performAction: function(actionName) {
+                var url = getActionAPIUrl(EditorData.video.id,
+                        EditorData.editingVersion.languageCode);
+
+                return $http.post(url, { action: actionName }, {
+                    headers: authHeaders()
+                });
+            },
+            postNote: function(body) {
+                var url = getNoteAPIUrl(EditorData.video.id,
+                        EditorData.editingVersion.languageCode);
+
+                return $http.post(url, { body: body }, {
+                    headers: authHeaders()
+                });
+            },
             getLanguages: function(callback) {
                 return _.values(languageMap);
             },
@@ -216,15 +239,16 @@ var angular = angular || null;
                 return promise;
 
             },
-            saveSubtitles: function(videoID, languageCode, dfxpString, title,
-                                   description, metadata, isComplete) {
+            saveSubtitles: function(dfxpString, title, description, metadata, isComplete, action) {
+                var videoID = EditorData.video.id;
+                var languageCode = EditorData.editingVersion.languageCode;
+
                 var url = getSubtitleSaveAPIUrl(videoID, languageCode);
                 // if isComplete is not specified as true or false, we send
                 // null, which means keep the complete flag the same as before
                 if(isComplete !== true && isComplete !== false) {
                     isComplete = null;
                 }
-
                 var promise = $http({
                     method: 'POST',
                     url: url,
@@ -239,14 +263,15 @@ var angular = angular || null;
                         from_editor: true,
                         metadata: metadata,
                         is_complete: isComplete,
+                        action: action,
                     }
                 });
 
                 return promise;
             }
         };
-    });
-    module.factory('SubtitleBackupStorage', function($window) {
+    }]);
+    module.factory('SubtitleBackupStorage', ["$window", function($window) {
         /**
          * Get the editor data that was passed to us from python
          *
@@ -307,12 +332,5 @@ var angular = angular || null;
                 $window.localStorage.removeItem(storageKey);
             },
         };
-    });
-    module.factory('EditorData', function($window) {
-        /**
-         * Get the editor data that was passed to us from python
-         *
-         */
-        return $window.editorData;
-    });
+    }]);
 }).call(this);

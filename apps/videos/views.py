@@ -53,11 +53,12 @@ from widget import rpc as widget_rpc
 from auth.models import CustomUser as User
 from statistic.models import EmailShareStatistic
 from subtitles import models as sub_models
+from subtitles.permissions import (user_can_view_private_subtitles,
+                                   user_can_edit_subtitles)
 from subtitles.forms import SubtitlesUploadForm
 from subtitles.pipeline import rollback_to
+from subtitles.workflows import get_workflow
 from teams.models import Task
-from teams.permissions import (can_create_and_edit_subtitles,
-                                    can_create_and_edit_translations)
 from videos import permissions
 from videos.decorators import get_video_revision, get_video_from_code
 from videos.forms import (
@@ -167,10 +168,11 @@ class LanguageList(object):
         return len(self.items)
 
 def index(request):
-    context = widget.add_onsite_js_files({})
-    context['all_videos'] = Video.objects.count()
-    context['popular_videos'] = VideoIndex.get_popular_videos("-today_views")[:VideoIndex.IN_ROW]
-    context['featured_videos'] = VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW]
+    context = {
+        'all_videos': Video.objects.count(),
+        'popular_videos': VideoIndex.get_popular_videos("-today_views")[:VideoIndex.IN_ROW],
+        'featured_videos': VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW],
+    }
     return render_to_response('index.html', context,
                               context_instance=RequestContext(request))
 
@@ -206,35 +208,6 @@ def popular_videos(request):
     return render_to_response('videos/popular_videos.html', {},
                               context_instance=RequestContext(request))
 
-def volunteer_page(request):
-    # Get the user comfort languages list
-    user_langs = get_user_languages_from_request(request)
-
-    relevant = VideoIndex.public().filter(video_language_exact__in=user_langs) \
-        .filter_or(languages_exact__in=user_langs) \
-        .order_by('-requests_count')
-
-    featured_videos =  relevant.filter(
-        featured__gt=datetime.datetime(datetime.MINYEAR, 1, 1)) \
-        .order_by('-featured')[:5]
-
-    popular_videos = relevant.order_by('-week_views')[:5]
-
-    latest_videos = relevant.order_by('-edited')[:15]
-
-    requested_videos = relevant.filter(requests_exact__in=user_langs)[:5]
-
-    context = {
-        'featured_videos': featured_videos,
-        'popular_videos': popular_videos,
-        'latest_videos': latest_videos,
-        'requested_videos': requested_videos,
-        'user_langs':user_langs,
-    }
-
-    return render_to_response('videos/volunteer.html', context,
-                              context_instance=RequestContext(request))
-
 def volunteer_category(request, category):
     '''
     Display results only for a particular category of video results from
@@ -242,7 +215,6 @@ def volunteer_category(request, category):
     '''
     return render_to_response('videos/volunteer_%s.html' %(category),
                               context_instance=RequestContext(request))
-
 
 def create(request):
     video_form = VideoForm(request.user, request.POST or None)
@@ -313,19 +285,21 @@ class VideoPageContext(dict):
         self.setup_tab(request, video, video_url, tab)
 
     def setup(self, request, video, video_url):
+        self.workflow = get_workflow(video)
         language_for_locale = video.subtitle_language(request.LANGUAGE_CODE)
         if language_for_locale:
             metadata = language_for_locale.get_metadata()
         else:
             metadata = video.get_metadata()
 
-        self.update(widget.add_onsite_js_files({}))
         self['page_title'] = self.page_title(video)
         self['metadata'] = metadata.convert_for_display()
         self['language_list'] = LanguageList(video)
         self['shows_widget_sharing'] = video.can_user_see(request.user)
         self['widget_settings'] = json.dumps(
             widget_rpc.get_general_settings(request))
+        self['add_language_mode'] = self.workflow.get_add_language_mode(
+            request.user)
 
         _add_share_panel_context_for_video(self, video)
         self['task'] =  _get_related_task(request)
@@ -333,13 +307,10 @@ class VideoPageContext(dict):
         if team_video is not None:
             self['team'] = team_video.team
             self['team_video'] = team_video
-            self['can_create_subs'] = can_create_and_edit_subtitles(
-                request.user, team_video)
             self['user_is_team_member'] = team_video.team.user_is_member(
                 request.user)
         else:
             self['team'] = self['team_video'] = None
-            self['can_create_subs'] = True
             self['user_is_team_member'] = False
 
     @staticmethod
@@ -531,8 +502,9 @@ class LanguagePageContext(dict):
     def __init__(self, request, video, lang_code, lang_id, version_id,
                  tab_only=False):
         dict.__init__(self)
-        self.public_only = self.calc_public_only(request, video)
         language = self._get_language(video, lang_code, lang_id)
+        self.public_only = self.calc_public_only(request, video,
+                                                 language.language_code)
         version = self._get_version(request, video, language, version_id)
         self['video'] = video
         self['language'] = language
@@ -561,9 +533,9 @@ class LanguagePageContext(dict):
             raise Http404
         return language
 
-    def calc_public_only(self, request, video):
-        team_video = video.get_team_video()
-        return (team_video and not team_video.team.is_member(request.user))
+    def calc_public_only(self, request, video, language_code):
+        return not user_can_view_private_subtitles(request.user, video,
+                                                   language_code)
 
     def _get_version(self, request, video, language, version_id):
         """Get the SubtitleVersion to use for a language page."""
@@ -579,8 +551,6 @@ class LanguagePageContext(dict):
 
     def setup(self, request, video, language, version):
         """Setup context variables."""
-
-        self.update(widget.add_onsite_js_files({}))
 
         self['revision_count'] = language.version_count()
         self['language_list'] = LanguageList(video)
@@ -782,13 +752,14 @@ def diffing(request, first_version, second_pk):
     diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles())
     team_video = video.get_team_video()
 
-    context = widget.add_onsite_js_files({})
-    context['video'] = video
-    context['diff_data'] = diff_data
-    context['language'] = language
-    context['first_version'] = first_version
-    context['second_version'] = second_version
-    context['latest_version'] = language.get_tip()
+    context = {
+        'video': video,
+        'diff_data': diff_data,
+        'language': language,
+        'first_version': first_version,
+        'second_version': second_version,
+        'latest_version': language.get_tip(),
+    }
     if team_video and not can_rollback_language(request.user, language):
         context['rollback_allowed'] = False
     else:
@@ -799,21 +770,6 @@ def diffing(request, first_version, second_pk):
     context['video_url'] = video.get_video_url()
 
     return render_to_response('videos/diffing.html', context,
-                              context_instance=RequestContext(request))
-
-def test_form_page(request):
-    if request.method == 'POST':
-        form = UserTestResultForm(request.POST)
-        if form.is_valid():
-            form.save(request)
-            messages.success(request, 'Thanks for your feedback.  It\'s a huge help to us as we improve the site.')
-            return redirect('videos:test_form_page')
-    else:
-        form = UserTestResultForm()
-    context = {
-        'form': form
-    }
-    return render_to_response('videos/test_form_page.html', context,
                               context_instance=RequestContext(request))
 
 @login_required

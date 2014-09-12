@@ -3,30 +3,14 @@
 {% block body_attrs %}id="video_profile" class="v1 video_view" data-video-id="{{ video.video_id}}" data-video-url="{{ video.get_video_url|safe }}"{% endblock %}
 {% block html_attrs %}id="video_view"{% endblock %}
 
-{% load comments i18n subtitles_tags teams_tags videos_tags media_compressor %}
+{% load comments i18n subtitles_tags teams_tags videos_tags %}
 
-{% block css %}
-{{ block.super }}
-{% include_bundle "video_history" %}
-{% include_bundle "widget-css"%}
-{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block scripts %}
 {{ block.super }}
-{% include_bundle "unisubs-onsite-compiled" %}
 <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
-{% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
-<script type="text/javascript">
-    {% if team.workflow_enabled %}
-    window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
-{% else %}
-window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
-{% endif %}
-window.WIDGET_SETTINGS = {{ widget_settings|safe }};
-</script>
 {% endblock %}
-
-{% block title %}{{ page_title }}{% endblock %}
 
 {% block opengraph-head %}
 {{block.super}}
@@ -83,18 +67,12 @@ window.WIDGET_SETTINGS = {{ widget_settings|safe }};
                     {% endblocktrans %}
                 </p>
             {% endif %}
-            {% if team.workflow_enabled and user_is_team_member %}
-            <a class="icon" href="{{ team_video.get_tasks_page_url }}"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
-            <p>
-                {% blocktrans with team_video.get_tasks_page_url as url %}
-                View <a href="{{ url }}">tasks for this video</a>.
-                {% endblocktrans %}
-            </p>
-            {% elif can_create_subs %}
+            {% if add_language_mode == '<standard>' %}
                 <a href="#create-subtitles-modal" class="icon open-modal"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
                     <p><a href="#create-subtitles-modal" class="open-modal">{% trans 'Add a new language!' %}</a></p>
                 {% upload_subtitles video %}
-            </p>
+            {% elif add_language_mode %}
+                <p>{{ add_language_mode }}</p>
             {% endif %}
         </div>
         {% include 'videos/_language-list.html' %}

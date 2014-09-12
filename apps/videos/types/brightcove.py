@@ -40,7 +40,7 @@ class BrightcoveVideoType(VideoType):
     abbreviation = 'C'
     name = 'Brightcove'
     site = 'brightcove.com'
-    js_url = "http://admin.brightcove.com/js/BrightcoveExperiences_all.js"
+    js_url = "//admin.brightcove.com/js/BrightcoveExperiences_all.js"
 
     def __init__(self, url):
         self.url = self._resolve_url_redirects(url)

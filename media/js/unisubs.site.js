@@ -556,7 +556,7 @@ var Site = function(Site) {
                 $.mod();
                 $.metadata.setType("attr", "data");
             }
-            if ($('#language_modal').length) {
+            if ($('#language_modal').length || $('#apply-modal').length || $('#language_profile').length) {
                 var cookies_are_enabled = function() {
                     document.cookie = 'testcookie';
                     return (document.cookie.indexOf('testcookie') != -1) ? true : false;
@@ -573,29 +573,38 @@ var Site = function(Site) {
                     $('.language_bar a').before('<span class="selected_language">' + h.slice(0,-2) + '</span>');
                 });
                 if (cookies_are_enabled()) {
-                    var $w = $('#language_modal');
-                    $w.find('.submit_button').click(function() {
-                        var values = {};
-                        var has_value = false;
-                        $('select', $w).each(function(i, item) {
-                            var $item = $(item);
-                            values[$item.attr('name')] = $item.val();
-                            if (!has_value && $item.val()) {
-                                has_value = true;
-                            }
-                        });
-                        if (!has_value) {
-                            $.jGrowl.error(window.LANGUAGE_SELECT_ERROR);
-                        } else {
-                            $w.html(window.LANGUAGE_SELECT_SAVING);
-                            ProfileApi.select_languages(values, function() {
-                                    window.location.reload(true);
-                                }, function() {
-                                    $w.modClose();
+		    var $w = $('#language_modal, #apply-modal, #language_profile');
+		    [$('#language_modal'), $('#apply-modal'), $('#language_profile')].forEach(function($w) {
+                        if($w.length)
+                            $w.find('.submit_button').click(function() {
+                                var values = {};
+                                var has_value = false;
+                                $('select', $w).each(function(i, item) {
+                                    var $item = $(item);
+                                    values[$item.attr('name')] = $item.val();
+                                    if (!has_value && $item.val()) {
+                                        has_value = true;
+                                    }
+                                });
+                                if (!has_value) {
+                                    $.jGrowl.error(window.LANGUAGE_SELECT_ERROR);
+                                } else {
+                                    if (typeof submit_languages_callback === "undefined")
+                                        $w.html(window.LANGUAGE_SELECT_SAVING);
+                                    ProfileApi.select_languages(values, function() {
+                                            if (typeof submit_languages_callback != "undefined")
+        					submit_languages_callback();
+                                            else if (typeof redirect != "undefined")
+                                                window.location = redirect;
+                                            else
+                                                window.location.reload(true);
+                                        }, function() {
+                                            $w.modClose();
+                                        }
+                                    );
                                 }
-                            );
-                        }
-                        return false;
+                                return false;
+                        });
                     });
                     $w.find('.close_button').click(function() {
                         $w.modClose();
@@ -693,24 +702,6 @@ var Site = function(Site) {
             tabLoader.addLinks('.tabs');
             tabLoader.addLinks('.pagination');
 
-            $('#add_subtitles').click( function() {
-                widget_widget_div.selectMenuItem(
-                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
-                return false;
-            });
-            $('.add-translation-behavior').click( function(e) {
-                e.preventDefault();
-                widget_widget_div.selectMenuItem(
-                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
-                return false;
-            });
-            $('.time_link').click( function() {
-                widget_widget_div.playAt(parseFloat(
-                $(this).find('.data').text()));
-                return false;
-            });
-            var SL_ID = window.LANGUAGE_ID;
-            unisubs.messaging.simplemessage.displayPendingMessages();
             $('#edit_subtitles_button').click( function(e) {
                 if (!(localStorage && localStorage.getItem)) {
                     alert("Sorry, you'll need to upgrade your browser to use the subtitling dialog.");
@@ -725,21 +716,10 @@ var Site = function(Site) {
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
-            $('.add-subtitles, .add-translation').click( function(evt) {
-                evt.preventDefault();
-                var $body = $('body');
-                var op = new unisubs.widget.SubtitleDialogOpener(
-                    $body.data('video-id'), $body.data('video-url'));
-                op.showStartDialog(null);
-                return false;
-            });
-            unisubs.widget.WidgetController.makeGeneralSettings(
-                    window.WIDGET_SETTINGS);
             var tabLoader = new AHAHTabLoader(function($container) {
                 that.setupModalDialogs($container);
             });
             tabLoader.addLinks('.tabs');
-            unisubs.messaging.simplemessage.displayPendingMessages();
         },
         video_set_language: function() {
             that.Utils.chosenify();
@@ -831,7 +811,6 @@ var Site = function(Site) {
                 $('input#id_task').val($(this).data('task'));
             });
 
-            unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             that.Utils.resetLangFilter($('select#id_task_language'));
             that.Utils.resetProjFilter();
             that.callOnPageShow(function() {

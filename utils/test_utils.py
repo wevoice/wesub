@@ -4,16 +4,16 @@ import os
 import simplejson as json
 import urlparse
 
-import mock
 from celery.task import Task
-from django.core.cache import cache
 from django.conf import settings
+from django.core.cache import cache
 from nose.plugins import Plugin
 from nose.tools import assert_equal
+from xvfbwrapper import Xvfb
+import mock
 import mock
 import requests
 import utils.youtube
-
 
 REQUEST_CALLBACKS = []
 
@@ -190,6 +190,20 @@ class MonkeyPatcher(object):
             # mock and restore it here
             mock_obj.side_effect = side_effect
 
+
+_xvfb = None
+def start_xvfb():
+    global _xvfb
+    if _xvfb is None:
+        _xvfb = Xvfb(width=1920, height=1080)
+        _xvfb.start()
+
+def stop_xvfb():
+    global _xvfb
+    if _xvfb is not None:
+        _xvfb.stop()
+        _xvfb = None
+
 class UnisubsTestPlugin(Plugin):
     name = 'Amara Test Plugin'
 
@@ -199,6 +213,7 @@ class UnisubsTestPlugin(Plugin):
         self.directories_to_skip = set([
             os.path.join(settings.PROJECT_ROOT, 'libs'),
         ])
+        self.vdisplay = None
 
     def options(self, parser, env=os.environ):
         parser.add_option("--with-webdriver",
@@ -221,6 +236,7 @@ class UnisubsTestPlugin(Plugin):
 
     def finalize(self, result):
         self.patcher.unpatch_functions()
+        stop_xvfb()
 
     def afterTest(self, test):
         self.patcher.reset_mocks()

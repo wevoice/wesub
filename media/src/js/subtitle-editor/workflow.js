@@ -25,83 +25,50 @@ var angular = angular || null;
      * App-level Workflow object
      */
 
-    Workflow = function(subtitleList, translating, titleEdited) {
-	this.translating = translating;
-	this.titleEdited = titleEdited;
-	this.showOverlay = true;
-        var self = this;
+    Workflow = function(subtitleList) {
         this.subtitleList = subtitleList;
+        this.stageOrder = [ 'typing', 'syncing', 'review' ];
         if(this.subtitleList.isComplete()) {
             this.stage = 'review';
         } else {
-            this.stage = 'type';
+            this.stage = 'typing';
         }
-        this.subtitleList.addChangeCallback(function() {
-            if(self.stage == 'review' && !self.subtitleList.isComplete()) {
-                self.stage = 'sync';
-            }
-        });
     }
 
     Workflow.prototype = {
-	appActionDone: function(){
-           if (this.showOverlay) this.showOverlay = false;
-	},
-        switchStage: function(newStage) {
-	    if (newStage == 'title') {
-                this.showOverlay = false; 
-		this.titleEdited(true);
-	    }
-            this.showOverlay = true;
-            this.stage = newStage;
-        },
-        canMoveToNext: function() {
-            switch(this.stage) {
-                case 'type':
-                    return true;
-                    
-                case 'sync':
-                    return this.subtitleList.isComplete();
-
-                case 'title':
-                    return this.titleEdited();
-
-                case 'review':
-                    return false;
-
-                default:
-                    throw "invalid value for Workflow.stage: " + this.stage;
+        stageIndex: function(stage) {
+            var stageIndex = this.stageOrder.indexOf(stage);
+            if(stageIndex == -1) {
+                throw "invalid stage: " + stage;
             }
+            return stageIndex;
         },
-        stageDone: function(stageName) {
-            if(stageName == 'type') {
-                return (this.stage == 'review' || this.stage == 'title' || this.stage == 'sync');
-            } else if(stageName == 'sync') {
-                return this.stage == 'review';
-            } else if(stageName == 'title') {
-                return (this.stage == 'review' || this.stage == 'sync');
+        stageCSSClass: function(stage) {
+            return this.stage == stage ? 'active' : 'inactive';
+        },
+        canCompleteStage: function(stage) {
+            if(stage == 'typing') {
+                return (this.subtitleList.length() > 0 &&
+                        !this.subtitleList.needsAnyTranscribed());
+            } else if(stage == 'syncing') {
+                return this.subtitleList.isComplete();
             } else {
                 return false;
             }
         },
+        completeStage: function(stage) {
+            var stageIndex = this.stageOrder.indexOf(stage);
+            this.stage = this.stageOrder[stageIndex+1];
+        },
     }
     module.value('Workflow', Workflow);
 
-    module.controller('WorkflowProgressionController', function($scope, $sce, EditorData, VideoPlayer) {
+    module.controller('NormalWorkflowController', ["$scope", "$sce", "EditorData", "VideoPlayer", function($scope, $sce, EditorData, VideoPlayer) {
 
-        $scope.$root.$on("video-playback-changes", function() {$scope.workflow.appActionDone();});
-        $scope.$root.$on("app-click", function() {$scope.workflow.appActionDone();});
-
-        // If a blank list of subs start, we autimatically start edition
+        // If a blank list of subs start, we automatically start editing
         if ($scope.workflow.subtitleList.length() == 0) {
             var newSub = $scope.workflow.subtitleList.insertSubtitleBefore(null);
             $scope.currentEdit.start(newSub);
-        }
-
-        var notATask = !EditorData.task_needs_pane;
-
-        $scope.showOverlay = function() {
-            return (notATask && $scope.workflow.showOverlay);
         }
 
         function rewindPlayback() {
@@ -109,34 +76,42 @@ var angular = angular || null;
             VideoPlayer.seek(0);
         }
 
-        $scope.onNextClicked = function(evt) {
-            if ($scope.workflow.stage == 'title') {
-                $scope.workflow.switchStage('sync');
-                if(!$scope.timelineShown) {
-                    $scope.toggleTimelineShown();
-                }
-                rewindPlayback();
-	    }
-	    else if ($scope.workflow.stage == 'sync') {
-                $scope.workflow.switchStage('review');
-                rewindPlayback();
+        $scope.$watch('workflow.stage', function(newStage) {
+            if(newStage == 'syncing' && !$scope.timelineShown) {
+                $scope.toggleTimelineShown();
             }
-	    else if ($scope.workflow.stage == 'type') {
-		if ($scope.translating()) {
-                    $scope.dialogManager.open('metadata');
-                    $scope.workflow.switchStage('title');
-                } else {
-                    $scope.workflow.switchStage('sync');
-                    if(!$scope.timelineShown) {
-                        $scope.toggleTimelineShown();
-                    }
-                }
-                rewindPlayback();
-            }
-            evt.preventDefault();
-            evt.stopPropagation();
-        }
-    });
+            rewindPlayback();
+        });
 
+        // Hack to make task buttons work, we should replace this when #1667
+        // is implemented
+        $scope.taskButtons = Boolean(EditorData.task_needs_pane);
+    }]);
+
+    module.controller('ReviewWorkflowController', ["$scope", function($scope) {
+        $scope.heading = $scope.workMode.heading;
+    }]);
+
+    module.controller('WorkflowController', ["$scope", "$controller", 'EditorData',
+            function($scope, $controller, EditorData) {
+        $scope.workMode = EditorData.work_mode;
+
+        if($scope.workMode.type == 'normal') {
+            $controller('NormalWorkflowController', {
+                $scope: $scope
+            });
+        } else if($scope.workMode.type == 'review') {
+            $controller('ReviewWorkflowController', {
+                $scope: $scope
+            });
+        }
+
+        $scope.onEditTitleClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dialogManager.open('metadata');
+        }
+
+    }]);
 
 })(this);

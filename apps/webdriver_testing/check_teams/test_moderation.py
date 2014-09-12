@@ -198,58 +198,58 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                                        review_allowed = 10, # peer
                                        )
         cls.contributor = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
-        cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
-                                    'subtitle_data') 
-        cls.rev1 = os.path.join(cls.subs_dir, 'Timed_text.en.srt')
-        cls.rev2 = os.path.join(cls.subs_dir, 'Timed_text.rev2.en.srt')
-        de = os.path.join(cls.subs_dir, 'Timed_text.rev3.en.srt')
-
-        cls.sv = os.path.join(cls.subs_dir, 'Timed_text.sv.dfxp')
 
         #Create en source language 2 revisions - approved.
         cls.video, cls.tv = cls._add_team_video()
-        cls._upload_subtitles(cls.video, 'en', cls.rev1, cls.contributor, 
+        cls._upload_subtitles(cls.video, 'en', cls.contributor, 
                               complete=False)
-        cls._upload_subtitles(cls.video, 'en', cls.rev2, cls.contributor)
+        cls._upload_subtitles(cls.video, 'en', cls.contributor)
         cls.data_utils.complete_review_task(cls.tv, 20, cls.owner)
         cls.data_utils.complete_approve_task(cls.tv, 20, cls.owner)
        
         #Add sv translation, reviewed
-        cls._upload_translation(cls.video, 'sv', cls.sv, cls.contributor)
+        cls._upload_translation(cls.video, 'sv', cls.contributor)
         cls.data_utils.complete_review_task(cls.tv, 20, cls.owner)
 
         #Add de translation complete waiting review
-        cls._upload_translation(cls.video, 'de', cls.sv, cls.contributor)
+        cls._upload_translation(cls.video, 'de', cls.contributor)
 
         #Add ru translation, incomplete.
-        cls._upload_translation(cls.video, 'ru', cls.sv, cls.contributor, 
+        cls._upload_translation(cls.video, 'ru', cls.contributor, 
                                 complete=False)
 
-    @classmethod
-    def _upload_subtitles(cls, video, lc, subs, user, complete=True):
-        data = {'language_code': lc,
-                     'video': video.pk,
-                     'primary_audio_language_code': 'en',
-                     'draft': open(subs),
-                     'complete': int(complete),
-                     'is_complete': complete,
-                    }
-        cls.data_utils.upload_subs(user, **data)
+
 
     @classmethod
-    def _upload_translation(cls, video, lc, subs, user, complete=True):
-        data = {'language_code': lc,
-                     'video': video.pk,
-                     'from_language_code': 'en',
-                     'draft': open(subs),
-                     'complete': int(complete),
-                     'is_complete': complete,
-                    }
-        cls.data_utils.upload_subs(user, **data)
+    def _upload_subtitles(cls, video, lc, user, complete=True):
+        data = {
+                    'language_code': lc,
+                    'committer': user,
+                    'video': video,
+                    'complete': None,
+                }
+        if complete == True:
+            data['action'] = 'complete'
+
+        cls.data_utils.add_subs(**data)
+
+    @classmethod
+    def _upload_translation(cls, video, lc, user, complete=True):
+        data = {
+                    'language_code': lc,
+                    'committer': user,
+                    'video': video,
+                    'complete': None
+                }
+        if complete == True:
+            data['action'] = 'complete'
+
+        cls.data_utils.add_subs(**data)
 
     @classmethod
     def _add_team_video(cls):
-        video = cls.data_utils.create_video()
+        vid_data = {'video__primary_audio_language_code': 'en' }
+        video = cls.data_utils.create_video(**vid_data)
         tv = TeamVideoFactory(team=cls.team, added_by=cls.owner, video=video)
         return video, tv
 
@@ -311,7 +311,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         """Tag display for original language needs review."""
 
         vid, tv = self._add_team_video()
-        self._upload_subtitles(vid, 'en', self.rev1, self.contributor, 
+        self._upload_subtitles(vid, 'en', self.contributor, 
                               complete=True)
         self.video_pg.open_video_page(vid.video_id)
         en_tag, _ = self.video_pg.language_status('English')
@@ -320,7 +320,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
     def test_tags_original_approve(self):
         """Tag display for original language needs approval."""
         vid, tv = self._add_team_video()
-        self._upload_subtitles(vid, 'en', self.rev1, self.contributor, 
+        self._upload_subtitles(vid, 'en', self.contributor, 
                               complete=True)
         self.data_utils.complete_review_task(tv, 20, self.owner)
 
@@ -330,7 +330,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
 
     def test_tags_original_incomplete(self):
         vid, tv = self._add_team_video()
-        self._upload_subtitles(vid, 'en', self.rev1, self.contributor, 
+        self._upload_subtitles(vid, 'en', self.contributor, 
                               complete=False)
         self.video_pg.open_video_page(vid.video_id)
         en_tag, _ = self.video_pg.language_status('English')

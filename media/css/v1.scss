@@ -2498,7 +2498,7 @@ a.truncated-expand {
     div.modal-body {
         div.message {
             max-height: 300px;
-            overflow: scroll;
+            overflow: auto;
 
             &::-webkit-scrollbar {
                 -webkit-appearance: none;
@@ -3113,4 +3113,25 @@ a.truncated-expand {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.v1 .current-languages {
+    padding-top: 15px;
+    span {
+        padding-right: 15px;
+    }
+}
+
+.v1 #apply-modal.modal {
+    overflow: auto;
+    max-height: 680px;
+}
+
+.v1 div.jGrowl {
+    // Default value is smaller than bootstrap modal
+    z-index: 12000;
+}
+
+.v1 h3.tab-heading {
+    padding-top: 55px;
 }
