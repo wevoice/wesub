@@ -39,6 +39,8 @@ else:
     ) + static(
         '/images/', document_root=os.path.join(settings.STATIC_ROOT, 'images')
     ) + static(
+        '/flowplayer/', document_root=os.path.join(settings.STATIC_ROOT, 'flowplayer')
+    ) + static(
         '/fonts/', document_root=os.path.join(settings.STATIC_ROOT, 'fonts')
     ) + static('/admin/', document_root=utils.admin_media_root())
 
