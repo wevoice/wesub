@@ -172,7 +172,7 @@
         </p>
     {% endif %}
 
-    {% if user.is_authenticated and not user.get_languages %}
+    {% if not tasks and user.is_authenticated and not user.get_languages %}
         <p class="prompt">
           <strong>{% trans "Use the filter to view tasks in a specific language" %}</strong>
         </p>
