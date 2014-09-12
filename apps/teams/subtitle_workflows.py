@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
@@ -156,8 +157,12 @@ class TaskTeamWorkflow(TeamWorkflow):
     def get_add_language_mode(self, user):
         if self.team_video.team.is_member(user):
             return mark_safe(
-                fmt(_('View <a href="%(url)s">tasks for this video</a>.'),
-                      url=self.team_video.get_tasks_page_url()))
+                fmt(_(
+                    '<a class="icon" href="%(url)s">'
+                    '<img src="%(static_url)simages/edit-subtitles.png"></a>'
+                    'View <a href="%(url)s">tasks for this video</a>.'),
+                    url=self.team_video.get_tasks_page_url(),
+                    static_url=settings.STATIC_URL))
         else:
             return None
 
