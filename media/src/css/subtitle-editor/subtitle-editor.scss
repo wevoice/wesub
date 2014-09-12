@@ -894,7 +894,7 @@ div.notes {
         right: 2em;
 
         textarea {
-            background: #1a1a1a;
+            background: #ececec;
             border: none;
             resize: none;
             width: 100%;
@@ -902,13 +902,18 @@ div.notes {
             border-radius: 5px;
             margin-top: 1em;
             padding: 0.5em;
-            color: $off-white;
+            color: $text-color;
         }
         button {
             @include big-button;
             float: right;
+            color: #ddd;
             background: #666;
             padding: 5px 20px;
+        }
+        p {
+            color: #aaa;
+            font-style: italic;
         }
     }
 
@@ -1040,7 +1045,6 @@ div.video {
     ul.video-controls {
         height: 32px;
         background: $dark-grey;
-        border-bottom: 1px solid #19191a;
         color: #fff;
 
         li {
@@ -1367,19 +1371,20 @@ div.workflow {
     }
 
     button {
+
         &.send-back {
             background-color: #d24655;
             background-image: url("../images/thumbs-down.png");
             background-position: 10px center;
             background-repeat: no-repeat;
-            padding-left: 40px;
+            padding-left: 30px;
         }
 
         &.endorse {
             background-image: url('../images/thumbs-up.png');
             background-position: 10px center;
             background-repeat: no-repeat;
-            padding-left: 40px;
+            padding-left: 30px;
         }
 
         &[disabled] {

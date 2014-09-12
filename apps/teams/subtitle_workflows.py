@@ -102,8 +102,7 @@ class TeamEditorNotes(workflows.EditorNotes):
         self.team = team_video.team
         self.video = team_video.video
         self.language_code = language_code
-        self.heading = fmt(_('%(team)s Team Subtitle Notes'),
-                           team=self.team)
+        self.heading = _('Team Notes')
         self.notes = list(TeamSubtitleNote.objects
                           .filter(video=self.video, team=self.team,
                                   language_code=language_code)
@@ -135,9 +134,9 @@ class TaskTeamWorkflow(TeamWorkflow):
         task = self.team_video.get_task_for_editor(language_code)
         if task is not None:
             if task.is_approve_task():
-                heading = _("Approve Work")
+                heading = _("Approve")
             elif task.is_review_task():
-                heading = _("Review Work")
+                heading = _("Review")
             else:
                 # get_task_for_editor should only return approve/review tasks
                 raise ValueError("Wrong task type: %s" % task)

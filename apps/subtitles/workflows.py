@@ -446,7 +446,7 @@ class EditorNotes(object):
     def __init__(self, video, language_code):
         self.video = video
         self.language_code = language_code
-        self.heading = _('Subtitle Notes')
+        self.heading = _('Notes')
         self.notes = list(SubtitleNote.objects
                           .filter(video=video, language_code=language_code)
                           .order_by('created')
