@@ -72,10 +72,12 @@ class EditorPage(UnisubsPage):
     _ENDORSE = 'div.substeps button.endorse' #when completing subtitling.
 
     # COLLAB PANEL
-    _COLLAB_PANEL = 'section.collab'
+    _COLLAB_PANEL = 'div.workflow'
     _SEND_BACK = 'button.send-back'
     _APPROVE = 'button.approve'
-    _NOTES = 'textarea[ng-model="collab.notes"]'
+    _NEW_NOTE = 'div.new-note textarea'
+    _SAVE_NOTE = 'div.new-note button'
+    _NOTES = 'ul.notes li p'
 
     def open_editor_page(self, video_id, lang, restore=False):
         self.open_page(self._URL.format(video_id, lang))
@@ -386,7 +388,8 @@ class EditorPage(UnisubsPage):
         self.wait_for_element_not_present(self._SEND_BACK)
        
     def add_note(self, note_text):
-        self.type_by_css(self._NOTES, note_text)
+        self.type_by_css(self._NEW_NOTE, note_text)
+        self.click_by_css(self._SAVE_NOTE)
     
     def current_notes(self):
         return self.get_text_by_css(self._NOTES)
