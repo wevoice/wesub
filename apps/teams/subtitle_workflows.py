@@ -56,10 +56,15 @@ class Complete(TaskAction):
             # code out of that app and into here, but maybe we should just
             # leave it and wait to phase the tasks system out
             return
-        task = (video.get_team_video().task_set
-                .incomplete_subtitle_or_translate()
-                .filter(language=subtitle_language.language_code).get())
-        task.complete()
+        try:
+            task = (video.get_team_video().task_set
+                    .incomplete_subtitle_or_translate()
+                    .filter(language=subtitle_language.language_code).get())
+        except Task.DoesNotExist:
+            # post publish edit, no task is available
+            return
+        else:
+            task.complete()
 
 def _complete_task(user, video, subtitle_language, saved_version, approved):
     team_video = video.get_team_video()
