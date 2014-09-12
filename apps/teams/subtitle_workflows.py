@@ -116,9 +116,9 @@ class TeamEditorNotes(workflows.EditorNotes):
             language_code=self.language_code,
             user=user, body=body)
 
-class TeamWorkflow(workflows.Workflow):
+class TeamWorkflow(workflows.DefaultWorkflow):
     def __init__(self, team_video):
-        workflows.Workflow.__init__(self, team_video.video)
+        workflows.DefaultWorkflow.__init__(self, team_video.video)
         self.team_video = team_video
 
     def get_editor_notes(self, language_code):
