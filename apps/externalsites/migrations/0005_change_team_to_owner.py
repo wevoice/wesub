@@ -116,7 +116,7 @@ class Migration(SchemaMigration):
             'write_token': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'externalsites.kalturaaccount': {
-            'Meta': {'object_name': 'KalturaAccount'},
+            'Meta': {'unique_together': "[('type', 'owner_id')]", 'object_name': 'KalturaAccount'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'owner_id': ('django.db.models.fields.IntegerField', [], {}),
             'partner_id': ('django.db.models.fields.CharField', [], {'max_length': '100'}),

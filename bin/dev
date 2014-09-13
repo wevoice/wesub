@@ -1,0 +1,211 @@
+#!/usr/bin/env python
+
+# Amara, universalsubtitles.org
+#
+# Copyright (C) 2014 Participatory Culture Foundation
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see
+# http://www.gnu.org/licenses/agpl-3.0.html.
+
+
+"""dev -- Useful commands for the dev environment
+
+Put a symlink to this script somewhere in your path.
+
+Then you can do things using "dev <command>".
+
+Run "dev" for a list of commands and "dev help <command>" for help on a
+specific command.
+"""
+
+import sys
+import os
+import optparse
+import subprocess
+
+def script_path():
+    path = __file__
+    while os.path.islink(path):
+        path = os.path.join(os.path.dirname(path),
+                            os.readlink(path))
+    return os.path.abspath(path)
+
+def unisubs_root():
+    return os.path.dirname(os.path.dirname(script_path()))
+
+def progname():
+    return os.path.basename(sys.argv[0])
+
+class Command(object):
+    options = []
+    raw_args = False
+
+    @classmethod
+    def name(cls):
+        return cls.__name__.lower()
+
+    @classmethod
+    def all_commands(cls):
+        return dict((sub_class.name(), sub_class)
+                    for sub_class in cls.__subclasses__())
+
+    @classmethod
+    def get_command(cls, name):
+        CommandClass = cls.all_commands()[name]
+        return CommandClass()
+
+    def usage(self):
+        return "%s\n\n%s" % (self.usage_header(), self.usage_detail())
+
+    def usage_header(self):
+        header = "usage: %s %s" % (progname(), self.name())
+        if self.raw_args:
+            return header + " [args]"
+        if self.options:
+            header += " [options]"
+        return header
+
+    def usage_detail(self):
+        return self.__doc__
+
+    def make_option_parser(self):
+        return optparse.OptionParser(self.usage(), option_list=self.options)
+
+    def print_help(self):
+        self.make_option_parser().print_help()
+
+    def run(self, command_args):
+        if self.raw_args:
+            options = {}
+            args = command_args
+        else:
+            parser = self.make_option_parser()
+            (options, args) = parser.parse_args(command_args)
+        return self.run_inner(args, options)
+
+    def run_inner(self, args, options):
+        raise NotImplementedError()
+
+class Help(Command):
+    """Get help on a command."""
+
+    def usage_header(self):
+        return "usage: %s help [command]" % (progname(),)
+
+    def run_inner(self, args, options):
+        try:
+            command_name = args[0]
+        except IndexError:
+            command_name = 'help'
+        try:
+            command = Command.get_command(command_name)
+        except KeyError:
+            print "Unknown command: %s" % command_name
+        else:
+            command.print_help()
+
+class Bash(Command):
+    """Run a bash script inside the app container."""
+
+    def run_inner(self, args, options):
+        subprocess.call(["fig", "run", "--rm", "bash", "/bin/bash"])
+
+class Build(Command):
+    """Build the app container."""
+
+    def run_inner(self, args, options):
+        subprocess.call(["docker", "build", "-t", "amara-app", "."])
+
+class Manage(Command):
+    """Run manage.py inside the app container."""
+
+    raw_args = True
+
+    def run_inner(self, args, options):
+        run_manage(args)
+
+class Test(Command):
+    """Run unittests."""
+
+    raw_args = True
+
+    def run_inner(self, args, options):
+        run_manage(['test', '--settings=dev_settings_test'] + args)
+
+class JSTest(Command):
+    """Run Javascript unittests."""
+
+    def run_inner(self, args, options):
+        subprocess.call(['docker', 'run', '--rm',
+                         '--volume=/home/ben/unisubs:/opt/unisubs',
+                         'amara/jstest'])
+
+class RunServer(Command):
+    """Run the django test server."""
+
+    def run_inner(self, args, options):
+        subprocess.call(["fig", "up", "app"])
+
+class RunSSLServer(Command):
+    """Run the django test server (HTTPS mode)."""
+
+    def run_inner(self, args, options):
+        subprocess.call(["fig", "up", "sslapp"])
+
+class DBReset(Command):
+    """Reset the database."""
+
+    def run_inner(self, args, options):
+        run_manage(['drop_all_tables'])
+        run_manage(['syncdb', '--all', '--noinput'])
+        run_manage(['migrate', '--fake'])
+
+class Start(Command):
+    """Start background docker containers (db, search, worker, etc)."""
+    def run_inner(self, args, options):
+        subprocess.call(['fig', 'up', '-d', 'db', 'queue', 'search', 'cache', 'worker'])
+
+class Stop(Command):
+    """Stop all docker containers."""
+    def run_inner(self, args, options):
+        subprocess.call(['fig', 'stop'])
+
+def run_manage(args):
+    subprocess.call(['fig', 'run', '--rm', 'app', 'python', 'manage.py'] + args)
+
+def usage():
+    print "Usage %s [command]" % progname()
+    print
+    print "Available commands:"
+    all_commands = Command.all_commands()
+    for name in sorted(all_commands):
+        print "%s -- %s" % (name, all_commands[name].__doc__)
+
+def main(args):
+    os.chdir(unisubs_root())
+    if not args:
+        usage()
+        return 1
+    try:
+        command = Command.get_command(args[0])
+    except KeyError:
+        usage()
+        return 1
+    else:
+        command.run(args[1:])
+
+if __name__ == '__main__':
+    rv = main(sys.argv[1:])
+    if rv is not None:
+        sys.exit(rv)

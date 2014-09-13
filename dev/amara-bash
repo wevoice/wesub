@@ -1,4 +1,0 @@
-#!/bin/bash
-
-cd "$( unisubs-root )"
-fig run --rm app /bin/bash

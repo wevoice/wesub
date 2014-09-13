@@ -49,6 +49,7 @@
 	padding: 0;
 	color: #656565;
 	margin: 0;
+	font-size: 14px;
 }
 
 #announce-banner li {
@@ -71,6 +72,8 @@
 }
 
 /* NAV */
+
+
 
 nav span {
 	float: right;
@@ -131,7 +134,7 @@ nav span {
 	display: block;
 }
 
-
+/* Me Menu (old style) */
 
 .navbar li#me_menu {
     float: left;
@@ -359,11 +362,54 @@ text-decoration: underline;
 	font-weight: 300;
 }
 
-/*MOBILE TWEAKS INDEX*/
+/*HELP BUTTON*/
+
+.help-tab {
+	-webkit-transform: rotate(270deg);
+	-moz-transform: rotate(270deg);
+	-ms-transform: rotate(270deg);
+	-o-transform: rotate(270deg);
+	transform: rotate(270deg);
+	border-top: medium none;
+	right: 0;
+	top: 33%;
+	-webkit-transform-origin: 100% 100%;
+	-moz-transform-origin: 100% 100%;
+	-o-transform-origin: 100% 100%;
+	-ms-transform-origin: 100% 100%;
+	transform-origin: 100% 100% 0;
+  border-style: solid;
+  border-width: 1px;
+  cursor: pointer;
+  display: block;
+  margin: 0;
+  padding: 2px 8px;
+  position: fixed;
+  text-align: center;
+  text-decoration: none;
+  z-index: 100000;
+	background-color: #7AC139;
+	border-color: #f2f2f3;
+	top: 170px;
+}
+
+.help-tab a {
+	font-family: 'Raleway', "Helvetica Neue", Helvetica, sans-serif;
+	color: #f2f2f3;
+	font-size: 13px;
+	font-weight: 300;
+	text-decoration: none;
+}
+
+.help-tab a:hover {
+	text-decoration: none;
+}
+
+/*SIZE TWEAKS INDEX*/
 
 @media (max-width: 768px) {
 
-	#announce-banner .close-banner {
+	#announce-banner .hide-announcement {
 		right: 20px;
 	}
 

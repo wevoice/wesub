@@ -25,4 +25,6 @@ class SyncingError(StandardError):
         return self.msg
 
 class YouTubeAccountExistsError(StandardError):
-    pass
+    def __init__(self, other_account):
+        StandardError.__init__(self)
+        self.other_account = other_account

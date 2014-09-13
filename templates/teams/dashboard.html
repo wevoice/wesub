@@ -24,12 +24,18 @@
     </script>
 {% endblock %}
 
-{% block select_language_dialog %}
-    {% select_language_dialog %}
-{% endblock %}
-
 {% block view_content %}
 
+ {% if not team|is_team_member:user or not videos %}
+    {% block select_language_dialog %}
+      {% if not team|is_team_member:user %}
+        {% url teams:join_team slug=team.slug as redirect_url %}
+        {% select_language_dialog hide_link="True" redirect=redirect_url %}
+    {% else %}
+        {% select_language_dialog hide_link="True" %}
+    {% endif %}
+    {% endblock %}
+  {% endif %}
     <div class="grid_8 view omega{% if team.get_workflow.requires_review_or_approval %} moderated{% endif %}{% if team.workflow_enabled %} task-enabled{% endif %}">
         {% if member or team.is_visible %}
             {% with "dashboard" as current %}
@@ -95,6 +101,7 @@
                         {% endblocktrans %}
                     </p>
                     {% include "teams/_join.html" %}
+
                 {% endif %}
             </div>
         {% endif %}
@@ -202,7 +209,7 @@
                 </p>
                 <ul class="suggestions">
                     <li>
-                        <a href="#" data-modal="language_modal" id="lang_select_btn">{% trans "Update your language preferences" %}</a>
+                        <a href="#" data-modal="language_modal" id="lang_select_btn">{% trans "Select the languages you can caption or translate" %}</a>
                     </li>
                     <li>
                         <a href="{% url teams:detail team.slug %}">Browse all videos</a>

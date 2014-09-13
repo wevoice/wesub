@@ -1,0 +1,18 @@
+{% load i18n %}
+<div id="language_picker" class="modal-body clearfix">
+  <form action="" method="get">
+    <fieldset>
+      {{ form.language1 }}
+      {{ form.language2 }}
+      {{ form.language3 }}
+      {{ form.language4 }}
+      {{ form.language5 }}
+      {{ form.language6 }}
+    </fieldset>
+  </form>
+</div>
+{% if redirect %}
+<script type="text/javascript">
+  var redirect = "{{ redirect }}";
+</script>
+{% endif %}

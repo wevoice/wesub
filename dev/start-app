@@ -1,8 +1,0 @@
-#!/bin/bash
-
-cd "$( unisubs-root )"
-if [ "$1" == "--ssl" ] ; then
-        fig up sslapp
-else
-        fig up app
-fi

@@ -1,4 +1,4 @@
-{% load i18n announcement_tags messages_tags profiles_tags media_bundle auth_tags %}
+{% load i18n announcement_tags messages_tags profiles_tags media_bundle media_compressor auth_tags %}
 
 <!DOCTYPE html>
 <html {% if LANGUAGE_BIDI %}dir="rtl"{% endif %} xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="en" lang="en" {% block html_attrs %}{% endblock %} class="base">
@@ -15,6 +15,9 @@
         <!-- Latest compiled and minified JavaScript -->
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,11 +49,12 @@
     <!--[if lt IE 9]>
         <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    {% media_bundle "hands_home.css" %}
+      {% media_bundle "hands_home.css" %}
 
     {% media_bundle "site.js" %}
+    {% media_bundle "dean.js" %}
     <script type="text/javascript" src="{% url js_i18n_catalog %}"></script>
-    <script src="{% url profiles:rpc_api %}" type="text/javascript"></script>  
+    <script src="{% url profiles:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript" src='{% url embedder_iframe %}'>
     </script>
     {% block scripts %}
@@ -58,13 +62,21 @@
     <script type="text/javascript">
         window.STATIC_URL = '{{ STATIC_URL }}';
         {% block oldmodal %}
-            window.OLD_MODAL = true; 
+            window.OLD_MODAL = true;
         {% endblock %}
     </script>
 </head>
 
 <body {% block body_attrs %}{% endblock %}>
     {% csrf_token %}
+    {% announcement %}
+    {% if user.is_authenticated %}
+        {% messages %}
+        {% block email_confirmation_block %}
+            {% email_confirmation_notification %}
+        {% endblock %}
+    {% endif %}
+    {% require_email_dialog %}
 
 <div>
     {% include 'header.html' %}
@@ -85,7 +97,7 @@
                     <li><a target="_blank" href="{% url admin:index %}">{% trans 'Admin' %}</a></li>
                 {% endif %}
                 {% if user.is_superuser %}
-                    <li><a target="_blank" href="http://sentry.pculture.org:9000">{% trans 'Sentry' %}</a></li>
+                    <li><a target="_blank" href="//sentry.pculture.org:9000">{% trans 'Sentry' %}</a></li>
                 {% endif %}
                 {% if user|can_translate %}
                     <li><a target="_blank" href="{% url rosetta-pick-file %}"><span>{% trans 'Rosetta' %}</span></a></li>
@@ -96,7 +108,7 @@
                 {% if user.is_superuser %}
                     <li><a target="_blank" href="{% url billing %}">{% trans 'Billing' %}</a></li>
                 {% endif %}
-                <li><a href="https://github.com/pculture/unisubs/commit/{{ LAST_COMMIT_GUID }}" title="{{ LAST_COMMIT_GUID }}">Github</a></li>
+                <li><a href="//github.com/pculture/unisubs/commit/{{ LAST_COMMIT_GUID }}" title="{{ LAST_COMMIT_GUID }}">Github</a></li>
             </ul>
             {% block page_controls %}{% endblock %}
         </div>

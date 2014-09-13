@@ -33,16 +33,16 @@ ADD .docker/master-worker.sh /usr/local/bin/master-worker
 ADD .docker/worker.sh /usr/local/bin/worker
 ADD .docker/test_app.sh /usr/local/bin/test_app
 ADD .docker/update_translations.sh /usr/local/bin/update_translations
+ADD .docker/entry.sh /usr/local/bin/entry
 RUN easy_install pip
 RUN pip install uwsgi
 RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements.txt)
 # this fixes the nose bug (https://github.com/django-nose/django-nose/issues/54)
 RUN rm /usr/local/man
-RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements-test.txt)
-RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements-doc.txt)
 ADD .docker/run.sh /usr/local/bin/run
 
 WORKDIR /opt/apps/unisubs
 VOLUME /opt/apps/unisubs
 EXPOSE 8000
-CMD ["/bin/bash", "/usr/local/bin/run"]
+ENTRYPOINT ["/usr/local/bin/entry"]
+CMD ["app"]

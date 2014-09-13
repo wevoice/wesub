@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 # Amara, universalsubtitles.org
-# 
+#
 # Copyright (C) 2013 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 # Django settings for unisubs project.
@@ -194,7 +194,6 @@ INSTALLED_APPS = (
     'startup',
     'staticmedia',
     'statistic',
-    'streamer',
     'teams',
     'testhelpers',
     'thirdpartyaccounts',
@@ -356,7 +355,7 @@ if USE_INTEGRATION:
     for dirname in os.listdir(INTEGRATION_PATH):
         if os.path.isfile(os.path.join(INTEGRATION_PATH, dirname, '__init__.py')):
             INSTALLED_APPS += (dirname,)
-    
+
     try:
         from integration_settings import *
     except ImportError:
@@ -370,27 +369,27 @@ MEDIA_BUNDLES = {
             "css/jquery.alerts.css",
             "css/960.css",
             "css/reset.css",
-            "css/html.css", 
-            "css/about_faq.css", 
-            "css/breadcrumb.css", 
+            "css/html.css",
+            "css/about_faq.css",
+            "css/breadcrumb.css",
             "css/buttons.css",
             "css/chosen.css",
-            "css/classes.css", 
+            "css/classes.css",
             "css/forms.css",
             "css/index.css",
             "css/layout.css",
-            "css/profile_pages.css", 
+            "css/profile_pages.css",
             "css/revision_history.css",
-            "css/teams.css", 
-            "css/transcripts.css", 
-            "css/background.css", 
-            "css/activity_stream.css", 
-            "css/settings.css", 
-            "css/feedback.css", 
-            "css/messages.css", 
-            "css/global.css", 
-            "css/top_user_panel.css", 
-            "css/services.css", 
+            "css/teams.css",
+            "css/transcripts.css",
+            "css/background.css",
+            "css/activity_stream.css",
+            "css/settings.css",
+            "css/feedback.css",
+            "css/messages.css",
+            "css/global.css",
+            "css/top_user_panel.css",
+            "css/services.css",
             "css/solutions.css",
             "css/watch.css",
             "css/v1.scss",
@@ -407,16 +406,11 @@ MEDIA_BUNDLES = {
             "css/dean/header-footer.css",
             "css/dean/index.css",
             "css/dean/main.css",
-            "css/dean/normalize.css",
          )
     },
     "dean.js": {
         "files": (
-          #  "js/dean-js/bootstrap-hover-dropdown.min.js",
-            "js/dean-js/choose-form-copy.js",
-            "js/dean-js/choose-form",
             "js/dean-js/plugins.js",
-            "js/dean-js/vendor/jquery-1.10.2.min.js",
             "js/dean-js/vendor/modernizr-2.6.2.min.js",
          )
     },
@@ -469,7 +463,6 @@ MEDIA_BUNDLES = {
             'src/js/popcorn/popcorn.flash-fallback.js',
             #'src/js/popcorn/popcorn.netflix.js',
             'src/js/subtitle-editor/app.js',
-            'src/js/subtitle-editor/collab.js',
             'src/js/subtitle-editor/dom.js',
             'src/js/subtitle-editor/help.js',
             'src/js/subtitle-editor/lock.js',

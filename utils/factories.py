@@ -31,6 +31,7 @@ from factory import Factory
 from factory.django import DjangoModelFactory
 
 import auth.models
+import babelsubs.storage
 import comments.models
 import externalsites.models
 import subtitles.models
@@ -92,6 +93,18 @@ class YouTubeVideoFactory(VideoFactory):
         return ('https://www.youtube.com/watch?v=%s' %
                 self.video_url__videoid)
 
+    @classmethod
+    def _generate(cls, create, attrs):
+        """Override the default _generate() to handle the channel_id
+        parameteter.
+        """
+        if 'channel_id' in attrs:
+            attrs['video_url__owner_username'] = attrs.pop('channel_id')
+        return super(YouTubeVideoFactory, cls)._generate(create, attrs)
+
+class VideoFeedFactory(DjangoModelFactory):
+    FACTORY_FOR = videos.models.VideoFeed
+
 class UserFactory(DjangoModelFactory):
     FACTORY_FOR = auth.models.CustomUser
 
@@ -132,6 +145,15 @@ class TeamFactory(DjangoModelFactory):
             # this forces the default project to be created
             team.default_project
         return team
+
+    @factory.post_generation
+    def admin(self, create, extracted, **kwargs):
+        if extracted:
+            assert create
+            TeamMemberFactory.create(
+                user=extracted, team=self,
+                role=teams.models.TeamMember.ROLE_ADMIN,
+            )
 
 class WorkflowFactory(DjangoModelFactory):
     FACTORY_FOR = teams.models.Workflow
@@ -236,6 +258,12 @@ class BrightcoveAccountFactory(DjangoModelFactory):
     publisher_id = 'publisher'
     write_token = 'write-token'
 
+class KalturaAccountFactory(DjangoModelFactory):
+    FACTORY_FOR = externalsites.models.KalturaAccount
+
+    partner_id = 'test-partner-id'
+    secret = 'test-secret'
+
 class YouTubeAccountFactory(DjangoModelFactory):
     FACTORY_FOR = externalsites.models.YouTubeAccount
 
@@ -257,6 +285,16 @@ class YouTubeVideoInfoFactory(Factory):
     description = 'test description'
     duration = 100
     thumbnail_url = 'http://example.com/thumbnail.png'
+
+class SubtitleSetFactory(Factory):
+    FACTORY_FOR = babelsubs.storage.SubtitleSet
+
+    language_code = 'en'
+
+    @factory.post_generation
+    def num_subs(self, create, extracted, **kwargs):
+        for i in xrange(extracted):
+            self.append_subtitle(i*1000, i*1000 - 1, "Sub %s" % i)
 
 def bulk_subs(sub_data):
     """Create a bunch of videos/languages/versions
