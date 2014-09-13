@@ -93,7 +93,7 @@ h2.main-title span{
 .center{
   text-align: center;
   }
-  
+
 .bull{ padding: 0 10px !important;}
 
 .bold{font-weight: bold;}
@@ -134,7 +134,7 @@ font-size: 16px;
   margin-left: 20px;
   margin-top: 2px;
   }
-  
+
 
 .unisubs-twitter-share{
   background: url("../images/share_icons.png") 0 -37px no-repeat !important;
@@ -146,7 +146,7 @@ font-size: 16px;
   background: url("../images/share_icons.png") 0 0px no-repeat !important;
   text-decoration: underline;
   }
-  
+
 
 
 .up_down{ text-align: right;}
@@ -250,7 +250,7 @@ font-size: 16px;
   clear: both;
   border: 1px solid #aaa;
   }
-  
+
 
 
 .disabled{ cursor: default !important;}
@@ -266,7 +266,7 @@ font-size: 16px;
 .styled{
   border: 1px solid #aaa;;
   background: #fff;
-  -moz-border-radius: 5px;  
+  -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   }
 
@@ -284,7 +284,7 @@ font-size: 16px;
 
 
 .wrap{
-  
+
   -moz-border-radius-topleft: 3px;
   -moz-border-radius-topright: 3px;
   -webkit-border-radius-top-left: 3px;
@@ -305,7 +305,7 @@ font-size: 16px;
   background: #a4c3ca;
   padding: 20px;
   margin: 0;
-  color: #fff;  
+  color: #fff;
   clear: both;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
@@ -332,49 +332,9 @@ font-size: 16px;
 .actions .blue_button,
 .actions .green_button,
 .actions .sort_button {
-  margin: 10px; 
+  margin: 10px;
   float: right;
   }
-
-
-/*/////////////////////////////////////////////
-
-~ Note
-
-/////////////////////////////////////////////*/
-
-
-/*#index .note{ display: none;}*/
-
-.note {
-  position: relative;
-  text-align: center;
-  color: #333;
-  background: #faf9c5;
-  text-shadow: 1px 1px 1px #fff;
-  font-size: 16px;
-  border-bottom: 1px solid #bfbe78;
-	padding: 15px;
-	margin: 0;
-}
-
-.note .hide-announcement, .note .hide-messages {
-  font-size: .8em;
-  position: absolute;
-  top: 15px; right: 15px;
-  text-decoration: none;
-  color: #bfbe78;
-}
-
-.note .hide-announcement:hover, .note .hide-messages:hover {
-  color: #8c8b58;
-}
-
-.note a {
-  color: #333;
-  font-weight: bold;
-}
-
 
 .no_subs{
   clear: both;
@@ -436,7 +396,7 @@ line-height: 1em;
 
 
 #send_message{
-width: 463px !important; 
+width: 463px !important;
 }
 
 #send_message button{

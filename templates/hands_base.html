@@ -68,28 +68,36 @@
 </head>
 
 <body {% block body_attrs %}{% endblock %}>
-    {% csrf_token %}
-    {% announcement %}
-    {% if user.is_authenticated %}
-        {% messages %}
-        {% block email_confirmation_block %}
-            {% email_confirmation_notification %}
-        {% endblock %}
-    {% endif %}
-    {% require_email_dialog %}
+  {% csrf_token %}
+  <ul id="announce-banner">
+    <li>
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12">
+            {% announcement %}
+            {% if user.is_authenticated %}
+                {% messages %}
+                {% block email_confirmation_block %}
+                    {% email_confirmation_notification %}
+                {% endblock %}
+            {% endif %}
+            {% require_email_dialog %}
+          </div> <!--/col-xs-12-->
+        </div> <!--/row-->
+      </div> <!--/container-->
+    </li>
+  </ul>
+  {% include 'header.html' %}
 
 <div>
-    {% include 'header.html' %}
+  {% block main_content %}{% endblock %}
 </div>
+
 <div>
-    {% block main_content %}{% endblock %}
+  {% block footer %}
+      {% include 'footer.html' %}
+  {% endblock %}
 </div>
-
-{% block footer %}
-    {% include 'footer.html' %}
-{% endblock %}
-
-    </div>
     {% if user.is_staff or user|can_translate %}
         <div id="admin_controls">
             <ul id="site_controls">
