@@ -49,6 +49,7 @@ from teams.permissions_const import (
     ROLE_CONTRIBUTOR
 )
 from teams import tasks
+from teams import workflows
 from utils import DEFAULT_PROTOCOL
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
@@ -192,8 +193,12 @@ class Team(models.Model):
     auth_provider_code = models.CharField(_(u'authentication provider code'),
                                           max_length=24, blank=True, default="")
 
+    # code value from one the TeamWorkflow subclasses
+    workflow_type = models.CharField(max_length=2)
+
     # Enabling Features
     projects_enabled = models.BooleanField(default=False)
+    # Deprecated field that enables the tasks workflow
     workflow_enabled = models.BooleanField(default=False)
 
     # Policies and Permissions
@@ -203,6 +208,9 @@ class Team(models.Model):
     video_policy = models.IntegerField(_(u'video policy'),
                                        choices=VIDEO_POLICY_CHOICES,
                                        default=VP_MEMBER)
+
+    # The values below here are mostly specific to the tasks workflow and will
+    # probably be deleted.
     task_assign_policy = models.IntegerField(_(u'task assignment policy'),
                                              choices=TASK_ASSIGN_CHOICES,
                                              default=TASK_ASSIGN_IDS['Any team member'])
@@ -245,6 +253,12 @@ class Team(models.Model):
 
     def is_tasks_team(self):
         return self.workflow_enabled
+
+    @property
+    def new_workflow(self):
+        if not hasattr(self, '_new_workflow'):
+            self._new_workflow = workflows.TeamWorkflow.get_workflow(self)
+        return self._new_workflow
 
     def get_tasks_page_url(self):
         return reverse('teams:team_tasks', kwargs={

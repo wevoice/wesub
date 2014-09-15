@@ -1,11 +1,11 @@
 {% load i18n teams_tags %}
 
 <ul class="tabs">
-    <li{% if current == "dashboard" %} class="current" {% endif %}>
-        <a href="{% url teams:dashboard team.slug %}">
-            {% trans "Dashboard" %}
-        </a>
+    {% for page in team.new_workflow.extra_pages %}
+    <li{% if current == page.name %} class="current" {% endif %}>
+        <a href="{{ page.url }}">{{ page.title }}</a>
     </li>
+    {% endfor %}
     <li{% if current == "videos" %} class="current" {% endif %}>
         <a href="{% url teams:detail team.slug %}">
             {% trans "Videos" %}
@@ -23,14 +23,6 @@
     </li>
 
     {% if team|is_team_member:user %}
-        {% if team.workflow_enabled %}
-            <li{% if current == "tasks" %} class="current" {% endif %}>
-                <a href="{% url teams:team_tasks team.slug %}">
-                    {% trans "Tasks" %}
-                </a>
-            </li>
-        {% endif %}
-
         {% if team|can_view_settings_tab:user %}
             <li{% if current == "settings" %} class="current" {% endif %}>
                 <a href="{% url teams:settings_basic slug=team.slug %}">
