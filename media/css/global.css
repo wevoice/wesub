@@ -246,7 +246,7 @@ div.note a.hide-messages {
     width: 960px;
 }
 #main_bar #bar_wrap a img.navbar-brand {
-  margin: 6px
+  margin: 8px
 }
 #main_bar ul#bar_menu li a.navbar-search {
   padding-bottom: 15px
@@ -526,6 +526,7 @@ ul#subnav li a:hover {
 
 #footer-terms {
   margin-top: .25em;
+  padding-left: 6px;
 }
 
 #footer-terms ul {

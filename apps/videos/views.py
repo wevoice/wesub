@@ -229,9 +229,9 @@ def create(request):
             context['vidscraper_error'] = True
             return render_to_response('videos/create.html', context,
                           context_instance=RequestContext(request))
-        messages.info(request, message=_(u'''Here is the subtitle workspace for your video. You can
-share the video with friends, or get an embed code for your site.  To add or
-improve subtitles, click the button below the video.'''))
+        messages.info(request, message=_(u'''Here is the subtitle workspace for your video.
+        You can share the video with friends, or get an embed code for your site. To start
+        new subtitles, click \"Add a new language!\" in the sidebar.'''))
 
         url_obj = video.videourl_set.filter(primary=True).all()[:1].get()
         if url_obj.type != 'Y':

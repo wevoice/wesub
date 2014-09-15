@@ -149,10 +149,6 @@ p.checkbox label {
     -moz-border-radius: 5px;
     -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    /* for firefox 3.6+ */
-    /* for webkit browsers */
-    background: -webkit-gradient(linear, 0% 100%, 0% 70%, from(#edf6f8), to(#fff));
-    background: -moz-linear-gradient(0% 75% 270deg, #fff, #edf6f8);
     border-radius: 5px;
     margin: 0 auto 15px auto;
     nowhitespace: afterproperty;

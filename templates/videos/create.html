@@ -1,78 +1,98 @@
-{% extends "base.html" %}
+{% extends "hands_base.html" %}
 
 {% load i18n %}
 
 {% block body_attrs %}id="create"{% endblock %}
 
 {% block main_content %}
-<div id="submit_video_form" class="clearfix">
-    {% if vidscraper_error %}
-        {% blocktrans %}
-        "Sorry, we couldn't identify the video at the link you sent.  Perhaps
-        it's a link we don't recognize, or perhaps you've linked to a page
-        that has multiple videos.  Try entering a different link to the video
-        you want to submit.  If you think there's been some mistake,
-        <a href="mailto:feedback@universalsubtitles.org">contact us</a>!"
-        {% endblocktrans %}
-    {% endif %}
-    
-    <form action="{% url videos:create %}" method="POST" class="main_video_form clearfix">
-      <div class="clearfix">
-          {{ video_form.non_field_errors }}
-          <h2 class="main_heading">{% trans 'Subtitle a Video' %}</h2>
-          {{ video_form.video_url.errors }}
-          <input type="text" id="submit_video_field" class="prefocus main_video_form_field"{% if initial_url %} value="{{ initial_url }}"{% endif %} name="video_url" />
-          <button class="green_button big" type="submit" value="Begin">{% trans 'Begin' %}</button>
+<div id="create-banner" class="top-banner">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 col-md-11 col-lg-10">
+        <div id="submit_video_form">
+          {% if vidscraper_error %}
+            {% blocktrans %}
+              "Sorry, we couldn't identify the video at the link you sent.  Perhaps it's a link we don't recognize, or perhaps you've linked to a page that has multiple videos.  Try entering a different link to the video you want to submit.  If you think there's been some mistake, <a href="mailto:feedback@universalsubtitles.org">contact us</a>!"
+            {% endblocktrans %}
+          {% endif %}
+
+          <form action="{% url videos:create %}" method="POST" class="main_video_form">
+
+            <h1 class="main_heading">{% trans 'Subtitle a Video' %}</h1>
+            <p class="subtext create-instructions">
+              {% trans 'Enter the URL of a Vimeo, YouTube, mp4, webm, flv, or ogg video' %}
+            </p>
+
+            <input type="text" id="submit_video_field" class="prefocus main_video_form_field"{% if initial_url %} value="{{ initial_url }}"{% endif %} name="video_url" />
+            <button class="blue-green-button" type="submit" value="Begin">
+              {% trans 'Begin' %} &raquo;
+            </button>
+            {{ video_form.video_url.errors }}
+            {{ video_form.non_field_errors }}
+          </form>
+
+          <script type="text/javascript">
+            jQuery('#submit_video_field').input_replacement({
+              text: '{% trans "for example" %}: http://www.youtube.com/watch?v=h4ce747',
+              prefocus_class: 'prefocus'
+            });
+          </script>
+        </div>
       </div>
-      <p>
-          {% trans 'Enter the URL of an Ogg, WebM, flv, mp4, Youtube, Vimeo or Dailymotion video. You can also use the' %}  
-          <a href="https://github.com/pculture/unisubs/wiki/Embed-Code-Usage-Guide">amara embedder</a>
-          {% trans 'to display the subtitles and transcript on your site.' %}
-      </p>
-    </form>
-    
-    <script type="text/javascript">
-        jQuery('#submit_video_field').input_replacement({
-            text: '{% trans "for example" %}: http://www.youtube.com/watch?v=h4ce747',
-            prefocus_class: 'prefocus'
-        });
-    </script>
-    
-    <div id="submit_multiple_videos" {% if not from_feed %}style="display: none;"{% endif %}>
-      <form action="{% url videos:create_from_feed %}" method="POST" id="bulk_create" class="clearfix">
-          
-          <h3>{% trans "Automatically submit videos" %}</h3>
-          <ul>
-              {{ feed_form.as_ul }}
-          </ul>
-          <button class="green_button big">{% trans "Let's Go!" %}</button>
-      </form>
-    </div><!-- // submit_multiple_videos -->
+    </div>
+  </div>
+</div>
 
-</div><!-- // submit_video_form -->
-<div id="submit_multiple_toggle">
-  <a id="btn_submit_multiple_toggle" class="toggle-create-form" href="#">{% trans "Or Submit Multiple Videos" %}</a>
-</div><!-- // submit_multiple_toggle -->
+<div class="container whitespace">
+  <div class="row">
+    <div class="col-xs-12">
 
-<p class="prompt">
-    {% blocktrans %}
-        Help organizations and deaf and hard of hearing viewers make videos accessible around the world.
-    {% endblocktrans %}
-    <br />
-    <a href="http://blog.universalsubtitles.org/volunteer/">{% trans "Volunteer" %} →</a>
-</p>
+      <h3>Getting started with Amara</h3>
 
-<script type="text/javascript">
-    jQuery('.toggle-create-form').click(function(){
-        var $link = $(this);
-        $('#submit_multiple_videos').toggle(0, function(){
-            if ($(this).is(':visible')){
-                $link.html('{% trans "Hide" %}');
-            }else{
-                $link.html('{% trans "Or Submit Multiple Videos" %}');
-            }
-        });
-        return false;
-    });
-</script>
+      <ul>
+        <li>
+          <h5><a href="#">Creating your first subtitles</a></h5>
+        </li>
+        <li>
+          <h5><a href="#">Using the Amara subtitle editor</a></h5>
+        </li>
+        <li>
+          <h5><a href="#">Inviting your viewers to help translate</a></h5>
+        </li>
+        <li>
+          <h5><a href="#">Embedding Amara subtitles on your website</a></h5>
+        </li>
+        <li>
+          <div id="submit_multiple_videos" {% if not from_feed %}style="display: none;"{% endif %}>
+            <form action="{% url videos:create_from_feed %}" method="POST" id="bulk_create" class="clearfix">
+              <h5>{% trans "Submit Multiple Videos" %}</h5>
+              <ul>
+                  {{ feed_form.as_ul }}
+                  <li>
+                    <button class="green_button big">{% trans "Let's Go!" %}</button>
+                  </li>
+              </ul>
+            </form>
+          </div><!-- // submit_multiple_videos -->
+          <div id="submit_multiple_toggle">
+            <h5><a id="btn_submit_multiple_toggle" class="toggle-create-form" href="#">{% trans "Submit Multiple Videos" %}</a></h5>
+          </div><!-- // submit_multiple_toggle -->
+          <script type="text/javascript">
+            jQuery('.toggle-create-form').click(function(){
+              var $link = $(this);
+              $('#submit_multiple_videos').toggle(0, function(){
+                if ($(this).is(':visible')){
+                  $link.html('{% trans "Hide" %}');
+                }else{
+                  $link.html('{% trans "Submit Multiple Videos" %}');
+                }
+              });
+              return false;
+            });
+          </script>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div><!-- //index-video"-->
 {% endblock %}
