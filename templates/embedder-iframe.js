@@ -72,7 +72,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
                 currentDiv.appendChild(loadingDiv); 
 
 		var iframe = document.createElement("IFRAME");
-		iframe.src = "//" + parser.host + "/embedder-widget-iframe/";
+		iframe.src = parser.protocol + "//" + parser.host + "/embedder-widget-iframe/";
 		if (noanalytics) iframe.src += "noanalytics/";
 		iframe.src += "?data=" +
 		    encodeURIComponent(JSON.stringify(currentDiv.dataset));
