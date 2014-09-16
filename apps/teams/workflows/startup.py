@@ -31,7 +31,7 @@ def get_workflow_override(video):
     if team_video is None:
         return DONT_OVERRIDE
     team_workflow = TeamWorkflow.get_workflow(team_video.team)
-    return team_video.get_subtitle_workflow(team_video)
+    return team_workflow.get_subtitle_workflow(team_video)
 
 # register defalut team workflows
 OldTeamWorkflow.register()
