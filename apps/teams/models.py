@@ -245,8 +245,10 @@ class Team(models.Model):
         creating = self.pk is None
         super(Team, self).save(*args, **kwargs)
         if creating:
-            # make sure we create a default project
+            # create a default project
             self.default_project
+            # setup our workflow
+            self.new_workflow.setup_team()
 
     def __unicode__(self):
         return self.name or self.slug

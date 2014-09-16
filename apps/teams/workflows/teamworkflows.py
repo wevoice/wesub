@@ -30,8 +30,8 @@ Team workflows are responsible for:
     - Handling other team pages like the dashboard/tasks page
 
 ..  autoclass:: TeamWorkflow
-    :members: type_code, label, workflow_settings_view, get_subtitle_workflow,
-              extra_pages
+    :members: type_code, label, workflow_settings_view, setup_team,
+              get_subtitle_workflow, extra_pages
 
 .. autoclass:: TeamPage
 
@@ -60,6 +60,10 @@ class TeamWorkflow(object):
 
     def __init__(self, team):
         self.team = team
+
+    def setup_team(self):
+        """Do any additional setup for newly created teams."""
+        pass
 
     def get_subtitle_workflow(self, team_video):
         """Get the SubtitleWorkflow for a video with this workflow.  """
