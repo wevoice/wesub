@@ -171,7 +171,7 @@ class TeamFactory(DjangoModelFactory):
             assert create
             TeamMemberFactory.create(
                 user=extracted, team=self,
-                role=teams.models.TeamMember.ROLE_MEMBER,
+                role=teams.models.TeamMember.ROLE_CONTRIBUTOR,
             )
 
 class WorkflowFactory(DjangoModelFactory):
