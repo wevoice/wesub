@@ -856,8 +856,8 @@ div.notes {
     .heading {
         position: absolute;
         top: 1em;
-        left: 3em;
-        right: 3em;
+        left: 2em;
+        right: 2em;
 
         h3 {
             font-size: 150%;
@@ -869,9 +869,10 @@ div.notes {
         position: absolute;
         top: 3.5em;
         bottom: 10em;
-        left: 3em;
-        right: 3em;
+        left: 2em;
+        right: 2em;
         overflow: auto;
+        padding: 0 0.5em;
 
         li {
             background: $semi-dark-grey;
@@ -896,8 +897,8 @@ div.notes {
 
         height: 9em;
         bottom: 1em;
-        left: 3em;
-        right: 3em;
+        left: 2em;
+        right: 2em;
 
         textarea {
             background: #ececec;
