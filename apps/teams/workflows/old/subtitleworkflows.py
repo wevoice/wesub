@@ -210,5 +210,5 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
             tasks.incomplete_subtitle_or_translate().exists()):
             return Complete()
         else:
-            return super(TaskTeamWorkflow, self).action_for_add_subtitles(
-                user, language_code, complete)
+            return (super(TaskTeamSubtitlesWorkflow, self)
+                    .action_for_add_subtitles(user, language_code, complete))

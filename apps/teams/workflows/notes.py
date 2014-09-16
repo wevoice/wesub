@@ -20,6 +20,8 @@
 EditorNote subclass for teams
 """
 
+from django.utils.translation import ugettext as _
+
 from subtitles.workflows import EditorNotes
 from teams.models import TeamSubtitleNote
 
