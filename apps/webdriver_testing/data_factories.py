@@ -75,6 +75,7 @@ class TeamFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = Team
     name = factory.Sequence(lambda n: 'Test Team%d' % n)
     slug = factory.Sequence(lambda n: 'test-team-%d' % n)
+    workflow_type = "O"
 
 class TeamMemberFactory(factory.django.DjangoModelFactory):
     @classmethod
