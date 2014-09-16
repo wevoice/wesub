@@ -135,7 +135,8 @@ class TaskTeamEditorNotes(TeamEditorNotes):
 
     def all_assignees(self):
         task_qs = (self.team_video.task_set
-                   .filter(assignee__isnull=False)
+                   .filter(language=self.language_code,
+                           assignee__isnull=False)
                    .select_related('assignee'))
         return set(task.assignee for task in task_qs)
 
