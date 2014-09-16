@@ -87,8 +87,8 @@ def get_urlpatterns():
     """Get Django urlpatterns for URLs from our optional apps.
 
     This function finds urlpatterns inside the urls module for each optional
-    app.  In addition a module variable called PREFIX must contain the prefix
-    for the urls.
+    app.  In addition a module variable can define a variable called PREFIX to
+    add a prefix to the urlpatterns.
 
     Returns:
         url patterns containing urls for our optional apps to add to our root
@@ -105,7 +105,7 @@ def get_urlpatterns():
         try:
             prefix = url_module.PREFIX
         except AttributeError:
-            continue
+            prefix = ''
         urls_module = '{0}.urls'.format(app_name)
         urlpatterns += patterns('', url(prefix, include(urls_module,
                                                         namespace=app_name)))

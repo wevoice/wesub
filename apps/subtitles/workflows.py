@@ -29,8 +29,8 @@ particular they control:
 
 .. autoclass:: Workflow
     :members: get_work_mode, get_actions, action_for_add_subtitles,
-        get_editor_notes, get_add_language_mode, user_can_edit_subtitles,
-        user_can_view_private_subtitles
+        get_editor_notes, extra_tabs, get_add_language_mode,
+        user_can_edit_subtitles, user_can_view_private_subtitles
 .. autofunction:: get_workflow(video)
 
 Editor Notes
@@ -57,6 +57,7 @@ them.
 
 """
 
+from collections import namedtuple
 from datetime import datetime, timedelta
 
 from django.utils.translation import ugettext_lazy
@@ -138,6 +139,20 @@ class Workflow(object):
             return APIComplete()
         else:
             return Unpublish()
+
+    def extra_tabs(self, user):
+        """Get extra tabs for the videos page
+
+        Returns:
+            list of (name, title) tuples.  name is used for the tab id, title
+            is a human friendly title.  For each tab name you should create a
+            video-<name>.html and video-<name>-tab.html templates.  If you
+            need to pass variables to those templates, create a
+            setup_tab_<name> method that inputs the same args as the methods
+            from VideoPageContext and returns a dict of variables for the
+            template.
+        """
+        return []
 
     def get_add_language_mode(self, user):
         """Control the add new language section of the video page

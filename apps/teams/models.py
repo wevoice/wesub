@@ -194,6 +194,11 @@ class Team(models.Model):
                                           max_length=24, blank=True, default="")
 
     # code value from one the TeamWorkflow subclasses
+    # Since other apps can add workflow types, let's use this system to avoid
+    # conflicts:
+    #   - Core types are defined in the teams app and 1 char long
+    #   - Extention types are defined on other apps.  They are 2 chars long,
+    #     with the first one being unique to the app.
     workflow_type = models.CharField(max_length=2)
 
     # Enabling Features
@@ -1169,6 +1174,13 @@ class TeamMember(models.Model):
                 return True
         return False
 
+    def is_manager(self):
+        """Test if the user is a manager or above."""
+        return self.role in (ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER)
+
+    def is_admin(self):
+        """Test if the user is an admin or owner."""
+        return self.role in (ROLE_OWNER, ROLE_ADMIN)
 
     class Meta:
         unique_together = (('team', 'user'),)
