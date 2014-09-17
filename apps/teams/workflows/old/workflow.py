@@ -42,6 +42,7 @@ class OldTeamWorkflow(TeamWorkflow):
 
     type_code = 'O'
     label = _('Old Style')
+    dashboard_view = staticmethod(views.old_dashboard)
     workflow_settings_view = staticmethod(views.old_team_settings_permissions)
 
     def get_subtitle_workflow(self, team_video):
@@ -52,9 +53,7 @@ class OldTeamWorkflow(TeamWorkflow):
             return TeamSubtitlesWorkflow(team_video)
 
     def extra_pages(self):
-        pages = [
-            self.team_page('dashboard', _('Dashboard'), 'teams:dashboard'),
-        ]
+        pages = [ ]
         if self.team.is_tasks_team():
             pages.append(self.team_page('tasks', _('Tasks'),
                                         'teams:team_tasks'))

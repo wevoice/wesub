@@ -1457,11 +1457,12 @@ def _get_task_filters(request):
              'assignee': request.GET.get('assignee'),
              'q': request.GET.get('q'), }
 
-@timefn
-@render_to('teams/dashboard.html')
 def dashboard(request, slug):
-
     team = get_team_for_view(slug, request.user, exclude_private=False)
+    return team.new_workflow.dashboard_view(request, team)
+
+@render_to('teams/dashboard.html')
+def old_dashboard(request, team):
     user = request.user if request.user.is_authenticated() else None
     try:
         member = team.members.get(user=user)

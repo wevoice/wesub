@@ -1,6 +1,11 @@
 {% load i18n teams_tags %}
 
 <ul class="tabs">
+    <li{% if current == "dashboard" %} class="current" {% endif %}>
+        <a href="{% url teams:dashboard team.slug %}">
+            {% trans "Dashboard" %}
+        </a>
+    </li>
     {% for page in team.new_workflow.extra_pages %}
     <li{% if current == page.name %} class="current" {% endif %}>
         <a href="{{ page.url }}">{{ page.title }}</a>

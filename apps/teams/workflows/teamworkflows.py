@@ -27,11 +27,12 @@ features.
 Team workflows are responsible for:
     - Providing a SubtitleWorkflow for team videos
     - Handling the workflow settings page
-    - Handling other team pages like the dashboard/tasks page
+    - Handling the dashboard page
+    - Creating extra tabs or the teams section
 
 ..  autoclass:: TeamWorkflow
-    :members: type_code, label, workflow_settings_view, setup_team,
-              get_subtitle_workflow, extra_pages
+    :members: type_code, label, dashboard_view, workflow_settings_view,
+              setup_team, get_subtitle_workflow, extra_pages
 
 .. autoclass:: TeamPage
 
@@ -49,6 +50,11 @@ class TeamWorkflow(object):
     """Human-friendly name for this workflow.  This is what appears on the
     team creation form.
     """
+    dashboard_view = NotImplemented
+    """
+    view function for the dashboard page.
+    """
+
     workflow_settings_view = NotImplemented
     """
     view function for the workflow settings page.
