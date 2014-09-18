@@ -410,12 +410,12 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
     _strip_nones(data)
 
     version = sl.add_version(subtitles=subtitles, **data)
+    _perform_team_operations(version, committer, action)
     if action:
         action.perform(author, video, sl, version)
 
     _update_video_data(sl, version)
     _update_followers(sl, author)
-    _perform_team_operations(version, committer, action)
 
     if origin in (ORIGIN_UPLOAD, ORIGIN_API):
         _fork_dependents(sl)
