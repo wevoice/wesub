@@ -62,6 +62,7 @@ class ViewsTests(TestCase):
             "video_url": u"",
             "membership_policy": u"4",
             "video_policy": u"1",
+            "workflow_type": u"O",
             "logo": u"",
             "slug": u"new-team",
             "name": u"New team"

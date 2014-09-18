@@ -33,10 +33,7 @@ from utils.factories import *
 from utils.translation import get_language_choices
 
 class TestVideoForm(TestCase):
-    @test_utils.patch_for_test('videos.forms.url_exists')
-    def setUp(self, mock_url_exists):
-        self.mock_url_exists = mock_url_exists
-        mock_url_exists.return_value = True
+    def setUp(self):
         self.vimeo_urls = ("http://vimeo.com/17853047",)
         self.youtube_urls = ("http://youtu.be/HaAVZ2yXDBo",
                              "http://www.youtube.com/watch?v=HaAVZ2yXDBo")
@@ -72,8 +69,9 @@ class TestVideoForm(TestCase):
     def test_dailymotion_urls(self):
         self._test_urls(self.daily_motion_urls)
 
-    def test_file_not_found_urls(self):
-        self.mock_url_exists.return_value = False
+    @test_utils.patch_for_test('utils.http.url_exists')
+    def test_file_not_found_urls(self, mock_url_exists):
+        mock_url_exists.return_value = False
         urls_to_test = [
             self.youtube_urls[0],
             self.vimeo_urls[0],

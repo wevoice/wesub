@@ -199,7 +199,7 @@ class Team(models.Model):
     #   - Core types are defined in the teams app and 1 char long
     #   - Extention types are defined on other apps.  They are 2 chars long,
     #     with the first one being unique to the app.
-    workflow_type = models.CharField(max_length=2)
+    workflow_type = models.CharField(max_length=2, default='O')
 
     # Enabling Features
     projects_enabled = models.BooleanField(default=False)

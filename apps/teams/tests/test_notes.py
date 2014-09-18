@@ -23,7 +23,8 @@ from nose.tools import *
 
 from subtitles import workflows
 from teams.models import TeamSubtitleNote, Task
-from teams.workflows import TaskTeamEditorNotes, TeamEditorNotes
+from teams.workflows.notes import TeamEditorNotes
+from teams.workflows.old.subtitleworkflows import TaskTeamEditorNotes
 from utils import test_utils
 from utils.factories import *
 
@@ -68,7 +69,7 @@ class TestTaskTeamNotes(TestCase):
         assert_equals(len(kwargs), 0)
         mock_send_messages.reset_mock()
 
-    @test_utils.patch_for_test('teams.workflows'
+    @test_utils.patch_for_test('teams.workflows.old.subtitleworkflows'
                                '.TaskTeamEditorNotes.send_messages')
     def test_emails(self, mock_send_messages):
         subtitler = UserFactory()

@@ -37,10 +37,7 @@ class TeamAddVideosTest(FeedImportTest):
         data = { 'feed_url': feed_url, }
         self.client.post(url, data)
 
-        import_task = test_utils.import_videos_from_feed.delay
-        self.assertEquals(import_task.call_count, 1)
-        feed_id = import_task.call_args[0][0]
-        feed = VideoFeed.objects.get(id=feed_id)
+        feed = VideoFeed.objects.get(url=feed_url)
         self.assertEquals(feed.url, feed_url)
         self.assertEquals(feed.team, team)
         self.assertEquals(feed.user, user)
