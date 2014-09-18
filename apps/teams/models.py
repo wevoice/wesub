@@ -267,6 +267,9 @@ class Team(models.Model):
             self._new_workflow = workflows.TeamWorkflow.get_workflow(self)
         return self._new_workflow
 
+    def is_old_style(self):
+        return self.workflow_type == "O"
+
     def get_tasks_page_url(self):
         return reverse('teams:team_tasks', kwargs={
             'slug': self.slug,
