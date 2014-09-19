@@ -42,7 +42,10 @@ else:
         '/flowplayer/', document_root=os.path.join(settings.STATIC_ROOT, 'flowplayer')
     ) + static(
         '/fonts/', document_root=os.path.join(settings.STATIC_ROOT, 'fonts')
-    ) + static('/admin/', document_root=utils.admin_media_root())
+    )
+
+    for static_dir in utils.app_static_media_dirs():
+        urlpatterns += static('/', document_root=static_dir)
 
 if settings.DEBUG:
     urlpatterns += patterns(
