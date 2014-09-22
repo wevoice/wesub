@@ -180,6 +180,7 @@ INSTALLED_APPS = (
     'rosetta',
     'raven.contrib.django',
     'south',
+    'rest_framework',
     'tastypie',
     # third party apps forked on our repo
     'localeurl',

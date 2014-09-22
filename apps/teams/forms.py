@@ -36,6 +36,7 @@ from teams.permissions import (
     can_assign_task, can_delete_language, can_remove_video
 )
 from teams.permissions_const import ROLE_NAMES
+from teams.workflows import TeamWorkflow
 from videos.forms import (AddFromFeedForm, language_choices_with_empty,
                                CreateSubtitlesForm,
                                MultiVideoCreateSubtitlesForm)
@@ -254,22 +255,23 @@ class AddTeamVideosFromFeedForm(AddFromFeedForm):
 
 class CreateTeamForm(BaseVideoBoundForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
+    workflow_type = forms.ChoiceField(choices=(), initial="O")
 
     class Meta:
         model = Team
-        fields = ('name', 'slug', 'description', 'logo', 'is_moderated',
+        fields = ('name', 'slug', 'description', 'logo', 'workflow_type',
                   'is_visible', 'video_url')
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(CreateTeamForm, self).__init__(*args, **kwargs)
+        self.fields['workflow_type'].choices = TeamWorkflow.get_choices()
         self.fields['video_url'].label = _(u'Team intro video URL')
         self.fields['video_url'].required = False
         self.fields['video_url'].help_text = _(u'''You can put an optional video
 on your team homepage that explains what your team is about, to attract volunteers.
 Enter a link to any compatible video, or to any video page on our site.''')
         self.fields['is_visible'].widget.attrs['class'] = 'checkbox'
-        self.fields['is_moderated'].widget.attrs['class'] = 'checkbox'
         self.fields['slug'].label = _(u'Team URL: http://universalsubtitles.org/teams/')
 
     def clean_slug(self):

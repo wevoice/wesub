@@ -273,11 +273,14 @@ def shortlink(request, encoded_pk):
 
 class VideoPageContext(dict):
     """Context dict for the video page."""
-    def __init__(self, request, video, video_url, tab, tab_only=False):
+    def __init__(self, request, video, video_url, tab, workflow,
+                 tab_only=False):
         dict.__init__(self)
+        self.workflow = workflow
         self['video'] = video
         self['create_subtitles_form'] = CreateSubtitlesForm(
             request, video, request.POST or None)
+        self['extra_tabs'] = workflow.extra_tabs(request.user)
         if not tab_only:
             video.prefetch_languages(with_public_tips=True,
                                      with_private_tips=True)
@@ -285,7 +288,6 @@ class VideoPageContext(dict):
         self.setup_tab(request, video, video_url, tab)
 
     def setup(self, request, video, video_url):
-        self.workflow = get_workflow(video)
         language_for_locale = video.subtitle_language(request.LANGUAGE_CODE)
         if language_for_locale:
             metadata = language_for_locale.get_metadata()
@@ -319,11 +321,24 @@ class VideoPageContext(dict):
                    title=video.title_display())
 
     def setup_tab(self, request, video, video_url, tab):
-        setup_tab_method = getattr(self, 'setup_tab_%s' % tab, None)
-        if setup_tab_method is not None:
-            setup_tab_method(request, video, video_url, tab)
+        for name, title in self['extra_tabs']:
+            if tab == name:
+                self['extra_tab'] = True
+                self.setup_extra_tab(request, video, video_url, tab)
+                return
+        self['extra_tab'] = False
+        method_name = 'setup_tab_%s' % tab
+        setup_tab_method = getattr(self, method_name, None)
+        if setup_tab_method:
+            setup_tab_method(request, video, video_url)
 
-    def setup_tab_video(self, request, video, video_url, tab):
+    def setup_extra_tab(self, request, video, video_url, tab):
+        method_name = 'setup_tab_%s' % tab
+        setup_tab_method = getattr(self.workflow, method_name, None)
+        if setup_tab_method:
+            self.update(setup_tab_method(request, video, video_url))
+
+    def setup_tab_video(self, request, video, video_url):
         self['width'] = "620"
         self['height'] = "370"
         self['video_url'] = video.get_video_url()
@@ -331,6 +346,17 @@ class VideoPageContext(dict):
 @get_video_from_code
 def redirect_to_video(request, video):
     return redirect(video, permanent=True)
+
+def calc_tab(request, workflow):
+    tab = request.GET.get('tab')
+    if tab in ('urls', 'comments', 'activity', 'video'):
+        return tab # default tab
+    for name, title in workflow.extra_tabs(request.user):
+        if name == tab:
+            # workflow extra tab
+            return tab
+    # invalid tab, force it to be video
+    return 'video'
 
 @get_video_from_code
 def video(request, video, video_url=None, title=None):
@@ -349,19 +375,17 @@ def video(request, video, video_url=None, title=None):
     if request.method != 'POST':
         video.update_view_counter()
 
-    tab = request.GET.get('tab')
-    if tab not in ('urls', 'comments', 'activity', 'video'):
-        # force tab to be video if it doesn't match either of the other
-        # tabs
-        tab = 'video'
+    workflow = get_workflow(video)
+
+    tab = calc_tab(request, workflow)
 
     if request.is_ajax():
-        context = VideoPageContext(request, video, video_url, tab,
+        context = VideoPageContext(request, video, video_url, tab, workflow,
                                    tab_only=True)
         template_name = 'videos/video-%s-tab.html' % tab
     else:
         template_name = 'videos/video-%s.html' % tab
-        context = VideoPageContext(request, video, video_url, tab)
+        context = VideoPageContext(request, video, video_url, tab, workflow)
     context['tab'] = tab
 
     if context['create_subtitles_form'].is_valid():

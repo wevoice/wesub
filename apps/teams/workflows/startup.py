@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2014 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,6 +16,22 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-# make sure we load our modules
-import teams.signalhandlers
-import teams.workflows.startup
+"""
+Team workflow startup code
+"""
+
+from utils.behaviors import DONT_OVERRIDE
+import subtitles.workflows
+from teams.workflows import TeamWorkflow
+from teams.workflows.old import OldTeamWorkflow
+
+@subtitles.workflows.get_workflow.override
+def get_workflow_override(video):
+    team_video = video.get_team_video()
+    if team_video is None:
+        return DONT_OVERRIDE
+    team_workflow = TeamWorkflow.get_workflow(team_video.team)
+    return team_workflow.get_subtitle_workflow(team_video)
+
+# register defalut team workflows
+OldTeamWorkflow.register()

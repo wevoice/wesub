@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2013 Participatory Culture Foundation
+# Copyright (C) 2014 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,6 +16,10 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+"""
+SubtitleWorkflow classes for old-style teams
+"""
+
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -23,17 +27,17 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
 from messages.models import Message
-from subtitles import workflows
 from subtitles.signals import subtitles_published
-from teams.models import Task, TeamSubtitleNote
+from teams.models import Task
 from teams.permissions import can_create_and_edit_subtitles
+from teams.workflows.notes import TeamEditorNotes
 from utils import send_templated_email
 from utils import translation
-from utils.behaviors import DONT_OVERRIDE
 from utils.text import fmt
 from videos.tasks import video_changed_tasks
+import subtitles.workflows
 
-class TaskAction(workflows.Action):
+class TaskAction(subtitles.workflows.Action):
     def send_signals(self, subtitle_language, version):
         # If we perform any action and it results in a public version, then we
         # should send the subtitles_published signal.
@@ -107,25 +111,6 @@ class SendBack(TaskAction):
         _complete_task(user, video, subtitle_language, saved_version,
                        Task.APPROVED_IDS['Rejected'])
 
-class TeamEditorNotes(workflows.EditorNotes):
-    def __init__(self, team_video, language_code):
-        self.team = team_video.team
-        self.video = team_video.video
-        self.team_video = team_video
-        self.language_code = language_code
-        self.heading = _('Team Notes')
-        self.notes = list(TeamSubtitleNote.objects
-                          .filter(video=self.video, team=self.team,
-                                  language_code=language_code)
-                          .order_by('created')
-                          .select_related('user'))
-
-    def post(self, user, body):
-        return TeamSubtitleNote.objects.create(
-            team=self.team, video=self.video,
-            language_code=self.language_code,
-            user=user, body=body)
-
 class TaskTeamEditorNotes(TeamEditorNotes):
     def post(self, user, body):
         note = super(TaskTeamEditorNotes, self).post(user, body)
@@ -166,9 +151,9 @@ class TaskTeamEditorNotes(TeamEditorNotes):
                 user=user, subject=subject,
                 content=render_to_string(message_template, data))
 
-class TeamWorkflow(workflows.DefaultWorkflow):
+class TeamSubtitlesWorkflow(subtitles.workflows.DefaultWorkflow):
     def __init__(self, team_video):
-        workflows.DefaultWorkflow.__init__(self, team_video.video)
+        subtitles.workflows.DefaultWorkflow.__init__(self, team_video.video)
         self.team_video = team_video
 
     def get_editor_notes(self, language_code):
@@ -180,7 +165,8 @@ class TeamWorkflow(workflows.DefaultWorkflow):
     def user_can_edit_subtitles(self, user, language_code):
         return can_create_and_edit_subtitles(user, self.team_video,
                                              language_code)
-class TaskTeamWorkflow(TeamWorkflow):
+
+class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
     def get_work_mode(self, user, language_code):
         task = self.team_video.get_task_for_editor(language_code)
         if task is not None:
@@ -191,9 +177,9 @@ class TaskTeamWorkflow(TeamWorkflow):
             else:
                 # get_task_for_editor should only return approve/review tasks
                 raise ValueError("Wrong task type: %s" % task)
-            return workflows.ReviewWorkMode(heading)
+            return subtitles.workflows.ReviewWorkMode(heading)
         else:
-            return workflows.NormalWorkMode()
+            return subtitles.workflows.NormalWorkMode()
 
     def get_actions(self, user, language_code):
         task = self.team_video.get_task_for_editor(language_code)
@@ -225,15 +211,5 @@ class TaskTeamWorkflow(TeamWorkflow):
             tasks.incomplete_subtitle_or_translate().exists()):
             return Complete()
         else:
-            return super(TaskTeamWorkflow, self).action_for_add_subtitles(
-                user, language_code, complete)
-
-@workflows.get_workflow.override
-def get_team_workflow(video):
-    team_video = video.get_team_video()
-    if team_video is None:
-        return DONT_OVERRIDE
-    if team_video.team.is_tasks_team():
-        return TaskTeamWorkflow(team_video)
-    else:
-        return TeamWorkflow(team_video)
+            return (super(TaskTeamSubtitlesWorkflow, self)
+                    .action_for_add_subtitles(user, language_code, complete))

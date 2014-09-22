@@ -49,6 +49,7 @@ from teams.permissions_const import (
     ROLE_CONTRIBUTOR
 )
 from teams import tasks
+from teams import workflows
 from utils import DEFAULT_PROTOCOL
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
@@ -192,8 +193,17 @@ class Team(models.Model):
     auth_provider_code = models.CharField(_(u'authentication provider code'),
                                           max_length=24, blank=True, default="")
 
+    # code value from one the TeamWorkflow subclasses
+    # Since other apps can add workflow types, let's use this system to avoid
+    # conflicts:
+    #   - Core types are defined in the teams app and 1 char long
+    #   - Extention types are defined on other apps.  They are 2 chars long,
+    #     with the first one being unique to the app.
+    workflow_type = models.CharField(max_length=2, default='O')
+
     # Enabling Features
     projects_enabled = models.BooleanField(default=False)
+    # Deprecated field that enables the tasks workflow
     workflow_enabled = models.BooleanField(default=False)
 
     # Policies and Permissions
@@ -203,6 +213,9 @@ class Team(models.Model):
     video_policy = models.IntegerField(_(u'video policy'),
                                        choices=VIDEO_POLICY_CHOICES,
                                        default=VP_MEMBER)
+
+    # The values below here are mostly specific to the tasks workflow and will
+    # probably be deleted.
     task_assign_policy = models.IntegerField(_(u'task assignment policy'),
                                              choices=TASK_ASSIGN_CHOICES,
                                              default=TASK_ASSIGN_IDS['Any team member'])
@@ -237,14 +250,25 @@ class Team(models.Model):
         creating = self.pk is None
         super(Team, self).save(*args, **kwargs)
         if creating:
-            # make sure we create a default project
+            # create a default project
             self.default_project
+            # setup our workflow
+            self.new_workflow.setup_team()
 
     def __unicode__(self):
         return self.name or self.slug
 
     def is_tasks_team(self):
         return self.workflow_enabled
+
+    @property
+    def new_workflow(self):
+        if not hasattr(self, '_new_workflow'):
+            self._new_workflow = workflows.TeamWorkflow.get_workflow(self)
+        return self._new_workflow
+
+    def is_old_style(self):
+        return self.workflow_type == "O"
 
     def get_tasks_page_url(self):
         return reverse('teams:team_tasks', kwargs={
@@ -1153,6 +1177,13 @@ class TeamMember(models.Model):
                 return True
         return False
 
+    def is_manager(self):
+        """Test if the user is a manager or above."""
+        return self.role in (ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER)
+
+    def is_admin(self):
+        """Test if the user is an admin or owner."""
+        return self.role in (ROLE_OWNER, ROLE_ADMIN)
 
     class Meta:
         unique_together = (('team', 'user'),)

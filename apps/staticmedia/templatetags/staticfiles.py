@@ -16,6 +16,12 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-# make sure we load our modules
-import teams.signalhandlers
-import teams.workflows.startup
+from django import template
+
+from staticmedia import utils
+
+register = template.Library()
+
+@register.simple_tag
+def static(path):
+    return utils.static_url() + path

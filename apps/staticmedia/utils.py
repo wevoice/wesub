@@ -20,7 +20,6 @@ import os
 import subprocess
 
 from django.conf import settings
-import django.contrib.admin
 
 import commit
 
@@ -71,8 +70,11 @@ def run_command(commandline, stdin=None):
     else:
         return stdout
 
-def admin_media_root():
-    """Get the root directory for admin media
-    """
-    admin_root = os.path.dirname(django.contrib.admin.__file__)
-    return os.path.join(admin_root, 'static', 'admin')
+def app_static_media_dirs():
+    static_media_dirs = []
+    for app in settings.INSTALLED_APPS:
+        module = __import__(app)
+        static_dir = os.path.join(os.path.dirname(module.__file__), 'static')
+        if os.path.exists(static_dir):
+            static_media_dirs.append(static_dir)
+    return static_media_dirs
