@@ -110,19 +110,17 @@ if [ -z "$SKIP_CODE_PULL" ] ; then
         INTEGRATION_REV=`cat ../optional/unisubs-integration`
         git reset --hard $INTEGRATION_REV
     fi
-    if [ -e $APP_DIR/amara-vimeo ]; then
-        cd $APP_DIR/amara-vimeo
-        git fetch
-        git checkout master
-        INTEGRATION_REV=`cat ../optional/amara-vimeo`
-        git reset --hard $INTEGRATION_REV
-    fi
     if [ -e $APP_DIR/amara-enterprise ]; then
         cd $APP_DIR/amara-enterprise
         git fetch
         git checkout master
         INTEGRATION_REV=`cat ../optional/amara-enterprise`
         git reset --hard $INTEGRATION_REV
+    fi
+    if [ -e $APP_DIR/amara-vimeo ]; then
+        cd $APP_DIR
+        # this is a hack because something depends on this file; no idea
+        touch ./optional/amara-vimeo
     fi
 fi
 cd $APP_DIR
