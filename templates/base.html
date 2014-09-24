@@ -51,18 +51,15 @@
 
 <body {% block body_attrs %}{% endblock %}>
     {% csrf_token %}
-    <ul id="announce-banner">
-      <li>
-        {% announcement %}
-        {% if user.is_authenticated %}
-            {% messages %}
-            {% block email_confirmation_block %}
-                {% email_confirmation_notification %}
-            {% endblock %}
-        {% endif %}
-        {% require_email_dialog %}
-      </li>
-    </ul>
+    {% announcement %}
+    {% if user.is_authenticated %}
+        {% messages %}
+        {% block email_confirmation_block %}
+            {% email_confirmation_notification %}
+        {% endblock %}
+    {% endif %}
+    {% require_email_dialog %}
+
 
     <div class="help-tab">
       <a href="//support.universalsubtitles.org/solution/categories/13504">{% trans 'Get Help' %}</a>
@@ -72,9 +69,9 @@
         <a href="/"><img class="navbar-brand" src="{{ STATIC_URL }}images/amara-o.png" /></a>
         <div id="bar_right">
           <ul id="bar_menu" class="clearfix">
-            <li id="nav_submit"><a href="{% url videos:create %}">{% trans 'Subtitle a Video' %}</a></li>
-            <li><a href="http://about.amara.org/volunteer/">{% trans "Join the Community" %}</a></li>
-            <li><a href="http://pro.amara.org">{% trans "Pro Services" %}</a></li>
+            <li id="nav_submit"><a href="{% url videos:create %}">{% trans 'Subtitle Editor' %}</a></li>
+            <li><a href="http://about.amara.org/volunteer/">Amara {% trans "Community" %}</a></li>
+            <li><a href="http://pro.amara.org">{% trans "Professional Services" %}</a></li>
             <li>
               <a class="navbar-search" href="/search/#/?q=">
                 <img alt="Search" src="{{ STATIC_URL }}images//glyphicons_027_search-light.png">

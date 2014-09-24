@@ -1,13 +1,22 @@
-/*SHARED STYLES */
+/* SHARED STYLES */
 
 .top-banner h1 {
 	margin-top: 80px;
 	width: 90%;
 }
 
-.whitespace {
+.whitespace-tall {
 	min-height: 400px;
 	color: #656565;
+}
+
+.whitespace {
+	color: #656565;
+}
+
+
+.whitespace h5 {
+	font-weight: 200;
 }
 
 .subtext {
@@ -35,10 +44,6 @@ ul {
 	background: url(../images/index-bg-hands.png) no-repeat center;
 }
 
-#index-banner h5 {
-	width: 80%;
-}
-
 #index-two-tone {
 	background: #277F6A; /* Old browsers */
 	background: -moz-linear-gradient(left,  #277F6A 50%, #3EA286 50%); /* FF3.6+ */
@@ -48,6 +53,10 @@ ul {
 	background: -ms-linear-gradient(left,  #277F6A 50%,#3EA286 50%); /* IE10+ */
 	background: linear-gradient(to right,  #277F6A 50%,#3EA286 50%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#277F6A', endColorstr='#3EA286',GradientType=1 ); /* IE6-9 */
+}
+
+#index-banner {
+	height: 360px;
 }
 
 .infobox h2 {
@@ -64,7 +73,7 @@ ul {
 	padding: 13px 26px;
 	color: #f2f2f3;
 	text-decoration:none;
-	margin-top: 17.5em;
+	margin-top: 16.5em;
 }
 
 .infobox h4 a:hover {
@@ -75,7 +84,7 @@ ul {
 	min-height: 472px;
 }
 
-/*INDEX-INDIVIDUALS*/
+/* INDEX-INDIVIDUALS */
 
 #index-individuals {
 	background: url(../images/index-bg-individuals.png) no-repeat center top #3EA286;
@@ -85,7 +94,7 @@ ul {
 	background-color: #277F6A;
 }
 
-/*INDEX-COMMUNITY*/
+/* INDEX-COMMUNITY */
 
 #index-community {
 	background: url(../images/index-bg-community.png) no-repeat center top #3F9B45;
@@ -105,7 +114,7 @@ ul {
 	width: 90%;
 }
 
-/*INDEX-PRO*/
+/* INDEX-PRO */
 
 #index-pro {
 	background: url(../images/index-bg-pro.png) no-repeat center top #297E6A;
@@ -115,7 +124,7 @@ ul {
 	background-color: #41A184;
 }
 
-/*INDEX-HILLS*/
+/* INDEX-HILLS */
 
 #index-hills {
 	background: url(../images/index-bg-rolling-hills.png) repeat-x center bottom #31CDAC;
@@ -167,7 +176,7 @@ ul {
 	margin: 10px 0 0 10px;
 }
 
-#create .whitespace h3{
+#create .whitespace-tall h3{
 	margin-top: 35px;
 }
 
@@ -183,8 +192,65 @@ ul {
 	display: block;
 }
 
+/* COMMUNITY PAGE */
 
-/*MOBILE TWEAKS INDEX*/
+#community-banner {
+	min-height: 300px;
+	background: url(../images/community-bg-twohands.png) no-repeat center #3f9b45;
+}
+
+h1.community-header {
+	margin: 45px 0 15px 0;
+}
+
+h5.community-header {
+	margin-bottom: 15px;
+}
+
+.mini-banner-header {
+	width: 100%;
+	background-color: #3f9b45;
+	color: #fff;
+	margin: 35px 0 35px 0;
+}
+
+.mini-banner-header h4 {
+	font-size: 22px;
+	font-weight: 200;
+}
+
+.community-directory div.community-directory-listing {
+	color: #656565;
+}
+
+.community-directory-listing-frame {
+	width: inherit;
+	height: 120px;
+	text-align: center;
+	display: table-cell;
+	vertical-align: middle;
+	background-color: #fff;
+	border: 1px solid #656565;
+	margin-top: 15px
+}
+
+.community-directory-listing h4 {
+	font-weight: 300;
+	margin: 15px 0 5px 0;
+	color: #297e6a;
+}
+
+.community-directory-listing h6 {
+	font-weight: 300;
+	margin-bottom: 30px;
+}
+
+#community #footer {
+	margin-top:25px;
+}
+
+
+/* MOBILE TWEAKS INDEX */
 
 @media (max-width: 768px) {
 
@@ -196,6 +262,8 @@ ul {
 	.infobox h4, .infobox h4 a, #index-community .infobox h4 a {
 		margin-top: 0;
 	}
+
+	/* INDEX */
 
 	#index-banner {
 		background-image: none;
@@ -217,18 +285,42 @@ ul {
 		margin-top: 9em;
 	}
 
-#index-community .infobox span {
-	float: left;
-}
+	#index-community .infobox span {
+		float: left;
+	}
 
 	#index-community .infobox h4 {
 		float: right;
 	}
 }
 
-/*BIG SCREEN TWEAKS INDEX*/
+/* SMALL SCREEN TWEAKS*/
+
+@media (min-width: 768px) {
+
+/* INDEX */
+
+	#index-banner h5 {
+		width: 75%;
+	}
+}
+
+/* SMALL SCREEN TWEAKS*/
+
+@media (min-width: 992px) {
+
+/* INDEX */
+
+	#index-banner h5 {
+		width: 90%;
+	}
+}
+
+/* BIG SCREEN TWEAKS*/
 
 @media (min-width: 1200px) {
+
+/* INDEX */
 
 	#index-banner h1 {
 		width: 65%;

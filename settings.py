@@ -403,15 +403,15 @@ MEDIA_BUNDLES = {
     },
     "hands_home.css": {
         "files": (
-            "css/dean/header-footer.css",
-            "css/dean/index.css",
-            "css/dean/main.css",
+            "css/hands-header-footer.css",
+            "css/hands-static.css",
+            "css/hands-main.css",
          )
     },
-    "dean.js": {
+    "hands_home.js": {
         "files": (
-            "js/dean-js/plugins.js",
-            "js/dean-js/vendor/modernizr-2.6.2.min.js",
+            "js/hands-plugins.js",
+            "js/hands-modernizr-2.6.2.min.js",
          )
     },
     "site.js": {

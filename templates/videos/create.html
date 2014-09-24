@@ -43,7 +43,7 @@
   </div>
 </div>
 
-<div class="container whitespace">
+<div class="container whitespace-tall">
   <div class="row">
     <div class="col-xs-12">
 
@@ -51,18 +51,18 @@
 
       <ul>
         <li>
-          <h5><a href="#">Creating your first subtitles</a></h5>
+          <h5><a href="#">{% trans 'Learning the Amara subtitle editor' %}</a></h5>
         </li>
         <li>
-          <h5><a href="#">Using the Amara subtitle editor</a></h5>
+          <h5><a href="#">{% trans 'How to use your completed subtitles' %}</a></h5>
         </li>
         <li>
-          <h5><a href="#">Inviting your viewers to help translate</a></h5>
+          <h5><a href="#">{% trans 'Inviting friends and fans to caption &amp; translate' %}</a></h5>
         </li>
         <li>
-          <h5><a href="#">Embedding Amara subtitles on your website</a></h5>
+          <h5><a href="#">{% trans 'Professional solutions for professional video' %}</a></h5>
         </li>
-        <li>
+        <!--<li>
           <div id="submit_multiple_videos" {% if not from_feed %}style="display: none;"{% endif %}>
             <form action="{% url videos:create_from_feed %}" method="POST" id="bulk_create" class="clearfix">
               <h5>{% trans "Submit Multiple Videos" %}</h5>
@@ -73,10 +73,10 @@
                   </li>
               </ul>
             </form>
-          </div><!-- // submit_multiple_videos -->
+          </div>
           <div id="submit_multiple_toggle">
             <h5><a id="btn_submit_multiple_toggle" class="toggle-create-form" href="#">{% trans "Submit Multiple Videos" %}</a></h5>
-          </div><!-- // submit_multiple_toggle -->
+          </div>
           <script type="text/javascript">
             jQuery('.toggle-create-form').click(function(){
               var $link = $(this);
@@ -90,9 +90,9 @@
               return false;
             });
           </script>
-        </li>
+        </li>-->
       </ul>
     </div>
   </div>
-</div><!-- //index-video"-->
+</div>
 {% endblock %}
