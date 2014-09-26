@@ -120,7 +120,7 @@ if [ -z "$SKIP_CODE_PULL" ] ; then
     if [ -e $APP_DIR/amara-vimeo ]; then
         cd $APP_DIR
         # this is a hack because something depends on this file; no idea
-        touch ./optional/amara-vimeo
+        echo "master" > ./optional/amara-vimeo
     fi
 fi
 cd $APP_DIR
