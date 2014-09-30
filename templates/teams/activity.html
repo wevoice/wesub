@@ -10,7 +10,8 @@
 
 {% block view_content %}
 
-    <div class="view grid_8 omega">
+    {% if team.is_old_style %}<div class="grid_8 view omega">{% else %}<div class="view">{% endif %}
+
         {% with "activity" as current %}
             {% include "teams/_tabs.html" %}
         {% endwith %}

@@ -496,7 +496,7 @@ class Page(object):
         self.browser.get(self.get_absolute_url(url))
         if alert_check:
             self.handle_js_alert('accept')
-        self.wait_for_element_visible('body')
+        self.wait_for_element_visible('div')
 
     def go_back(self):
         """Go back to previous page.  """

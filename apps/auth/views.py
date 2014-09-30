@@ -111,13 +111,16 @@ def delete_user(request):
 def login_post(request):
     redirect_to = make_redirect_to(request)
     form = AuthenticationForm(data=request.POST, label_suffix="")
-    if form.is_valid():
-        auth_login(request, form.get_user())
-        if request.session.test_cookie_worked():
-            request.session.delete_test_cookie()
-        return HttpResponseRedirect(redirect_to)
-    else:
-        return render_login(request, CustomUserCreationForm(label_suffix=""), form, redirect_to)
+    try:
+        if form.is_valid():
+            auth_login(request, form.get_user())
+            if request.session.test_cookie_worked():
+                request.session.delete_test_cookie()
+            return HttpResponseRedirect(redirect_to)
+        else:
+            return render_login(request, CustomUserCreationForm(label_suffix=""), form, redirect_to)
+    except ValueError:
+            return render_login(request, CustomUserCreationForm(label_suffix=""), form, redirect_to)
 
 
 def token_login(request, token):

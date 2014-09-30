@@ -16,40 +16,38 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-"""util.behaviors -- Define extensible behavior functions
+"""
+Extensible behavior functions
 
 This module allows one app to define a "behavior function", which other apps
-can then override to change the behavior.  Using the behavior mechanism allows
-things to be loosely coupled, because the original function doesn't need to
-have any specific knowledge about the override function.
+can then override to change the behavior.  This is the `Chain of responsibility pattern <http://http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern/>`_ which helps keep modules loosely coupled.
 
-An example of this is the video title.  The videos app defines
-the make_title_display() behavior function, which by default just returns the
-title.  Then we override it with the amaradotorg app to change the title for
-certain teams.   Using the behaviors module allows this to be done without
-videos ever importing from amaradotorg, which would cause a circular import
+A typical use for this is the title that we display on the video page.
+Normally we just print a simple video title, but if the video is part of
+certain teams we want to print a modified title.  Putting the code that deals
+with this inside the videos app is bad practice because:
 
-A typical example is one app defines an override function:
->>> @behavior
-... def eat_ice_cream(flavor):
-...     return 'Yum'
->>> eat_ice_cream('vanilla')  
-'Yum'
+- It's adding complexity to the videos app.  Handling team requirements is
+  outside of its scope.
+- It requires importing from the teams app, but the teams app needs to import
+  from the videos app.  So we now have a circular dependency.
 
-Then another app overrides it to customize the behavior.
->>> @eat_ice_cream.override
-... def eat_ice_cream_picky(flavor):
-...     if flavor == 'vanilla':
-...         return 'Yuck'
-...     else:
-...         return DONT_OVERRIDE
->>> eat_ice_cream('vanilla')
-'Yuck'
->>> eat_ice_cream('chocolate')
-'Yum'
+Instead, videos defines the `make_video_title` behavior, which can then be
+overriden by other apps.  This allows us to change the behavior without having
+to add complexity/dependencies to the videos app.  The code works something
+like this.
 
-By convention, behavior functions are put in a module named
-<appname>.behaviors.
+Example:
+    >>> @behavior
+    ... def make_video_title(video)
+    ...     return video.title
+    >>> @make_video_title.override
+    ... def make_video_title_for_team_foo(video):
+    ...     team_video = video.get_team_video()
+    ...     if team_video and team_video.slug == 'foo'
+    ...         return 'My Team: %s' % video.title
+    ...     else:
+    ...         return DONT_OVERRIDE
 """
 
 from functools import wraps

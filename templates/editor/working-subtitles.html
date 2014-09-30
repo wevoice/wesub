@@ -19,6 +19,11 @@
                 <li><a href="#" class="clear-text" ng-click="showClearTextModal($event)" title="Clear text of all subtitles">{% trans "Clear text" %}</a></li>
                 <li><a href="#" class="revert-saved" ng-click="showResetModal($event)" title="Revert to last saved version">{% trans "Revert to last saved version" %}</a></li>
                 <li><a href="#" class="upload-subtitles" ng-click="showUploadSubtitlesModal($event)" title="Upload subtitles">{% trans "Upload subtitles" %}</a></li>
+                <li><a href="#" ng-click="toggleWarningsShown()" class="show-warnings">
+                    <span ng-show="warningsShown">{% trans "Hide" %}</span>
+                    <span ng-show="!warningsShown">{% trans "Show" %}</span>
+                    {% trans "Warnings" %}
+                </a></li>
             </ul>
         </div>
     </div>
@@ -43,26 +48,32 @@
         <table>
             <tr>
                 <th>Start</th>
-                <td><em>[[ currentEdit.draft.storedSubtitle.startTime|displayTime ]]</em></td>
+                <td><em ng-class="{'warning': showWarning(currentEdit.draft, 'timing')}">[[ currentEdit.draft.storedSubtitle.startTime|displayTime ]]</em></td>
             </tr>
             <tr>
                 <th>End</th>
-                <td><em>[[ currentEdit.draft.storedSubtitle.endTime|displayTime ]]</em></td>
+                <td><em ng-class="{'warning': showWarning(currentEdit.draft, 'timing')}">[[ currentEdit.draft.storedSubtitle.endTime|displayTime ]]</em></td>
             </tr>
             <tr>
                 <th>Characters</th>
-                <td>[[ currentEdit.draft.characterCount() ]]</td>
+                <td ng-class="{'warning': showWarning(currentEdit.draft, 'longline')}">[[ currentEdit.draft.characterCount() ]]</td>
             </tr>
             <tr class="child"
                 ng-repeat="count in currentEdit.lineCounts() track by $index">
                 <th>Line [[ $index + 1 ]]</th>
-                <td>[[ count ]]</td>
+                <td ng-class="{'warning': showWarning(currentEdit.draft, 'longline', $index)}">[[ count ]]</td>
             </tr>
             <tr class="char-rate" ng-show="currentEdit.draft.isSynced()">
                 <th>Chars/sec</th>
-                <td>[[ currentEdit.draft.characterRate() ]]</td>
+                <td ng-class="{'warning': showWarning(currentEdit.draft, 'characterRate')}">[[ currentEdit.draft.characterRate() ]]</td>
             </tr>
         </table>
+	<div class="warning-text">
+	  <p ng-show="showWarning(currentEdit.draft, 'lines')">{% trans "Avoid more than 2 lines per subtitle; split the subtitle into two." %}</p>
+	  <p ng-show="showWarning(currentEdit.draft, 'timing')">{% trans "Briefly displayed subtitles are hard to read; the duration should be more than 700ms." %}</p>
+	  <p ng-show="showWarning(currentEdit.draft, 'characterRate') && !(showWarning(currentEdit.draft, 'timing'))">{% trans "The reading rate should be kept below 22 characters / second; lengthen the duration or split the subtitles." %}</p>
+	  <p ng-show="showWarning(currentEdit.draft, 'longline')">{% trans "Keep subtitle line length less than 43 characters; Add a line break if necessary." %}</p>
+	</div>
     </div>
 
     <div class="working subtitles" subtitle-scroller="working-subtitle-set" />

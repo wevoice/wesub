@@ -250,6 +250,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         cls.tasks_tab.open_team_page(cls.team.slug)
 
     def tearDown(self):
+        self.browser.get_screenshot_as_file("%s.png" % self.id())
         if self.team.subtitle_policy > 10:
             self.team.subtitle_policy = 10
             self.team.save() 
@@ -342,7 +343,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
                                  % self.team.slug)
 
         self.tasks_tab.perform_task('Transcribe English Subtitles', tv.title)
-        self.editor_pg.start_next_step()
         self.editor_pg.endorse_subs()
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
@@ -378,7 +378,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
                                  % self.team.slug)
         self.tasks_tab.perform_task('Translate Subtitles into ' 
                                                'Russian', tv.title)
-        self.editor_pg.start_next_step()
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=ru' 
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Translate Subtitles into '
@@ -889,21 +888,23 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 'complete': 1
                }
         self.data_utils.upload_subs(self.contributor, **data)
-        mail.outbox = []
         self.complete_review_task(tv, 20)
         self.tasks_tab.log_in(self.owner, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.perform_task('Approve Original English ' 
                                                'Subtitles', video.title)
-        note_text = 'This is horrible!\n What were you thinking'
+        note_text = 'This is horrible'
+        mail.outbox = []
         self.editor_pg.add_note(note_text)
         self.editor_pg.send_back_task()
+        self.logger.info(len(mail.outbox))
+        email_to = mail.outbox[0].to     
+        msg = str(mail.outbox[0].message())
+        self.assertIn(note_text, msg)
         email_to = mail.outbox[-1].to     
         msg = str(mail.outbox[-1].message())
-        self.logger.info("MESSAGE: %s" % msg)
         self.assertIn(self.contributor.email, email_to)
         self.assertIn(self.rejected_text, msg)
-        self.assertIn(note_text, msg)
 
 
     def make_video_with_approved_transcript(self):

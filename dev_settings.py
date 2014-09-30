@@ -82,7 +82,7 @@ YOUTUBE_CLIENT_SECRET = None
 YOUTUBE_API_KEY = None
 
 # Celery
-CELERY_ALWAYS_EAGER = True
+CELERY_ALWAYS_EAGER = False
 CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 
 # Or you can use redis as backend

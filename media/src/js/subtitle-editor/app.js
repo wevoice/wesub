@@ -25,6 +25,7 @@ var angular = angular || null;
         'amara.SubtitleEditor.modal',
         'amara.SubtitleEditor.dom',
         'amara.SubtitleEditor.lock',
+        'amara.SubtitleEditor.notes',
         'amara.SubtitleEditor.session',
         'amara.SubtitleEditor.workflow',
         'amara.SubtitleEditor.subtitles.controllers',
@@ -51,6 +52,14 @@ var angular = angular || null;
 
     module.constant('MIN_DURATION', 250); // 0.25 seconds
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
+
+    module.factory('EditorData', ["$window", function($window) {
+        /**
+         * Get the editor data that was passed to us from python
+         *
+         */
+        return $window.editorData;
+    }]);
 
     module.controller("AppController", ['$scope', '$sce', '$controller', 
                       '$window', 'EditorData', 'VideoPlayer', 'Workflow',
@@ -97,14 +106,18 @@ var angular = angular || null;
                 return true;
             return false; 
         }
-        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating);
-        $scope.timelineShown = ($scope.workflow.stage != 'type' ||
-                EditorData.task_needs_pane);
+        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
+        $scope.warningsShown = true;
+        $scope.timelineShown = $scope.workflow.stage != 'typing';
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
         }
         $scope.toggleTimelineShown = function() {
-            $scope.timelineShown = !$scope.timelineShown
+            $scope.timelineShown = !$scope.timelineShown;
+        }
+        $scope.toggleWarningsShown = function() {
+            $scope.warningsShown = !$scope.warningsShown;
+	    $scope.workingSubtitles.subtitleList.emitChange("reload", null);
         }
         $scope.keepHeaderSizeSync = function() {
             var newHeaderSize = Math.max($('div.subtitles.reference .content').outerHeight(),

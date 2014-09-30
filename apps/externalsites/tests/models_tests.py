@@ -128,6 +128,15 @@ class YouTubeTeamGetSyncAccountTest(YouTubeGetSyncAccountTestBase):
                                              self.account.channel_id)
         self.check_get_sync_account_matches_account(video)
 
+    def test_1686(self):
+        # Test the corner case from 1686 -- we're syncing another team's
+        # videos but the the channel id doesn't match
+
+        other_team = TeamFactory()
+        self.account.sync_teams = [other_team]
+        video = self.make_youtube_team_video(other_team, 'other-channel')
+        self.check_get_sync_account_doesnt_match_account(video)
+
 class YouTubeUserGetSyncAccountTest(YouTubeGetSyncAccountTestBase):
     # Test get_sync_accounts with user YouTube accounts
     #

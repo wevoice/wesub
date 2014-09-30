@@ -35,7 +35,7 @@ var USER_IDLE_MINUTES = 15;
             });
         };
     });
-    module.directive('workingSubtitles', function() {
+    module.directive('workingSubtitles', ['VideoPlayer', function(VideoPlayer) {
         return function link(scope, elem, attrs) {
             var startHelper = $('div.sync-help.begin', elem);
             var endHelper = $('div.sync-help.end', elem);
@@ -57,16 +57,19 @@ var USER_IDLE_MINUTES = 15;
             var lastSyncEndIndex = null;
 
             scope.positionSyncHelpers = function(startIndex, endIndex) {
-                if(!scope.timelineShown) {
-                    startHelper.hide();
-                    endHelper.hide();
-                    return;
-                }
                 if(startIndex === undefined) {
                     startIndex = lastSyncStartIndex;
                 }
                 if(endIndex === undefined) {
                     endIndex = lastSyncEndIndex;
+                }
+                lastSyncStartIndex = startIndex;
+                lastSyncEndIndex = endIndex;
+
+                if(!scope.timelineShown || !VideoPlayer.isPlaying()) {
+                    startHelper.hide();
+                    endHelper.hide();
+                    return;
                 }
                 var startTop = null;
                 var endTop = null;
@@ -88,8 +91,6 @@ var USER_IDLE_MINUTES = 15;
                 } else {
                     endHelper.hide();
                 }
-                lastSyncStartIndex = startIndex;
-                lastSyncEndIndex = endIndex;
             }
 
             scope.positionInfoTray = function() {
@@ -135,12 +136,16 @@ var USER_IDLE_MINUTES = 15;
                 scope.positionSyncHelpers();
             });
 
+            scope.$root.$on("video-playback-changes", function() {
+                scope.positionSyncHelpers();
+            });
+
             scope.$root.$on('working-subtitles-scrolled', function() {
                 scope.positionSyncHelpers();
                 scope.positionInfoTray();
             });
         };
-    });
+    }]);
 
     module.directive('subtitleScroller', ["$window", function($window) {
         var window = $($window);
@@ -248,6 +253,7 @@ var USER_IDLE_MINUTES = 15;
             templateLI.append('<span class="timing" />');
             templateLI.append('<span class="subtitle-text" />');
             if(!readOnly) {
+		templateLI.append('<span class="warning">!</span>');
                 templateLI.append(makeImageButton('remove-subtitle',
                     'images/editor/remove-subtitle.gif'));
                 templateLI.append(makeImageButton('insert-subtitle',
@@ -336,6 +342,7 @@ var USER_IDLE_MINUTES = 15;
                 elt.prop('className', classes.join(' '));
                 $('span.subtitle-text', elt).html(content);
                 $('span.timing', elt).text(displayTime(subtitle.startTime));
+		$('span.warning', elt).toggle($scope.warningsShown && subtitle.hasWarning());
             }
 
             function findSubtitleData(node) {

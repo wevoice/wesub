@@ -54,7 +54,8 @@ class Command(BaseCommand):
         self.upload_bundles()
         self.upload_static_dir('images')
         self.upload_static_dir('fonts')
-        self.upload_admin_files()
+        self.upload_static_dir('flowplayer')
+        self.upload_app_static_media()
         self.upload_old_embedder()
 
     def setup_s3_subdir(self):
@@ -105,14 +106,13 @@ class Command(BaseCommand):
                 s3_path = os.path.relpath(path, settings.STATIC_ROOT)
                 self.upload_file(path, s3_path)
 
-    def upload_admin_files(self):
-        root_dir = utils.admin_media_root()
-        for dirpath, dirs, files in os.walk(root_dir):
-            for filename in files:
-                path = os.path.join(dirpath, filename)
-                s3_path = os.path.join('admin',
-                                       os.path.relpath(path, root_dir))
-                self.upload_file(path, s3_path)
+    def upload_app_static_media(self):
+        for root_dir in utils.app_static_media_dirs():
+            for dirpath, dirs, files in os.walk(root_dir):
+                for filename in files:
+                    path = os.path.join(dirpath, filename)
+                    s3_path = os.path.relpath(path, root_dir)
+                    self.upload_file(path, s3_path)
 
     def should_gzip(self, content_type):
         if not self.options['gzip']:

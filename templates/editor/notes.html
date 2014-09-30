@@ -1,0 +1,15 @@
+{% load i18n %}
+<div class="notes" ng-controller="NotesController">
+    <div class="heading"><h3>[[ heading ]]</h3></div>
+    <ul class="notes" note-scroller>
+        <li ng-repeat="note in notes">
+            <p ng-bind-html="note.body"></p>
+            <p class="byline">[[ note.user ]] - [[ note.created ]]</p>
+        </li>
+    </ul>
+    <div class="new-note">
+        <textarea ng-model="newNoteText"></textarea>
+        <button ng-click="onPostClicked($event);">Post New Note</button>
+        <p>{% trans "notes are only visible in the editor" %}</p>
+    </div>
+</div>

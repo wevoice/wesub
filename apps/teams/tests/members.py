@@ -21,6 +21,7 @@ class MembershipTests(BaseMembershipTests):
             dict(
             name="arthur",
             slug="arthur",
+            workflow_type='O',
             membership_policy=1,
             video_policy=1,
         ))

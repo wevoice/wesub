@@ -19,7 +19,7 @@
 
 {% block view_content %}
 
-    <div class="grid_8 view omega">
+    {% if team.is_old_style %}<div class="grid_8 view omega">{% else %}<div class="view">{% endif %}
         {% with "videos" as current %}
             {% include 'teams/_tabs.html' %}
         {% endwith %}
