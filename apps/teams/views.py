@@ -89,6 +89,7 @@ from videos.models import Action, VideoUrl, Video, VideoFeed
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
+from teams import workflows
 
 from teams.bulk_actions import complete_approve_tasks
 
@@ -283,9 +284,12 @@ def settings_guidelines(request, team):
 
     return { 'team': team, 'form': form, }
 
-@render_to('teams/settings-permissions.html')
 @settings_page
 def settings_permissions(request, team):
+    return team.new_workflow.workflow_settings_view(request, team)
+
+@render_to('teams/settings-permissions.html')
+def old_team_settings_permissions(request, team):
     workflow = Workflow.get_for_target(team.id, 'team')
     moderated = team.moderates_videos()
 
@@ -1453,11 +1457,12 @@ def _get_task_filters(request):
              'assignee': request.GET.get('assignee'),
              'q': request.GET.get('q'), }
 
-@timefn
-@render_to('teams/dashboard.html')
 def dashboard(request, slug):
-
     team = get_team_for_view(slug, request.user, exclude_private=False)
+    return team.new_workflow.dashboard_view(request, team)
+
+@render_to('teams/dashboard.html')
+def old_dashboard(request, team):
     user = request.user if request.user.is_authenticated() else None
     try:
         member = team.members.get(user=user)

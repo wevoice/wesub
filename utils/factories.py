@@ -137,6 +137,7 @@ class TeamFactory(DjangoModelFactory):
     name = factory.Sequence(lambda n: 'Team %s' % n)
     slug = factory.LazyAttribute(lambda t: slugify(t.name))
     membership_policy = teams.models.Team.OPEN
+    workflow_type = 'O'
 
     @classmethod
     def _generate(cls, create, attrs):
@@ -155,6 +156,24 @@ class TeamFactory(DjangoModelFactory):
                 role=teams.models.TeamMember.ROLE_ADMIN,
             )
 
+    @factory.post_generation
+    def manager(self, create, extracted, **kwargs):
+        if extracted:
+            assert create
+            TeamMemberFactory.create(
+                user=extracted, team=self,
+                role=teams.models.TeamMember.ROLE_MANAGER,
+            )
+
+    @factory.post_generation
+    def member(self, create, extracted, **kwargs):
+        if extracted:
+            assert create
+            TeamMemberFactory.create(
+                user=extracted, team=self,
+                role=teams.models.TeamMember.ROLE_CONTRIBUTOR,
+            )
+
 class WorkflowFactory(DjangoModelFactory):
     FACTORY_FOR = teams.models.Workflow
     review_allowed = 30 # admin must review
@@ -166,6 +185,14 @@ class TeamMemberFactory(DjangoModelFactory):
     role = teams.models.TeamMember.ROLE_OWNER
     user = factory.SubFactory(UserFactory)
     team = factory.SubFactory(TeamFactory)
+
+class TeamContributorMemberFactory(DjangoModelFactory):
+    FACTORY_FOR = teams.models.TeamMember
+
+    role = teams.models.TeamMember.ROLE_OWNER
+    user = factory.SubFactory(UserFactory)
+    team = factory.SubFactory(TeamFactory)
+
 
 class TeamVideoFactory(DjangoModelFactory):
     FACTORY_FOR = teams.models.TeamVideo
@@ -197,7 +224,7 @@ class TaskFactory(DjangoModelFactory):
     type = teams.models.Task.TYPE_IDS['Subtitle']
 
     @classmethod
-    def create_review(cls, team_video, language_code, user, **kwargs):
+    def create_review(cls, team_video, language_code, subtitler, **kwargs):
         """Create a task, then move it to the review stage
 
         assumptions:
@@ -213,25 +240,28 @@ class TaskFactory(DjangoModelFactory):
         version = pipeline.add_subtitles(team_video.video, language_code,
                                          sub_data, complete=False,
                                          visibility='private')
-        task.assignee = user
+        task.assignee = subtitler
         task.new_subtitle_version = version
         return task.complete()
 
     @classmethod
-    def create_approve(cls, team_video, language_code, user, **kwargs):
+    def create_approve(cls, team_video, language_code, reviewer,
+                       subtitler=None, **kwargs):
         """Create a task, then move it to the approval stage
 
         assumptions:
             - there are no Tasks or SubtitleVersions for this video+language
             - approve is enabled for the team
         """
-        task = cls.create_review(team_video, language_code, user)
+        if subtitler is None:
+            subtitler = reviewer
+        task = cls.create_review(team_video, language_code, subtitler, **kwargs)
         if task.type == teams.models.Task.TYPE_IDS['Approve']:
             # review isn't enabled, but approve is.  Just return the task
             # early
             return task
 
-        task.assignee = user
+        task.assignee = reviewer
         task.approved = teams.models.Task.APPROVED_IDS['Approved']
         return task.complete()
 
@@ -293,8 +323,10 @@ class SubtitleSetFactory(Factory):
 
     @factory.post_generation
     def num_subs(self, create, extracted, **kwargs):
+        if extracted is None:
+            extracted = 10
         for i in xrange(extracted):
-            self.append_subtitle(i*1000, i*1000 - 1, "Sub %s" % i)
+            self.append_subtitle(i*1000, i*1000 + 999, "Sub %s" % i)
 
 def bulk_subs(sub_data):
     """Create a bunch of videos/languages/versions

@@ -49,6 +49,7 @@ from teams.permissions_const import (
     ROLE_CONTRIBUTOR
 )
 from teams import tasks
+from teams import workflows
 from utils import DEFAULT_PROTOCOL
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
@@ -57,6 +58,7 @@ from videos.models import Video, VideoUrl, SubtitleVersion, SubtitleLanguage
 from subtitles.models import (
     SubtitleVersion as NewSubtitleVersion,
     SubtitleLanguage as NewSubtitleLanguage,
+    SubtitleNoteBase,
     ORIGIN_IMPORTED
 )
 from subtitles import pipeline
@@ -191,8 +193,17 @@ class Team(models.Model):
     auth_provider_code = models.CharField(_(u'authentication provider code'),
                                           max_length=24, blank=True, default="")
 
+    # code value from one the TeamWorkflow subclasses
+    # Since other apps can add workflow types, let's use this system to avoid
+    # conflicts:
+    #   - Core types are defined in the teams app and 1 char long
+    #   - Extention types are defined on other apps.  They are 2 chars long,
+    #     with the first one being unique to the app.
+    workflow_type = models.CharField(max_length=2, default='O')
+
     # Enabling Features
     projects_enabled = models.BooleanField(default=False)
+    # Deprecated field that enables the tasks workflow
     workflow_enabled = models.BooleanField(default=False)
 
     # Policies and Permissions
@@ -202,6 +213,9 @@ class Team(models.Model):
     video_policy = models.IntegerField(_(u'video policy'),
                                        choices=VIDEO_POLICY_CHOICES,
                                        default=VP_MEMBER)
+
+    # The values below here are mostly specific to the tasks workflow and will
+    # probably be deleted.
     task_assign_policy = models.IntegerField(_(u'task assignment policy'),
                                              choices=TASK_ASSIGN_CHOICES,
                                              default=TASK_ASSIGN_IDS['Any team member'])
@@ -236,11 +250,25 @@ class Team(models.Model):
         creating = self.pk is None
         super(Team, self).save(*args, **kwargs)
         if creating:
-            # make sure we create a default project
+            # create a default project
             self.default_project
+            # setup our workflow
+            self.new_workflow.setup_team()
 
     def __unicode__(self):
         return self.name or self.slug
+
+    def is_tasks_team(self):
+        return self.workflow_enabled
+
+    @property
+    def new_workflow(self):
+        if not hasattr(self, '_new_workflow'):
+            self._new_workflow = workflows.TeamWorkflow.get_workflow(self)
+        return self._new_workflow
+
+    def is_old_style(self):
+        return self.workflow_type == "O"
 
     def get_tasks_page_url(self):
         return reverse('teams:team_tasks', kwargs={
@@ -874,6 +902,35 @@ class TeamVideo(models.Model):
             video_moved_from_team_to_team.send(sender=self,
                                                destination_team=new_team, video=self.video)
 
+    def get_task_for_editor(self, language_code):
+        if not hasattr(self, '_editor_task'):
+            self._editor_task = self._get_task_for_editor(language_code)
+        return self._editor_task
+
+    def _get_task_for_editor(self, language_code):
+        task_set = self.task_set.incomplete().filter(language=language_code)
+        # 2533: We can get 2 review tasks if we include translate/transcribe
+        # tasks in the results.  This is because when we have a task id and
+        # the user clicks endorse, we do the following:
+        #    - save the subtitles
+        #    - save the task, setting subtitle_version to the version that we
+        #      just saved
+        #
+        # However, the task code creates a task on both of those steps.  I'm not
+        # sure exactly what the old editor does to make this not happen, but
+        # it's safest to just not send task_id in that case
+        task_set = task_set.filter(type__in=(Task.TYPE_IDS['Review'],
+                                             Task.TYPE_IDS['Approve']))
+        # This assumes there is only 1 incomplete tasks at once, hopefully
+        # that's a good enough assumption to hold until we dump tasks for the
+        # collab model.
+        tasks = list(task_set[:1])
+        if tasks:
+            return tasks[0]
+        else:
+            return None
+
+
 class TeamVideoMigration(models.Model):
     from_team = models.ForeignKey(Team, related_name='+')
     to_team = models.ForeignKey(Team, related_name='+')
@@ -1120,6 +1177,13 @@ class TeamMember(models.Model):
                 return True
         return False
 
+    def is_manager(self):
+        """Test if the user is a manager or above."""
+        return self.role in (ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER)
+
+    def is_admin(self):
+        """Test if the user is an admin or owner."""
+        return self.role in (ROLE_OWNER, ROLE_ADMIN)
 
     class Meta:
         unique_together = (('team', 'user'),)
@@ -1179,6 +1243,8 @@ class MembershipNarrowing(models.Model):
 
         return super(MembershipNarrowing, self).save(*args, **kwargs)
 
+class TeamSubtitleNote(SubtitleNoteBase):
+    team = models.ForeignKey(Team, related_name='+')
 
 class ApplicationInvalidException(Exception):
     pass
@@ -1809,6 +1875,18 @@ class Task(models.Model):
         This lets us patch it in the unittests.
         """
         return datetime.datetime.now()
+
+    def is_subtitle_task(self):
+        return self.type == Task.TYPE_IDS['Subtitle']
+
+    def is_translate_task(self):
+        return self.type == Task.TYPE_IDS['Translate']
+
+    def is_review_task(self):
+        return self.type == Task.TYPE_IDS['Review']
+
+    def is_approve_task(self):
+        return self.type == Task.TYPE_IDS['Approve']
 
     @property
     def workflow(self):
@@ -3076,7 +3154,3 @@ class Partner(models.Model):
 
     def is_admin(self, user):
         return user in self.admins.all()
-
-# we know that models.py is always loaded, import signalhandlers to ensure it
-# gets loaded as well
-import teams.signalhandlers

@@ -385,27 +385,6 @@ class SubtitleLanguage(models.Model):
     writelock_session_key = models.CharField(max_length=255, blank=True,
                                              editable=False)
 
-    # Denormalized signoff/collaborator count fields.
-    # These are stored here for speed of retrieval and filtering.
-    #
-    # They are updated in the update_signoff_counts() method, which is called
-    # from the Collaborator .save() method.
-    #
-    # I'd really like to reconsider whether we need these when we actually start
-    # using them.  If we can use some SQL magic in a manager to avoid the
-    # denormalized fields but still have speedy queries I'd prefer that to
-    # having to make sure these are properly synced.
-    unofficial_signoff_count = models.PositiveIntegerField(default=0,
-                                                           editable=False)
-    official_signoff_count = models.PositiveIntegerField(default=0,
-                                                         editable=False)
-    pending_signoff_count = models.PositiveIntegerField(default=0,
-                                                        editable=False)
-    pending_signoff_unexpired_count = models.PositiveIntegerField(default=0,
-                                                                  editable=False)
-    pending_signoff_expired_count = models.PositiveIntegerField(default=0,
-                                                                editable=False)
-
     followers = models.ManyToManyField(User, blank=True,
             related_name='new_followed_languages', editable=False)
 
@@ -419,7 +398,6 @@ class SubtitleLanguage(models.Model):
         super(SubtitleLanguage, self).__init__(*args, **kwargs)
         self._tip_cache = {}
         self._translation_source_version_cache = {}
-        self._original_subtitles_complete = self.subtitles_complete
 
     # Writelocking
     @property
@@ -505,8 +483,6 @@ class SubtitleLanguage(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        send_subtitles_changed = kwargs.pop('send_subtitles_changed', True)
-
         assert self.language_code in VALID_LANGUAGE_CODES, \
             "Subtitle Language %s should be a valid code." % self.language_code
 
@@ -516,10 +492,6 @@ class SubtitleLanguage(models.Model):
             self.created = datetime.now()
 
         super(SubtitleLanguage, self).save(*args, **kwargs)
-        if self._original_subtitles_complete != self.subtitles_complete:
-            self._original_subtitles_complete = self.subtitles_complete
-            if send_subtitles_changed:
-                signals.subtitles_changed.send(self, version=None)
 
     def title_display(self):
         tip = self.get_tip()
@@ -1765,8 +1737,6 @@ class SubtitleVersion(models.Model):
         self.save()
         if not was_public and self.is_tip():
             self.subtitle_language.set_tip_cache('public', self)
-            signals.subtitles_changed.send(self.subtitle_language,
-                                           version=self)
 
     def unpublish(self, delete=False, signal=True):
         """Unpublish this version.
@@ -1789,8 +1759,6 @@ class SubtitleVersion(models.Model):
             new_tip = version=self.subtitle_language.get_tip(public=True)
             if new_tip is None:
                 signals.language_deleted.send(self.subtitle_language)
-            signals.subtitles_changed.send(self.subtitle_language,
-                                           version=self)
 
     @models.permalink
     def get_absolute_url(self):
@@ -1836,67 +1804,15 @@ class SubtitleVersionMetadata(models.Model):
         else:
             return self.data
 
-
-# Collaborators ---------------------------------------------------------------
-class CollaboratorManager(models.Manager):
-    def get_for(self, subtitle_language):
-        return self.get_query_set().filter(subtitle_language=subtitle_language)
-
-    def get_all_signoffs_for(self, subtitle_language):
-        return self.get_for(subtitle_language).filter(signoff=True)
-
-    def get_peer_signoffs_for(self, subtitle_language):
-        return (self.get_all_signoffs_for(subtitle_language)
-                    .filter(signoff_is_official=False))
-
-    def get_official_signoffs_for(self, subtitle_language):
-        return (self.get_all_signoffs_for(subtitle_language)
-                    .filter(signoff_is_official=True))
-
-    def get_unsignedoff_for(self, subtitle_language, include_expired=False):
-        qs = self.get_for(subtitle_language).filter(signoff=False)
-
-        if not include_expired:
-            qs = qs.exclude(expired=True)
-
-        return qs
-
-class Collaborator(models.Model):
-    """Collaborator models represent a user working on a specific language."""
-
-    user = models.ForeignKey(User)
-    subtitle_language = models.ForeignKey(SubtitleLanguage)
-
-    signoff = models.BooleanField(default=False)
-    signoff_is_official = models.BooleanField(default=False)
-    expired = models.BooleanField(default=False)
-
-    expiration_start = models.DateTimeField(editable=False)
-
-    created = models.DateTimeField(editable=False)
-
-    objects = CollaboratorManager()
+class SubtitleNoteBase(models.Model):
+    video = models.ForeignKey(Video, related_name='+')
+    language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
+    user = models.ForeignKey(User, related_name='+', null=True)
+    body = models.TextField()
+    created = models.DateTimeField(default=datetime.now)
 
     class Meta:
-        unique_together = (('user', 'subtitle_language'),)
+        abstract = True
 
-
-    def save(self, *args, **kwargs):
-        creating = not self.pk
-
-        if creating and not self.created:
-            self.created = datetime.now()
-
-        if creating and not self.expiration_start:
-            self.expiration_start = self.created
-
-        result = super(Collaborator, self).save(*args, **kwargs)
-
-        # Update the denormalized signoff count fields for SubtitleLanguages.
-        # This has to be done after we've saved this Collaborator so the changes
-        # will take effect.
-        self.subtitle_language.update_signoff_counts()
-
-        return result
-
-
+class SubtitleNote(SubtitleNoteBase):
+    pass

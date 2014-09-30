@@ -1,11 +1,11 @@
 {% load i18n %}
-<div class="help-panel" ng-controller="WorkflowProgressionController">
+<div class="help-panel">
     <!-- not ready for release just yet
        <a class="advanced" ng-click="showAdvancedModal()">Advanced &raquo;</a>
    -->
 
     <h1>{% trans "Keyboard controls" %}&nbsp;&nbsp;&nbsp;<a href="" ng-click="onMoreControlsClicked($event)">{% trans "more commands" %} &#187;</a></h1>
-    <div ng-show="workflow.stage == 'type'">
+    <div ng-show="workflow.stage == 'typing'">
         <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
             <div class="key-pattern">Tab</div>
             <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
@@ -23,7 +23,7 @@
             <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
         </div>
     </div>
-    <div ng-show="workflow.stage == 'sync'">
+    <div ng-show="workflow.stage == 'syncing'">
         <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
             <div class="key-pattern">Tab</div>
             <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
@@ -48,7 +48,7 @@
             </div>
         </div>
     </div>
-    <div ng-show="(workflow.stage == 'review') || (workflow.stage == 'title')">
+    <div ng-show="(workflow.stage == 'review')">
         <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
             <div class="key-pattern">Tab</div>
             <div class="shortcut-desc">{% trans "Play / Pause" %}</div>

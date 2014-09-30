@@ -215,12 +215,12 @@ class TestCaseTimedText(WebdriverTestCase):
             'webdriver_testing', 'subtitle_data')
         cls.video_pg.open_video_page(cls.test_video.video_id)
         cls.video_pg.log_in(cls.user.username, 'password')
-        cls.video_pg.set_skiphowto()
 
 
     def setUp(self):
         super(TestCaseTimedText, self).setUp()
         self.video_pg.open_video_page(self.test_video.video_id)
+
 
     def _upload_and_verify(self, sub_file, lang, lang_code, expected_count):
         """Upload the subtitle file and confirm subs are stored.

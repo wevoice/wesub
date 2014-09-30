@@ -53,11 +53,12 @@ from widget import rpc as widget_rpc
 from auth.models import CustomUser as User
 from statistic.models import EmailShareStatistic
 from subtitles import models as sub_models
+from subtitles.permissions import (user_can_view_private_subtitles,
+                                   user_can_edit_subtitles)
 from subtitles.forms import SubtitlesUploadForm
 from subtitles.pipeline import rollback_to
+from subtitles.workflows import get_workflow
 from teams.models import Task
-from teams.permissions import (can_create_and_edit_subtitles,
-                                    can_create_and_edit_translations)
 from videos import permissions
 from videos.decorators import get_video_revision, get_video_from_code
 from videos.forms import (
@@ -272,11 +273,14 @@ def shortlink(request, encoded_pk):
 
 class VideoPageContext(dict):
     """Context dict for the video page."""
-    def __init__(self, request, video, video_url, tab, tab_only=False):
+    def __init__(self, request, video, video_url, tab, workflow,
+                 tab_only=False):
         dict.__init__(self)
+        self.workflow = workflow
         self['video'] = video
         self['create_subtitles_form'] = CreateSubtitlesForm(
             request, video, request.POST or None)
+        self['extra_tabs'] = workflow.extra_tabs(request.user)
         if not tab_only:
             video.prefetch_languages(with_public_tips=True,
                                      with_private_tips=True)
@@ -296,6 +300,8 @@ class VideoPageContext(dict):
         self['shows_widget_sharing'] = video.can_user_see(request.user)
         self['widget_settings'] = json.dumps(
             widget_rpc.get_general_settings(request))
+        self['add_language_mode'] = self.workflow.get_add_language_mode(
+            request.user)
 
         _add_share_panel_context_for_video(self, video)
         self['task'] =  _get_related_task(request)
@@ -303,13 +309,10 @@ class VideoPageContext(dict):
         if team_video is not None:
             self['team'] = team_video.team
             self['team_video'] = team_video
-            self['can_create_subs'] = can_create_and_edit_subtitles(
-                request.user, team_video)
             self['user_is_team_member'] = team_video.team.user_is_member(
                 request.user)
         else:
             self['team'] = self['team_video'] = None
-            self['can_create_subs'] = True
             self['user_is_team_member'] = False
 
     @staticmethod
@@ -318,11 +321,24 @@ class VideoPageContext(dict):
                    title=video.title_display())
 
     def setup_tab(self, request, video, video_url, tab):
-        setup_tab_method = getattr(self, 'setup_tab_%s' % tab, None)
-        if setup_tab_method is not None:
-            setup_tab_method(request, video, video_url, tab)
+        for name, title in self['extra_tabs']:
+            if tab == name:
+                self['extra_tab'] = True
+                self.setup_extra_tab(request, video, video_url, tab)
+                return
+        self['extra_tab'] = False
+        method_name = 'setup_tab_%s' % tab
+        setup_tab_method = getattr(self, method_name, None)
+        if setup_tab_method:
+            setup_tab_method(request, video, video_url)
 
-    def setup_tab_video(self, request, video, video_url, tab):
+    def setup_extra_tab(self, request, video, video_url, tab):
+        method_name = 'setup_tab_%s' % tab
+        setup_tab_method = getattr(self.workflow, method_name, None)
+        if setup_tab_method:
+            self.update(setup_tab_method(request, video, video_url))
+
+    def setup_tab_video(self, request, video, video_url):
         self['width'] = "620"
         self['height'] = "370"
         self['video_url'] = video.get_video_url()
@@ -330,6 +346,17 @@ class VideoPageContext(dict):
 @get_video_from_code
 def redirect_to_video(request, video):
     return redirect(video, permanent=True)
+
+def calc_tab(request, workflow):
+    tab = request.GET.get('tab')
+    if tab in ('urls', 'comments', 'activity', 'video'):
+        return tab # default tab
+    for name, title in workflow.extra_tabs(request.user):
+        if name == tab:
+            # workflow extra tab
+            return tab
+    # invalid tab, force it to be video
+    return 'video'
 
 @get_video_from_code
 def video(request, video, video_url=None, title=None):
@@ -348,19 +375,17 @@ def video(request, video, video_url=None, title=None):
     if request.method != 'POST':
         video.update_view_counter()
 
-    tab = request.GET.get('tab')
-    if tab not in ('urls', 'comments', 'activity', 'video'):
-        # force tab to be video if it doesn't match either of the other
-        # tabs
-        tab = 'video'
+    workflow = get_workflow(video)
+
+    tab = calc_tab(request, workflow)
 
     if request.is_ajax():
-        context = VideoPageContext(request, video, video_url, tab,
+        context = VideoPageContext(request, video, video_url, tab, workflow,
                                    tab_only=True)
         template_name = 'videos/video-%s-tab.html' % tab
     else:
         template_name = 'videos/video-%s.html' % tab
-        context = VideoPageContext(request, video, video_url, tab)
+        context = VideoPageContext(request, video, video_url, tab, workflow)
     context['tab'] = tab
 
     if context['create_subtitles_form'].is_valid():
@@ -501,8 +526,9 @@ class LanguagePageContext(dict):
     def __init__(self, request, video, lang_code, lang_id, version_id,
                  tab_only=False):
         dict.__init__(self)
-        self.public_only = self.calc_public_only(request, video)
         language = self._get_language(video, lang_code, lang_id)
+        self.public_only = self.calc_public_only(request, video,
+                                                 language.language_code)
         version = self._get_version(request, video, language, version_id)
         self['video'] = video
         self['language'] = language
@@ -531,9 +557,9 @@ class LanguagePageContext(dict):
             raise Http404
         return language
 
-    def calc_public_only(self, request, video):
-        team_video = video.get_team_video()
-        return (team_video and not team_video.team.is_member(request.user))
+    def calc_public_only(self, request, video, language_code):
+        return not user_can_view_private_subtitles(request.user, video,
+                                                   language_code)
 
     def _get_version(self, request, video, language, version_id):
         """Get the SubtitleVersion to use for a language page."""

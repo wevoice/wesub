@@ -20,9 +20,14 @@
 
     var module = angular.module('amara.SubtitleEditor.video.controllers', []);
 
-    module.controller('VideoController', ['$scope', '$sce', 'VideoPlayer', function($scope, $sce, VideoPlayer) {
-        $scope.overlayText = null;
-        $scope.showOverlay = false;
+    module.controller('VideoController', ['$scope', '$sce', 'EditorData', 'VideoPlayer', function($scope, $sce, EditorData, VideoPlayer) {
+        $scope.subtitleText = null;
+        $scope.showSubtitle = false;
+        if(EditorData.work_mode.type == 'normal') {
+            $scope.showOverlay = true;
+        } else {
+            $scope.showOverlay = false;
+        }
 
         $scope.videoState = {
             loaded: false,
@@ -46,6 +51,13 @@
         $scope.$root.$on("video-volume-update", function(evt, volume) {
             $scope.videoState.volume = volume;
         });
+        $scope.$root.$on("video-playback-changes", function() {
+            $scope.showOverlay = false;
+        });
+        $scope.$root.$on("app-click", function() {
+            $scope.showOverlay = false;
+        });
+
 
         $scope.playPauseClicked = function(event) {
             VideoPlayer.togglePlay();
@@ -59,28 +71,28 @@
 
         $scope.$watch('currentEdit.draft.content()', function(newValue) {
             if(newValue !== null && newValue !== undefined) {
-                $scope.overlayText = $sce.trustAsHtml(newValue);
-                $scope.showOverlay = true;
+                $scope.subtitleText = $sce.trustAsHtml(newValue);
+                $scope.showSubtitle = true;
             } else if($scope.timeline.shownSubtitle !== null) {
-                $scope.overlayText = $sce.trustAsHtml($scope.timeline.shownSubtitle.content());
-                $scope.showOverlay = true;
+                $scope.subtitleText = $sce.trustAsHtml($scope.timeline.shownSubtitle.content());
+                $scope.showSubtitle = true;
             } else {
-                $scope.showOverlay = false;
+                $scope.showSubtitle = false;
             }
         });
         $scope.$root.$on('subtitle-selected', function($event, scope) {
             if(scope.subtitle.isSynced()) {
                 VideoPlayer.playChunk(scope.startTime, scope.duration());
             }
-            $scope.overlayText = $sce.trustAsHtml(scope.subtitle.content());
-            $scope.showOverlay = true;
+            $scope.subtitleText = $sce.trustAsHtml(scope.subtitle.content());
+            $scope.showSubtitle = true;
         });
         $scope.$watch('timeline.shownSubtitle', function(subtitle) {
             if(subtitle !== null) {
-                $scope.overlayText = $sce.trustAsHtml(subtitle.content());
-                $scope.showOverlay = true;
+                $scope.subtitleText = $sce.trustAsHtml(subtitle.content());
+                $scope.showSubtitle = true;
             } else {
-                $scope.showOverlay = false;
+                $scope.showSubtitle = false;
             }
         });
 

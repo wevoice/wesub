@@ -38,7 +38,7 @@ from teams.permissions import can_create_and_edit_subtitles
 from videos.tasks import import_videos_from_feed
 from videos.types import video_type_registrar, VideoTypeError
 from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexField, FeedURLField, ReCaptchaField
-from utils.http import url_exists
+from utils import http
 from utils.text import fmt
 from utils.translation import get_language_choices, get_user_languages_from_request
 
@@ -73,7 +73,8 @@ class CreateVideoUrlForm(forms.ModelForm):
 
             video_url = video_type.convert_to_video_url()
 
-            if video_type.requires_url_exists and  not url_exists(video_url) :
+            if (video_type.requires_url_exists and
+                not http.url_exists(video_url)):
                 raise forms.ValidationError(_(u'This URL appears to be a broken link.'))
 
         except VideoTypeError, e:
@@ -171,7 +172,7 @@ class VideoForm(forms.Form):
                 # choke on redirection (urllib2 for python2.6), see https://unisubs.sifterapp.com/projects/12298/issues/427646/comments
                 video_url = video_type.convert_to_video_url()
 
-                if not url_exists(video_url) :
+                if not http.url_exists(video_url):
                     raise forms.ValidationError(_(u'This URL appears to be a broken link.'))
 
         return video_url

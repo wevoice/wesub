@@ -75,7 +75,19 @@ EOF
     git pull --ff-only origin $REV
     if [ ! -e "unisubs-integration" ]; then
         until git clone git@github.com:pculture/unisubs-integration.git ; do
-            echo "Error during clone; trying again in 5 seconds..."
+            echo "Error during unisubs-integration clone; trying again in 5 seconds..."
+            sleep 5
+        done
+    fi
+    if [ ! -e "amara-vimeo" ]; then
+        until git clone git@github.com:pculture/amara-vimeo.git ; do
+            echo "Error during amara-vimeo clone; trying again in 5 seconds..."
+            sleep 5
+        done
+    fi
+    if [ ! -e "amara-enterprise" ]; then
+        until git clone git@github.com:pculture/amara-enterprise.git ; do
+            echo "Error during amara-enterprise clone; trying again in 5 seconds..."
             sleep 5
         done
     fi
@@ -97,6 +109,18 @@ if [ -z "$SKIP_CODE_PULL" ] ; then
         git checkout master
         INTEGRATION_REV=`cat ../optional/unisubs-integration`
         git reset --hard $INTEGRATION_REV
+    fi
+    if [ -e $APP_DIR/amara-enterprise ]; then
+        cd $APP_DIR/amara-enterprise
+        git fetch
+        git checkout master
+        INTEGRATION_REV=`cat ../optional/amara-enterprise`
+        git reset --hard $INTEGRATION_REV
+    fi
+    if [ -e $APP_DIR/amara-vimeo ]; then
+        cd $APP_DIR
+        # this is a hack because something depends on this file; no idea
+        echo "master" > ./optional/amara-vimeo
     fi
 fi
 cd $APP_DIR
