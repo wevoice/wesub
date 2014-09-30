@@ -30,6 +30,7 @@ class ATeamPage(UnisubsPage):
     _ACTIVITY_TAB = "ul.tabs li a[href*='activity']"
     _SETTINGS_TAB = "ul.tabs li a[href*='settings']"
     _TASKS_TAB = "ul.tabs li a[href*='tasks']"
+    _COLLAB_TAB = "ul.tabs li a[href*='collaborations']"
 
 
     _ERROR = '.errorlist li'

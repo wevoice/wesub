@@ -50,7 +50,6 @@ class EditorPage(UnisubsPage):
     _ADD_SUB_TO_END = 'a.end'
     _TIMELINE_DISPLAY = 'a.show-timeline span'
     _WORKING_METADATA_EXPANDER = 'div.working div.metadata a'
-    _COPY_TIMING = 'li a.copyover'
     _TOOLS_MENU = 'div.toolbox-inside a'
     _PARAGRAPH_MARKER = '.new-paragraph'
     _REMOVE_SUBTITLE = '.remove-subtitle'
@@ -69,12 +68,13 @@ class EditorPage(UnisubsPage):
     #RIGHT COLUMN
 
     _NEXT_STEP = 'button.next-step'
-    _ENDORSE = 'div.substeps button.endorse' #when completing subtitling.
-
+    _ENDORSE = 'button.endorse' #when completing subtitling.
+    _COLLAB_ENDORSE = 'button.endorse'
+    _COLLAB_SENDBACK = 'div.actions button.send-back'
     # COLLAB PANEL
     _COLLAB_PANEL = 'div.workflow'
     _SEND_BACK = 'button.send-back'
-    _APPROVE = 'button.approve'
+    _APPROVE = 'button.endorse'
     _NEW_NOTE = 'div.new-note textarea'
     _SAVE_NOTE = 'div.new-note button'
     _NOTES = 'ul.notes li p'
@@ -296,6 +296,14 @@ class EditorPage(UnisubsPage):
         else:
             return 'Element not displayed'
 
+    def upload_subtitles(self, sub_file):
+        menu_items = self.tools_menu_items()
+        menu_items['upload-subtitles']['element'].click()
+        self.type_by_css('input#subtitles-file-field', sub_file)
+        self.click_by_css('button.upload-subtitles-submit-button-')
+        time.sleep(3)
+        self.wait_for_element_present(self._TOOLS_MENU)
+
     def toggle_paragraph(self, position):
         """Toggles the paragraph marker on or off. """
 
@@ -379,6 +387,10 @@ class EditorPage(UnisubsPage):
     def collab_panel_displayed(self):
         return self.is_element_visible(self._COLLAB_PANEL)
 
+    def action_buttons(self):
+        els = self.get_elements_list("div.actions button")
+        return [el.text for el in els]
+
     def approve_task(self):
         self.click_by_css(self._APPROVE)
         self.wait_for_element_not_present(self._APPROVE)
@@ -428,9 +440,14 @@ class EditorPage(UnisubsPage):
 
     def endorse_subs(self):
         self.click_by_css(self._ENDORSE, self._ACTIVE_MODAL)
-       # self.click_by_css(self._ACTIVE_MODAL + " button")
-       # self.handle_js_alert('accept')
 
+    def endorse_collab(self):
+        self.click_by_css(self._COLLAB_ENDORSE)
+        self.wait_for_element_not_present(self._COLLAB_ENDORSE)
+
+    def sendback_collab(self):
+        self.click_by_css(self._COLLAB_SENDBACK)
+        self.wait_for_element_not_present(self._COLLAB_SENDBACK)
 
     def next_step(self):
         els = self.get_elements_list(self._NEXT_STEP)
