@@ -186,6 +186,14 @@ class TeamMemberFactory(DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     team = factory.SubFactory(TeamFactory)
 
+class TeamContributorMemberFactory(DjangoModelFactory):
+    FACTORY_FOR = teams.models.TeamMember
+
+    role = teams.models.TeamMember.ROLE_OWNER
+    user = factory.SubFactory(UserFactory)
+    team = factory.SubFactory(TeamFactory)
+
+
 class TeamVideoFactory(DjangoModelFactory):
     FACTORY_FOR = teams.models.TeamVideo
 
