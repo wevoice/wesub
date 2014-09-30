@@ -191,7 +191,7 @@ nav span {
     font-weight: normal;
     max-width: 101px;
     overflow: hidden;
-    padding: 18px 0 20px 15px;
+    padding: 18px 0 20px 0;
     text-overflow: ellipsis;
 }
 

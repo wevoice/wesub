@@ -216,7 +216,7 @@ h5.community-header {
 
 .mini-banner-header h4 {
 	font-size: 22px;
-	font-weight: 200;
+	font-weight: 400;
 }
 
 .community-directory div.community-directory-listing {
@@ -234,6 +234,11 @@ h5.community-header {
 	margin-top: 15px
 }
 
+.community-directory-listing-frame img {
+	max-width: 135px;
+	max-height: 115px;
+}
+
 .community-directory-listing h4 {
 	font-weight: 300;
 	margin: 15px 0 5px 0;
@@ -241,8 +246,12 @@ h5.community-header {
 }
 
 .community-directory-listing h6 {
-	font-weight: 300;
+	font-weight: 500;
 	margin-bottom: 30px;
+}
+
+.community-directory-listing p {
+	font-weight: 300;
 }
 
 #community #footer {
