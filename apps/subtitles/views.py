@@ -217,10 +217,7 @@ def subtitle_editor(request, video_id, language_code):
     languages = video.newsubtitlelanguage_set.annotate(
         num_versions=Count('subtitleversion'))
 
-    video_urls = []
-    for v in video.get_video_urls():
-        video_urls.append(v.url)
-
+    workflow = get_workflow(video)
 
     editor_data = {
         'canSync': bool(request.GET.get('canSync', True)),
@@ -237,7 +234,7 @@ def subtitle_editor(request, video_id, language_code):
             'title': video.title,
             'description': video.description,
             'primaryVideoURL': video.get_video_url(),
-            'videoURLs': video_urls,
+            'videoURLs': workflow.editor_video_urls(language_code),
             'metadata': video.get_metadata(),
         },
         'editingVersion': {
@@ -258,7 +255,6 @@ def subtitle_editor(request, video_id, language_code):
         'notesHeading': 'Editor Notes',
     }
 
-    workflow = get_workflow(video)
     editor_data.update(workflow.editor_data(request.user, language_code))
 
     if task:
