@@ -95,7 +95,6 @@
                 "videoURLs": [
                     "http://vimeo.com/25082970"
                 ],
-                "primaryVideoURL": "http://vimeo.com/25082970"
             },
             "oldEditorURL": '/old-editor/test-url/',
             "languages": [
