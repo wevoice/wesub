@@ -487,7 +487,8 @@ class Video(models.Model):
 
         try:
             video_url_obj = VideoUrl.objects.get(
-                url=vt.convert_to_video_url())
+                url=vt.convert_to_video_url(),
+                type=vt.abbreviation)
             video, created = video_url_obj.video, False
         except models.ObjectDoesNotExist:
             video, created = None, False
@@ -509,7 +510,6 @@ class Video(models.Model):
 
             #Save video url
             defaults = {
-                'type': vt.abbreviation,
                 'original': True,
                 'primary': True,
                 'added_by': user,
@@ -518,8 +518,10 @@ class Video(models.Model):
             }
             if vt.video_id:
                 defaults['videoid'] = vt.video_id
-            video_url_obj, created = VideoUrl.objects.get_or_create(url=vt.convert_to_video_url(),
-                                                                    defaults=defaults)
+            video_url_obj, created = VideoUrl.objects.get_or_create(
+                url=vt.convert_to_video_url(),
+                type=vt.abbreviation,
+                defaults=defaults)
             obj.update_search_index()
             video, created = obj, True
 
@@ -1780,7 +1782,7 @@ class UserTestResult(models.Model):
 class VideoUrl(models.Model):
     video = models.ForeignKey(Video)
     type = models.CharField(max_length=1)
-    url = models.URLField(max_length=255, unique=True)
+    url = models.URLField(max_length=255)
     videoid = models.CharField(max_length=50, blank=True)
     primary = models.BooleanField(default=False)
     original = models.BooleanField(default=False)
@@ -1792,6 +1794,9 @@ class VideoUrl(models.Model):
 
     class Meta:
         ordering = ("video", "-primary",)
+        unique_together = (
+            ('url', 'type'),
+        )
 
     def __unicode__(self):
         return self.url
