@@ -70,21 +70,6 @@ VIDEO_TYPE_FLV = 'L'
 VIDEO_TYPE_BRIGHTCOVE = 'C'
 VIDEO_TYPE_MP3 = 'M'
 VIDEO_TYPE_KALTURA = 'K'
-VIDEO_TYPE = (
-    (VIDEO_TYPE_HTML5, 'HTML5'),
-    (VIDEO_TYPE_YOUTUBE, 'Youtube'),
-    (VIDEO_TYPE_BLIPTV, 'Blip.tv'),
-    (VIDEO_TYPE_GOOGLE, 'video.google.com'),
-    (VIDEO_TYPE_FORA, 'Fora.tv'),
-    (VIDEO_TYPE_USTREAM, 'Ustream.tv'),
-    (VIDEO_TYPE_VIMEO, 'Vimeo.com'),
-    (VIDEO_TYPE_WISTIA, 'Wistia.com'),
-    (VIDEO_TYPE_DAILYMOTION, 'dailymotion.com'),
-    (VIDEO_TYPE_FLV, 'FLV'),
-    (VIDEO_TYPE_BRIGHTCOVE, 'brightcove.com'),
-    (VIDEO_TYPE_MP3, 'MP3'),
-    (VIDEO_TYPE_KALTURA, 'kaltura.com'),
-)
 VIDEO_META_CHOICES = (
     (1, 'Author',),
     (2, 'Creation Date',),
@@ -1803,7 +1788,7 @@ class UserTestResult(models.Model):
 # VideoUrl
 class VideoUrl(models.Model):
     video = models.ForeignKey(Video)
-    type = models.CharField(max_length=1, choices=VIDEO_TYPE)
+    type = models.CharField(max_length=1)
     url = models.URLField(max_length=255, unique=True)
     videoid = models.CharField(max_length=50, blank=True)
     primary = models.BooleanField(default=False)
