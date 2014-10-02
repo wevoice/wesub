@@ -1781,7 +1781,12 @@ class UserTestResult(models.Model):
 # VideoUrl
 class VideoUrl(models.Model):
     video = models.ForeignKey(Video)
-    type = models.CharField(max_length=1)
+    # Type is a character code that specifies the video type.  Types defined
+    # in the videos app are 1 char long.  Other apps can create their own
+    # types and register them with the video_type_registrar.  In that case the
+    # type should be 2 chars long with the first char being unique for the
+    # app.
+    type = models.CharField(max_length=2)
     url = models.URLField(max_length=255)
     videoid = models.CharField(max_length=50, blank=True)
     primary = models.BooleanField(default=False)
