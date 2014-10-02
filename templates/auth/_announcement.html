@@ -1,22 +1,23 @@
 {% load i18n %}
-
 {% if obj %}
-{{ obj.content|safe }}
+
+
+<div class="container note">
 <ul id="announce-banner">
   <li>
-    <div class="container">
       <div class="row">
         <div class="col-xs-12">
-          <div class="note">
-              <div></div>
+
+                {{ obj.content|safe }}
               <a href="#" class="hide-announcement">{% trans "Hide" %}</a>
               <script type="text/javascript">
                   window.COOKIE = '{{ cookie_name }}={{ date|urlencode }}; path=/; expires=';
               </script>
-          </div>
         </div> <!--/col-xs-12-->
       </div> <!--/row-->
     </div> <!--/container-->
   </li>
 </ul>
+</div>
 {% endif %}
+

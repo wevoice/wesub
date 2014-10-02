@@ -1,5 +1,4 @@
 {% load i18n profiles_tags auth_tags %}
-
 <header class="navbar navbar-static-top" id="top" role="banner">
   <div class="container">
     <div class="navbar-header">
@@ -24,11 +23,12 @@
             <a href="//pro.amara.org">{% trans "Professional Solutions" %}</a>
           </li>
           <li>
-  					<a class="search-icon" href="/videos/watch/">
-  						<img alt="Search" src="{{ STATIC_URL }}images//glyphicons_027_search-light.png">
-  					</a>
-					</li>
+            <a class="search-icon" href="/videos/watch/">
+        	<img alt="Search" src="{{ STATIC_URL }}images//glyphicons_027_search-light.png">
+            </a>
+	  </li>
         </ul><!-- .nav navbar-nav -->
+
         <ul class="nav navbar-nav navbar-right">
           {% if user.is_authenticated %}
             <li id="me_menu">
