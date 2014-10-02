@@ -249,7 +249,8 @@ div.note a.hide-messages {
   margin: 8px
 }
 #main_bar ul#bar_menu li a.navbar-search {
-  padding-bottom: 15px
+  padding-top: 18px;
+  padding-bottom: 17px;
 }
 #main_bar h1 a {
     background: url(../images/amara-o.png) 0 1px no-repeat;

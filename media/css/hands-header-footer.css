@@ -1,7 +1,7 @@
 /* BASICS (this top section may become redundant once main.css is used sitewide) */
 .navbar, #footer {
 	font-size: 14px;
-	font-weight: 100;
+	font-weight: 200;
 	letter-spacing: .035em;
 	word-spacing: 0.04em;
 	font-family:  'Raleway', "Helvetica Neue", Helvetica, sans-serif;
@@ -33,13 +33,13 @@
 .navbar h5, #footer h5 {
 	font-size: 16px;
 	line-height: 1.7em;
-	font-weight: 100;
+	font-weight: 200;
 }
 
 .navbar h6, #footer h6 {
 	font-size: 14px;
 	line-height: 1.4em;
-	font-weight: 100;
+	font-weight: 200;
 }
 
 /*ANNOUNCE BANNER*/
@@ -89,6 +89,11 @@ nav span {
 
 .navbar a, .navbar a:hover {
 	color: #656565;
+}
+
+.navbar .search-icon {
+	padding-top: 16px;
+	padding-bottom: 21px;
 }
 
 .navbar-brand {
