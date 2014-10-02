@@ -493,44 +493,35 @@ class Video(models.Model):
             video, created = None, False
 
         if not video:
-            try:
-                video_url_obj = VideoUrl.objects.get(
-                    type=vt.abbreviation,
-                    videoid=vt.video_id,
-                    url=vt.convert_to_video_url())
-                if user:
-                    Action.create_video_handler(video_url_obj.video, user)
-                return video_url_obj.video, False
-            except VideoUrl.DoesNotExist:
-                obj = Video()
-                # video types can can fecth subtitles might do it async:
-                kwargs = {}
-                if vt.CAN_IMPORT_SUBTITLES:
-                    kwargs['fetch_subs_async'] = fetch_subs_async
-                vt.set_values(obj, **kwargs)
-                if obj.title:
-                    obj.slug = slugify(obj.title)
-                obj.user = user
-                obj.save()
+            obj = Video()
+            # video types can can fecth subtitles might do it async:
+            kwargs = {}
+            if vt.CAN_IMPORT_SUBTITLES:
+                kwargs['fetch_subs_async'] = fetch_subs_async
+            vt.set_values(obj, **kwargs)
+            if obj.title:
+                obj.slug = slugify(obj.title)
+            obj.user = user
+            obj.save()
 
-                save_thumbnail_in_s3.delay(obj.pk)
-                Action.create_video_handler(obj, user)
+            save_thumbnail_in_s3.delay(obj.pk)
+            Action.create_video_handler(obj, user)
 
-                #Save video url
-                defaults = {
-                    'type': vt.abbreviation,
-                    'original': True,
-                    'primary': True,
-                    'added_by': user,
-                    'video': obj,
-                    'owner_username': vt.owner_username(),
-                }
-                if vt.video_id:
-                    defaults['videoid'] = vt.video_id
-                video_url_obj, created = VideoUrl.objects.get_or_create(url=vt.convert_to_video_url(),
-                                                                        defaults=defaults)
-                obj.update_search_index()
-                video, created = obj, True
+            #Save video url
+            defaults = {
+                'type': vt.abbreviation,
+                'original': True,
+                'primary': True,
+                'added_by': user,
+                'video': obj,
+                'owner_username': vt.owner_username(),
+            }
+            if vt.video_id:
+                defaults['videoid'] = vt.video_id
+            video_url_obj, created = VideoUrl.objects.get_or_create(url=vt.convert_to_video_url(),
+                                                                    defaults=defaults)
+            obj.update_search_index()
+            video, created = obj, True
 
         if timestamp and video_url_obj.created != timestamp:
            video_url_obj.created = timestamp
