@@ -218,6 +218,10 @@ def subtitle_editor(request, video_id, language_code):
         num_versions=Count('subtitleversion'))
 
     workflow = get_workflow(video)
+    if 'video_url' in request.GET:
+        video_urls = [request.GET['video_url']]
+    else:
+        video_urls = workflow.editor_video_urls(language_code)
 
     editor_data = {
         'canSync': bool(request.GET.get('canSync', True)),
@@ -234,7 +238,7 @@ def subtitle_editor(request, video_id, language_code):
             'title': video.title,
             'description': video.description,
             'primaryVideoURL': video.get_video_url(),
-            'videoURLs': workflow.editor_video_urls(language_code),
+            'videoURLs': video_urls,
             'metadata': video.get_metadata(),
         },
         'editingVersion': {
