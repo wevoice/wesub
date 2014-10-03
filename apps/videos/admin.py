@@ -17,6 +17,12 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib import admin
+from django.core.urlresolvers import reverse
+from django import forms
+from djcelery.admin import TaskMonitor
+from djcelery.models import TaskState
+
+from utils.celery_search_index import update_search_index
 from videos.models import (
     Video, SubtitleLanguage, SubtitleVersion, VideoFeed, VideoMetadata,
     VideoUrl, SubtitleVersionMetadata, Action, Subtitle
@@ -24,15 +30,19 @@ from videos.models import (
 from videos.tasks import (
     video_changed_tasks, import_videos_from_feed
 )
-
-from django.core.urlresolvers import reverse
-from utils.celery_search_index import update_search_index
-
+from videos.types import video_type_choices
 
 class VideoUrlInline(admin.StackedInline):
     model = VideoUrl
     raw_id_fields = ['added_by']
     extra = 0
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name == 'type':
+            return forms.ChoiceField(choices=video_type_choices(),
+                                     label=u'Type')
+        return super(VideoUrlInline, self).formfield_for_dbfield(
+            db_field, **kwargs)
 
 class VideoAdmin(admin.ModelAdmin):
     actions = None
@@ -85,11 +95,6 @@ class VideoFeedAdmin(admin.ModelAdmin):
 admin.site.register(Video, VideoAdmin)
 admin.site.register(VideoMetadata, VideoMetadataAdmin)
 admin.site.register(VideoFeed, VideoFeedAdmin)
-
-#Fix Celery tasks display
-from djcelery.models import TaskState
-from djcelery.admin import TaskMonitor
-from django import forms
 
 class TaskStateForm(forms.ModelForm):
     traceback_display = forms.CharField(required=False, label=u'Traceback')
