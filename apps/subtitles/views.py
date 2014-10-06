@@ -27,10 +27,12 @@ from django.conf import settings
 from django.contrib import messages
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
-from django.shortcuts import render_to_response, get_object_or_404, redirect
+from django.views.generic import View
+from django.shortcuts import render, get_object_or_404, redirect
 from django.template.defaultfilters import urlize, linebreaks, force_escape
 from django.views.decorators.clickjacking import xframe_options_exempt
 
@@ -56,51 +58,6 @@ def _version_data(version):
         'description': version.description,
     }
 
-def _language_data(language, editing_version, translated_from_version,
-                   base_language):
-    '''
-    Creates a dict with language info, suitable for encoding
-    into json and bootstrapping the editor. Includes
-    the version data for the version being edited and the
-    original translation source, if any.
-    '''
-    versions_data = []
-
-    versions = list(language.subtitleversion_set.full())
-    for i, version in enumerate(versions):
-        version_data = {
-            'version_no':version.version_number,
-            'visibility': visibility(version),
-        }
-        if editing_version == version:
-            version_data.update(_version_data(version))
-        elif translated_from_version == version:
-            version_data.update(_version_data(version))
-        elif (language.language_code == base_language and
-              i == len(versions) - 1):
-            version_data.update(_version_data(version))
-
-        versions_data.append(version_data)
-
-
-    subtitle_language = editing_version.subtitle_language if editing_version else ''
-
-    return {
-        'translatedFrom': translated_from_version and {
-            'language_code': translated_from_version.subtitle_language.language_code,
-            'version_number': translated_from_version.version_number,
-        },
-        'editingLanguage': language == subtitle_language,
-        'language_code': language.language_code,
-        'name': language.get_language_code_display(),
-        'pk': language.pk,
-        'numVersions': language.num_versions,
-        'versions': versions_data,
-        'subtitles_complete': language.subtitles_complete,
-        'is_rtl': language.is_rtl(),
-        'is_original': language.is_primary_audio_language()
-    }
-
 def regain_lock(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
     language = video.subtitle_language(language_code)
@@ -122,36 +79,6 @@ def release_lock(request, video_id, language_code):
 
     return HttpResponse(json.dumps({'url': reverse('videos:video', args=(video_id,))}))
 
-def assign_task_for_editor(video, language_code, user):
-    team_video = video.get_team_video()
-    if team_video is None:
-        return None
-    task_set = team_video.task_set.incomplete().filter(language=language_code)
-    tasks = list(task_set[:1])
-    if tasks:
-        task = tasks[0]
-        if task.assignee is None and can_assign_task(task, user):
-            task.assignee = user
-            task.set_expiration()
-            task.save()
-
-        if task.assignee != user:
-            return fmt(_("Another user is currently performing "
-                         "the %(task_type)s task for these subtitles"),
-                       task_type=task.get_type_display())
-
-def get_team_attributes_for_editor(video):
-    team_video = video.get_team_video()
-    if team_video:
-        team = team_video.team
-        return dict([('teamName', team.name), ('guidelines', dict(
-            [(s.key_name.split('_', 1)[-1],
-              linebreaks(urlize(force_escape(s.data))))
-             for s in team.settings.guidelines()
-             if s.data.strip()]))])
-    else:
-        return None
-
 def old_editor(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
     language = get_object_or_404(SubtitleLanguage, video=video,
@@ -161,107 +88,171 @@ def old_editor(request, video_id, language_code):
                                     request.GET.get('task_id'))
     return redirect("http://%s%s" % (request.get_host(), url_path))
 
-@xframe_options_exempt
-@login_required
-def subtitle_editor(request, video_id, language_code):
-    '''
-    Renders the subtitle-editor page, with all data neeeded for the UI
-    as a json object on the html document.
-    If the language does not exist, it will create one and lock it.
-    Also decides what source version should be shown initially (if
-    it is a translation).
-    '''
-    # FIXME: permissions
-    video = get_object_or_404(Video, video_id=video_id)
+class SubtitleEditorBase(View):
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(SubtitleEditorBase, self).dispatch(
+            request, *args, **kwargs)
 
-    if (video.primary_audio_language_code and 
-        SubtitleVersion.objects.extant().filter(
-            video=video, language_code=video.primary_audio_language_code)
-        .exists()):
-        base_language = video.primary_audio_language_code
-    else:
-        base_language = None
+    def get_video_urls(self):
+        """Get video URLs to send to the editor."""
+        return self.workflow.editor_video_urls(self.language_code)
 
-    try:
-        editing_language = video.newsubtitlelanguage_set.get(language_code=language_code)
-    except SubtitleLanguage.DoesNotExist:
-        editing_language = SubtitleLanguage(video=video,language_code=language_code)
+    def get_redirect_url(self):
+        return self.video.get_absolute_url()
 
-    if not editing_language.can_writelock(request.browser_id):
-        messages.error(request, _("You can't edit this subtitle because it's locked"))
-        return redirect(video)
+    def calc_base_language(self):
+        if (self.video.primary_audio_language_code and 
+            SubtitleVersion.objects.extant().filter(
+                video=self.video,
+                language_code=self.video.primary_audio_language_code)
+            .exists()):
+            self.base_language = self.video.primary_audio_language_code
+        else:
+            self.base_language = None
 
-    error_message = assign_task_for_editor(video, language_code, request.user)
-    if error_message:
-        messages.error(request, error_message)
-        return redirect(video)
-    team_video = video.get_team_video()
-    if team_video is not None:
-        task = team_video.get_task_for_editor(language_code)
-    else:
-        task = None
-    check_result = can_add_version(request.user, video, language_code)
-    if not check_result:
-        messages.error(request, check_result.message)
-        return redirect(video)
+    def calc_editing_language(self):
+        self.editing_language = self.video.subtitle_language(self.language_code)
+        if self.editing_language is None:
+            self.editing_language = SubtitleLanguage(
+                video=self.video, language_code=self.language_code)
 
-    editing_language.writelock(request.user, request.browser_id, save=True)
+    def check_can_writelock(self):
+        if not self.editing_language.can_writelock(self.request.browser_id):
+            msg = _("You can't edit this subtitle because it's locked")
+            messages.error(self.request, msg)
+            return False
+        else:
+            return True
 
-    # if this language is a translation, show both
-    editing_version = editing_language.get_tip(public=False)
-    # we ignore forking because even if it *is* a fork, we still want to show
-    # the user the rererence languages:
-    translated_from_version = editing_language.\
-        get_translation_source_version(ignore_forking=True)
+    def get_editor_data(self):
+        editor_data = {
+            'canSync': bool(self.request.GET.get('canSync', True)),
+            'canAddAndRemove': bool(self.request.GET.get('canAddAndRemove', True)),
+            # front end needs this to be able to set the correct
+            # api headers for saving subs
+            'authHeaders': {
+                'x-api-username': self.request.user.username,
+                'x-apikey': self.request.user.get_api_key()
+            },
+            'username': self.request.user.username,
+            'video': {
+                'id': self.video.video_id,
+                'title': self.video.title,
+                'description': self.video.description,
+                'primaryVideoURL': self.video.get_video_url(),
+                'videoURLs': self.get_video_urls(),
+                'metadata': self.video.get_metadata(),
+            },
+            'editingVersion': {
+                'languageCode': self.editing_language.language_code,
+                'versionNumber': (self.editing_version.version_number
+                                  if self.editing_version else None),
+            },
+            'baseLanguage': self.base_language,
+            'languages': [self.editor_data_for_language(lang)
+                          for lang in self.languages],
+            'languageCode': self.request.LANGUAGE_CODE,
+            'oldEditorURL': reverse('subtitles:old-editor', kwargs={
+                'video_id': self.video.video_id,
+                'language_code': self.editing_language.language_code,
+            }),
+            'staticURL': settings.STATIC_URL,
+            'notesHeading': 'Editor Notes',
+            'redirectUrl': self.get_redirect_url(),
+        }
 
-    languages = video.newsubtitlelanguage_set.annotate(
-        num_versions=Count('subtitleversion'))
+        editor_data.update(self.workflow.editor_data(
+            self.user, self.language_code))
 
-    workflow = get_workflow(video)
-    if 'video_url' in request.GET:
-        video_urls = [request.GET['video_url']]
-    else:
-        video_urls = workflow.editor_video_urls(language_code)
+        team_attributes = self.get_team_editor_data()
+        if team_attributes:
+            editor_data['teamAttributes'] = team_attributes
 
-    editor_data = {
-        'canSync': bool(request.GET.get('canSync', True)),
-        'canAddAndRemove': bool(request.GET.get('canAddAndRemove', True)),
-        # front end needs this to be able to set the correct
-        # api headers for saving subs
-        'authHeaders': {
-            'x-api-username': request.user.username,
-            'x-apikey': request.user.get_api_key()
-        },
-        'username': request.user.username,
-        'video': {
-            'id': video.video_id,
-            'title': video.title,
-            'description': video.description,
-            'primaryVideoURL': video.get_video_url(),
-            'videoURLs': video_urls,
-            'metadata': video.get_metadata(),
-        },
-        'editingVersion': {
-            'languageCode': editing_language.language_code,
-            'versionNumber': (editing_version.version_number
-                              if editing_version else None),
-        },
-        'baseLanguage': base_language,
-        'languages': [_language_data(lang, editing_version,
-                                     translated_from_version, base_language)
-                      for lang in languages],
-        'languageCode': request.LANGUAGE_CODE,
-        'oldEditorURL': reverse('subtitles:old-editor', kwargs={
-            'video_id': video.video_id,
-            'language_code': editing_language.language_code,
-        }),
-        'staticURL': settings.STATIC_URL,
-        'notesHeading': 'Editor Notes',
-    }
+        return editor_data
 
-    editor_data.update(workflow.editor_data(request.user, language_code))
+    def editor_data_for_language(self, language):
+        versions_data = []
 
-    if task:
+        versions = list(language.subtitleversion_set.full())
+        for i, version in enumerate(versions):
+            version_data = {
+                'version_no':version.version_number,
+                'visibility': visibility(version),
+            }
+            if self.editing_version == version:
+                version_data.update(_version_data(version))
+            elif self.translated_from_version == version:
+                version_data.update(_version_data(version))
+            elif (language.language_code == self.base_language and
+                  i == len(versions) - 1):
+                version_data.update(_version_data(version))
+
+            versions_data.append(version_data)
+
+
+        return {
+            'translatedFrom': self.translated_from_version and {
+                'language_code': self.translated_from_version.subtitle_language.language_code,
+                'version_number': self.translated_from_version.version_number,
+            },
+            'editingLanguage': language == self.editing_language,
+            'language_code': language.language_code,
+            'name': language.get_language_code_display(),
+            'pk': language.pk,
+            'numVersions': language.num_versions,
+            'versions': versions_data,
+            'subtitles_complete': language.subtitles_complete,
+            'is_rtl': language.is_rtl(),
+            'is_original': language.is_primary_audio_language()
+        }
+
+    def get_team_editor_data(self):
+        if self.team_video:
+            team = self.team_video.team
+            return dict([('teamName', team.name), ('guidelines', dict(
+                [(s.key_name.split('_', 1)[-1],
+                  linebreaks(urlize(force_escape(s.data))))
+                 for s in team.settings.guidelines()
+                 if s.data.strip()]))])
+        else:
+            return None
+
+    def assign_task_for_editor(self):
+        """Try to assign any unassigned tasks to our user.
+
+        If we can't assign the task, return False.
+        """
+        if self.team_video is None:
+            return True
+        task_set = self.team_video.task_set.incomplete().filter(
+            language=self.language_code)
+        tasks = list(task_set[:1])
+        if tasks:
+            task = tasks[0]
+            if task.assignee is None and can_assign_task(task, self.user):
+                task.assignee = self.user
+                task.set_expiration()
+                task.save()
+
+            if task.assignee != self.user:
+                msg = fmt(_("Another user is currently performing "
+                            "the %(task_type)s task for these subtitles"),
+                          task_type=task.get_type_display())
+                messages.error(self.request, msg)
+                return False
+        return True
+
+    def handle_task(self, context, editor_data):
+        """Does most of the dirty-work to handle tasks.  """
+        context['task'] = None
+        if self.team_video is None:
+            return
+
+        task = self.team_video.get_task_for_editor(self.language_code)
+        if not task:
+            return
+        context['task'] = task
         editor_data['task_id'] = task.id
         editor_data['savedNotes'] = task.body
         editor_data['task_needs_pane'] = task.get_type_display() in ('Review', 'Approve')
@@ -271,22 +262,56 @@ def subtitle_editor(request, video_id, language_code):
             'task_id': task.id,
         })
 
-    team_attributes = get_team_attributes_for_editor(video)
-    if team_attributes:
-        editor_data['teamAttributes'] = team_attributes
+    def get(self, request, video_id, language_code):
+        self.video = get_object_or_404(Video, video_id=video_id)
+        self.team_video = self.video.get_team_video()
+        self.language_code = language_code
+        self.user = request.user
+        self.calc_base_language()
+        self.calc_editing_language()
 
-    return render_to_response("editor/editor.html", {
-        'video': video,
-        'DEBUG': settings.DEBUG,
-        'language': editing_language,
-        'other_languages': languages,
-        'version': editing_version,
-        'translated_from_version': translated_from_version,
-        'task': task,
-        'editor_data': json.dumps(editor_data, indent=4),
-        'upload_subtitles_form': SubtitlesUploadForm(request.user, video,
-                                                     initial={'language_code': editing_language.language_code})
-    }, context_instance=RequestContext(request))
+        if not self.check_can_writelock():
+            return redirect(self.video)
+        if not self.assign_task_for_editor():
+            return redirect(self.video)
+        check_result = can_add_version(request.user, self.video, language_code)
+        if not check_result:
+            messages.error(request, check_result.message)
+            return redirect(self.video)
+
+        self.editing_language.writelock(self.user, self.request.browser_id,
+                                        save=True)
+        self.editing_version = self.editing_language.get_tip(public=False)
+        # we ignore forking because even if it *is* a fork, we still want to
+        # show the user the rererence languages:
+        self.translated_from_version = self.editing_language.\
+            get_translation_source_version(ignore_forking=True)
+        self.languages = self.video.newsubtitlelanguage_set.annotate(
+            num_versions=Count('subtitleversion'))
+        self.workflow = get_workflow(self.video)
+        editor_data = self.get_editor_data()
+
+        context = {
+            'video': self.video,
+            'DEBUG': settings.DEBUG,
+            'language': self.editing_language,
+            'other_languages': self.languages,
+            'version': self.editing_version,
+            'translated_from_version': self.translated_from_version,
+            'upload_subtitles_form': SubtitlesUploadForm(
+                request.user, self.video,
+                initial={'language_code': self.editing_language.language_code})
+        }
+        self.handle_task(context, editor_data)
+        context['editor_data'] = json.dumps(editor_data, indent=4)
+
+        return render(request, "editor/editor.html", context)
+
+class SubtitleEditor(SubtitleEditorBase):
+    @method_decorator(xframe_options_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(SubtitleEditor, self).dispatch(
+            request, *args, **kwargs)
 
 def download(request, video_id, language_code, filename, format,
              version_number=None):

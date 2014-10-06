@@ -78,10 +78,6 @@ var angular = angular || null;
             $window.location = location;
         }
 
-        function redirectToVideoPage() {
-            redirectTo('/videos/' + EditorData.video.id + '/');
-        }
-
         function redirectToLegacyEditor() {
             redirectTo(EditorData.oldEditorURL);
         }
@@ -107,10 +103,10 @@ var angular = angular || null;
         $scope.session = {
             exit: function() {
                 if(!$scope.session.subtitlesChanged) {
-                    redirectToVideoPage();
+                    $scope.exitEditor();
                 } else {
                     $scope.dialogManager.openDialog('unsavedWork', {
-                        'exit': redirectToVideoPage
+                        'exit': $scope.exitEditor
                     });
                 }
             },
@@ -129,7 +125,7 @@ var angular = angular || null;
                 saveSubtitles().then(function onSuccess() {
                     $scope.dialogManager.closeFreezeBox();
                     $scope.dialogManager.openDialog('changesSaved', {
-                        exit: redirectToVideoPage
+                        exit: $scope.exitEditor
                     });
                 }, function onError() {
                     $scope.dialogManager.closeFreezeBox();
@@ -147,7 +143,7 @@ var angular = angular || null;
                     var promise = saveSubtitles(true);
                 }
                 promise.then(function() {
-                    redirectToVideoPage();
+                    $scope.exitEditor();
                 });
             },
             */
@@ -176,7 +172,7 @@ var angular = angular || null;
                     promise.then(
                         function onSuccess() {
                             $scope.dialogManager.closeFreezeBox();
-                            redirectToVideoPage();
+                            $scope.exitEditor();
                         },
                         function onError() {
                             $scope.dialogManager.closeFreezeBox();
