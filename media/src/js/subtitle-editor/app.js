@@ -307,8 +307,8 @@ var angular = angular || null;
         $scope.collab = {
             notes: EditorData.savedNotes
         };
-        $scope.exitToVideoPage = function() {
-            $window.location = '/videos/' + $scope.videoId + '/';
+        $scope.exitEditor = function() {
+            $window.location = EditorData.redirectUrl;
         }
         $scope.exitToLegacyEditor = function() {
             $window.location = EditorData.oldEditorURL;
@@ -440,7 +440,7 @@ var angular = angular || null;
                     }
                     regainLockAfterIdle();
                 },
-                closeEditor: $scope.exitToVideoPage
+                closeEditor: $scope.exitEditor
             }, { text: makeText() });
         }
 
@@ -450,7 +450,7 @@ var angular = angular || null;
 
             dialogManager.openDialog('sessionEnded', {
                 resume: regainLockAfterIdle,
-                closeEditor: $scope.exitToVideoPage
+                closeEditor: $scope.exitEditor
             });
         }
 
