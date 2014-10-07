@@ -67,6 +67,20 @@ div.note a.hide-messages {
   float: right;
 }
 
+div.note a.hide-announcement {
+  float: right;
+}
+
+/*HIDE EMAIL CONFIRMATION BANNER - EXCEPT FOR PERSONAL PAGES*/
+
+.email-confirmation {
+  display: none;
+}
+
+body.profile .email-confirmation, body.dashboard .email-confirmation {
+  display: block;
+}
+
 /* New header styles */
 
 #main_bar {
@@ -186,7 +200,7 @@ div.note a.hide-messages {
 
 #main_bar #user_menu .message_count {
     float: right;
-    color: #bbb;
+    color: #999;
 }
 
 #main_bar li#me_menu #user_menu #menu ul#dropdown li ul#teams_menu {
@@ -200,6 +214,8 @@ div.note a.hide-messages {
 }
 #main_bar li#me_menu #user_menu #menu ul#dropdown li h4 a {
     padding: 0 0 0 15px;
+    color: #77a700;
+    font-weight: 400;
 }
 
 #main_bar li#me_menu #user_menu #menu ul#dropdown li h4 a:hover {

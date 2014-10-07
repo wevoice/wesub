@@ -70,6 +70,12 @@ div.note a.hide-messages {
 	float: right;
 }
 
+/*HIDE EMAIL CONFIRMATION BANNER - EXCEPT FOR PERSONAL PAGES*/
+
+.email-confirmation {
+	display: none;
+}
+
 /* NAV */
 
 nav span {
@@ -256,11 +262,13 @@ nav span {
     padding: 0;
 }
 .navbar li#me_menu #user_menu #menu ul#dropdown li h4 a {
-    padding: 0 0 0 15px;
+    padding: 0 0 0 30px;
+		color: #77a700;
+		font-weight: 500;
 }
 
 .navbar li#me_menu #user_menu #menu ul#dropdown li h4 a:hover {
-    background: transparent
+    background: transparent;
 }
 
 .navbar li#me_menu #user_menu #menu ul#dropdown li a {
@@ -408,6 +416,49 @@ text-decoration: underline;
 .help-tab a:hover {
 	text-decoration: none;
 	color: #f2f2f3;
+}
+
+/* ADMIN CONTROLS */
+#admin_controls {
+		position: fixed;
+		bottom: 0; left: 0;
+		-moz-box-shadow: 0 0 10px rgba(0,0,0, 0.3);
+		-webkit-box-shadow: 0 0 10px rgba(0,0,0, 0.3);
+		background: hsla(0, 0%, 97%, .8);
+		z-index: 99;
+}
+#admin_controls ul {
+		float: left;
+		padding: 0;
+}
+#admin_controls ul li {
+		display: inline;
+}
+#admin_controls a, #admin_controls div.admin-edit-specific-version {
+		display: block;
+		float: left;
+		font-size: 14px;
+		padding: .5em 1em;
+		text-decoration: none;
+		color: #777;
+		font-weight: 400;
+}
+div.admin-edit-specific-version select {
+		margin: -3px 3px;
+}
+#admin_controls:hover a {
+		color: #7692a3
+}
+#admin_controls a:hover {
+		color: #1573AD;
+}
+#site_controls {
+		border-right: 1px solid #ddd;
+}
+
+ul#site_controls {
+	margin:0;
+	padding:0;
 }
 
 /*SIZE TWEAKS INDEX*/

@@ -14,7 +14,7 @@
               <script type="text/javascript">
                   $('.note .hide-messages').click(function(){
                       var $this = $(this);
-                      $this.parents('.note').hide();
+                      $this.parents('#announce-banner').hide();
                       var d = new Date()
                       d.setTime(d.getTime() + 60*60*24*365*1000)
                       document.cookie = '{{ cookie_name }}={{ last_unread|urlencode }}; path=/; expires='+d.toUTCString();

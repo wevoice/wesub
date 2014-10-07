@@ -11,7 +11,7 @@
       <div class="row">
         <div class="col-xs-12 col-sm-6">
           <h1>{% trans "Amara makes video globally accessible" %}</h1>
-          <h5>{% trans "Captions, subtitles, and translations made simple." %}</h5>
+          <h5>{% trans "Captions, subtitles, and translations simplified." %}</h5>
         </div>
       </div>
     </div>
@@ -19,10 +19,18 @@
 </div>
 
 
-<div class="container whitespace-tall">
+<div class="container whitespace text-center">
   <div class="row">
-    <div class="col-xs-12">
-
+    <div class="index-video-container col-xs-12 col-sm-7 col-md-6">
+      <div onclick="this.nextElementSibling.style.display='block'; this.style.display='none'" class="flex-video flex-video-foil widescreen"><img src="{{ STATIC_URL }}images/index-video-thumbnail.png" style="cursor:pointer; width:100%;" />
+      </div>
+      <div style="display:none;" class="flex-video widescreen">
+      <iframe src="//www.youtube-nocookie.com/embed/c2UFCEAIbxg?rel=0&autoplay=1&showinfo=0&cc_load_policy=1" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+    <div class="index-video-description col-xs-12 col-sm-5 col-md-6 text-left">
+      <h3>{% trans "Meet Amara" %}</h3>
+      <h5>{% trans "Home to an award winning subtitle editor, many different video localization and accessibility communities, plus a range of professional solutions that make it easy to caption and translate video." %}</h5>
     </div>
   </div>
 </div>
@@ -63,7 +71,7 @@
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-lg-offset-1 col-lg-5">
         <h2>{% trans "Professional Solutions" %}</h2>
-        <h5>{% trans "Amara provides a complete solution for captioning and translation. Whether you’d like to purchase subtitles or use the collaborative platform, we can help." %}</h5>
+        <h5>{% trans "Amara provides a complete solution for captioning and translation. Whether you'd like to purchase subtitles or use the collaborative platform, we can help." %}</h5>
       </div>
       <div class="col-xs-12 col-sm-6 col-lg-5">
         <h4 class="float-right"><a href="//pro.amara.org">{% trans "Professional Solutions" %} &raquo;</a></h4>
