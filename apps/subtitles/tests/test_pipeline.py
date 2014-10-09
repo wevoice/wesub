@@ -133,8 +133,8 @@ class TestHelperFunctions(TestCase):
 class TestBasicAdding(TestCase):
     def setUp(self):
         self.video = make_video()
-        users = User.objects.all()
-        (self.u1, self.u2) = users[:2]
+        self.u1 = UserFactory()
+        self.u2 = UserFactory()
         self.anon = User.get_anonymous()
 
     def test_add_empty_versions(self):
@@ -656,8 +656,8 @@ class TestBasicAdding(TestCase):
 class TestRollbacks(TestCase):
     def setUp(self):
         self.video = make_video()
-        users = User.objects.all()
-        (self.u1, self.u2) = users[:2]
+        self.u1 = UserFactory()
+        self.u2 = UserFactory()
         self.anon = User.get_anonymous()
 
         v = self.video

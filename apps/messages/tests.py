@@ -39,10 +39,11 @@ import messages.tasks
 
 class MessageTest(TestCase):
     def setUp(self):
-        self.author = User.objects.all()[:1].get()
+        self.author = UserFactory()
         self.subject = "Let's talk"
         self.body = "Will you please help me out with Portuguese trans?"
-        self.user = User.objects.exclude(pk=self.author.pk)[:1].get()
+        self.user = UserFactory()
+        mail.outbox = []
 
     def _create_message(self, to_user):
         self.message = Message(user=to_user,
@@ -90,7 +91,7 @@ class MessageTest(TestCase):
         team , created= Team.objects.get_or_create(name='test', slug='test')
         # creates dummy users:
         for x in xrange(0,5):
-            user, member = User.objects.get_or_create(
+            user = UserFactory(
                 username="test%s" % x,
                 email = "test%s@example.com" % x,
             )
@@ -158,7 +159,7 @@ class MessageTest(TestCase):
 
         # creates dummy users:
         for x in xrange(0,5):
-            user, member = User.objects.get_or_create(
+            user = UserFactory(
                 username="test%s" % x,
                 email = "test%s@example.com" % x,
                 notify_by_email = True,
@@ -230,10 +231,10 @@ class MessageTest(TestCase):
 
 
         team , created= Team.objects.get_or_create(name='test', slug='test')
-        applying_user = User.objects.all()[0]
+        applying_user = UserFactory()
         # creates dummy users:
         for x in xrange(0,4):
-            user, member = User.objects.get_or_create(
+            user = UserFactory(
                 username="test%s" % x,
                 email = "test%s@example.com" % x,
                 notify_by_email = True,
@@ -282,8 +283,7 @@ class MessageTest(TestCase):
 
 
     def test_account_verified(self):
-       user = User.objects.filter(
-           notify_by_email=True, email__isnull=False)[0]
+       user = UserFactory(notify_by_email=True)
        c = EmailConfirmation.objects.send_confirmation(user)
        num_emails = len(mail.outbox)
        num_messages = Message.objects.filter(user=user).count()
@@ -293,10 +293,9 @@ class MessageTest(TestCase):
                         Message.objects.filter(user=user).count())
 
     def test_team_inviation_sent(self):
-        team, created= Team.objects.get_or_create(name='test', slug='test')
-        owner, created = TeamMember.objects.get_or_create(
-            team=team, user=User.objects.all()[2], role='owner')
-        applying_user = User.objects.all()[0]
+        team = TeamFactory(name='test', slug='test')
+        owner = TeamMemberFactory(team=team, role=TeamMember.ROLE_OWNER)
+        applying_user = UserFactory()
         applying_user.notify_by_email = True
         applying_user.save()
         mail.outbox = []
@@ -313,84 +312,9 @@ class MessageTest(TestCase):
         self.assertIn(applying_user.email, msg.to[0] )
         self.assertIn(message, msg.body, )
 
-
-    def test_moderated_notifies_only_when_published(self):
-        # TODO: should this use the new visibility settings instead of the old
-        # moderation stuff?
-        """
-        Set up a public team, add new video and new version.
-        Notification should be sent.
-        Setup  a team with moderated videos
-        """
-        def video_with_two_followers():
-            v, c = Video.get_or_create_for_url("http://blip.tv/file/get/Miropcf-AboutUniversalSubtitles847.ogv")
-            f1 = User.objects.all()[0]
-            f2 = User.objects.all()[1]
-            f1.notify_by_email = f2.notify_by_email = True
-            f1.save()
-            f2.save()
-            v.followers.add(f1, f2)
-            return v
-        def new_version(v):
-
-            subs = [
-                (0, 1000, 'Hello', {}),
-                (2000, 5000, 'world.', {})
-            ]
-            add_subtitles(v, 'en', subs, author=self.author,
-                    committer=self.author)
-            subs = [
-                (0, 1000, 'Hello', {}),
-                (3000, 5000, 'world.', {})
-            ]
-            return add_subtitles(v, 'en', subs, author=self.author,
-                    committer=self.author)
-
-        v = video_with_two_followers()
-        mail.outbox = []
-        v = video_with_two_followers()
-        sv = new_version(v)
-        video_changed_tasks(v.pk, sv.pk)
-        # notifications are only sent on the second version of a video
-        # as optimization
-        sv = new_version(v)
-        video_changed_tasks(v.pk, sv.pk)
-        # video is public , followers should be notified
-        self.assertEquals(len(mail.outbox), 2)
-        mail.outbox = []
-        # add to a moderated video
-        team = Team.objects.create(slug='my-team', name='myteam',
-                workflow_enabled=True)
-        workflow = Workflow(team=team, review_allowed=20,approve_allowed=20)
-        workflow.save()
-
-        tv = TeamVideo(team=team, video=v, added_by=User.objects.all()[2])
-        tv.save()
-        sv = new_version(v)
-        # with the widget, this would set up correctly
-        sv.moderation_status = WAITING_MODERATION
-        sv.save()
-
-        video_changed_tasks(v.pk, sv.pk)
-        sv = sub_models.SubtitleVersion.objects.get(pk=sv.pk)
-        self.assertFalse(sv.is_public())
-        # no emails should be sent before the video is approved
-        self.assertEqual(len(mail.outbox), 0)
-        # approve video
-        t = Task(type=40, approved=20, team_video=tv, team=team, language='en',
-                new_subtitle_version=sv, assignee=self.author)
-        t.save()
-        t.complete()
-        self.assertTrue(sv.is_public())
-        video_changed_tasks(v.pk, sv.pk)
-        # Once the video is approved, we should send out the
-        # team-task-approved-published.html email and the
-        # email_notification_non_editors.html to the author
-        self.assertEqual(len(mail.outbox), 2)
-
     def test_send_message_view(self):
-        to_user = User.objects.filter(notify_by_email=True)[0]
-        user, c = User.objects.get_or_create(username='username')
+        to_user = UserFactory()
+        user = UserFactory(username='username')
         user.notify_by_email = True
         user.set_password('username')
         user.save()
@@ -407,8 +331,8 @@ class MessageTest(TestCase):
         # User is invited to a team
         # - User accepts invitation
         # - Message for the invitation gets deleted -> wrong!
-        user = User.objects.filter(notify_by_message=True)[0]
-        owner = User.objects.filter(notify_by_message=True)[1]
+        user = UserFactory(notify_by_message=True)
+        owner = UserFactory(notify_by_message=True)
         team = Team.objects.create(name='test-team', slug='test-team', membership_policy=Team.APPLICATION)
 
         invite_form = InviteForm(team, owner, {

@@ -262,7 +262,7 @@ class TeamVideoTest(TestCase):
             pass
 
     def test_publish_draft_when_teamvideo_deleted(self):
-        user = User.objects.all()[0]
+        user = UserFactory()
         team = TeamFactory()
         tv = TeamVideoFactory(team=team, added_by=user)
         video = tv.video
@@ -927,11 +927,11 @@ class TestJqueryRpc(TestCase):
         fix_teams_roles()
         self.team = Team(name='Test', slug='test')
         self.team.save()
-        self.user = User.objects.all()[:1].get()
+        self.user = UserFactory()
         self.rpc = TeamsApiClass()
 
     def test_promote_user(self):
-        other_user = User.objects.exclude(pk=self.user.pk)[:1].get()
+        other_user = UserFactory()
         user_tm = TeamMember(team=self.team, user=self.user)
         user_tm.save()
         other_user_tm = TeamMember(team=self.team, user=other_user)
@@ -1050,7 +1050,6 @@ class TeamsDetailQueryTest(TestCase):
             ul.save()
         self.user = User.objects.get(id=self.user.id)
 
-
     def _create_rdm_video(self, i):
         video, created = Video.get_or_create_for_url("http://www.example.com/%s.mp4" % i)
         return video
@@ -1059,7 +1058,8 @@ class TeamsDetailQueryTest(TestCase):
         team, created = Team.objects.get_or_create(slug='arthur')
         team.videos.all().delete()
         from utils import multi_query_set as mq
-        created_tvs = [TeamVideo.objects.get_or_create(team=team, added_by=User.objects.all()[0], video=self._create_rdm_video(x) )[0] for x in xrange(10,30)]
+        user = UserFactory()
+        created_tvs = [TeamVideo.objects.get_or_create(team=team, added_by=user, video=self._create_rdm_video(x) )[0] for x in xrange(10,30)]
         created_pks = [x.pk for x in created_tvs]
         multi = mq.MultiQuerySet(*[TeamVideo.objects.filter(pk=x) for x in created_pks])
         self.assertTrue([x.pk for x in multi] == created_pks)
@@ -1146,10 +1146,10 @@ class TestLanguagePreference(TestCase):
 class TestInvites(TestCase):
 
     def setUp(self):
-        self.user = User.objects.filter(notify_by_message=True)[0]
+        self.user = UserFactory(notify_by_message=True)
         self.user.set_password(self.user.username)
         self.user.save()
-        self.owner = User.objects.filter(notify_by_message=True)[1]
+        self.owner = UserFactory(notify_by_message=True)
         self.team = Team.objects.create(name='test-team', slug='test-team', membership_policy=Team.APPLICATION)
         TeamMember.objects.create(user=self.owner, role=TeamMember.ROLE_ADMIN, team=self.team)
 
@@ -1301,12 +1301,12 @@ class TestInvites(TestCase):
 class TestApplication(TestCase, test_utils.TestCaseMessagesMixin):
     def setUp(self):
         self.team, c = Team.objects.get_or_create(name='test', slug='test',membership_policy=Team.APPLICATION )
-        self.owner = User.objects.create(username='test-owner')
+        self.owner = UserFactory(username='test-owner')
         self.owner.set_password('test')
         self.owner.save()
         TeamMember.objects.create(team=self.team, user=self.owner, role=TeamMember.ROLE_OWNER)
 
-        self.applicant = User.objects.create(username='test-applicant')
+        self.applicant = UserFactory(username='test-applicant')
         self.applicant.set_password('test')
         self.applicant.save()
 
@@ -1459,17 +1459,6 @@ class TestApplication(TestCase, test_utils.TestCaseMessagesMixin):
 
 
 class PartnerTest(TestCase):
-
-    def test_is_admin(self):
-        partner = Partner.objects.create(name='Le Partner', slug='partner')
-        user = User.objects.get(username='adam')
-
-        self.assertFalse(partner.is_admin(user))
-        partner.admins.add(user)
-        self.assertTrue(partner.is_admin(user))
-
-
-
     def setUp(self):
         fix_teams_roles()
         self.auth = {
@@ -1486,6 +1475,14 @@ class PartnerTest(TestCase):
         self.team, created = Team.objects.get_or_create(name="test-team", slug="test-team")
         self.tvs = _create_team_videos( self.team, self.videos, [self.user])
         reset_solr()
+
+    def test_is_admin(self):
+        partner = Partner.objects.create(name='Le Partner', slug='partner')
+        user = UserFactory()
+
+        self.assertFalse(partner.is_admin(user))
+        partner.admins.add(user)
+        self.assertTrue(partner.is_admin(user))
 
     def test_approved(self):
         # TODO: Closing this up to unblock a merge
@@ -1611,7 +1608,7 @@ class PartnerTest(TestCase):
         from teams.models import BillingRecord
         from videos.tasks import video_changed_tasks
 
-        user = User.objects.all()[0]
+        user = UserFactory()
         team = TeamFactory()
         tv = TeamVideoFactory(team=team, added_by=user)
         video = tv.video
@@ -1635,7 +1632,7 @@ class PartnerTest(TestCase):
         from teams.models import BillingRecord
         from videos.tasks import video_changed_tasks
 
-        user = User.objects.all()[0]
+        user = UserFactory()
         team = TeamFactory()
         tv = TeamVideoFactory(team=team, added_by=user,
                               video__primary_audio_language_code='en')
@@ -1672,7 +1669,7 @@ class PartnerTest(TestCase):
         from teams.models import BillingRecord
         from videos.tasks import video_changed_tasks
 
-        user = User.objects.all()[0]
+        user = UserFactory()
         team = TeamFactory()
         tv = TeamVideoFactory(team=team, added_by=user)
         video = tv.video
