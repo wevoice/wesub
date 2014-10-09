@@ -12,15 +12,10 @@ class CreatePage(UnisubsPage):
     _SINGLE_URL_ENTRY_BOX = "input.main_video_form_field"
     _INPUT_PREFOCUS = "input#submit_video_field.prefocus"
     _URL = "videos/create/"
-    _SUBMIT_BUTTON = "form.main_video_form button.green_button"
-    _MULTI_SUBMIT_LINK = (" div#submit_multiple_toggle "
-                         "a#btn_submit_multiple_toggle.toggle-create-form")
+    _SUBMIT_BUTTON = "button.blue-green-button"
     _YOUTUBE_USER_FIELD = "li input#id_usernames"
     _YOUTUBE_PAGE_FIELD = "li input#id_youtube_user_url"
     _FEED_URL = "li input#id_feed_url"
-    _SUBMIT_MULTI = ("div#submit_multiple_videos "
-                    "form#bulk_create button.green_button")
-    _HIDE_MULTI = "div#submit_multiple_toggle"
     _SUBMIT_ERROR = "ul.errorlist li"
 
     def open_create_page(self):
@@ -30,7 +25,7 @@ class CreatePage(UnisubsPage):
     def submit_video(self, video_url):
         self.logger.info('Submitting the video: %s' %video_url)
         self.wait_for_element_present(self._INPUT_PREFOCUS)
-        self.click_by_css("div h2.main_heading")
+        self.click_by_css("div#submit_video_form")
         self.clear_text(self._SINGLE_URL_ENTRY_BOX)
         self.type_by_css(self._SINGLE_URL_ENTRY_BOX, video_url)
         self.click_by_css(self._SUBMIT_BUTTON)
