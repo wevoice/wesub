@@ -213,9 +213,6 @@ var angular = angular || null;
                     });
                 }
             },
-            getPrimaryVideoURL: function() {
-                return EditorData.video.primaryVideoURL;
-            },
             getVideoURLs: function() {
                 return EditorData.video.videoURLs;
             },

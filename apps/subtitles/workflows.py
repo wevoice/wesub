@@ -225,6 +225,10 @@ class Workflow(object):
             'notes': editor_notes.note_editor_data(),
         }
 
+    def editor_video_urls(self, language_code):
+        """Get video URLs to send to the editor."""
+        return [v.url for v in self.video.get_video_urls()]
+
 @behavior
 def get_workflow(video):
     """Get the workflow to use for a subtitle set

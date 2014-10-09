@@ -73,56 +73,12 @@ EOF
     git branch --track $REV origin/$REV
     git checkout --force $REV
     git pull --ff-only origin $REV
-    if [ ! -e "unisubs-integration" ]; then
-        until git clone git@github.com:pculture/unisubs-integration.git ; do
-            echo "Error during unisubs-integration clone; trying again in 5 seconds..."
-            sleep 5
-        done
-    fi
-    if [ ! -e "amara-vimeo" ]; then
-        until git clone git@github.com:pculture/amara-vimeo.git ; do
-            echo "Error during amara-vimeo clone; trying again in 5 seconds..."
-            sleep 5
-        done
-    fi
-    if [ ! -e "amara-enterprise" ]; then
-        until git clone git@github.com:pculture/amara-enterprise.git ; do
-            echo "Error during amara-enterprise clone; trying again in 5 seconds..."
-            sleep 5
-        done
-    fi
+    ./bin/update-integration.py --clone-missing
     s3cmd -c /etc/s3cfg get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
     # get transifex config
     s3cmd -c /etc/s3cfg get --force s3://amara/settings/transifexrc /.transifexrc
 fi
 
-# checkout respective revisions
-if [ -z "$SKIP_CODE_PULL" ] ; then
-    cd $APP_DIR
-    git fetch
-    git branch --track $REV origin/$REV
-    git checkout --force $REV
-    git pull --ff-only origin $REV
-    if [ -e $APP_DIR/unisubs-integration ]; then
-        cd $APP_DIR/unisubs-integration
-        git fetch
-        git checkout master
-        INTEGRATION_REV=`cat ../optional/unisubs-integration`
-        git reset --hard $INTEGRATION_REV
-    fi
-    if [ -e $APP_DIR/amara-enterprise ]; then
-        cd $APP_DIR/amara-enterprise
-        git fetch
-        git checkout master
-        INTEGRATION_REV=`cat ../optional/amara-enterprise`
-        git reset --hard $INTEGRATION_REV
-    fi
-    if [ -e $APP_DIR/amara-vimeo ]; then
-        cd $APP_DIR
-        # this is a hack because something depends on this file; no idea
-        echo "master" > ./optional/amara-vimeo
-    fi
-fi
 cd $APP_DIR
 python ./deploy/create_commit_file.py
 

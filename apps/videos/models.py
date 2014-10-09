@@ -70,21 +70,6 @@ VIDEO_TYPE_FLV = 'L'
 VIDEO_TYPE_BRIGHTCOVE = 'C'
 VIDEO_TYPE_MP3 = 'M'
 VIDEO_TYPE_KALTURA = 'K'
-VIDEO_TYPE = (
-    (VIDEO_TYPE_HTML5, 'HTML5'),
-    (VIDEO_TYPE_YOUTUBE, 'Youtube'),
-    (VIDEO_TYPE_BLIPTV, 'Blip.tv'),
-    (VIDEO_TYPE_GOOGLE, 'video.google.com'),
-    (VIDEO_TYPE_FORA, 'Fora.tv'),
-    (VIDEO_TYPE_USTREAM, 'Ustream.tv'),
-    (VIDEO_TYPE_VIMEO, 'Vimeo.com'),
-    (VIDEO_TYPE_WISTIA, 'Wistia.com'),
-    (VIDEO_TYPE_DAILYMOTION, 'dailymotion.com'),
-    (VIDEO_TYPE_FLV, 'FLV'),
-    (VIDEO_TYPE_BRIGHTCOVE, 'brightcove.com'),
-    (VIDEO_TYPE_MP3, 'MP3'),
-    (VIDEO_TYPE_KALTURA, 'kaltura.com'),
-)
 VIDEO_META_CHOICES = (
     (1, 'Author',),
     (2, 'Creation Date',),
@@ -502,50 +487,43 @@ class Video(models.Model):
 
         try:
             video_url_obj = VideoUrl.objects.get(
-                url=vt.convert_to_video_url())
+                url=vt.convert_to_video_url(),
+                type=vt.abbreviation)
             video, created = video_url_obj.video, False
         except models.ObjectDoesNotExist:
             video, created = None, False
 
         if not video:
-            try:
-                video_url_obj = VideoUrl.objects.get(
-                    type=vt.abbreviation,
-                    videoid=vt.video_id,
-                    url=vt.convert_to_video_url())
-                if user:
-                    Action.create_video_handler(video_url_obj.video, user)
-                return video_url_obj.video, False
-            except VideoUrl.DoesNotExist:
-                obj = Video()
-                # video types can can fecth subtitles might do it async:
-                kwargs = {}
-                if vt.CAN_IMPORT_SUBTITLES:
-                    kwargs['fetch_subs_async'] = fetch_subs_async
-                vt.set_values(obj, **kwargs)
-                if obj.title:
-                    obj.slug = slugify(obj.title)
-                obj.user = user
-                obj.save()
+            obj = Video()
+            # video types can can fecth subtitles might do it async:
+            kwargs = {}
+            if vt.CAN_IMPORT_SUBTITLES:
+                kwargs['fetch_subs_async'] = fetch_subs_async
+            vt.set_values(obj, **kwargs)
+            if obj.title:
+                obj.slug = slugify(obj.title)
+            obj.user = user
+            obj.save()
 
-                save_thumbnail_in_s3.delay(obj.pk)
-                Action.create_video_handler(obj, user)
+            save_thumbnail_in_s3.delay(obj.pk)
+            Action.create_video_handler(obj, user)
 
-                #Save video url
-                defaults = {
-                    'type': vt.abbreviation,
-                    'original': True,
-                    'primary': True,
-                    'added_by': user,
-                    'video': obj,
-                    'owner_username': vt.owner_username(),
-                }
-                if vt.video_id:
-                    defaults['videoid'] = vt.video_id
-                video_url_obj, created = VideoUrl.objects.get_or_create(url=vt.convert_to_video_url(),
-                                                                        defaults=defaults)
-                obj.update_search_index()
-                video, created = obj, True
+            #Save video url
+            defaults = {
+                'original': True,
+                'primary': True,
+                'added_by': user,
+                'video': obj,
+                'owner_username': vt.owner_username(),
+            }
+            if vt.video_id:
+                defaults['videoid'] = vt.video_id
+            video_url_obj, created = VideoUrl.objects.get_or_create(
+                url=vt.convert_to_video_url(),
+                type=vt.abbreviation,
+                defaults=defaults)
+            obj.update_search_index()
+            video, created = obj, True
 
         if timestamp and video_url_obj.created != timestamp:
            video_url_obj.created = timestamp
@@ -1803,8 +1781,13 @@ class UserTestResult(models.Model):
 # VideoUrl
 class VideoUrl(models.Model):
     video = models.ForeignKey(Video)
-    type = models.CharField(max_length=1, choices=VIDEO_TYPE)
-    url = models.URLField(max_length=255, unique=True)
+    # Type is a character code that specifies the video type.  Types defined
+    # in the videos app are 1 char long.  Other apps can create their own
+    # types and register them with the video_type_registrar.  In that case the
+    # type should be 2 chars long with the first char being unique for the
+    # app.
+    type = models.CharField(max_length=2)
+    url = models.URLField(max_length=255)
     videoid = models.CharField(max_length=50, blank=True)
     primary = models.BooleanField(default=False)
     original = models.BooleanField(default=False)
@@ -1816,6 +1799,9 @@ class VideoUrl(models.Model):
 
     class Meta:
         ordering = ("video", "-primary",)
+        unique_together = (
+            ('url', 'type'),
+        )
 
     def __unicode__(self):
         return self.url
