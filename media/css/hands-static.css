@@ -233,6 +233,11 @@ ul {
 	margin: 10px 0 0 10px;
 }
 
+#submit_video_form a {
+	color: #a1cf3d;
+	text-decoration: underline;
+}
+
 #create .whitespace-tall h3{
 	margin-top: 35px;
 }

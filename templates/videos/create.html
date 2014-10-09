@@ -12,7 +12,7 @@
         <div id="submit_video_form">
           {% if vidscraper_error %}
             {% blocktrans %}
-              "Sorry, we couldn't identify the video at the link you sent.  Perhaps it's a link we don't recognize, or perhaps you've linked to a page that has multiple videos.  Try entering a different link to the video you want to submit.  If you think there's been some mistake, <a href="mailto:feedback@universalsubtitles.org">contact us</a>!"
+              "Sorry, we couldn't identify the video at the link you sent. Perhaps it's a link we don't recognize, or perhaps you've linked to a page that has multiple videos. Try entering a different link to the video you want to submit. If you think there's been some mistake, <a href="mailto:feedback@universalsubtitles.org">contact us</a>!"
             {% endblocktrans %}
           {% endif %}
 
@@ -20,13 +20,16 @@
 
             <h1 class="main_heading">{% trans 'Subtitle a Video' %}</h1>
             <p class="subtext create-instructions">
-              {% trans 'Enter the URL of a Vimeo, YouTube, mp4, webm, flv, or ogg video' %}
+              {% trans 'Submit a video URL to enable the Amara Editor &amp; public subtitling.' %} <a target="_blank" href="http://pculture.freshdesk.com/solution/articles/200448-what-does-adding-a-video-amara">{% trans 'Learn more' %}</a>
             </p>
 
             <input type="text" id="submit_video_field" class="prefocus main_video_form_field"{% if initial_url %} value="{{ initial_url }}"{% endif %} name="video_url" />
             <button class="blue-green-button" type="submit" value="Begin">
               {% trans 'Begin' %} &raquo;
             </button>
+            <ul class="errorlist">
+              <li>{% trans 'Acceptable Formats Include: Vimeo, Youtube, mp4, WebM, flv, &amp; ogg.' %}</li>
+            </ul>
             {{ video_form.video_url.errors }}
             {{ video_form.non_field_errors }}
           </form>
@@ -51,46 +54,17 @@
 
       <ul>
         <li>
-          <h5><a href="#">{% trans 'Learn the Amara subtitle editor' %}</a></h5>
+          <h5><a href="http://support.amara.org/support/solutions/articles/195345-how-to-transcribe-and-translate">{% trans 'Learn the Amara subtitle editor' %}</a></h5>
         </li>
         <li>
-          <h5><a href="#">{% trans 'Use your completed subtitles' %}</a></h5>
+          <h5><a href="http://support.amara.org/solution/articles/200446-using-completed">{% trans 'Use your completed subtitles' %}</a></h5>
         </li>
         <li>
-          <h5><a href="#">{% trans 'Invite friends and fans to help caption &amp; translate' %}</a></h5>
+          <h5><a href="http://support.amara.org/solution/articles/200447-the-basics-of-collaboration-on">{% trans 'Invite friends and fans to help caption &amp; translate' %}</a></h5>
         </li>
         <li>
-          <h5><a href="#">{% trans 'Get professional tools and On Demand subtitles' %}</a></h5>
+          <h5><a href="http://support.amara.org/solution/articles/35519--i-m-interested-in-amara-professional">{% trans 'Get professional tools and On Demand subtitles' %}</a></h5>
         </li>
-        <!--<li>
-          <div id="submit_multiple_videos" {% if not from_feed %}style="display: none;"{% endif %}>
-            <form action="{% url videos:create_from_feed %}" method="POST" id="bulk_create" class="clearfix">
-              <h5>{% trans "Submit Multiple Videos" %}</h5>
-              <ul>
-                  {{ feed_form.as_ul }}
-                  <li>
-                    <button class="green_button big">{% trans "Let's Go!" %}</button>
-                  </li>
-              </ul>
-            </form>
-          </div>
-          <div id="submit_multiple_toggle">
-            <h5><a id="btn_submit_multiple_toggle" class="toggle-create-form" href="#">{% trans "Submit Multiple Videos" %}</a></h5>
-          </div>
-          <script type="text/javascript">
-            jQuery('.toggle-create-form').click(function(){
-              var $link = $(this);
-              $('#submit_multiple_videos').toggle(0, function(){
-                if ($(this).is(':visible')){
-                  $link.html('{% trans "Hide" %}');
-                }else{
-                  $link.html('{% trans "Submit Multiple Videos" %}');
-                }
-              });
-              return false;
-            });
-          </script>
-        </li>-->
       </ul>
     </div>
   </div>
