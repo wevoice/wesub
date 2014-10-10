@@ -16,9 +16,12 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import os
+
 from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.shortcuts import render
+from django.views import static
 
 from staticmedia import bundles
 from staticmedia import oldembedder
@@ -53,3 +56,9 @@ def old_embedder_test(request):
     return render(request, 'staticmedia/old-embedder-test.html', {
         'old_embedder_url': old_embedder_url,
     })
+
+def serve_add_static_media(request, path):
+    for root_dir in utils.app_static_media_dirs():
+        if os.path.exists(os.path.join(root_dir, path)):
+            return static.serve(request, path, document_root=root_dir)
+    raise Http404("'%s' could not be found" % path)
