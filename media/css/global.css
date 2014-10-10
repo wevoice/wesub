@@ -285,12 +285,11 @@ body.profile .email-confirmation, body.dashboard .email-confirmation {
     line-height: 1em;
 }
 #lang_bar {
-    -moz-box-shadow: inset 0 -1px 0 #3c9edc;
-    -webkit-box-shadow: inset 0 -1px 0 #3c9edc;
-    background: #126295;
+    background: #bbb;
     position: relative;
     width: 100%;
     z-index: 1;
+    height: 2px;
 }
 
 /*HELP BUTTON*/
