@@ -29,7 +29,7 @@ from django.utils.translation import ugettext_lazy
 from messages.models import Message
 from subtitles.signals import subtitles_published
 from teams.models import Task
-from teams.permissions import can_create_and_edit_subtitles
+from teams.permissions import can_add_version
 from teams.workflows.notes import TeamEditorNotes
 from utils import send_templated_email
 from utils import translation
@@ -163,8 +163,7 @@ class TeamSubtitlesWorkflow(subtitles.workflows.DefaultWorkflow):
         return self.team_video.team.is_member(user)
 
     def user_can_edit_subtitles(self, user, language_code):
-        return can_create_and_edit_subtitles(user, self.team_video,
-                                             language_code)
+        return can_add_version(user, self.video, language_code)
 
 class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
     def get_work_mode(self, user, language_code):

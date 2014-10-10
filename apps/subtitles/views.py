@@ -42,7 +42,7 @@ from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.templatetags.new_subtitles_tags import visibility
 from subtitles.forms import SubtitlesUploadForm
 from teams.models import Task
-from teams.permissions import can_add_version, can_assign_task
+from teams.permissions import can_assign_task
 from utils.text import fmt
 from videos.models import Video
 
@@ -124,6 +124,14 @@ class SubtitleEditorBase(View):
             return False
         else:
             return True
+
+    def check_can_edit(self):
+        if self.workflow.user_can_edit_subtitles(self.user,
+                                                 self.language_code):
+            return True
+        messages.error(self.request,
+                       _('Sorry, these subtitles are privately moderated.'))
+        return False
 
     def get_editor_data(self):
         editor_data = {
@@ -269,14 +277,11 @@ class SubtitleEditorBase(View):
         self.user = request.user
         self.calc_base_language()
         self.calc_editing_language()
+        self.workflow = get_workflow(self.video)
 
-        if not self.check_can_writelock():
-            return redirect(self.video)
-        if not self.assign_task_for_editor():
-            return redirect(self.video)
-        check_result = can_add_version(request.user, self.video, language_code)
-        if not check_result:
-            messages.error(request, check_result.message)
+        if (not self.check_can_edit() or
+            not self.check_can_writelock() or
+            not self.assign_task_for_editor()):
             return redirect(self.video)
 
         self.editing_language.writelock(self.user, self.request.browser_id,
@@ -288,7 +293,6 @@ class SubtitleEditorBase(View):
             get_translation_source_version(ignore_forking=True)
         self.languages = self.video.newsubtitlelanguage_set.annotate(
             num_versions=Count('subtitleversion'))
-        self.workflow = get_workflow(self.video)
         editor_data = self.get_editor_data()
 
         context = {
