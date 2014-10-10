@@ -20,7 +20,7 @@
 
             <h1 class="main_heading">{% trans 'Subtitle a Video' %}</h1>
             <p class="subtext create-instructions">
-              {% trans 'Enter a video URL to use the Amara Editor &amp; enable public subtitling.' %} <a target="_blank" href="http://pculture.freshdesk.com/solution/articles/200448-what-does-adding-a-video-amara">{% trans 'Learn more' %}</a>
+              {% trans 'Enter a video URL to use the Amara editor &amp; enable public subtitling.' %} <a target="_blank" href="http://pculture.freshdesk.com/solution/articles/200448-what-does-adding-a-video-amara">{% trans 'Learn more' %}</a>
             </p>
 
             <input type="text" id="submit_video_field" class="prefocus main_video_form_field"{% if initial_url %} value="{{ initial_url }}"{% endif %} name="video_url" />
@@ -28,7 +28,7 @@
               {% trans 'Begin' %} &raquo;
             </button>
             <ul class="errorlist">
-              <li>{% trans 'Acceptable Formats Include: Vimeo, Youtube, mp4, WebM, flv, ogg &amp; mp3.' %}</li>
+              <li>{% trans 'Acceptable Formats Include: Vimeo, Youtube, mp4, WebM, flv, ogg &amp; mp3' %}</li>
             </ul>
             {{ video_form.video_url.errors }}
             {{ video_form.non_field_errors }}
