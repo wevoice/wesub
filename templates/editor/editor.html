@@ -22,7 +22,7 @@
         window.Amara.conf = window.Amara.conf || {};
         window.Amara.conf.STATIC_ROOT_URL = '{{ STATIC_URL }}';
     </script>
-
+    <link rel="stylesheet" ng-repeat="customCSS in customCSSs" ng-href="[[ customCSS.href ]]">
     <!--[if IE]>
         <style type="text/css">
             .group {

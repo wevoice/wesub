@@ -82,6 +82,8 @@ var angular = angular || null;
         $scope.translating = function() {
             return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         }
+        if (EditorData.customCss)
+	    $scope.customCSSs = [{"href": EditorData.customCss}];
         if (EditorData.teamAttributes) {
             $scope.teamName = EditorData.teamAttributes.teamName
             if (EditorData.teamAttributes.guidelines &&
