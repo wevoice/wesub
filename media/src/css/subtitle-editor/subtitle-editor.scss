@@ -323,7 +323,6 @@ header.main {
     }
     div.session {
         text-align: right;
-        background: black;
 
         button {
             -webkit-transition: color 0.03s linear;
@@ -331,7 +330,7 @@ header.main {
             transition: color 0.03s linear;
 
             color: #999999;
-            background: black;
+            background: $dark-grey;
             border: none;
             font: normal 11px $OpenSans;
             height: 38px;
