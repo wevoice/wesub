@@ -2,17 +2,17 @@
 {% if user.is_authenticated %}
     <div id="user_menu">
         <div id="menu_name">
-            <a href="{% url profiles:dashboard %}">{{ user.username }} &#9662;</a>
+            <a href="{% url profiles:profile user.username %}">{{ user.username }} &#9662;</a>
         </div>
         <div id="menu">
             <ul id="dropdown">
                 <li>
-                    <a href="{% url profiles:dashboard %}">
+                    <a href="{% url profiles:profile user.username %}">
                         {% trans "Dashboard" %}
                     </a>
                 </li>
                 <li>
-                    <a href="{% url profiles:profile user.username %}">{% trans "Profile" %}</a>
+                    <a href="{% url profiles:account %}">{% trans "Profile" %}</a>
                 </li>
                 <li>
                     <a href="{% url profiles:videos user.username %}">
@@ -25,11 +25,6 @@
                     {% if user.unread_messages_count %}
                         <span class="message_count">{{ user.unread_messages_count }}</span>
                     {% endif %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url profiles:account %}">
-                    {% trans "Account" %}
                     </a>
                 </li>
                 <li>

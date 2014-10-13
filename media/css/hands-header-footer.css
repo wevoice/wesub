@@ -332,6 +332,10 @@ nav span {
 	font-weight: 500;
 }
 
+a #footer-pcf h6:hover {
+	text-decoration: underline;
+}
+
 #footer-terms {
 	margin-top: .25em;
 }
