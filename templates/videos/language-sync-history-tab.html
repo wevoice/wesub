@@ -1,12 +1,13 @@
 {% load i18n %}
 <div class="tab" id="sync-history-tab">
     {% if current_version %}
-        <h2>{% blocktrans with version=current_version.version_number %}Current public tip is version #{{ version }}{% endblocktrans %}</h2>
+    <h2>External subtitle syncing and history</h2>
+        <p class="view-notice">{% blocktrans with version=current_version.version_number %}The latest version available for syncing is version #{{ version }}{% endblocktrans %}</p>
     {% else %}
-        <h2>{% trans "No current public tip" %}</h2>
+        <p class="view-notice">{% trans "No versions currently available for syncing" %}</h2>
     {% endif %}
-    <h2>{% trans "Synced Versions" %}</h2>
-    <table class="synced-versions">
+    <h3>{% trans "Synced Versions" %}</h2>
+    <table class="new-style">
         <tr>
             <td><h4>{% trans "Video URL" %}</h4></td>
             <td><h4>{% trans "Version" %}</h4></td>
@@ -35,8 +36,8 @@
     </table>
 
     {% if sync_history %}
-    <h2>{% trans "Sync History" %}</h2>
-    <table class="sync-history">
+    <h3>{% trans "Sync History" %}</h3>
+    <table class="new-style">
         <tr>
             <td><h4>{% trans "Date" %}</h4></td>
             <td><h4>{% trans "Account" %}</h4></td>
