@@ -128,7 +128,7 @@ form p label {
     width: 220px;
 }
 form p.help {
-    font-size: 20px;
+    font-size: 16px;
 	margin-top: 5px;
 }
 form.message_form ul li label {
