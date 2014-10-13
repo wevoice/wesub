@@ -79,6 +79,7 @@ var angular = angular || null;
         $scope.loadingFinished = false;
         $scope.uploading = false;
         $scope.uploadError = false;
+        $scope.exiting = false;
         $scope.translating = function() {
             return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         }
@@ -308,9 +309,11 @@ var angular = angular || null;
             notes: EditorData.savedNotes
         };
         $scope.exitEditor = function() {
+            $scope.exiting = true;
             $window.location = EditorData.redirectUrl;
         }
         $scope.exitToLegacyEditor = function() {
+            $scope.exiting = true;
             $window.location = EditorData.oldEditorURL;
         }
         $scope.showDebugModal = function(evt) {
