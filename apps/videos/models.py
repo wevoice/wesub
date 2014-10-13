@@ -43,7 +43,7 @@ from auth.models import CustomUser as User, Awards
 from videos import behaviors
 from videos import metadata
 from videos import signals
-from videos.types import video_type_registrar
+from videos.types import video_type_registrar, video_type_choices
 from videos.feed_parser import VideoImporter
 from comments.models import Comment
 from statistic import hitcounts
@@ -1808,6 +1808,12 @@ class VideoUrl(models.Model):
 
     def is_html5(self):
         return self.type == VIDEO_TYPE_HTML5
+
+    def get_type_display(self):
+        for (type_, label) in video_type_choices():
+            if self.type == type_:
+                return label
+        return _('Unknown video type')
 
     @models.permalink
     def get_absolute_url(self):
