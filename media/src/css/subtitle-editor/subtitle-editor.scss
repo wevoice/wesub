@@ -247,37 +247,30 @@ div.timeline {
     right: 0;
 }
 
-div.subtitle-area {
+div.edit-area {
     position: absolute;
-    top: $top-section-height;
     bottom: 0;
-    width: 37%;
+    top: $top-section-height;
 
     body.timeline-shown & {
         top: $top-section-height + $timeline-height;
     }
+}
 
+div.subtitle-area {
+    width: 37%;
     &.reference {
         left: 0;
     }
-
     &.work {
         left: 37%;
-        @include box-shadow(0, 0, 20px, rgba(0, 0, 0, 0.23));
+        @include box-shadow(0, 0, 10px, rgba(0, 0, 0, 0.10));
     }
 }
 
 div.notes {
-    position: absolute;
-    bottom: 0;
-    top: $top-section-height;
-    bottom: 0;
     right: 0;
     width: 26%;
-
-    body.timeline-shown & {
-        top: $top-section-height + $timeline-height;
-    }
 }
 
 
@@ -849,29 +842,15 @@ div.help-panel {
     }
 }
 div.notes {
-    background: $dark-grey;
-    color: #ddd;
-
-    .heading {
-        position: absolute;
-        top: 1em;
-        left: 2em;
-        right: 2em;
-
-        h3 {
-            font-size: 150%;
-            color: $off-white;
-        }
-    }
-
     ul.notes {
+        color: #ddd;
         position: absolute;
         top: 3.5em;
         bottom: 10em;
         left: 2em;
         right: 2em;
         overflow: auto;
-        padding: 0 0.5em;
+        padding: 0.5em;
 
         li {
             background: $semi-dark-grey;
@@ -892,21 +871,23 @@ div.notes {
 
 
     .new-note {
+        background: $dark-grey;
         position: absolute;
-
-        height: 9em;
-        bottom: 1em;
-        left: 2em;
-        right: 2em;
+        height: 11em;
+        width: 100%;
+        bottom: 0;
+        padding: 0.5em 2em;
 
         textarea {
+            left: 2em;
+            right: 2em;
             background: #ececec;
             border: none;
             resize: none;
             width: 100%;
             height: 4em;
             border-radius: 5px;
-            margin-top: 1em;
+            margin: 1em 0;
             padding: 0.5em;
             color: $text-color;
         }
@@ -1168,15 +1149,18 @@ div.workspace-tools {
     border-top: 1px solid #DADBDC;
     position: relative;
     @include multi-box-shadow(
-        0, -5px, 5px, rgba(#E0E1E2, 1),
-        -7px, 0, 7px, rgba(0, 0, 0, 0.08)
+        0, -2px, 2px, rgba(#E0E1E2, 1),
+        -2px, 0, 7px, rgba(0, 0, 0, 0.08)
     );
 
-    div.subtitles-language {
-        float: left;
+    .heading {
         padding: 10px;
         font-size: 12px;
         line-height: 1.34em;
+    }
+
+    div.subtitles-language {
+        float: left;
     }
     div.toolbox {
         padding-top: 5px;
