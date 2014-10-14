@@ -22,7 +22,7 @@
         window.Amara.conf = window.Amara.conf || {};
         window.Amara.conf.STATIC_ROOT_URL = '{{ STATIC_URL }}';
     </script>
-
+    <link rel="stylesheet" ng-repeat="customCSS in customCSSs" ng-href="[[ customCSS.href ]]">
     <!--[if IE]>
         <style type="text/css">
             .group {
@@ -48,13 +48,12 @@
 
     {% include 'editor/timeline.html' %}
 
-    <div class="subtitle-area reference">
+    <div class="subtitle-area edit-area reference">
         {% include 'editor/reference-subtitles.html' %}
     </div>
-    <div class="subtitle-area work">
+    <div class="subtitle-area edit-area work">
         {% include 'editor/working-subtitles.html' %}
     </div>
-
     {% include 'editor/notes.html' %}
 </div>
 {% include 'editor/dialogs.html' %}

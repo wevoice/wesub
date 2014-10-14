@@ -1,6 +1,6 @@
 {% load i18n %}
-<div class="notes" ng-controller="NotesController">
-    <div class="heading"><h3>[[ heading ]]</h3></div>
+<div class="notes edit-area" ng-controller="NotesController">
+    <div class="workspace-tools group toolbar"><h3 class="heading">[[ heading ]]</h3></div>
     <ul class="notes" note-scroller>
         <li ng-repeat="note in notes">
             <p ng-bind-html="note.body"></p>
@@ -10,6 +10,5 @@
     <div class="new-note">
         <textarea ng-model="newNoteText"></textarea>
         <button ng-click="onPostClicked($event);">Post New Note</button>
-        <p>{% trans "notes are only visible in the editor" %}</p>
     </div>
 </div>
