@@ -654,3 +654,5 @@ try:
     }
 except ImportError:
     pass
+
+optionalapps.add_extra_settings(globals(), locals())

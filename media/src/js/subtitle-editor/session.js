@@ -70,18 +70,6 @@ var angular = angular || null;
          *     respond to our requests.
          */
 
-        var exiting = false;
-
-        function redirectTo(location) {
-            $scope.dialogManager.showFreezeBox($sce.trustAsHtml('Exiting&hellip;'));
-            exiting = true;
-            $window.location = location;
-        }
-
-        function redirectToLegacyEditor() {
-            redirectTo(EditorData.oldEditorURL);
-        }
-
         function saveSubtitles(markComplete) {
             if($scope.overrides.forceSaveError) {
                 var deferred = $q.defer();
@@ -112,10 +100,10 @@ var angular = angular || null;
             },
             exitToLegacyEditor: function() {
                 if(!$scope.session.subtitlesChanged) {
-                    redirectToLegacyEditor();
+                    scope.exitToLegacyEditor();
                 } else {
                     $scope.dialogManager.openDialog('legacyEditorUnsavedWork', {
-                        'discardChangesAndOpenLegacyEditor': redirectToLegacyEditor
+                        'discardChangesAndOpenLegacyEditor': scope.exitToLegacyEditor
                     });
                 }
             },
@@ -207,7 +195,7 @@ var angular = angular || null;
         });
 
         $window.onbeforeunload = function() {
-            if($scope.session.subtitlesChanged && !exiting) {
+            if($scope.session.subtitlesChanged && !$scope.exiting) {
               return "You have unsaved work";
             } else {
               return null;
