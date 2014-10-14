@@ -264,7 +264,7 @@ div.subtitle-area {
     }
     &.work {
         left: 37%;
-        @include box-shadow(0, 0, 20px, rgba(0, 0, 0, 0.23));
+        @include box-shadow(0, 0, 10px, rgba(0, 0, 0, 0.10));
     }
 }
 
@@ -1149,8 +1149,8 @@ div.workspace-tools {
     border-top: 1px solid #DADBDC;
     position: relative;
     @include multi-box-shadow(
-        0, -5px, 5px, rgba(#E0E1E2, 1),
-        -7px, 0, 7px, rgba(0, 0, 0, 0.08)
+        0, -2px, 2px, rgba(#E0E1E2, 1),
+        -2px, 0, 7px, rgba(0, 0, 0, 0.08)
     );
 
     .heading {
