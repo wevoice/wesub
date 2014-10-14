@@ -84,9 +84,11 @@ var angular = angular || null;
             return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         }
         if (EditorData.customCss)
-	    $scope.customCSSs = [{"href": EditorData.customCss}];
+            $scope.customCSSs = [{"href": EditorData.customCss}];
         if (EditorData.teamAttributes) {
             $scope.teamName = EditorData.teamAttributes.teamName
+            if (EditorData.teamAttributes.type && EditorData.teamAttributes.type == "EC")
+                $scope.noLinkToLegacy = true;
             if (EditorData.teamAttributes.guidelines &&
 		(EditorData.teamAttributes.guidelines['subtitle'] ||
 		 EditorData.teamAttributes.guidelines['translate'] ||
