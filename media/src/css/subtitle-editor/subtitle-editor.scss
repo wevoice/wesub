@@ -19,12 +19,49 @@ $CodePro: 'CodeProLC', $OpenSans;
     font-style: normal;
 }
 
+
+/*******************************************
+* This is to have a page whose size is a multiple
+* of 100 so that there is no rounding glitch
+* with integer percenages of columns
+*******************************************/
+@media (max-width: 999px) {
+    div.page {
+        width: 800px;
+    }
+}
+@media (min-width: 1000px) and (max-width: 1199px) {
+    div.page {
+        width: 1000px;
+    }
+}
+@media (min-width: 1200px) and (max-width: 1399px) {
+    div.page {
+        width: 1200px;
+    }
+}
+@media (min-width: 1400px) and (max-width: 1599px) {
+    div.page {
+        width: 1400px;
+    }
+}
+@media (min-width: 1600px) and (max-width: 1799px) {
+    div.page {
+        width: 1600px;
+    }
+}
+@media (min-width: 1800px) {
+    div.page {
+        width: 1800px;
+    }
+}
+
+
 /*
  * These colors sould be put in the colors modules, but does it make sense to
  * share them with the rest of the CSS?  Maybe we should have a different file
  * for editor colors.
  */
-
 
 $header-height: 38px;
 $top-section-height: 290px;
