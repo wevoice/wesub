@@ -87,7 +87,7 @@ var angular = angular || null;
             $scope.customCSSs = [{"href": EditorData.customCss}];
         if (EditorData.teamAttributes) {
             $scope.teamName = EditorData.teamAttributes.teamName
-            if (EditorData.teamAttributes.type && EditorData.teamAttributes.type == "EC")
+            if (EditorData.teamAttributes.type && EditorData.teamAttributes.type != "O")
                 $scope.noLinkToLegacy = true;
             if (EditorData.teamAttributes.guidelines &&
 		(EditorData.teamAttributes.guidelines['subtitle'] ||
