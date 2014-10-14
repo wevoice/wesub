@@ -1,0 +1,118 @@
+{% load i18n announcement_tags messages_tags profiles_tags media_bundle media_compressor auth_tags %}
+
+<!DOCTYPE html>
+<html {% if LANGUAGE_BIDI %}dir="rtl"{% endif %} xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="en" lang="en" {% block html_attrs %}{% endblock %} class="base">
+
+<head>
+  <title>{% block title %}Amara - {% trans 'Caption, translate, subtitle and transcribe video.' %}{% endblock %}</title>
+  <link href='//fonts.googleapis.com/css?family=Raleway:500,400,300,200' rel='stylesheet' type='text/css'>
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+  {% media_bundle "hands_home.css" %}
+
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Amara is home to the world's largest subtitling community and is a complete solution for captions, subtitles, and translations. Amara makes captioning &amp; translation easier, faster, more affordable.">
+  <meta name="keywords" content="subtitles, captions, transcripts, translation, film, crowdsourcing, Amara, Universal Subtitles">
+  <meta name="application-name" content="Amara - Buy captions, video translations, transcriptions, and crowd subtitling" />
+  <meta name="msapplication-tooltip" content="A platform for collaborative subtitles!" />
+  <meta name="title" content="Crowd Subtitles | Amara - Buy captions, video translations, transcriptions, and crowd subtitling" />
+
+  {% if not current_site.name == 'amara-production' %}
+    <meta name="robots" content="noindex, nofollow"/>
+  {% endif %}
+  {% block opengraph-head %}
+    <meta property="fb:admins" content="539835590"/>
+  {% endblock  %}
+
+  <link rel="shortcut icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
+  <link rel="icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
+
+  <!--[if IE]>
+      <style type="text/css"> .group { display: block; zoom: 1; } </style>
+  <![endif]-->
+  <!--[if gte IE 8]>
+      {% media_bundle "ie8.css" %}
+  <![endif]-->
+  <!--[if IE 8]>
+      <style> .notIE { display: none !important ; } </style>
+  <![endif]-->
+  <!--[if lt IE 9]>
+      <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+  {% media_bundle "site.js" %}
+  {% media_bundle "hands_home.js" %}
+  <script type="text/javascript" src="{% url js_i18n_catalog %}"></script>
+  <script src="{% url profiles:rpc_api %}" type="text/javascript"></script>
+  <script type="text/javascript" src='{% url embedder_iframe %}'>
+  </script>
+  {% block scripts %}
+  {% endblock %}
+  <script type="text/javascript">
+    window.STATIC_URL = '{{ STATIC_URL }}';
+    {% block oldmodal %}
+      window.OLD_MODAL = true;
+    {% endblock %}
+  </script>
+</head>
+
+<body {% block body_attrs %}{% endblock %}>
+  {% csrf_token %}
+    {% announcement %}
+    {% if user.is_authenticated %}
+        {% messages %}
+        {% block email_confirmation_block %}
+            {% email_confirmation_notification %}
+        {% endblock %}
+    {% endif %}
+    {% require_email_dialog %}
+  {% include 'header.html' %}
+
+<div>
+  {% block main_content %}{% endblock %}
+</div>
+
+<div>
+  {% block footer %}
+      {% include 'footer.html' %}
+  {% endblock %}
+</div>
+  {% if user.is_staff or user|can_translate %}
+    <div id="admin_controls">
+      <ul id="site_controls">
+        {% if user.is_staff %}
+          <li><a target="_blank" href="{% url admin:index %}">{% trans 'Admin' %}</a></li>
+        {% endif %}
+        {% if user.is_superuser %}
+          <li><a target="_blank" href="//sentry.pculture.org:9000">{% trans 'Sentry' %}</a></li>
+        {% endif %}
+        {% if user|can_translate %}
+          <li><a target="_blank" href="{% url rosetta-pick-file %}"><span>{% trans 'Rosetta' %}</span></a></li>
+        {% endif %}
+        {% if user.is_superuser %}
+          <li><a target="_blank" href="{% url auth:login_trap %}">{% trans 'Impersonate' %}</a></li>
+        {% endif %}
+        {% if user.is_superuser %}
+          <li><a target="_blank" href="{% url billing %}">{% trans 'Billing' %}</a></li>
+        {% endif %}
+        <li><a href="//github.com/pculture/unisubs/commit/{{ LAST_COMMIT_GUID }}" title="{{ LAST_COMMIT_GUID }}">Github</a></li>
+      </ul>
+        {% block page_controls %}{% endblock %}
+    </div>
+  {% endif %}
+  {% block bottom_scripts %}{% endblock %}
+
+  {% include "_analytics.html" %}
+</body>
+</html>
