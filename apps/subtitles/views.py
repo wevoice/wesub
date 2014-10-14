@@ -101,6 +101,9 @@ class SubtitleEditorBase(View):
     def get_redirect_url(self):
         return self.video.get_absolute_url()
 
+    def get_custom_css(self):
+        return ""
+
     def calc_base_language(self):
         if (self.video.primary_audio_language_code and 
             SubtitleVersion.objects.extant().filter(
@@ -160,6 +163,7 @@ class SubtitleEditorBase(View):
             'staticURL': settings.STATIC_URL,
             'notesHeading': 'Editor Notes',
             'redirectUrl': self.get_redirect_url(),
+            'customCss': self.get_custom_css(),
         }
 
         editor_data.update(self.workflow.editor_data(

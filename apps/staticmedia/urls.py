@@ -44,8 +44,10 @@ else:
         '/fonts/', document_root=os.path.join(settings.STATIC_ROOT, 'fonts')
     )
 
-    for static_dir in utils.app_static_media_dirs():
-        urlpatterns += static('/', document_root=static_dir)
+    urlpatterns += patterns(
+        'staticmedia.views',
+        (r'^(?P<path>.*)$', 'serve_add_static_media')
+    )
 
 if settings.DEBUG:
     urlpatterns += patterns(

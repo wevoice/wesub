@@ -62,7 +62,7 @@ class BaseTestPermission(TestCase):
         self.setup_videos()
 
     def setup_users(self):
-        self.user = User.objects.all()[0]
+        self.user = UserFactory()
         self.owner_account = UserFactory(username='owner')
         self.outsider = UserFactory(username='outsider')
         self.site_admin = UserFactory(username='site_admin', is_staff=True)

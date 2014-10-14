@@ -148,9 +148,9 @@ class TestViews(WebUseTest):
 
     def test_video_url_create(self):
         self._login()
-        v = Video.objects.all()[:1].get()
+        v = VideoFactory()
 
-        user = User.objects.exclude(id=self.user.id)[:1].get()
+        user = UserFactory()
         user.notify_by_email = True
         user.is_active = True
         user.valid_email = True
