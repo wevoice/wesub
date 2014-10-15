@@ -100,10 +100,10 @@ var angular = angular || null;
             },
             exitToLegacyEditor: function() {
                 if(!$scope.session.subtitlesChanged) {
-                    scope.exitToLegacyEditor();
+                    $scope.exitToLegacyEditor();
                 } else {
                     $scope.dialogManager.openDialog('legacyEditorUnsavedWork', {
-                        'discardChangesAndOpenLegacyEditor': scope.exitToLegacyEditor
+                        'discardChangesAndOpenLegacyEditor': $scope.exitToLegacyEditor
                     });
                 }
             },
