@@ -732,6 +732,24 @@ var Site = function(Site) {
             that.Utils.chosenify();
             that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
 	},
+        teams_activity: function() {
+            function onMoreClicked(e) {
+                var loadingIcon = $('img.loading-icon');
+                e.preventDefault();
+                var $link = $(this);
+                loadingIcon.show();
+                $link.remove();
+                $.get($link.attr('href'), function(data) {
+                    var $data = $(data);
+                    $('#activity-list ul').append($data.find('li'));
+                    $('.pagination').append($data.find('a.show-more'));
+                    $('div.pagination a').click(onMoreClicked);
+                    loadingIcon.hide();
+                });
+            }
+
+            $('div.pagination a').click(onMoreClicked);
+        },
         move_videos: function() {
             that.Utils.chosenify();
             that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
