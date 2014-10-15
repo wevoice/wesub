@@ -442,7 +442,7 @@ var USER_IDLE_MINUTES = 15;
                 if(li) {
                     li.removeClass('edit');
                     $('textarea.subtitle-edit', li).remove();
-                    if ((draft.storedSubtitle.content().length == 0) && (subtitleMap[draft.storedSubtitle.id].next().html() == undefined)) {
+                    if ((draft.storedSubtitle.content().length == 0) && (subtitleMap[draft.storedSubtitle.id].next().html() == undefined) && (subtitleList.length() > 1)) {
                         subtitleList.removeSubtitle(draft.storedSubtitle);
                     }
                 }
