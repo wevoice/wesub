@@ -157,7 +157,8 @@ class TeamSubtitlesWorkflow(subtitles.workflows.DefaultWorkflow):
         self.team_video = team_video
 
     def get_editor_notes(self, language_code):
-        return TeamEditorNotes(self.team_video, language_code)
+        return TeamEditorNotes(self.team_video.team, self.team_video.video,
+                               language_code)
 
     def user_can_view_private_subtitles(self, user, language_code):
         return self.team_video.team.is_member(user)
@@ -190,7 +191,8 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
             return [Complete()]
 
     def get_editor_notes(self, language_code):
-        return TaskTeamEditorNotes(self.team_video, language_code)
+        return TaskTeamEditorNotes(self.team_video.team,
+                                   self.team_video.video, language_code)
 
     def get_add_language_mode(self, user):
         if self.team_video.team.is_member(user):
