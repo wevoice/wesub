@@ -70,6 +70,7 @@ $warning-color: #ff6000;
 $blue: #126295;
 $teal: #15998e;
 $semi-dark-grey: #888;
+$light-grey: #F3F4F5;
 $dark-grey: #333;
 $off-white: #f3f3f3;
 
@@ -139,8 +140,13 @@ $off-white: #f3f3f3;
 
 
 // Page
+body {
+    background: $light-grey;
+    &.loading-finished {
+        background: $dark-grey;
+    }
+}
 html, body {
-    background: $dark-grey;
     overflow: hidden;
 }
 body {
@@ -320,7 +326,6 @@ div.notes {
 header.main {
     background: $dark-grey;
     border-bottom: 1px solid #474849;
-    //@include multi-box-shadow(0, -1px, 0, #151617, 0, 5px, 8px, #D7D8D9);
 
     div.site {
         float: left;
