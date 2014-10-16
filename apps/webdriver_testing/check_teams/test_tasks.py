@@ -151,7 +151,6 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
         self.tasks_tab.perform_task('Transcribe Subtitles', tv.title)
         self.modal.add_language('English', 'English')
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
-        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
 
 
     def test_transcription_save(self):
@@ -166,7 +165,6 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
 
         self.modal.add_language('English', 'English')
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
-        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
         self.editor_pg.add_subs_to_the_end()
         self.editor_pg.save('Exit')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&/' 
@@ -185,7 +183,6 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
         self.tasks_tab.perform_task('Transcribe Subtitles', tv.title)
         self.modal.add_language('English', 'English')
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
-        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
         self.editor_pg.add_subs_to_the_end()
         self.editor_pg.save('Exit')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me'
@@ -250,7 +247,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         cls.tasks_tab.open_team_page(cls.team.slug)
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
         if self.team.subtitle_policy > 10:
             self.team.subtitle_policy = 10
             self.team.save() 

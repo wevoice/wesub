@@ -444,7 +444,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.dashboard_tab.click_lang_task('jaws.mp4', 
                                            'Create French subtitles')
         self.assertEqual(u'Editing French\u2026', self.editor_pg.working_language())
-        self.assertEqual('French (original)', self.editor_pg.selected_ref_language())
         self.editor_pg.exit()
 
     def test_start_subtitles_audio_unknown(self):
@@ -460,7 +459,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
                                            'Create subtitles')
         self.modal.add_language('French', 'French') 
         self.assertEqual(u'Editing French\u2026', self.editor_pg.working_language())
-        self.assertEqual('French (original)', self.editor_pg.selected_ref_language())
         self.editor_pg.exit()
 
     def test_start_review(self):

@@ -84,7 +84,6 @@ class TestCaseUnpublishLast(WebdriverTestCase):
 
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert('accept')
 
