@@ -1355,7 +1355,6 @@ div.workflow {
     }
 
     &.review {
-        color: #E6E6E6;
         padding: 2em;
 
         a.edit-metadata {
@@ -1363,7 +1362,9 @@ div.workflow {
         }
 
         .actions {
-            margin-right: 10px;
+            button {
+                margin-right: 10px;
+            }
             position: absolute;
             bottom: 1em;
             left: 2em;
