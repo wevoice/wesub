@@ -910,17 +910,14 @@ def activity(request, slug):
     #
     # Much like the Tasks page, this query performs extremely poorly when run
     # normally.  So we split it into two parts here so that each will run fast.
-    action_ids = Action.objects.for_team(team, ids=True)
     end = page * ACTIONS_ON_PAGE
     start = end - ACTIONS_ON_PAGE
-    action_ids = list(action_ids[start:end])
-
-    has_more = len(action_ids) >= ACTIONS_ON_PAGE
-
-    activity_list = list(Action.objects.filter(id__in=action_ids).select_related(
-            'video', 'user', 'new_language', 'new_language__video'
-    ).order_by())
-    activity_list.sort(key=lambda a: action_ids.index(a.pk))
+    action_qs = Action.objects.for_team(team)[start:end]
+    action_qs = action_qs.select_related(
+        'video', 'user', 'new_language', 'new_language__video'
+    )
+    activity_list = list(action_qs)
+    has_more = len(activity_list) >= ACTIONS_ON_PAGE
 
     context = {
         'activity_list': activity_list,
