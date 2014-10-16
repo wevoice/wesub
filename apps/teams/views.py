@@ -33,7 +33,8 @@ from django.http import (
     Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse,
     HttpResponseBadRequest, HttpResponseServerError
 )
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import (get_object_or_404, redirect, render_to_response,
+                              render)
 from django.template import RequestContext
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
@@ -892,10 +893,9 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
-@timefn
-@render_to('teams/activity.html')
 def activity(request, slug):
     team = get_team_for_view(slug, request.user)
+    end = int(request.GET.get('end', ACTIONS_ON_PAGE))
 
     user = request.user if request.user.is_authenticated() else None
     try:
@@ -908,9 +908,9 @@ def activity(request, slug):
     # Much like the Tasks page, this query performs extremely poorly when run
     # normally.  So we split it into two parts here so that each will run fast.
     action_ids = Action.objects.for_team(team, ids=True)
-    action_ids, pagination_info = paginate(action_ids, ACTIONS_ON_PAGE,
-                                           request.GET.get('page'))
-    action_ids = list(action_ids)
+    action_ids = list(action_ids[end-ACTIONS_ON_PAGE:end])
+
+    has_more = len(action_ids) >= ACTIONS_ON_PAGE
 
     activity_list = list(Action.objects.filter(id__in=action_ids).select_related(
             'video', 'user', 'new_language', 'new_language__video'
@@ -920,12 +920,16 @@ def activity(request, slug):
     context = {
         'activity_list': activity_list,
         'team': team,
-        'member': member
+        'member': member,
+        'next_end': end + ACTIONS_ON_PAGE,
+        'has_more': has_more,
     }
-    context.update(pagination_info)
-
-    return context
-
+    if not request.is_ajax():
+        return render(request, 'teams/activity.html', context)
+    else:
+        # for ajax requests we only want to return the activity list, since
+        # that's all that the JS code needs.
+        return render(request, 'teams/_activity-list.html', context)
 
 # Members
 @timefn
