@@ -895,7 +895,10 @@ def remove_video(request, team_video_pk):
 
 def activity(request, slug):
     team = get_team_for_view(slug, request.user)
-    end = int(request.GET.get('end', ACTIONS_ON_PAGE))
+    try:
+        page = int(request.GET['page'])
+    except (ValueError, KeyError):
+        page = 1
 
     user = request.user if request.user.is_authenticated() else None
     try:
@@ -907,21 +910,20 @@ def activity(request, slug):
     #
     # Much like the Tasks page, this query performs extremely poorly when run
     # normally.  So we split it into two parts here so that each will run fast.
-    action_ids = Action.objects.for_team(team, ids=True)
-    action_ids = list(action_ids[end-ACTIONS_ON_PAGE:end])
-
-    has_more = len(action_ids) >= ACTIONS_ON_PAGE
-
-    activity_list = list(Action.objects.filter(id__in=action_ids).select_related(
-            'video', 'user', 'new_language', 'new_language__video'
-    ).order_by())
-    activity_list.sort(key=lambda a: action_ids.index(a.pk))
+    end = page * ACTIONS_ON_PAGE
+    start = end - ACTIONS_ON_PAGE
+    action_qs = Action.objects.for_team(team)[start:end]
+    action_qs = action_qs.select_related(
+        'video', 'user', 'new_language', 'new_language__video'
+    )
+    activity_list = list(action_qs)
+    has_more = len(activity_list) >= ACTIONS_ON_PAGE
 
     context = {
         'activity_list': activity_list,
         'team': team,
         'member': member,
-        'next_end': end + ACTIONS_ON_PAGE,
+        'next_page': page + 1,
         'has_more': has_more,
     }
     if not request.is_ajax():

@@ -1480,7 +1480,7 @@ class ActionRenderer(object):
         return fmt(msg, **kwargs)
 
 class ActionManager(models.Manager):
-    def for_team(self, team, ids=False):
+    def for_team(self, team):
         '''Return the actions for the given team.
 
         If ids is True, instead of returning Action objects it will return
@@ -1488,19 +1488,10 @@ class ActionManager(models.Manager):
         around some MySQL brokenness.
 
         '''
-        result = self.filter(
+        return self.filter(
             Q(team=team) |
             Q(video__teamvideo__team=team)
         )
-
-        if ids:
-            result = result.values_list('id', flat=True)
-        else:
-            result = result.select_related(
-                'video', 'user', 'language', 'language__video'
-            )
-
-        return result
 
     def for_user(self, user):
         return self.filter(Q(user=user) | Q(team__in=user.teams.all())).distinct()
