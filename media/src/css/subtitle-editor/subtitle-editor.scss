@@ -1415,7 +1415,7 @@ div.workflow {
             padding-left: 30px;
         }
 
-        &[disabled] {
+        &.disabled {
             background-color: $semi-dark-grey;
             border-color: $semi-dark-grey;
             cursor: default;
