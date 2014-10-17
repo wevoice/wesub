@@ -318,9 +318,14 @@ def _update_followers(subtitle_language, author):
         subtitle_language.followers.add(author)
 
 def _update_video_data(subtitle_language, version):
+    import logging
+    logging.warn("_update_video_data: %s %s", version.is_public(),
+                 subtitle_language.is_primary_audio_language())
+
     if version.is_public() and subtitle_language.is_primary_audio_language():
         video = version.video
         video_changed = False
+        logging.warn("%s -- %s", video.title, version.title)
         if version.title and video.title != version.title:
             video.title = version.title
             video_changed = True
