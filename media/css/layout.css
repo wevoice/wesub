@@ -14,7 +14,7 @@
 }
 
 .content {
-  min-height: 300px;
+  min-height: 600px;
   clear: both;
   line-height: 15px;
   font-size: 12px;
@@ -115,7 +115,7 @@
 /*.small_list .info{
   margin-left: 65px;
   }*/
-  
+
 
 .big_list li,
 .small_list li{
@@ -170,20 +170,20 @@
   padding: 0;
   font-size: .9em;
   }
-  
+
 
 .big_list li div div{
 margin-top: 5px;
 line-height: 1.8em;
 float: left;
   }
-  
+
 
 .big_list li div div a,
 .small_list li div div a{
   font-size: .9em;
   }
-  
+
 
 
 .big_list li p,
@@ -209,7 +209,7 @@ float: none;
 .need_help span{
   background: url(../images/ribbons.png) left 0 no-repeat;
 float: left;
-padding: 0px 15px 0px 20px !important; 
+padding: 0px 15px 0px 20px !important;
 color: #fff !important;
 margin-right: 10px !important;
 line-height: 2em;
@@ -221,7 +221,7 @@ width: 123px;
 .completed_in span{
   background: url(../images/ribbons.png) left -34px no-repeat;
 float: left;
-padding: 0px 15px 0px 20px !important; 
+padding: 0px 15px 0px 20px !important;
 color: #fff !important;
 margin-right: 10px !important;
 line-height: 2em;
@@ -276,7 +276,7 @@ margin: 0px !important;
   border-bottom: 0 !important;;
   padding: 0 !important;
   }
-  
+
 .embed_options_link {
 	font-size: 10px;
 	position: relative;
@@ -302,7 +302,7 @@ margin: 0px !important;
   font-weight: bold;
   font-size: 13px;
   background: #ecf0f1;
-  -moz-border-radius: 5px;  
+  -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   height: 1.6em;
   }
@@ -412,7 +412,7 @@ float: right;
 
 .toggle span{
 background: #fff;
-  -moz-border-radius: 15px;  
+  -moz-border-radius: 15px;
   -webkit-border-radius: 15px;
 
 margin-right: 10px;
@@ -461,13 +461,13 @@ float: left;
 
 
 .search_title {
-  -moz-border-radius: 35px !important;  
+  -moz-border-radius: 35px !important;
   -webkit-border-radius: 35px;
 	padding: 8px 13px 5px 16px;
 }
 
 .search_full {
-  -moz-border-radius: 35px !important;  
+  -moz-border-radius: 35px !important;
   -webkit-border-radius: 35px;
 	padding: 8px 16px 5px 13px;
 }
@@ -653,7 +653,7 @@ width: 390px;
 
 .nav li.last a {
   border: none;
-/*  background: url(../images/nav2.png) right top no-repeat;*/ 
+/*  background: url(../images/nav2.png) right top no-repeat;*/
  }
 
 

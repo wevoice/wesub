@@ -18,4 +18,4 @@
 
 # make sure we load our modules
 import teams.signalhandlers
-import teams.subtitle_workflows
+import teams.workflows.startup

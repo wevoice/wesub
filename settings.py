@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 # Amara, universalsubtitles.org
-# 
+#
 # Copyright (C) 2013 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 # Django settings for unisubs project.
@@ -180,6 +180,7 @@ INSTALLED_APPS = (
     'rosetta',
     'raven.contrib.django',
     'south',
+    'rest_framework',
     'tastypie',
     # third party apps forked on our repo
     'localeurl',
@@ -369,27 +370,27 @@ MEDIA_BUNDLES = {
             "css/jquery.alerts.css",
             "css/960.css",
             "css/reset.css",
-            "css/html.css", 
-            "css/about_faq.css", 
-            "css/breadcrumb.css", 
+            "css/html.css",
+            "css/about_faq.css",
+            "css/breadcrumb.css",
             "css/buttons.css",
             "css/chosen.css",
-            "css/classes.css", 
+            "css/classes.css",
             "css/forms.css",
             "css/index.css",
             "css/layout.css",
-            "css/profile_pages.css", 
+            "css/profile_pages.css",
             "css/revision_history.css",
-            "css/teams.css", 
-            "css/transcripts.css", 
-            "css/background.css", 
-            "css/activity_stream.css", 
-            "css/settings.css", 
-            "css/feedback.css", 
-            "css/messages.css", 
-            "css/global.css", 
-            "css/top_user_panel.css", 
-            "css/services.css", 
+            "css/teams.css",
+            "css/transcripts.css",
+            "css/background.css",
+            "css/activity_stream.css",
+            "css/settings.css",
+            "css/feedback.css",
+            "css/messages.css",
+            "css/global.css",
+            "css/top_user_panel.css",
+            "css/services.css",
             "css/solutions.css",
             "css/watch.css",
             "css/v1.scss",
@@ -400,6 +401,19 @@ MEDIA_BUNDLES = {
         "files": (
             "css/new_index.css",
         ),
+    },
+    "hands_home.css": {
+        "files": (
+            "css/hands-header-footer.css",
+            "css/hands-static.css",
+            "css/hands-main.css",
+         )
+    },
+    "hands_home.js": {
+        "files": (
+            "js/hands-plugins.js",
+            "js/hands-modernizr-2.6.2.min.js",
+         )
     },
     "site.js": {
         "files": (
@@ -653,3 +667,5 @@ try:
     }
 except ImportError:
     pass
+
+optionalapps.add_extra_settings(globals(), locals())

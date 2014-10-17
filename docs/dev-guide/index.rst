@@ -10,6 +10,7 @@ codebase.
 
    workflow
    testing
+   teams
    editor
    subtitle-workflows
    permissions

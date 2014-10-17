@@ -1906,26 +1906,24 @@ class TestFetchAndJoin(TestCase):
 
 class TestTeamInteractions(TestCase):
     def setUp(self):
-        users = User.objects.all()
+        self.user1 = UserFactory()
+        self.user2 = UserFactory()
+        self.user_public = UserFactory()
 
-        self.user1 = users[0]
-        self.user2 = users[1]
-        self.user_public = users[2]
+        self.team1 = TeamFactory(name='One', slug='one')
+        self.team2 = TeamFactory(name='Two', slug='two')
 
-        self.team1 = Team.objects.create(name='One', slug='one')
-        self.team2 = Team.objects.create(name='Two', slug='two')
-
-        TeamMember.objects.create(user=self.user1, team=self.team1)
-        TeamMember.objects.create(user=self.user2, team=self.team2)
+        TeamMemberFactory(user=self.user1, team=self.team1)
+        TeamMemberFactory(user=self.user2, team=self.team2)
 
         self.video1 = make_video()
         self.video2 = make_video_2()
         self.video_public = make_video_3()
 
-        TeamVideo.objects.create(video=self.video1, team=self.team1,
-                                 added_by=User.get_anonymous())
-        TeamVideo.objects.create(video=self.video2, team=self.team2,
-                                 added_by=User.get_anonymous())
+        TeamVideoFactory(video=self.video1, team=self.team1,
+                         added_by=User.get_anonymous())
+        TeamVideoFactory(video=self.video2, team=self.team2,
+                         added_by=User.get_anonymous())
 
         self.en1 = make_sl(self.video1, 'en')
         self.en2 = make_sl(self.video2, 'en')

@@ -39,7 +39,7 @@ def refresh(m):
 
 class TestVideo(TestCase):
     def setUp(self):
-        self.user = User.objects.all()[0]
+        self.user = UserFactory()
         self.youtube_video = 'http://www.youtube.com/watch?v=pQ9qX8lcaBQ'
         self.html5_video = 'http://mirrorblender.top-ix.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_stereo.ogg'
 

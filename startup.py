@@ -60,10 +60,10 @@ def run_startup_modules():
     from django.conf import settings
 
     for app in settings.INSTALLED_APPS:
-        try:
+        module = __import__(app)
+        package_dir = os.path.dirname(module.__file__)
+        if os.path.exists(os.path.join(package_dir, 'startup.py')):
             __import__('%s.startup' % app)
-        except ImportError:
-            pass
 
 def startup():
     """Set up the amara environment.  This should be called before running any

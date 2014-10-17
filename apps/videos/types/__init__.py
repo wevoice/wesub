@@ -42,4 +42,8 @@ video_type_registrar.register(Mp3VideoType)
 UPDATE_VERSION_ACTION = 'update_subtitles'
 DELETE_LANGUAGE_ACTION = 'delete_subtitles'
 
+def video_type_choices():
+    return sorted(video_type_registrar.choices,
+                  key=lambda choice: choice[1].lower())
+
 __all__ = ['VideoTypeError', 'video_type_registrar', "UPDATE_VERSION_ACTION", "DELETE_LANGUAGE_ACTION"]

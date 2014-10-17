@@ -201,6 +201,10 @@ div.fix-chosen div.chzn-container {
     }
 }
 
+.loading-icon {
+    display: none;
+}
+
 /* Tabs */
 .show-border {
     border-bottom-width: 2px;
@@ -891,6 +895,33 @@ div.fix-chosen div.chzn-container {
 
 .v1 .view #sync-history-tab table {
     margin-bottom: 1em;
+}
+
+table.new-style {
+    width: 100%;
+    margin-bottom: 1.5em;
+
+    th, td {
+        padding: 8px;
+        margin: 0;
+        border: none;
+    }
+    th {
+        float: none;
+        border-bottom: 2px solid #ddd;
+        font-weight: bold;
+    }
+    td {
+        border-bottom: 1px solid #ddd;
+        
+        &.actions {
+            text-align: right;
+
+            button, a.button {
+                padding: 0.25em 0.5em;
+            }
+        }
+    }
 }
 
 p.view-more {
@@ -1678,6 +1709,11 @@ body.account {
         > div {
             clear: both;
             padding: 0;
+
+            &.extra-tab {
+                padding: 1em;
+            }
+
         }
 
         #video-tab .video-tools {

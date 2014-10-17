@@ -34,17 +34,17 @@
     <!--[if lt IE 9]>
         <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
+    <link href='//fonts.googleapis.com/css?family=Raleway:500,300,200,100' rel='stylesheet' type='text/css'>
     {% media_bundle "site.js" %}
     <script type="text/javascript" src="{% url js_i18n_catalog %}"></script>
-    <script src="{% url profiles:rpc_api %}" type="text/javascript"></script>  
+    <script src="{% url profiles:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript" src='{% url embedder_iframe %}'>
     </script>
     {% block scripts %}{% endblock %}
     <script type="text/javascript">
         window.STATIC_URL = '{{ STATIC_URL }}';
         {% block oldmodal %}
-            window.OLD_MODAL = true; 
+            window.OLD_MODAL = true;
         {% endblock %}
     </script>
 </head>
@@ -59,32 +59,35 @@
         {% endblock %}
     {% endif %}
     {% require_email_dialog %}
+
+
+    <div class="help-tab">
+      <a target="_blank" href="http://support.amara.org/support/solutions">{% trans 'Get Help' %}</a>
+    </div>
     <div id="main_bar">
-        <div id="bar_wrap" class="clearfix">
-            <h1><a href="/">Amara</a></h1>
-            <div id="bar_right">
-                <div id="bar_search">
-                    <form method="get" action="{{BASE_URL}}{% url search:index %}">
-                        <input type="text" name="q" placeholder='{% trans "Search Amara&hellip;" %}'/>
-                    </form>
-                </div>
-                <ul id="bar_menu" class="clearfix">
-                    <li id="nav_submit"><a href="{% url videos:create %}">{% trans 'Subtitle Videos' %}</a></li>
-                    <li><a href="{% url videos:watch_page %}">{% trans 'Browse' %}</a></li>
-                    <li><a href="http://about.amara.org/volunteer/">{% trans "Volunteer" %}</a></li>
-                    <li><a href="http://pro.amara.org">{% trans "Pro Services" %}</a></li>
-                    <li><a href="http://support.amara.org/support/home" target="_blank">{% trans 'Help' %}</a></li>
-                    {% if user.is_authenticated %}
-                        <li id="me_menu">{% top_user_panel %}</li>
-                    {% else %}
-                        <li><a href="{% url auth:login %}?next={{ request.path_info|urlencode }}">{% trans 'Sign in / Sign up' %}</a></li>
-                    {% endif %}
-                </ul>
-            </div>
+      <div id="bar_wrap" class="clearfix">
+        <a href="/"><img class="navbar-brand" src="{{ STATIC_URL }}images/amara-o.png" /></a>
+        <div id="bar_right">
+          <ul id="bar_menu" class="clearfix">
+            <li id="nav_submit"><a href="{% url videos:create %}">{% trans 'Subtitle Video' %}</a></li>
+            <li><a href="/community">{% trans "Community" %}</a></li>
+            <li><a href="//pro.amara.org">{% trans "Professional Solutions" %}</a></li>
+            <li>
+              <a class="navbar-search" href="/videos/watch/">
+                <img alt="Search" src="{{ STATIC_URL }}images/glyphicons_027_search-light.png">
+              </a>
+            </li>
+            {% if user.is_authenticated %}
+            <li id="me_menu">{% top_user_panel %}</li>
+            {% else %}
+            <li><a href="{% url auth:login %}?next={{ request.path_info|urlencode }}">{% trans 'Sign in / Sign up' %}</a></li>
+            {% endif %}
+          </ul>
         </div>
+      </div>
     </div>
     <!-- Temporary until we change the banner design -->
-    <div id="lang_bar" style="height: 10px;">
+    <div id="lang_bar">
     </div>
 
     <!-- empty block for banner above page content -->
@@ -117,21 +120,45 @@
         {% endif %}
         {% block main_content %}{% endblock %}
     </div>
-    <div class="footer">
-        <div class="floatleft">
-            {% trans 'Amara is a project of <a href="http://participatoryculture.org/">PCF</a>.' %}  
+
+    <div id="footer">
+      <div id="footer-base">
+        <div class="container">
+          <div class="row">
+            <div id="footer-nav" class="col-sm-7 col-sm-push-5">
+              <span>
+                <ul>
+                  <li><strong>Amara</strong></li>
+                  <li><a href="//about.amara.org/">{% trans 'Blog' %}</a></li>
+                  <li><a href="http://support.universalsubtitles.org/solution/categories/13504">{% trans 'Help' %}</a></li>
+                  <li><a href="http://support.amara.org/support/solutions/articles/35517--i-have-a-non-technical-question-about">{% trans 'Contact' %}</a></li>
+                </ul>
+                <ul>
+                  <li><strong>{% trans 'Videos' %}</strong></li>
+                  <li><a href="/search/#/?q=">{% trans 'Search' %}</a></li>
+                  <li><a href="/videos/watch/">{% trans 'Browse' %}</a></li>
+                  <li><a href="#videos/watch/featured/">{% trans 'Featured' %}</a></li>
+                </ul>
+                <ul>
+                  <li><strong>{% trans 'More' %}</strong></li>
+                  <li><a href="//twitter.com/AmaraSubs/">Twitter</a></li>
+                  <li><a href="//facebook.com/Amara.Community">Facebook</a></li>
+                </ul>
+              </span>
+            </div>
+            <div id="footer-terms" class="col-sm-5 col-sm-pull-7">
+              <a href="//amara.org"><img src="{{ STATIC_URL }}images/amara-logotype.png" alt="Amara's green circle logotype" /></a>
+              <ul>
+                <li><a href="//about.amara.org/tos/">{% trans 'Terms' %}</a></li>
+                <li><a href="//pculture.org/pcf/websites-privacy/">{% trans 'Privacy' %}</a></li>
+                <li><a href="/security">{% trans 'Security' %}</a></li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div class="floatright">
-            <a href="/about">{% trans 'About' %}</a>
-            <a href="http://www.pculture.org/pcf/jobs/">{% trans 'Jobs' %}</a>
-            <a href="http://www.facebook.com/Amara.Community/">Facebook</a> 
-            <a href="http://twitter.com/amarasubs">Twitter</a>
-            <a href="http://support.amara.org/support/solutions/articles/35517--i-have-a-non-technical-question-about-amara">{% trans 'Contact Us' %}</a>
-            <a href="http://www.pculture.org/pcf/websites-privacy/">{% trans 'Privacy Policy' %}</a>
-            <a href="http://about.amara.org/tos/">{% trans 'Terms of Service' %}</a>
-            <a href="{% url security_page %}">{% trans 'Security' %}</a>
-        </div>
+      </div>
     </div>
+
     {% if user.is_staff or user|can_translate %}
         <div id="admin_controls">
             <ul id="site_controls">
@@ -139,7 +166,7 @@
                     <li><a target="_blank" href="{% url admin:index %}">{% trans 'Admin' %}</a></li>
                 {% endif %}
                 {% if user.is_superuser %}
-                    <li><a target="_blank" href="http://sentry.pculture.org:9000">{% trans 'Sentry' %}</a></li>
+                    <li><a target="_blank" href="//sentry.pculture.org:9000">{% trans 'Sentry' %}</a></li>
                 {% endif %}
                 {% if user|can_translate %}
                     <li><a target="_blank" href="{% url rosetta-pick-file %}"><span>{% trans 'Rosetta' %}</span></a></li>

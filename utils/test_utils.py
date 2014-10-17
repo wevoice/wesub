@@ -15,6 +15,9 @@ import mock
 import requests
 import utils.youtube
 
+def reload_obj(model_obj):
+    return model_obj.__class__.objects.get(pk=model_obj.pk)
+
 REQUEST_CALLBACKS = []
 
 class Response(dict):

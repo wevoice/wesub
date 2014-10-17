@@ -83,14 +83,14 @@ def _perform_team_operations(version, committer, action):
     appease the teams system gods.
 
     """
-    from teams import subtitle_workflows
+    from teams.workflows.old.subtitleworkflows import Complete
 
     team_video = version.video.get_team_video()
 
     if not team_video:
         return
 
-    complete = isinstance(action, subtitle_workflows.Complete)
+    complete = isinstance(action, Complete)
 
     _record_workflow_origin(team_video, version)
     _update_visibility_and_tasks(team_video, version, committer, complete)

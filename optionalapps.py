@@ -40,6 +40,7 @@ automatically pull them in if they are present.  Here's how we do it:
 .. autofunction:: get_repository_paths
 .. autofunction:: get_apps
 .. autofunction:: get_urlpatterns
+.. autofunction:: add_extra_settings
 
 """
 
@@ -87,8 +88,8 @@ def get_urlpatterns():
     """Get Django urlpatterns for URLs from our optional apps.
 
     This function finds urlpatterns inside the urls module for each optional
-    app.  In addition a module variable called PREFIX must contain the prefix
-    for the urls.
+    app.  In addition a module variable can define a variable called PREFIX to
+    add a prefix to the urlpatterns.
 
     Returns:
         url patterns containing urls for our optional apps to add to our root
@@ -105,9 +106,22 @@ def get_urlpatterns():
         try:
             prefix = url_module.PREFIX
         except AttributeError:
-            continue
+            prefix = ''
         urls_module = '{0}.urls'.format(app_name)
         urlpatterns += patterns('', url(prefix, include(urls_module,
                                                         namespace=app_name)))
 
     return urlpatterns
+
+def add_extra_settings(globals, locals):
+    """Add extra values to the settings module.
+
+    This function looks for files named settings_extra.py in each optional
+    repository.  If that exists, then we call execfile() to run the code using
+    the settings globals/locals.  This simulates that code being inside the
+    settings module.
+    """
+    for directory in get_repository_paths():
+        settings_extra = os.path.join(directory, 'settings_extra.py')
+        if os.path.exists(settings_extra):
+            execfile(settings_extra, globals, locals)

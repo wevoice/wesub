@@ -79,9 +79,12 @@ var angular = angular || null;
         $scope.loadingFinished = false;
         $scope.uploading = false;
         $scope.uploadError = false;
+        $scope.exiting = false;
         $scope.translating = function() {
             return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         }
+        if (EditorData.customCss)
+	    $scope.customCSSs = [{"href": EditorData.customCss}];
         if (EditorData.teamAttributes) {
             $scope.teamName = EditorData.teamAttributes.teamName
             if (EditorData.teamAttributes.guidelines &&
@@ -307,10 +310,12 @@ var angular = angular || null;
         $scope.collab = {
             notes: EditorData.savedNotes
         };
-        $scope.exitToVideoPage = function() {
-            $window.location = '/videos/' + $scope.videoId + '/';
+        $scope.exitEditor = function() {
+            $scope.exiting = true;
+            $window.location = EditorData.redirectUrl;
         }
         $scope.exitToLegacyEditor = function() {
+            $scope.exiting = true;
             $window.location = EditorData.oldEditorURL;
         }
         $scope.showDebugModal = function(evt) {
@@ -440,7 +445,7 @@ var angular = angular || null;
                     }
                     regainLockAfterIdle();
                 },
-                closeEditor: $scope.exitToVideoPage
+                closeEditor: $scope.exitEditor
             }, { text: makeText() });
         }
 
@@ -450,7 +455,7 @@ var angular = angular || null;
 
             dialogManager.openDialog('sessionEnded', {
                 resume: regainLockAfterIdle,
-                closeEditor: $scope.exitToVideoPage
+                closeEditor: $scope.exitEditor
             });
         }
 

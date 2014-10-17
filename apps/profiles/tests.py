@@ -52,7 +52,7 @@ class TestViews(TestCase):
         user = User.objects.get(pk=self.user.pk)
         self.assertEqual(user.username, data['username'])
 
-        other_user = User.objects.exclude(pk=self.user.pk)[:1].get()
+        other_user = UserFactory()
         data['username'] = other_user.username
         response = self.client.post(reverse('profiles:account'), data=data)
         self.assertEqual(response.status_code, 200)
@@ -77,7 +77,7 @@ class TestViews(TestCase):
         # able to change this
         self.assertNotEqual(user.username, data['username'])
         self.assertNotEqual(user.email, data['email'])
-        other_user = User.objects.exclude(pk=self.user.pk)[:1].get()
+        other_user = UserFactory()
         data['username'] = other_user.username
         response = self.client.post(reverse('profiles:edit'), data=data)
         self.assertRedirects(response, reverse('profiles:edit'))

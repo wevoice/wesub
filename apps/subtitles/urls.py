@@ -17,11 +17,11 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.conf.urls.defaults import url, patterns
-
+from subtitles.views import SubtitleEditor
 
 urlpatterns = patterns('subtitles.views',
     url(r'^old-editor/(?P<video_id>[\w]+)/(?P<language_code>[\w-]+)/$', 'old_editor', name='old-editor'),
-    url(r'^editor/(?P<video_id>[\w]+)/(?P<language_code>[\w-]+)/$', 'subtitle_editor', name='subtitle-editor'),
+    url(r'^editor/(?P<video_id>[\w]+)/(?P<language_code>[\w-]+)/$', SubtitleEditor.as_view(), name='subtitle-editor'),
     url(r'^editor/(?P<video_id>[\w]+)/(?P<language_code>[\w-]+)/regain', 'regain_lock', name='regain_lock'),
     url(r'^editor/(?P<video_id>[\w]+)/(?P<language_code>[\w-]+)/release', 'release_lock', name='release_lock'),
     url(r'^(?P<video_id>[\w]+)/(?P<language_code>[\w-]+)(?:/(?P<version_number>[\d]+))?/download/(?P<filename>.+)\.(?P<format>[\w]+)', 'download', name='download'),

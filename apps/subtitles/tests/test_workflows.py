@@ -105,7 +105,7 @@ class SubtitleNotesTest(TestCase):
         self.editor_notes = workflows.EditorNotes(self.video, 'en')
 
     def test_heading(self):
-        assert_equal(self.editor_notes.heading, 'Subtitle Notes')
+        assert_equal(self.editor_notes.heading, 'Notes')
 
     def test_notes_list(self):
         assert_equal(len(self.editor_notes.notes), 2)

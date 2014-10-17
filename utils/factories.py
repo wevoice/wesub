@@ -137,6 +137,7 @@ class TeamFactory(DjangoModelFactory):
     name = factory.Sequence(lambda n: 'Team %s' % n)
     slug = factory.LazyAttribute(lambda t: slugify(t.name))
     membership_policy = teams.models.Team.OPEN
+    workflow_type = 'O'
 
     @classmethod
     def _generate(cls, create, attrs):
@@ -155,6 +156,24 @@ class TeamFactory(DjangoModelFactory):
                 role=teams.models.TeamMember.ROLE_ADMIN,
             )
 
+    @factory.post_generation
+    def manager(self, create, extracted, **kwargs):
+        if extracted:
+            assert create
+            TeamMemberFactory.create(
+                user=extracted, team=self,
+                role=teams.models.TeamMember.ROLE_MANAGER,
+            )
+
+    @factory.post_generation
+    def member(self, create, extracted, **kwargs):
+        if extracted:
+            assert create
+            TeamMemberFactory.create(
+                user=extracted, team=self,
+                role=teams.models.TeamMember.ROLE_CONTRIBUTOR,
+            )
+
 class WorkflowFactory(DjangoModelFactory):
     FACTORY_FOR = teams.models.Workflow
     review_allowed = 30 # admin must review
@@ -166,6 +185,14 @@ class TeamMemberFactory(DjangoModelFactory):
     role = teams.models.TeamMember.ROLE_OWNER
     user = factory.SubFactory(UserFactory)
     team = factory.SubFactory(TeamFactory)
+
+class TeamContributorMemberFactory(DjangoModelFactory):
+    FACTORY_FOR = teams.models.TeamMember
+
+    role = teams.models.TeamMember.ROLE_OWNER
+    user = factory.SubFactory(UserFactory)
+    team = factory.SubFactory(TeamFactory)
+
 
 class TeamVideoFactory(DjangoModelFactory):
     FACTORY_FOR = teams.models.TeamVideo

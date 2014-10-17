@@ -1,13 +1,13 @@
 <div class="language-selections group toolbar"
     language-selector
     ng-controller="LanguageSelectorController">
-    <div class="select">
+    <div class="select" ng-show="versions">
         <select name="language"
             ng-model='language'
             ng-options="(item.name + (item.isPrimaryAudioLanguage? ' (original)' : '')) for item in languages | orderBy:'name'">
         </select>
     </div>
-    <div class="select">
+    <div class="select" ng-show="versions">
         <select name="version" class="version-select">
             <option
             ng-repeat='thisVersion in versions'
@@ -26,7 +26,7 @@
             read-only="yes"></ul>
 
     </div>
-    <a ng-click="toggleScrollingSynced()"
+    <a ng-click="toggleScrollingSynced()" ng-show="referenceSubtitles.subtitleList.length() > 0"
         ng-class="{ locked: scrollingSynced, unlocked: !scrollingSynced }"
         class="scroll-lock">
     </a>

@@ -151,7 +151,6 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
         self.tasks_tab.perform_task('Transcribe Subtitles', tv.title)
         self.modal.add_language('English', 'English')
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
-        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
 
 
     def test_transcription_save(self):
@@ -166,7 +165,6 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
 
         self.modal.add_language('English', 'English')
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
-        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
         self.editor_pg.add_subs_to_the_end()
         self.editor_pg.save('Exit')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&/' 
@@ -185,7 +183,6 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
         self.tasks_tab.perform_task('Transcribe Subtitles', tv.title)
         self.modal.add_language('English', 'English')
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
-        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
         self.editor_pg.add_subs_to_the_end()
         self.editor_pg.save('Exit')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me'
@@ -887,21 +884,23 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 'complete': 1
                }
         self.data_utils.upload_subs(self.contributor, **data)
-        mail.outbox = []
         self.complete_review_task(tv, 20)
         self.tasks_tab.log_in(self.owner, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.perform_task('Approve Original English ' 
                                                'Subtitles', video.title)
-        note_text = 'This is horrible!\n What were you thinking'
+        note_text = 'This is horrible'
+        mail.outbox = []
         self.editor_pg.add_note(note_text)
         self.editor_pg.send_back_task()
+        self.logger.info(len(mail.outbox))
+        email_to = mail.outbox[0].to     
+        msg = str(mail.outbox[0].message())
+        self.assertIn(note_text, msg)
         email_to = mail.outbox[-1].to     
         msg = str(mail.outbox[-1].message())
-        self.logger.info("MESSAGE: %s" % msg)
         self.assertIn(self.contributor.email, email_to)
         self.assertIn(self.rejected_text, msg)
-        self.assertIn(note_text, msg)
 
 
     def make_video_with_approved_transcript(self):

@@ -33,7 +33,8 @@ from django.http import (
     Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse,
     HttpResponseBadRequest, HttpResponseServerError
 )
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import (get_object_or_404, redirect, render_to_response,
+                              render)
 from django.template import RequestContext
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
@@ -89,6 +90,7 @@ from videos.models import Action, VideoUrl, Video, VideoFeed
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
+from teams import workflows
 
 from teams.bulk_actions import complete_approve_tasks
 
@@ -283,9 +285,12 @@ def settings_guidelines(request, team):
 
     return { 'team': team, 'form': form, }
 
-@render_to('teams/settings-permissions.html')
 @settings_page
 def settings_permissions(request, team):
+    return team.new_workflow.workflow_settings_view(request, team)
+
+@render_to('teams/settings-permissions.html')
+def old_team_settings_permissions(request, team):
     workflow = Workflow.get_for_target(team.id, 'team')
     moderated = team.moderates_videos()
 
@@ -888,10 +893,12 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
-@timefn
-@render_to('teams/activity.html')
 def activity(request, slug):
     team = get_team_for_view(slug, request.user)
+    try:
+        page = int(request.GET['page'])
+    except (ValueError, KeyError):
+        page = 1
 
     user = request.user if request.user.is_authenticated() else None
     try:
@@ -903,25 +910,28 @@ def activity(request, slug):
     #
     # Much like the Tasks page, this query performs extremely poorly when run
     # normally.  So we split it into two parts here so that each will run fast.
-    action_ids = Action.objects.for_team(team, ids=True)
-    action_ids, pagination_info = paginate(action_ids, ACTIONS_ON_PAGE,
-                                           request.GET.get('page'))
-    action_ids = list(action_ids)
-
-    activity_list = list(Action.objects.filter(id__in=action_ids).select_related(
-            'video', 'user', 'new_language', 'new_language__video'
-    ).order_by())
-    activity_list.sort(key=lambda a: action_ids.index(a.pk))
+    end = page * ACTIONS_ON_PAGE
+    start = end - ACTIONS_ON_PAGE
+    action_qs = Action.objects.for_team(team)[start:end]
+    action_qs = action_qs.select_related(
+        'video', 'user', 'new_language', 'new_language__video'
+    )
+    activity_list = list(action_qs)
+    has_more = len(activity_list) >= ACTIONS_ON_PAGE
 
     context = {
         'activity_list': activity_list,
         'team': team,
-        'member': member
+        'member': member,
+        'next_page': page + 1,
+        'has_more': has_more,
     }
-    context.update(pagination_info)
-
-    return context
-
+    if not request.is_ajax():
+        return render(request, 'teams/activity.html', context)
+    else:
+        # for ajax requests we only want to return the activity list, since
+        # that's all that the JS code needs.
+        return render(request, 'teams/_activity-list.html', context)
 
 # Members
 @timefn
@@ -1453,11 +1463,12 @@ def _get_task_filters(request):
              'assignee': request.GET.get('assignee'),
              'q': request.GET.get('q'), }
 
-@timefn
-@render_to('teams/dashboard.html')
 def dashboard(request, slug):
-
     team = get_team_for_view(slug, request.user, exclude_private=False)
+    return team.new_workflow.dashboard_view(request, team)
+
+@render_to('teams/dashboard.html')
+def old_dashboard(request, team):
     user = request.user if request.user.is_authenticated() else None
     try:
         member = team.members.get(user=user)

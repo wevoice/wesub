@@ -1,32 +1,20 @@
 {% extends "teams/base.html" %}
 
-{% load i18n teams_tags paginator profiles_tags %}
+{% load i18n %}
 
-{% block title %}
-    {{ team }} | Amara
-{% endblock %}
-
+{% block html_attrs %}id="teams_activity"{% endblock %}
 {% block body_attrs %}id="teams" class="v1"{% endblock %}
+{% block title %}{{ team }} | Amara{% endblock %}
 
 {% block view_content %}
+    {% if team.is_old_style %}<div class="grid_8 view omega">{% else %}<div class="view">{% endif %}
 
-    <div class="view grid_8 omega">
         {% with "activity" as current %}
             {% include "teams/_tabs.html" %}
         {% endwith %}
 
-        {% if activity_list %}
-            <ul class="activity listing">
-                {% with 1 as medium_thumb %}
-                    {% for item in activity_list %}
-                        <li>{{ item.render }}</li>
-                    {% endfor %}
-                {% endwith %}
-            </ul>
-            {% if is_paginated %}{% paginator %}{% endif %}
-        {% else %}
-            <p class="empty">{% trans "Sorry, no activity yet" %}...</p>
-        {% endif %}
+        <div id="activity-list">
+            {% include "teams/_activity-list.html" %}
+        </div>
     </div>
-
 {% endblock %}

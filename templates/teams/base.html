@@ -13,9 +13,13 @@
         {% endif %}
     </div>
 
+    {% if team.is_old_style %}
     <div class="grid_4 context alpha">
         {% include 'teams/_context_team.html' %}
     </div>
+    {% else %}
+    <h2 class="main-title">{{ team }}</h2>
+    {% endif %}
 
     {% block view_content %}{% endblock %}
 
