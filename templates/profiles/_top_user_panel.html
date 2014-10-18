@@ -2,7 +2,7 @@
 {% if user.is_authenticated %}
     <div id="user_menu">
         <div id="menu_name">
-            <a href="{% url profiles:profile user.username %}">{{ user.username }} &#9662;</a>
+            <a href="{% url profiles:edit %}">{{ user.username }} &#9662;</a>
         </div>
         <div id="menu">
             <ul id="dropdown">
@@ -12,7 +12,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url profiles:profile user.username %}">{% trans "Profile" %}</a>
+                    <a href="{% url profiles:edit %}">{% trans "Profile" %}</a>
                 </li>
                 <li>
                     <a href="{% url profiles:videos user.username %}">
