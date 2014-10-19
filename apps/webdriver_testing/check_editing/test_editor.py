@@ -53,19 +53,24 @@ class TestCaseEditing(WebdriverTestCase):
                    }
             cls.data_utils.add_subs(**defaults)
 
+    def tearDown(self):
+        #Exit editor when test ends
+        try:
+            self.editor_pg.exit()
+        except:
+            pass
+
     def test_reference_lang_original(self):
         """Default reference lang for transcription is the same lang. """
 
         self.editor_pg.open_editor_page(self.video.video_id, 'en')
         self.assertEqual('English', self.editor_pg.selected_ref_language())
-        self.editor_pg.exit()
 
 
     def test_reference_lang_translation(self):
         """Default reference lang for translation is primary_audio lang. """
         self.editor_pg.open_editor_page(self.video.video_id, 'da')
         self.assertEqual('English', self.editor_pg.selected_ref_language())
-        self.editor_pg.exit()
 
 
     def test_reference_text_displayed(self):
@@ -86,7 +91,6 @@ class TestCaseEditing(WebdriverTestCase):
         self.logger.info(self.editor_pg.reference_text(3))
         self.assertEqual(u'可以来解决各种迫切的问题。', 
                          self.editor_pg.reference_text(3))
-        self.editor_pg.exit()
 
 
     def test_reference_private_versions(self):
@@ -101,7 +105,6 @@ class TestCaseEditing(WebdriverTestCase):
         self.assertEqual(None, self.editor_pg.default_ref_version())
         self.assertEqual(None, 
                          self.editor_pg.reference_text(1))
-        self.editor_pg.exit()
 
 
 
@@ -110,7 +113,6 @@ class TestCaseEditing(WebdriverTestCase):
         self.editor_pg.open_editor_page(self.video.video_id, 'en')
         sub_text, _ = self.editor_pg.click_working_sub_line(3)
         self.assertEqual(sub_text, self.editor_pg.sub_overlayed_text())
-        self.editor_pg.exit()
 
 
     def test_remove_active_subtitle(self):
@@ -124,7 +126,6 @@ class TestCaseEditing(WebdriverTestCase):
         self.assertEqual(subtext[2], removed_text)
         subtext = self.editor_pg.working_text()
         self.assertNotEqual(subtext[2], removed_text)
-        self.editor_pg.exit()
 
         
 
@@ -133,14 +134,12 @@ class TestCaseEditing(WebdriverTestCase):
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
         self.editor_pg.open_editor_page(self.video.video_id, 'tr')
         self.assertEqual(u'Editing Turkish\u2026', self.editor_pg.working_language())
-        self.editor_pg.exit()
 
 
     def test_page_title(self):
         self.editor_pg.open_editor_page(self.video.video_id, 'en')
         self.assertEqual('Open Source Philosophy',
                          self.editor_pg.video_title())
-        self.editor_pg.exit()
 
 
 
@@ -156,7 +155,6 @@ class TestCaseEditing(WebdriverTestCase):
                          'character count is not expected value')
         self.assertEqual('19.7', sub_info['Chars/sec'], 
                          'character rate is not expected value')
-        self.editor_pg.exit()
 
 
     def test_info_tray_multiline(self):
@@ -171,7 +169,6 @@ class TestCaseEditing(WebdriverTestCase):
                          'Line 2 is not expected value')
         self.assertEqual('72', sub_info['Characters'], 
                          'character count is not expected value')
-        self.editor_pg.exit()
 
 
     def test_info_tray_char_updates(self):
@@ -181,7 +178,6 @@ class TestCaseEditing(WebdriverTestCase):
         sub_info  = (self.editor_pg.subtitle_info(1, active=True))
         self.assertEqual('11', sub_info['Characters'], 
                          'character count is not expected value')
-        self.editor_pg.exit()
 
 
 
@@ -194,7 +190,6 @@ class TestCaseEditing(WebdriverTestCase):
         self.editor_pg.add_subs_to_the_end(subs)
         new_subs = self.editor_pg.working_text()[-3:]
         self.assertEqual(subs, new_subs)
-        self.editor_pg.exit()
 
 
     def test_one_version(self):
@@ -205,13 +200,10 @@ class TestCaseEditing(WebdriverTestCase):
         self.editor_pg.open_editor_page(self.video.video_id, 'en')
         self.assertEqual(101, len(self.editor_pg.working_text()))
         self.assertEqual(101, len(self.editor_pg.reference_text()))
-        self.editor_pg.exit()
 
     def test_sync_subs(self):
         """Sync subtitles """
         self.editor_pg.open_editor_page(self.video.video_id, 'nl')
-        self.editor_pg.start_next_step()
-        self.editor_pg.close_edit_title()
         self.editor_pg.start_sync()
         time.sleep(2)
         self.editor_pg.buffer_up_subs()
@@ -227,7 +219,6 @@ class TestCaseEditing(WebdriverTestCase):
         self.logger.info(diffs)
         for x in diffs:
             self.assertGreater(x.seconds, 3)
-        self.editor_pg.exit()
 
 
     def test_syncing_scroll(self):
@@ -243,7 +234,6 @@ class TestCaseEditing(WebdriverTestCase):
             el = self.editor_pg.working_text_elements()[x]
             self.assertTrue(el.is_displayed())
             self.editor_pg.sync(1, sub_length=1, sub_space=.05)
-        self.editor_pg.exit()
 
 
     def test_helper_syncing(self):
@@ -251,7 +241,7 @@ class TestCaseEditing(WebdriverTestCase):
 
         """
         self.editor_pg.open_editor_page(self.video.video_id, 'tr')
-        text = self.editor_pg.working_text()
+        time.sleep(3)
         self.editor_pg.buffer_up_subs()
         self.editor_pg.toggle_playback()
         self.editor_pg.sync(1, sub_length=2, sub_space=2)
@@ -259,7 +249,6 @@ class TestCaseEditing(WebdriverTestCase):
         for x in range(0, 17):
             self.editor_pg.sync(1, sub_length=1, sub_space=.05)
             self.assertTrue(self.editor_pg.sync_help_displayed())
-        self.editor_pg.exit()
 
 
     def test_helper_scrolling(self):
@@ -267,7 +256,7 @@ class TestCaseEditing(WebdriverTestCase):
 
         """
         self.editor_pg.open_editor_page(self.video.video_id, 'tr')
-        text = self.editor_pg.working_text()
+        time.sleep(3)
         self.editor_pg.buffer_up_subs()
         self.editor_pg.toggle_playback()
         self.editor_pg.sync(1, sub_length=2, sub_space=2)
@@ -277,7 +266,6 @@ class TestCaseEditing(WebdriverTestCase):
         self.editor_pg.toggle_playback()
         self.browser.execute_script("window.location.hash='add-sub-at-end'")
         self.assertFalse(self.editor_pg.sync_help_displayed())
-        self.editor_pg.exit()
 
 
 
@@ -293,4 +281,3 @@ class TestCaseEditing(WebdriverTestCase):
         self.assertEqual(expected_text, sub_text)
         self.assertEqual(sub_text, self.editor_pg.sub_overlayed_text())
         self.assertEqual(expected_text, sub_text)
-        self.editor_pg.exit()
