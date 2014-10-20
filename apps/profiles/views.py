@@ -114,10 +114,20 @@ def dashboard(request):
 
     tasks = user.open_tasks()
 
+    team_activity = (Action.objects
+                     .for_user_team_activity(user)
+                     .select_related('team', 'member', 'user')
+                    )
+    video_activity = (Action.objects
+                      .for_user_video_activity(user)
+                      .select_related('video', 'new_language',
+                                      'new_language__video', 'user')
+                     )
+
     context = {
         'user_info': user,
-        'team_activity': Action.objects.for_user_team_activity(user)[:8],
-        'video_activity': Action.objects.for_user_video_activity(user)[:8],
+        'team_activity': team_activity[:8],
+        'video_activity': video_activity[:8],
         'tasks': tasks,
     }
 
