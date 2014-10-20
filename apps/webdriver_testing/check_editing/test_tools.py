@@ -51,8 +51,7 @@ class TestCaseTools(WebdriverTestCase):
         try:
             self.editor_pg.exit()
         except:
-            self.editor_pg.open_page('/')
-            self.editor_pg.handle_js_alert('accept') 
+            pass
 
     def test_timings_present_for_new_translation(self):
         """New translation starts with lines and times. """

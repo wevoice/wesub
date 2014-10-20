@@ -5,7 +5,7 @@ import os
 import filecmp
 
 from videos import metadata_manager
-
+from videos.models import Video
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages.teams import videos_tab
 from webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
@@ -58,15 +58,13 @@ class TestCaseEdit(WebdriverTestCase):
         """Submit a new video for the team.
 
         """
+        test_url = 'http://www.youtube.com/watch?v=i_0DXxNeaQ0'
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.add_video(
-            url = 'http://www.youtube.com/watch?v=i_0DXxNeaQ0')
+        self.videos_tab.add_video(url=test_url)
         self.videos_tab.open_videos_tab(self.team.slug)
-
-        self.assertTrue(self.videos_tab.video_present(
-            'What is up with Noises? (The Science and Mathematics'
-                        ' of Sound, Frequency, and Pitch)'))
+        video, _ = Video.get_or_create_for_url(test_url)
+        self.assertTrue(self.videos_tab.video_present(video.title))
 
 
     def test_add_duplicate(self):

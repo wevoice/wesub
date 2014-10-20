@@ -13,7 +13,7 @@
         <button href="#" ng-click="dialogManager.onOpenClick('debug', $event)">Debug</button>
         {% endif %}
         <button class="discard" ng-click="onExitClicked($event)">Exit</button>
-        <button class="go-to-legacy-editor" ng-click="onLegacyEditorClicked($event)">Legacy Editor</button>
+        <button ng-hide="noLinkToLegacy" class="go-to-legacy-editor" ng-click="onLegacyEditorClicked($event)">Legacy Editor</button>
         <button class="save" ng-disabled="!session.subtitlesChanged" ng-click="onSaveDraftClicked($event)">{% trans "Save Draft" %}</button>
     </div>
 </header>

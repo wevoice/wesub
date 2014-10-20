@@ -91,7 +91,10 @@ def profile(request, user_id):
             form = AdminProfileForm(instance=user)
     else:
         form = None
-    qs = Action.objects.filter(user=user)
+    qs = (Action.objects
+          .filter(user=user)
+          .select_related('new_language', 'new_language__video', 'video',
+                          'user'))
 
     extra_context = {
         'user_info': user,

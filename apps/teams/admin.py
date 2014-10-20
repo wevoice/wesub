@@ -200,6 +200,7 @@ class BillingReportAdmin(admin.ModelAdmin):
 
 class InviteAdmin(admin.ModelAdmin):
     list_display = ('user', 'team', 'role', 'approved',)
+    raw_id_fields = ('user',)
 
 
 class ApplicationAdmin(admin.ModelAdmin):
