@@ -1497,10 +1497,18 @@ class ActionManager(models.Manager):
         return self.filter(Q(user=user) | Q(team__in=user.teams.all())).distinct()
 
     def for_user_team_activity(self, user):
-        return self.filter(team__in=user.teams.all()).exclude(user=user)
+        return self.extra(
+            tables=['teams_teammember'],
+            where=['teams_teammember.team_id = videos_action.team_id',
+                   'teams_teammember.user_id=%s'],
+            params=[user.id]).exclude(user=user)
 
     def for_user_video_activity(self, user):
-        return self.filter(video__in=user.videos.all()).exclude(user=user)
+        return self.extra(
+            tables=['auth_customuser_videos'],
+            where=['auth_customuser_videos.video_id = videos_action.video_id',
+                   'auth_customuser_videos.customuser_id=%s'],
+            params=[user.id]).exclude(user=user)
 
     def for_video(self, video):
         return (Action.objects.filter(video=video)
