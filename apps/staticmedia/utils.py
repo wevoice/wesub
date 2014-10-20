@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import importlib
 import os
 import subprocess
 
@@ -73,7 +74,7 @@ def run_command(commandline, stdin=None):
 def app_static_media_dirs():
     static_media_dirs = []
     for app in settings.INSTALLED_APPS:
-        module = __import__(app)
+        module = importlib.import_module(app)
         static_dir = os.path.join(os.path.dirname(module.__file__), 'static')
         if os.path.exists(static_dir):
             static_media_dirs.append(static_dir)
