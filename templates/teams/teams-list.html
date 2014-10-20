@@ -60,7 +60,7 @@
                 <li>
                     <h3>
                         <a href="{{ team.get_absolute_url }}">{{ team }}</a>
-                        {% if team|is_team_member:user and not my_teams %} 
+                        {% if team.user_is_member and not my_teams %} 
                             <span class="descriptor">{% trans 'Your team' %}</span>
                         {% endif %}
                         {% if not team.is_visible %}

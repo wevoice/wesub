@@ -141,7 +141,8 @@ def index(request, my_teams=False):
     else:
         ordering = request.GET.get('o', 'members')
         qs = (Team.objects.for_user(request.user)
-              .add_videos_count().add_members_count())
+              .add_videos_count().add_members_count()
+              .add_user_is_member(request.user))
 
     if q:
         qs = qs.filter(Q(name__icontains=q)|Q(description__icontains=q))

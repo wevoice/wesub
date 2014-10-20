@@ -105,6 +105,20 @@ class TeamQuerySet(query.QuerySet):
         }
         return self.extra(select=select)
 
+    def add_user_is_member(self, user):
+        """Add user_is_member field to this query """
+        if not user.is_authenticated():
+            return self.extra(select={'user_is_member': False})
+        select = {
+            'user_is_member':  (
+                'EXISTS (SELECT 1 '
+                'FROM teams_teammember tm '
+                'WHERE tm.team_id=teams_team.id '
+                'AND tm.user_id=%s)'
+            )
+        }
+        return self.extra(select=select, select_params=[user.id])
+
 class TeamManager(models.Manager):
     def get_query_set(self):
         """Return a QS of all non-deleted teams."""
