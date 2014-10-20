@@ -140,7 +140,8 @@ def index(request, my_teams=False):
         qs = Team.objects.filter(members__user=request.user)
     else:
         ordering = request.GET.get('o', 'members')
-        qs = Team.objects.for_user(request.user).annotate(_member_count=Count('users__pk'))
+        qs = (Team.objects.for_user(request.user)
+              .add_videos_count().add_members_count())
 
     if q:
         qs = qs.filter(Q(name__icontains=q)|Q(description__icontains=q))
@@ -148,7 +149,7 @@ def index(request, my_teams=False):
     order_fields = {
         'name': 'name',
         'date': 'created',
-        'members': '_member_count'
+        'members': '_members_count'
     }
     order_fields_name = {
         'name': _(u'Name'),
