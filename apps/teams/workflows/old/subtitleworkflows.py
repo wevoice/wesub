@@ -79,15 +79,17 @@ def _complete_task(user, video, subtitle_language, saved_version, approved):
         task.assignee = user
     elif task.assignee != user:
         raise ValueError("Task not assigned to user")
-    task.new_subtitle_version = subtitle_language.get_tip()
+    if saved_version:
+        task.new_subtitle_version = saved_version
+    else:
+        task.new_subtitle_version = subtitle_language.get_tip()
     task.approved = approved
     task.complete()
     if saved_version is None:
-        if saved_version is None:
-            version_id = None
-        else:
-            version_id = saved_version.id
-            video_changed_tasks.delay(team_video.video_id, version_id)
+        version_id = None
+    else:
+        version_id = saved_version.id
+    video_changed_tasks.delay(team_video.video_id, version_id)
 
 class Approve(TaskAction):
     name = 'approve'
