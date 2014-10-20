@@ -1433,8 +1433,10 @@ class SubtitleVersion(models.Model):
         else:
             Action.create_caption_handler(self, self.created)
 
-        return super(SubtitleVersion, self).save(*args, **kwargs)
+        super(SubtitleVersion, self).save(*args, **kwargs)
 
+        if self.is_public() and self.is_for_primary_audio_language():
+            self._set_video_data()
 
     def get_ancestors(self):
         """Return all ancestors of this version.  WARNING: MAY EAT YOUR DB!
@@ -1733,6 +1735,20 @@ class SubtitleVersion(models.Model):
         self.save()
         if not was_public and self.is_tip():
             self.subtitle_language.set_tip_cache('public', self)
+        if self.is_for_primary_audio_language():
+            self._set_video_data()
+
+    def _set_video_data(self):
+        video = self.video
+        video_changed = False
+        if self.title and video.title != self.title:
+            video.title = self.title
+            video_changed = True
+        if self.description and video.description != self.description:
+            video.description = self.description
+            video_changed = True
+        if video_changed:
+            video.save()
 
     def unpublish(self, delete=False, signal=True):
         """Unpublish this version.
