@@ -47,7 +47,7 @@ class EditorPage(UnisubsPage):
     _SYNC_HELP = 'div.sync-help'
     _INFO_TRAY = 'div.info-tray'
     _INFO_DETAILS = 'div.info-tray tr'
-    _ADD_SUB_TO_END = 'a.end'
+    _ADD_SUB_TO_END = 'div[ng-switch="bottomState()"] a'
     _TIMELINE_DISPLAY = 'a.show-timeline span'
     _WORKING_METADATA_EXPANDER = 'div.working div.metadata a'
     _TOOLS_MENU = 'div.toolbox-inside a'
@@ -67,8 +67,8 @@ class EditorPage(UnisubsPage):
 
     #RIGHT COLUMN
 
-    _NEXT_STEP = 'button.next-step'
-    _ENDORSE = 'button.endorse' #when completing subtitling.
+    _NEXT_STEP = 'li.active button'
+    _COMPLETE = 'li.active button' #when completing subtitling.
     _COLLAB_ENDORSE = 'button.endorse'
     _COLLAB_SENDBACK = 'div.actions button.send-back'
     # COLLAB PANEL
@@ -421,8 +421,11 @@ class EditorPage(UnisubsPage):
         return fields
 
     def toggle_playback(self):
-        self.wait_for_element_present(self._EMBEDDED_VIDEO)
-        self.type_special_key('TAB', modifier='SHIFT', element='body')
+        els = self.get_elements_list('div.instruction-item')
+        for el in els:
+            if 'Play' in el.text:
+                el.click()
+                return
 
     def buffer_up_subs(self):
         self.toggle_playback()
@@ -436,10 +439,10 @@ class EditorPage(UnisubsPage):
         self.click_by_css(self._NEXT_STEP)
 
     def start_sync(self):
-        self.click_by_css('div.substeps div button.next-step')
+        self.click_by_css(self._NEXT_STEP)
 
     def endorse_subs(self):
-        self.click_by_css(self._ENDORSE, self._ACTIVE_MODAL)
+        self.click_by_css(self._COMPLETE, self._ACTIVE_MODAL)
 
     def endorse_collab(self):
         self.click_by_css(self._COLLAB_ENDORSE)

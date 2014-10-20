@@ -312,13 +312,8 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
         self.videos_tab.add_video(url=test_url, project=self.project2.name)
         video, _ = Video.get_or_create_for_url(test_url)
         video.update_search_index()
-       # management.call_command('update_video_metadata')
-       # management.call_command('update_index', interactive=False)
-
         self.videos_tab.open_page(project_page)
-        self.assertTrue(self.videos_tab.video_present(
-            'What is up with Noises? (The Science and Mathematics'
-                        ' of Sound, Frequency, and Pitch)'))
+        self.assertTrue(self.videos_tab.video_present(video.title))
 
 
     def test_search_simple(self):
