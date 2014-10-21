@@ -38,6 +38,10 @@ from videos.tasks import video_changed_tasks
 import subtitles.workflows
 
 class TaskAction(subtitles.workflows.Action):
+    # we always start the subtitles as private, then call publish() once
+    # complete() is called for the last task
+    subtitle_visibility = 'private'
+
     def send_signals(self, subtitle_language, version):
         # If we perform any action and it results in a public version, then we
         # should send the subtitles_published signal.

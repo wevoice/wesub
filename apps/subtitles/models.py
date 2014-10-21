@@ -743,9 +743,7 @@ class SubtitleLanguage(models.Model):
 
         sv.set_subtitles(kwargs.get('subtitles', None))
         if metadata is not None:
-            sv.update_metadata(metadata, commit=False)
-            # save the video to commit the changes to it
-            self.video.save()
+            sv.update_metadata(metadata)
         self._sanity_check_parents(sv, parents)
 
         sv.full_clean()
