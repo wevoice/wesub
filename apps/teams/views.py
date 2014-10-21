@@ -140,7 +140,9 @@ def index(request, my_teams=False):
         qs = Team.objects.filter(members__user=request.user)
     else:
         ordering = request.GET.get('o', 'members')
-        qs = Team.objects.for_user(request.user).annotate(_member_count=Count('users__pk'))
+        qs = (Team.objects.for_user(request.user)
+              .add_videos_count().add_members_count()
+              .add_user_is_member(request.user))
 
     if q:
         qs = qs.filter(Q(name__icontains=q)|Q(description__icontains=q))
@@ -148,7 +150,7 @@ def index(request, my_teams=False):
     order_fields = {
         'name': 'name',
         'date': 'created',
-        'members': '_member_count'
+        'members': '_members_count'
     }
     order_fields_name = {
         'name': _(u'Name'),
@@ -165,18 +167,12 @@ def index(request, my_teams=False):
     if ordering in order_fields and order_type in ['asc', 'desc']:
         qs = qs.order_by(('-' if order_type == 'desc' else '')+order_fields[ordering])
 
-    highlighted_ids = list(Team.objects.for_user(request.user).filter(highlight=True).values_list('id', flat=True))
-    random.shuffle(highlighted_ids)
-    highlighted_qs = Team.objects.filter(pk__in=highlighted_ids[:HIGHTLIGHTED_TEAMS_ON_PAGE]) \
-        .annotate(_member_count=Count('users__pk'))
-
     extra_context = {
         'my_teams': my_teams,
         'query': q,
         'ordering': ordering,
         'order_type': order_type,
         'order_name': order_fields_name.get(ordering, 'name'),
-        'highlighted_qs': highlighted_qs,
     }
     return object_list(request, queryset=qs,
                        paginate_by=TEAMS_ON_PAGE,

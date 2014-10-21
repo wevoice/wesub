@@ -29,6 +29,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core.files import File
 from django.db import models
+from django.db.models import query
 from django.db.models.signals import post_save, post_delete, pre_delete
 from django.http import Http404
 from django.template.loader import render_to_string
@@ -73,10 +74,55 @@ ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
 # Teams
+class TeamQuerySet(query.QuerySet):
+    def add_members_count(self):
+        """Add _members_count field to this query
+
+        This can be used to order/filter the query and also avoids a query in
+        when Team.members_count() is called.
+        """
+        select = {
+            '_members_count': (
+                'SELECT COUNT(1) '
+                'FROM teams_teammember tm '
+                'WHERE tm.team_id=teams_team.id'
+            )
+        }
+        return self.extra(select=select)
+
+    def add_videos_count(self):
+        """Add _videos_count field to this query
+
+        This can be used to order/filter the query and also avoids a query in
+        when Team.video_count() is called.
+        """
+        select = {
+            '_videos_count':  (
+                'SELECT COUNT(1) '
+                'FROM teams_teamvideo tv '
+                'WHERE tv.team_id=teams_team.id'
+            )
+        }
+        return self.extra(select=select)
+
+    def add_user_is_member(self, user):
+        """Add user_is_member field to this query """
+        if not user.is_authenticated():
+            return self.extra(select={'user_is_member': False})
+        select = {
+            'user_is_member':  (
+                'EXISTS (SELECT 1 '
+                'FROM teams_teammember tm '
+                'WHERE tm.team_id=teams_team.id '
+                'AND tm.user_id=%s)'
+            )
+        }
+        return self.extra(select=select, select_params=[user.id])
+
 class TeamManager(models.Manager):
     def get_query_set(self):
         """Return a QS of all non-deleted teams."""
-        return super(TeamManager, self).get_query_set().filter(deleted=False)
+        return TeamQuerySet(Team).filter(deleted=False)
 
     def for_user(self, user, exclude_private=False):
         """Return the teams visible for the given user.
@@ -110,7 +156,6 @@ class TeamManager(models.Manager):
             notify_interval=notify_interval,
             teamvideo__created__gt=models.F('last_notification_time'))
             .distinct())
-
 
 class Team(models.Model):
     APPLICATION = 1
@@ -459,15 +504,15 @@ class Team(models.Model):
 
     # Item counts
     @property
-    def member_count(self):
+    def members_count(self):
         """Return the number of members of this team.
 
         Caches the result in-object for performance.
 
         """
-        if not hasattr(self, '_member_count'):
-            setattr(self, '_member_count', self.users.count())
-        return self._member_count
+        if not hasattr(self, '_members_count'):
+            setattr(self, '_members_count', self.users.count())
+        return self._members_count
 
     @property
     def videos_count(self):
