@@ -29,7 +29,7 @@ Types for metadata fields have several different representations:
 There is also support for an having other models use the fields from video and
 optionally override them.  To implement that, you need to add the
 meta_N_content columns to your model, and use update_child_and_video()
-and get_metadata_for_child() functions to get/set the metadata data.
+and get_child_metadata() functions to get/set the metadata data.
 This is currently used by SubtitleVersion
 """
 

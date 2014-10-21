@@ -742,12 +742,10 @@ class SubtitleLanguage(models.Model):
         sv = SubtitleVersion(*args, **kwargs)
 
         sv.set_subtitles(kwargs.get('subtitles', None))
-        if metadata is not None:
-            sv.update_metadata(metadata)
         self._sanity_check_parents(sv, parents)
 
         sv.full_clean()
-        sv.save()
+        sv.save(metadata=metadata)
 
         for p in parents:
             sv.parents.add(p)
@@ -1409,9 +1407,13 @@ class SubtitleVersion(models.Model):
 
     def save(self, *args, **kwargs):
         creating = not self.pk
+        video_needs_save = False
 
         if creating and not self.created:
             self.created = datetime.now()
+        if 'metadata' in kwargs:
+            self.update_metadata(kwargs.pop('metadata'), commit=False)
+            video_needs_save = True
 
         # Sanity checking of the denormalized data.
         assert self.language_code == self.subtitle_language.language_code, \
@@ -1429,6 +1431,8 @@ class SubtitleVersion(models.Model):
 
         if self.is_public() and self.is_for_primary_audio_language():
             self._set_video_data()
+        elif video_needs_save:
+            self.video.save()
 
     def get_ancestors(self):
         """Return all ancestors of this version.  WARNING: MAY EAT YOUR DB!
@@ -1572,7 +1576,6 @@ class SubtitleVersion(models.Model):
         return self.subtitle_language.subtitleversion_set
 
     def update_metadata(self, new_metadata, commit=True):
-        lang = self.subtitle_language
         metadata.update_child_and_video(self, self.video, new_metadata,
                                         commit)
 
@@ -1731,16 +1734,10 @@ class SubtitleVersion(models.Model):
             self._set_video_data()
 
     def _set_video_data(self):
-        video = self.video
-        video_changed = False
-        if self.title and video.title != self.title:
-            video.title = self.title
-            video_changed = True
-        if self.description and video.description != self.description:
-            video.description = self.description
-            video_changed = True
-        if video_changed:
-            video.save()
+        self.video.title = self.title
+        self.video.description = self.description
+        self.video.update_metadata(self.get_metadata(), commit=False)
+        self.video.save()
 
     def unpublish(self, delete=False, signal=True):
         """Unpublish this version.
