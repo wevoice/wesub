@@ -1423,13 +1423,7 @@ class SubtitleVersion(models.Model):
         assert self.visibility in ('public', 'private',), \
             "Version visibility must be either 'public' or 'private'!"
 
-        from django.conf import settings
-        if hasattr(settings, 'TERN_IMPORT') and settings.TERN_IMPORT:
-            # This check is a shim for the data import.  We can delete it once
-            # that's done and just always create an action.
-            pass
-        else:
-            Action.create_caption_handler(self, self.created)
+        Action.create_caption_handler(self, self.created)
 
         super(SubtitleVersion, self).save(*args, **kwargs)
 
