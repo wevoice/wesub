@@ -191,8 +191,8 @@ def team_metrics(team, member, projects):
                    ngettext('Video', 'Videos', team.videos_count),
                    team.videos_count),
         TeamMetric(reverse('teams:detail_members', args=(team.slug,)),
-                   ngettext('Member', 'Members', team.member_count),
-                   team.member_count),
+                   ngettext('Member', 'Members', team.members_count),
+                   team.members_count),
     ]
     if team.workflow_enabled:
         metrics.append(TeamMetric(
