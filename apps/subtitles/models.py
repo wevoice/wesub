@@ -27,6 +27,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import query, Q
 from django.utils import simplejson as json
+from django.utils.translation import ugettext
 from django.utils.translation import ugettext_lazy as _
 
 from subtitles import cache
@@ -1813,6 +1814,12 @@ class SubtitleNoteBase(models.Model):
 
     class Meta:
         abstract = True
+
+    def get_username(self):
+        if self.user:
+            return self.user.username
+        else:
+            return ugettext('None')
 
 class SubtitleNote(SubtitleNoteBase):
     pass

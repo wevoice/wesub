@@ -495,7 +495,7 @@ class EditorNotes(object):
     def note_editor_data(self):
         now = datetime.now()
         return [
-            dict(user=note.user.username,
+            dict(user=note.get_username(),
                  created=self.format_created(note.created, now),
                  body=note.body)
             for note in self.notes
