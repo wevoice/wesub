@@ -893,7 +893,7 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
-def activity(request, slug):
+def activity(request, slug, tab='videos'):
     team = get_team_for_view(slug, request.user)
     try:
         page = int(request.GET['page'])
@@ -910,10 +910,13 @@ def activity(request, slug):
     #
     # Much like the Tasks page, this query performs extremely poorly when run
     # normally.  So we split it into two parts here so that each will run fast.
+    if tab == 'team':
+        action_qs = Action.objects.filter(team=team)
+    else:
+        action_qs = Action.objects.for_team_videos(team)
     end = page * ACTIONS_ON_PAGE
     start = end - ACTIONS_ON_PAGE
-    action_qs = Action.objects.for_team(team)[start:end]
-    action_qs = action_qs.select_related(
+    action_qs = action_qs[start:end].select_related(
         'video', 'user', 'new_language', 'new_language__video'
     )
     activity_list = list(action_qs)
@@ -923,6 +926,7 @@ def activity(request, slug):
         'activity_list': activity_list,
         'team': team,
         'member': member,
+        'activity_tab': tab,
         'next_page': page + 1,
         'has_more': has_more,
     }
@@ -932,6 +936,9 @@ def activity(request, slug):
         # for ajax requests we only want to return the activity list, since
         # that's all that the JS code needs.
         return render(request, 'teams/_activity-list.html', context)
+
+def team_activity(request, slug):
+    return activity(request, slug, tab='team')
 
 # Members
 @timefn

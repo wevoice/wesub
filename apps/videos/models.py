@@ -1480,17 +1480,13 @@ class ActionRenderer(object):
         return fmt(msg, **kwargs)
 
 class ActionManager(models.Manager):
-    def for_team(self, team):
-        '''Return the actions for the given team.
-
-        If ids is True, instead of returning Action objects it will return
-        a values_list of their IDs.  This can be useful if you need to work
-        around some MySQL brokenness.
-
-        '''
-        return self.filter(
-            Q(team=team) |
-            Q(video__teamvideo__team=team)
+    def for_team_videos(self, team):
+        """Return the actions for a team's videos"""
+        return self.extra(
+            where=['videos_action.video_id IN (SELECT video_id '
+                   'FROM teams_teamvideo '
+                   'WHERE team_id=%s)'],
+            params=[team.id]
         )
 
     def for_user(self, user):

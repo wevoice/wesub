@@ -13,6 +13,10 @@
             {% include "teams/_tabs.html" %}
         {% endwith %}
 
+        <div class="tools subnav">
+            {% include 'teams/_subnav_activity.html' with current_sub=activity_tab %}
+        </div>
+
         <div id="activity-list">
             {% include "teams/_activity-list.html" %}
         </div>
