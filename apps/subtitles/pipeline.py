@@ -56,6 +56,7 @@ a nutshell:
 
 from django.db import transaction
 
+from videos.models import Video
 from subtitles.models import (
     SubtitleLanguage, SubtitleVersion, ORIGIN_ROLLBACK, ORIGIN_API,
     ORIGIN_UPLOAD, ORIGIN_WEB_EDITOR
@@ -365,8 +366,11 @@ def _get_language(video, language_code):
 
     """
     try:
-        sl = SubtitleLanguage.objects.get(video=video,
-                                          language_code=language_code)
+        # Use select_for_update() to lock the row for the language we're about
+        # to update.  Since we know that we're going to do some work, then
+        # update the language, locking at the start prevents deadlocks.
+        sl = (SubtitleLanguage.objects.select_for_update()
+              .get(video=video, language_code=language_code))
         language_needs_save = False
     except SubtitleLanguage.DoesNotExist:
         sl = SubtitleLanguage(video=video, language_code=language_code)
@@ -397,6 +401,10 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
     This function is the meat of the subtitle pipeline.  The user-facing
     add_subtitles is a thin wrappers around this.
     """
+    # Use select_for_update() to lock the row for our video.  We know
+    # that we're going to do some work, then potentially update the video,
+    # locking at the start prevents deadlocks.
+    Video.objects.select_for_update(id=video.id)
     sl, language_needs_save = _get_language(video, language_code)
     if language_needs_save:
         sl.save()
