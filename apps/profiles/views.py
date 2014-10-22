@@ -93,8 +93,8 @@ def profile(request, user_id):
         form = None
     qs = (Action.objects
           .filter(user=user)
-          .select_related('new_language', 'new_language__video', 'video',
-                          'user'))
+          .select_related('user')
+          .prefetch_related('new_language', 'new_language__video', 'video'))
 
     extra_context = {
         'user_info': user,
@@ -116,12 +116,14 @@ def dashboard(request):
 
     team_activity = (Action.objects
                      .for_user_team_activity(user)
-                     .select_related('team', 'member', 'user')
+                     .select_related('user')
+                     .prefetch_related('team', 'member')
                     )
     video_activity = (Action.objects
                       .for_user_video_activity(user)
-                      .select_related('video', 'new_language',
-                                      'new_language__video', 'user')
+                      .select_related('user')
+                      .prefetch_related('video', 'new_language',
+                                        'new_language__video')
                      )
 
     context = {
