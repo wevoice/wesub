@@ -1408,11 +1408,12 @@ class SubtitleVersion(models.Model):
     def save(self, *args, **kwargs):
         creating = not self.pk
         video_needs_save = False
+        metadata = kwargs.pop('metadata', None)
 
         if creating and not self.created:
             self.created = datetime.now()
-        if 'metadata' in kwargs:
-            self.update_metadata(kwargs.pop('metadata'), commit=False)
+        if metadata is not None:
+            self.update_metadata(metadata, commit=False)
             video_needs_save = True
 
         # Sanity checking of the denormalized data.
