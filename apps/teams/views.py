@@ -902,17 +902,19 @@ def activity(request, slug, tab='videos'):
     except TeamMember.DoesNotExist:
         member = None
 
+    # This section is here to work around MySQL's poor decisions.
+    #
+    # Much like the Tasks page, this query performs extremely poorly when run
+    # normally.  So we split it into two parts here so that each will run fast.
     if tab == 'team':
         action_qs = Action.objects.filter(team=team)
     else:
         action_qs = Action.objects.for_team_videos(team)
     end = page * ACTIONS_ON_PAGE
     start = end - ACTIONS_ON_PAGE
-    action_qs = (action_qs[start:end]
-                 .select_related('user')
-                 .prefetch_related('video', 'new_language',
-                                   'new_language__video')
-                )
+    action_qs = action_qs[start:end].select_related(
+        'video', 'user', 'new_language', 'new_language__video'
+    )
     activity_list = list(action_qs)
     has_more = len(activity_list) >= ACTIONS_ON_PAGE
 

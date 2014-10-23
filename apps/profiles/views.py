@@ -17,6 +17,8 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import logging
+from datetime import datetime, timedelta
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -93,8 +95,9 @@ def profile(request, user_id):
         form = None
     qs = (Action.objects
           .filter(user=user)
-          .select_related('user')
-          .prefetch_related('new_language', 'new_language__video', 'video'))
+          .select_related('new_language', 'new_language__video', 'video',
+                          'user')
+         )
 
     extra_context = {
         'user_info': user,
@@ -113,17 +116,18 @@ def dashboard(request):
     user = request.user
 
     tasks = user.open_tasks()
+    since = datetime.now() - timedelta(days=30)
 
     team_activity = (Action.objects
                      .for_user_team_activity(user)
-                     .select_related('user')
-                     .prefetch_related('team', 'member')
+                     .filter(created__gt=since)
+                     .select_related('team', 'member', 'user')
                     )
     video_activity = (Action.objects
                       .for_user_video_activity(user)
-                      .select_related('user')
-                      .prefetch_related('video', 'new_language',
-                                        'new_language__video')
+                      .filter(created__gt=since)
+                      .select_related('video', 'new_language',
+                                      'new_language__video', 'user')
                      )
 
     context = {
