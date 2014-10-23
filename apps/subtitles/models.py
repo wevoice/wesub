@@ -1580,7 +1580,9 @@ class SubtitleVersion(models.Model):
                                         commit)
 
     def get_metadata(self):
-        return metadata.get_child_metadata(self, self.video)
+        return metadata.get_child_metadata(
+            self, self.video,
+            fallback_to_video=self.is_for_primary_audio_language())
 
     def get_metadata_for_display(self):
         return self.get_metadata().convert_for_display()

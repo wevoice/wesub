@@ -191,8 +191,15 @@ def update_child_and_video(child, video, new_metadata, commit=True):
     if commit:
         child.save()
 
-def get_child_metadata(child, video):
-    """Get the metadata data for a child."""
+def get_child_metadata(child, video, fallback_to_video=False):
+    """Get the metadata data for a child.
+
+    Params:
+        child: Child object
+        video: Video object
+        fallback_to_video: if True then for values that aren't set for child
+            we will use the value from video instead.
+    """
     rv = MetadataDict()
 
     for i in xrange(METADATA_FIELD_COUNT):
@@ -200,6 +207,8 @@ def get_child_metadata(child, video):
         if type_val is None:
             break
         name = type_value_to_name[type_val]
-        child_content = getattr(child, content_field(i))
-        rv[name] = child_content
+        value = getattr(child, content_field(i))
+        if not value and fallback_to_video:
+            value = getattr(video, content_field(i))
+        rv[name] = value
     return rv
