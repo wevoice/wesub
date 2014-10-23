@@ -440,15 +440,17 @@ class Announcement(models.Model):
 
     @classmethod
     def last(cls, hidden_date=None):
-        last = cache.get(cls.cache_key, '')
+        last = cache.get(cls.cache_key)
+        if last == 0:
+            return None
 
-        if last == '':
+        if last is None:
             try:
                 qs = cls.objects.filter(created__lte=datetime.today()) \
                     .filter(hidden=False)
                 last = qs[0:1].get()
             except cls.DoesNotExist:
-                last = None
+                last = 0
             cache.set(cls.cache_key, last, 60*60)
 
         if hidden_date and last and last.created < hidden_date:
