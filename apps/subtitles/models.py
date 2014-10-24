@@ -1737,8 +1737,10 @@ class SubtitleVersion(models.Model):
             self._set_video_data()
 
     def _set_video_data(self):
-        self.video.title = self.title
-        self.video.description = self.description
+        if self.title:
+            self.video.title = self.title
+        if self.description:
+            self.video.description = self.description
         self.video.update_metadata(self.get_metadata(), commit=False)
         self.video.save()
 
