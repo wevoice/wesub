@@ -117,6 +117,17 @@ class SendBack(TaskAction):
         _complete_task(user, video, subtitle_language, saved_version,
                        Task.APPROVED_IDS['Rejected'])
 
+class TaskSaveDraft(TaskAction):
+    # we don't need to set any of these since we only return this in
+    # action_for_add_subtitles()
+    name = ''
+    label = ''
+    in_progress_text = ''
+    complete = False
+
+    def do_perform(self, user, video, subtitle_language, saved_version):
+        pass
+
 class TaskTeamEditorNotes(TeamEditorNotes):
     def post(self, user, body):
         note = super(TaskTeamEditorNotes, self).post(user, body)
@@ -191,9 +202,13 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
         if task is not None:
             # review/approve task
             return [SendBack(), Approve()]
-        else:
+        elif (self.team_video.task_set
+              .incomplete_subtitle_or_translate().exists()):
             # subtitle/translate task
             return [Complete()]
+        else:
+            # post-edit
+            return [subtitles.workflows.Publish()]
 
     def get_editor_notes(self, language_code):
         return TaskTeamEditorNotes(self.team_video, language_code)
@@ -215,6 +230,8 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
         if (complete == True and
             tasks.incomplete_subtitle_or_translate().exists()):
             return Complete()
+        elif complete is None:
+            return TaskSaveDraft()
         else:
             return (super(TaskTeamSubtitlesWorkflow, self)
                     .action_for_add_subtitles(user, language_code, complete))
