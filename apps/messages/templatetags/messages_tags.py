@@ -16,31 +16,38 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django import template
+from django.core.cache import cache
+from django.template.loader import render_to_string
 
 from messages.models import Message
 
-
 register = template.Library()
 
-@register.inclusion_tag('messages/_messages.html', takes_context=True)
+@register.simple_tag(takes_context=True)
 def messages(context):
     user = context['user']
-    if user.is_authenticated():
-        hidden_message_id = context['request'].COOKIES.get(Message.hide_cookie_name)
-        qs = user.unread_messages(hidden_message_id)
-        try:
-            last_unread = qs[:1].get().pk
-        except Message.DoesNotExist:
-            last_unread = ''
-        count = user.unread_messages_count(hidden_message_id)
-    else:
-        qs = Message.objects.none()
-        last_unread = ''
-        count = 0
+    request = context['request']
+    hidden_message_id = request.COOKIES.get(Message.hide_cookie_name)
+    if not user.is_authenticated():
+        return ''
 
-    return {
+    cache_key = 'user-messages:{0}'.format(user.id)
+    cached = cache.get(cache_key)
+    if isinstance(cached, tuple) and cached[0] == hidden_message_id:
+        return cached[1]
+
+    qs = user.unread_messages(hidden_message_id)
+    try:
+        last_unread = qs[:1].get().pk
+    except Message.DoesNotExist:
+        last_unread = ''
+    count = user.unread_messages_count(hidden_message_id)
+    
+    content = render_to_string('messages/_messages.html',  {
         'msg_count': count,
         'last_unread': last_unread,
         'cookie_name': Message.hide_cookie_name
-    }
+    })
+    cache.set(cache_key, (hidden_message_id, content), 30 * 60)
+    return content
 
