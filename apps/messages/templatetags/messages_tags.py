@@ -16,7 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django import template
-from django.core.cache import cache
 from django.template.loader import render_to_string
 
 from messages.models import Message
@@ -31,8 +30,7 @@ def messages(context):
     if not user.is_authenticated():
         return ''
 
-    cache_key = 'user-messages:{0}'.format(user.id)
-    cached = cache.get(cache_key)
+    cached = user.cache.get('messages')
     if isinstance(cached, tuple) and cached[0] == hidden_message_id:
         return cached[1]
 
@@ -48,6 +46,6 @@ def messages(context):
         'last_unread': last_unread,
         'cookie_name': Message.hide_cookie_name
     })
-    cache.set(cache_key, (hidden_message_id, content), 30 * 60)
+    user.cache.set('messages', (hidden_message_id, content), 30 * 60)
     return content
 

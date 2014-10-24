@@ -17,7 +17,6 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django import template
 from django.conf import settings
-from django.core.cache import cache
 from django.template.loader import render_to_string
 from rosetta.views import can_translate as can_translate_func
 
@@ -107,10 +106,9 @@ def custom_avatar(user, size):
 @register.simple_tag(takes_context=True)
 def top_user_panel(context):
     user = context['user']
-    cache_key = 'user-top-panel:{0}'.format(user.id)
-    cached = cache.get(cache_key)
+    cached = user.cache.get('top-panel')
     if cached:
         return cached
     content = render_to_string('profiles/_top_user_panel.html', context)
-    cache.set(cache_key, content, 30*60)
+    user.cache.set('top-panel', content, 30*60)
     return content

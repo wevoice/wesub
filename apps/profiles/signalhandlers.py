@@ -16,12 +16,13 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.core.cache import cache
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 
+from auth.models import UserCache
 from teams.models import TeamMember
 
 @receiver(post_save, sender=TeamMember)
+@receiver(post_delete, sender=TeamMember)
 def on_team_member_saved(sender, instance, **kwargs):
-    cache.delete('user-top-panel:{0}'.format(instance.user_id))
+    UserCache.delete_by_id(instance.user_id, 'top-panel')
