@@ -79,6 +79,7 @@ worker:
   volumes:
     - .:/opt/apps/unisubs
   links:
+    - app
     - db
     - queue
     - cache
