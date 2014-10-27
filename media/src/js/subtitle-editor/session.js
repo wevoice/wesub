@@ -107,10 +107,10 @@ var angular = angular || null;
                     });
                 }
             },
-            save: function() {
+            saveDraft: function() {
                 var msg = $sce.trustAsHtml('Saving&hellip;');
                 $scope.dialogManager.showFreezeBox(msg);
-                saveSubtitles().then(function onSuccess() {
+                saveSubtitles(false).then(function onSuccess() {
                     $scope.dialogManager.closeFreezeBox();
                     $scope.dialogManager.openDialog('changesSaved', {
                         exit: $scope.exitEditor
@@ -187,7 +187,7 @@ var angular = angular || null;
         $scope.onSaveDraftClicked = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
-            $scope.session.save();
+            $scope.session.saveDraft();
         }
 
         $scope.$root.$on('work-done', function() {

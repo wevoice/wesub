@@ -261,14 +261,14 @@ describe('The SessionController', function() {
 
     it('handles saving subtitles', function() {
         session.subtitlesChanged = true;
-        session.save();
+        session.saveDraft();
         // While the save is in-progress we should show a freeze box
         expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Saving&hellip;');
         // After the save is complete, we should close the freezebox and show
         // the subtitles saved dialog
         $rootScope.$digest();
         expect(backendMethodsCalled).toEqual(['saveSubtitles']);
-        expect(markAsCompleteArg).toBe(undefined);
+        expect(markAsCompleteArg).toBe(false);
         expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
         expect($scope.dialogManager.openDialog).toHaveBeenCalledWith(
             'changesSaved', jasmine.any(Object));
@@ -276,7 +276,7 @@ describe('The SessionController', function() {
 
     it('handles the exit button after saving subtitles', function() {
         session.subtitlesChanged = true;
-        session.save();
+        session.saveDraft();
         $rootScope.$digest();
         var callbacks = $scope.dialogManager.openDialog.mostRecentCall.args[1];
         callbacks.exit();
@@ -286,7 +286,7 @@ describe('The SessionController', function() {
     it('handles errors while saving subtitles', function() {
         simulateSaveError = true;
         session.subtitlesChanged = true;
-        session.save();
+        session.saveDraft();
         $rootScope.$digest();
         expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
         expect($scope.dialogManager.open).toHaveBeenCalledWith('save-error');
@@ -359,7 +359,7 @@ describe('The SessionController', function() {
         expect($window.onbeforeunload()).toBe(null);
         session.subtitlesChanged = true;
         expect($window.onbeforeunload()).toBeTruthy();
-        session.save()
+        session.saveDraft()
         $rootScope.$digest();
         expect($window.onbeforeunload()).toBe(null);
     });
