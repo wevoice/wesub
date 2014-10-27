@@ -104,6 +104,9 @@ class SubtitleEditorBase(View):
     def get_custom_css(self):
         return ""
 
+    def get_title(self):
+        return _('Amara')
+
     def calc_base_language(self):
         if (self.video.primary_audio_language_code and 
             SubtitleVersion.objects.extant().filter(
@@ -300,6 +303,7 @@ class SubtitleEditorBase(View):
         editor_data = self.get_editor_data()
 
         context = {
+            'title': self.get_title(),
             'video': self.video,
             'DEBUG': settings.DEBUG,
             'language': self.editing_language,
