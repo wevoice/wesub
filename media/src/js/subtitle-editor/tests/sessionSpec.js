@@ -140,15 +140,17 @@ describe('The SessionController', function() {
         $scope.overrides = {
             forceSaveError: false
         };
+        $window = {};
         $scope.dialogManager = jasmine.createSpyObj('dialogManager', [
             'open', 'close', 'openDialog', 'showFreezeBox', 'closeFreezeBox'
         ]);
-        $window = { location: null };
         $controller('SessionController', {
             $scope: $scope,
-            $window: $window,
+            $window: $window
         });
         session = $scope.session;
+        $scope.exitEditor = jasmine.createSpy('exitEditor');
+        $scope.exitToLegacyEditor = jasmine.createSpy('exitToLegacyEditor');
     }));
 
     beforeEach(inject(function($q) {
@@ -201,19 +203,18 @@ describe('The SessionController', function() {
     });
 
     function expectRedirectToVideoPage() {
-        var videoPagePath = '/videos/' + EditorData.video.id + '/';
-        expect($window.location).toEqual(videoPagePath);
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Exiting&hellip;');
+        expect($scope.exitEditor).toHaveBeenCalled();
+        expect($scope.exitToLegacyEditor).not.toHaveBeenCalled();
     }
 
     function expectRedirectToLegacyEditor() {
-        expect($window.location).toEqual(EditorData.oldEditorURL);
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Exiting&hellip;');
+        expect($scope.exitToLegacyEditor).toHaveBeenCalled();
+        expect($scope.exitEditor).not.toHaveBeenCalled();
     }
 
     function expectNoRedirect() {
-        expect($window.location).toEqual(null);
-        expect($scope.dialogManager.showFreezeBox).not.toHaveBeenCalled();
+        expect($scope.exitToLegacyEditor).not.toHaveBeenCalled();
+        expect($scope.exitEditor).not.toHaveBeenCalled();
     }
 
     it('handles exiting', function() {
