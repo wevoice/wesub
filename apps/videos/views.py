@@ -169,7 +169,6 @@ class LanguageList(object):
 
 def index(request):
     context = {
-        'all_videos': Video.objects.count(),
         'popular_videos': VideoIndex.get_popular_videos("-today_views")[:VideoIndex.IN_ROW],
         'featured_videos': VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW],
     }
