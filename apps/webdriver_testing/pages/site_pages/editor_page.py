@@ -10,7 +10,6 @@ class EditorPage(UnisubsPage):
     """
      This is the NEW subtitle editor.
     """
-
     _URL = "subtitles/editor/{0}/{1}/"  # (video_id, lang_code)
     EXIT_BUTTON = 'div.exit'
     _EXIT = 'button.discard'
@@ -28,6 +27,7 @@ class EditorPage(UnisubsPage):
                         "upload them to the system later.")
     _SAVE_SUBS = 'div.download textarea'
     _MAIN = 'section.main'
+    _EDIT_TITLE = "textarea[fixsize-bind='currentSubtitles.title']" 
 
     #LEFT COLUMN
     _HELP_KEYS = 'div.help-panel ul li span.key'
@@ -140,6 +140,10 @@ class EditorPage(UnisubsPage):
         self.wait_for_element_present(self._VIDEO_SUBTITLE, wait_time=20)
         return self.get_text_by_css(self._VIDEO_SUBTITLE)
 
+
+    def session_buttons(self):
+        buttons = self.browser.find_elements_by_css_selector(self._SESSION_BUTTONS)
+        return [el.text for el in buttons] 
 
     def legacy_editor(self):
         buttons = self.browser.find_elements_by_css_selector(self._SESSION_BUTTONS)
@@ -277,7 +281,6 @@ class EditorPage(UnisubsPage):
         els = self.get_elements_list("ul.toolbox-menu li")
         menu_list = {}
         for el in els:
-            self.logger.info(el.get_attribute("class"))
             item = el.find_element_by_css_selector("a")
             menu_item = item.get_attribute("class")
             item_properties = { 
@@ -298,7 +301,9 @@ class EditorPage(UnisubsPage):
 
     def upload_subtitles(self, sub_file):
         menu_items = self.tools_menu_items()
-        menu_items['upload-subtitles']['element'].click()
+        self.logger.info(menu_items['upload-subtitles']['element'].tag_name)
+        self.browser.execute_script("document.getElementsByClassName('upload-subtitles')[0].click()")
+        self.wait_for_element_visible('button.upload-subtitles-submit-button-')
         self.type_by_css('input#subtitles-file-field', sub_file)
         self.click_by_css('button.upload-subtitles-submit-button-')
         time.sleep(3)
@@ -374,6 +379,18 @@ class EditorPage(UnisubsPage):
                 pass
         self.handle_js_alert('accept')
 
+    def edit_title_displayed(self):
+        els = self.get_elements_list("div.video-title a")
+        return [el.is_displayed() for el in els]
+
+    def edit_title(self, new_title):
+        self.click_by_css("div.video-title a")
+        active_modal = self.is_element_present(self._ACTIVE_MODAL)
+        self.clear_text(self._EDIT_TITLE)
+        self.type_by_css(self._EDIT_TITLE, new_title)
+        done = active_modal.find_element_by_css_selector("button")
+        done.click()
+
     def close_edit_title(self):
         
         active_modal = self.is_element_present(self._ACTIVE_MODAL)
@@ -442,7 +459,8 @@ class EditorPage(UnisubsPage):
         self.click_by_css(self._NEXT_STEP)
 
     def endorse_subs(self):
-        self.click_by_css(self._COMPLETE, self._ACTIVE_MODAL)
+        self.click_by_css(self._COMPLETE)
+        self.wait_for_element_not_present(self._ACTIVE_MODAL)
 
     def endorse_collab(self):
         self.click_by_css(self._COLLAB_ENDORSE)
