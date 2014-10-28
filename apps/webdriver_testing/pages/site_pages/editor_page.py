@@ -69,8 +69,9 @@ class EditorPage(UnisubsPage):
 
     _NEXT_STEP = 'li.active button'
     _COMPLETE = 'li.active button' #when completing subtitling.
-    _COLLAB_ENDORSE = 'button.endorse'
+    _COLLAB_ENDORSE = 'div.workflow li.active button'
     _COLLAB_SENDBACK = 'div.actions button.send-back'
+    _COLLAB_BUTTON = 'div.actions button'
     # COLLAB PANEL
     _COLLAB_PANEL = 'div.workflow'
     _SEND_BACK = 'button.send-back'
@@ -306,8 +307,8 @@ class EditorPage(UnisubsPage):
         self.wait_for_element_visible('button.upload-subtitles-submit-button-')
         self.type_by_css('input#subtitles-file-field', sub_file)
         self.click_by_css('button.upload-subtitles-submit-button-')
-        time.sleep(3)
-        self.wait_for_element_present(self._TOOLS_MENU)
+        time.sleep(1)
+        self.wait_for_element_present("div.workflow")
 
     def toggle_paragraph(self, position):
         """Toggles the paragraph marker on or off. """
@@ -404,6 +405,10 @@ class EditorPage(UnisubsPage):
     def collab_panel_displayed(self):
         return self.is_element_visible(self._COLLAB_PANEL)
 
+    def collab_action(self, action):
+        els = self.get_elements_list("div.actions button")
+        [el.click() for el in els if el.text == action]
+
     def action_buttons(self):
         els = self.get_elements_list("div.actions button")
         return [el.text for el in els]
@@ -462,8 +467,12 @@ class EditorPage(UnisubsPage):
         self.click_by_css(self._COMPLETE)
         self.wait_for_element_not_present(self._ACTIVE_MODAL)
 
-    def endorse_collab(self):
-        self.click_by_css(self._COLLAB_ENDORSE)
+    def endorse_collab(self, action):
+        buttons = self.get_elements_list(self._COLLAB_ENDORSE)
+        for el in buttons:
+            self.logger.info(el.text)
+            if el.text == action:
+                el.click()
         self.wait_for_element_not_present(self._COLLAB_ENDORSE)
 
     def sendback_collab(self):
