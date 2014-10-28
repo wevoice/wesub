@@ -21,7 +21,6 @@
 import itertools
 from datetime import datetime, date, timedelta
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -40,20 +39,13 @@ from babelsubs.storage import calc_changes
 from babelsubs.generators.html import HTMLGenerator
 from babelsubs import load_from
 from subtitles import signals
-from videos.behaviors import make_video_title
-
 from utils.compress import compress, decompress
 from utils.redis_utils import RedisSimpleField
 from utils.subtitles import create_new_subtitles
-from utils.translation import is_rtl
-
-
-ALL_LANGUAGES = sorted([(val, _(name)) for val, name in settings.ALL_LANGUAGES],
-                       key=lambda v: v[1])
-VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
+from utils import translation
+from videos.behaviors import make_video_title
 
 WRITELOCK_EXPIRATION = 30 # 30 seconds
-
 
 # Utility functions -----------------------------------------------------------
 def mapcat(fn, iterable):
@@ -364,7 +356,8 @@ class SubtitleLanguage(models.Model):
     """
     # Basic Data
     video = models.ForeignKey(Video, related_name='newsubtitlelanguage_set')
-    language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
+    language_code = models.CharField(max_length=16,
+                                     choices=translation.ALL_LANGUAGE_CHOICES)
     created = models.DateTimeField(editable=False)
 
     # Should be True if the latest version for this set of subtitles covers all
@@ -469,7 +462,7 @@ class SubtitleLanguage(models.Model):
 
 
     def is_rtl(self):
-        return is_rtl(self.language_code)
+        return translation.is_rtl(self.language_code)
 
     def dir(self):
         if self.is_rtl():
@@ -484,8 +477,10 @@ class SubtitleLanguage(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        assert self.language_code in VALID_LANGUAGE_CODES, \
-            "Subtitle Language %s should be a valid code." % self.language_code
+        if not self.language_code in translation.ALL_LANGUAGE_CODES:
+            raise ValidationError(
+                "Subtitle Language %s should be a valid code." %
+                self.language_code)
 
         creating = not self.pk
 
@@ -1217,7 +1212,8 @@ class SubtitleVersion(models.Model):
 
     video = models.ForeignKey(Video, related_name='newsubtitleversion_set')
     subtitle_language = models.ForeignKey(SubtitleLanguage)
-    language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
+    language_code = models.CharField(max_length=16,
+                                     choices=translation.ALL_LANGUAGE_CHOICES)
 
     # If you just want to *check* the visibility of a version you probably want
     # to use the is_public and is_private methods instead, which handle the
@@ -1430,13 +1426,7 @@ class SubtitleVersion(models.Model):
         assert self.visibility in ('public', 'private',), \
             "Version visibility must be either 'public' or 'private'!"
 
-        from django.conf import settings
-        if hasattr(settings, 'TERN_IMPORT') and settings.TERN_IMPORT:
-            # This check is a shim for the data import.  We can delete it once
-            # that's done and just always create an action.
-            pass
-        else:
-            Action.create_caption_handler(self, self.created)
+        Action.create_caption_handler(self, self.created)
 
         return super(SubtitleVersion, self).save(*args, **kwargs)
 
@@ -1807,7 +1797,8 @@ class SubtitleVersionMetadata(models.Model):
 
 class SubtitleNoteBase(models.Model):
     video = models.ForeignKey(Video, related_name='+')
-    language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
+    language_code = models.CharField(max_length=16,
+                                     choices=translation.ALL_LANGUAGE_CHOICES)
     user = models.ForeignKey(User, related_name='+', null=True)
     body = models.TextField()
     created = models.DateTimeField(default=datetime.now)
