@@ -253,6 +253,7 @@ LOCALE_INDEPENDENT_PATHS = (
     re.compile('^/jstest/'),
     re.compile('^/sitemap.*.xml'),
     re.compile('^/externalsites/youtube-callback'),
+    re.compile('^/providers/'),
     re.compile('^/crossdomain.xml'),
 )
 
