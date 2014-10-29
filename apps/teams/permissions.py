@@ -670,7 +670,7 @@ def can_add_version(user, video, language_code):
 
     # basic check, if the user doesn't have view permission, then they can't
     # add a new version
-    if not team_video.video.can_user_see(user):
+    if not (team.is_visible or team.is_member(user)):
         return TeamsPermissionsCheck(False, team, default_message)
 
     # check if the user has permission based on the tasks system

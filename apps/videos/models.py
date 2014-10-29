@@ -394,6 +394,20 @@ class Video(models.Model):
         if hasattr(self, '_cached_teamvideo'):
             del self._cached_teamvideo
 
+    def get_workflow(self):
+        # need to import here because things are all tangled up
+        from subtitles.workflows import get_workflow
+        if not hasattr(self, '_cached_workflow'):
+            self._cached_workflow = get_workflow(self)
+        return self._cached_workflow
+
+    def clear_workflow_cache(self):
+        if hasattr(self, '_cached_workflow'):
+            del self._cached_workflow
+
+    def can_user_see(self, user):
+        return self.get_workflow().user_can_view_video(user)
+
     def thumbnail_link(self):
         """Return a URL to this video's thumbnail, or '' if there isn't one.
 
@@ -889,19 +903,6 @@ class Video(models.Model):
         meta['creation_date'] = VideoMetadata.string_to_date(meta.get('creation_date'))
 
         return meta
-
-    def can_user_see(self, user):
-        team_video = self.get_team_video()
-
-        if not team_video:
-            return True
-
-        team = team_video.team
-
-        if team and team.is_visible:
-            return True
-
-        return team.is_member(user)
 
     @property
     def translations(self):
