@@ -712,18 +712,7 @@ def can_add_version(user, video, language_code):
     # all checks passed
     return TeamsPermissionsCheck(True)
 
-def can_view_version(user, subtitle_version):
-    if not subtitle_version.video.can_user_see(user):
-        return False
-    if subtitle_version.is_public():
-        return True
-    else:
-        return can_view_private_versions(user,
-                                         subtitle_version.subtitle_language)
-
 def can_view_private_versions(user, language):
-    if not language.video.can_user_see(user):
-        return False
     team_video = language.video.get_team_video()
     if team_video is None:
         return True
