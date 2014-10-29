@@ -255,6 +255,7 @@ LOCALE_INDEPENDENT_PATHS = (
     re.compile('^/externalsites/youtube-callback'),
     re.compile('^/providers/'),
     re.compile('^/crossdomain.xml'),
+    re.compile('^/embedder-widget-iframe/'),
 )
 
 #Haystack configuration
