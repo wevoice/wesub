@@ -12,10 +12,16 @@ from django.utils.translation.trans_real import parse_accept_lang_header
 
 from unilangs import get_language_name_mapping, LanguageCode
 
-
 # A set of all language codes we support.
-SUPPORTED_LANGUAGE_CODES = set(get_language_name_mapping('unisubs').keys())
+_supported_languages_map = get_language_name_mapping('unisubs')
+_all_languages_map = get_language_name_mapping('internal')
+SUPPORTED_LANGUAGE_CODES = set(_supported_languages_map.keys())
+ALL_LANGUAGE_CODES = set(_all_languages_map.keys())
 
+SUPPORTED_LANGUAGE_CHOICES = list(sorted(_supported_languages_map.items(),
+                                         key=lambda c: c[1]))
+ALL_LANGUAGE_CHOICES = list(sorted(_all_languages_map.items(),
+                                   key=lambda c: c[1]))
 
 def _only_supported_languages(language_codes):
     """Filter the given list of language codes to contain only codes we support."""
