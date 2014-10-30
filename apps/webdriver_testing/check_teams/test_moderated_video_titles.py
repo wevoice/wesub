@@ -59,6 +59,7 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
 
     def setUp(self):
         self.tasks_tab.open_team_page(self.team.slug)
+        self.tasks_tab.handle_js_alert('accept')
 
     def tearDown(self):
         self.browser.get_screenshot_as_file("%s.png" % self.id())
@@ -90,9 +91,9 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         if title:
             self.editor_pg.edit_title(title)
         if action == "approve":
-            self.editor_pg.approve_task()
+            self.editor_pg.collab_action('Approve')
         elif action == "sendback":
-            self.editor_pg.send_back_task()
+            self.editor_pg.collab_action('Send Back')
         elif action == "draft": 
             self.editor_pg.save('Exit')
         else:
@@ -135,7 +136,7 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.edit_subtitles() 
         self.editor_pg.edit_title(new_title)
-        self.editor_pg.approve_task()
+        self.editor_pg.collab_action('Publish')
         self.assertEqual(new_title, self.video_pg.video_title())
 
 
