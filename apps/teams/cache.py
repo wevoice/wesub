@@ -33,9 +33,9 @@ def _team_preferred_langs_id(team):
 
 
 def invalidate_lang_preferences(team):
-    cache.delete(_team_readable_langs_id(team))
-    cache.delete(_team_writable_langs_id(team))
-    cache.delete(_team_preferred_langs_id(team))
+    cache.delete(_team_readable_langs_id(team), version=CACHE_VERSION)
+    cache.delete(_team_writable_langs_id(team), version=CACHE_VERSION)
+    cache.delete(_team_preferred_langs_id(team), version=CACHE_VERSION)
 
 
 def get_readable_langs(team):

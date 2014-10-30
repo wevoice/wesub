@@ -107,7 +107,7 @@ class TeamQuerySet(query.QuerySet):
     def add_user_is_member(self, user):
         """Add user_is_member field to this query """
         if not user.is_authenticated():
-            return self.extra(select={'user_is_member': False})
+            return self.extra(select={'user_is_member': 0})
         select = {
             'user_is_member':  (
                 'EXISTS (SELECT 1 '
