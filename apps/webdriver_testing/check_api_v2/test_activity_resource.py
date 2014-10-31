@@ -35,7 +35,7 @@ class TestCaseActivity(WebdriverTestCase):
              user=UserFactory.create())
         TeamVideoFactory.create(team=cls.open_team, added_by=cls.user)
 
-    def test_list__video_update(self):
+    def test_list_video_update(self):
         """Verify video update activity.
         GET /api2/partners/activity/[activity-id]/
 
@@ -63,7 +63,7 @@ class TestCaseActivity(WebdriverTestCase):
         response = r.json
         #activity_query = '?team={0}&type={1}'.format(
         #    self.open_team.slug, 2)
-        activity_query = '?team=%s&type=4' % self.open_team.slug
+        activity_query = '?team=%s&type=4&team-activity=1' % self.open_team.slug
         url_part = 'activity/%s' % activity_query
         r = self.data_utils.make_request(self.user, 'get', url_part)
         self.assertEqual(200, r.status_code)
@@ -71,7 +71,7 @@ class TestCaseActivity(WebdriverTestCase):
 
 
 
-    def test_team__video_added(self):
+    def test_team_video_added(self):
         """Verify team video added activity.
 
         GET /api2/partners/activity/[activity-id]/
@@ -88,7 +88,7 @@ class TestCaseActivity(WebdriverTestCase):
         resp = r.json
         new_vid_id = resp['id']
 
-        activity_query = '?team={0}&type={1}'.format(
+        activity_query = '?team={0}&type={1}&team-activity=1'.format(
             self.open_team.slug, 1)
         url_part = 'activity/%s' %activity_query
         r = self.data_utils.make_request(self.user, 'get', url_part)

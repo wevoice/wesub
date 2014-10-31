@@ -26,7 +26,7 @@ from auth.models import CustomUser as User
 from contextlib import contextmanager
 from testhelpers import views as helpers
 from utils.factories import *
-from utils.translation import SUPPORTED_LANGUAGE_CODES
+from utils.translation import ALL_LANGUAGE_CODES
 
 from teams.permissions_const import *
 from teams.permissions import (
@@ -42,7 +42,7 @@ from teams.permissions import (
 )
 
 
-TOTAL_LANGS = len(SUPPORTED_LANGUAGE_CODES)
+TOTAL_LANGS = len(ALL_LANGUAGE_CODES)
 
 
 def _set_subtitles(team_video, language, original, complete, translations=[]):

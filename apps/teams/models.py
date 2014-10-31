@@ -52,6 +52,7 @@ from teams.permissions_const import (
 from teams import tasks
 from teams import workflows
 from utils import DEFAULT_PROTOCOL
+from utils import translation
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
@@ -70,8 +71,6 @@ logger = logging.getLogger(__name__)
 celery_logger = logging.getLogger('celery.task')
 
 BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
-ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
-VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
 # Teams
 class TeamQuerySet(query.QuerySet):
@@ -108,7 +107,7 @@ class TeamQuerySet(query.QuerySet):
     def add_user_is_member(self, user):
         """Add user_is_member field to this query """
         if not user.is_authenticated():
-            return self.extra(select={'user_is_member': False})
+            return self.extra(select={'user_is_member': 0})
         select = {
             'user_is_member':  (
                 'EXISTS (SELECT 1 '
@@ -1255,7 +1254,8 @@ class MembershipNarrowing(models.Model):
     """
     member = models.ForeignKey(TeamMember, related_name="narrowings")
     project = models.ForeignKey(Project, null=True, blank=True)
-    language = models.CharField(max_length=24, blank=True, choices=ALL_LANGUAGES)
+    language = models.CharField(max_length=24, blank=True,
+                                choices=translation.ALL_LANGUAGE_CHOICES)
 
     added_by = models.ForeignKey(TeamMember, related_name="narrowing_includer", null=True, blank=True)
 
@@ -1838,8 +1838,9 @@ class Task(models.Model):
 
     team = models.ForeignKey(Team)
     team_video = models.ForeignKey(TeamVideo)
-    language = models.CharField(max_length=16, choices=ALL_LANGUAGES, blank=True,
-                                db_index=True)
+    language = models.CharField(max_length=16,
+                                choices=translation.ALL_LANGUAGE_CHOICES,
+                                blank=True, db_index=True)
     assignee = models.ForeignKey(User, blank=True, null=True)
     subtitle_version = models.ForeignKey(SubtitleVersion, blank=True, null=True)
     new_subtitle_version = models.ForeignKey(NewSubtitleVersion,
@@ -2400,8 +2401,9 @@ class Task(models.Model):
         is_review_or_approve = self.get_type_display() in ('Review', 'Approve')
 
         if self.language:
-            assert self.language in VALID_LANGUAGE_CODES, \
-                "Subtitle Language should be a valid code."
+            if not self.language in translation.ALL_LANGUAGE_CODES:
+                raise ValidationError(
+                    "Subtitle Language should be a valid code.")
 
         result = super(Task, self).save(*args, **kwargs)
 
@@ -2487,21 +2489,19 @@ class Setting(models.Model):
 class TeamLanguagePreferenceManager(models.Manager):
     def _generate_writable(self, team):
         """Return the set of language codes that are writeable for this team."""
-        langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
 
         unwritable = self.for_team(team).filter(allow_writes=False, preferred=False).values("language_code")
         unwritable = set([x['language_code'] for x in unwritable])
 
-        return langs_set - unwritable
+        return translation.ALL_LANGUAGE_CODES - unwritable
 
     def _generate_readable(self, team):
         """Return the set of language codes that are readable for this team."""
-        langs = set([x[0] for x in settings.ALL_LANGUAGES])
 
         unreadable = self.for_team(team).filter(allow_reads=False, preferred=False).values("language_code")
         unreadable = set([x['language_code'] for x in unreadable])
 
-        return langs - unreadable
+        return translation.ALL_LANGUAGE_CODES - unreadable
 
     def _generate_preferred(self, team):
         """Return the set of language codes that are preferred for this team."""

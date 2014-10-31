@@ -112,6 +112,12 @@ class SendBack(TaskAction):
                        Task.APPROVED_IDS['Rejected'])
 
 class TaskTeamEditorNotes(TeamEditorNotes):
+    def __init__(self, team_video, language_code):
+        super(TaskTeamEditorNotes, self).__init__(team_video.team,
+                                                  team_video.video,
+                                                  language_code)
+        self.team_video = team_video
+
     def post(self, user, body):
         note = super(TaskTeamEditorNotes, self).post(user, body)
         email_to = [u for u in self.all_assignees() if u != note.user]
@@ -191,8 +197,7 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
             return [Complete()]
 
     def get_editor_notes(self, language_code):
-        return TaskTeamEditorNotes(self.team_video.team,
-                                   self.team_video.video, language_code)
+        return TaskTeamEditorNotes(self.team_video, language_code)
 
     def get_add_language_mode(self, user):
         if self.team_video.team.is_member(user):

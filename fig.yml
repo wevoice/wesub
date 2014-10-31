@@ -58,7 +58,7 @@ bash:
 sslapp:
   image: amara-app
   entrypoint: /usr/bin/env
-  command: /usr/bin/python manage.py runserverssl 0.0.0.0:8000 --nostatic
+  command: /usr/bin/python manage.py runsslserver 0.0.0.0:8000
   environment:
       DJANGO_SETTINGS_MODULE: dev_settings
 

@@ -125,7 +125,7 @@ class Build(Command):
     """Build the app container."""
 
     def run_inner(self, args, options):
-        subprocess.call(["docker", "build", "-t", "amara-app", "."])
+        subprocess.call(["docker", "build", "--no-cache", "-t", "amara-app", "."])
 
 class Manage(Command):
     """Run manage.py inside the app container."""
