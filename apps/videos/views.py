@@ -296,7 +296,6 @@ class VideoPageContext(dict):
         self['page_title'] = self.page_title(video)
         self['metadata'] = metadata.convert_for_display()
         self['language_list'] = LanguageList(video)
-        self['shows_widget_sharing'] = video.can_user_see(request.user)
         self['widget_settings'] = json.dumps(
             widget_rpc.get_general_settings(request))
         self['add_language_mode'] = self.workflow.get_add_language_mode(
@@ -579,7 +578,6 @@ class LanguagePageContext(dict):
         self['language_list'] = LanguageList(video)
         self['page_title'] = self.page_title(language)
         self['edit_url'] = language.get_widget_url()
-        self['shows_widget_sharing'] = video.can_user_see(request.user)
         self['width'] = "289"
         self['height'] = "173"
         self['video_url'] = video.get_video_url()
