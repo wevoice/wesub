@@ -48,6 +48,7 @@ class MessageManager(models.Manager):
         super(MessageManager, self).bulk_create(object_list, **kwargs)
         for user_id in set(m.user_id for m in object_list):
             UserCache.delete_by_id(user_id, 'messages')
+            UserCache.delete_by_id(user_id, 'top-panel')
 
 class Message(models.Model):
     user = models.ForeignKey(User)

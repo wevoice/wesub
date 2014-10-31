@@ -24,5 +24,6 @@ from messages.models import Message
 
 @receiver(post_save, sender=Message)
 @receiver(post_delete, sender=Message)
-def on_team_member_saved(sender, instance, **kwargs):
+def on_message_saved(sender, instance, **kwargs):
     UserCache.delete_by_id(instance.user_id, 'messages')
+    UserCache.delete_by_id(instance.user_id, 'top-panel')

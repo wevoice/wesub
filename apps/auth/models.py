@@ -196,9 +196,7 @@ class CustomUser(BaseUser):
         return qs
 
     def unread_messages_count(self, hidden_meassage_id=None):
-        if not hasattr(self, '_unread_messages_count'):
-            self._unread_messages_count = self.unread_messages(hidden_meassage_id=hidden_meassage_id).count()
-        return self._unread_messages_count
+        return self.unread_messages(hidden_meassage_id).count()
 
     @classmethod
     def video_followers_change_handler(cls, sender, instance, action, reverse, model, pk_set, **kwargs):
