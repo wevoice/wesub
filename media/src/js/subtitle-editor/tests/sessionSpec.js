@@ -140,15 +140,17 @@ describe('The SessionController', function() {
         $scope.overrides = {
             forceSaveError: false
         };
+        $window = {};
         $scope.dialogManager = jasmine.createSpyObj('dialogManager', [
             'open', 'close', 'openDialog', 'showFreezeBox', 'closeFreezeBox'
         ]);
-        $window = { location: null };
         $controller('SessionController', {
             $scope: $scope,
-            $window: $window,
+            $window: $window
         });
         session = $scope.session;
+        $scope.exitEditor = jasmine.createSpy('exitEditor');
+        $scope.exitToLegacyEditor = jasmine.createSpy('exitToLegacyEditor');
     }));
 
     beforeEach(inject(function($q) {
@@ -201,19 +203,18 @@ describe('The SessionController', function() {
     });
 
     function expectRedirectToVideoPage() {
-        var videoPagePath = '/videos/' + EditorData.video.id + '/';
-        expect($window.location).toEqual(videoPagePath);
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Exiting&hellip;');
+        expect($scope.exitEditor).toHaveBeenCalled();
+        expect($scope.exitToLegacyEditor).not.toHaveBeenCalled();
     }
 
     function expectRedirectToLegacyEditor() {
-        expect($window.location).toEqual(EditorData.oldEditorURL);
-        expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Exiting&hellip;');
+        expect($scope.exitToLegacyEditor).toHaveBeenCalled();
+        expect($scope.exitEditor).not.toHaveBeenCalled();
     }
 
     function expectNoRedirect() {
-        expect($window.location).toEqual(null);
-        expect($scope.dialogManager.showFreezeBox).not.toHaveBeenCalled();
+        expect($scope.exitToLegacyEditor).not.toHaveBeenCalled();
+        expect($scope.exitEditor).not.toHaveBeenCalled();
     }
 
     it('handles exiting', function() {
@@ -260,14 +261,14 @@ describe('The SessionController', function() {
 
     it('handles saving subtitles', function() {
         session.subtitlesChanged = true;
-        session.save();
+        session.saveDraft();
         // While the save is in-progress we should show a freeze box
         expect($scope.dialogManager.showFreezeBox).toHaveBeenCalledWithTrusted('Saving&hellip;');
         // After the save is complete, we should close the freezebox and show
         // the subtitles saved dialog
         $rootScope.$digest();
         expect(backendMethodsCalled).toEqual(['saveSubtitles']);
-        expect(markAsCompleteArg).toBe(undefined);
+        expect(markAsCompleteArg).toBe(false);
         expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
         expect($scope.dialogManager.openDialog).toHaveBeenCalledWith(
             'changesSaved', jasmine.any(Object));
@@ -275,7 +276,7 @@ describe('The SessionController', function() {
 
     it('handles the exit button after saving subtitles', function() {
         session.subtitlesChanged = true;
-        session.save();
+        session.saveDraft();
         $rootScope.$digest();
         var callbacks = $scope.dialogManager.openDialog.mostRecentCall.args[1];
         callbacks.exit();
@@ -285,7 +286,7 @@ describe('The SessionController', function() {
     it('handles errors while saving subtitles', function() {
         simulateSaveError = true;
         session.subtitlesChanged = true;
-        session.save();
+        session.saveDraft();
         $rootScope.$digest();
         expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
         expect($scope.dialogManager.open).toHaveBeenCalledWith('save-error');
@@ -358,7 +359,7 @@ describe('The SessionController', function() {
         expect($window.onbeforeunload()).toBe(null);
         session.subtitlesChanged = true;
         expect($window.onbeforeunload()).toBeTruthy();
-        session.save()
+        session.saveDraft()
         $rootScope.$digest();
         expect($window.onbeforeunload()).toBe(null);
     });
