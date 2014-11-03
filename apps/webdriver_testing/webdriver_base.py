@@ -25,7 +25,6 @@ from django.test.testcases import (TestCase)
 from selenium import webdriver
 from django.conf import settings
 from django.contrib.sites.models import Site
-from urlparse import urlparse
 from django.core import management
 
 from utils import test_utils

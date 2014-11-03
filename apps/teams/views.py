@@ -20,7 +20,7 @@ import logging
 import random
 
 import babelsubs
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -2412,8 +2412,8 @@ def billing(request):
 
     else:
         form = BillingReportForm()
-
-    reports = BillingReport.objects.all().order_by('-pk')
+    # We only get reports started less than a year ago, and prefetch teams
+    reports = BillingReport.objects.filter(start_date__gte=datetime.now()-timedelta(days=61)).prefetch_related('teams').order_by('-pk')
 
     return render_to_response('teams/billing/reports.html', {
         'form': form,
