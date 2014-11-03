@@ -2413,7 +2413,7 @@ def billing(request):
     else:
         form = BillingReportForm()
 
-    reports = BillingReport.objects.all().order_by('-pk')
+    reports = BillingReport.objects.all().prefetch_related('teams').order_by('-pk')
 
     return render_to_response('teams/billing/reports.html', {
         'form': form,
