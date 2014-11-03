@@ -2413,7 +2413,7 @@ def billing(request):
     else:
         form = BillingReportForm()
     # We only get reports started less than a year ago, and prefetch teams
-    reports = BillingReport.objects.filter(start_date__gte=datetime.now()-timedelta(days=365)).prefetch_related('teams').order_by('-pk')
+    reports = BillingReport.objects.filter(start_date__gte=datetime.now()-timedelta(days=61)).prefetch_related('teams').order_by('-pk')
 
     return render_to_response('teams/billing/reports.html', {
         'form': form,
