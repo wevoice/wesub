@@ -243,6 +243,7 @@ var angular = angular || null;
               url: form.action,
               type: 'POST',
               data: new FormData(form),
+              dataType: 'JSON',
               headers: authHeaders(),
               processData: false,
               contentType: false,

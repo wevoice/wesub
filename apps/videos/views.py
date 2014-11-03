@@ -455,8 +455,6 @@ def upload_subtitles(request):
     form = SubtitlesUploadForm(request.user, video, True, request.POST,
                                request.FILES, initial={'primary_audio_language_code':video.primary_audio_language_code})
 
-    response = lambda s: HttpResponse('<textarea>%s</textarea>' % json.dumps(s))
-
     try:
         if form.is_valid():
             version = form.save()
@@ -476,7 +474,7 @@ def upload_subtitles(request):
         client.create_from_exception()
         output['errors'] = {'__all__': [force_unicode(e)]}
 
-    return response(output)
+    return HttpResponse(json.dumps(output))
 
 def feedback(request, hide_captcha=False):
     output = dict(success=False)
