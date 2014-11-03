@@ -312,7 +312,9 @@ class SubtitleEditorBase(View):
             'translated_from_version': self.translated_from_version,
             'upload_subtitles_form': SubtitlesUploadForm(
                 request.user, self.video,
-                initial={'language_code': self.editing_language.language_code})
+                initial={'language_code':
+                         self.editing_language.language_code},
+                allow_all_languages=True),
         }
         self.handle_task(context, editor_data)
         context['editor_data'] = json.dumps(editor_data, indent=4)

@@ -453,7 +453,9 @@ def upload_subtitles(request):
     output = {'success': False}
     video = Video.objects.get(id=request.POST['video'])
     form = SubtitlesUploadForm(request.user, video, True, request.POST,
-                               request.FILES, initial={'primary_audio_language_code':video.primary_audio_language_code})
+                               request.FILES,
+                               initial={'primary_audio_language_code':video.primary_audio_language_code},
+                               allow_all_languages=True)
 
     try:
         if form.is_valid():
