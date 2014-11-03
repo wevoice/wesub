@@ -307,8 +307,8 @@ class EditorPage(UnisubsPage):
         self.wait_for_element_visible('button.upload-subtitles-submit-button-')
         self.type_by_css('input#subtitles-file-field', sub_file)
         self.click_by_css('button.upload-subtitles-submit-button-')
-        time.sleep(1)
-        self.wait_for_element_present("div.workflow")
+        self.wait_for_element_not_visible("aside")
+        time.sleep(4)
 
     def toggle_paragraph(self, position):
         """Toggles the paragraph marker on or off. """
@@ -473,6 +473,7 @@ class EditorPage(UnisubsPage):
             if el.text == action:
                 el.click()
                 return
+        time.sleep(2)
 
     def sendback_collab(self):
         self.click_by_css(self._COLLAB_SENDBACK)
