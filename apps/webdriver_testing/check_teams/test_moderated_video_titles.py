@@ -61,9 +61,6 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert('accept')
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
-
     @classmethod
     def _create_subs(cls, video, lc, user, complete=False):
         subtitles_1 = [
