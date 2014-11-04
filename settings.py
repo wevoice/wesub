@@ -632,7 +632,7 @@ LOGGING = {
     },
 }
 
-from periodic_tasks_settings import CELERYBEAT_SCHEDULE
+from task_settings import *
 
 try:
     import debug_toolbar

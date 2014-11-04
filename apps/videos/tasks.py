@@ -96,11 +96,10 @@ def save_thumbnail_in_s3(video_id):
 
 @task
 def update_from_feed():
-    return # disable until we speed this up
     qs = VideoFeed.objects.exclude(last_update__gt=datetime.now()-
                                    timedelta(hours=1))
     for feed in qs:
-        update_video_feed.delay(feed.pk)
+        update_video_feed.apply_async(args=(feed.pk,), queue='feeds')
 
 @task
 def update_video_feed(video_feed_id):
