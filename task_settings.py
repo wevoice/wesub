@@ -18,9 +18,15 @@
 
 """periodic_task_settings -- settings for celery periodic tasks."""
 
-from celery.schedules import crontab
 from datetime import timedelta
 
+from celery.schedules import crontab
+from kombu import Exchange, Queue
+
+CELERY_QUEUES = (
+    Queue('celery', routing_key='celery'),
+    Queue('feeds', routing_key='feeds'),
+)
 
 CELERYBEAT_SCHEDULE = {
     'gauge-auth': {
@@ -85,3 +91,5 @@ except ImportError:
 else:
     CELERYBEAT_SCHEDULE.update(
         integration_periodic_task_settings.CELERYBEAT_SCHEDULE)
+
+__all__ = ['CELERYBEAT_SCHEDULE', 'CELERY_QUEUES', ]
