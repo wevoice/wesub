@@ -35,10 +35,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'statistic.tasks.gauge_statistic',
         'schedule': timedelta(seconds=300),
     },
-    'gauge-statistics-languages': {
-        'task': 'statistic.tasks.gauge_statistic_languages',
-        'schedule': timedelta(minutes=5),
-    },
     'migrate-hit-counts': {
         'task': 'statistic.tasks.migrate_hit_counts',
         'schedule': crontab(hour=1, minute=0),

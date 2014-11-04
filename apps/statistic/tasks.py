@@ -33,35 +33,11 @@ def gauge_statistic():
     Gauge('statistic.shares.twitter').report(TweeterShareStatistic.objects.count())
     Gauge('statistic.shares.facebook').report(FBShareStatistic.objects.count())
     Gauge('statistic.shares.email').report(EmailShareStatistic.objects.count())
-    total_key = st_sub_fetch_handler.total_key.get()
-    if total_key:
-        total_key = int(total_key)
-    else:
-        total_key = 0
-    Gauge('statistic.views.subtitles').report(total_key)
 
 def graphite_slugify(s):
     for c in ' -.,:':
         s = s.replace(c, '_')
     return s
-
-@task
-def gauge_statistic_languages():
-    from videos.models import SubtitleLanguage, ALL_LANGUAGES
-
-    lang_names = dict(ALL_LANGUAGES)
-    lang_names[u''] = 'Unknown'
-
-    ls = SubtitleLanguage.objects.values('language').annotate(count=Count('language'))
-
-    for l in ls:
-        language_code = l['language']
-        language_name = lang_names.get(language_code, 'Unknown')
-        count = l['count']
-        name = graphite_slugify(language_name)
-
-        Gauge('statistic.languages.%s.count' % name).report(count)
-
 
 @task
 def migrate_hit_counts():
