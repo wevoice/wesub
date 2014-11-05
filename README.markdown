@@ -20,7 +20,7 @@ Amara uses [Docker](http://docker.io).  For ease of development, we use the [Fig
 
 3. Build the Amara docker image:
 
-        ./bin/dev_build_images.sh
+        ./bin/dev build
 
 4. Start Amara Services:
 
@@ -28,7 +28,7 @@ Amara uses [Docker](http://docker.io).  For ease of development, we use the [Fig
 
 5. Configure Database:
 
-        fig run initdb
+        ./bin/dev dbreset
 
 6. Start Amara:
 
