@@ -138,7 +138,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'unisubs.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -201,7 +201,6 @@ INSTALLED_APPS = (
     'teams',
     'testhelpers',
     'thirdpartyaccounts',
-    'unisubs', #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
     'unisubs_compressor',
     'uslogging',
     'utils',
