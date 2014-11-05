@@ -33,7 +33,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url logout %}?next={{ request.path_info|urlencode }}">{% trans 'Logout' %}</a>
+                    <a href="{% url logout %}">{% trans 'Logout' %}</a>
                 </li>
                 {% with user.teams.all as user_teams %}
                     {% if user_teams %}
