@@ -223,7 +223,6 @@ STARTUP_MODULES = [
 # This allow know are workers online or not: python manage.py celerybeat
 
 CELERY_IGNORE_RESULT = True
-CELERY_DISABLE_RATE_LIMITS = True
 CELERY_SEND_EVENTS = False
 CELERY_SEND_TASK_ERROR_EMAILS = True
 CELERY_RESULT_BACKEND = 'redis'
