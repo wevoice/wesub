@@ -62,7 +62,7 @@ def get_language_choices_as_dicts(with_empty=False):
 
 def get_language_label(code):
     """Return the translated, human-readable label for the given language code."""
-    lc = LanguageCode(code, 'unisubs')
+    lc = LanguageCode(code, 'internal')
     return u'%s' % _(lc.name())
 
 
