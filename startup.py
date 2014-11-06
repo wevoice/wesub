@@ -53,6 +53,11 @@ def run_startup_modules():
     from django.conf import settings
 
     for app in settings.INSTALLED_APPS:
+        if app == 'django_extensions':
+            # This gets added in readthedocs, but can't be imported at this
+            # point for some reason.  We can just skip it since we know that
+            # it doesn't have startup code.
+            continue
         module = __import__(app)
         package_dir = os.path.dirname(module.__file__)
         if os.path.exists(os.path.join(package_dir, 'startup.py')):
