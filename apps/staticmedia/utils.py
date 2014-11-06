@@ -22,7 +22,10 @@ import subprocess
 
 from django.conf import settings
 
-import commit
+try:
+    import commit
+except ImportError:
+    commit = None
 
 def s3_subdirectory():
     """Get the subdirectory to store media in for S3
@@ -34,6 +37,8 @@ def s3_subdirectory():
         - We can set the HTTP cache headers so that servers cache the content
         forever without worrying about stale media files.
     """
+    if commit is None:
+        raise AssertionError("No commit module")
     return commit.LAST_COMMIT_GUID.split('/')[1]
 
 def static_url():
