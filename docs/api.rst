@@ -839,7 +839,10 @@ List activity items:
 
 .. http:get:: /api2/partners/activity/
 
-    :query team: Show only items related to a given team (team slug)
+    :query team: Show only items related to a given team (team slug).
+    :query team-activity: If team is given, we normally return activity on the
+       team's videos.  If you want to see activity for the team itself (members
+       joining/leaving and team video deletions, then add team-activity=1)
     :query video: Show only items related to a given video (video id)
     :query type: Show only items with a given activity type (int, see below)
     :query language: Show only items with a given language (language code)

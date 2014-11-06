@@ -338,7 +338,8 @@ class EditorPage(UnisubsPage):
         self.toggle_timeline('Show')
         for line in subs:
             self.browser.execute_script("window.location.hash='add-sub-at-end'")
-            self.click_by_css(self._ADD_SUB_TO_END)
+            if not self.is_element_present('textarea.subtitle-edit'):
+                self.click_by_css(self._ADD_SUB_TO_END)
             self.type_by_css('textarea.subtitle-edit', '%s\n' % line)
 
     def add_new_lines(self, lines):
@@ -472,8 +473,8 @@ class EditorPage(UnisubsPage):
         for el in buttons:
             if el.text == action:
                 el.click()
+                self.wait_for_element_not_present(self._SESSION_BUTTONS)
                 return
-        time.sleep(2)
 
     def sendback_collab(self):
         self.click_by_css(self._COLLAB_SENDBACK)
