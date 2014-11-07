@@ -432,6 +432,15 @@ class Unpublish(Action):
         # complete=False causes all the work to be done
         pass
 
+class SaveDraft(Action):
+    name = 'save-draft'
+    label = ugettext_lazy('Save Draft')
+    in_progress_text = ugettext_lazy('Saving')
+    complete = None
+
+    def do_perform(self, user, video, subtitle_language, saved_version):
+        pass
+
 class APIComplete(Action):
     """Action that handles complete=True from the API
 
@@ -516,7 +525,7 @@ class DefaultWorkflow(Workflow):
         return NormalWorkMode()
 
     def get_actions(self, user, language_code):
-        return [Publish()]
+        return [SaveDraft(), Publish()]
 
     def user_can_view_private_subtitles(self, user, language_code):
         return user.is_staff

@@ -195,10 +195,10 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
         task = self.team_video.get_task_for_editor(language_code)
         if task is not None:
             # review/approve task
-            return [SendBack(), Approve()]
+            return [subtitles.workflows.SaveDraft(), SendBack(), Approve()]
         else:
             # subtitle/translate task
-            return [Complete()]
+            return [subtitles.workflows.SaveDraft(), Complete()]
 
     def get_editor_notes(self, language_code):
         return TaskTeamEditorNotes(self.team_video, language_code)
