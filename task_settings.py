@@ -83,13 +83,4 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-# try adding periodic tasks from our integration repo
-try:
-    import integration_periodic_task_settings
-except ImportError:
-    pass
-else:
-    CELERYBEAT_SCHEDULE.update(
-        integration_periodic_task_settings.CELERYBEAT_SCHEDULE)
-
 __all__ = ['CELERYBEAT_SCHEDULE', 'CELERY_QUEUES', ]
