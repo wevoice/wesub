@@ -420,7 +420,8 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
     version = sl.add_version(subtitles=subtitles, **data)
     _perform_team_operations(version, committer, action)
     if action:
-        action.perform(author, video, sl, version)
+        action.validate(author, video, sl, version)
+        action.update_language(author, video, sl, version)
 
     _update_video_data(sl, version)
     _update_followers(sl, author)
@@ -434,9 +435,6 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
         # entire concept of forking.
         sl.fork()
         _fork_dependents(sl)
-
-    if action:
-        action.send_signals(sl, version)
 
     return version
 
@@ -556,10 +554,14 @@ def add_subtitles(video, language_code, subtitles,
     if action:
         visibility = action.subtitle_visibility
     with transaction.commit_on_success():
-        return _add_subtitles(video, language_code, subtitles, title,
-                              description, author, visibility,
-                              visibility_override, parents, None, committer,
-                              created, note, origin, metadata, action)
+        version = _add_subtitles(video, language_code, subtitles, title,
+                                 description, author, visibility,
+                                 visibility_override, parents, None, committer,
+                                 created, note, origin, metadata, action)
+    if action:
+        action.perform(author, video, version.subtitle_language, version)
+    return version
+
 
 def _calc_action_for_add_subtitles(video, language_code, author, complete,
                                    action_name):

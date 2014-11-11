@@ -37,38 +37,9 @@ from utils.text import fmt
 from videos.tasks import video_changed_tasks
 import subtitles.workflows
 
-class TaskAction(subtitles.workflows.Action):
-    def send_signals(self, subtitle_language, version):
-        # If we perform any action and it results in a public version, then we
-        # should send the subtitles_published signal.
-        if subtitle_language.get_tip(public=True):
-            subtitles_published.send(subtitle_language, version=version)
-
-class Complete(TaskAction):
-    """Used when the initial transcriber/translator completes their work """
-    name = 'complete'
-    label = ugettext_lazy('Complete')
-    in_progress_text = ugettext_lazy('Saving')
-    visual_class = 'endorse'
-    complete = True
-
-    def do_perform(self, user, video, subtitle_language, saved_version):
-        if saved_version is not None:
-            # I think the cleanest way to handle things would be to create the
-            # review/approve task now but there is already code in
-            # subtitles.pipeline to do that.  It would be nice to move that
-            # code out of that app and into here, but maybe we should just
-            # leave it and wait to phase the tasks system out
-            return
-        try:
-            task = (video.get_team_video().task_set
-                    .incomplete_subtitle_or_translate()
-                    .filter(language=subtitle_language.language_code).get())
-        except Task.DoesNotExist:
-            # post publish edit, no task is available
-            return
-        else:
-            task.complete()
+def _send_subtitles_published_if_needed(subtitle_language, version):
+    if subtitle_language.get_tip(public=True):
+        subtitles_published.send(subtitle_language, version=version)
 
 def _complete_task(user, video, subtitle_language, saved_version, approved):
     team_video = video.get_team_video()
@@ -89,18 +60,39 @@ def _complete_task(user, video, subtitle_language, saved_version, approved):
             version_id = saved_version.id
             video_changed_tasks.delay(team_video.video_id, version_id)
 
-class Approve(TaskAction):
+class Complete(subtitles.workflows.Action):
+    """Used when the initial transcriber/translator completes their work """
+    name = 'complete'
+    label = ugettext_lazy('Complete')
+    in_progress_text = ugettext_lazy('Saving')
+    visual_class = 'endorse'
+    complete = True
+
+    def perform(self, user, video, subtitle_language, saved_version):
+        try:
+            task = (video.get_team_video().task_set
+                    .incomplete_subtitle_or_translate()
+                    .filter(language=subtitle_language.language_code).get())
+        except Task.DoesNotExist:
+            # post publish edit, no task is available
+            return
+        else:
+            task.complete()
+        _send_subtitles_published_if_needed(subtitle_language, saved_version)
+
+class Approve(subtitles.workflows.Action):
     name = 'approve'
     label = ugettext_lazy('Approve')
     in_progress_text = ugettext_lazy('Approving')
     visual_class = 'endorse'
     complete = True
 
-    def do_perform(self, user, video, subtitle_language, saved_version):
+    def perform(self, user, video, subtitle_language, saved_version):
         _complete_task(user, video, subtitle_language, saved_version,
                        Task.APPROVED_IDS['Approved'])
+        _send_subtitles_published_if_needed(subtitle_language, saved_version)
 
-class SendBack(TaskAction):
+class SendBack(subtitles.workflows.Action):
     name = 'send-back'
     label = ugettext_lazy('Send Back')
     in_progress_text = ugettext_lazy('Sending back')
@@ -110,6 +102,7 @@ class SendBack(TaskAction):
     def do_perform(self, user, video, subtitle_language, saved_version):
         _complete_task(user, video, subtitle_language, saved_version,
                        Task.APPROVED_IDS['Rejected'])
+        _send_subtitles_published_if_needed(subtitle_language, saved_version)
 
 class TaskTeamEditorNotes(TeamEditorNotes):
     def __init__(self, team_video, language_code):
