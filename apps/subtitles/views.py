@@ -331,20 +331,18 @@ def download(request, video_id, language_code, filename, format,
              version_number=None):
 
     video = get_object_or_404(Video, video_id=video_id)
+    workflow = video.get_workflow()
+    if not workflow.user_can_view_video(request.user):
+        raise Http404()
 
     language = video.subtitle_language(language_code)
     if language is None:
         raise Http404()
 
-    team_video = video.get_team_video()
-
-    if team_video and not team_video.team.user_is_member(request.user):
-        # Non-members can only see public versions
-        version = language.version(public_only=True,
-                                   version_number=version_number)
-    else:
-        version = language.version(public_only=False,
-                                   version_number=version_number)
+    public_only = workflow.user_can_view_private_subtitles(request.user,
+                                                           language_code)
+    version = language.version(public_only=public_only,
+                               version_number=version_number)
 
     if not version:
         raise Http404()
