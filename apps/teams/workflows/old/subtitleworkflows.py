@@ -137,7 +137,9 @@ class TaskTeamEditorNotes(TeamEditorNotes):
             _(u'%(user)s added a note while editing %(title)s'),
             user=unicode(note.user), title=self.video.title_display())
 
-        tasks_url = universal_url('teams:team_tasks', slug=self.team.slug)
+        tasks_url = universal_url('teams:team_tasks', kwargs={
+            'slug': self.team.slug,
+        })
         filter_query = '?team_video={0}&assignee=anyone&language_code={1}'
         filter_query = filter_query.format(self.team_video.pk,
                                            self.language_code)
