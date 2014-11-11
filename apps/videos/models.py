@@ -53,6 +53,7 @@ from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
 from utils.subtitles import create_new_subtitles, dfxp_merge
 from utils.text import fmt
+from utils.translation import ALL_LANGUAGE_CHOICES
 from teams.moderation_const import MODERATION_STATUSES, UNMODERATED
 from raven.contrib.django.models import client
 
@@ -216,9 +217,8 @@ class Video(models.Model):
     # directely
     is_public = models.BooleanField(default=True)
 
-    primary_audio_language_code = models.CharField(max_length=16, blank=True,
-                                                   default='',
-                                                   choices=ALL_LANGUAGES)
+    primary_audio_language_code = models.CharField(
+        max_length=16, blank=True, default='', choices=ALL_LANGUAGE_CHOICES)
 
     objects = models.Manager()
     public  = PublicVideoManager()

@@ -57,6 +57,7 @@ from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from videos.models import Video, VideoUrl, SubtitleVersion, SubtitleLanguage
+from videos.tasks import video_changed_tasks
 from subtitles.models import (
     SubtitleVersion as NewSubtitleVersion,
     SubtitleLanguage as NewSubtitleLanguage,
@@ -932,10 +933,8 @@ class TeamVideo(models.Model):
                                               to_team=new_team,
                                               to_project=self.project)
 
-            # Update all Solr data.
-            metadata_manager.update_metadata(video.pk)
-            video.update_search_index()
-            tasks.update_one_team_video(self.pk)
+            # Update search data and other things
+            video_changed_tasks.delay(video.pk)
 
             # Create any necessary tasks.
             autocreate_tasks(self)
@@ -2693,7 +2692,7 @@ class TeamNotificationSetting(models.Model):
 
     def get_notification_class(self):
         try:
-            from notificationclasses import NOTIFICATION_CLASS_MAP
+            from ted.notificationclasses import NOTIFICATION_CLASS_MAP
 
             return NOTIFICATION_CLASS_MAP[self.notification_class]
         except ImportError:
