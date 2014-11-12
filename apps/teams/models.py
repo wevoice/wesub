@@ -2439,6 +2439,7 @@ class Setting(models.Model):
         (101, 'messages_manager'),
         (102, 'messages_admin'),
         (103, 'messages_application'),
+        (104, 'messages_joins'),
         (200, 'guidelines_subtitle'),
         (201, 'guidelines_translate'),
         (202, 'guidelines_review'),
