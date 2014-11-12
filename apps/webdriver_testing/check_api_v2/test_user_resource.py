@@ -1,6 +1,7 @@
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing import data_helpers
-from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import UserLangFactory
+from utils.factories import *
 from webdriver_testing.pages.site_pages.profiles import profile_personal_page 
 import os
 
@@ -91,4 +92,15 @@ class TestCaseUserResource(WebdriverTestCase):
         self.assertEqual('This value may contain only letters, '
                          'numbers and @/./+/-/_ characters.', 
                          user_data['username'][0])
+
+    def test_user_languages(self):
+        member = UserFactory()
+        langs = ['en', 'cs', 'ru', 'ar']
+        for lc in langs:
+            UserLangFactory(user = member,
+                            language = lc)
+        team = TeamFactory(member=member)
+        url_part = 'users/' + member.username 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        self.assertEqual(langs, r.json['languages'])
 
