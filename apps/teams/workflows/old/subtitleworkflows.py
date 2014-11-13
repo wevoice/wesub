@@ -99,7 +99,7 @@ class SendBack(subtitles.workflows.Action):
     visual_class = 'send-back'
     complete = False
 
-    def do_perform(self, user, video, subtitle_language, saved_version):
+    def perform(self, user, video, subtitle_language, saved_version):
         _complete_task(user, video, subtitle_language, saved_version,
                        Task.APPROVED_IDS['Rejected'])
         _send_subtitles_published_if_needed(subtitle_language, saved_version)
