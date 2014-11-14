@@ -377,14 +377,8 @@ def video(request, video, video_url=None, title=None):
     workflow = get_workflow(video)
 
     tab = calc_tab(request, workflow)
-
-    if request.is_ajax():
-        context = VideoPageContext(request, video, video_url, tab, workflow,
-                                   tab_only=True)
-        template_name = 'videos/video-%s-tab.html' % tab
-    else:
-        template_name = 'videos/video-%s.html' % tab
-        context = VideoPageContext(request, video, video_url, tab, workflow)
+    template_name = 'videos/video-%s.html' % tab
+    context = VideoPageContext(request, video, video_url, tab, workflow)
     context['tab'] = tab
 
     if context['create_subtitles_form'].is_valid():
@@ -719,18 +713,13 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
         # tabs
         tab = 'subtitles'
         ContextClass = LanguagePageContextSubtitles
-    if request.is_ajax():
-        context = ContextClass(request, video, lang, lang_id, version_id,
-                               tab_only=True)
-        template_name = 'videos/language-%s-tab.html' % tab
-    else:
-        template_name = 'videos/language-%s.html' % tab
-        context = ContextClass(request, video, lang, lang_id, version_id)
-        context['tab'] = tab
-        if 'tab' not in request.GET and request.method != 'POST':
-            # we only want to update the view counter if this request wasn't
-            # the result of a tab click.
-            video.update_view_counter()
+    template_name = 'videos/language-%s.html' % tab
+    context = ContextClass(request, video, lang, lang_id, version_id)
+    context['tab'] = tab
+    if 'tab' not in request.GET and request.method != 'POST':
+        # we only want to update the view counter if this request wasn't
+        # the result of a tab click.
+        video.update_view_counter()
     if context['create_subtitles_form'].is_valid():
         return context['create_subtitles_form'].handle_post()
     return render(request, template_name, context)

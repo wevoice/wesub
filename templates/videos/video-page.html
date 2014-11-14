@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block body_attrs %}id="video_profile" class="v1 video_view" data-video-id="{{ video.video_id}}" data-video-url="{{ video.get_video_url|safe }}"{% endblock %}
-{% block html_attrs %}id="video_view"{% endblock %}
 
 {% load comments i18n subtitles_tags teams_tags videos_tags %}
 
