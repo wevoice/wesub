@@ -675,9 +675,9 @@ class LanguagePageContextRevisions(LanguagePageContext):
         else:
             revisions_qs = language.subtitleversion_set.extant()
         revisions_qs = revisions_qs.order_by('-version_number')
-
+        revisions_per_page =  request.GET.get('revisions_per_page') or self.REVISIONS_PER_PAGE
         revisions, pagination_info = paginate(
-            revisions_qs, self.REVISIONS_PER_PAGE, request.GET.get('page'))
+            revisions_qs, revisions_per_page, request.GET.get('page'), allow_more=(int(revisions_per_page) + 10))
         self.update(pagination_info)
         self['revisions'] = language.optimize_versions(revisions)
 
@@ -719,7 +719,6 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
         # tabs
         tab = 'subtitles'
         ContextClass = LanguagePageContextSubtitles
-
     if request.is_ajax():
         context = ContextClass(request, video, lang, lang_id, version_id,
                                tab_only=True)
