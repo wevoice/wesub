@@ -93,6 +93,14 @@ div.time_change {
 .diff_title {
     font-weight: normal
 }
+a.nav_button {
+    padding-left: 5px;
+    text-decoration: none;
+}
+a.nav_button.disabled {
+    pointer-events: none;
+    color: gray;
+}
 a.next_edit {
     float: right;
     padding-right: 20px;

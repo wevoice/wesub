@@ -798,7 +798,10 @@ def diffing(request, first_version, second_pk):
     video = first_version.subtitle_language.video
     diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles(), mappings=HTMLGenerator.MAPPINGS)
     team_video = video.get_team_video()
-
+    first_version_previous = first_version.previous_version()
+    first_version_next = first_version.next_version()
+    second_version_previous = second_version.previous_version()
+    second_version_next = second_version.next_version()
     context = {
         'video': video,
         'diff_data': diff_data,
@@ -806,6 +809,10 @@ def diffing(request, first_version, second_pk):
         'first_version': first_version,
         'second_version': second_version,
         'latest_version': language.get_tip(),
+        'first_version_previous': first_version_previous if (first_version_previous != second_version) else None,
+        'first_version_next': first_version_next,
+        'second_version_previous': second_version_previous,
+        'second_version_next': second_version_next if (second_version_next != first_version) else None,
     }
     if team_video and not can_rollback_language(request.user, language):
         context['rollback_allowed'] = False
