@@ -133,13 +133,13 @@ class Bump(Command):
     def run_inner(self, args, options):
         self.bump_repo('amara-enterprise')
         os.chdir(unisubs_root())
-        subprocess.call(['git', 'commit', '-m', 'Bumping version'])
+        subprocess.call(['git', 'commit', '-e', '-m', 'Bumping version'])
 
     def bump_repo(self, repo_name):
         # Storing root as we'll need to come back
         unisubs_folder = unisubs_root()
         os.chdir(os.path.join(unisubs_root(), repo_name))
-        p = subprocess.Popen(['git', 'rev-parse', 'master'],
+        p = subprocess.Popen(['git', 'rev-parse', 'HEAD'],
                              stdout=subprocess.PIPE)
         stdout, stderr = p.communicate()
         commit_id = stdout.strip()
