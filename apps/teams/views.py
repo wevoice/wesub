@@ -912,6 +912,10 @@ def activity(request, slug, tab='videos'):
         action_qs = Action.objects.for_team_videos(team)
     end = page * ACTIONS_ON_PAGE
     start = end - ACTIONS_ON_PAGE
+
+    sort = request.GET.get('sort', '-created')
+    action_qs = action_qs.order_by(sort)
+
     action_qs = action_qs[start:end].select_related(
         'video', 'user', 'new_language', 'new_language__video'
     )

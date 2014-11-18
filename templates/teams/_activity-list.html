@@ -1,20 +1,49 @@
 {% load i18n media_bundle %}
 
 {% if activity_list %}
-    <ul class="activity listing">
-        {% with 1 as medium_thumb %}
-            {% for item in activity_list %}
-                <li>{{ item.render }}</li>
-            {% endfor %}
-        {% endwith %}
-    </ul>
-    
-    {% if has_more %}
-    <div class="pagination">
-        <a class="show-more" href="{% url teams:activity slug=team.slug %}?page={{ next_page }}">{% trans "Show More" %}</a>
-        <img class="loading-icon" src="{% static_url %}images/ajax-loader.gif">
+{% load query_string %}
+<div class="tools group">
+  <a href="#filter" id="sort-filter">
+    {% trans 'Filter and Sort' %}
+    <span></span>
+  </a>
+</div>
+<div class="filters group {% if filtered or request.GET.sort %}active{% endif %}">
+  <p>
+    <div class="filter-chunk">
+      <span class="inner">{% trans 'sorted by' %}</span>
+      <select name="sort">
+	<option {% if request.GET.sort == '-created' or not request.GET.sort %}selected="selected"{% endif %}
+		value="{% query_string request.GET sort='-created' page='' %}">
+          {% trans 'date, newest' %}
+	</option>
+	<option {% if request.GET.sort == 'created' %}selected="selected"{% endif %}
+		value="{% query_string request.GET sort='created' page='' %}">
+          {% trans 'date, oldest' %}
+	</option>
+      </select>
     </div>
-    {% endif %}
+  </p>
+  {% if filtered or request.GET.sort %}
+  <a href="{{ request.path }}" class="clear-filters"
+     title="{% trans 'Clear all filters, sorts, and search terms' %}">{% trans 'Clear' %}</a>
+  {% endif %}
+</div>
+
+<ul class="activity listing">
+  {% with 1 as medium_thumb %}
+  {% for item in activity_list %}
+  <li>{{ item.render }}</li>
+  {% endfor %}
+  {% endwith %}
+</ul>
+
+{% if has_more %}
+<div class="pagination">
+  <a class="show-more" href="{% url teams:activity slug=team.slug %}?page={{ next_page }}">{% trans "Show More" %}</a>
+  <img class="loading-icon" src="{% static_url %}images/ajax-loader.gif">
+</div>
+{% endif %}
 {% else %}
-    <p class="empty">{% trans "Sorry, no activity yet" %}...</p>
+<p class="empty">{% trans "Sorry, no activity yet" %}...</p>
 {% endif %}
