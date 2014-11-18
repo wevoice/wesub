@@ -920,10 +920,14 @@ def activity(request, slug, tab='videos'):
         'video', 'user', 'new_language', 'new_language__video'
     )
     activity_list = list(action_qs)
+    action_types = set(map(lambda x : (x.action_type, x.get_action_type_display()), activity_list))
+    if request.GET.get('action_type') and request.GET.get('action_type') != 'any':
+        activity_list = filter(lambda x: str(x.action_type) == request.GET.get('action_type'), activity_list)
     has_more = len(activity_list) >= ACTIONS_ON_PAGE
 
     context = {
         'activity_list': activity_list,
+        'action_types': action_types,
         'team': team,
         'member': member,
         'activity_tab': tab,
