@@ -1,7 +1,7 @@
 {% load i18n media_bundle %}
 
 {% if activity_list %}
-{% load query_string %}
+{% load query_string teams_tags %}
 <div class="tools group">
   <a href="#filter" id="sort-filter">
     {% trans 'Filter and Sort' %}
@@ -25,7 +25,23 @@
 	</option>
 	{% endfor %}
       </select>
-      <span class="inner">{% trans 'Activity type' %}</span>
+    </div>
+    {% endif %}
+
+    {% if languages %}
+    <div class="filter-chunk">
+      <span class="inner">{% trans 'Language' %}</span>
+      <select id="id_language" name="language" class="language-filter chosen">
+	<option value="{% query_string request.GET language='any' %}">
+	  {% trans 'Any Language' %}
+	</option>
+	{% for language in languages %}
+	<option value="{% query_string request.GET language=language %}"
+                {% if request.GET.language == language %}selected="selected"{% endif %}>
+          {{ language|display_language }}
+	</option>
+	{% endfor %}
+      </select>
     </div>
     {% endif %}
 
