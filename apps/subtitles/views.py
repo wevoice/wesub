@@ -37,6 +37,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.template.defaultfilters import urlize, linebreaks, force_escape
 from django.views.decorators.clickjacking import xframe_options_exempt
 
+from auth.models import CustomUser as User
 from subtitles import shims
 from subtitles.workflows import get_workflow
 from subtitles.models import SubtitleLanguage, SubtitleVersion
@@ -328,19 +329,42 @@ class SubtitleEditor(SubtitleEditorBase):
         return super(SubtitleEditor, self).dispatch(
             request, *args, **kwargs)
 
+def _user_for_download_permissions(request):
+    # check authorization...  This is pretty hacky.  We should implement
+    # pculture/amara-enterprise#89
+    if request.user.is_authenticated():
+        return request.user
+    username = request.META.get('HTTP_X_API_USERNAME', None)
+    api_key = request.META.get( 'HTTP_X_APIKEY', None)
+    if not username or not api_key:
+        return request.user
+    try:
+        import apiv2
+        from tastypie.models import ApiKey
+    except ImportError:
+        return request.user
+    try:
+        api_user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return request.user
+    if not ApiKey.objects.filter(user=api_user, key=api_key).exists():
+        return request.user
+    return api_user
+
 def download(request, video_id, language_code, filename, format,
              version_number=None):
 
     video = get_object_or_404(Video, video_id=video_id)
     workflow = video.get_workflow()
-    if not workflow.user_can_view_video(request.user):
+    user = _user_for_download_permissions(request)
+    if not workflow.user_can_view_video(user):
         raise PermissionDenied()
 
     language = video.subtitle_language(language_code)
     if language is None:
         raise PermissionDenied()
 
-    public_only = workflow.user_can_view_private_subtitles(request.user,
+    public_only = workflow.user_can_view_private_subtitles(user,
                                                            language_code)
     version = language.version(public_only=not public_only,
                                version_number=version_number)
