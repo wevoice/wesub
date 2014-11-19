@@ -21,8 +21,8 @@ li.even, li.even li {
     background: #edfcfd !important
 }
 a.roll_back {
-    width: 80px;
-    height: 50px;
+    width: 120px;
+    height: 40px;
     display: table-cell;
     vertical-align: middle;
     margin: 0px auto;
@@ -33,7 +33,7 @@ a.roll_back {
     font-weight: bold;
     color: #000;
     border: 1px solid #9e381d;
-    font-size: 14px;
+    font-size: 12px;
     text-shadow: 1px 1px 0px #c67573;
     box-shadow: inset 0px 1px 1px #c67573;
     -moz-box-shadow: inset 0px 1px 0px #c67573;
