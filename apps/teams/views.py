@@ -926,8 +926,7 @@ def activity(request, slug, tab='videos'):
         language_choices = [(code, name) for code, name in get_language_choices()
                             if code in readable_langs]
         languages = set(map(lambda x : x.new_language.language_code, filter(lambda x : x.new_language, activity_list)))
-    action_types = set(map(lambda x : (x.action_type, x.get_action_type_display()), activity_list))
-
+    action_types = Action.TYPES_CATEGORIES[tab]
     if request.GET.get('action_type') and request.GET.get('action_type') != 'any':
         activity_list = filter(lambda x: str(x.action_type) == request.GET.get('action_type'), activity_list)
 

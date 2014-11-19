@@ -1549,7 +1549,14 @@ class Action(models.Model):
         (EDIT_URL, _(u'edit url')),
         (DELETE_URL, _(u'delete url')),
     )
-
+    TYPES_CATEGORIES = dict(
+        videos = [(x[0], x[1]) for x in TYPES if x[0] in
+                 [ADD_VIDEO, CHANGE_TITLE, COMMENT, ADD_TRANSLATION, ADD_VERSION,
+                  ADD_VIDEO_URL, SUBTITLE_REQUEST, APPROVE_VERSION, REJECT_VERSION,
+                  REVIEW_VERSION, ACCEPT_VERSION, DECLINE_VERSION, DELETE_VIDEO,
+                  EDIT_URL,DELETE_URL]],
+        team = [(x[0], x[1]) for x in TYPES if x[0] in
+                [MEMBER_LEFT, MEMBER_JOINED]])
     renderer = ActionRenderer('videos/_action_tpl.html')
     renderer_for_video = ActionRenderer('videos/_action_tpl_video.html')
 
