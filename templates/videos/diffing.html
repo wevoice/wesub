@@ -95,18 +95,19 @@
     <div style="clear: both"></div>
 
     <div class="left_column">
-        <div class="revision_buttons">
-            {% if second_version.next_version and rollback_allowed %}
-                <a href="{% url videos:rollback second_version.pk %}" class="roll_back">
-                    {% trans 'Roll back to version' %} (#{{ second_version.version_number }})
-                </a>
-            {% else %}
-                <a href="" class="roll_back disabled" >
-                    {% trans 'Latest Revision' %}
-                </a>
-            {% endif %}
-
-        </div>
+      {% if rollback_allowed %}
+      <div class="revision_buttons">
+        {% if second_version.next_version %}
+        <a href="{% url videos:rollback second_version.pk %}" class="roll_back">
+          {% trans 'Roll back to version' %} (#{{ second_version.version_number }})
+        </a>
+        {% else %}
+        <a href="" class="roll_back disabled" >
+          {% trans 'Latest Revision' %}
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
 
         <h3 class="diff_title">
             Revision #{{ second_version.version_number }} by {{ second_version.author }}
@@ -138,17 +139,19 @@
     </div>
 
     <div class="right_column">
-        <div class="revision_buttons">
-            {% if first_version.next_version and rollback_allowed %}
-                <a href="{% url videos:rollback first_version.pk %}" class="roll_back">
-                    {% trans 'Roll back to version' %} (#{{ first_version.version_number }})
-                </a>
-            {% else %}
-                <a href="" class="roll_back disabled" >
-                    {% trans 'Latest Revision' %}
-                </a>
-            {% endif %}
-         </div>
+      {% if rollback_allowed %}
+      <div class="revision_buttons">
+        {% if first_version.next_version %}
+        <a href="{% url videos:rollback first_version.pk %}" class="roll_back">
+          {% trans 'Roll back to version' %} (#{{ first_version.version_number }})
+        </a>
+        {% else %}
+        <a href="" class="roll_back disabled" >
+          {% trans 'Latest Revision' %}
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
 
         <h3 class="diff_title">
             Revision #{{ first_version.version_number }} by {{ first_version.author }}
