@@ -933,8 +933,15 @@ def activity(request, slug, tab='videos'):
 
     has_more = len(activity_list) >= ACTIONS_ON_PAGE
 
+    query = request.GET.get('q', '')
+
+    filtered = bool(set(request.GET.keys()).intersection([
+        'action_type', 'language', 'sort']))
+
     context = {
         'activity_list': activity_list,
+        'query': query,
+        'filtered': filtered,
         'action_types': action_types,
         'languages': languages,
         'team': team,

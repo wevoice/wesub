@@ -18,17 +18,21 @@
         </div>
 
 	{% load query_string teams_tags %}
-	<div class="filters group {% if filtered or request.GET.sort %}active{% endif %}">
-	  <p>
+	<form class="filters group no-ajax{% if filtered or request.GET.sort %} active{% endif %}">
+          <input type="hidden" name="q" value="{{ query }}" />
+          <button class="reduced" id="update">Update</button>
+            {% if filtered %}
+            <a href="{% url teams:activity team.slug %}{% if query %}?q={{ query }}{% endif %}" class="button cancel">Clear</a>
+            {% endif %}
 	    {% if action_types %}
 	    <div class="filter-chunk">
 	      <span class="inner">{% trans 'Action Type' %}</span>
-	      <select id="id_activity_type" name="type" class="type-filter chosen">
-		<option value="{% query_string request.GET action_type='any' %}">
+	      <select id="id_activity_type" name="action_type" class="type-filter chosen">
+		<option value="any">
 		  {% trans 'Any type' %}
 		</option>
 		{% for type in action_types %}
-		<option value="{% query_string request.GET action_type=type.0 %}"
+		<option value="{{ type.0 }}"
 			{% if request.GET.action_type == type.0|slugify %}selected="selected"{% endif %}>
 		  {{ type.1 }}
 		</option>
@@ -41,11 +45,11 @@
 	    <div class="filter-chunk">
 	      <span class="inner">{% trans 'Language' %}</span>
 	      <select id="id_language" name="language" class="language-filter chosen">
-		<option value="{% query_string request.GET language='any' %}">
+		<option value="any">
 		  {% trans 'Any Language' %}
 		</option>
 		{% for language in languages %}
-		<option value="{% query_string request.GET language=language %}"
+		<option value="{{ language }}"
 			{% if request.GET.language == language %}selected="selected"{% endif %}>
 		  {{ language|display_language }}
 		</option>
@@ -59,21 +63,16 @@
 	      <span class="inner">{% trans 'Sorted by' %}</span>
 	      <select name="sort">
 		<option {% if request.GET.sort == '-created' or not request.GET.sort %}selected="selected"{% endif %}
-			value="{% query_string request.GET sort='-created' page='' %}">
+			value="-created">
 		  {% trans 'date, newest' %}
 		</option>
 		<option {% if request.GET.sort == 'created' %}selected="selected"{% endif %}
-			value="{% query_string request.GET sort='created' page='' %}">
+			value="created">
 		  {% trans 'date, oldest' %}
 		</option>
 	      </select>
 	    </div>
-	  </p>
-	  {% if filtered or request.GET.sort %}
-	  <a href="{{ request.path }}" class="clear-filters"
-	     title="{% trans 'Clear all filters, sorts, and search terms' %}">{% trans 'Clear' %}</a>
-	  {% endif %}
-	</div>
+	</form>
 
         <div id="activity-list">
             {% include "teams/_activity-list.html" %}
