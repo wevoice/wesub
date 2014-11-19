@@ -80,7 +80,7 @@ def paginator(context, anchor='', adjacent_pages=3):
             getvars = "&%s" % GET_vars.urlencode()
 
     return {
-        'more': context['more'],
+        'more': context['more'] if 'more' in context else None,
         'page_obj': page_obj,
         'paginator': paginator,
         'hits': context['hits'],
