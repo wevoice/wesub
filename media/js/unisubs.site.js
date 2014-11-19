@@ -481,6 +481,10 @@ var Site = function(Site) {
                     $('.filters').toggle();
                     $(this).children('span').toggleClass('open');
                 });
+		if ($('#sort-filter').hasClass("default-open")) {
+                    $('.filters').show();
+                    $('#sort-filter').children('span').addClass('open');
+		}
                 $('select', '.filters:not(.no-ajax)').change(function(e) {
                     window.location = $(this).children('option:selected').attr('value');
                 });
