@@ -33,9 +33,8 @@ class TestCaseEditing(WebdriverTestCase):
         cls.video_pg.log_in(cls.user.username, 'password')
 
 
-        data = {'url': 'http://www.youtube.com/watch?v=5CKwCfLUwj4', 
-                'video__title': 'Open Source Philosophy',
-                                 'type': 'Y' 
+        data = {'video_url': 'http://www.youtube.com/watch?v=5CKwCfLUwj4', 
+                'title': 'Open Source Philosophy',
                } 
         cls.video = cls.data_utils.create_video(**data) 
         cls.data_utils.add_subs(video=cls.video) 
