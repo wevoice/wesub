@@ -920,8 +920,11 @@ def activity(request, slug, tab='videos'):
         'video', 'user', 'new_language', 'new_language__video'
     )
     activity_list = list(action_qs)
-    languages = None
+    language_choices = None
     if tab == 'videos':
+        readable_langs = TeamLanguagePreference.objects.get_readable(team)
+        language_choices = [(code, name) for code, name in get_language_choices()
+                            if code in readable_langs]
         languages = set(map(lambda x : x.new_language.language_code, filter(lambda x : x.new_language, activity_list)))
     action_types = set(map(lambda x : (x.action_type, x.get_action_type_display()), activity_list))
 
@@ -943,7 +946,7 @@ def activity(request, slug, tab='videos'):
         'query': query,
         'filtered': filtered,
         'action_types': action_types,
-        'languages': languages,
+        'language_choices': language_choices,
         'team': team,
         'member': member,
         'activity_tab': tab,
