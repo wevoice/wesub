@@ -1,32 +1,38 @@
 {% load i18n videos_tags %}
 <div class="pagination">
-   {% if has_previous %}
-        <a class="previous_page" href="?page={{ previous }}{{ getvars }}{{ anchor }}" rel="next">&#8592; {% trans 'Previous' %}</a>
+  {% if more %}
+    {% if has_next %}
+      <a class="" href="?revisions_per_page={{ more }}&page=1{{ getvars }}{{ anchor }}" rel="next">&#8595; {% trans 'Show More' %} &#8595;</a>
+    {% endif %}
    {% else %}
-        <span class="previous_page disabled">&#8592; {% trans 'Previous' %}</span>
-   {% endif %}    
+     {% if has_previous %}
+          <a class="previous_page" href="?page={{ previous }}{{ getvars }}{{ anchor }}" rel="next">&#8592; {% trans 'Previous' %}</a>
+     {% else %}
+          <span class="previous_page disabled">&#8592; {% trans 'Previous' %}</span>
+     {% endif %}    
 
-   {% if show_first %}
-      <a rel="next" href="?page=1{{ getvars }}{{ anchor }}">1</a>
-      <em>...</em>
-   {% endif %}
+     {% if show_first %}
+        <a rel="next" href="?page=1{{ getvars }}{{ anchor }}">1</a>
+        <em>...</em>
+     {% endif %}
 
-   {% for linkpage in page_numbers %}
-      {% ifequal linkpage page %}
-         <em>{{ page }}</em>
-      {% else %}
-         <a rel="next" href="?page={{ linkpage }}{{ getvars }}{{ anchor }}">{{ linkpage }}</a>
-      {% endifequal %}
-   {% endfor %}
+     {% for linkpage in page_numbers %}
+        {% ifequal linkpage page %}
+           <em>{{ page }}</em>
+        {% else %}
+           <a rel="next" href="?page={{ linkpage }}{{ getvars }}{{ anchor }}">{{ linkpage }}</a>
+        {% endifequal %}
+     {% endfor %}
 
-   {% if show_last %}
-      <em>...</em>
-      <a rel="next" href="?page=last{{ getvars }}{{ anchor }}">{{ pages }}</a>
-   {% endif %}
+     {% if show_last %}
+        <em>...</em>
+        <a rel="next" href="?page=last{{ getvars }}{{ anchor }}">{{ pages }}</a>
+     {% endif %}
     
-   {% if has_next %}
-        <a class="next_page" href="?page={{ next }}{{ getvars }}{{ anchor }}" rel="next">{% trans 'Next' %} &#8594;</a>
-   {% else %}
-        <span class="next_page disabled">{% trans 'Next' %} &#8594;</span>
-   {% endif %}     
+     {% if has_next %}
+          <a class="next_page" href="?page={{ next }}{{ getvars }}{{ anchor }}" rel="next">{% trans 'Next' %} &#8594;</a>
+     {% else %}
+          <span class="next_page disabled">{% trans 'Next' %} &#8594;</span>
+     {% endif %}
+  {% endif %}
 </div>
