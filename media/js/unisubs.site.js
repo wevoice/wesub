@@ -751,7 +751,7 @@ var Site = function(Site) {
                     loadingIcon.hide();
                 });
             }
-
+            that.Utils.chosenify();
             $('div.pagination a').click(onMoreClicked);
         },
         move_videos: function() {
