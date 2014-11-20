@@ -791,6 +791,7 @@ class SubtitleLanguage(models.Model):
             signals.language_deleted.send(lang)
             from teams.signals import api_language_deleted
             api_language_deleted.send(lang)
+        Video.invalidate_cache_for_video(self.video_id)
 
     def update_signoff_counts(self):
         """Update the denormalized signoff count fields and save."""
@@ -1719,10 +1720,6 @@ class SubtitleVersion(models.Model):
     def publish(self):
         """Make this version publicly viewable."""
 
-        team_video = self.video.get_team_video()
-
-        assert team_video, \
-               "Cannot publish for a video not moderated by a team."
         was_public = self.is_public()
         self.visibility = 'public'
         self.save()
@@ -1737,9 +1734,6 @@ class SubtitleVersion(models.Model):
         :param signal: when set we will emit the public_tip_changed() or
         language_deleted signal
         """
-        team_video = self.video.get_team_video()
-        assert team_video, \
-               "Cannot unpublish for a video not moderated by a team."
         if signal:
             was_tip = self.is_tip()
 

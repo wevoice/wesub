@@ -40,6 +40,7 @@ from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
 
 from auth.models import CustomUser as User, Awards
+from caching import CacheGroup
 from videos import behaviors
 from videos import metadata
 from videos import signals
@@ -48,7 +49,6 @@ from videos.feed_parser import VideoImporter
 from comments.models import Comment
 from statistic import hitcounts
 from widget import video_cache
-from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
 from utils.subtitles import create_new_subtitles, dfxp_merge
@@ -311,6 +311,25 @@ class Video(models.Model):
             return '%s/.../%s' % (parts[0], parts[-1])
         else:
             return url
+
+    @classmethod
+    def _make_cache_group(cls, video_pk):
+        return CacheGroup('video-{0}'.format(video_pk))
+
+    @property
+    def cache(self):
+        if not hasattr(self, '_cache'):
+            if self.id is None:
+                raise ValueError("No id yet")
+            self._cache = Video._make_cache_group(self.id)
+        return self._cache
+
+    def invalidate_cache(self):
+        self.cache.invalidate()
+
+    @classmethod
+    def invalidate_cache_for_video(cls, video_id):
+        cls._make_cache_group(video_id).invalidate()
 
     def get_download_filename(self):
         """Get the filename to download this video as

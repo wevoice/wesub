@@ -18,11 +18,13 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from datetime import datetime
+import contextlib
 
 import math_captcha
 import babelsubs
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from nose.tools import *
 
 from auth.models import CustomUser as User
 from subtitles.pipeline import add_subtitles
@@ -107,4 +109,10 @@ class WebUseTest(TestCase):
         else:
             self._login(get_user(200))
 
-
+@contextlib.contextmanager
+def assert_invalidates_video_cache(video):
+    key = 'assert-invalidates-video-cache'
+    Video._make_cache_group(video.id).set(key, 'value')
+    yield
+    cache = Video._make_cache_group(video.id)
+    assert_equal(cache.get(key), None, 'video cache not invalidated')
