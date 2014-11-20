@@ -52,7 +52,7 @@ from teams.forms import (
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
     make_billing_report_form, TaskCreateSubtitlesForm,
-    TeamMultiVideoCreateSubtitlesForm, MoveVideosForm
+    TeamMultiVideoCreateSubtitlesForm, MoveVideosForm, AddVideoToTeamForm,
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -740,6 +740,23 @@ def move_videos(request, slug, project_slug=None, languages=None):
                     record._team_video.original_language_code = record.original_language
                     record._team_video.completed_langs = record.video_completed_langs
     return extra_context
+
+@login_required
+def add_video_to_team(request, video_id):
+    video = get_object_or_404(Video, video_id=video_id)
+    if request.method == 'POST':
+        form = AddVideoToTeamForm(request.user, request.POST)
+        if form.is_valid():
+            team = Team.objects.get(id=form.cleaned_data['team'])
+            team_video = TeamVideo.objects.create(video=video, team=team)
+            update_one_team_video.delay(team_video.pk)
+            return redirect(video.get_absolute_url())
+    else:
+        form = AddVideoToTeamForm(request.user)
+    return render(request, 'teams/add-video-to-team.html', {
+        'video': video,
+        'form': form,
+    })
 
 @render_to('teams/add_video.html')
 @login_required

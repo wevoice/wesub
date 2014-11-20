@@ -236,6 +236,14 @@ class CustomUser(BaseUser):
     def speaks_language(self, language_code):
         return language_code in [l.language for l in self.get_languages()]
 
+    def is_team_manager(self):
+        cached_value = self.cache.get('is-manager')
+        if cached_value is not None:
+            return cached_value
+        is_manager = self.managed_teams().exists()
+        self.cache.set('is-manager', is_manager)
+        return is_manager
+
     def managed_teams(self, include_manager=True):
         from teams.models import TeamMember
         possible_roles = [TeamMember.ROLE_OWNER, TeamMember.ROLE_ADMIN]

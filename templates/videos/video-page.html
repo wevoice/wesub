@@ -78,8 +78,8 @@
         <div class="sharing-tools group">
             {% include '_sharing_widget.html' %}
         </div>
-        {% if user.managed_teams and not team %}
-            {% team_add_video_select %}
+        {% if user.is_team_manager and not team %}
+        <a href="{% url teams:add_video_to_team video.video_id %}">{% trans "Add this video to one of your teams" %}</a>
         {% endif %}
     </div>
     <div class="grid_8 view omega">
