@@ -19,11 +19,10 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
 
-from auth.models import UserCache
+from auth.models import CustomUser as User
 from messages.models import Message
 
 @receiver(post_save, sender=Message)
 @receiver(post_delete, sender=Message)
 def on_message_saved(sender, instance, **kwargs):
-    UserCache.delete_by_id(instance.user_id, 'messages')
-    UserCache.delete_by_id(instance.user_id, 'top-panel')
+    User.invalidate_cache_for_user(instance.user_id)

@@ -44,61 +44,16 @@ from django.core.urlresolvers import reverse
 
 from tastypie.models import ApiKey
 
+from caching import CacheGroup
 from utils.tasks import send_templated_email_async
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 EMAIL_CONFIRMATION_DAYS = getattr(settings, 'EMAIL_CONFIRMATION_DAYS', 3)
 
-class UserCache(object):
-    """Handle per-user caching
-
-    There are several things that we want to cache on a per-user basis.
-    UserCache optimizes this a bit by allowing all cache values to be fetched
-    at once, instead of one at a time.
-
-    If you want to cache something for a user you should:
-        - add the key you want to use to UserCache.keys_to_fetch
-        - use User.cache.get/set/delete to manage the key
-
-    Note: to make keys unique per-user, we will prepend each key with the
-    string "user-<id>:" when accessing the cache
-    """
-
-    keys_to_fetch = []
+class UserCacheGroup(CacheGroup):
     def __init__(self, user_id):
-        self.user_id = user_id
-        self.cached_values = None
-
-    def get(self, key, default=None):
-        if self.cached_values is None:
-            self._get_cached_values()
-        value = self.cached_values.get(self._cache_key(key))
-        if value is not None:
-            return value
-        else:
-            return default
-
-    def _get_cached_values(self):
-        cache_keys = [self._cache_key(key) for key in self.keys_to_fetch]
-        self.cached_values = cache.get_many(cache_keys)
-
-    def set(self, key, value, expiration):
-        cache.set(self._cache_key(key), value, expiration)
-
-    def delete(self, key):
-        cache.delete(self._cache_key(key))
-
-    def _cache_key(self, key):
-        return 'user-{0}:{1}'.format(self.user_id, key)
-
-    @classmethod
-    def delete_by_id(cls, user_id, key):
-        """Delete a cache value using a user id
-
-        This method allows cache values to be deleted from the cache without
-        loading the User object from the DB.
-        """
-        cls(user_id).delete(key)
+        super(UserCacheGroup, self).__init__('user-{0}'.format(user_id),
+                                             cache_pattern='user')
 
 class CustomUser(BaseUser):
     AUTOPLAY_ON_BROWSER = 1
@@ -144,7 +99,11 @@ class CustomUser(BaseUser):
 
     def __init__(self, *args, **kwargs):
         super(CustomUser, self).__init__(*args, **kwargs)
-        self.cache = UserCache(self.id)
+        self.cache = UserCacheGroup(self.id)
+
+    @staticmethod
+    def invalidate_cache_for_user(user_id):
+        UserCacheGroup(user_id).invalidate()
 
     def __unicode__(self):
         if not self.is_active:

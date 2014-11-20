@@ -19,10 +19,10 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
 
-from auth.models import UserCache
+from auth.models import CustomUser as User
 from teams.models import TeamMember
 
 @receiver(post_save, sender=TeamMember)
 @receiver(post_delete, sender=TeamMember)
 def on_team_member_saved(sender, instance, **kwargs):
-    UserCache.delete_by_id(instance.user_id, 'top-panel')
+    User.invalidate_cache_for_user(instance.user_id)
