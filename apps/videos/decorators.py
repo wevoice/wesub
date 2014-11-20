@@ -13,7 +13,8 @@ def get_video_from_code(func):
     for the user on that request.
     """
     def wrapper(request, video_id, *args, **kwargs):
-        video = get_object_or_404(Video, video_id=video_id)
+        qs = Video.objects.select_related('teamvideo')
+        video = get_object_or_404(qs, video_id=video_id)
         if not video.can_user_see(request.user):
             raise Http404
         return func(request, video, *args, **kwargs)

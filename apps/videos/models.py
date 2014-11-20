@@ -35,6 +35,7 @@ from django.db import IntegrityError
 from django.utils.dateformat import format as date_format
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext
 from django.template.defaultfilters import slugify
 from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
@@ -312,6 +313,16 @@ class Video(models.Model):
         else:
             return url
 
+    def page_title(self):
+        """Get the title that should appear at the top of the video page."""
+        cached = self.cache.get('page-title')
+        if cached is not None:
+            return cached
+        title = fmt(ugettext('%(title)s with subtitles | Amara'),
+                     title=self.title_display())
+        self.cache.set('page-title', title)
+        return title
+
     @classmethod
     def _make_cache_group(cls, video_pk):
         return CacheGroup('video-{0}'.format(video_pk))
@@ -402,7 +413,8 @@ class Video(models.Model):
             return self._cached_teamvideo
         try:
             team_video = self.teamvideo
-            team_video.video = self
+            if team_video is not None:
+                team_video.video = self
             rv = team_video
         except TeamVideo.DoesNotExist:
             rv = None
@@ -661,6 +673,17 @@ class Video(models.Model):
 
     def all_subtitle_languages(self):
         return self._language_fetcher.fetch_all_languages(self)
+
+    def languages_with_versions(self):
+        cached = self.cache.get('langs-with-versions')
+        if cached is not None:
+            return cached
+        languages = [
+            l.language_code for l in
+            self.newsubtitlelanguage_set.having_versions()
+        ]
+        self.cache.set('langs-with-versions', languages)
+        return languages
 
     def language_with_pk(self, language_pk):
         language_pk = int(language_pk)

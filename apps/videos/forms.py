@@ -400,9 +400,7 @@ class CreateSubtitlesForm(CreateSubtitlesFormBase):
     def setup_subtitle_language_code(self):
         super(CreateSubtitlesForm, self).setup_subtitle_language_code()
         # remove languages that already have subtitles
-        current_langs = set(
-            l.language_code for l in
-            self.video.newsubtitlelanguage_set.having_versions())
+        current_langs = set(self.video.languages_with_versions())
         field = self.fields['subtitle_language_code']
         field.choices = [choice for choice in field.choices
                          if choice[0] not in current_langs]

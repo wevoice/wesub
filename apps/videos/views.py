@@ -286,14 +286,6 @@ class VideoPageContext(dict):
         self.setup_tab(request, video, video_url, tab)
 
     def setup(self, request, video, video_url):
-        language_for_locale = video.subtitle_language(request.LANGUAGE_CODE)
-        if language_for_locale:
-            metadata = language_for_locale.get_metadata()
-        else:
-            metadata = video.get_metadata()
-
-        self['page_title'] = self.page_title(video)
-        self['metadata'] = metadata.convert_for_display()
         self['widget_settings'] = json.dumps(
             widget_rpc.get_general_settings(request))
         self['add_language_mode'] = self.workflow.get_add_language_mode(
@@ -305,16 +297,8 @@ class VideoPageContext(dict):
         if team_video is not None:
             self['team'] = team_video.team
             self['team_video'] = team_video
-            self['user_is_team_member'] = team_video.team.user_is_member(
-                request.user)
         else:
             self['team'] = self['team_video'] = None
-            self['user_is_team_member'] = False
-
-    @staticmethod
-    def page_title(video):
-        return fmt(ugettext('%(title)s with subtitles | Amara'),
-                   title=video.title_display())
 
     def setup_tab(self, request, video, video_url, tab):
         for name, title in self['extra_tabs']:
@@ -337,7 +321,6 @@ class VideoPageContext(dict):
     def setup_tab_video(self, request, video, video_url):
         self['width'] = "620"
         self['height'] = "370"
-        self['video_url'] = video.get_video_url()
 
 @get_video_from_code
 def redirect_to_video(request, video):
