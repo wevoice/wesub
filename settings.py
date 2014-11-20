@@ -191,6 +191,7 @@ INSTALLED_APPS = (
     'amaradotorg',
     'amaracelery',
     'api',
+    'caching',
     'comments',
     'externalsites',
     'messages',
