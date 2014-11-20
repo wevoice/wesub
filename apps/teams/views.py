@@ -913,25 +913,28 @@ def activity(request, slug, tab='videos'):
     end = page * ACTIONS_ON_PAGE
     start = end - ACTIONS_ON_PAGE
 
+    if request.GET.get('action_type') and request.GET.get('action_type') != 'any':
+        action_qs = action_qs.filter(action_type = int(request.GET.get('action_type')))
+
+    action_qs = action_qs.select_related('new_language')
+
+    if tab == 'videos' and request.GET.get('language') and request.GET.get('language') != 'any':
+        action_qs = action_qs.filter(new_language__isnull = False, new_language__language_code = request.GET.get('language'))
+
     sort = request.GET.get('sort', '-created')
     action_qs = action_qs.order_by(sort)
 
     action_qs = action_qs[start:end].select_related(
-        'video', 'user', 'new_language', 'new_language__video'
+        'video', 'user', 'new_language__video'
     )
+
     activity_list = list(action_qs)
     language_choices = None
     if tab == 'videos':
         readable_langs = TeamLanguagePreference.objects.get_readable(team)
         language_choices = [(code, name) for code, name in get_language_choices()
                             if code in readable_langs]
-        languages = set(map(lambda x : x.new_language.language_code, filter(lambda x : x.new_language, activity_list)))
     action_types = Action.TYPES_CATEGORIES[tab]
-    if request.GET.get('action_type') and request.GET.get('action_type') != 'any':
-        activity_list = filter(lambda x: str(x.action_type) == request.GET.get('action_type'), activity_list)
-
-    if tab == 'videos' and request.GET.get('language') and request.GET.get('language') != 'any':
-        activity_list = filter(lambda x: str(x.new_language.language_code) == request.GET.get('language'), filter(lambda x : x.new_language, activity_list))
 
     has_more = len(activity_list) >= ACTIONS_ON_PAGE
 
