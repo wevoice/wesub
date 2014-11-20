@@ -2,12 +2,11 @@ import os
 import codecs
 import time
 
+from utils.factories import *
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages import video_page
 from webdriver_testing.pages.site_pages import video_language_page
 from webdriver_testing import data_helpers
-from webdriver_testing.data_factories import UserFactory
-from webdriver_testing.data_factories import VideoUrlFactory
 from webdriver_testing.pages.site_pages import editor_page 
 
 class TestCaseUploadTranslation(WebdriverTestCase):
@@ -18,7 +17,7 @@ class TestCaseUploadTranslation(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseUploadTranslation, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
-        cls.user = UserFactory.create(username = 'user')
+        cls.user = UserFactory()
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
         cls.editor_pg = editor_page.EditorPage(cls)

@@ -47,17 +47,7 @@ describe('The SessionBackend', function() {
     }
 
     it('saves subtitles', function() {
-        $scope.sessionBackend.saveSubtitles(true);
-        expect(SubtitleStorage.saveSubtitles).toHaveBeenCalledWith(
-            $scope.workingSubtitles.subtitleList.toXMLString(),
-            $scope.workingSubtitles.title,
-            $scope.workingSubtitles.description,
-            $scope.workingSubtitles.metadata,
-            true, null);
-    });
-
-    it('saves subtitles with actions', function() {
-        $scope.sessionBackend.saveSubtitlesWithAction('action');
+        $scope.sessionBackend.saveSubtitles('action');
         expect(SubtitleStorage.saveSubtitles).toHaveBeenCalledWith(
             $scope.workingSubtitles.subtitleList.toXMLString(),
             $scope.workingSubtitles.title,
@@ -103,8 +93,7 @@ describe('The SessionController', function() {
     var session;
     var backendMethodsCalled;
     var simulateSaveError;
-    var markAsCompleteArg = null;
-    var actionArg = null;
+    var actionArg;
 
     beforeEach(function() {
         module('amara.SubtitleEditor.mocks');
@@ -135,6 +124,12 @@ describe('The SessionController', function() {
                 in_progress_text: 'Doing Action 3',
                 complete: null
             },
+            {
+                name: 'save-draft',
+                label: 'Save Draft',
+                in_progress_text: 'Saving...',
+                complete: false
+            }
         ];
         $scope = $rootScope.$new();
         $scope.overrides = {
@@ -155,6 +150,7 @@ describe('The SessionController', function() {
 
     beforeEach(inject(function($q) {
         backendMethodsCalled = [];
+        actionArg = null;
         simulateSaveError = false;
         var backendMethods = [ 
             'saveSubtitles',
@@ -164,9 +160,8 @@ describe('The SessionController', function() {
         $scope.sessionBackend = {};
         _.each(backendMethods, function(methodName) {
             var spy = jasmine.createSpy().andCallFake(function(arg) {
-                if(methodName == 'saveSubtitles') {
-                    markAsCompleteArg = arg;
-                } else if(methodName == 'saveSubtitlesWithAction' || methodName == 'performAction') {
+                if(methodName == 'saveSubtitles'
+                    || methodName == 'performAction') {
                     actionArg = arg;
                 }
                 backendMethodsCalled.push(methodName);
@@ -259,7 +254,7 @@ describe('The SessionController', function() {
         expectRedirectToLegacyEditor();
     });
 
-    it('handles saving subtitles', function() {
+    it('handles saving drafts', function() {
         session.subtitlesChanged = true;
         session.saveDraft();
         // While the save is in-progress we should show a freeze box
@@ -268,7 +263,7 @@ describe('The SessionController', function() {
         // the subtitles saved dialog
         $rootScope.$digest();
         expect(backendMethodsCalled).toEqual(['saveSubtitles']);
-        expect(markAsCompleteArg).toBe(false);
+        expect(actionArg).toBe('save-draft');
         expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
         expect($scope.dialogManager.openDialog).toHaveBeenCalledWith(
             'changesSaved', jasmine.any(Object));
@@ -292,7 +287,7 @@ describe('The SessionController', function() {
         expect($scope.dialogManager.open).toHaveBeenCalledWith('save-error');
     });
 
-    it('lists actions', function() {
+    it('lists actions, but excludes save draft', function() {
         expect($scope.actions[0].label).toEqual('Action 1');
         expect($scope.actions[1].label).toEqual('Action 2');
         expect($scope.actions[2].label).toEqual('Action 3');
@@ -328,7 +323,7 @@ describe('The SessionController', function() {
         // After the save is complete, we should close the freezebox and show
         // the subtitles saved dialog
         $rootScope.$digest();
-        expect(backendMethodsCalled).toEqual(['saveSubtitlesWithAction']);
+        expect(backendMethodsCalled).toEqual(['saveSubtitles']);
         expect(actionArg).toEqual(EditorData.actions[0].name);
         expect($scope.dialogManager.closeFreezeBox).toHaveBeenCalled();
         expectRedirectToVideoPage();

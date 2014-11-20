@@ -151,7 +151,7 @@ class EditorPage(UnisubsPage):
         for el in buttons:
             if 'Legacy Editor' in el.text:
                 el.click()
-                time.sleep(2)
+                time.sleep(5)
                 return
 
     def save(self, save_option):

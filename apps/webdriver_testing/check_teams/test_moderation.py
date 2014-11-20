@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
 
+from utils.factories import *
+from subtitles import pipeline
+
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.data_factories import TeamMemberFactory
-from webdriver_testing.data_factories import TeamVideoFactory
-from webdriver_testing.data_factories import WorkflowFactory
-from webdriver_testing.data_factories import UserFactory
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages import video_page
 from webdriver_testing.pages.site_pages import video_language_page
@@ -45,15 +45,11 @@ class TestCasePublishedVideos(WebdriverTestCase):
 
         #Add video to team with published subtitles
         cls.logger.info('Setup: Add video to team with published subs.')
-        vid = cls.data_utils.create_video()
-        cls.data_utils.add_subs(video=vid)
-        cls.published = TeamVideoFactory.create(
-                team=cls.team, 
-                video=vid,
-                added_by=cls.user).video
-
+        cls.published = VideoFactory()
+        pipeline.add_subtitles(cls.published, 'en', SubtitleSetFactory(),
+                               action='publish')
+        TeamVideoFactory(team=cls.team, video=cls.published)
         cls.video_pg.open_video_page(cls.published.video_id)
-        cls.video_pg.set_skiphowto()
 
 
     def setUp(self):
@@ -248,9 +244,8 @@ class TestCaseViewSubtitles(WebdriverTestCase):
 
     @classmethod
     def _add_team_video(cls):
-        vid_data = {'video__primary_audio_language_code': 'en' }
-        video = cls.data_utils.create_video(**vid_data)
-        tv = TeamVideoFactory(team=cls.team, added_by=cls.owner, video=video)
+        video = VideoFactory(primary_audio_language_code='en')
+        tv = TeamVideoFactory(team=cls.team, video=video)
         return video, tv
 
     def setUp(self):

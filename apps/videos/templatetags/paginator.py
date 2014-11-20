@@ -17,10 +17,9 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django import template
 from django.core.paginator import Paginator, EmptyPage
-
 register = template.Library()
 
-def paginate(items, per_page, page):
+def paginate(items, per_page, page, allow_more=0):
     if page != 'last':
         page = int(page) if page else 1
 
@@ -40,6 +39,7 @@ def paginate(items, per_page, page):
         'page_obj': page_obj,
         'pages': paginator.num_pages,
         'has_next': page_obj.has_next(),
+        'more': allow_more,
         'has_previous': page_obj.has_previous(),
         'is_paginated': page_obj.has_other_pages(),
         'hits': paginator.count,
@@ -72,12 +72,15 @@ def paginator(context, anchor='', adjacent_pages=3):
     getvars = ''
     if 'request' in context:
         GET_vars = context['request'].GET.copy()
+        if 'revisions_per_page' in GET_vars:
+            del GET_vars['revisions_per_page']
         if 'page' in GET_vars:
             del GET_vars['page']
         if len(GET_vars.keys()) > 0:
             getvars = "&%s" % GET_vars.urlencode()
 
     return {
+        'more': context['more'] if 'more' in context else None,
         'page_obj': page_obj,
         'paginator': paginator,
         'hits': context['hits'],

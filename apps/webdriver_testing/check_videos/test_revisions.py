@@ -10,7 +10,7 @@ from webdriver_testing.pages.site_pages import video_page
 from webdriver_testing.pages.site_pages import diffing_page
 from webdriver_testing.pages.site_pages import video_language_page
 from webdriver_testing import data_helpers
-from webdriver_testing.data_factories import UserFactory
+from utils.factories import *
 
 
 class TestCaseRevisionNotifications(WebdriverTestCase):
@@ -20,7 +20,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseRevisionNotifications, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
-        cls.user = UserFactory.create()
+        cls.user = UserFactory()
         cls.video_pg = video_page.VideoPage(cls)
         cls.diffing_pg = diffing_page.DiffingPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
@@ -42,7 +42,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         v1 = sl.get_tip().id
         sl.clear_tip_cache()
 
-        user2 = UserFactory.create()
+        user2 = UserFactory()
         self.video_pg.log_in(user2.username, 'password')
         rev2 = os.path.join(self.subs_path, 'rev2.dfxp')
         self.video_pg.open_video_page(video.video_id)
@@ -69,7 +69,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.upload_subtitles('English', rev1)
 
-        follower = UserFactory.create(email='follower@example.com')
+        follower = UserFactory()
         self.video_language_pg.open_video_lang_page(video.video_id, 'en')
         self.video_pg.log_in(follower.username, 'password')
         self.video_pg.page_refresh()
@@ -110,7 +110,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
 
         """
         video = self.data_utils.create_video()
-        follower = UserFactory.create(email='follower@example.com')
+        follower = UserFactory()
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.log_in(follower.username, 'password')
         self.video_pg.page_refresh()
@@ -140,7 +140,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         """
         self.skipTest('needs https://unisubs.sifterapp.com/issues/2220 fixed')
         video = self.data_utils.create_video()
-        follower = UserFactory.create(email='follower@example.com')
+        follower = UserFactory()
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.log_in(follower.username, 'password')
         self.video_pg.page_refresh()
@@ -170,8 +170,8 @@ class TestCaseRevisionEdits(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
         cls.video_pg = video_page.VideoPage(cls)
-        cls.user1 = UserFactory.create()
-        cls.user2 = UserFactory.create()
+        cls.user1 = UserFactory()
+        cls.user2 = UserFactory()
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data')  
 

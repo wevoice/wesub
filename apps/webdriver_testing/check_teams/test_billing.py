@@ -55,7 +55,7 @@ class TestCaseBilling(WebdriverTestCase):
     @classmethod
     def _create_tv_with_original_subs(cls, user, team, complete=True):
 
-        vid_data = {'video__primary_audio_language_code': 'en' }
+        vid_data = {'primary_audio_language_code': 'en' }
         video = cls.data_utils.create_video(**vid_data)
         tv = TeamVideoFactory.create(
             team=team, 
