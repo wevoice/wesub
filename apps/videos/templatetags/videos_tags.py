@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django import template
 
@@ -24,10 +25,11 @@ register = template.Library()
 
 from django.contrib.sites.models import Site
 
+from staticmedia import utils
+from utils.basexconverter import base62
+from videos.views import LanguageList
 from videos.types import video_type_registrar, VideoTypeError
 from videos import permissions
-
-from utils.basexconverter import base62
 
 @register.inclusion_tag('videos/_video.html', takes_context=True)
 def render_video(context, video, display_views='total'):
@@ -212,3 +214,18 @@ def multi_video_create_subtitles_data_attrs(video):
                       video.primary_audio_language_code))
     return mark_safe(' '.join('%s="%s"' % (key, value)
                               for (key, value) in attrs))
+
+@register.simple_tag(name='language-list')
+def language_list(video):
+    cached = video.cache.get('language-list')
+    if cached is not None:
+        return cached
+    video.prefetch_languages(with_public_tips=True,
+                             with_private_tips=True)
+    content = render_to_string('videos/_language-list.html', {
+        'video': video,
+        'language_list': LanguageList(video),
+        'STATIC_URL': utils.static_url(),
+    })
+    video.cache.set('language-list', content)
+    return content

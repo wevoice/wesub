@@ -282,8 +282,6 @@ class VideoPageContext(dict):
             request, video, request.POST or None)
         self['extra_tabs'] = workflow.extra_tabs(request.user)
         if not tab_only:
-            video.prefetch_languages(with_public_tips=True,
-                                     with_private_tips=True)
             self.setup(request, video, video_url)
         self.setup_tab(request, video, video_url, tab)
 
@@ -296,7 +294,6 @@ class VideoPageContext(dict):
 
         self['page_title'] = self.page_title(video)
         self['metadata'] = metadata.convert_for_display()
-        self['language_list'] = LanguageList(video)
         self['widget_settings'] = json.dumps(
             widget_rpc.get_general_settings(request))
         self['add_language_mode'] = self.workflow.get_add_language_mode(
@@ -556,8 +553,6 @@ class LanguagePageContext(dict):
         self['create_subtitles_form'] = CreateSubtitlesForm(
             request, video, request.POST or None)
         if not tab_only:
-            video.prefetch_languages(with_public_tips=True,
-                                     with_private_tips=True)
             self.setup(request, video, language, version)
         self.setup_tab(request, video, language, version)
 
@@ -596,7 +591,6 @@ class LanguagePageContext(dict):
         """Setup context variables."""
 
         self['revision_count'] = language.version_count()
-        self['language_list'] = LanguageList(video)
         self['page_title'] = self.page_title(language)
         self['edit_url'] = language.get_widget_url()
         self['width'] = "289"
