@@ -108,7 +108,21 @@ get.  If the version changes between the get() and set() calls, then the
 value stored with set() will not be valid.  This works somewhat similarly to
 the memcached GETS and CAS operations.
 
+Cache Groups and DB Models
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Cache groups can save and restore django models using get_model() and
+set_model().  There is a pretty conservative policy around this.  Only the
+actual row data will be stored to cache -- other attributes like cached
+related instances are not stored.  Also, restored models can't be saved to the
+DB.  All of this is to try to prevent overly aggressive caching from causing
+weird/wrong behavior.
+
+To add caching support to your model, add :class:`ModelCacheManager` as an
+attribute to your class definition.
+
 .. autoclass:: CacheGroup
+.. autoclass:: ModelCacheManager
 """
 from __future__ import absolute_import
 import collections
@@ -177,11 +191,15 @@ class CacheGroup(object):
     .. automethod:: get_many
     .. automethod:: set
     .. automethod:: set_many
+    .. automethod:: get_or_calc
+    .. automethod:: get_model
+    .. automethod:: set_model
     .. automethod:: invalidate
 
     """
 
     def __init__(self, prefix, cache_pattern=None, invalidate_on_deploy=True):
+        self.prefix = prefix
         self.cache_wrapper = _CacheWrapper(prefix)
         if cache_pattern:
             # copy the values from _cache_pattern_memory now.  It's going to
@@ -267,6 +285,75 @@ class CacheGroup(object):
         )
         self.cache_wrapper.set_many(values_to_set, timeout)
 
+    def get_or_calc(self, key, work_func, *args, **kwargs):
+        """Shortcut for the typical cache usage pattern
+
+        get_or_calc() is used when a cache value stores the result of a
+        function.  The steps are:
+
+        - Try self.get(key)
+        - If there is a cache miss then
+
+          - call work_func() to calculate the value
+          - store it in the cache
+        """
+        cached_value = self.get(key)
+        if cached_value is not None:
+            return cached_value
+        calculated_value = work_func(*args, **kwargs)
+        self.set(key, calculated_value)
+        return calculated_value
+
+    def get_model(self, ModelClass, key):
+        """Get a model stored with set_model()
+
+        .. note::
+
+            To be catious, models fetched from the cache don't allow saving.
+            If the cache data is out of date, we don't want to saave it to
+            disk.
+        """
+        value = self.get(key)
+        if value is None:
+            return None
+        if value == 'does-not-exist':
+            raise ModelClass.DoesNotExist()
+        try:
+            instance = self._tuple_to_model(ModelClass, value)
+        except StandardError:
+            # invalid data stored or we're fetching the wrong cache key, don't
+            # return anything.
+            return None
+        instance.save = self._model_save_override
+        return instance
+
+    def _model_save_override(model, *args, **kwargs):
+        raise TypeError("Saving cached models is prohibitted")
+
+    def set_model(self, key, instance, timeout=None):
+        """Store a model instance in the cache
+
+        Storing a model is a tricky thing.  This method works by storing a
+        tuple containing the values of the DB row.  We store it like that for
+        2 reasons:
+
+        - It's space efficient
+        - It drops things like cached related objects.  This is probably good
+          since it makes it so we don't also cache those objects, which can
+          lead to unexpected behavior and bugs.
+
+        Args:
+            key: key to store the instance with
+            instance: Django model instance, or None to indicate the model
+                      does not exist in the DB.  This will make get_model()
+                      raise a ObjectDoesNotExist exception.
+        """
+        if instance is not None:
+            value = self._model_to_tuple(instance)
+        else:
+            value = 'does-not-exist'
+        self.set(key, value, timeout)
+
     def _pack_cache_value(self, value):
         """Combine our version and value together to get a value to store in
         the cache.
@@ -289,3 +376,88 @@ class CacheGroup(object):
             if len(cache_value) == 2:
                 return cache_value
         return (None, None)
+
+    @staticmethod
+    def _model_to_tuple(instance):
+        return tuple(getattr(instance, f.column, None)
+                     for f in instance._meta.fields)
+
+    @staticmethod
+    def _tuple_to_model(ModelClass, tup):
+        value_dict = dict(
+            (f.column, tup[i])
+            for i, f in enumerate(ModelClass._meta.fields))
+        return ModelClass(**value_dict)
+
+class ModelCacheManager(object):
+    """Manage CacheGroups for a django model.
+
+    ModelCacheManager is meant to be added as an attribute to a class.  It
+    does 2 things: manages CacheGroups for the model class and implements the
+    python descriptor protocol to create a CacheGroup for each instance.  If
+    you add ``cache = ModelCacheManager()`` to your class definition,
+    then:
+
+    - At the class level, MyModel.cache will be the ModelCacheManager instance
+    - At the instance level, my_model.cache will be a :class:`CacheGroup`
+      specific to that instance
+
+    .. automethod:: get_cache_group
+    .. automethod:: invalidate_by_pk
+    .. automethod:: get_instance
+
+    """
+    def __init__(self, default_cache_pattern=None):
+        self.default_cache_pattern = default_cache_pattern
+        # we will set in __get__ once the attribute is accessed
+        self.model_class = None
+
+    def _make_prefix(self, pk):
+        return '{0}:{1}'.format(self.model_class.__name__.lower(), pk)
+
+    def get_cache_group(self, pk, cache_pattern=None):
+        """Create a CacheGroup for an instance of this model
+
+        Args:
+            pk: primary key value for the instance
+            cache_pattern: cache pattern to use or None to use the default
+                           cache pattern for this ModelCacheManager
+        """
+        if cache_pattern is None:
+            cache_pattern = self.default_cache_pattern
+        return CacheGroup(self._make_prefix(pk), cache_pattern)
+
+    def invalidate_by_pk(self, pk):
+        """Invalidate a CacheGroup for an instance
+
+        This is a shortcut for get_cache_group(pk).invalidate() and can be
+        used to invalidate without having to load the instance from the DB.
+        """
+        return self.get_cache_group(pk).invalidate()
+
+    def get_instance(self, pk, cache_pattern=None):
+        """Get a cached instance from it's cache group
+
+        This will create a CacheGroup, get the instance from it or load it
+        from the DB, then reuse the CacheGroup for the instance's cache.  If a
+        cache pattern is used this means we can load the instance and all of
+        the needed cache values with one get_many() call.
+        """
+        cache_group = self.get_cache_group(pk, cache_pattern)
+        instance = cache_group.get_model(self.model_class, 'self')
+        if instance is None:
+            instance = self.model_class.objects.get(pk=pk)
+            cache_group.set_model('self', instance)
+        # re-use the cache group that we just created for the instance
+        instance._cache_group = cache_group
+        return instance
+
+    def __get__(self, instance, owner):
+        self.model_class = owner
+        if instance is None:
+            # class-level access
+            return self
+        # instance-level access
+        if not hasattr(instance, '_cache_group'):
+            instance._cache_group = self.get_cache_group(instance.pk)
+        return instance._cache_group

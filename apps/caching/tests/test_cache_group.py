@@ -16,13 +16,20 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
+
+from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import TestCase
 from django.test.utils import override_settings
 from nose.tools import *
 import mock
 
-from caching.cachegroup import CacheGroup, _cache_pattern_memory
+from caching.cachegroup import (CacheGroup, _cache_pattern_memory,
+                                ModelCacheManager)
+from utils import test_utils
+from utils.factories import *
+from videos.models import Video
 
 def make_cache_group(**kwargs):
     if 'invalidate_on_deploy' not in kwargs:
@@ -86,6 +93,32 @@ class CacheGroupTest(TestCase):
 
         self.check_cache_miss('key1')
         self.check_cache_miss('key2')
+
+    def test_get_or_calc(self):
+        # test calling get_or_calc without any data stored.  We should call
+        # our function, then store the data
+        func = mock.Mock(return_value=self.CACHE_VALUE)
+        cache_group = make_cache_group()
+        result = cache_group.get_or_calc('key', func)
+        assert_equal(result, self.CACHE_VALUE)
+        self.check_cache_hit('key')
+
+    def test_get_or_calc_function_args(self):
+        # test calling get_or_calc passes function arguments correctly
+        func = mock.Mock(return_value=self.CACHE_VALUE)
+        cache_group = make_cache_group()
+        cache_group.get_or_calc('key', func, 'foo', bar='baz')
+        assert_equal(func.call_args, mock.call('foo', bar='baz'))
+
+    def test_get_or_calc_cache_hit(self):
+        # test get_or_calc with a cache hit.  We should avoid calling the
+        # function in this case
+        func = mock.Mock(return_value=self.CACHE_VALUE)
+        self.populate_key('key')
+        cache_group = make_cache_group()
+        result = cache_group.get_or_calc('key', func, 'foo', bar='baz')
+        assert_equal(result, self.CACHE_VALUE)
+        assert_equal(func.call_count, 0)
 
     def patch_get_commit_id(self):
         return mock.patch('caching.cachegroup.get_commit_id')
@@ -206,3 +239,108 @@ class CachePatternTest(TestCase):
         cache_group.get_many(['b', 'c'])
         assert_equal(cache_group.cache_wrapper.get_many.call_args,
                      mock.call(set(['a', 'b', 'c', cache_group.version_key])))
+
+class ModelCachingTest(TestCase):
+    def test_model_to_tuple(self):
+        video = VideoFactory()
+        pickled = CacheGroup._model_to_tuple(video)
+        assert_equal(video, CacheGroup._tuple_to_model(Video, pickled))
+
+    def test_get_model_cache_miss(self):
+        cache_group = make_cache_group()
+        assert_equal(cache_group.get_model(Video, 'video'), None)
+
+    def test_set(self):
+        video = VideoFactory()
+        cache_group = make_cache_group()
+        cache_group.set_model('video', video)
+        cache_group = make_cache_group()
+        assert_equal(cache_group.get_model(Video, 'video'), video)
+
+    def test_save_throws_error(self):
+        make_cache_group().set_model('video', VideoFactory())
+        video = make_cache_group().get_model(Video, 'video')
+        with assert_raises(TypeError):
+            video.save()
+
+    def test_get_with_invalid_data(self):
+        cache_group = make_cache_group()
+        cache_group.set('video', 'foo')
+        cache_group = make_cache_group()
+        assert_equal(cache_group.get_model(Video, 'video'), None)
+
+    def test_does_not_exist(self):
+        make_cache_group().set_model('video', None)
+        with assert_raises(Video.DoesNotExist):
+            make_cache_group().get_model(Video, 'video')
+
+class ModelCacheManagerTest(TestCase):
+    def setUp(self):
+        # test ModelCacheManager using the User model.  To do this, we
+        # simulate User having cache = ModelCacheManager() in its class
+        # definition.
+        User.cache = ModelCacheManager()
+        self.model_cache_manager = User.cache
+        self.instance = User.objects.create_user('test-user')
+        self.pk = self.instance.pk
+    
+    def tearDown(self):
+        del User.cache
+
+    def test_get_cache_group(self):
+        cache_group = self.model_cache_manager.get_cache_group(self.pk)
+        assert_is_instance(cache_group, CacheGroup)
+        assert_equal(cache_group.prefix, 'user:{0}'.format(self.pk))
+
+    def test_default_cache_pattern(self):
+        # setting default_cache_pattern should set the cache pattern for cache
+        # groups
+        self.model_cache_manager.default_cache_pattern = 'foo'
+        cache_group = self.model_cache_manager.get_cache_group(self.pk)
+        assert_equal(cache_group.cache_pattern, 'foo')
+
+    def test_override_default_cache_pattern(self):
+        self.model_cache_manager.default_cache_pattern = 'foo'
+        cache_group = self.model_cache_manager.get_cache_group(self.pk, 'bar')
+        assert_equal(cache_group.cache_pattern, 'bar')
+
+    def test_invalidate_by_pk(self):
+        cache_group = self.model_cache_manager.get_cache_group(self.pk)
+        cache_group.set('key', 'value')
+        self.model_cache_manager.invalidate_by_pk(self.pk)
+        cache_group2 = self.model_cache_manager.get_cache_group(self.pk)
+        assert_equal(cache_group2.get('key'), None)
+
+    def test_get_instance(self):
+        # Since the instance is not cached at this point, calling
+        # get_instance() should fetch it from the DB
+        with self.assertNumQueries(1):
+            instance = self.model_cache_manager.get_instance(self.pk)
+        assert_equal(instance, self.instance)
+
+    def test_get_instance_cache_hit(self):
+        self.model_cache_manager.get_instance(self.pk)
+        # calling get_instance should save the result in cache.  This time
+        # around we shouldn't need a DB query
+        with self.assertNumQueries(0):
+            instance = self.model_cache_manager.get_instance(self.pk)
+        assert_equal(instance, self.instance)
+
+    def test_get_instance_saves_cache_group(self):
+        instance = self.model_cache_manager.get_instance(self.pk)
+        # We should re-use the cache group that we created the instance from.
+        # Check this by seeing if current_version is set
+        assert_not_equal(instance._cache_group.current_version, None)
+
+    # Test implementation of the python descriptor protocol (AKA __get__)
+    def test_descriptor_class_access(self):
+        # When accessed via a class, the descriptor should just return the
+        # ModelCacheManager
+        assert_equal(User.cache, self.model_cache_manager)
+
+    def test_descriptor_instance_access(self):
+        # When accessed via an instance, the description should return a cache
+        # group for that instance
+        user = User.objects.create_user(username='test-user2')
+        assert_is_instance(user.cache, CacheGroup)
+        assert_equal(user.cache.prefix, 'user:{0}'.format(user.pk))
