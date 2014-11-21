@@ -244,8 +244,8 @@ class TestCaseApprovalWorkflowPostEdit(WebdriverTestCase):
         cls.en_lc = TeamMemberFactory(role="ROLE_MANAGER",team=cls.team)
         TeamManagerLanguageFactory(member = cls.en_lc,
                                    language = 'en')
-        cls.de_lc = TeamMemberFactory(role="ROLE_MANAGER",user__username='de_manager',
-                                             team=cls.team)
+        cls.de_lc = TeamMemberFactory(role="ROLE_MANAGER",
+                                             team=cls.team).user
         TeamManagerLanguageFactory(member = cls.de_lc,
                                    language = 'de')
 
@@ -325,7 +325,7 @@ class TestCaseApprovalWorkflowPostEdit(WebdriverTestCase):
                          'same-lang lc check failed')
 
         #de lang coordinator
-        self.video_lang_pg.log_in(self.de_lc.user.username, 'password')
+        self.video_lang_pg.log_in(self.de_lc.username, 'password')
         self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
         self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT,
                          self.video_lang_pg.edit_subtitles_active(), 
@@ -392,7 +392,7 @@ class TestCaseApprovalWorkflowPostEdit(WebdriverTestCase):
                          'Guest user check failed')
 
         #de lang coordinator
-        self.video_lang_pg.log_in('de_manager', 'password')
+        self.video_lang_pg.log_in(de_manager.username, 'password')
         self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
         self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT,
                          self.video_lang_pg.edit_subtitles_active(), 
