@@ -43,18 +43,25 @@
 
 	    {% if language_choices %}
 	    <div class="filter-chunk">
-	      <span class="inner">{% trans 'Language' %}</span>
-	      <select id="id_language" name="language" class="language-filter chosen">
+	      <span class="inner">{% trans 'Subtitles Language' %}</span>
+	      <select id="id_subtitles_language" name="subtitles_language" class="language-filter chosen">
 		<option value="any">
 		  {% trans 'Any Language' %}
 		</option>
-
-
                 {% for code, name in language_choices %}
-                <option {% if request.GET.language == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
+                <option {% if request.GET.subtitles_language == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
                 {% endfor %}
-
-
+	      </select>
+	    </div>
+	    <div class="filter-chunk">
+	      <span class="inner">{% trans 'Video Language' %}</span>
+	      <select id="id_video_language" name="video_language" class="language-filter chosen">
+		<option value="any">
+		  {% trans 'Any Language' %}
+		</option>
+                {% for code, name in language_choices %}
+                <option {% if request.GET.video_language == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
+                {% endfor %}
 	      </select>
 	    </div>
 	    {% endif %}
