@@ -924,6 +924,13 @@ class Video(models.Model):
     def get_metadata(self):
         return metadata.get_metadata_for_video(self)
 
+    def get_metadata_for_locale(self, language_code):
+        language_for_locale = self.subtitle_language(language_code)
+        if language_for_locale:
+            return language_for_locale.get_metadata()
+        else:
+            return self.get_metadata()
+
     def update_metadata(self, new_metadata, commit=True):
         metadata.update_video(self, new_metadata, commit)
 

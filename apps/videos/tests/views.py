@@ -400,8 +400,8 @@ class TestViews(WebUseTest):
 
 class VideoTitleTest(TestCase):
     def check_video_page_title(self, video, correct_title):
-        self.assertEquals(views.VideoPageContext.page_title(video),
-                          correct_title)
+        video.cache.invalidate()
+        self.assertEquals(video.page_title(), correct_title)
 
     def check_language_page_title(self, language, correct_title):
         self.assertEquals(views.LanguagePageContext.page_title(language),

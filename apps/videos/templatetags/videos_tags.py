@@ -234,11 +234,7 @@ def language_list(video):
 @register.simple_tag(name='video-metadata', takes_context=True)
 def video_metadata(context, video):
     request = context['request']
-    language_for_locale = video.subtitle_language(request.LANGUAGE_CODE)
-    if language_for_locale:
-        metadata = language_for_locale.get_metadata()
-    else:
-        metadata = video.get_metadata()
+    metadata = video.get_metadata_for_locale(request.LANGUAGE_CODE)
     return "\n".join(
         '<h4>{0}: {1}</h4>'.format(field['label'], field['content'])
         for field in metadata.convert_for_display()

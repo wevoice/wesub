@@ -55,6 +55,10 @@ class UserCacheGroup(CacheGroup):
         super(UserCacheGroup, self).__init__('user-{0}'.format(user_id),
                                              cache_pattern='user')
 
+    @classmethod
+    def for_anonymous(cls):
+        return cls('anon')
+
 class CustomUser(BaseUser):
     AUTOPLAY_ON_BROWSER = 1
     AUTOPLAY_ON_LANGUAGES = 2
