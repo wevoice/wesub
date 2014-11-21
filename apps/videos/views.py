@@ -675,9 +675,9 @@ class LanguagePageContextRevisions(LanguagePageContext):
         else:
             revisions_qs = language.subtitleversion_set.extant()
         revisions_qs = revisions_qs.order_by('-version_number')
-
+        revisions_per_page =  request.GET.get('revisions_per_page') or self.REVISIONS_PER_PAGE
         revisions, pagination_info = paginate(
-            revisions_qs, self.REVISIONS_PER_PAGE, request.GET.get('page'))
+            revisions_qs, revisions_per_page, request.GET.get('page'), allow_more=(int(revisions_per_page) + 10))
         self.update(pagination_info)
         self['revisions'] = language.optimize_versions(revisions)
 
@@ -719,7 +719,6 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
         # tabs
         tab = 'subtitles'
         ContextClass = LanguagePageContextSubtitles
-
     if request.is_ajax():
         context = ContextClass(request, video, lang, lang_id, version_id,
                                tab_only=True)
@@ -799,7 +798,10 @@ def diffing(request, first_version, second_pk):
     video = first_version.subtitle_language.video
     diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles(), mappings=HTMLGenerator.MAPPINGS)
     team_video = video.get_team_video()
-
+    first_version_previous = first_version.previous_version()
+    first_version_next = first_version.next_version()
+    second_version_previous = second_version.previous_version()
+    second_version_next = second_version.next_version()
     context = {
         'video': video,
         'diff_data': diff_data,
@@ -807,6 +809,10 @@ def diffing(request, first_version, second_pk):
         'first_version': first_version,
         'second_version': second_version,
         'latest_version': language.get_tip(),
+        'first_version_previous': first_version_previous if (first_version_previous != second_version) else None,
+        'first_version_next': first_version_next,
+        'second_version_previous': second_version_previous,
+        'second_version_next': second_version_next if (second_version_next != first_version) else None,
     }
     if team_video and not can_rollback_language(request.user, language):
         context['rollback_allowed'] = False

@@ -22,9 +22,8 @@ class TestCaseTools(WebdriverTestCase):
         cls.modal = site_modals.SiteModals(cls)
         cls.user = UserFactory.create()
         cls.data_utils = data_helpers.DataHelpers()
-        data = {'url': 'http://www.youtube.com/watch?v=5CKwCfLUwj4',
-                'video__title': 'Open Source Philosophy',
-                                 'type': 'Y'
+        data = {'video_url': 'http://www.youtube.com/watch?v=5CKwCfLUwj4',
+                'title': 'Open Source Philosophy',
                }
         cls.video = cls.data_utils.create_video(**data)
         cls.data_utils.add_subs(video=cls.video)

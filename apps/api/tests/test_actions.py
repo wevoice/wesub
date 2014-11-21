@@ -73,7 +73,7 @@ class TestActionsAPI(TestCase):
             'action': 'action1',
         })
         assert_equal(response.status_code, 200, response.content)
-        assert_equal(self.action1.do_perform.call_count, 1)
+        assert_equal(self.action1.perform.call_count, 1)
 
     def test_perform_with_bad_data(self):
         response = self.client.post(self.api_path, {})
