@@ -36,7 +36,7 @@
 
     <div class="grid_4 context alpha">
         <h1 class="main-title">
-            <a href="{{share_panel_permalink}}" {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ video.title_display }}</a>
+            <a href="{{share_panel_permalink}}" {% if video.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ video.title_display }}</a>
         </h1>
         {% cache-by-video metrics %}
         <ul class="metrics">
@@ -78,7 +78,7 @@
         </div>
         {% language-list video %}
         <div class="sharing-tools group">
-            {% include '_sharing_widget.html' %}
+        {% sharing-widget-for-video video %}
         </div>
         {% if user.is_team_manager and not team %}
         <a href="{% url teams:add_video_to_team video.video_id %}">{% trans "Add this video to one of your teams" %}</a>

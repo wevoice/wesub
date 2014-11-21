@@ -72,7 +72,7 @@ from videos.models import (
 )
 from videos.rpc import VideosApiClass
 from videos.search_indexes import VideoIndex
-from videos.share_utils import _add_share_panel_context_for_video, _add_share_panel_context_for_history
+from videos import share_utils
 from videos.tasks import video_changed_tasks
 from widget.views import base_widget_params
 from externalsites.models import can_sync_videourl
@@ -291,7 +291,6 @@ class VideoPageContext(dict):
         self['add_language_mode'] = self.workflow.get_add_language_mode(
             request.user)
 
-        _add_share_panel_context_for_video(self, video)
         self['task'] =  _get_related_task(request)
         team_video = video.get_team_video()
         if team_video is not None:
@@ -580,7 +579,7 @@ class LanguagePageContext(dict):
         self['height'] = "173"
         self['video_url'] = video.get_video_url()
         self['language'] = language
-        _add_share_panel_context_for_history(self, video, language)
+        share_utils.add_share_panel_context_for_history(self, video, language)
         if video.get_team_video() is not None:
             self['team'] = video.get_team_video().team
         else:

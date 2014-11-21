@@ -30,6 +30,7 @@ from utils.basexconverter import base62
 from videos.views import LanguageList
 from videos.types import video_type_registrar, VideoTypeError
 from videos import permissions
+from videos import share_utils
 
 @register.inclusion_tag('videos/_video.html', takes_context=True)
 def render_video(context, video, display_views='total'):
@@ -230,7 +231,6 @@ def language_list(video):
     video.cache.set('language-list', content)
     return content
 
-
 @register.simple_tag(name='video-metadata', takes_context=True)
 def video_metadata(context, video):
     request = context['request']
@@ -239,3 +239,13 @@ def video_metadata(context, video):
         '<h4>{0}: {1}</h4>'.format(field['label'], field['content'])
         for field in metadata.convert_for_display()
     )
+
+@register.simple_tag(name='sharing-widget-for-video')
+def sharing_widget_for_video(video):
+    cached = video.cache.get('sharing-widget')
+    if cached is not None:
+        return cached
+    context = share_utils.share_panel_context_for_video(video)
+    content = render_to_string('_sharing_widget.html', context)
+    video.cache.set("sharing-widget", content)
+    return content

@@ -50,11 +50,11 @@ from videos.feed_parser import VideoImporter
 from comments.models import Comment
 from statistic import hitcounts
 from widget import video_cache
+from utils import translation
 from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
 from utils.subtitles import create_new_subtitles, dfxp_merge
 from utils.text import fmt
-from utils.translation import ALL_LANGUAGE_CHOICES
 from teams.moderation_const import MODERATION_STATUSES, UNMODERATED
 from raven.contrib.django.models import client
 
@@ -219,7 +219,8 @@ class Video(models.Model):
     is_public = models.BooleanField(default=True)
 
     primary_audio_language_code = models.CharField(
-        max_length=16, blank=True, default='', choices=ALL_LANGUAGE_CHOICES)
+        max_length=16, blank=True, default='',
+        choices=translation.ALL_LANGUAGE_CHOICES)
 
     objects = models.Manager()
     public  = PublicVideoManager()
@@ -657,6 +658,10 @@ class Video(models.Model):
 
         """
         return True if self._original_subtitle_language() else False
+
+    def is_rtl(self):
+        return (self.primary_audio_language_code
+                and translation.is_rtl(self.primary_audio_language_code))
 
     def subtitle_language(self, language_code=None):
         """Get as SubtitleLanguage for this video
