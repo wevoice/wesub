@@ -1078,9 +1078,6 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data')  
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
-
 
     def _upload_en_draft(self, video, subs, user, complete=False):
         data = {'language_code': 'en',

@@ -40,7 +40,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
     @classmethod
     def setUpClass(cls):
         super(WebdriverTestCase, cls).setUpClass()
-        management.call_command('flush', interactive=False)
+        #management.call_command('flush', interactive=False)
         site_obj = Site.objects.get_current()
         Site.objects.clear_cache()
         site_obj.domain = ('%s:%s' % (cls.server_thread.host,
@@ -54,6 +54,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        cls.browser.execute_script("window.stop()")
         if not cls.NEW_BROWSER_PER_TEST_CASE:
             cls.destroy_browser()
         #destroy the selenium browser before teardown to avoid liveserver
