@@ -19,7 +19,7 @@
 import logging
 
 from django import template
-from auth.models import UserCacheGroup
+from auth.models import AnonymousUserCacheGroup
 
 register = template.Library()
 
@@ -68,7 +68,7 @@ class CacheByUserNode(CacheNode):
         if user.is_authenticated():
             return user.cache
         else:
-            return UserCacheGroup.for_anonymous()
+            return AnonymousUserCacheGroup()
 
 class CacheByVideoNode(CacheNode):
     def get_cache_group(self, context):

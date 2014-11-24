@@ -41,7 +41,7 @@ from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
 
 from auth.models import CustomUser as User, Awards
-from caching import CacheGroup
+from caching import ModelCacheManager
 from videos import behaviors
 from videos import metadata
 from videos import signals
@@ -222,6 +222,8 @@ class Video(models.Model):
         max_length=16, blank=True, default='',
         choices=translation.ALL_LANGUAGE_CHOICES)
 
+    cache = ModelCacheManager()
+
     objects = models.Manager()
     public  = PublicVideoManager()
 
@@ -323,25 +325,6 @@ class Video(models.Model):
                      title=self.title_display())
         self.cache.set('page-title', title)
         return title
-
-    @classmethod
-    def _make_cache_group(cls, video_pk):
-        return CacheGroup('video-{0}'.format(video_pk))
-
-    @property
-    def cache(self):
-        if not hasattr(self, '_cache'):
-            if self.id is None:
-                raise ValueError("No id yet")
-            self._cache = Video._make_cache_group(self.id)
-        return self._cache
-
-    def invalidate_cache(self):
-        self.cache.invalidate()
-
-    @classmethod
-    def invalidate_cache_for_video(cls, video_id):
-        cls._make_cache_group(video_id).invalidate()
 
     def get_download_filename(self):
         """Get the filename to download this video as

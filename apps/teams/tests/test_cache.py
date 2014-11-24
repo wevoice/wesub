@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2014 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,13 +16,19 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.dispatch import receiver
-from django.db.models.signals import post_save, post_delete
+from __future__ import absolute_import
 
-from auth.models import CustomUser as User
-from messages.models import Message
+from django.test import TestCase
 
-@receiver(post_save, sender=Message)
-@receiver(post_delete, sender=Message)
-def on_message_saved(sender, instance, **kwargs):
-    User.cache.invalidate_by_pk(instance.user_id)
+from caching.tests.utils import assert_invalidates_model_cache
+from utils.factories import *
+
+class TeamCacheInvalidationTest(TestCase):
+    def test_change_team(self):
+        pass
+
+    def test_change_team_member(self):
+        pass
+
+    def test_change_membership_narrowing(self):
+        pass

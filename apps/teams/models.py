@@ -845,7 +845,7 @@ class TeamVideo(models.Model):
         if not self.pk:
             self.created = datetime.datetime.now()
         super(TeamVideo, self).save(*args, **kwargs)
-        self.video.invalidate_cache()
+        self.video.cache.invalidate()
 
     def is_checked_out(self, ignore_user=None):
         '''Return whether this video is checked out in a task.
@@ -1087,7 +1087,7 @@ def team_video_delete(sender, instance, **kwargs):
     except Video.DoesNotExist:
         pass
     if instance.video_id is not None:
-        Video.invalidate_cache_for_video(instance.video_id)
+        Video.cache.invalidate_by_pk(instance.video_id)
 
 def on_language_deleted(sender, **kwargs):
     """When a language is deleted, delete all tasks associated with it."""
@@ -2411,7 +2411,7 @@ class Task(models.Model):
         if update_team_video_index:
             tasks.update_one_team_video.delay(self.team_video.pk)
 
-        self.team_video.video.invalidate_cache()
+        Video.cache.invalidate_by_pk(self.team_video.video_id)
 
         return result
 

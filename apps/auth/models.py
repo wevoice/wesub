@@ -44,20 +44,16 @@ from django.core.urlresolvers import reverse
 
 from tastypie.models import ApiKey
 
-from caching import CacheGroup
+from caching import CacheGroup, ModelCacheManager
 from utils.tasks import send_templated_email_async
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 EMAIL_CONFIRMATION_DAYS = getattr(settings, 'EMAIL_CONFIRMATION_DAYS', 3)
 
-class UserCacheGroup(CacheGroup):
-    def __init__(self, user_id):
-        super(UserCacheGroup, self).__init__('user-{0}'.format(user_id),
-                                             cache_pattern='user')
-
-    @classmethod
-    def for_anonymous(cls):
-        return cls('anon')
+class AnonymousUserCacheGroup(CacheGroup):
+    def __init__(self):
+        super(AnonymousUserCacheGroup, self).__init__('user:anon',
+                                                      cache_pattern='user')
 
 class CustomUser(BaseUser):
     AUTOPLAY_ON_BROWSER = 1
@@ -98,16 +94,10 @@ class CustomUser(BaseUser):
 
     objects = UserManager()
 
+    cache = ModelCacheManager(default_cache_pattern='user')
+
     class Meta:
         verbose_name = 'User'
-
-    def __init__(self, *args, **kwargs):
-        super(CustomUser, self).__init__(*args, **kwargs)
-        self.cache = UserCacheGroup(self.id)
-
-    @staticmethod
-    def invalidate_cache_for_user(user_id):
-        UserCacheGroup(user_id).invalidate()
 
     def __unicode__(self):
         if not self.is_active:

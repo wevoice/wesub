@@ -37,12 +37,12 @@ def on_feed_imported(signal, sender, new_videos, **kwargs):
 @receiver(post_save, sender=TeamMember)
 @receiver(post_delete, sender=TeamMember)
 def on_team_member_change(sender, instance, **kwargs):
-    User.invalidate_cache_for_user(instance.user_id)
+    User.cache.invalidate_by_pk(instance.user_id)
 
 @receiver(post_save, sender=MembershipNarrowing)
 @receiver(post_delete, sender=MembershipNarrowing)
 def on_membership_narrowing_change(sender, instance, **kwargs):
     try:
-        User.invalidate_cache_for_user(instance.member.user_id)
+        User.cache.invalidate_by_pk(instance.member.user_id)
     except TeamMember.DoesNotExist:
         pass

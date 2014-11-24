@@ -791,7 +791,7 @@ class SubtitleLanguage(models.Model):
             signals.language_deleted.send(lang)
             from teams.signals import api_language_deleted
             api_language_deleted.send(lang)
-        Video.invalidate_cache_for_video(self.video_id)
+        Video.cache.invalidate_by_pk(self.video_id)
 
     def update_signoff_counts(self):
         """Update the denormalized signoff count fields and save."""

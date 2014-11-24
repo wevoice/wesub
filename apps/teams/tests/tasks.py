@@ -8,12 +8,12 @@ from django.test.client import Client
 from django.core.urlresolvers import reverse
 
 from auth.models import CustomUser as User
+from caching.tests.utils import assert_invalidates_model_cache
 from teams.forms import TaskCreateForm, TaskAssignForm
 from teams.models import Task, Team, TeamVideo, TeamMember
 from utils.testeditor import TestEditor
 from utils.factories import *
 from videos.models import Video
-from videos.tests.videotestutils import assert_invalidates_video_cache
 
 # review setting constants
 DONT_REQUIRE_REVIEW = 0
@@ -691,7 +691,7 @@ class ViewsTest(TestCase):
 class VideoCacheTest(TestCase):
     def test_add_task_invalidates_video_cache(self):
         team_video = TeamVideoFactory()
-        with assert_invalidates_video_cache(team_video.video):
+        with assert_invalidates_model_cache(team_video.video):
             task = Task(team=team_video.team, team_video=team_video,
                         language='en', type=Task.TYPE_IDS['Translate'])
             task.save(update_team_video_index=False)

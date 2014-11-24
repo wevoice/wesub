@@ -46,7 +46,7 @@ class MessageManager(models.Manager):
     def bulk_create(self, object_list, **kwargs):
         super(MessageManager, self).bulk_create(object_list, **kwargs)
         for user_id in set(m.user_id for m in object_list):
-            User.invalidate_cache_for_user(user_id)
+            User.cache.invalidate_by_pk(user_id)
 
 class Message(models.Model):
     user = models.ForeignKey(User)

@@ -28,16 +28,16 @@ from videos.models import Video, VideoUrl
 @receiver(post_delete, sender=VideoUrl)
 def on_video_related_change(sender, instance, **kwargs):
     if instance.video_id is not None:
-        Video.invalidate_cache_for_video(instance.video_id)
+        Video.cache.invalidate_by_pk(instance.video_id)
 
 @receiver(post_save, sender=Video)
 def on_video_change(sender, instance, **kwargs):
-    instance.invalidate_cache()
+    instance.cache.invalidate()
 
 @receiver(m2m_changed, sender=Video.followers.through)
 def on_video_followers_changed(instance, reverse, **kwargs):
     if not reverse:
-        instance.invalidate_cache()
+        instance.cache.invalidate()
     else:
         for video in instance.followed_videos.all():
-            video.invalidate_cache()
+            video.cache.invalidate()

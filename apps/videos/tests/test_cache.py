@@ -18,10 +18,10 @@
 
 from django.test import TestCase
 
+from caching.tests.utils import assert_invalidates_model_cache
 from subtitles import pipeline
 from subtitles.models import SubtitleLanguage
 from utils.factories import *
-from videos.tests.videotestutils import assert_invalidates_video_cache
 
 class VideoCacheInvalidationTest(TestCase):
     # test a bunch of actions that should invalidate the video cache
@@ -32,54 +32,54 @@ class VideoCacheInvalidationTest(TestCase):
         self.language = self.version.subtitle_language
 
     def test_new_version(self):
-        with assert_invalidates_video_cache(self.video):
+        with assert_invalidates_model_cache(self.video):
             pipeline.add_subtitles(self.video, 'en', SubtitleSetFactory())
 
     def test_rollback(self):
         pipeline.add_subtitles(self.video, 'en', SubtitleSetFactory())
-        with assert_invalidates_video_cache(self.video):
+        with assert_invalidates_model_cache(self.video):
             pipeline.rollback_to(self.video, 'en', 1)
 
     def test_delete_language(self):
-        with assert_invalidates_video_cache(self.video):
+        with assert_invalidates_model_cache(self.video):
             self.language.nuke_language()
 
     def test_new_language(self):
-        with assert_invalidates_video_cache(self.video):
+        with assert_invalidates_model_cache(self.video):
             SubtitleLanguage.objects.create(video=self.video,
                                             language_code='fr')
 
     def test_add_video_url(self):
-        with assert_invalidates_video_cache(self.video):
+        with assert_invalidates_model_cache(self.video):
             VideoURLFactory(video=self.video)
 
     def test_remove_video_url(self):
         video_url = VideoURLFactory(video=self.video)
-        with assert_invalidates_video_cache(self.video):
+        with assert_invalidates_model_cache(self.video):
             video_url.delete()
 
     def test_update_video(self):
-        with assert_invalidates_video_cache(self.video):
+        with assert_invalidates_model_cache(self.video):
             self.video.title = 'new title'
             self.video.save()
 
     def test_update_language(self):
-        with assert_invalidates_video_cache(self.video):
+        with assert_invalidates_model_cache(self.video):
             self.language.subtitles_complete = True
             self.language.save()
 
     def test_update_version(self):
         pipeline.add_subtitles(self.video, 'en', SubtitleSetFactory())
-        with assert_invalidates_video_cache(self.video):
+        with assert_invalidates_model_cache(self.video):
             self.version.unpublish()
 
     def test_add_follower(self):
         user = UserFactory()
-        with assert_invalidates_video_cache(self.video):
+        with assert_invalidates_model_cache(self.video):
             self.video.followers.add(user)
 
     def test_remove_follower(self):
         user = UserFactory()
         self.video.followers.add(user)
-        with assert_invalidates_video_cache(self.video):
+        with assert_invalidates_model_cache(self.video):
             self.video.followers.remove(user)
