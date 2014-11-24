@@ -165,6 +165,50 @@ class SubtitleLanguageFetcher(object):
         self.cache = {}
         self.all_languages_fetched = False
 
+class VideoCacheManager(ModelCacheManager):
+    def __init__(self, cache_pattern=None):
+        super(VideoCacheManager, self).__init__(cache_pattern)
+        self._video_id_to_pk = {}
+
+    def get_instance(self, pk, cache_pattern=None):
+        video = super(VideoCacheManager, self).get_instance(pk, cache_pattern)
+        # use a cached team_video as well
+        video._cached_teamvideo = self._get_team_video_from_cache(video)
+        return video
+
+    def _get_team_video_from_cache(self, video):
+        from teams.models import TeamVideo
+        try:
+            team_video = video.cache.get_model(TeamVideo, 'teamvideo')
+            if team_video is not None:
+                team_video.video = video
+                return team_video
+        except TeamVideo.DoesNotExist:
+            return None
+        # cache miss
+        team_video = video.get_team_video()
+        video.cache.set_model('teamvideo', team_video)
+        return team_video
+
+    def get_instance_by_video_id(self, video_id, cache_pattern=None):
+        return self.get_instance(self._pk_for_video_id(video_id),
+                                 cache_pattern)
+
+    def _pk_for_video_id(self, video_id):
+        # find the video PK using the video ID.  This should never take a long
+        # time so we cache it in several ways
+        try:
+            return self._video_id_to_pk[video_id]
+        except KeyError:
+            pass
+        cache_key = 'videopk:{0}'.format(video_id)
+        pk = cache.get(cache_key)
+        if pk is None:
+            pk = Video.objects.get(video_id=video_id).pk
+            cache.set(cache_key, pk)
+        self._video_id_to_pk[video_id] = pk
+        return pk
+
 class Video(models.Model):
     """Central object in the system"""
 
@@ -222,7 +266,7 @@ class Video(models.Model):
         max_length=16, blank=True, default='',
         choices=translation.ALL_LANGUAGE_CHOICES)
 
-    cache = ModelCacheManager()
+    cache = VideoCacheManager()
 
     objects = models.Manager()
     public  = PublicVideoManager()
@@ -840,6 +884,13 @@ class Video(models.Model):
         self.writelock_owner = None
         self.writelock_session_key = ''
         self.writelock_time = None
+
+    def user_is_follower(self, user):
+        followers = self.cache.get('followers')
+        if followers is None:
+            followers = list(self.followers.values_list('id', flat=True))
+            self.cache.set('followers', followers)
+        return user.id in followers
 
     def notification_list(self, exclude=None):
         qs = self.followers.filter(notify_by_email=True, is_active=True)

@@ -61,7 +61,8 @@ from subtitles.pipeline import rollback_to
 from subtitles.workflows import get_workflow
 from teams.models import Task
 from videos import permissions
-from videos.decorators import get_video_revision, get_video_from_code
+from videos.decorators import (get_video_revision, get_video_from_code,
+                               get_cached_video_from_code)
 from videos.forms import (
     VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm,
     CreateVideoUrlForm, AddFromFeedForm,
@@ -336,7 +337,7 @@ def calc_tab(request, workflow):
     # invalid tab, force it to be video
     return 'video'
 
-@get_video_from_code
+@get_cached_video_from_code('video-page')
 def video(request, video, video_url=None, title=None):
     """
     If user is about to perform a task on this video, then t=[task.pk]
@@ -349,9 +350,6 @@ def video(request, video, video_url=None, title=None):
     # FIXME: what is this crazy mess?
     if not video_url and ((video.title_for_url() and not video.title_for_url() == title) or (not video.title and title)):
         return redirect(video, permanent=True)
-
-    if request.method != 'POST':
-        video.update_view_counter()
 
     workflow = get_workflow(video)
 

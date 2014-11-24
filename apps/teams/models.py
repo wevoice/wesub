@@ -38,6 +38,7 @@ from haystack import site
 from haystack.query import SQ
 
 import teams.moderation_const as MODERATION
+from caching import ModelCacheManager
 from comments.models import Comment
 from auth.models import CustomUser as User
 from auth.providers import get_authentication_provider
@@ -282,6 +283,8 @@ class Team(models.Model):
     objects = TeamManager()
     all_objects = models.Manager() # For accessing deleted teams, if necessary.
 
+    cache = ModelCacheManager()
+
     class Meta:
         ordering = ['name']
         verbose_name = _(u'Team')
@@ -418,7 +421,11 @@ class Team(models.Model):
         return member
 
     def user_is_member(self, user):
-        return self.get_member(user) is not None
+        members = self.cache.get('members')
+        if members is None:
+            members = list(self.members.values_list('user_id', flat=True))
+            self.cache.set('members', members)
+        return user.id in members
 
     def uncache_member(self, user):
         try:

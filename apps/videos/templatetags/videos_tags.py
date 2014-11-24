@@ -57,7 +57,7 @@ def is_follower(obj, user):
     if not obj:
         return False
 
-    return obj.followers.filter(pk=user.pk).exists()
+    return obj.user_is_follower(user)
 
 @register.filter
 def can_user_edit_video_urls(video, user):
