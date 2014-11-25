@@ -30,7 +30,8 @@ particular they control:
 .. autoclass:: Workflow
     :members: get_work_mode, get_actions, action_for_add_subtitles,
         get_editor_notes, extra_tabs, get_add_language_mode,
-        user_can_edit_subtitles, user_can_view_private_subtitles
+        user_can_view_video, user_can_edit_subtitles,
+        user_can_view_private_subtitles
 .. autofunction:: get_workflow(video)
 
 Editor Notes
@@ -192,8 +193,8 @@ class Workflow(object):
         """
         action = self.lookup_action(user, language_code, action_name)
         subtitle_language = self.video.subtitle_language(language_code)
+        action.validate(user, self.video, subtitle_language, None)
         action.perform(user, self.video, subtitle_language, None)
-        action.send_signals(subtitle_language, None)
 
     def user_can_view_private_subtitles(self, user, language_code):
         """Check if a user can view private subtitles
@@ -207,12 +208,21 @@ class Workflow(object):
         """
         raise NotImplementedError()
 
+    def user_can_view_video(self, user):
+        """Check if a user can view the video
+
+        Returns:
+            True/False
+        """
+        raise NotImplementedError()
+
     def user_can_edit_subtitles(self, user, language_code):
         """Check if a user can edit subtitles
 
         Returns:
             True/False
         """
+        raise NotImplementedError()
 
     def editor_data(self, user, language_code):
         """Get data to pass to the editor for this workflow."""
@@ -282,7 +292,7 @@ class Action(object):
     """Base class for actions
 
     Other components can define new actions by subclassing Action, setting the
-    class attributes, then implementing do_perform().
+    class attributes, and optionally implementing perform().
 
     """
 
@@ -322,8 +332,17 @@ class Action(object):
     CLASS_SEND_BACK = 'send-back'
     """reject/send-back buttons"""
 
-    def _check_can_perform(self, subtitle_language, saved_version):
+    def validate(self, user, video, subtitle_language, saved_version):
         """Check if we can perform this action.
+
+        Args:
+            user (User): User performing the action
+            video (Video): Video being changed
+            subtitle_language (SubtitleLanguage): SubtitleLanguage being
+                changed
+            saved_version (SubtitleVersion or None): new version that was
+                created for subtitle changes that happened alongside this
+                action.  Will be None if no changes were made.
 
         Raises:
             ActionError -- this action can't be performed
@@ -349,35 +368,23 @@ class Action(object):
                 created for subtitle changes that happened alongside this
                 action.  Will be None if no changes were made.
         """
-        self._check_can_perform(subtitle_language, saved_version)
-        if self.complete is not None:
-            subtitle_language.subtitles_complete = self.complete
-        self.do_perform(user, video, subtitle_language, saved_version)
-        subtitle_language.save()
+        pass
 
-    def do_perform(self, user, video, subtitle_language, saved_version):
-        """
-        Does the work to perform this action.  Subclasses must implement this
-        method.
-
-        Notes:
-            - If complete is set to True or False, we will already have
-              updated subtitles_complete at this point.
-            - We will save the SubtitleLanguage after do_perform runs, so
-              don't save it yourself.
-        """
-        raise NotImplementedError()
-
-    def send_signals(self, subtitle_language, version):
-        """Send signals after an action
-
-        This is called at the end of perform() and pipeline.add_subtitles().
+    def update_language(self, user, video, subtitle_language, saved_version):
+        """Update the subtitle language after adding subtitles
 
         Args:
-            subtitle_language (SubtitleLanguage): changed language
-            version (SubtitleVersion): new subtitle version or None
+            user (User): User performing the action
+            video (Video): Video being changed
+            subtitle_language (SubtitleLanguage): SubtitleLanguage being
+                changed
+            saved_version (SubtitleVersion or None): new version that was
+                created for subtitle changes that happened alongside this
+                action.  Will be None if no changes were made.
         """
-        pass
+        if self.complete is not None:
+            subtitle_language.subtitles_complete = self.complete
+            subtitle_language.save()
 
     def editor_data(self):
         """Get a dict of data to pass to the editor for this action."""
@@ -400,12 +407,9 @@ class Publish(Action):
     visual_class = 'endorse'
     complete = True
 
-    def do_perform(self, user, video, subtitle_language, saved_version):
-        # complete=True causes all the work to be done.
-        pass
-
-    def send_signals(self, subtitle_language, version):
-        signals.subtitles_published.send(subtitle_language, version=version)
+    def perform(self, user, video, subtitle_language, saved_version):
+        signals.subtitles_published.send(subtitle_language,
+                                         version=saved_version)
 
 class Unpublish(Action):
     """Unpublish action
@@ -418,9 +422,11 @@ class Unpublish(Action):
     visual_class = 'send-back'
     complete = False
 
-    def do_perform(self, user, video, subtitle_language, saved_version):
-        # complete=False causes all the work to be done
-        pass
+class SaveDraft(Action):
+    name = 'save-draft'
+    label = ugettext_lazy('Save Draft')
+    in_progress_text = ugettext_lazy('Saving')
+    complete = None
 
 class APIComplete(Action):
     """Action that handles complete=True from the API
@@ -436,18 +442,14 @@ class APIComplete(Action):
     visual_class = 'endorse'
     complete = None
 
-    def do_perform(self, user, video, subtitle_language, saved_version):
-        # we only use this action from pipeline.add_subtitles, so we can
-        # assume saved_version is not None
-        if (saved_version is None or not saved_version.is_synced()):
-            subtitle_language.subtitles_complete = False
-        else:
-            subtitle_language.subtitles_complete = True
+    def update_language(self, user, video, subtitle_language, saved_version):
+        subtitle_language.subtitles_complete = saved_version.is_synced()
+        subtitle_language.save()
 
-    def send_signals(self, subtitle_language, version):
+    def perform(self, user, video, subtitle_language, saved_version):
         if subtitle_language.subtitles_complete:
             signals.subtitles_published.send(subtitle_language,
-                                             version=version)
+                                             version=saved_version)
 
 class EditorNotes(object):
     """Manage notes for the subtitle editor.
@@ -495,7 +497,7 @@ class EditorNotes(object):
     def note_editor_data(self):
         now = datetime.now()
         return [
-            dict(user=note.user.username,
+            dict(user=note.get_username(),
                  created=self.format_created(note.created, now),
                  body=note.body)
             for note in self.notes
@@ -506,10 +508,13 @@ class DefaultWorkflow(Workflow):
         return NormalWorkMode()
 
     def get_actions(self, user, language_code):
-        return [Publish()]
+        return [SaveDraft(), Publish()]
 
     def user_can_view_private_subtitles(self, user, language_code):
         return user.is_staff
+
+    def user_can_view_video(self, user):
+        return True
 
     def user_can_edit_subtitles(self, user, language_code):
         return True

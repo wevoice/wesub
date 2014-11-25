@@ -18,9 +18,15 @@
 
 """periodic_task_settings -- settings for celery periodic tasks."""
 
-from celery.schedules import crontab
 from datetime import timedelta
 
+from celery.schedules import crontab
+from kombu import Exchange, Queue
+
+CELERY_QUEUES = (
+    Queue('celery', routing_key='celery'),
+    Queue('feeds', routing_key='feeds'),
+)
 
 CELERYBEAT_SCHEDULE = {
     'gauge-auth': {
@@ -34,10 +40,6 @@ CELERYBEAT_SCHEDULE = {
     'gauge-statistics': {
         'task': 'statistic.tasks.gauge_statistic',
         'schedule': timedelta(seconds=300),
-    },
-    'gauge-statistics-languages': {
-        'task': 'statistic.tasks.gauge_statistic_languages',
-        'schedule': timedelta(minutes=5),
     },
     'migrate-hit-counts': {
         'task': 'statistic.tasks.migrate_hit_counts',
@@ -81,11 +83,4 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-# try adding periodic tasks from our integration repo
-try:
-    import integration_periodic_task_settings
-except ImportError:
-    pass
-else:
-    CELERYBEAT_SCHEDULE.update(
-        integration_periodic_task_settings.CELERYBEAT_SCHEDULE)
+__all__ = ['CELERYBEAT_SCHEDULE', 'CELERY_QUEUES', ]

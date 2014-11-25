@@ -21,6 +21,7 @@ import simplejson as json
 import babelsubs
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, Http404
 from django.db.models import Count
 from django.conf import settings
@@ -36,6 +37,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.template.defaultfilters import urlize, linebreaks, force_escape
 from django.views.decorators.clickjacking import xframe_options_exempt
 
+from auth.models import CustomUser as User
 from subtitles import shims
 from subtitles.workflows import get_workflow
 from subtitles.models import SubtitleLanguage, SubtitleVersion
@@ -103,6 +105,9 @@ class SubtitleEditorBase(View):
 
     def get_custom_css(self):
         return ""
+
+    def get_title(self):
+        return _('Amara')
 
     def calc_base_language(self):
         if (self.video.primary_audio_language_code and 
@@ -300,6 +305,7 @@ class SubtitleEditorBase(View):
         editor_data = self.get_editor_data()
 
         context = {
+            'title': self.get_title(),
             'video': self.video,
             'DEBUG': settings.DEBUG,
             'language': self.editing_language,
@@ -308,7 +314,9 @@ class SubtitleEditorBase(View):
             'translated_from_version': self.translated_from_version,
             'upload_subtitles_form': SubtitlesUploadForm(
                 request.user, self.video,
-                initial={'language_code': self.editing_language.language_code})
+                initial={'language_code':
+                         self.editing_language.language_code},
+                allow_all_languages=True),
         }
         self.handle_task(context, editor_data)
         context['editor_data'] = json.dumps(editor_data, indent=4)
@@ -321,24 +329,45 @@ class SubtitleEditor(SubtitleEditorBase):
         return super(SubtitleEditor, self).dispatch(
             request, *args, **kwargs)
 
+def _user_for_download_permissions(request):
+    # check authorization...  This is pretty hacky.  We should implement
+    # pculture/amara-enterprise#89
+    if request.user.is_authenticated():
+        return request.user
+    username = request.META.get('HTTP_X_API_USERNAME', None)
+    api_key = request.META.get( 'HTTP_X_APIKEY', None)
+    if not username or not api_key:
+        return request.user
+    try:
+        import apiv2
+        from tastypie.models import ApiKey
+    except ImportError:
+        return request.user
+    try:
+        api_user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return request.user
+    if not ApiKey.objects.filter(user=api_user, key=api_key).exists():
+        return request.user
+    return api_user
+
 def download(request, video_id, language_code, filename, format,
              version_number=None):
 
     video = get_object_or_404(Video, video_id=video_id)
+    workflow = video.get_workflow()
+    user = _user_for_download_permissions(request)
+    if not workflow.user_can_view_video(user):
+        raise PermissionDenied()
 
     language = video.subtitle_language(language_code)
     if language is None:
-        raise Http404()
+        raise PermissionDenied()
 
-    team_video = video.get_team_video()
-
-    if team_video and not team_video.team.user_is_member(request.user):
-        # Non-members can only see public versions
-        version = language.version(public_only=True,
-                                   version_number=version_number)
-    else:
-        version = language.version(public_only=False,
-                                   version_number=version_number)
+    public_only = workflow.user_can_view_private_subtitles(user,
+                                                           language_code)
+    version = language.version(public_only=not public_only,
+                               version_number=version_number)
 
     if not version:
         raise Http404()

@@ -29,6 +29,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core.files import File
 from django.db import models
+from django.db.models import query
 from django.db.models.signals import post_save, post_delete, pre_delete
 from django.http import Http404
 from django.template.loader import render_to_string
@@ -51,10 +52,12 @@ from teams.permissions_const import (
 from teams import tasks
 from teams import workflows
 from utils import DEFAULT_PROTOCOL
+from utils import translation
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from videos.models import Video, VideoUrl, SubtitleVersion, SubtitleLanguage
+from videos.tasks import video_changed_tasks
 from subtitles.models import (
     SubtitleVersion as NewSubtitleVersion,
     SubtitleLanguage as NewSubtitleLanguage,
@@ -69,14 +72,57 @@ logger = logging.getLogger(__name__)
 celery_logger = logging.getLogger('celery.task')
 
 BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
-ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
-VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
 # Teams
+class TeamQuerySet(query.QuerySet):
+    def add_members_count(self):
+        """Add _members_count field to this query
+
+        This can be used to order/filter the query and also avoids a query in
+        when Team.members_count() is called.
+        """
+        select = {
+            '_members_count': (
+                'SELECT COUNT(1) '
+                'FROM teams_teammember tm '
+                'WHERE tm.team_id=teams_team.id'
+            )
+        }
+        return self.extra(select=select)
+
+    def add_videos_count(self):
+        """Add _videos_count field to this query
+
+        This can be used to order/filter the query and also avoids a query in
+        when Team.video_count() is called.
+        """
+        select = {
+            '_videos_count':  (
+                'SELECT COUNT(1) '
+                'FROM teams_teamvideo tv '
+                'WHERE tv.team_id=teams_team.id'
+            )
+        }
+        return self.extra(select=select)
+
+    def add_user_is_member(self, user):
+        """Add user_is_member field to this query """
+        if not user.is_authenticated():
+            return self.extra(select={'user_is_member': 0})
+        select = {
+            'user_is_member':  (
+                'EXISTS (SELECT 1 '
+                'FROM teams_teammember tm '
+                'WHERE tm.team_id=teams_team.id '
+                'AND tm.user_id=%s)'
+            )
+        }
+        return self.extra(select=select, select_params=[user.id])
+
 class TeamManager(models.Manager):
     def get_query_set(self):
         """Return a QS of all non-deleted teams."""
-        return super(TeamManager, self).get_query_set().filter(deleted=False)
+        return TeamQuerySet(Team).filter(deleted=False)
 
     def for_user(self, user, exclude_private=False):
         """Return the teams visible for the given user.
@@ -110,7 +156,6 @@ class TeamManager(models.Manager):
             notify_interval=notify_interval,
             teamvideo__created__gt=models.F('last_notification_time'))
             .distinct())
-
 
 class Team(models.Model):
     APPLICATION = 1
@@ -459,15 +504,15 @@ class Team(models.Model):
 
     # Item counts
     @property
-    def member_count(self):
+    def members_count(self):
         """Return the number of members of this team.
 
         Caches the result in-object for performance.
 
         """
-        if not hasattr(self, '_member_count'):
-            setattr(self, '_member_count', self.users.count())
-        return self._member_count
+        if not hasattr(self, '_members_count'):
+            setattr(self, '_members_count', self.users.count())
+        return self._members_count
 
     @property
     def videos_count(self):
@@ -801,7 +846,6 @@ class TeamVideo(models.Model):
             self.created = datetime.datetime.now()
         super(TeamVideo, self).save(*args, **kwargs)
 
-
     def is_checked_out(self, ignore_user=None):
         '''Return whether this video is checked out in a task.
 
@@ -889,10 +933,8 @@ class TeamVideo(models.Model):
                                               to_team=new_team,
                                               to_project=self.project)
 
-            # Update all Solr data.
-            metadata_manager.update_metadata(video.pk)
-            video.update_search_index()
-            tasks.update_one_team_video(self.pk)
+            # Update search data and other things
+            video_changed_tasks.delay(video.pk)
 
             # Create any necessary tasks.
             autocreate_tasks(self)
@@ -1210,7 +1252,8 @@ class MembershipNarrowing(models.Model):
     """
     member = models.ForeignKey(TeamMember, related_name="narrowings")
     project = models.ForeignKey(Project, null=True, blank=True)
-    language = models.CharField(max_length=24, blank=True, choices=ALL_LANGUAGES)
+    language = models.CharField(max_length=24, blank=True,
+                                choices=translation.ALL_LANGUAGE_CHOICES)
 
     added_by = models.ForeignKey(TeamMember, related_name="narrowing_includer", null=True, blank=True)
 
@@ -1793,8 +1836,9 @@ class Task(models.Model):
 
     team = models.ForeignKey(Team)
     team_video = models.ForeignKey(TeamVideo)
-    language = models.CharField(max_length=16, choices=ALL_LANGUAGES, blank=True,
-                                db_index=True)
+    language = models.CharField(max_length=16,
+                                choices=translation.ALL_LANGUAGE_CHOICES,
+                                blank=True, db_index=True)
     assignee = models.ForeignKey(User, blank=True, null=True)
     subtitle_version = models.ForeignKey(SubtitleVersion, blank=True, null=True)
     new_subtitle_version = models.ForeignKey(NewSubtitleVersion,
@@ -2355,8 +2399,9 @@ class Task(models.Model):
         is_review_or_approve = self.get_type_display() in ('Review', 'Approve')
 
         if self.language:
-            assert self.language in VALID_LANGUAGE_CODES, \
-                "Subtitle Language should be a valid code."
+            if not self.language in translation.ALL_LANGUAGE_CODES:
+                raise ValidationError(
+                    "Subtitle Language should be a valid code.")
 
         result = super(Task, self).save(*args, **kwargs)
 
@@ -2394,6 +2439,7 @@ class Setting(models.Model):
         (101, 'messages_manager'),
         (102, 'messages_admin'),
         (103, 'messages_application'),
+        (104, 'messages_joins'),
         (200, 'guidelines_subtitle'),
         (201, 'guidelines_translate'),
         (202, 'guidelines_review'),
@@ -2442,21 +2488,19 @@ class Setting(models.Model):
 class TeamLanguagePreferenceManager(models.Manager):
     def _generate_writable(self, team):
         """Return the set of language codes that are writeable for this team."""
-        langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
 
         unwritable = self.for_team(team).filter(allow_writes=False, preferred=False).values("language_code")
         unwritable = set([x['language_code'] for x in unwritable])
 
-        return langs_set - unwritable
+        return translation.ALL_LANGUAGE_CODES - unwritable
 
     def _generate_readable(self, team):
         """Return the set of language codes that are readable for this team."""
-        langs = set([x[0] for x in settings.ALL_LANGUAGES])
 
         unreadable = self.for_team(team).filter(allow_reads=False, preferred=False).values("language_code")
         unreadable = set([x['language_code'] for x in unreadable])
 
-        return langs - unreadable
+        return translation.ALL_LANGUAGE_CODES - unreadable
 
     def _generate_preferred(self, team):
         """Return the set of language codes that are preferred for this team."""
@@ -2649,7 +2693,7 @@ class TeamNotificationSetting(models.Model):
 
     def get_notification_class(self):
         try:
-            from notificationclasses import NOTIFICATION_CLASS_MAP
+            from ted.notificationclasses import NOTIFICATION_CLASS_MAP
 
             return NOTIFICATION_CLASS_MAP[self.notification_class]
         except ImportError:

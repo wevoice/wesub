@@ -20,7 +20,7 @@ import logging
 import random
 
 import babelsubs
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -140,7 +140,9 @@ def index(request, my_teams=False):
         qs = Team.objects.filter(members__user=request.user)
     else:
         ordering = request.GET.get('o', 'members')
-        qs = Team.objects.for_user(request.user).annotate(_member_count=Count('users__pk'))
+        qs = (Team.objects.for_user(request.user)
+              .add_videos_count().add_members_count()
+              .add_user_is_member(request.user))
 
     if q:
         qs = qs.filter(Q(name__icontains=q)|Q(description__icontains=q))
@@ -148,7 +150,7 @@ def index(request, my_teams=False):
     order_fields = {
         'name': 'name',
         'date': 'created',
-        'members': '_member_count'
+        'members': '_members_count'
     }
     order_fields_name = {
         'name': _(u'Name'),
@@ -165,18 +167,12 @@ def index(request, my_teams=False):
     if ordering in order_fields and order_type in ['asc', 'desc']:
         qs = qs.order_by(('-' if order_type == 'desc' else '')+order_fields[ordering])
 
-    highlighted_ids = list(Team.objects.for_user(request.user).filter(highlight=True).values_list('id', flat=True))
-    random.shuffle(highlighted_ids)
-    highlighted_qs = Team.objects.filter(pk__in=highlighted_ids[:HIGHTLIGHTED_TEAMS_ON_PAGE]) \
-        .annotate(_member_count=Count('users__pk'))
-
     extra_context = {
         'my_teams': my_teams,
         'query': q,
         'ordering': ordering,
         'order_type': order_type,
         'order_name': order_fields_name.get(ordering, 'name'),
-        'highlighted_qs': highlighted_qs,
     }
     return object_list(request, queryset=qs,
                        paginate_by=TEAMS_ON_PAGE,
@@ -893,7 +889,7 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
-def activity(request, slug):
+def activity(request, slug, tab='videos'):
     team = get_team_for_view(slug, request.user)
     try:
         page = int(request.GET['page'])
@@ -910,10 +906,13 @@ def activity(request, slug):
     #
     # Much like the Tasks page, this query performs extremely poorly when run
     # normally.  So we split it into two parts here so that each will run fast.
+    if tab == 'team':
+        action_qs = Action.objects.filter(team=team)
+    else:
+        action_qs = Action.objects.for_team_videos(team)
     end = page * ACTIONS_ON_PAGE
     start = end - ACTIONS_ON_PAGE
-    action_qs = Action.objects.for_team(team)[start:end]
-    action_qs = action_qs.select_related(
+    action_qs = action_qs[start:end].select_related(
         'video', 'user', 'new_language', 'new_language__video'
     )
     activity_list = list(action_qs)
@@ -923,6 +922,7 @@ def activity(request, slug):
         'activity_list': activity_list,
         'team': team,
         'member': member,
+        'activity_tab': tab,
         'next_page': page + 1,
         'has_more': has_more,
     }
@@ -932,6 +932,9 @@ def activity(request, slug):
         # for ajax requests we only want to return the activity list, since
         # that's all that the JS code needs.
         return render(request, 'teams/_activity-list.html', context)
+
+def team_activity(request, slug):
+    return activity(request, slug, tab='team')
 
 # Members
 @timefn
@@ -2409,8 +2412,8 @@ def billing(request):
 
     else:
         form = BillingReportForm()
-
-    reports = BillingReport.objects.all().order_by('-pk')
+    # We only get reports started less than a year ago, and prefetch teams
+    reports = BillingReport.objects.filter(start_date__gte=datetime.now()-timedelta(days=61)).prefetch_related('teams').order_by('-pk')
 
     return render_to_response('teams/billing/reports.html', {
         'form': form,

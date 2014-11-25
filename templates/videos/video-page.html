@@ -76,11 +76,9 @@
             {% endif %}
         </div>
         {% include 'videos/_language-list.html' %}
-        {% if shows_widget_sharing %}
         <div class="sharing-tools group">
             {% include '_sharing_widget.html' %}
         </div>
-        {% endif %}
         {% if user.managed_teams and not team %}
             {% team_add_video_select %}
         {% endif %}

@@ -22,6 +22,7 @@ from subtitles.pipeline import add_subtitles
 from teams.forms import InviteForm
 from teams import moderation_const as MODERATION
 from teams import tasks
+from teams.cache import invalidate_lang_preferences
 from teams.models import (
     Team, Invite, TeamVideo, Application, TeamMember,
     TeamLanguagePreference, Partner, TeamNotificationSetting,
@@ -32,6 +33,7 @@ from teams.rpc import TeamsApiClass
 from teams.templatetags import teams_tags
 from teams.tests.teamstestsutils import refresh_obj, reset_solr
 from utils import test_utils
+from utils import translation
 from utils.factories import *
 from utils.rpc import Error, Msg
 from videos import metadata_manager
@@ -1069,8 +1071,7 @@ class TestLanguagePreference(TestCase):
     def setUp(self):
         fix_teams_roles()
         self.team = TeamFactory()
-        self.langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
-        from teams.cache import invalidate_lang_preferences
+        self.langs_set = translation.ALL_LANGUAGE_CODES
         invalidate_lang_preferences(self.team)
 
     def test_readable_lang(self):

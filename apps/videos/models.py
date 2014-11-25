@@ -52,6 +52,7 @@ from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
 from utils.subtitles import create_new_subtitles, dfxp_merge
 from utils.text import fmt
+from utils.translation import ALL_LANGUAGE_CHOICES
 from teams.moderation_const import MODERATION_STATUSES, UNMODERATED
 from raven.contrib.django.models import client
 
@@ -225,9 +226,8 @@ class Video(models.Model):
     # directely
     is_public = models.BooleanField(default=True)
 
-    primary_audio_language_code = models.CharField(max_length=16, blank=True,
-                                                   default='',
-                                                   choices=ALL_LANGUAGES)
+    primary_audio_language_code = models.CharField(
+        max_length=16, blank=True, default='', choices=ALL_LANGUAGE_CHOICES)
 
     objects = models.Manager()
     public  = PublicVideoManager()
@@ -374,6 +374,20 @@ class Video(models.Model):
     def clear_team_video_cache(self):
         if hasattr(self, '_cached_teamvideo'):
             del self._cached_teamvideo
+
+    def get_workflow(self):
+        # need to import here because things are all tangled up
+        from subtitles.workflows import get_workflow
+        if not hasattr(self, '_cached_workflow'):
+            self._cached_workflow = get_workflow(self)
+        return self._cached_workflow
+
+    def clear_workflow_cache(self):
+        if hasattr(self, '_cached_workflow'):
+            del self._cached_workflow
+
+    def can_user_see(self, user):
+        return self.get_workflow().user_can_view_video(user)
 
     def thumbnail_link(self):
         """Return a URL to this video's thumbnail, or '' if there isn't one.
@@ -870,19 +884,6 @@ class Video(models.Model):
         meta['creation_date'] = VideoMetadata.string_to_date(meta.get('creation_date'))
 
         return meta
-
-    def can_user_see(self, user):
-        team_video = self.get_team_video()
-
-        if not team_video:
-            return True
-
-        team = team_video.team
-
-        if team and team.is_visible:
-            return True
-
-        return team.is_member(user)
 
     @property
     def translations(self):
@@ -1461,27 +1462,31 @@ class ActionRenderer(object):
         return fmt(msg, **kwargs)
 
 class ActionManager(models.Manager):
-    def for_team(self, team):
-        '''Return the actions for the given team.
-
-        If ids is True, instead of returning Action objects it will return
-        a values_list of their IDs.  This can be useful if you need to work
-        around some MySQL brokenness.
-
-        '''
-        return self.filter(
-            Q(team=team) |
-            Q(video__teamvideo__team=team)
+    def for_team_videos(self, team):
+        """Return the actions for a team's videos"""
+        return self.extra(
+            where=['videos_action.video_id IN (SELECT video_id '
+                   'FROM teams_teamvideo '
+                   'WHERE team_id=%s)'],
+            params=[team.id]
         )
 
     def for_user(self, user):
         return self.filter(Q(user=user) | Q(team__in=user.teams.all())).distinct()
 
     def for_user_team_activity(self, user):
-        return self.filter(team__in=user.teams.all()).exclude(user=user)
+        return self.extra(
+            tables=['teams_teammember'],
+            where=['teams_teammember.team_id = videos_action.team_id',
+                   'teams_teammember.user_id=%s'],
+            params=[user.id]).exclude(user=user)
 
     def for_user_video_activity(self, user):
-        return self.filter(video__in=user.videos.all()).exclude(user=user)
+        return self.extra(
+            tables=['auth_customuser_videos'],
+            where=['auth_customuser_videos.video_id = videos_action.video_id',
+                   'auth_customuser_videos.customuser_id=%s'],
+            params=[user.id]).exclude(user=user)
 
     def for_video(self, video):
         return (Action.objects.filter(video=video)

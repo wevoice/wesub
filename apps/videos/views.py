@@ -23,6 +23,7 @@ from collections import namedtuple
 
 import simplejson as json
 from babelsubs.storage import diff as diff_subs
+from babelsubs.generators.html import HTMLGenerator
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -169,7 +170,6 @@ class LanguageList(object):
 
 def index(request):
     context = {
-        'all_videos': Video.objects.count(),
         'popular_videos': VideoIndex.get_popular_videos("-today_views")[:VideoIndex.IN_ROW],
         'featured_videos': VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW],
     }
@@ -297,7 +297,6 @@ class VideoPageContext(dict):
         self['page_title'] = self.page_title(video)
         self['metadata'] = metadata.convert_for_display()
         self['language_list'] = LanguageList(video)
-        self['shows_widget_sharing'] = video.can_user_see(request.user)
         self['widget_settings'] = json.dumps(
             widget_rpc.get_general_settings(request))
         self['add_language_mode'] = self.workflow.get_add_language_mode(
@@ -424,14 +423,40 @@ def actions_list(request, video_id):
                        template_object_name='action',
                        extra_context=extra_context)
 
-@login_required
+def check_upload_subtitles_permissions(request):
+    # check authorization...  This is pretty hacky.  We should implement
+    # #1830.
+    if request.user.is_authenticated():
+        return True
+    username = request.META.get('HTTP_X_API_USERNAME', None)
+    api_key = request.META.get( 'HTTP_X_APIKEY', None)
+    if not username or not api_key:
+        return False
+    try:
+        import apiv2
+        from tastypie.models import ApiKey
+    except ImportError:
+        return False
+    try:
+        api_user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return False
+    if not ApiKey.objects.filter(user=api_user, key=api_key).exists():
+        return False
+    request.user = api_user
+    return True
+
 def upload_subtitles(request):
+    if not check_upload_subtitles_permissions(request):
+        path = request.get_full_path()
+        return redirect_to_login(path)
+
     output = {'success': False}
     video = Video.objects.get(id=request.POST['video'])
     form = SubtitlesUploadForm(request.user, video, True, request.POST,
-                               request.FILES, initial={'primary_audio_language_code':video.primary_audio_language_code})
-
-    response = lambda s: HttpResponse('<textarea>%s</textarea>' % json.dumps(s))
+                               request.FILES,
+                               initial={'primary_audio_language_code':video.primary_audio_language_code},
+                               allow_all_languages=True)
 
     try:
         if form.is_valid():
@@ -452,7 +477,7 @@ def upload_subtitles(request):
         client.create_from_exception()
         output['errors'] = {'__all__': [force_unicode(e)]}
 
-    return response(output)
+    return HttpResponse(json.dumps(output))
 
 def feedback(request, hide_captcha=False):
     output = dict(success=False)
@@ -580,7 +605,6 @@ class LanguagePageContext(dict):
         self['language_list'] = LanguageList(video)
         self['page_title'] = self.page_title(language)
         self['edit_url'] = language.get_widget_url()
-        self['shows_widget_sharing'] = video.can_user_see(request.user)
         self['width'] = "289"
         self['height'] = "173"
         self['video_url'] = video.get_video_url()
@@ -651,9 +675,9 @@ class LanguagePageContextRevisions(LanguagePageContext):
         else:
             revisions_qs = language.subtitleversion_set.extant()
         revisions_qs = revisions_qs.order_by('-version_number')
-
+        revisions_per_page =  request.GET.get('revisions_per_page') or self.REVISIONS_PER_PAGE
         revisions, pagination_info = paginate(
-            revisions_qs, self.REVISIONS_PER_PAGE, request.GET.get('page'))
+            revisions_qs, revisions_per_page, request.GET.get('page'), allow_more=(int(revisions_per_page) + 10))
         self.update(pagination_info)
         self['revisions'] = language.optimize_versions(revisions)
 
@@ -695,7 +719,6 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
         # tabs
         tab = 'subtitles'
         ContextClass = LanguagePageContextSubtitles
-
     if request.is_ajax():
         context = ContextClass(request, video, lang, lang_id, version_id,
                                tab_only=True)
@@ -773,9 +796,12 @@ def diffing(request, first_version, second_pk):
         first_version, second_version = second_version, first_version
 
     video = first_version.subtitle_language.video
-    diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles())
+    diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles(), mappings=HTMLGenerator.MAPPINGS)
     team_video = video.get_team_video()
-
+    first_version_previous = first_version.previous_version()
+    first_version_next = first_version.next_version()
+    second_version_previous = second_version.previous_version()
+    second_version_next = second_version.next_version()
     context = {
         'video': video,
         'diff_data': diff_data,
@@ -783,6 +809,10 @@ def diffing(request, first_version, second_pk):
         'first_version': first_version,
         'second_version': second_version,
         'latest_version': language.get_tip(),
+        'first_version_previous': first_version_previous if (first_version_previous != second_version) else None,
+        'first_version_next': first_version_next,
+        'second_version_previous': second_version_previous,
+        'second_version_next': second_version_next if (second_version_next != first_version) else None,
     }
     if team_video and not can_rollback_language(request.user, language):
         context['rollback_allowed'] = False

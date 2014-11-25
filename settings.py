@@ -138,7 +138,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'unisubs.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -201,7 +201,6 @@ INSTALLED_APPS = (
     'teams',
     'testhelpers',
     'thirdpartyaccounts',
-    'unisubs', #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
     'unisubs_compressor',
     'uslogging',
     'utils',
@@ -224,7 +223,6 @@ STARTUP_MODULES = [
 # This allow know are workers online or not: python manage.py celerybeat
 
 CELERY_IGNORE_RESULT = True
-CELERY_DISABLE_RATE_LIMITS = True
 CELERY_SEND_EVENTS = False
 CELERY_SEND_TASK_ERROR_EMAILS = True
 CELERY_RESULT_BACKEND = 'redis'
@@ -253,7 +251,9 @@ LOCALE_INDEPENDENT_PATHS = (
     re.compile('^/jstest/'),
     re.compile('^/sitemap.*.xml'),
     re.compile('^/externalsites/youtube-callback'),
+    re.compile('^/providers/'),
     re.compile('^/crossdomain.xml'),
+    re.compile('^/embedder-widget-iframe/'),
 )
 
 #Haystack configuration
@@ -357,12 +357,7 @@ ROSETTA_EXCLUDED_APPLICATIONS = (
 )
 
 INSTALLED_APPS += optionalapps.get_apps()
-try:
-    from integration_settings import *
-except ImportError:
-    pass
-# paths from MEDIA URL
-# this needs to run after the integration player has loaded
+
 MEDIA_BUNDLES = {
     "base.css": {
         "files": (
@@ -630,7 +625,7 @@ LOGGING = {
     },
 }
 
-from periodic_tasks_settings import CELERYBEAT_SCHEDULE
+from task_settings import *
 
 try:
     import debug_toolbar

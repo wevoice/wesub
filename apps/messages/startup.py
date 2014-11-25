@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2013 Participatory Culture Foundation
+# Copyright (C) 2014 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,16 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-import requests
 
-def url_exists(url):
-    """Check that a url (when following redirection) exists.
+from auth.models import UserCache
 
-    This is needed because Django's validators rely on Python's urllib2 which in
-    verions < 2.6 won't follow redirects.
+UserCache.keys_to_fetch.append('messages')
 
-    """
-    try:
-        return 200 <= requests.head(url, timeout=15.0).status_code < 400
-    except (requests.ConnectionError, requests.Timeout):
-        return False
+# import signalhandlers to register the receiver functions
+import messages.signalhandlers
