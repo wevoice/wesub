@@ -17,7 +17,7 @@
             {% include 'teams/_subnav_activity.html' with current_sub=activity_tab %}
         </div>
 
-	{% load query_string teams_tags %}
+	{% load teams_tags %}
 	<form class="filters group no-ajax{% if filtered or request.GET.sort %} active{% endif %}">
           <input type="hidden" name="q" value="{{ query }}" />
           <button class="reduced" id="update">Update</button>
