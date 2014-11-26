@@ -40,6 +40,8 @@ class TestAction(workflows.Action):
         self.update_language = mock.Mock()
         def on_method_call(method_name, *args, **kwargs):
             self.call_order.append(method_name)
+            orig_method = getattr(workflows.Action, method_name)
+            return orig_method(self, *args, **kwargs)
 
         self.perform.side_effect = functools.partial(
             on_method_call, 'perform')
