@@ -201,8 +201,15 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
             # review/approve task
             return [TaskSaveDraft(), SendBack(), Approve()]
         else:
-            # subtitle/translate task
-            return [TaskSaveDraft(), Complete()]
+            incomplete_task_qs = (self.team_video.task_set.incomplete()
+                                  .filter(language=language_code))
+            if incomplete_task_qs.exists():
+                # subtitle/translate task
+                return [TaskSaveDraft(), Complete()]
+            else:
+                # post publish edit
+                return [subtitles.workflows.SaveDraft(),
+                        subtitles.workflows.Publish()]
 
     def get_editor_notes(self, language_code):
         return TaskTeamEditorNotes(self.team_video, language_code)
