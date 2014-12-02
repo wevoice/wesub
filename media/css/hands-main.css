@@ -102,9 +102,13 @@ body {
 	font-weight: 200;
 	letter-spacing: .035em;
 	word-spacing: 0.04em;
-	font-family:  'Raleway', "Helvetica Neue", Helvetica, sans-serif;
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
 	background-color: #f2f2f3;
 	color: #f2f2f3;
+}
+
+h1, h2, h3 {
+	font-family:  'Raleway', "Helvetica Neue", Helvetica, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
