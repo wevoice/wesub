@@ -32,17 +32,6 @@ from videos.types import video_type_registrar, VideoTypeError
 from videos import permissions
 from videos import share_utils
 
-@register.inclusion_tag('videos/_video.html', takes_context=True)
-def render_video(context, video, display_views='total'):
-    context['video'] = video
-
-    if display_views and hasattr(video, '%s_views' % display_views):
-        context['video_views'] = getattr(video, '%s_views' % display_views)
-    else:
-        context['video_views'] = video.total_views
-
-    return context
-
 @register.inclusion_tag('videos/_feature_video.html', takes_context=True)
 def feature_video(context, video):
     context['video'] = video

@@ -188,9 +188,7 @@ def watch_page(request):
 
     context = {
         'featured_videos': VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW],
-        'popular_videos': VideoIndex.get_popular_videos()[:VideoIndex.IN_ROW],
         'latest_videos': VideoIndex.get_latest_videos()[:VideoIndex.IN_ROW*3],
-        'popular_display_views': 'week',
         'is_indexing': is_indexing
     }
     return render_to_response('videos/watch.html', context,
@@ -202,10 +200,6 @@ def featured_videos(request):
 
 def latest_videos(request):
     return render_to_response('videos/latest_videos.html', {},
-                              context_instance=RequestContext(request))
-
-def popular_videos(request):
-    return render_to_response('videos/popular_videos.html', {},
                               context_instance=RequestContext(request))
 
 def volunteer_category(request, category):
@@ -689,10 +683,6 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
     template_name = 'videos/language-%s.html' % tab
     context = ContextClass(request, video, lang, lang_id, version_id)
     context['tab'] = tab
-    if 'tab' not in request.GET and request.method != 'POST':
-        # we only want to update the view counter if this request wasn't
-        # the result of a tab click.
-        video.update_view_counter()
     if context['create_subtitles_form'].is_valid():
         return context['create_subtitles_form'].handle_post()
     return render(request, template_name, context)
