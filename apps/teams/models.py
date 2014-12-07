@@ -510,17 +510,37 @@ class Team(models.Model):
         Caches the result in-object for performance.
 
         """
+        return self.members_count_since()
+
+    def members_count_since(self, joined_since = None):
+        """Return the number of members of this team.
+
+        Caches the result in-object for performance.
+
+        """
+        if joined_since:
+            return self.users.filter(date_joined__gt=datetime.datetime.now() - datetime.timedelta(days=joined_since)).count()
         if not hasattr(self, '_members_count'):
             setattr(self, '_members_count', self.users.count())
         return self._members_count
 
     @property
-    def videos_count(self):
+    def videos_count(self, added_since = None):
         """Return the number of videos of this team.
 
         Caches the result in-object for performance.
 
         """
+        return self.videos_count_since()
+
+    def videos_count_since(self, added_since = None):
+        """Return the number of videos of this team.
+
+        Caches the result in-object for performance.
+
+        """
+        if added_since:
+            return self.teamvideo_set.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=added_since)).count()
         if not hasattr(self, '_videos_count'):
             setattr(self, '_videos_count', self.teamvideo_set.count())
         return self._videos_count

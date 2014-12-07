@@ -84,6 +84,7 @@ from utils.translation import (
     get_language_choices, get_language_choices_as_dicts, languages_with_labels, get_user_languages_from_request
 )
 from utils.chunkediter import chunkediter
+from utils.graphing import plot
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
 from videos.models import Action, VideoUrl, Video, VideoFeed
@@ -110,7 +111,7 @@ UNASSIGNED_TASKS_ON_PAGE = getattr(settings, 'UNASSIGNED_TASKS_ON_PAGE', 15)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
 DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
-
+ALL_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 
 def get_team_for_view(slug, user, exclude_private=True):
@@ -889,8 +890,37 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
+
+def statistics(request, slug, tab='teamstats'):
+    team = get_team_for_view(slug, request.user)
+    summary = ''
+    graph = ''
+    if tab == 'videosstats':
+        summary = _(u'%s videos, %s videos added this month' % (team.videos_count, team.videos_count_since(30)))
+        languages = list(SubtitleLanguage.objects.filter(video__in=team.videos.all()).values_list('language_code', flat=True))
+        numbers = []
+        for l in set(languages):
+            numbers.append((ALL_LANGUAGES_DICT[l], languages.count(l)))
+        graph = plot(numbers)
+    elif tab == 'teamstats':
+        summary = _(u'%s members, %s members this month' % (team.members_count, team.members_count_since(30)))
+        languages = list(UserLanguage.objects.filter(user__in=team.users.all()).values_list('language', flat=True))
+        numbers = []
+        for l in set(languages):
+            numbers.append((ALL_LANGUAGES_DICT[l], languages.count(l)))
+        graph = plot(numbers, graph_type='HorizontalBar')
+
+    context = {
+        'summary': summary,
+        'activity_tab': tab,
+        'team': team,
+        'graph': graph
+    }
+    return render(request, 'teams/statistics.html', context)
+
 def activity(request, slug, tab='videos'):
     team = get_team_for_view(slug, request.user)
+
     try:
         page = int(request.GET['page'])
     except (ValueError, KeyError):
@@ -953,7 +983,7 @@ def activity(request, slug, tab='videos'):
         'member': member,
         'activity_tab': tab,
         'next_page': page + 1,
-        'has_more': has_more,
+        'has_more': has_more
     }
     if not request.is_ajax():
         return render(request, 'teams/activity.html', context)
@@ -964,6 +994,10 @@ def activity(request, slug, tab='videos'):
 
 def team_activity(request, slug):
     return activity(request, slug, tab='team')
+def teamstatistics_activity(request, slug):
+    return statistics(request, slug, tab='teamstats')
+def videosstatistics_activity(request, slug):
+    return statistics(request, slug, tab='videosstats')
 
 # Members
 @timefn

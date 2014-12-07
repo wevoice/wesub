@@ -1,0 +1,25 @@
+{% extends "teams/base.html" %}
+
+{% load i18n media_bundle %}
+
+{% block html_attrs %}id="teams_activity"{% endblock %}
+{% block body_attrs %}id="teams" class="v1"{% endblock %}
+{% block title %}{{ team }} | Amara{% endblock %}
+{% media_bundle "graphs.js" %}
+{% block view_content %}
+    {% if team.is_old_style %}<div class="grid_8 view omega">{% else %}<div class="view">{% endif %}
+
+        {% with "activity" as current %}
+            {% include "teams/_tabs.html" %}
+        {% endwith %}
+        <div class="tools subnav">
+            {% include 'teams/_subnav_activity.html' with current_sub=activity_tab %}
+        </div>
+	<div>
+	  <p class="summary">{{ summary }}</p>
+	  <figure>
+	    {{ graph|safe }}
+	  </figure>
+	</div>
+  </div>
+{% endblock %}
