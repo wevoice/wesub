@@ -532,6 +532,9 @@ class Team(models.Model):
             setattr(self, '_members_count', self.users.count())
         return self._members_count
 
+    def members_since(self, joined_since):
+        return self.users.filter(date_joined__gt=datetime.datetime.now() - datetime.timedelta(days=joined_since))
+
     @property
     def videos_count(self, added_since = None):
         """Return the number of videos of this team.
@@ -552,6 +555,9 @@ class Team(models.Model):
         if not hasattr(self, '_videos_count'):
             setattr(self, '_videos_count', self.teamvideo_set.count())
         return self._videos_count
+
+    def videos_since(self, added_since):
+        return self.videos.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=added_since))
 
     def unassigned_tasks(self, sort=None):
         qs = Task.objects.filter(team=self, deleted=False, completed=None, assignee=None, type=Task.TYPE_IDS['Approve'])

@@ -912,26 +912,48 @@ def statistics(request, slug, tab='teamstats'):
     team = get_team_for_view(slug, request.user)
     summary = ''
     graph = ''
+    graph_recent = ''
     if tab == 'videosstats':
         summary = _(u'%s videos, %s videos added this month' % (team.videos_count, team.videos_count_since(30)))
         languages = list(SubtitleLanguage.objects.filter(video__in=team.videos.all()).values_list('language_code', flat=True))
         numbers = []
+        total = 0
         for l in set(languages):
-            numbers.append((ALL_LANGUAGES_DICT[l], languages.count(l)))
-        graph = plot(numbers)
+            count = languages.count(l)
+            numbers.append((ALL_LANGUAGES_DICT[l], count))
+            total += count
+        title = _(u"%s subtitles") % total
+        graph = plot(numbers, title=title)
+        languages_recent = list(SubtitleLanguage.objects.filter(video__in=team.videos_since(30)).values_list('language_code', flat=True))
+        numbers_recent = []
+        total_recent = 0
+        for l in set(languages_recent):
+            count_recent = languages_recent.count(l)
+            numbers_recent.append((ALL_LANGUAGES_DICT[l], count_recent))
+            total_recent += count_recent
+        title_recent = _(u"%s subtitles added this month") % total_recent
+        graph_recent = plot(numbers_recent, title=title_recent)
     elif tab == 'teamstats':
         summary = _(u'%s members, %s members this month' % (team.members_count, team.members_count_since(30)))
         languages = list(UserLanguage.objects.filter(user__in=team.users.all()).values_list('language', flat=True))
         numbers = []
         for l in set(languages):
             numbers.append((ALL_LANGUAGES_DICT[l], languages.count(l)))
+        title = _(u"Languages spoken by team members")
         graph = plot(numbers, graph_type='HorizontalBar')
+        languages_recent = list(UserLanguage.objects.filter(user__in=team.members_since(30)).values_list('language', flat=True))
+        numbers_recent = []
+        for l in set(languages_recent):
+            numbers_recent.append((ALL_LANGUAGES_DICT[l], languages_recent.count(l)))
+        title_recent = _(u"Languages spoken by team members who joined this month")
+        graph_recent = plot(numbers_recent, graph_type='HorizontalBar')
 
     context = {
         'summary': summary,
         'activity_tab': tab,
         'team': team,
-        'graph': graph
+        'graph': graph,
+        'graph_recent': graph_recent,
     }
     return render(request, 'teams/statistics.html', context)
 
