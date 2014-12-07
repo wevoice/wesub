@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from django.core.urlresolvers import reverse
 from django.utils import translation
 from django.test import TestCase
+from nose.tools import *
 import mock
 
 from utils import test_utils
@@ -70,15 +71,59 @@ class MetadataFieldsTest(TestCase):
         self.assertEquals(self.video.get_metadata(),
                           {'speaker-name': 'Speaker2'})
 
-    def test_add_metadata_doesnt_change_video(self):
-        # When we set metadata for a a language, it shouldn't update the video
+    def test_add_metadata_for_primary_language_updates_video(self):
+        # When we set metadata for the primary audio language, we should
+        # update the video's metadata
         self.video.update_metadata({'speaker-name': 'Speaker1'})
         self.video.primary_audio_language_code = 'en'
         self.video.save()
         version = pipeline.add_subtitles(
             self.video, 'en', None,
             metadata={'speaker-name': 'Speaker2'})
-        self.video = Video.objects.get(pk=self.video.pk)
+        self.video = test_utils.reload_obj(self.video)
+        self.assertEquals(self.video.get_metadata(),
+                          {'speaker-name': 'Speaker2'})
+
+    def test_add_metadata_for_private_versions_dont_update_video(self):
+        # When we set metadata for the primary audio language, but the version
+        # is private, we shouldn't update the video's metadata
+        TeamVideoFactory(video=self.video)
+        self.video.update_metadata({'speaker-name': 'Speaker1'})
+        self.video.primary_audio_language_code = 'en'
+        self.video.save()
+        version = pipeline.add_subtitles(
+            self.video, 'en', None, visibility='private',
+            metadata={'speaker-name': 'Speaker2'})
+        self.video = test_utils.reload_obj(self.video)
+        self.assertEquals(self.video.get_metadata(),
+                          {'speaker-name': 'Speaker1'})
+
+    def test_publish_primary_audio_language_updates_video(self):
+        # When we publish a version for the primary audio language, we should
+        # update the video's metadata
+        TeamVideoFactory(video=self.video)
+        self.video.update_metadata({'speaker-name': 'Speaker1'})
+        self.video = test_utils.reload_obj(self.video)
+        self.video.primary_audio_language_code = 'en'
+        self.video.save()
+        version = pipeline.add_subtitles(
+            self.video, 'en', None, visibility='private',
+            metadata={'speaker-name': 'Speaker2'})
+        version.publish()
+        self.video = test_utils.reload_obj(self.video)
+        self.assertEquals(self.video.get_metadata(),
+                          {'speaker-name': 'Speaker2'})
+
+    def test_add_metadata_for_other_languages_dont_update_video(self):
+        # When we set metadata for a language other than the primary audio
+        # language, it shouldn't update the video
+        self.video.update_metadata({'speaker-name': 'Speaker1'})
+        self.video.primary_audio_language_code = 'en'
+        self.video.save()
+        version = pipeline.add_subtitles(
+            self.video, 'fr', None,
+            metadata={'speaker-name': 'Speaker2'})
+        self.video = test_utils.reload_obj(self.video)
         self.assertEquals(self.video.get_metadata(),
                           {'speaker-name': 'Speaker1'})
 
@@ -190,7 +235,7 @@ class MetadataFieldsTest(TestCase):
         # but convert_for_display() should eliminate the value
         self.assertEquals(self.video.get_metadata().convert_for_display(), [])
 
-class MetadataViewsTest(TestCase):
+class MetadataForLocaleTest(TestCase):
     def setUp(self):
         TestCase.setUp(self)
         self.video = VideoFactory()
@@ -201,20 +246,12 @@ class MetadataViewsTest(TestCase):
             'location': 'Place-fr',
         })
 
-    def check_response_location(self, correct_location):
-        url = reverse('videos:video_with_title', kwargs={
-            'video_id': self.video.video_id,
-            'title': self.video.title_for_url(),
-        })
-        response = self.client.get(url)
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.context['metadata'][0]['content'],
-                          correct_location)
-
     def test_locale_with_metadata(self):
-        translation.activate('fr')
-        self.check_response_location('Place-fr')
+        assert_equal(self.video.get_metadata_for_locale('fr'), {
+            'location': 'Place-fr',
+        })
 
     def test_locale_without_metadata(self):
-        translation.activate('de')
-        self.check_response_location('Place')
+        assert_equal(self.video.get_metadata_for_locale('de'), {
+            'location': 'Place',
+        })

@@ -130,6 +130,10 @@ class EditorPage(UnisubsPage):
         self.select_option_by_text(self._REFERENCE_SELECT, language)
         time.sleep(2)
 
+    def reference_languages(self):
+        els = self.get_elements_list(self._REFERENCE_SELECT)
+        return [el.text for el in els]
+
     def select_ref_version(self, version_no):
         """Choose a reference version from the list. """
 
@@ -147,11 +151,11 @@ class EditorPage(UnisubsPage):
         return [el.text for el in buttons] 
 
     def legacy_editor(self):
+        time.sleep(4)
         buttons = self.browser.find_elements_by_css_selector(self._SESSION_BUTTONS)
         for el in buttons:
             if 'Legacy Editor' in el.text:
                 el.click()
-                time.sleep(2)
                 return
 
     def save(self, save_option):
@@ -407,7 +411,7 @@ class EditorPage(UnisubsPage):
         return self.is_element_visible(self._COLLAB_PANEL)
 
     def collab_action(self, action):
-        els = self.get_elements_list("div.actions button")
+        els = self.get_elements_list("button[ng-repeat='action in actions']")
         [el.click() for el in els if el.text == action]
 
     def action_buttons(self):

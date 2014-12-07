@@ -2,7 +2,6 @@
 import os
 import time
 
-
 from ted import tasks
 from videos.models import Video
 from utils.factories import *
@@ -61,21 +60,24 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert('accept')
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file("%s.png" % self.id())
+
     @classmethod
     def _create_subs(cls, video, lc, user, complete=False):
         subtitles_1 = [
-            (0, 1000, 'Hello there'),
+            (0500,2000, 'Hello there'),
         ]
         subtitles_2 = [
-            (0, 1000, 'Hello there'),
-            (1000, 2000, 'Hello there'),
+            (0500, 2000, 'Hello there'),
+            (3000, 5000, 'Hello there'),
         ]
-        add_subtitles(video, lc, subtitles_1, visibility='private')
+        add_subtitles(video, lc, subtitles_1)
         add_subtitles(video, lc, subtitles_2,
                       author=user,
                       committer=user,
                       complete=complete,
-                      visibility='private')
+                      )
 
 
     def perform_task(self, task_type, video, action, title=None, edit=None):
@@ -117,7 +119,7 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
 
 
 
-    def skip_post_publish_edit(self):
+    def test_post_publish_edit(self):
         """Edit title in approve, video title updated after publish """
         video = TeamVideoFactory(team=self.team,
                                  video__primary_audio_language_code='en',
@@ -165,7 +167,9 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.perform_task("Review Original", video, "approve", title=new_title)
         self.assertEqual(video.title, self.video_pg.video_title())
-        self.data_utils.complete_approve_task(video.get_team_video(), 20, self.admin)
+        self.tasks_tab.log_in(self.admin.username, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.perform_task("Approve Original", video, "approve", title=new_title)
         self.video_pg.open_video_page(video.video_id)
         self.assertEqual(new_title, self.video_pg.video_title())
 
@@ -183,7 +187,7 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&/'
                                  % self.team.slug)
-        self.perform_task("Transcribe", video, "endorse", title=None, edit='type')
+        self.perform_task("Transcribe", video, "endorse", edit='upload', title=None)
         self.data_utils.complete_review_task(video.get_team_video(), 20, self.manager)
         self.data_utils.complete_approve_task(video.get_team_video(), 20, self.admin)
         self.video_pg.open_video_page(video.video_id)
@@ -229,7 +233,9 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.perform_task("Transcribe", video, "endorse", title=new_title, edit='upload')
         self.assertEqual(video.title, self.video_pg.video_title())
         self.data_utils.complete_review_task(video.get_team_video(), 20, self.manager)
-        self.data_utils.complete_approve_task(video.get_team_video(), 20, self.admin)
+        self.tasks_tab.log_in(self.admin.username, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.perform_task("Approve Original", video, "approve", title=new_title)
         self.video_pg.open_video_page(video.video_id)
         self.assertEqual(new_title, self.video_pg.video_title())
 
@@ -248,7 +254,9 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.tasks_tab.log_in(self.manager.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.perform_task("Review Original", video, "approve", title=None, edit='upload')
-        self.data_utils.complete_approve_task(video.get_team_video(), 20, self.admin)
+        self.tasks_tab.log_in(self.admin.username, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.perform_task("Approve Original", video, "approve", title=new_title)
         self.video_pg.open_video_page(video.video_id)
         self.assertEqual(new_title, self.video_pg.video_title())
 

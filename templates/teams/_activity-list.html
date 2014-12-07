@@ -11,7 +11,7 @@
 
 {% if has_more %}
 <div class="pagination">
-  <a class="show-more" href="{% url teams:activity slug=team.slug %}?page={{ next_page }}">{% trans "Show More" %}</a>
+  <a class="show-more" href="" data-page="{{ next_page }}">{% trans "Show More" %}</a>
   <img class="loading-icon" src="{% static_url %}images/ajax-loader.gif">
 </div>
 {% endif %}

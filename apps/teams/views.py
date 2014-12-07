@@ -52,7 +52,7 @@ from teams.forms import (
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
     make_billing_report_form, TaskCreateSubtitlesForm,
-    TeamMultiVideoCreateSubtitlesForm, MoveVideosForm
+    TeamMultiVideoCreateSubtitlesForm, MoveVideosForm, AddVideoToTeamForm,
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -742,6 +742,23 @@ def move_videos(request, slug, project_slug=None, languages=None):
                     record._team_video.completed_langs = record.video_completed_langs
     return extra_context
 
+@login_required
+def add_video_to_team(request, video_id):
+    video = get_object_or_404(Video, video_id=video_id)
+    if request.method == 'POST':
+        form = AddVideoToTeamForm(request.user, request.POST)
+        if form.is_valid():
+            team = Team.objects.get(id=form.cleaned_data['team'])
+            team_video = TeamVideo.objects.create(video=video, team=team)
+            update_one_team_video.delay(team_video.pk)
+            return redirect(video.get_absolute_url())
+    else:
+        form = AddVideoToTeamForm(request.user)
+    return render(request, 'teams/add-video-to-team.html', {
+        'video': video,
+        'form': form,
+    })
+
 @render_to('teams/add_video.html')
 @login_required
 def add_video(request, slug):
@@ -946,16 +963,18 @@ def activity(request, slug, tab='videos'):
     if request.GET.get('action_type') and request.GET.get('action_type') != 'any':
         action_qs = action_qs.filter(action_type = int(request.GET.get('action_type')))
 
-    action_qs = action_qs.select_related('new_language')
-
-    if tab == 'videos' and request.GET.get('language') and request.GET.get('language') != 'any':
-        action_qs = action_qs.filter(new_language__isnull = False, new_language__language_code = request.GET.get('language'))
+    action_qs = action_qs.select_related('new_language', 'video')
+    if tab == 'videos':
+        if request.GET.get('video_language') and request.GET.get('video_language') != 'any':
+            action_qs = action_qs.filter(video__primary_audio_language_code = request.GET.get('video_language'))
+        if request.GET.get('subtitles_language') and request.GET.get('subtitles_language') != 'any':
+            action_qs = action_qs.filter(new_language__isnull = False, new_language__language_code = request.GET.get('subtitles_language'))
 
     sort = request.GET.get('sort', '-created')
     action_qs = action_qs.order_by(sort)
 
     action_qs = action_qs[start:end].select_related(
-        'video', 'user', 'new_language__video'
+        'user', 'new_language__video'
     )
 
     activity_list = list(action_qs)
@@ -1473,7 +1492,7 @@ def _tasks_list(request, team, project, filters, user):
         if filters['language'] != 'all':
             tasks = tasks.filter(language=filters['language'])
     elif request.user.is_authenticated() and request.user.get_languages():
-        languages = [ul.language for ul in request.user.get_languages()] + ['']
+        languages = request.user.get_languages() + ['']
         tasks = tasks.filter(language__in=languages)
 
     if filters.get('q'):
@@ -1616,7 +1635,7 @@ def old_dashboard(request, team):
             for tv in team_videos:
                 videos.append(tv.teamvideo)
         else:
-            lang_list = [l.language for l in user_languages]
+            lang_list = user_languages
 
             for video in team_videos.all():
                 subtitled_languages = (video.newsubtitlelanguage_set
@@ -1625,7 +1644,7 @@ def old_dashboard(request, team):
                                                  .values_list("language_code", flat=True))
                 if len(subtitled_languages) != len(user_languages):
                     tv = video.teamvideo
-                    tv.languages = [l for l in user_languages if l.language not in subtitled_languages]
+                    tv.languages = [l for l in user_languages if l not in subtitled_languages]
                     videos.append(tv)
     else:
         videos = []
