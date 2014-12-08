@@ -96,8 +96,8 @@
                                 {{ member.user }}
                                 {% if member.user == user %}({% trans 'Me' %}){% endif %}
                             </a>
-                            {% for lang in member.user.get_languages %}
-                                <span class="descriptor">{{ lang.get_language_display }}</span>
+                            {% for lang in member.user.get_language_names %}
+                                <span class="descriptor">{{ lang }}</span>
                             {% endfor %}
                         </h3>
                         <p>{{ member.role|capfirst }}
