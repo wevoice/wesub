@@ -53,8 +53,14 @@ var angular = angular || null;
         }
     });
     module.filter('versionDropDownDisplay', function(){
-        return function (versionData) {
-            return 'Version ' + versionData.version_no;
+        return function (versionData){
+            if(versionData.visibility == 'private'
+                || versionData.visibility == 'deleted') {
+                return "Version " + versionData.version_no +
+                            " (" + versionData.visibility + ")";
+            } else {
+                return "Version " + versionData.version_no;
+            }
         }
     })
     module.filter('metadataTypeName', function(){
