@@ -19,13 +19,9 @@
         </div>
 	<div>
 	  <p class="summary">{{ summary }}</p>
-	  <figure>
-	    {{ graph|safe }}
-	  </figure>
+	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph }}"></object>
 	  <p class="summary">{{ summary_recent }}</p>
-	  <figure>
-	    {{ graph_recent|safe }}
-	  </figure>
+	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_recent }}"></object>
 	</div>
   </div>
 {% endblock %}
