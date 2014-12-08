@@ -149,6 +149,9 @@ class TestCaseTED(WebdriverTestCase):
 
         cls.logger.info("Create TED teams")
         cls.admin = UserFactory()
+        for lang in ['en', 'fi', 'sv']:
+            UserLangFactory(user = cls.admin,
+                            language = lang)
         cls.manager = UserFactory()
         cls.member = UserFactory()
         cls.ted_team = TeamFactory(
@@ -171,7 +174,7 @@ class TestCaseTED(WebdriverTestCase):
                            name='TedTalks',
                            slug='tedtalks')
 
-        lang_list = ['en', 'ru', 'pt-br', 'de', 'sv']
+        lang_list = ['en', 'ru', 'pt-br', 'de', 'sv', 'fi']
         for language in lang_list:
             TeamLangPrefFactory.create(team=cls.ted_team, language_code=language,
                                        preferred=True)
@@ -216,7 +219,7 @@ class TestCaseTED(WebdriverTestCase):
 
         #Add approved 'en' subs speaker name
         speaker_data =  { 'speaker-name': 'Santa' } 
-        cls._create_subs(cls.speaker_video, 'en', complete=True, metadata=speaker_data) 
+        cls._create_subs(cls.speaker_video, 'en', complete=None, metadata=speaker_data) 
         cls.data_utils.complete_review_task(cls.speaker_video.get_team_video(),
                                             20, cls.admin)
         cls.data_utils.complete_approve_task(cls.speaker_video.get_team_video(),
@@ -244,6 +247,9 @@ class TestCaseTED(WebdriverTestCase):
         cls.video_pg.open_video_page(cls.speaker_video.video_id)
 
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file("%s.png" % self.id())
+
     @classmethod
     def _add_speakername(cls, speaker):
         url_part = 'videos/%s/' % cls.speaker_video.video_id
@@ -266,10 +272,10 @@ class TestCaseTED(WebdriverTestCase):
         add_subtitles(cls.speaker_video, lc, subtitles_2, 
                       author=cls.admin, 
                       committer=cls.admin, 
-                      complete=complete,
+                      action='complete',
                       metadata=metadata,
                       title=title, 
-                      visibility='private')
+                      )
 
     def test_ted_api_speakername_published(self):
         """TED api returns translated speaker name from published version."""
@@ -334,7 +340,7 @@ class TestCaseTED(WebdriverTestCase):
 
     def test_site_search_video_speakername(self):
         """Site search for video speaker name has results. """
-        speaker = 'Jinsop Lee'
+        speaker = 'Santa'
         self.watch_pg.open_watch_page()
         results_pg = self.watch_pg.basic_search(speaker)
         self.assertTrue(results_pg.search_has_results())
@@ -364,15 +370,11 @@ class TestCaseTED(WebdriverTestCase):
     def test_dashboard_display_speaker(self):
         """Speaker name displays with title on dashboard. """
         self.dashboard_tab.log_out()
-        for lang in ['en', 'ru', 'sv']:
-            UserLangFactory(user = self.admin,
-                            language = lang)
-
         self.dashboard_tab.log_in(self.admin.username, 'password')
         self.dashboard_tab.open_team_page(self.ted_team.slug)
         self.assertTrue(self.dashboard_tab.dash_task_present(
-                            task_type='Create Russian subtitles',
-                            title='Jinsop Lee: TestVideo1'))
+                            task_type='Create Finnish subtitles',
+                            title='Santa: TestVideo1'))
 
     def test_dashboard_display_nospeaker(self):
         """Title only when no speaker name for video on dashboard. """
@@ -387,15 +389,15 @@ class TestCaseTED(WebdriverTestCase):
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.ted_team.slug)
         self.assertTrue(self.tasks_tab.task_present('Approve German Subtitles',
-                        'Jinsop Lee: TestVideo1'))
+                        'Santa: TestVideo1'))
 
     def test_tasks_tab_search_speaker(self):
         """Tasks tab search on speaker name returns search results . """
         self.tasks_tab.log_in(self.admin.username, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?project=any&assignee=anyone&q=Jinsop'
+        self.tasks_tab.open_page('teams/%s/tasks/?project=any&assignee=anyone&q=Santa'
                                  % self.ted_team.slug)
         self.assertTrue(self.tasks_tab.task_present('Approve German Subtitles',
-                        'Jinsop Lee: TestVideo1'))
+                        'Santa: TestVideo1'))
 
 
     def test_tasks_tab_display_nospeaker(self):
@@ -416,10 +418,10 @@ class TestCaseTED(WebdriverTestCase):
     def test_videos_tab_search_speaker(self):
         """Videos tab search on speaker name returns search results . """
         self.videos_tab.log_in(self.admin.username, 'password')
-        self.videos_tab.open_page('/teams/%s/videos/?assignee=&project=&lang=&q=Jinsop'
+        self.videos_tab.open_page('/teams/%s/videos/?assignee=&project=&lang=&q=Santa'
                                  % self.ted_team.slug)
         self.assertTrue(self.videos_tab.is_text_present('h4 a', 
-                                                        'Jinsop Lee: TestVideo1'))
+                                                        'Santa: TestVideo1'))
 
     def test_videos_tab_display_nospeaker(self):
         """Title only when no speaker name for video on videos tab. """
@@ -447,7 +449,7 @@ class TestCaseTED(WebdriverTestCase):
         self.video_pg.open_video_activity(self.speaker_video.video_id)
         video_activities = self.video_pg.activity_list()
         for activity in video_activities:
-            if 'Jinsop Lee: ' in activity:
+            if 'Santa: ' in activity:
                 break
         else:
             self.fail('speaker name not found in any activities, %s' % video_activities)
@@ -457,7 +459,7 @@ class TestCaseTED(WebdriverTestCase):
         self.profile_dash_pg.open_profile_dashboard()
         user_tasks = self.profile_dash_pg.current_tasks()
         for t in user_tasks:
-            if 'Jinsop Lee: TestVideo1' in t:
+            if 'Santa: TestVideo1' in t:
                 break
         else:
             self.fail('speaker name not found in any tasks, %s' % user_tasks)
