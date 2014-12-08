@@ -13,10 +13,12 @@
     <li {% if current_sub == "teamstats" %}class="current"{% endif %}>
         <a href="{% url teams:teamstatistics-activity team.slug %}">{% trans "Team Statistics" %}</a>
     </li>
+    {% if current_sub == "videos" or current_sub == "team" %}
     <li>
       <a href="#filter" id="sort-filter" class="default-open">
 	{% trans 'Filter and Sort' %}
 	<span></span>
       </a>
     </li>
+    {% endif %}
 </ul>

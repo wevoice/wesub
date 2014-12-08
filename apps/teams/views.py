@@ -914,27 +914,29 @@ def statistics(request, slug, tab='teamstats'):
     graph = ''
     graph_recent = ''
     if tab == 'videosstats':
-        summary = _(u'%s videos, %s videos added this month' % (team.videos_count, team.videos_count_since(30)))
         languages = list(SubtitleLanguage.objects.filter(video__in=team.videos.all()).values_list('language_code', flat=True))
+        summary = _(u'%s Videos, %s Languages' % (team.videos_count, len(languages)))
         numbers = []
         total = 0
         for l in set(languages):
             count = languages.count(l)
             numbers.append((ALL_LANGUAGES_DICT[l], count))
             total += count
-        title = _(u"%s subtitles") % total
+        title = _(u"%s Captions and Translations") % total
         graph = plot(numbers, title=title)
         languages_recent = list(SubtitleLanguage.objects.filter(video__in=team.videos_since(30)).values_list('language_code', flat=True))
+        summary_recent = _(u'%s Videos, %s Languages this month' % (team.videos_count_since(30), len(languages_recent)))
         numbers_recent = []
         total_recent = 0
         for l in set(languages_recent):
             count_recent = languages_recent.count(l)
             numbers_recent.append((ALL_LANGUAGES_DICT[l], count_recent))
             total_recent += count_recent
-        title_recent = _(u"%s subtitles added this month") % total_recent
+        title_recent = _(u"%s  Captions and Translations this Month") % total_recent
         graph_recent = plot(numbers_recent, title=title_recent)
     elif tab == 'teamstats':
-        summary = _(u'%s members, %s members this month' % (team.members_count, team.members_count_since(30)))
+        summary = _(u'%s members' % (team.members_count))
+        summary_recent = _(u'%s new members this month' % (team.members_count_since(30)))
         languages = list(UserLanguage.objects.filter(user__in=team.users.all()).values_list('language', flat=True))
         numbers = []
         for l in set(languages):
@@ -950,6 +952,7 @@ def statistics(request, slug, tab='teamstats'):
 
     context = {
         'summary': summary,
+        'summary_recent': summary_recent,
         'activity_tab': tab,
         'team': team,
         'graph': graph,

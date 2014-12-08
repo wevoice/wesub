@@ -11,6 +11,7 @@ def plot(data, title=None, graph_type='Pie'):
         pie_chart = pygal.HorizontalBar(disable_xml_declaration=True, style=LightGreenStyle)
     if title:
         pie_chart.title = title
+    data.sort(reverse=True, key=lambda x:x[1])
     for item in data:
         pie_chart.add(item[0], item[1])
     return pie_chart.render()
