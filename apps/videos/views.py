@@ -202,14 +202,6 @@ def latest_videos(request):
     return render_to_response('videos/latest_videos.html', {},
                               context_instance=RequestContext(request))
 
-def volunteer_category(request, category):
-    '''
-    Display results only for a particular category of video results from
-    popular, featured and latest videos.
-    '''
-    return render_to_response('videos/volunteer_%s.html' %(category),
-                              context_instance=RequestContext(request))
-
 def create(request):
     video_form = VideoForm(request.user, request.POST or None)
     context = {
