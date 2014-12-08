@@ -420,11 +420,11 @@ class UserLanguage(models.Model):
 
     def save(self, *args, **kwargs):
         super(UserLanguage, self).save(*args, **kwargs)
-        cache.delete('user_languages_%s' % self.user_id)
+        CustomUser.cache.invalidate_by_pk(self.user_id)
 
     def delete(self, *args, **kwargs):
-        cache.delete('user_languages_%s' % self.user_id)
-        return super(UserLanguage, self).delete(*args, **kwargs)
+        super(UserLanguage, self).delete(*args, **kwargs)
+        CustomUser.cache.invalidate_by_pk(self.user_id)
 
 class Announcement(models.Model):
     content = models.CharField(max_length=500)
