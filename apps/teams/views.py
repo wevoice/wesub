@@ -939,14 +939,14 @@ def statistics(request, slug, tab='teamstats'):
         numbers = []
         for l in set(languages):
             numbers.append((ALL_LANGUAGES_DICT[l], languages.count(l)))
-        title = _(u"Languages spoken by team members")
-        graph = plot(numbers, graph_type='HorizontalBar')
+        title = u'Languages spoken by team members'
+        graph = plot(numbers, graph_type='HorizontalBar', title=title)
         languages_recent = list(UserLanguage.objects.filter(user__in=team.members_since(30)).values_list('language', flat=True))
         numbers_recent = []
         for l in set(languages_recent):
             numbers_recent.append((ALL_LANGUAGES_DICT[l], languages_recent.count(l)))
-        title_recent = _(u"Languages spoken by team members who joined this month")
-        graph_recent = plot(numbers_recent, graph_type='HorizontalBar')
+        title_recent = u'Languages spoken by team members who joined this month'
+        graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent)
 
     context = {
         'summary': summary,
