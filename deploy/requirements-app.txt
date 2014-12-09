@@ -42,7 +42,7 @@ vendor/boto-2.1.0-0.tar.gz
 -e git+https://github.com/linsomniac/python-memcached.git@bacb8058152873e46e6a2367452a353e4d98a065#egg=python-memcached
 feedparser
 lxml==2.3
-raven==1.8.2
+raven==5.1.1
 transifex-client==0.8
 django-extensions==0.4.1
 # do we really need this in prod?

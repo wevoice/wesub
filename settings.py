@@ -177,7 +177,7 @@ INSTALLED_APPS = (
     'djcelery',
     'haystack',
     'rosetta',
-    'raven.contrib.django',
+    'raven.contrib.django.raven_compat',
     'south',
     'rest_framework',
     'tastypie',
