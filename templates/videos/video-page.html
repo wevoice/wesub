@@ -35,7 +35,7 @@
     {% endif %}
 
     <div class="grid_4 context alpha">
-        {% cache-by-video page-title %}
+        {% cache-by-video page-title-html %}
         <h1 class="main-title">
             <a href="{{share_panel_permalink}}" {% if video.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ video.title_display }}</a>
         </h1>
