@@ -12,7 +12,6 @@
             <option
             ng-repeat='thisVersion in versions'
             ng-selected='version == thisVersion'
-            ng-disabled='thisVersion.visibility != "public"'
             value="[[thisVersion.version_no]]">
             [[thisVersion|versionDropDownDisplay]]</option>
         </select>
