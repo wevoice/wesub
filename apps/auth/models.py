@@ -25,18 +25,12 @@ import urllib
 import hashlib
 import hmac
 import uuid
-try:
-    from hashlib import sha1
-except ImportError:
-    import sha
-    sha1 = sha.sha
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.utils.http import urlquote
 from django.core.exceptions import MultipleObjectsReturned
 from utils.amazon import S3EnabledImageField
 from datetime import datetime, timedelta
 from django.core.cache import cache
-from django.utils.hashcompat import sha_constructor
 from utils.metrics import Meter
 from random import random
 from django.contrib.sites.models import Site
@@ -492,8 +486,8 @@ class EmailConfirmationManager(models.Manager):
 
         self.filter(user=user).delete()
 
-        salt = sha_constructor(str(random())+settings.SECRET_KEY).hexdigest()[:5]
-        confirmation_key = sha_constructor(salt + user.email.encode('utf-8')).hexdigest()
+        salt = hashlib.sha1(str(random())+settings.SECRET_KEY).hexdigest()[:5]
+        confirmation_key = hashlib.sha1(salt + user.email.encode('utf-8')).hexdigest()
         try:
             current_site = Site.objects.get_current()
         except Site.DoesNotExist:
@@ -545,7 +539,7 @@ class LoginTokenManager(models.Manager):
 
     def generate_token(self, user):
         new_uuid = uuid.uuid4()
-        return hmac.new("%s%s" % (user.pk, str(new_uuid)), digestmod=sha1).hexdigest()
+        return hmac.new("%s%s" % (user.pk, str(new_uuid)), digestmod=hashlib.sha1).hexdigest()
 
     def for_user(self, user, updates=True):
         try:
