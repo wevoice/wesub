@@ -65,7 +65,6 @@ def get_language_label(code):
     lc = LanguageCode(code, 'internal')
     return u'%s' % _(lc.name())
 
-
 def get_user_languages_from_request(request, readable=False, guess=True):
     """Return a list of our best guess at languages that request.user speaks."""
     languages = []
