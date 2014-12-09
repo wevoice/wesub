@@ -40,7 +40,6 @@ from babelsubs.generators.html import HTMLGenerator
 from babelsubs import load_from
 from subtitles import signals
 from utils.compress import compress, decompress
-from utils.redis_utils import RedisSimpleField
 from utils.subtitles import create_new_subtitles
 from utils import translation
 from videos.behaviors import make_video_title

@@ -16,13 +16,14 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from functools import update_wrapper
 import sys
+
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.http import HttpResponse
 from django.utils import simplejson
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.functional import update_wrapper
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
