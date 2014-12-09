@@ -22,7 +22,6 @@ from celery.task import task
 
 from django.db.models import Count
 
-from statistic import hitcounts
 from statistic.models import (
     EmailShareStatistic, TweeterShareStatistic, FBShareStatistic,
 )
@@ -38,7 +37,3 @@ def graphite_slugify(s):
     for c in ' -.,:':
         s = s.replace(c, '_')
     return s
-
-@task
-def migrate_hit_counts():
-    hitcounts.migrate_all()

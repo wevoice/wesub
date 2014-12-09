@@ -48,7 +48,6 @@ from videos import signals
 from videos.types import video_type_registrar, video_type_choices
 from videos.feed_parser import VideoImporter
 from comments.models import Comment
-from statistic import hitcounts
 from widget import video_cache
 from utils import translation
 from utils.amazon import S3EnabledImageField
@@ -296,35 +295,6 @@ class Video(models.Model):
         from utils.celery_search_index import update_search_index
         update_search_index.delay(self.__class__, self.pk)
 
-    @property
-    def views(self):
-        """Return a dict of the number of views recorded for this video.
-
-        The map will look like:
-
-            {'month': 100, 'week': 5, 'year': 10223, 'total': 20333}
-
-        Caches this map in memcache for two hours.
-
-        """
-        if not hasattr(self, '_video_views_statistic'):
-            cache_key = 'video_views_statistic_%s' % self.pk
-            views_st = cache.get(cache_key)
-
-            if not views_st:
-                views_st = self.views_nocache
-                cache.set(cache_key, views_st, 60*60*2)
-
-            self._video_views_statistic = views_st
-
-        return self._video_views_statistic
-
-    @property
-    def views_nocache(self):
-        views_st = hitcounts.video_hits.get_counts(self)
-        views_st['total'] = self.view_count
-        return views_st
-
     def title_display(self, use_language_title=True):
         """
         Get the full title to display for users
@@ -362,10 +332,6 @@ class Video(models.Model):
         title = title.replace("\n", ' ')
         # remove any questionable characters
         return re.sub(r'(?u)[^-\w ]', '', title)
-
-    def update_view_counter(self):
-        """Queue a Celery task that will increment the number of views for this video."""
-        hitcounts.video_hits.add_hit(self)
 
     def get_thumbnail(self, fallback=True):
         """Return a URL to this video's thumbnail.
