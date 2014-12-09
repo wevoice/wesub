@@ -20,15 +20,15 @@ def plot(data, title=None, graph_type='Pie'):
         colors=('#4d4d4d', '#5da5da', '#faa43a', '#60bd68', '#f17cb0', '#b2912f', '#b276b2', '#decf3f', '#f15854'))
     data.sort(reverse=True, key=lambda x:x[1])
     if graph_type == 'Pie':
-        pie_chart = pygal.Pie(style=custom_style, inner_radius=.4)
+        chart = pygal.Pie(style=custom_style, inner_radius=.4)
     else:
-        pie_chart = pygal.HorizontalBar(style=custom_style)
+        chart = pygal.HorizontalBar(style=custom_style)
         if data:
-            pie_chart.y_labels = map(repr, range(data[len(data)-1][1] - 1, data[0][1] + 1))
-            pie_chart.value_formatter = lambda x: str(int(x))
+            chart.y_labels = map(repr, range(data[len(data)-1][1] - 1, data[0][1] + 1))
+            chart.value_formatter = lambda x: str(int(x))
     if title:
-        pie_chart.title = title
+        chart.title = title
     data.sort(reverse=True, key=lambda x:x[1])
     for item in data:
-        pie_chart.add(item[0], [{'value': item[1], 'label': item[0]}])
-    return base64.b64encode(pie_chart.render())
+        chart.add(item[0], [{'value': item[1], 'label': item[0]}])
+    return base64.b64encode(chart.render())
