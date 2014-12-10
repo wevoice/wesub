@@ -52,7 +52,6 @@ from vidscraper.errors import Error as VidscraperError
 import widget
 from widget import rpc as widget_rpc
 from auth.models import CustomUser as User
-from statistic.models import EmailShareStatistic
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.permissions import (user_can_view_private_subtitles,
                                    user_can_edit_subtitles)
@@ -458,11 +457,6 @@ def email_friend(request):
     if request.method == 'POST':
         form = EmailFriendForm(request.POST, auto_id="email_friend_id_%s", label_suffix="")
         if form.is_valid():
-            email_st = EmailShareStatistic()
-            if request.user.is_authenticated():
-                email_st.user = request.user
-            email_st.save()
-
             form.send()
             messages.info(request, 'Email Sent!')
 

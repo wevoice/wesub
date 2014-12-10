@@ -197,7 +197,6 @@ INSTALLED_APPS = (
     'profiles',
     'search',
     'staticmedia',
-    'statistic',
     'teams',
     'testhelpers',
     'thirdpartyaccounts',
