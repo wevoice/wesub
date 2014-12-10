@@ -244,11 +244,9 @@ class TestCaseTED(WebdriverTestCase):
         #Add ru draft, no speaker name
         cls._create_subs(cls.speaker_video, 'ru')
         management.call_command('update_index', interactive=False)
+        management.call_command('index_team_videos', 'ted')
         cls.video_pg.open_video_page(cls.speaker_video.video_id)
 
-
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
 
     @classmethod
     def _add_speakername(cls, speaker):

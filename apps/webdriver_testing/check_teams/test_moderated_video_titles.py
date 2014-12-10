@@ -61,9 +61,6 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert('accept')
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
-
     @classmethod
     def _create_subs(cls, video, lc, user, complete=False):
         subtitles_1 = [
@@ -77,11 +74,10 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         add_subtitles(video, lc, subtitles_2,
                       author=user,
                       committer=user,
-                      complete=complete,
+                      action='complete'
                       )
 
-
-    def perform_task(self, task_type, video, action, title=None, edit=None):
+    def perform_task(self, task_type, video, title=None, edit=None):
         self.tasks_tab.perform_task("%s English Subtitles" % task_type,
                                     video.title)
         if edit == 'upload':
@@ -90,14 +86,6 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
             self.editor_pg.edit_sub_line('edit', 1)
         if title:
             self.editor_pg.edit_title(title)
-        if action == "approve":
-            self.editor_pg.collab_action('Approve')
-        elif action == "sendback":
-            self.editor_pg.collab_action('Send Back')
-        elif action == "draft": 
-            self.editor_pg.save('Exit')
-        else:
-            self.editor_pg.endorse_subs()
 
 
     def test_speakername_edit_in_task(self):
@@ -151,7 +139,8 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.data_utils.complete_review_task(video.get_team_video(), 20, self.manager)
         self.tasks_tab.log_in(self.admin.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.perform_task("Approve Original", video, "approve", title=new_title)
+        self.perform_task("Approve Original", video, title=new_title)
+        self.editor_pg.collab_action("Approve")
         self.assertEqual(new_title, self.video_pg.video_title())
 
     def test_review_edit_title(self):
@@ -164,11 +153,13 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         new_title = 'this is a new title'
         self.tasks_tab.log_in(self.manager.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.perform_task("Review Original", video, "approve", title=new_title)
+        self.perform_task("Review Original", video, title=new_title)
+        self.editor_pg.collab_action("Approve")
         self.assertEqual(video.title, self.video_pg.video_title())
         self.tasks_tab.log_in(self.admin.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.perform_task("Approve Original", video, "approve", title=new_title)
+        self.perform_task("Approve Original", video, title=None)
+        self.editor_pg.collab_action("Approve")
         self.video_pg.open_video_page(video.video_id)
         self.assertEqual(new_title, self.video_pg.video_title())
 
@@ -182,11 +173,13 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         new_title = 'this is a new title'
         self.tasks_tab.log_in(self.manager.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.perform_task("Review Original", video, "sendback", title=new_title, edit='type')
+        self.perform_task("Review Original", video, title=new_title, edit='type')
+        self.editor_pg.collab_action("Send Back")
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&/'
                                  % self.team.slug)
         self.perform_task("Transcribe", video, "endorse", edit='upload', title=None)
+        self.editor_pg.collab_action("Endorse")
         self.data_utils.complete_review_task(video.get_team_video(), 20, self.manager)
         self.data_utils.complete_approve_task(video.get_team_video(), 20, self.admin)
         self.video_pg.open_video_page(video.video_id)
@@ -203,7 +196,8 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         new_title = "subtitler edited the title"
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.perform_task("Transcribe", video, "draft", title=new_title, edit='upload')
+        self.perform_task("Transcribe", video, title=new_title, edit='upload')
+        self.editor_pg.save("Exit")
         self.assertEqual(video.title, self.video_pg.video_title())
 
 
@@ -217,7 +211,8 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         new_title = "subtitler edited the title"
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.perform_task("Transcribe", video, "draft", title=new_title, edit='upload')
+        self.perform_task("Transcribe", video, title=new_title, edit='upload')
+        self.editor_pg.save("Exit")
         self.assertEqual(video.title, self.video_pg.video_title())
 
     def test_transcribe_edit_title(self):
@@ -234,8 +229,8 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.data_utils.complete_review_task(video.get_team_video(), 20, self.manager)
         self.tasks_tab.log_in(self.admin.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.perform_task("Approve Original", video, "approve", title=new_title)
-        self.video_pg.open_video_page(video.video_id)
+        self.perform_task("Approve Original", video, title=new_title)
+        self.editor_pg.collab_action("Approve")
         self.assertEqual(new_title, self.video_pg.video_title())
 
     def test_transcribe_edit_title_reviewer_subs(self):
@@ -255,7 +250,7 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.perform_task("Review Original", video, "approve", title=None, edit='upload')
         self.tasks_tab.log_in(self.admin.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.perform_task("Approve Original", video, "approve", title=new_title)
-        self.video_pg.open_video_page(video.video_id)
+        self.perform_task("Approve Original", video, title=new_title)
+        self.editor_pg.collab_action("Approve")
         self.assertEqual(new_title, self.video_pg.video_title())
 

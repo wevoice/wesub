@@ -5,6 +5,7 @@ import os
 import time 
 from django.test import TestCase
 from django.core import management
+from videos.models import Video
 from webdriver_testing.pages.site_pages import site_modals
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing import data_helpers
@@ -20,6 +21,7 @@ class TestCaseTools(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseTools, cls).setUpClass()
         cls.modal = site_modals.SiteModals(cls)
+        cls.data_utils = data_helpers.DataHelpers()
         cls.editor_pg = editor_page.EditorPage(cls)
         cls.video_pg = video_page.VideoPage(cls)
         cls.user = UserFactory.create()
@@ -89,14 +91,4 @@ class TestCaseTools(WebdriverTestCase):
         self.editor_pg.open_ed_with_base(self.video.video_id, 'sv', 'nl')
         self.editor_pg.select_ref_language('Dutch')
         time.sleep(3)
-        self.assertEqual("Element not displayed", self.editor_pg.copy_timings())
-
-    def test_copy_timings_reference_private(self):
-        """No copy in menu if reference subs are draft (private). """
-        sl_tr = self.video.subtitle_language('tr').get_tip(full=True)
-        sl_tr.visibility_override = 'private'
-        sl_tr.save()
-
-        self.editor_pg.open_editor_page(self.video.video_id, 'en')
-        self.editor_pg.select_ref_language('Turkish')
         self.assertEqual("Element not displayed", self.editor_pg.copy_timings())
