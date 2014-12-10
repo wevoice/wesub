@@ -8,18 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Removing unique constraint on 'SubtitleViewsPerDay', fields ['subtitle_language', 'date']
-        db.delete_unique('statistic_subtitleviewsperday', ['subtitle_language_id', 'date'])
-
-        # Removing unique constraint on 'VideoHitsPerMonth', fields ['video', 'date']
-        db.delete_unique('statistic_videohitspermonth', ['video_id', 'date'])
-
-        # Removing unique constraint on 'VideoHitsPerDay', fields ['video', 'date']
-        db.delete_unique('statistic_videohitsperday', ['video_id', 'date'])
-
-        # Removing unique constraint on 'SubtitleViewsPerMonth', fields ['subtitle_language', 'date']
-        db.delete_unique('statistic_subtitleviewspermonth', ['subtitle_language_id', 'date'])
-
         # Deleting model 'SubtitleViewsPerMonth'
         db.delete_table('statistic_subtitleviewspermonth')
 
