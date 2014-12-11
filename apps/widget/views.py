@@ -43,7 +43,6 @@ import widget
 from auth.models import CustomUser
 from teams.models import Task
 from teams.permissions import get_member
-from uslogging.models import WidgetDialogCall
 from utils import DEFAULT_PROTOCOL
 from utils.metrics import Meter
 from videos import models
@@ -375,7 +374,6 @@ def rpc(request, method_name, null=False):
     Meter('widget-rpc-calls').inc()
     if method_name[:1] == '_':
         return HttpResponseServerError('cant call private method')
-    _log_call(request.browser_id, method_name, request.POST.copy())
     args = { 'request': request }
     try:
         for k, v in request.POST.items():
@@ -407,7 +405,6 @@ def rpc(request, method_name, null=False):
 
 @csrf_exempt
 def xd_rpc(request, method_name, null=False):
-    _log_call(request.browser_id, method_name, request.POST.copy())
     args = { 'request' : request }
     for k, v in request.POST.items():
         if k[0:4] == 'xdp:':
@@ -428,7 +425,6 @@ def xd_rpc(request, method_name, null=False):
 
 def jsonp(request, method_name, null=False):
     Meter('widget-jsonp-calls').inc()
-    _log_call(request.browser_id, method_name, request.GET.copy())
     callback = request.GET.get('callback', 'callback')
     args = { 'request' : request }
     for k, v in request.GET.items():
@@ -440,12 +436,3 @@ def jsonp(request, method_name, null=False):
     return HttpResponse(
         "{0}({1});".format(callback, json.dumps(result)),
         "text/javascript")
-
-def _log_call(browser_id, method_name, request_args):
-    if method_name in ['start_editing', 'fork', 'set_title',
-                       'save_subtitles', 'finished_subtitles']:
-        call = WidgetDialogCall(
-            browser_id=browser_id,
-            method=method_name,
-            request_args=request_args)
-        call.save()

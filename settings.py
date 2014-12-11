@@ -201,7 +201,6 @@ INSTALLED_APPS = (
     'testhelpers',
     'thirdpartyaccounts',
     'unisubs_compressor',
-    'uslogging',
     'utils',
     'videos',
     'widget',
