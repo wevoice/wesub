@@ -56,6 +56,7 @@ class TestCaseManualTasks(WebdriverTestCase):
 
 
     def setUp(self):
+        management.call_command('clear_cache')
         management.call_command('update_index', interactive=False)
         self.videos_tab.open_videos_tab(self.team.slug)
 
@@ -289,7 +290,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
                          tv.title), 
                          "You don't have permission to perform this task.")
 
-
     def test_transcription_complete(self):
         """Translation tasks are created for preferred languages, on complete.
 
@@ -477,6 +477,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
 
     def setUp(self):
+        management.call_command('clear_cache')
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert(action='accept')
 
@@ -1105,6 +1106,7 @@ class TestCaseAutomaticTasksLegacyEditor(WebdriverTestCase):
 
 
     def setUp(self):
+        management.call_command('clear_cache')
         self.tasks_tab.open_page('teams/%s' % self.team.slug, True)
 
 
@@ -1213,6 +1215,7 @@ class TestCaseModeratedTasksLegacyEditor(WebdriverTestCase):
         cls.accepted_approve = 'and they are now published!'
 
     def setUp(self):
+        management.call_command('clear_cache')
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert(action='accept')
 

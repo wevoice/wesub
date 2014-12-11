@@ -5,7 +5,7 @@ from utils.factories import *
 from subtitles import pipeline
 
 from webdriver_testing.webdriver_base import WebdriverTestCase
-from webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.data_factories import TeamLangPrefFactory
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages import video_page
 from webdriver_testing.pages.site_pages import video_language_page
@@ -197,7 +197,13 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                                        autocreate_translate=True,
                                        approve_allowed = 10, # manager
                                        review_allowed = 10, # peer
-                                       )
+                                      )
+        lang_list = ['en', 'ru', 'pt-br', 'fr', 'de', 'sv']
+        for language in lang_list:
+            TeamLangPrefFactory.create(
+                team = cls.team,
+                language_code = language,
+                preferred = True)                       
 
         #Create en source language 2 revisions - approved.
         cls.video, cls.tv = cls._add_team_video()
@@ -208,14 +214,14 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         cls.data_utils.complete_approve_task(cls.tv, 20, cls.admin)
        
         #Add sv translation, reviewed
-        cls._upload_translation(cls.video, 'sv', cls.member)
+        cls._upload_subtitles(cls.video, 'sv', cls.member)
         cls.data_utils.complete_review_task(cls.tv, 20, cls.admin)
 
         #Add de translation complete waiting review
-        cls._upload_translation(cls.video, 'de', cls.member)
+        cls._upload_subtitles(cls.video, 'de', cls.member)
 
         #Add ru translation, incomplete.
-        cls._upload_translation(cls.video, 'ru', cls.member, 
+        cls._upload_subtitles(cls.video, 'ru', cls.member, 
                                 complete=False)
 
 
@@ -226,25 +232,11 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                     'language_code': lc,
                     'committer': user,
                     'video': video,
-                    'complete': None,
+                    'complete': complete,
                 }
-        if complete == True:
-            data['action'] = 'complete'
 
         cls.data_utils.add_subs(**data)
 
-    @classmethod
-    def _upload_translation(cls, video, lc, user, complete=True):
-        data = {
-                    'language_code': lc,
-                    'committer': user,
-                    'video': video,
-                    'complete': None
-                }
-        if complete == True:
-            data['action'] = 'complete'
-
-        cls.data_utils.add_subs(**data)
 
     @classmethod
     def _add_team_video(cls):

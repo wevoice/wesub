@@ -46,6 +46,7 @@ from tastypie.models import ApiKey
 
 from caching import CacheGroup, ModelCacheManager
 from utils.tasks import send_templated_email_async
+from utils import translation
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 EMAIL_CONFIRMATION_DAYS = getattr(settings, 'EMAIL_CONFIRMATION_DAYS', 3)
@@ -216,13 +217,16 @@ class CustomUser(BaseUser):
                 .exclude(customuser__followed_languages__video=instance.video).delete()
 
     def get_languages(self):
-        """
-        Just to control this query
-        """
+        """Get a list of language codes that the user speaks."""
         return self.cache.get_or_calc("languages", self.calc_languages)
 
     def calc_languages(self):
         return list(self.userlanguage_set.values_list('language', flat=True))
+
+    def get_language_names(self):
+        """Get a list of language names that the user speaks."""
+        return [translation.get_language_label(lc)
+                for lc in self.get_languages()]
 
     def speaks_language(self, language_code):
         return language_code in [l.language for l in self.get_languages()]
@@ -293,18 +297,15 @@ class CustomUser(BaseUser):
         if user_languages:
             return user_languages[0].language
 
-        from utils.translation import get_user_languages_from_request
-
         if request:
-            languages = get_user_languages_from_request(request)
+            languages = translation.get_user_languages_from_request(request)
             if languages:
                 return languages[0]
 
         return 'en'
 
     def guess_is_rtl(self, request=None):
-        from utils.translation import is_rtl
-        return is_rtl(self.guess_best_lang(request))
+        return translation.is_rtl(self.guess_best_lang(request))
 
     @models.permalink
     def profile_url(self):
@@ -420,11 +421,11 @@ class UserLanguage(models.Model):
 
     def save(self, *args, **kwargs):
         super(UserLanguage, self).save(*args, **kwargs)
-        cache.delete('user_languages_%s' % self.user_id)
+        CustomUser.cache.invalidate_by_pk(self.user_id)
 
     def delete(self, *args, **kwargs):
-        cache.delete('user_languages_%s' % self.user_id)
-        return super(UserLanguage, self).delete(*args, **kwargs)
+        super(UserLanguage, self).delete(*args, **kwargs)
+        CustomUser.cache.invalidate_by_pk(self.user_id)
 
 class Announcement(models.Model):
     content = models.CharField(max_length=500)
