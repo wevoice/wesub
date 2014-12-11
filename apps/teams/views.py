@@ -915,20 +915,22 @@ def statistics(request, slug, tab='teamstats'):
     graph_recent = ''
     if tab == 'videosstats':
         languages = list(SubtitleLanguage.objects.filter(video__in=team.videos.all()).values_list('language_code', flat=True))
-        summary = _(u'%s Videos, %s Languages' % (team.videos_count, len(languages)))
         numbers = []
         total = 0
-        for l in set(languages):
+        unique_languages = set(languages)
+        summary = _(u'%s Videos, %s Languages' % (team.videos_count, len(unique_languages)))
+        for l in unique_languages:
             count = languages.count(l)
             numbers.append((ALL_LANGUAGES_DICT[l], count))
             total += count
         title = _(u"%s Captions and Translations") % total
         graph = plot(numbers, title=title)
         languages_recent = list(SubtitleLanguage.objects.filter(video__in=team.videos_since(30)).values_list('language_code', flat=True))
-        summary_recent = _(u'%s Videos, %s Languages this month' % (team.videos_count_since(30), len(languages_recent)))
+        unique_languages_recent = set(languages_recent)
+        summary_recent = _(u'%s Videos, %s Languages this month' % (team.videos_count_since(30), len(unique_languages_recent)))
         numbers_recent = []
         total_recent = 0
-        for l in set(languages_recent):
+        for l in unique_languages_recent:
             count_recent = languages_recent.count(l)
             numbers_recent.append((ALL_LANGUAGES_DICT[l], count_recent))
             total_recent += count_recent
