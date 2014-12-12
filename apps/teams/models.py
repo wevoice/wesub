@@ -2646,8 +2646,8 @@ class TeamLanguagePreference(models.Model):
     team = models.ForeignKey(Team, related_name="lang_preferences")
     language_code = models.CharField(max_length=16)
 
-    allow_reads = models.BooleanField()
-    allow_writes = models.BooleanField()
+    allow_reads = models.BooleanField(default=False)
+    allow_writes = models.BooleanField(default=False)
     preferred = models.BooleanField(default=False)
 
     objects = TeamLanguagePreferenceManager()
@@ -3212,7 +3212,7 @@ class BillingRecord(models.Model):
             blank=True, on_delete=models.SET_NULL)
 
     minutes = models.FloatField(blank=True, null=True)
-    is_original = models.BooleanField()
+    is_original = models.BooleanField(default=False)
     team = models.ForeignKey(Team)
     created = models.DateTimeField()
     source = models.CharField(max_length=255)

@@ -225,7 +225,7 @@ class Video(models.Model):
     title = models.CharField(max_length=2048, blank=True)
     description = models.TextField(blank=True)
     duration = models.PositiveIntegerField(null=True, blank=True, help_text=_(u'in seconds'))
-    allow_community_edits = models.BooleanField()
+    allow_community_edits = models.BooleanField(default=False)
     allow_video_urls_edit = models.BooleanField(default=True)
     writelock_time = models.DateTimeField(null=True, editable=False)
     writelock_session_key = models.CharField(max_length=255, editable=False)
@@ -1068,7 +1068,7 @@ class VideoMetadata(models.Model):
 # SubtitleLanguage
 class SubtitleLanguage(models.Model):
     video = models.ForeignKey(Video)
-    is_original = models.BooleanField()
+    is_original = models.BooleanField(default=False)
     language = models.CharField(max_length=16, choices=ALL_LANGUAGES, blank=True)
     writelock_time = models.DateTimeField(null=True, editable=False)
     writelock_session_key = models.CharField(max_length=255, blank=True, editable=False)
