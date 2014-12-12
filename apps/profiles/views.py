@@ -29,7 +29,6 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_unicode
-from django.views.generic.list_detail import object_list
 from django.views.generic.simple import direct_to_template
 from tastypie.models import ApiKey
 
@@ -38,6 +37,7 @@ from profiles.forms import (EditUserForm, EditAccountForm, SendMessageForm,
                             EditAvatarForm, AdminProfileForm)
 from profiles.rpc import ProfileApiClass
 import externalsites.models
+from utils.objectlist import object_list
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
 from utils.text import fmt
