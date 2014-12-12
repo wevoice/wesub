@@ -29,14 +29,14 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import ObjectDoesNotExist
 from django.http import HttpResponse, Http404, HttpResponseServerError, HttpResponseRedirect
-from django.shortcuts import render_to_response, redirect, get_object_or_404
+from django.shortcuts import (render, render_to_response, redirect,
+                              get_object_or_404)
 from django.template import RequestContext
 from django.template.defaultfilters import urlize, linebreaks, force_escape
 from django.utils.encoding import iri_to_uri
 from django.utils.http import cookie_date
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic.simple import direct_to_template
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 import widget
@@ -58,8 +58,9 @@ def embedder_widget(request, analytics):
     """
     This serves the new embedder.
     """
-    return direct_to_template(request, 'embedder-widget.html',
-                              {'noanalytics': analytics == "noanalytics/"})
+    return render(request, 'embedder-widget.html', {
+        'noanalytics': analytics == "noanalytics/",
+    })
 
 def embed(request, version_no=''):
     """
