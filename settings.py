@@ -178,7 +178,6 @@ INSTALLED_APPS = (
     'haystack',
     'rosetta',
     'raven.contrib.django.raven_compat',
-    'south',
     'rest_framework',
     'tastypie',
     # third party apps forked on our repo
