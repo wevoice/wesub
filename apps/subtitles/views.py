@@ -191,8 +191,12 @@ class SubtitleEditorBase(View):
     def editor_data_for_language(self, language):
         versions_data = []
 
-        versions = list(language.subtitleversion_set.full())
-        for i, version in enumerate(versions):
+        if self.workflow.user_can_view_private_subtitles(
+            self.user, language.language_code):
+            language_qs = language.subtitleversion_set.extant()
+        else:
+            language_qs = language.subtitleversion_set.public()
+        for i, version in enumerate(language_qs):
             version_data = {
                 'version_no':version.version_number,
                 'visibility': visibility(version),
@@ -202,7 +206,7 @@ class SubtitleEditorBase(View):
             elif self.translated_from_version == version:
                 version_data.update(_version_data(version))
             elif (language.language_code == self.base_language and
-                  i == len(versions) - 1):
+                  i == len(language_qs) - 1):
                 version_data.update(_version_data(version))
 
             versions_data.append(version_data)

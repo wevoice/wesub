@@ -130,6 +130,10 @@ class EditorPage(UnisubsPage):
         self.select_option_by_text(self._REFERENCE_SELECT, language)
         time.sleep(2)
 
+    def reference_languages(self):
+        els = self.get_elements_list(self._REFERENCE_SELECT)
+        return [el.text for el in els]
+
     def select_ref_version(self, version_no):
         """Choose a reference version from the list. """
 
@@ -407,7 +411,7 @@ class EditorPage(UnisubsPage):
         return self.is_element_visible(self._COLLAB_PANEL)
 
     def collab_action(self, action):
-        els = self.get_elements_list("div.actions button")
+        els = self.get_elements_list("button[ng-repeat='action in actions']")
         [el.click() for el in els if el.text == action]
 
     def action_buttons(self):

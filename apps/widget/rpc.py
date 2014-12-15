@@ -211,10 +211,6 @@ class Rpc(BaseRpc):
         # played from amara or other sites, however it wasn't very useful
         # since most other sites din't use it.  So when we switched to the new
         # statistics system we just removed the functionality.
-        #
-        # It would be great to re-implement this, and connect it to
-        # statistics.hitcounts.subtitle_views.  However, we need to figure how
-        # to deal the external sites.
 
         return { 'response': 'ok' }
 

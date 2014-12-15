@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+from caching.tests.utils import assert_invalidates_model_cache
 
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
@@ -32,24 +33,23 @@ class TestCaseMembersTab(WebdriverTestCase):
         cls.project = ProjectFactory(team=cls.team)
         cls.members_tab.open_members_page(cls.team.slug)
 
-
     def test_invitation_form(self):
         """Send an invitation via the form on the members tab.
 
         """
+        non_member = UserFactory()
         self.members_tab.log_in(self.admin.username, 'password')
         self.members_tab.open_members_page(self.team.slug)
-        self.members_tab.invite_user_via_form(user = self.user,
-                                              message = 'Join my team',
-                                              role = 'Contributor')
-        self.members_tab.log_in(self.user.username, 'password')
-        self.assertEqual(1, self.user.team_invitations.count())
-        self.assertEqual(1, self.team.invitations.count())
+        self.members_tab.invite_user_via_form(
+            user = non_member,
+            message = 'Join my team',
+            role = 'Contributor')
+        self.assertEqual(1, non_member.team_invitations.count())
         #Verify the user gets the message displayed.
+        self.members_tab.log_in(non_member.username, 'password')
         self.user_message_pg.open_messages()
         self.assertTrue('has invited you' in 
             self.user_message_pg.message_text())
-
 
     def test_assign_manager(self):
         """Asign a manager with no restrictions.
@@ -59,7 +59,8 @@ class TestCaseMembersTab(WebdriverTestCase):
  
         self.members_tab.log_in(self.admin.username, 'password')
         self.members_tab.member_search(self.promoted_manager.username)
-        self.members_tab.edit_user(role="Manager")
+        with assert_invalidates_model_cache(self.team):
+            self.members_tab.edit_user(role="Manager")
         self.members_tab.member_search(self.promoted_manager.username)
         self.assertEqual(self.members_tab.user_role(), 'Manager')
 
