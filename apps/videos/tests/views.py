@@ -388,16 +388,6 @@ class TestViews(WebUseTest):
     def test_policy_page(self):
         self._simple_test('policy_page')
 
-    def test_volunteer_page_category(self):
-        self._login()
-        categories = ['featured', 'popular', 'requested', 'latest']
-        for category in categories:
-            url = reverse('videos:volunteer_category',
-                          kwargs={'category': category})
-
-            response = self.client.post(url)
-            self.assertEqual(response.status_code, 200)
-
 class VideoTitleTest(TestCase):
     def check_video_page_title(self, video, correct_title):
         video.cache.invalidate()
