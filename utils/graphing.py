@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger("Graphs")
 
-def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Other", y_title=None, x_labels=None):
+def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Other", y_title=None, labels=False):
     logger.error(data)
     custom_style = Style(
         background='transparent',
@@ -24,12 +24,7 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
     else:
         chart = pygal.HorizontalBar(style=custom_style)
         if data:
-            if x_labels:
-                chart.x_labels = x_labels
-            if isinstance(data[0][1], list):
-                chart.y_labels = map(repr, range(min(data[0][1] + data[1][1]) - 1, max(data[0][1] + data[1][1]) + 1))
-            else:
-                chart.y_labels = map(repr, range(data[len(data)-1][1] - 1, data[0][1] + 1))
+            chart.y_labels = map(repr, range(data[len(data)-1][1] - 1, data[0][1] + 1))
             chart.value_formatter = lambda x: str(int(x))
     if title:
         chart.title = title
@@ -39,8 +34,8 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
         data = data[:max_entries]
         data.append((other_label,  remaining_data[1]))
     for item in data:
-        if isinstance(item[1], list):
-            chart.add(item[0], item[1])
+        if labels:
+            chart.add(item[0], [{'value': item[1], 'label': item[2]}])
         else:
             chart.add(item[0], [{'value': item[1], 'label': item[0]}])
     if y_title:
