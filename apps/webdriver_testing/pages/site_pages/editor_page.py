@@ -477,8 +477,8 @@ class EditorPage(UnisubsPage):
         for el in buttons:
             if el.text == action:
                 el.click()
-                self.wait_for_element_not_present(self._SESSION_BUTTONS)
-                time.sleep(2)
+                time.sleep(3)
+                self.wait_for_element_not_present("aside.freeze-box", 30)
                 return
             else:
                 self.logger.info("%s button not found" % action)

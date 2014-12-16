@@ -14,7 +14,7 @@ class ActivityTab(ATeamPage):
     _ACTIVITY_FILTER = 'select#id_activity_type'
     _SUBTITLE_LANG_FILTER = 'select#id_subtitles_language'
     _SORT_FILTER = 'select#sort'
-    _PRIMARY_AUDIO_FILTER = 'select#video_language'
+    _PRIMARY_AUDIO_FILTER = 'select#id_video_language'
     _UPDATE_FILTER = 'button#update'
     _ACTIVITY = 'ul.activity li'
 
@@ -60,7 +60,7 @@ class ActivityTab(ATeamPage):
 
         This is only for bulk move videos page.
         """
-        self.click_by_css('div#video_language_chzn')
+        self.click_by_css('div#id_video_language_chzn')
         self.select_from_chosen(self._PRIMARY_AUDIO_FILTER, setting)
 
 

@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python # -*- coding: utf-8 -*-
 
 import time
 
@@ -246,7 +245,12 @@ class TestCaseTED(WebdriverTestCase):
         management.call_command('update_index', interactive=False)
         management.call_command('index_team_videos', 'ted')
         cls.video_pg.open_video_page(cls.speaker_video.video_id)
-
+        
+        #Assign Finnish to Admin
+        tv = cls.speaker_video.get_team_video()
+        task = tv.task_set.incomplete().filter(language='fi')[0]
+        task.assignee = cls.admin
+        task.save()
 
     @classmethod
     def _add_speakername(cls, speaker):
@@ -386,7 +390,7 @@ class TestCaseTED(WebdriverTestCase):
         self.tasks_tab.log_in(self.admin.username, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.ted_team.slug)
-        self.assertTrue(self.tasks_tab.task_present('Approve German Subtitles',
+        self.assertTrue(self.tasks_tab.task_present('Translate Subtitles into Finnish',
                         'Santa: TestVideo1'))
 
     def test_tasks_tab_search_speaker(self):
@@ -394,7 +398,7 @@ class TestCaseTED(WebdriverTestCase):
         self.tasks_tab.log_in(self.admin.username, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?project=any&assignee=anyone&q=Santa'
                                  % self.ted_team.slug)
-        self.assertTrue(self.tasks_tab.task_present('Approve German Subtitles',
+        self.assertTrue(self.tasks_tab.task_present('Translate Subtitles into Finnish',
                         'Santa: TestVideo1'))
 
 

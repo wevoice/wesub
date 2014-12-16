@@ -1177,7 +1177,7 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         self.data_utils.complete_approve_task(tv, 20, self.admin)
         en_v4 = pipeline.add_subtitles(video, 'en', SubtitleSetFactory(), 
                                        committer=self.admin,
-                                       author=self.admin, action='complete')
+                                       author=self.admin, complete='complete')
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(self.admin.username, 'password')
         self.video_lang_pg.open_page(en_v3.get_absolute_url())
@@ -1203,7 +1203,7 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         self.data_utils.complete_approve_task(tv, 20, self.admin)
         en_v4 = pipeline.add_subtitles(video, 'en', SubtitleSetFactory(), 
                                        committer=self.admin,
-                                       author=self.admin, action='complete')
+                                       author=self.admin, complete='complete')
 
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(self.admin.username, 'password')
