@@ -166,11 +166,12 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
 
     def test_review_edit_title_reject(self):
         """Edit title in review, video title updated after publish """
-        video = TeamVideoFactory(team=self.team,
-                                 video__primary_audio_language_code='en'
-                                ).video
+        video = VideoFactory(title = 'test title',
+                             primary_audio_language_code='en'
+                            )
+        TeamVideoFactory(team=self.team, video=video)
         self._create_subs(video, 'en', self.member, complete=True)
-        orig_title = video.title
+        orig_title = 'test title'
         new_title = 'this is a new title'
         self.tasks_tab.log_in(self.manager.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
@@ -242,7 +243,7 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
                              title = 'test title'
                              )
         TeamVideoFactory(video=video, team=self.team)
-        orig_title = video.title
+        orig_title = 'test title' 
         new_title = "edited"
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
