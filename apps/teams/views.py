@@ -940,7 +940,7 @@ def statistics(request, slug, tab='teamstats'):
             total += count_complete + count_incomplete
         summary = _(u'%s Videos, %s Languages' % (team.videos_count, len(unique_languages)))
         title = _(u"%s Captions and Translations") % total
-        graph = plot(numbers, title=title, graph_type='HorizontalBar', labels=True)
+        graph = plot(numbers, title=title, graph_type='HorizontalBar', labels=True, max_entries=20)
 
         
         (complete_languages_recent, incomplete_languages_recent) = _get_team_languages(team, since=30)
@@ -955,7 +955,7 @@ def statistics(request, slug, tab='teamstats'):
             numbers_recent.append((ALL_LANGUAGES_DICT[l], count_complete_recent + count_incomplete_recent, "%s - %s published - %s in-progress" % (ALL_LANGUAGES_DICT[l], count_complete_recent, count_incomplete_recent)))
             total_recent += count_complete_recent + count_incomplete_recent
         title_recent = _(u"%s  Captions and Translations this Month") % total_recent
-        graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True)
+        graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)
     elif tab == 'teamstats':
         languages = list(UserLanguage.objects.filter(user__in=team.users.all()).values_list('language', flat=True))
         unique_languages = set(languages)
