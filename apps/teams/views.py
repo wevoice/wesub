@@ -920,6 +920,11 @@ def _get_team_languages(team, since=None):
     return (complete_languages, incomplete_languages)
 
 def statistics(request, slug, tab='teamstats'):
+    def strip_strings_chrome(s):
+        if len(s) > 13:
+            return s[:11] + u'...'
+        else:
+            return s
     team = get_team_for_view(slug, request.user)
     summary = ''
     graph = ''
@@ -936,7 +941,7 @@ def statistics(request, slug, tab='teamstats'):
         for l in unique_languages:
             count_complete = complete_languages.count(l)
             count_incomplete = incomplete_languages.count(l)
-            numbers.append((ALL_LANGUAGES_DICT[l], count_complete + count_incomplete, "%s - %s published - %s in-progress" % (ALL_LANGUAGES_DICT[l], count_complete, count_incomplete)))
+            numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete + count_incomplete, "%s - %s published - %s in-progress" % (ALL_LANGUAGES_DICT[l], count_complete, count_incomplete)))
             total += count_complete + count_incomplete
         summary = _(u'%s Videos, %s Languages' % (team.videos_count, len(unique_languages)))
         title = _(u"%s Captions and Translations") % total
@@ -952,7 +957,7 @@ def statistics(request, slug, tab='teamstats'):
         for l in unique_languages_recent:
             count_complete_recent = complete_languages_recent.count(l)
             count_incomplete_recent = incomplete_languages_recent.count(l)
-            numbers_recent.append((ALL_LANGUAGES_DICT[l], count_complete_recent + count_incomplete_recent, "%s - %s published - %s in-progress" % (ALL_LANGUAGES_DICT[l], count_complete_recent, count_incomplete_recent)))
+            numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete_recent + count_incomplete_recent, "%s - %s published - %s in-progress" % (ALL_LANGUAGES_DICT[l], count_complete_recent, count_incomplete_recent)))
             total_recent += count_complete_recent + count_incomplete_recent
         title_recent = _(u"%s  Captions and Translations this Month") % total_recent
         graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)
@@ -962,17 +967,17 @@ def statistics(request, slug, tab='teamstats'):
         summary = _(u'%s members speaking %s languages' % (team.members_count, len(unique_languages)))
         numbers = []
         for l in unique_languages:
-            numbers.append((ALL_LANGUAGES_DICT[l], languages.count(l)))
+            numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), languages.count(l), ALL_LANGUAGES_DICT[l]))
         title = u'Languages spoken by team members'
-        graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25)
+        graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25, labels=True)
         languages_recent = list(UserLanguage.objects.filter(user__in=team.members_since(30)).values_list('language', flat=True))
         unique_languages_recent = set(languages_recent)
         summary_recent = _(u'%s new members this month, speaking %s languages' % (team.members_count_since(30), len(unique_languages_recent)))
         numbers_recent = []
         for l in unique_languages_recent:
-            numbers_recent.append((ALL_LANGUAGES_DICT[l], languages_recent.count(l)))
+            numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), languages_recent.count(l), ALL_LANGUAGES_DICT[l]))
         title_recent = u'Languages spoken by team members who joined this month'
-        graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25)
+        graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True)
 
         active_users = {}
         for sv in SubtitleVersion.objects.filter(video__in=team.videos.all()).values_list('author', 'subtitle_language'):
@@ -982,7 +987,7 @@ def statistics(request, slug, tab='teamstats'):
                 active_users[sv[0]] = set([sv[1]])
         def displayable_user(pk):
             u = User.objects.get(pk=int(pk[0]))
-            return ("%s %s (%s)" % (u.first_name, u.last_name, u.username), len(pk[1]))
+            return (strip_strings_chrome("%s %s (%s)" % (u.first_name, u.last_name, u.username)), len(pk[1]), "%s %s (%s)" % (u.first_name, u.last_name, u.username))
         most_active_users = map(displayable_user, active_users.items())
         logger.error(most_active_users)
         most_active_users.sort(reverse=True, key=lambda x: x[1])
@@ -992,7 +997,7 @@ def statistics(request, slug, tab='teamstats'):
         title_additional = "Most active users"
         summary_additional = "%s most active contributors" % len(most_active_users)
         y_title = "Number of Captions and Translations"
-        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title)
+        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title, labels=True)
 
     context = {
         'summary': summary,
