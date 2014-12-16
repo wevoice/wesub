@@ -155,7 +155,7 @@
       </div>
     </div>
 
-    {% if user.is_staff or user|can_translate %}
+    {% if user.is_staff %}
         <div id="admin_controls">
             <ul id="site_controls">
                 {% if user.is_staff %}
@@ -163,9 +163,6 @@
                 {% endif %}
                 {% if user.is_superuser %}
                     <li><a target="_blank" href="//sentry.pculture.org:9000">{% trans 'Sentry' %}</a></li>
-                {% endif %}
-                {% if user|can_translate %}
-                    <li><a target="_blank" href="{% url rosetta-pick-file %}"><span>{% trans 'Rosetta' %}</span></a></li>
                 {% endif %}
                 {% if user.is_superuser %}
                     <li><a target="_blank" href="{% url auth:login_trap %}">{% trans 'Impersonate' %}</a></li>

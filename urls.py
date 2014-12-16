@@ -66,8 +66,6 @@ urlpatterns = patterns('',
         include('comments.urls', namespace='comments')),
     url(r'^messages/',
         include('messages.urls', namespace='messages')),
-    url(r'^rosetta/',
-        include('rosetta.urls')),
     # TODO: Not sure what this is.  It's breaking the app under Django 1.4
     # url(r'^pcf-targetter/',
     #     include('targetter.urls', namespace='targetter')),
