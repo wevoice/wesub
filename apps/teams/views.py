@@ -908,25 +908,53 @@ def remove_video(request, team_video_pk):
         return HttpResponseRedirect(next)
 
 
+def _get_team_languages(team):
+    def first_member(x):
+        return x[0]
+    languages = list(SubtitleLanguage.objects.filter(video__in=team.videos.all()).values_list('language_code', 'subtitles_complete'))
+    complete_languages = map(first_member, filter(lambda x: x[1], languages))
+    incomplete_languages = map(first_member, filter(lambda x: not x[1], languages))
+    return (complete_languages, incomplete_languages)
+
 def statistics(request, slug, tab='teamstats'):
     team = get_team_for_view(slug, request.user)
+    
+
+    
     summary = ''
     graph = ''
     graph_recent = ''
     graph_additional = None
     summary_additional = None
     if tab == 'videosstats':
-        languages = list(SubtitleLanguage.objects.filter(video__in=team.videos.all()).values_list('language_code', flat=True))
-        numbers = []
-        total = 0
+        (complete_languages, incomplete_languages) = _get_team_languages(team)
+        languages = complete_languages + incomplete_languages
         unique_languages = set(languages)
-        summary = _(u'%s Videos, %s Languages' % (team.videos_count, len(unique_languages)))
+        total = 0
+        complete = []
+        incomplete = []
+        labels = []
         for l in unique_languages:
-            count = languages.count(l)
-            numbers.append((ALL_LANGUAGES_DICT[l], count))
-            total += count
+            count_complete = complete_languages.count(l)
+            count_incomplete = incomplete_languages.count(l)
+            complete.append(count_complete)
+            incomplete.append(count_incomplete)
+            labels.append(ALL_LANGUAGES_DICT[l])
+            total += count_complete + count_incomplete
+
+        #languages = list(SubtitleLanguage.objects.filter(video__in=team.videos.all()).values_list('language_code', flat=True))
+        #numbers = []
+        #total = 0
+        #unique_languages = set(languages)
+        summary = _(u'%s Videos, %s Languages' % (team.videos_count, len(unique_languages)))
+        #for l in unique_languages:
+        #    count = languages.count(l)
+        #    numbers.append((ALL_LANGUAGES_DICT[l], count))
+        #    total += count
         title = _(u"%s Captions and Translations") % total
-        graph = plot(numbers, title=title)
+        #graph = plot(numbers, title=title, graph_type='HorizontalBar')
+        graph = plot([("Published", complete), ("In progress", incomplete)], title=title, graph_type='HorizontalBar', x_labels=labels)
+        
         languages_recent = list(SubtitleLanguage.objects.filter(video__in=team.videos_since(30)).values_list('language_code', flat=True))
         unique_languages_recent = set(languages_recent)
         summary_recent = _(u'%s Videos, %s Languages this month' % (team.videos_count_since(30), len(unique_languages_recent)))
@@ -937,7 +965,7 @@ def statistics(request, slug, tab='teamstats'):
             numbers_recent.append((ALL_LANGUAGES_DICT[l], count_recent))
             total_recent += count_recent
         title_recent = _(u"%s  Captions and Translations this Month") % total_recent
-        graph_recent = plot(numbers_recent, title=title_recent)
+        graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar')
     elif tab == 'teamstats':
         languages = list(UserLanguage.objects.filter(user__in=team.users.all()).values_list('language', flat=True))
         unique_languages = set(languages)
