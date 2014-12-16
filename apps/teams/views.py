@@ -913,6 +913,8 @@ def statistics(request, slug, tab='teamstats'):
     summary = ''
     graph = ''
     graph_recent = ''
+    graph_additional = None
+    summary_additional = None
     if tab == 'videosstats':
         languages = list(SubtitleLanguage.objects.filter(video__in=team.videos.all()).values_list('language_code', flat=True))
         numbers = []
@@ -937,28 +939,52 @@ def statistics(request, slug, tab='teamstats'):
         title_recent = _(u"%s  Captions and Translations this Month") % total_recent
         graph_recent = plot(numbers_recent, title=title_recent)
     elif tab == 'teamstats':
-        summary = _(u'%s members' % (team.members_count))
-        summary_recent = _(u'%s new members this month' % (team.members_count_since(30)))
         languages = list(UserLanguage.objects.filter(user__in=team.users.all()).values_list('language', flat=True))
+        unique_languages = set(languages)
+        summary = _(u'%s members speaking %s languages' % (team.members_count, len(unique_languages)))
         numbers = []
-        for l in set(languages):
+        for l in unique_languages:
             numbers.append((ALL_LANGUAGES_DICT[l], languages.count(l)))
         title = u'Languages spoken by team members'
-        graph = plot(numbers, graph_type='HorizontalBar', title=title)
+        graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25)
         languages_recent = list(UserLanguage.objects.filter(user__in=team.members_since(30)).values_list('language', flat=True))
+        unique_languages_recent = set(languages_recent)
+        summary_recent = _(u'%s new members this month, speaking %s languages' % (team.members_count_since(30), len(unique_languages_recent)))
         numbers_recent = []
-        for l in set(languages_recent):
+        for l in unique_languages_recent:
             numbers_recent.append((ALL_LANGUAGES_DICT[l], languages_recent.count(l)))
         title_recent = u'Languages spoken by team members who joined this month'
-        graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent)
+        graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25)
+
+        active_users = {}
+        for sv in SubtitleVersion.objects.filter(video__in=team.videos.all()).values_list('author', 'subtitle_language'):
+            if sv[0] in active_users:
+                active_users[sv[0]].add(sv[1])
+            else:
+                active_users[sv[0]] = set([sv[1]])
+        def displayable_user(pk):
+            u = User.objects.get(pk=int(pk[0]))
+            return ("%s %s (%s)" % (u.first_name, u.last_name, u.username), len(pk[1]))
+        most_active_users = map(displayable_user, active_users.items())
+        logger.error(most_active_users)
+        most_active_users.sort(reverse=True, key=lambda x: x[1])
+        if len(most_active_users) > 20:
+            most_active_users = most_active_users[:20]
+        logger.error(most_active_users)
+        title_additional = "Most active users"
+        summary_additional = "%s most active contributors" % len(most_active_users)
+        y_title = "Number of Captions and Translations"
+        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title)
 
     context = {
         'summary': summary,
         'summary_recent': summary_recent,
+        'summary_additional': summary_additional,
         'activity_tab': tab,
         'team': team,
         'graph': graph,
         'graph_recent': graph_recent,
+        'graph_additional': graph_additional,
     }
     return render(request, 'teams/statistics.html', context)
 
