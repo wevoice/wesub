@@ -40,8 +40,8 @@
                   <h3>
                     <a href="{{ item.user.get_absolute_url }}">{{ item.user }}</a>
 		    <a class="action" href="{% url messages:new %}?user={{ item.user.username }}">{% trans 'Send a message' %}</a>
-                    {% for lang in item.user.get_languages %}
-                    <span class="descriptor">{{ lang.get_language_display }}</span>
+                    {% for language in item.user.get_language_names %}
+                    <span class="descriptor">{{ language }}</span>
                     {% endfor %}
                   </h3>
                         {% if item.note %}
