@@ -23,7 +23,8 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
     else:
         chart = pygal.Bar(style=custom_style, legend_at_bottom=True, explicit_size=True)
         if data:
-            chart.y_labels = map(repr, range(data[len(data)-1][1] - 1, data[0][1] + 1))
+            maximum = data[0][1] + 1
+            chart.y_labels = map(repr, range(0, maximum, max(1, int(maximum/10))))
             chart.value_formatter = lambda x: str(int(x))
     if title:
         chart.title = title
@@ -31,7 +32,7 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
     if max_entries and (len(data) > max_entries):
         remaining_data = reduce(lambda x, y: ('',x[1]+y[1]), data[max_entries:])
         data = data[:max_entries]
-        data.append((other_label,  remaining_data[1], 'Other', ''))
+        #data.append((other_label,  remaining_data[1], 'Other', ''))
     for item in data:
         label = ''
         if labels:
