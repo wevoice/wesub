@@ -20,10 +20,10 @@
 
 from collections import namedtuple
 from lxml import etree
+import json
 import logging
 import urllib
 import re
-import simplejson as json
 
 from django.conf import settings
 from django.utils.translation import ugettext as _

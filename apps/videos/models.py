@@ -17,8 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import logging
-logger = logging.getLogger("videos-models")
-
+import json
 import string
 import random
 from datetime import datetime, date
@@ -37,7 +36,6 @@ from django.utils.dateformat import format as date_format
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
-from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
 
 from auth.models import CustomUser as User, Awards
@@ -56,6 +54,8 @@ from utils.subtitles import create_new_subtitles, dfxp_merge
 from utils.text import fmt
 from teams.moderation_const import MODERATION_STATUSES, UNMODERATED
 from raven.contrib.django.models import client
+
+logger = logging.getLogger("videos-models")
 
 NO_SUBTITLES, SUBTITLES_FINISHED = range(2)
 VIDEO_TYPE_HTML5 = 'H'

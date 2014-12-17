@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import json
 import re
 import time
 import traceback
 
 import babelsubs
 
-import simplejson as json
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -38,7 +38,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.simple import direct_to_template
 from django.views.decorators.clickjacking import xframe_options_exempt
-from simplejson.decoder import JSONDecodeError
 
 import widget
 from auth.models import CustomUser
@@ -382,11 +381,11 @@ def rpc(request, method_name, null=False):
         for k, v in request.POST.items():
             try:
                 args[k.encode('ascii')] = json.loads(v)
-            except JSONDecodeError:
+            except ValueError:
                 pass
     except UnicodeEncodeError:
         return HttpResponseServerError('non-ascii chars received')
-    except JSONDecodeError:
+    except ValueError:
         return HttpResponseServerError('invalid json')
     rpc_module = null_rpc_views if null else rpc_views
     try:
@@ -414,7 +413,7 @@ def xd_rpc(request, method_name, null=False):
         if k[0:4] == 'xdp:':
             try:
                 args[k[4:].encode('ascii')] = json.loads(v)
-            except JSONDecodeError:
+            except ValueError:
                 pass
     rpc_module = null_rpc_views if null else rpc_views
     func = getattr(rpc_module, method_name)

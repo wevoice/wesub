@@ -21,7 +21,7 @@ import string
 import urllib, urllib2
 from collections import namedtuple
 
-import simplejson as json
+import json
 from babelsubs.storage import diff as diff_subs
 from babelsubs.generators.html import HTMLGenerator
 from django.conf import settings

@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import functools
+import json
 import logging
 import random
 
@@ -36,7 +37,6 @@ from django.http import (
 from django.shortcuts import (get_object_or_404, redirect, render_to_response,
                               render)
 from django.template import RequestContext
-from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri, force_unicode
 from django.views.generic.list_detail import object_list

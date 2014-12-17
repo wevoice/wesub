@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import json
 import logging
 from datetime import datetime, timedelta
 
@@ -26,7 +27,6 @@ from django.core.urlresolvers import  reverse
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
-from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_unicode
 from django.views.generic.list_detail import object_list

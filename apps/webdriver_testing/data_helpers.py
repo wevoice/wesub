@@ -1,6 +1,6 @@
+import json
 import logging
 import time
-import simplejson
 import requests
 from django.core import management
 from django.http import HttpResponse
@@ -40,7 +40,7 @@ class DataHelpers(object):
                     'X-apikey': api_user.get_api_key(),
                     'X-api-username': api_user.username,
                   }
-        r = getattr(s, request_type)(url, headers=headers, data=simplejson.dumps(kwargs))
+        r = getattr(s, request_type)(url, headers=headers, data=json.dumps(kwargs))
         return r
 
     def create_video(self, **kwargs):

@@ -19,11 +19,11 @@
 from __future__ import absolute_import
 import datetime
 import itertools
+import json
 import string
 
 from django.test import TestCase
 from django.db.models.signals import post_save
-from django.utils import simplejson as json
 import babelsubs
 import mock
 
