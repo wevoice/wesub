@@ -926,7 +926,14 @@ def activity(request, slug, tab='videos'):
     if tab == 'team':
         action_qs = Action.objects.filter(team=team)
     else:
-        action_qs = Action.objects.for_team_videos(team)
+        video_language = request.GET.get('video_language')
+        if video_language == 'any':
+            video_language = None
+        subtitles_language = request.GET.get('subtitles_language')
+        if subtitles_language == 'any':
+            subtitles_language = None
+        action_qs = team.fetch_video_actions(video_language,
+                                             subtitles_language)
     end = page * ACTIONS_ON_PAGE
     start = end - ACTIONS_ON_PAGE
 
@@ -934,11 +941,6 @@ def activity(request, slug, tab='videos'):
         action_qs = action_qs.filter(action_type = int(request.GET.get('action_type')))
 
     action_qs = action_qs.select_related('new_language', 'video')
-    if tab == 'videos':
-        if request.GET.get('video_language') and request.GET.get('video_language') != 'any':
-            action_qs = action_qs.filter(video__primary_audio_language_code = request.GET.get('video_language'))
-        if request.GET.get('subtitles_language') and request.GET.get('subtitles_language') != 'any':
-            action_qs = action_qs.filter(new_language__isnull = False, new_language__language_code = request.GET.get('subtitles_language'))
 
     sort = request.GET.get('sort', '-created')
     action_qs = action_qs.order_by(sort)
