@@ -16,8 +16,8 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.conf.urls.defaults import url, patterns
 from django.views.generic.base import TemplateView
+from django.conf.urls import url, patterns
 from teams.rpc import rpc_router
 
 urlpatterns = patterns('teams.views',

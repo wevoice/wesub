@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from openid_consumer.views import begin, complete, signout
 from django.views.generic.base import TemplateView
 
