@@ -52,4 +52,7 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
     if len(data) < 4:
         chart.width = 450
         chart.height = 345
+    else:
+        chart.width = 645
+        chart.height = 517
     return base64.b64encode(chart.render())
