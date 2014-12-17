@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger("Graphs")
 
-def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Other", y_title=None, labels=False):
+def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Other", y_title=None, labels=False, xlinks=False):
     custom_style = Style(
         background='transparent',
         font_family='sans-serif',
@@ -33,10 +33,19 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
         data = data[:max_entries]
         data.append((other_label,  remaining_data[1], 'Other'))
     for item in data:
+        label = ''
         if labels:
-            chart.add(item[0], [{'value': item[1], 'label': item[2]}])
+            label = item[2]
         else:
-            chart.add(item[0], [{'value': item[1], 'label': item[0]}])
+            label = item[0]
+        if xlinks:
+            chart.add(item[0], [{'value': item[1],
+                                 'label': label,
+                                 'xlink': {
+                                     'href': item[3],
+                                     'target': '_blank'}}])
+        else:
+            chart.add(item[0], [{'value': item[1], 'label': label}])
     if y_title:
         chart.y_title = y_title
     if len(data) < 4:

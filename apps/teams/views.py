@@ -987,16 +987,17 @@ def statistics(request, slug, tab='teamstats'):
                 active_users[sv[0]] = set([sv[1]])
         def displayable_user(pk):
             u = User.objects.get(pk=int(pk[0]))
-            return (strip_strings_chrome("%s %s (%s)" % (u.first_name, u.last_name, u.username)), len(pk[1]), "%s %s (%s)" % (u.first_name, u.last_name, u.username))
+            return (strip_strings_chrome("%s %s (%s)" % (u.first_name, u.last_name, u.username)), len(pk[1]),
+                    "%s %s (%s)" % (u.first_name, u.last_name, u.username),
+                    "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse("profiles:profile", kwargs={'user_id': str(pk[0])}))
+            )
         most_active_users = map(displayable_user, active_users.items())
-        logger.error(most_active_users)
         most_active_users.sort(reverse=True, key=lambda x: x[1])
         if len(most_active_users) > 20:
             most_active_users = most_active_users[:20]
-        logger.error(most_active_users)
         title_additional = "%s most active contributors" % len(most_active_users)
         y_title = "Number of Captions and Translations"
-        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title, labels=True)
+        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title, labels=True, xlinks=True)
 
     context = {
         'summary': summary,
