@@ -21,7 +21,7 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
     if graph_type == 'Pie':
         chart = pygal.Pie(style=custom_style, inner_radius=.4)
     else:
-        chart = pygal.Bar(style=custom_style, legend_at_bottom=True)
+        chart = pygal.Bar(style=custom_style, legend_at_bottom=True, explicit_size=True)
         if data:
             chart.y_labels = map(repr, range(data[len(data)-1][1] - 1, data[0][1] + 1))
             chart.value_formatter = lambda x: str(int(x))
@@ -39,4 +39,7 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
             chart.add(item[0], [{'value': item[1], 'label': item[0]}])
     if y_title:
         chart.y_title = y_title
+    if len(data) < 4:
+        chart.width = 450
+        chart.height = 345
     return base64.b64encode(chart.render())

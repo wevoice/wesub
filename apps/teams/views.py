@@ -951,7 +951,7 @@ def statistics(request, slug, tab='teamstats'):
         (complete_languages_recent, incomplete_languages_recent) = _get_team_languages(team, since=30)
         languages_recent = complete_languages_recent + incomplete_languages_recent
         unique_languages_recent = set(languages_recent)
-        summary_recent = _(u'%s Videos, %s Languages this month' % (team.videos_count_since(30), len(unique_languages_recent)))
+        summary_recent = _(u'Last 30 days: %s Videos, %s Languages' % (team.videos_count_since(30), len(unique_languages_recent)))
         numbers_recent = []
         total_recent = 0
         for l in unique_languages_recent:
@@ -959,7 +959,7 @@ def statistics(request, slug, tab='teamstats'):
             count_incomplete_recent = incomplete_languages_recent.count(l)
             numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete_recent + count_incomplete_recent, "%s - %s published - %s in-progress" % (ALL_LANGUAGES_DICT[l], count_complete_recent, count_incomplete_recent)))
             total_recent += count_complete_recent + count_incomplete_recent
-        title_recent = _(u"%s  Captions and Translations this Month") % total_recent
+        title_recent = _(u"Last 30 days: %s  Captions and Translations were published") % total_recent
         graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)
     elif tab == 'teamstats':
         languages = list(UserLanguage.objects.filter(user__in=team.users.all()).values_list('language', flat=True))
@@ -972,11 +972,11 @@ def statistics(request, slug, tab='teamstats'):
         graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25, labels=True)
         languages_recent = list(UserLanguage.objects.filter(user__in=team.members_since(30)).values_list('language', flat=True))
         unique_languages_recent = set(languages_recent)
-        summary_recent = _(u'%s new members this month, speaking %s languages' % (team.members_count_since(30), len(unique_languages_recent)))
+        summary_recent = _(u'Last 30 days: %s new members speaking %s languages' % (team.members_count_since(30), len(unique_languages_recent)))
         numbers_recent = []
         for l in unique_languages_recent:
             numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), languages_recent.count(l), ALL_LANGUAGES_DICT[l]))
-        title_recent = u'Languages spoken by team members who joined this month'
+        title_recent = u'Languages spoken by team members'
         graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True)
 
         active_users = {}
