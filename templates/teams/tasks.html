@@ -19,7 +19,6 @@
         {% endif %}
         window.CURRENT_USER_ID = {% firstof request.user.id %};
         window.TEAM_SLUG = '{{ team.slug }}';
-        window.USER_LANGS = {{ user.get_languages.count }};
         window.REQUEST_TEAM_VIDEO = '{{ request.GET.team_video }}';
     </script>
 {% endblock %}
