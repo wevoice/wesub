@@ -33,7 +33,7 @@ from django.db.models import query
 from django.db.models.signals import post_save, post_delete, pre_delete
 from django.http import Http404
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 from haystack import site
 from haystack.query import SQ
 
@@ -560,10 +560,21 @@ class Team(models.Model):
 
         Caches the result in-object for performance.
 
+        Note: the count is capped at 1001 tasks.  If a team has more than
+        that, we generally just want to display "> 1000".  Use
+        get_tasks_count_display() to do that.
+
         """
         if not hasattr(self, '_tasks_count'):
             setattr(self, '_tasks_count', self._count_tasks())
         return self._tasks_count
+
+    def get_tasks_count_display(self):
+        """Get a string to display for our tasks count."""
+        if self.tasks_count <= 1000:
+            return unicode(self.tasks_count)
+        else:
+            return ugettext('> 1000')
 
     # Applications (people applying to join)
     def application_message(self):

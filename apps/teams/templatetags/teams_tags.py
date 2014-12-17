@@ -198,7 +198,7 @@ def team_metrics(team, member, projects):
         metrics.append(TeamMetric(
             reverse('teams:team_tasks', args=(team.slug,)),
             ngettext('Task', 'Tasks', team.tasks_count),
-            team.tasks_count))
+            team.get_tasks_count_display()))
     if projects:
         metrics.append(TeamMetric(
             reverse('teams:detail', args=(team.slug,)),
