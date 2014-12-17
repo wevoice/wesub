@@ -22,8 +22,7 @@
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph }}"></object>
 	  <p class="summary">{{ summary_recent }}</p>
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_recent }}"></object>
-	  {% if graph_additional and summary_additional %}
-	  <p class="summary">{{ summary_additional }}</p>
+	  {% if graph_additional %}
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_additional }}"></object>
 	  {% endif %}
 	</div>

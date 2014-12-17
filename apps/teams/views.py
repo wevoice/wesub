@@ -980,7 +980,7 @@ def statistics(request, slug, tab='teamstats'):
         graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True)
 
         active_users = {}
-        for sv in SubtitleVersion.objects.filter(video__in=team.videos.all()).values_list('author', 'subtitle_language'):
+        for sv in SubtitleVersion.objects.filter(video__in=team.videos.all()).exclude(author__username="anonymous").values_list('author', 'subtitle_language'):
             if sv[0] in active_users:
                 active_users[sv[0]].add(sv[1])
             else:
@@ -994,15 +994,13 @@ def statistics(request, slug, tab='teamstats'):
         if len(most_active_users) > 20:
             most_active_users = most_active_users[:20]
         logger.error(most_active_users)
-        title_additional = "Most active users"
-        summary_additional = "%s most active contributors" % len(most_active_users)
+        title_additional = "%s most active contributors" % len(most_active_users)
         y_title = "Number of Captions and Translations"
         graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title, labels=True)
 
     context = {
         'summary': summary,
         'summary_recent': summary_recent,
-        'summary_additional': summary_additional,
         'activity_tab': tab,
         'team': team,
         'graph': graph,
