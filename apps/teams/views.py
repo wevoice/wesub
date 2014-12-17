@@ -975,9 +975,14 @@ def statistics(request, slug, tab='teamstats'):
         summary_recent = _(u'Last 30 days: %s new members speaking %s languages' % (team.members_count_since(30), len(unique_languages_recent)))
         numbers_recent = []
         for l in unique_languages_recent:
-            numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), languages_recent.count(l), ALL_LANGUAGES_DICT[l]))
+            numbers_recent.append(
+                (strip_strings_chrome(ALL_LANGUAGES_DICT[l]),
+                 languages_recent.count(l),
+                 ALL_LANGUAGES_DICT[l],
+                 "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse('teams:detail_members', args=[], kwargs={'slug': team.slug}) + "?sort=-joined&lang=%s" % l))
+                )
         title_recent = u'Languages spoken by team members'
-        graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True)
+        graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True, xlinks=True)
 
         active_users = {}
         for sv in SubtitleVersion.objects.filter(video__in=team.videos.all()).exclude(author__username="anonymous").values_list('author', 'subtitle_language'):
