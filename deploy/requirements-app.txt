@@ -21,7 +21,6 @@ vendor/django-storages.tar.gz
 vendor/python-openid-2.2.5.tar.gz
 vendor/python-yadis-1.1.0.tar.gz
 vendor/gdata-2.0.16.tar.gz
-vendor/django-math-captcha-0.1.tar.gz
 vendor/BeautifulSoup-3.2.0.tar.gz
 celery==3.0.11
 billiard==2.7.3.30
