@@ -1,9 +1,19 @@
 import pygal
 from pygal.style import Style
+from tempfile import NamedTemporaryFile
 import base64
 import logging
 
 logger = logging.getLogger("Graphs")
+
+custom_css = '''
+{{ id }}.tooltip rect {
+  fill: grey !important;
+}
+'''
+custom_css_file = '/tmp/pygal_custom_style.css'
+with open(custom_css_file, 'w') as f:
+  f.write(custom_css)
 
 def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Other", y_title=None, labels=False, xlinks=False):
     custom_style = Style(
@@ -14,14 +24,16 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
         foreground_light='black',
         foreground_dark='#FFFFFF',
         opacity='.9',
-        opacity_hover='.5',
+        opacity_hover='0.5',
         transition='400ms ease-in',
         colors=('#5da5da', '#faa43a', '#60bd68', '#f17cb0', '#b2912f', '#b276b2', '#decf3f', '#f15854', '#4d4d4d'))
     data.sort(reverse=True, key=lambda x:x[1])
     if graph_type == 'Pie':
         chart = pygal.Pie(style=custom_style, inner_radius=.4)
     else:
-        chart = pygal.Bar(style=custom_style, legend_at_bottom=True, explicit_size=True)
+        config = pygal.Config(style=custom_style, legend_at_bottom=True, explicit_size=True)
+        config.css.append(custom_css_file)
+        chart = pygal.Bar(config)
         if data:
             maximum = data[0][1] + 1
             chart.y_labels = map(repr, range(0, maximum, max(1, int(maximum/10))))
