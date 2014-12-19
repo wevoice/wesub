@@ -930,8 +930,8 @@ def _get_team_languages(team, since=None):
 
 def statistics(request, slug, tab='teamstats'):
     def strip_strings_chrome(s):
-        if len(s) > 13:
-            return s[:11] + u'...'
+        if len(s) > 11:
+            return s[:9] + u'...'
         else:
             return s
     team = get_team_for_view(slug, request.user)
