@@ -941,7 +941,7 @@ def statistics(request, slug, tab='teamstats'):
         for l in unique_languages:
             count_complete = complete_languages.count(l)
             count_incomplete = incomplete_languages.count(l)
-            numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete + count_incomplete, "%s - %s published - %s in-progress" % (ALL_LANGUAGES_DICT[l], count_complete, count_incomplete)))
+            numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete + count_incomplete, "%s - %s published" % (ALL_LANGUAGES_DICT[l], count_complete)))
             total += count_complete + count_incomplete
         summary = _(u'%s Videos, %s Languages' % (team.videos_count, len(unique_languages)))
         title = _(u"%s Captions and Translations") % total
@@ -957,7 +957,7 @@ def statistics(request, slug, tab='teamstats'):
         for l in unique_languages_recent:
             count_complete_recent = complete_languages_recent.count(l)
             count_incomplete_recent = incomplete_languages_recent.count(l)
-            numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete_recent + count_incomplete_recent, "%s - %s published - %s in-progress" % (ALL_LANGUAGES_DICT[l], count_complete_recent, count_incomplete_recent)))
+            numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete_recent + count_incomplete_recent, "%s - %s published" % (ALL_LANGUAGES_DICT[l], count_complete_recent)))
             total_recent += count_complete_recent + count_incomplete_recent
         title_recent = _(u"Last 30 days: %s  Captions and Translations were published") % total_recent
         graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)

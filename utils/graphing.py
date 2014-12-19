@@ -8,7 +8,11 @@ logger = logging.getLogger("Graphs")
 
 custom_css = '''
 {{ id }}.tooltip rect {
-  fill: grey !important;
+  fill: gray !important;
+}
+
+{{ id }} .value:before {
+  content: "Hello" !important;
 }
 '''
 custom_css_file = '/tmp/pygal_custom_style.css'
@@ -60,11 +64,12 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
         if xlinks:
             chart.add(item[0], [{'value': item[1],
                                  'label': label,
+                                 'value 2': "Total: ",
                                  'xlink': {
                                      'href': item[3],
                                      'target': '_blank'}}])
         else:
-            chart.add(item[0], [{'value': item[1], 'label': label}])
+            chart.add(item[0], [{'value': item[1], 'label': label, 'value 2': "Total: "}])
     if y_title:
         chart.y_title = y_title
     if len(data) < 4:
