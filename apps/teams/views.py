@@ -970,7 +970,7 @@ def statistics(request, slug, tab='teamstats'):
         numbers = []
         for l in unique_languages:
             numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), languages.count(l), ALL_LANGUAGES_DICT[l]))
-        title = u'Languages spoken by team members'
+        title = ''
         graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25, labels=True)
         languages_recent = list(UserLanguage.objects.filter(user__in=team.members_since(30)).values_list('language', flat=True))
         unique_languages_recent = set(languages_recent)
@@ -983,7 +983,7 @@ def statistics(request, slug, tab='teamstats'):
                  ALL_LANGUAGES_DICT[l],
                  "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse('teams:detail_members', args=[], kwargs={'slug': team.slug}) + "?sort=-joined&lang=%s" % l))
                 )
-        title_recent = u'Languages spoken by team members'
+        title_recent = ''
         graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True, xlinks=True)
 
         active_users = {}
@@ -1008,7 +1008,7 @@ def statistics(request, slug, tab='teamstats'):
 
         most_active_users = map(displayable_user, most_active_users)
 
-        title_additional = "%s most active contributors" % len(most_active_users)
+        title_additional = "Top %s contributors" % len(most_active_users)
         y_title = "Number of Captions and Translations"
         graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title, labels=True, xlinks=True)
 
