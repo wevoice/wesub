@@ -202,6 +202,7 @@ def latest_videos(request):
     return render_to_response('videos/latest_videos.html', {},
                               context_instance=RequestContext(request))
 
+@login_required
 def create(request):
     video_form = VideoForm(request.user, request.POST or None)
     context = {
