@@ -909,12 +909,15 @@ def remove_video(request, team_video_pk):
 
 
 def _get_team_languages(team, since=None):
+    query_sl = SubtitleLanguage.objects.filter(video__in=team.videos.all())
+    if since:
+        query_sl = query_sl.filter(id__in=SubtitleVersion.objects.filter(video__in=team.videos.all(),
+                                            created__gt=datetime.now() - timedelta(days=since)).order_by('subtitle_language').values_list('subtitle_language', flat=True).distinct())
+    query_sl = query_sl.values_list('language_code', 'subtitles_complete')
+    languages = list(query_sl)
+
     def first_member(x):
         return x[0]
-    if since:
-        languages = list(SubtitleLanguage.objects.filter(video__in=team.videos_since(since)).values_list('language_code', 'subtitles_complete'))
-    else:
-        languages = list(SubtitleLanguage.objects.filter(video__in=team.videos.all()).values_list('language_code', 'subtitles_complete'))
     complete_languages = map(first_member, filter(lambda x: x[1], languages))
     incomplete_languages = map(first_member, filter(lambda x: not x[1], languages))
     return (complete_languages, incomplete_languages)
@@ -947,7 +950,6 @@ def statistics(request, slug, tab='teamstats'):
         title = _(u"%s Captions and Translations") % total
         graph = plot(numbers, title=title, graph_type='HorizontalBar', labels=True, max_entries=20)
 
-        
         (complete_languages_recent, incomplete_languages_recent) = _get_team_languages(team, since=30)
         languages_recent = complete_languages_recent + incomplete_languages_recent
         unique_languages_recent = set(languages_recent)
