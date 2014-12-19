@@ -910,9 +910,11 @@ def remove_video(request, team_video_pk):
 
 def _get_team_languages(team, since=None):
     query_sl = SubtitleLanguage.objects.filter(video__in=team.videos.all())
+    new_languages = []
     if since:
         query_sl = query_sl.filter(id__in=SubtitleVersion.objects.filter(video__in=team.videos.all(),
                                             created__gt=datetime.now() - timedelta(days=since)).order_by('subtitle_language').values_list('subtitle_language', flat=True).distinct())
+        new_languages = list(SubtitleLanguage.objects.filter(video__in=team.videos_since(since)).values_list('language_code', 'subtitles_complete'))
     query_sl = query_sl.values_list('language_code', 'subtitles_complete')
     languages = list(query_sl)
 
@@ -920,7 +922,11 @@ def _get_team_languages(team, since=None):
         return x[0]
     complete_languages = map(first_member, filter(lambda x: x[1], languages))
     incomplete_languages = map(first_member, filter(lambda x: not x[1], languages))
-    return (complete_languages, incomplete_languages)
+    new_languages = map(first_member, new_languages)
+    if since:
+        return (complete_languages, incomplete_languages, new_languages)
+    else:
+        return (complete_languages, incomplete_languages)
 
 def statistics(request, slug, tab='teamstats'):
     def strip_strings_chrome(s):
@@ -950,7 +956,7 @@ def statistics(request, slug, tab='teamstats'):
         title = "Top 20 languages"
         graph = plot(numbers, title=title, graph_type='HorizontalBar', labels=True, max_entries=20)
 
-        (complete_languages_recent, incomplete_languages_recent) = _get_team_languages(team, since=30)
+        (complete_languages_recent, incomplete_languages_recent, new_languages) = _get_team_languages(team, since=30)
         languages_recent = complete_languages_recent + incomplete_languages_recent
         unique_languages_recent = set(languages_recent)
         summary_recent = "Last 30 days"
@@ -961,7 +967,7 @@ def statistics(request, slug, tab='teamstats'):
             count_incomplete_recent = incomplete_languages_recent.count(l)
             numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete_recent + count_incomplete_recent, "%s - %s published" % (ALL_LANGUAGES_DICT[l], count_complete_recent)))
             total_recent += count_complete_recent + count_incomplete_recent
-        title_recent = _(u"%s videos, %s languages edited") % (team.videos_count_since(30), len(unique_languages_recent))
+        title_recent = _(u"%s videos, %s new languages, %s languages edited") % (team.videos_count_since(30), len(set(new_languages)), len(unique_languages_recent))
         graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)
     elif tab == 'teamstats':
         languages = list(UserLanguage.objects.filter(user__in=team.users.all()).values_list('language', flat=True))
