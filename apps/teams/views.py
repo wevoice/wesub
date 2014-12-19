@@ -946,14 +946,14 @@ def statistics(request, slug, tab='teamstats'):
             count_incomplete = incomplete_languages.count(l)
             numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete + count_incomplete, "%s - %s published" % (ALL_LANGUAGES_DICT[l], count_complete)))
             total += count_complete + count_incomplete
-        summary = _(u'%s Videos, %s Languages' % (team.videos_count, len(unique_languages)))
-        title = _(u"%s Captions and Translations") % total
+        summary = _(u'%s videos, %s languages, %s captions and translations' % (team.videos_count, len(unique_languages), total))
+        title = "Top 20 languages"
         graph = plot(numbers, title=title, graph_type='HorizontalBar', labels=True, max_entries=20)
 
         (complete_languages_recent, incomplete_languages_recent) = _get_team_languages(team, since=30)
         languages_recent = complete_languages_recent + incomplete_languages_recent
         unique_languages_recent = set(languages_recent)
-        summary_recent = _(u'Last 30 days: %s Videos, %s Languages' % (team.videos_count_since(30), len(unique_languages_recent)))
+        summary_recent = "Last 30 days"
         numbers_recent = []
         total_recent = 0
         for l in unique_languages_recent:
@@ -961,7 +961,7 @@ def statistics(request, slug, tab='teamstats'):
             count_incomplete_recent = incomplete_languages_recent.count(l)
             numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete_recent + count_incomplete_recent, "%s - %s published" % (ALL_LANGUAGES_DICT[l], count_complete_recent)))
             total_recent += count_complete_recent + count_incomplete_recent
-        title_recent = _(u"Last 30 days: %s  Captions and Translations were published") % total_recent
+        title_recent = _(u"%s videos, %s languages edited") % (team.videos_count_since(30), len(unique_languages_recent))
         graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)
     elif tab == 'teamstats':
         languages = list(UserLanguage.objects.filter(user__in=team.users.all()).values_list('language', flat=True))

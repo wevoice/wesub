@@ -35,7 +35,7 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
     if graph_type == 'Pie':
         chart = pygal.Pie(style=custom_style, inner_radius=.4)
     else:
-        config = pygal.Config(style=custom_style, legend_at_bottom=True, explicit_size=True)
+        config = pygal.Config(style=custom_style, legend_at_bottom=True, explicit_size=True, legend_font_size=12)
         config.css.append(custom_css_file)
         chart = pygal.Bar(config)
         if data:
