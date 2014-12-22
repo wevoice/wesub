@@ -940,6 +940,7 @@ def statistics(request, slug, tab='teamstats'):
     graph_recent = ''
     summary_recent = ''
     graph_additional = None
+    graph_additional_recent = None
     summary_additional = None
     if tab == 'videosstats':
         (complete_languages, incomplete_languages) = _get_team_languages(team)
