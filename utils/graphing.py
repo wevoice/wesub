@@ -61,12 +61,12 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
         if data:
           if (len(data) > 1) and (data[0][1] > 100) and (data[0][1] > 3*data[1][1]):
             maximum = 2 * data[1][1]
-            chart.y_labels = map(repr, range(0, maximum, max(1,round(maximum/10, -int(math.floor(math.log10(1+ maximum/10)))))))
+            chart.y_labels = map(repr, range(0, maximum, max(1,int(round(maximum/10, -int(math.floor(math.log10(1+ maximum/10))))))))
             chart.value_formatter = lambda x: str(int(x))
             chart.range = (0, maximum)
           else:
             maximum = data[0][1] + 1
-            chart.y_labels = map(repr, range(0, maximum, max(1,round(maximum/10, -int(math.floor(math.log10(1+ maximum/10)))))))
+            chart.y_labels = map(repr, range(0, maximum, max(1,int(round(maximum/10, -int(math.floor(math.log10(1+ maximum/10))))))))
             chart.value_formatter = lambda x: str(int(x))
     if title:
         chart.title = title
