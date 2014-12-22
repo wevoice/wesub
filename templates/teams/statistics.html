@@ -25,6 +25,9 @@
 	  {% if graph_additional %}
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_additional }}"></object>
 	  {% endif %}
+	  {% if graph_additional_recent %}
+	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_additional_recent }}"></object>
+	  {% endif %}
 	</div>
   </div>
 {% endblock %}

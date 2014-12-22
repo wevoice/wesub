@@ -1,7 +1,27 @@
+# -*- coding: utf-8 -*-
+# Amara, universalsubtitles.org
+#
+# Copyright (C) 2014 Participatory Culture Foundation
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see
+# http://www.gnu.org/licenses/agpl-3.0.html.
+
 import pygal
 from pygal.style import Style
 from tempfile import NamedTemporaryFile
-import base64
+import base64, math
+import unicodedata
 import logging
 
 logger = logging.getLogger("Graphs")
@@ -46,7 +66,7 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
             chart.range = (0, maximum)
           else:
             maximum = data[0][1] + 1
-            chart.y_labels = map(repr, range(0, maximum, max(1, int(maximum/10))))
+            chart.y_labels = map(repr, range(0, maximum, max(1,int(math.pow(10,int(math.log(maximum,10)))/10))))
             chart.value_formatter = lambda x: str(int(x))
     if title:
         chart.title = title
@@ -62,14 +82,14 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
         else:
             label = item[0]
         if xlinks:
-            chart.add(item[0], [{'value': item[1],
-                                 'label': label,
-                                 'value 2': "Total: ",
-                                 'xlink': {
-                                     'href': item[3],
-                                     'target': '_blank'}}])
+          chart.add(item[0], [{'value': item[1],
+                               'label': label,
+                               'value 2': "Total: ",
+                               'xlink': {
+                                 'href': item[3],
+                                 'target': '_blank'}}])
         else:
-            chart.add(item[0], [{'value': item[1], 'label': label, 'value 2': "Total: "}])
+          chart.add(item[0], [{'value': item[1], 'label': unicodedata.normalize('NFKD', label).encode('ascii', 'ignore'), 'value 2': "Total: "}])
     if y_title:
         chart.y_title = y_title
     if len(data) < 4:

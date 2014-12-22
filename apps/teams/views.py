@@ -1004,6 +1004,18 @@ def statistics(request, slug, tab='teamstats'):
         if len(most_active_users) > 20:
             most_active_users = most_active_users[:20]
 
+        active_users_recent = {}
+        for sv in SubtitleVersion.objects.filter(video__in=team.videos.all(), created__gt=datetime.now() - timedelta(days=30)).exclude(author__username="anonymous").values_list('author', 'subtitle_language'):
+            if sv[0] in active_users_recent:
+                active_users_recent[sv[0]].add(sv[1])
+            else:
+                active_users_recent[sv[0]] = set([sv[1]])
+
+        most_active_users_recent = active_users_recent.items()
+        most_active_users_recent.sort(reverse=True, key=lambda x: x[1])
+        if len(most_active_users_recent) > 20:
+            most_active_users_recent = most_active_users_recent[:20]
+
         def displayable_user(pk):
             u = User.objects.get(pk=int(pk[0]))
             return (strip_strings_chrome("%s %s (%s)" % (u.first_name, u.last_name, u.username)),
@@ -1018,6 +1030,11 @@ def statistics(request, slug, tab='teamstats'):
         y_title = "Number of Captions and Translations"
         graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title, labels=True, xlinks=True)
 
+        most_active_users_recent = map(displayable_user, most_active_users_recent)
+
+        title_additional_recent = "Last 30 days: top %s contributors" % len(most_active_users_recent)
+        graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title=title_additional_recent, y_title=y_title, labels=True, xlinks=True)
+
     context = {
         'summary': summary,
         'summary_recent': summary_recent,
@@ -1026,6 +1043,7 @@ def statistics(request, slug, tab='teamstats'):
         'graph': graph,
         'graph_recent': graph_recent,
         'graph_additional': graph_additional,
+        'graph_additional_recent': graph_additional_recent,
     }
     return render(request, 'teams/statistics.html', context)
 
