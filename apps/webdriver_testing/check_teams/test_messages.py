@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.core import mail
 import time
-
+from django.core import management
 from teams import tasks
 from teams.models import TeamMember
+from teams.models import Team
 
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages.teams import ATeamPage
@@ -27,7 +28,7 @@ class TestCaseMessageUsers(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.admin = UserFactory()
         cls.manager = UserFactory()
-        cls.member = UserFactory()
+        cls.member = UserFactory(notify_by_email=True, is_active=True)
         cls.team1 = TeamFactory(admin=cls.admin,
                                manager=cls.manager,
                                member=cls.member)
@@ -202,7 +203,8 @@ class TestCaseTeamMessages(WebdriverTestCase):
 
         cls.team = TeamFactory(admin=cls.admin,
                                manager=cls.manager,
-                               member=cls.member)
+                               member=cls.member,
+                               )
         cls.team.membership_policy = 1
         cls.team.save()
 
@@ -215,9 +217,14 @@ class TestCaseTeamMessages(WebdriverTestCase):
 
     def test_videos_added_hourly(self):
         """check emails sent with hourly setting for videos added"""
+        team = TeamFactory(admin=self.admin,
+                           manager=self.manager,
+                           member=self.member,
+                           notify_interval = Team.NOTIFY_HOURLY)
         for x in range(0,5):
-            video = TeamVideoFactory.create(
-                    team=self.team)
+            video = VideoFactory()
+            TeamVideoFactory(video=video, team=team) 
+        management.call_command('update_index', interactive=False)
         mail.outbox = []
         tasks.add_videos_notification_hourly.apply()
         time.sleep(2)
@@ -225,19 +232,22 @@ class TestCaseTeamMessages(WebdriverTestCase):
         self.assertIn('team has added new videos, and they need your help:', 
                       msg)
         for x in mail.outbox:
-            self.logger.info(x.message())
-        self.assertEqual(3,len(mail.outbox))
+            self.logger.info(x.to)
+        self.assertEqual(8,len(mail.outbox))
 
     def test_videos_added_daily(self):
         """check email sent with daily setting for videos added"""
         team2 = TeamFactory(admin=self.admin,
                             manager=self.manager,
                             member=self.member,
-                            notify_interval = 'NOTIFY_DAILY')
-        video = TeamVideoFactory(team=team2) 
+                            notify_interval = Team.NOTIFY_DAILY)
+        video = VideoFactory()
+        TeamVideoFactory(video=video, team=team2) 
+        management.call_command('update_index', interactive=False)
         mail.outbox = []
         tasks.add_videos_notification_daily.apply()
-        time.sleep(2)
+        time.sleep(5)
+        self.logger.info(len(mail.outbox))
         msg = str(mail.outbox[-1].message())
         self.logger.info(msg)
         self.assertIn('team has added new videos, and they need your help:', 
@@ -248,6 +258,8 @@ class TestCaseTeamMessages(WebdriverTestCase):
         """message sent when user joins the team."""
         joiner = UserFactory()
         langs = ['en', 'cs', 'ru', 'ar']
+        for lc in langs:
+            UserLangFactory(user=joiner, language=lc)
         self.a_team_pg.log_in(joiner.username, 'password')
         mail.outbox = []
         self.a_team_pg.open_team_page(self.team.slug)

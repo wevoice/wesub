@@ -33,7 +33,7 @@ from django.db.models import query
 from django.db.models.signals import post_save, post_delete, pre_delete
 from django.http import Http404
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 from haystack import site
 from haystack.query import SQ
 
@@ -57,7 +57,8 @@ from utils import translation
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
-from videos.models import Video, VideoUrl, SubtitleVersion, SubtitleLanguage
+from videos.models import (Video, VideoUrl, SubtitleVersion, SubtitleLanguage,
+                           Action)
 from videos.tasks import video_changed_tasks
 from subtitles.models import (
     SubtitleVersion as NewSubtitleVersion,
@@ -486,6 +487,25 @@ class Team(models.Model):
             return False
         return self.is_member(user)
 
+    def fetch_video_actions(self, video_language=None,
+                            subtitle_language=None):
+        """Fetch the Action objects for this team's videos
+
+        Args:
+            video_language: only actions for videos with this
+                            primary_audio_language_code
+            subtitle_language: only actions that have subtitles in these
+                               languages
+        """
+        video_q = TeamVideo.objects.filter(team=self).values_list('video_id')
+        if video_language is not None:
+            video_q = video_q.filter(
+                video__primary_audio_language_code=video_language)
+        if subtitle_language is not None:
+            video_q = video_q.filter(
+                video__newsubtitlelanguage_set__language_code=subtitle_language)
+        return Action.objects.filter(video_id__in=video_q)
+
     # moderation
 
 
@@ -586,10 +606,21 @@ class Team(models.Model):
 
         Caches the result in-object for performance.
 
+        Note: the count is capped at 1001 tasks.  If a team has more than
+        that, we generally just want to display "> 1000".  Use
+        get_tasks_count_display() to do that.
+
         """
         if not hasattr(self, '_tasks_count'):
             setattr(self, '_tasks_count', self._count_tasks())
         return self._tasks_count
+
+    def get_tasks_count_display(self):
+        """Get a string to display for our tasks count."""
+        if self.tasks_count <= 1000:
+            return unicode(self.tasks_count)
+        else:
+            return ugettext('> 1000')
 
     # Applications (people applying to join)
     def application_message(self):

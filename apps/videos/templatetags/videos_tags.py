@@ -225,7 +225,7 @@ def video_metadata(context, video):
     request = context['request']
     metadata = video.get_metadata_for_locale(request.LANGUAGE_CODE)
     return "\n".join(
-        '<h4>{0}: {1}</h4>'.format(field['label'], field['content'])
+        u'<h4>{0}: {1}</h4>'.format(field['label'], field['content'])
         for field in metadata.convert_for_display()
     )
 

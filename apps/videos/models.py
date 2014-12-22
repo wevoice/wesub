@@ -1527,15 +1527,6 @@ class ActionRenderer(object):
         return fmt(msg, **kwargs)
 
 class ActionManager(models.Manager):
-    def for_team_videos(self, team):
-        """Return the actions for a team's videos"""
-        return self.extra(
-            where=['videos_action.video_id IN (SELECT video_id '
-                   'FROM teams_teamvideo '
-                   'WHERE team_id=%s)'],
-            params=[team.id]
-        )
-
     def for_user(self, user):
         return self.filter(Q(user=user) | Q(team__in=user.teams.all())).distinct()
 
