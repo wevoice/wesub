@@ -985,7 +985,7 @@ def statistics(request, slug, tab='teamstats'):
                 active_users[sv[0]] = set([sv[1]])
 
         most_active_users = active_users.items()
-        most_active_users.sort(reverse=True, key=lambda x: x[1])
+        most_active_users.sort(reverse=True, key=lambda x: len(x[1]))
         if len(most_active_users) > 20:
             most_active_users = most_active_users[:20]
 
@@ -997,7 +997,7 @@ def statistics(request, slug, tab='teamstats'):
                 active_users_recent[sv[0]] = set([sv[1]])
 
         most_active_users_recent = active_users_recent.items()
-        most_active_users_recent.sort(reverse=True, key=lambda x: x[1])
+        most_active_users_recent.sort(reverse=True, key=lambda x: len(x[1]))
         if len(most_active_users_recent) > 20:
             most_active_users_recent = most_active_users_recent[:20]
 
