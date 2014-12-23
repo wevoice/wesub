@@ -907,6 +907,7 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
+@staff_member_required
 def statistics(request, slug, tab='teamstats'):
     """computes a bunch of statistics for the team, either at the video or member levels.
     """

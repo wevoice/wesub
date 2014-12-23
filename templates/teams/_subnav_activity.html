@@ -7,12 +7,14 @@
     <li {% if current_sub == "team" %}class="current"{% endif %}>
         <a href="{% url teams:team-activity team.slug %}">{% trans "Team" %}</a>
     </li>
+    {% if user.is_staff %}
     <li {% if current_sub == "videosstats" %}class="current"{% endif %}>
         <a href="{% url teams:videosstatistics-activity team.slug %}">{% trans "Videos Statistics" %}</a>
     </li>
     <li {% if current_sub == "teamstats" %}class="current"{% endif %}>
         <a href="{% url teams:teamstatistics-activity team.slug %}">{% trans "Team Statistics" %}</a>
     </li>
+    {% endif %}
     {% if current_sub == "videos" or current_sub == "team" %}
     <li>
       <a href="#filter" id="sort-filter" class="default-open">
