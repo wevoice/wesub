@@ -908,6 +908,8 @@ def remove_video(request, team_video_pk):
         return HttpResponseRedirect(next)
 
 def statistics(request, slug, tab='teamstats'):
+    """computes a bunch of statistics for the team, either at the video or member levels.
+    """
     def strip_strings_chrome(s):
         if len(s) > 11:
             return s[:9] + u'...'
@@ -950,7 +952,7 @@ def statistics(request, slug, tab='teamstats'):
         title_recent = _(u"%s videos, %s new languages, %s languages edited") % (team.videos_count_since(30), len(set(new_languages)), len(unique_languages_recent))
         graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)
     elif tab == 'teamstats':
-        languages = list(UserLanguage.objects.filter(user__in=team.users.all()).values_list('language', flat=True))
+        languages = list(team.languages())
         unique_languages = set(languages)
         summary = _(u'%s members speaking %s languages' % (team.members_count, len(unique_languages)))
         numbers = []
@@ -958,7 +960,7 @@ def statistics(request, slug, tab='teamstats'):
             numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), languages.count(l), ALL_LANGUAGES_DICT[l]))
         title = ''
         graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25, labels=True)
-        languages_recent = list(UserLanguage.objects.filter(user__in=team.members_since(30)).values_list('language', flat=True))
+        languages_recent = list(team.languages(members_joined_since=30))
         unique_languages_recent = set(languages_recent)
         summary_recent = _(u'Last 30 days: %s new members speaking %s languages' % (team.members_count_since(30), len(unique_languages_recent)))
         numbers_recent = []
@@ -973,7 +975,7 @@ def statistics(request, slug, tab='teamstats'):
         graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True, xlinks=True)
 
         active_users = {}
-        for sv in SubtitleVersion.objects.filter(video__in=team.videos.all()).exclude(author__username="anonymous").values_list('author', 'subtitle_language'):
+        for sv in team.active_users():
             if sv[0] in active_users:
                 active_users[sv[0]].add(sv[1])
             else:
@@ -985,7 +987,7 @@ def statistics(request, slug, tab='teamstats'):
             most_active_users = most_active_users[:20]
 
         active_users_recent = {}
-        for sv in SubtitleVersion.objects.filter(video__in=team.videos.all(), created__gt=datetime.now() - timedelta(days=30)).exclude(author__username="anonymous").values_list('author', 'subtitle_language'):
+        for sv in team.active_users(since=30):
             if sv[0] in active_users_recent:
                 active_users_recent[sv[0]].add(sv[1])
             else:
@@ -996,21 +998,32 @@ def statistics(request, slug, tab='teamstats'):
         if len(most_active_users_recent) > 20:
             most_active_users_recent = most_active_users_recent[:20]
 
-        def displayable_user(pk):
-            u = User.objects.get(pk=int(pk[0]))
-            return (strip_strings_chrome("%s %s (%s)" % (u.first_name, u.last_name, u.username)),
-                    len(pk[1]),
-                    "%s %s (%s)" % (u.first_name, u.last_name, u.username),
-                    "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse("profiles:profile", kwargs={'user_id': str(pk[0])}))
+        def displayable_user(user, users_details):
+            user_details = users_details[user[0]]
+            return (strip_strings_chrome("%s %s (%s)" % (user_details[1], user_details[2], user_details[3])),
+                    len(user[1]),
+                    "%s %s (%s)" % (user_details[1], user_details[2], user_details[3]),
+                    "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse("profiles:profile", kwargs={'user_id': str(user[0])}))
             )
 
-        most_active_users = map(displayable_user, most_active_users)
+        user_details = User.displayable_users(map(lambda x: int(x[0]), most_active_users))
+        user_details_dict = {}
+        for user in user_details:
+            user_details_dict[user[0]] = user
+
+        most_active_users = map(lambda x: displayable_user(x, user_details_dict), most_active_users)
 
         title_additional = "Top %s contributors" % len(most_active_users)
         y_title = "Number of Captions and Translations"
         graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title, labels=True, xlinks=True)
 
-        most_active_users_recent = map(displayable_user, most_active_users_recent)
+
+        user_details_recent = User.displayable_users(map(lambda x: int(x[0]), most_active_users_recent))
+        user_details_dict_recent = {}
+        for user in user_details_recent:
+            user_details_dict_recent[user[0]] = user
+
+        most_active_users_recent = map(lambda x: displayable_user(x, user_details_dict_recent), most_active_users_recent)
 
         title_additional_recent = "Last 30 days: top %s contributors" % len(most_active_users_recent)
         graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title=title_additional_recent, y_title=y_title, labels=True, xlinks=True)

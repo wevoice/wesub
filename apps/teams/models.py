@@ -40,7 +40,7 @@ from haystack.query import SQ
 import teams.moderation_const as MODERATION
 from caching import ModelCacheManager
 from comments.models import Comment
-from auth.models import CustomUser as User
+from auth.models import UserLanguage, CustomUser as User
 from auth.providers import get_authentication_provider
 from messages import tasks as notifier
 from subtitles import shims
@@ -325,6 +325,21 @@ class Team(models.Model):
             'slug': self.slug,
         })
 
+    def languages(self, members_joined_since=None):
+        """Returns the languages spoken by the member of the team
+        """
+        if members_joined_since:
+            users = self.members_since(members_joined_since)
+        else:
+            users = self.users.all()
+        return UserLanguage.objects.filter(user__in=users).values_list('language', flat=True)
+
+    def active_users(self, since=None):
+        sv = NewSubtitleVersion.objects.filter(video__in=self.videos.all())
+        if since:
+            sv = sv.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=since))
+        return sv.exclude(author__username="anonymous").values_list('author', 'subtitle_language')
+
     def render_message(self, msg):
         """Return a string of HTML represention a team header for a notification.
 
@@ -538,21 +553,18 @@ class Team(models.Model):
         Caches the result in-object for performance.
 
         """
-        return self.members_count_since()
-
-    def members_count_since(self, joined_since = None):
-        """Return the number of members of this team.
-
-        Caches the result in-object for performance.
-
-        """
-        if joined_since:
-            return self.users.filter(date_joined__gt=datetime.datetime.now() - datetime.timedelta(days=joined_since)).count()
         if not hasattr(self, '_members_count'):
             setattr(self, '_members_count', self.users.count())
         return self._members_count
 
+    def members_count_since(self, joined_since):
+        """Return the number of members of this team who joined the last n days.
+        """
+        return self.users.filter(date_joined__gt=datetime.datetime.now() - datetime.timedelta(days=joined_since)).count()
+
     def members_since(self, joined_since):
+        """ Returns the members who joined the team the last n days
+        """
         return self.users.filter(date_joined__gt=datetime.datetime.now() - datetime.timedelta(days=joined_since))
 
     @property
@@ -562,21 +574,18 @@ class Team(models.Model):
         Caches the result in-object for performance.
 
         """
-        return self.videos_count_since()
-
-    def videos_count_since(self, added_since = None):
-        """Return the number of videos of this team.
-
-        Caches the result in-object for performance.
-
-        """
-        if added_since:
-            return self.teamvideo_set.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=added_since)).count()
         if not hasattr(self, '_videos_count'):
             setattr(self, '_videos_count', self.teamvideo_set.count())
         return self._videos_count
 
+    def videos_count_since(self):
+        """Return the number of videos of this team added the last n days.
+        """
+        return self.teamvideo_set.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=added_since)).count()
+
     def videos_since(self, added_since):
+        """Returns the videos of this team added the last n days.
+        """
         return self.videos.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=added_since))
 
     def unassigned_tasks(self, sort=None):
