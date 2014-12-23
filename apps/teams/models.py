@@ -568,7 +568,7 @@ class Team(models.Model):
         return self.users.filter(date_joined__gt=datetime.datetime.now() - datetime.timedelta(days=joined_since))
 
     @property
-    def videos_count(self, added_since = None):
+    def videos_count(self):
         """Return the number of videos of this team.
 
         Caches the result in-object for performance.
@@ -578,7 +578,7 @@ class Team(models.Model):
             setattr(self, '_videos_count', self.teamvideo_set.count())
         return self._videos_count
 
-    def videos_count_since(self):
+    def videos_count_since(self, added_since = None):
         """Return the number of videos of this team added the last n days.
         """
         return self.teamvideo_set.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=added_since)).count()
