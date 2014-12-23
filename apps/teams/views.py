@@ -65,7 +65,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
-    can_delete_language, can_move_videos, can_sort_by_primary_language
+    can_delete_language, can_move_videos, can_sort_by_primary_language, can_view_stats_tab
 )
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
@@ -907,7 +907,7 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
-@staff_member_required
+@login_required
 def statistics(request, slug, tab='teamstats'):
     """computes a bunch of statistics for the team, either at the video or member levels.
     """
@@ -917,6 +917,8 @@ def statistics(request, slug, tab='teamstats'):
         else:
             return s
     team = get_team_for_view(slug, request.user)
+    if not can_view_stats_tab(team, request.user):
+        return HttpResponseForbidden("Not allowed")
     summary = ''
     graph = ''
     graph_recent = ''
