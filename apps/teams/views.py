@@ -917,8 +917,6 @@ def statistics(request, slug, tab='teamstats'):
         else:
             return s
     team = get_team_for_view(slug, request.user)
-    if not can_view_stats_tab(team, request.user):
-        return HttpResponseForbidden("Not allowed")
     summary = ''
     graph = ''
     graph_recent = ''
@@ -955,6 +953,8 @@ def statistics(request, slug, tab='teamstats'):
         title_recent = _(u"%s videos, %s new languages, %s languages edited") % (team.videos_count_since(30), len(set(new_languages)), len(unique_languages_recent))
         graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)
     elif tab == 'teamstats':
+        if not can_view_stats_tab(team, request.user):
+            return HttpResponseForbidden("Not allowed")
         languages = list(team.languages())
         unique_languages = set(languages)
         summary = _(u'%s members speaking %s languages' % (team.members_count, len(unique_languages)))
