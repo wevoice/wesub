@@ -65,7 +65,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
-    can_delete_language, can_move_videos, can_sort_by_primary_language
+    can_delete_language, can_move_videos, can_sort_by_primary_language, can_view_stats_tab
 )
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
@@ -907,6 +907,7 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
+@login_required
 def statistics(request, slug, tab='teamstats'):
     """computes a bunch of statistics for the team, either at the video or member levels.
     """
@@ -952,6 +953,8 @@ def statistics(request, slug, tab='teamstats'):
         title_recent = _(u"%s videos, %s new languages, %s languages edited") % (team.videos_count_since(30), len(set(new_languages)), len(unique_languages_recent))
         graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)
     elif tab == 'teamstats':
+        if not can_view_stats_tab(team, request.user):
+            return HttpResponseForbidden("Not allowed")
         languages = list(team.languages())
         unique_languages = set(languages)
         summary = _(u'%s members speaking %s languages' % (team.members_count, len(unique_languages)))
@@ -982,7 +985,7 @@ def statistics(request, slug, tab='teamstats'):
                 active_users[sv[0]] = set([sv[1]])
 
         most_active_users = active_users.items()
-        most_active_users.sort(reverse=True, key=lambda x: x[1])
+        most_active_users.sort(reverse=True, key=lambda x: len(x[1]))
         if len(most_active_users) > 20:
             most_active_users = most_active_users[:20]
 
@@ -994,7 +997,7 @@ def statistics(request, slug, tab='teamstats'):
                 active_users_recent[sv[0]] = set([sv[1]])
 
         most_active_users_recent = active_users_recent.items()
-        most_active_users_recent.sort(reverse=True, key=lambda x: x[1])
+        most_active_users_recent.sort(reverse=True, key=lambda x: len(x[1]))
         if len(most_active_users_recent) > 20:
             most_active_users_recent = most_active_users_recent[:20]
 
