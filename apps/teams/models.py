@@ -40,7 +40,7 @@ from haystack.query import SQ
 import teams.moderation_const as MODERATION
 from caching import ModelCacheManager
 from comments.models import Comment
-from auth.models import CustomUser as User
+from auth.models import UserLanguage, CustomUser as User
 from auth.providers import get_authentication_provider
 from messages import tasks as notifier
 from subtitles import shims
@@ -325,6 +325,21 @@ class Team(models.Model):
             'slug': self.slug,
         })
 
+    def languages(self, members_joined_since=None):
+        """Returns the languages spoken by the member of the team
+        """
+        if members_joined_since:
+            users = self.members_since(members_joined_since)
+        else:
+            users = self.users.all()
+        return UserLanguage.objects.filter(user__in=users).values_list('language', flat=True)
+
+    def active_users(self, since=None):
+        sv = NewSubtitleVersion.objects.filter(video__in=self.videos.all())
+        if since:
+            sv = sv.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=since))
+        return sv.exclude(author__username="anonymous").values_list('author', 'subtitle_language')
+
     def render_message(self, msg):
         """Return a string of HTML represention a team header for a notification.
 
@@ -542,6 +557,16 @@ class Team(models.Model):
             setattr(self, '_members_count', self.users.count())
         return self._members_count
 
+    def members_count_since(self, joined_since):
+        """Return the number of members of this team who joined the last n days.
+        """
+        return self.users.filter(date_joined__gt=datetime.datetime.now() - datetime.timedelta(days=joined_since)).count()
+
+    def members_since(self, joined_since):
+        """ Returns the members who joined the team the last n days
+        """
+        return self.users.filter(date_joined__gt=datetime.datetime.now() - datetime.timedelta(days=joined_since))
+
     @property
     def videos_count(self):
         """Return the number of videos of this team.
@@ -552,6 +577,16 @@ class Team(models.Model):
         if not hasattr(self, '_videos_count'):
             setattr(self, '_videos_count', self.teamvideo_set.count())
         return self._videos_count
+
+    def videos_count_since(self, added_since = None):
+        """Return the number of videos of this team added the last n days.
+        """
+        return self.teamvideo_set.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=added_since)).count()
+
+    def videos_since(self, added_since):
+        """Returns the videos of this team added the last n days.
+        """
+        return self.videos.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=added_since))
 
     def unassigned_tasks(self, sort=None):
         qs = Task.objects.filter(team=self, deleted=False, completed=None, assignee=None, type=Task.TYPE_IDS['Approve'])
@@ -705,6 +740,29 @@ class Team(models.Model):
         """
         return TeamLanguagePreference.objects.get_readable(self)
 
+    def get_team_languages(self, since=None):
+        query_sl = NewSubtitleLanguage.objects.filter(video__in=self.videos.all())
+        new_languages = []
+        if since:
+            query_sl = query_sl.filter(id__in=NewSubtitleVersion.objects.filter(video__in=self.videos.all(),
+                                                                             created__gt=datetime.datetime.now() - datetime.timedelta(days=since)).order_by('subtitle_language').values_list('subtitle_language', flat=True).distinct())
+            new_languages = list(NewSubtitleLanguage.objects.filter(video__in=self.videos_since(since)).values_list('language_code', 'subtitles_complete'))
+        query_sl = query_sl.values_list('language_code', 'subtitles_complete')
+        languages = list(query_sl)
+
+        def first_member(x):
+            return x[0]
+        complete_languages = map(first_member, filter(lambda x: x[1], languages))
+        incomplete_languages = map(first_member, filter(lambda x: not x[1], languages))
+        new_languages = map(first_member, new_languages)
+        if since:
+            return (complete_languages, incomplete_languages, new_languages)
+        else:
+            return (complete_languages, incomplete_languages)
+
+
+
+    
 # This needs to be constructed after the model definition since we need a
 # reference to the class itself.
 Team._meta.permissions = TEAM_PERMISSIONS

@@ -2377,6 +2377,15 @@ a.truncated-expand {
 }
 
 /* Crazytown */
+
+
+#teams .view {
+    p.summary {
+        font-size: 1.25em;
+        font-weight: bold;
+        text-align: center;
+    }
+}
 #teams .backnav, #teams .backnav a {
     color: $light; 
 }
