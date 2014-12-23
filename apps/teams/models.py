@@ -731,6 +731,29 @@ class Team(models.Model):
         """
         return TeamLanguagePreference.objects.get_readable(self)
 
+    def get_team_languages(self, since=None):
+        query_sl = NewSubtitleLanguage.objects.filter(video__in=self.videos.all())
+        new_languages = []
+        if since:
+            query_sl = query_sl.filter(id__in=NewSubtitleVersion.objects.filter(video__in=self.videos.all(),
+                                                                             created__gt=datetime.datetime.now() - datetime.timedelta(days=since)).order_by('subtitle_language').values_list('subtitle_language', flat=True).distinct())
+            new_languages = list(NewSubtitleLanguage.objects.filter(video__in=self.videos_since(since)).values_list('language_code', 'subtitles_complete'))
+        query_sl = query_sl.values_list('language_code', 'subtitles_complete')
+        languages = list(query_sl)
+
+        def first_member(x):
+            return x[0]
+        complete_languages = map(first_member, filter(lambda x: x[1], languages))
+        incomplete_languages = map(first_member, filter(lambda x: not x[1], languages))
+        new_languages = map(first_member, new_languages)
+        if since:
+            return (complete_languages, incomplete_languages, new_languages)
+        else:
+            return (complete_languages, incomplete_languages)
+
+
+
+    
 # This needs to be constructed after the model definition since we need a
 # reference to the class itself.
 Team._meta.permissions = TEAM_PERMISSIONS

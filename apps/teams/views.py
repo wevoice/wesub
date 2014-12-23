@@ -907,27 +907,6 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
-
-def _get_team_languages(team, since=None):
-    query_sl = SubtitleLanguage.objects.filter(video__in=team.videos.all())
-    new_languages = []
-    if since:
-        query_sl = query_sl.filter(id__in=SubtitleVersion.objects.filter(video__in=team.videos.all(),
-                                            created__gt=datetime.now() - timedelta(days=since)).order_by('subtitle_language').values_list('subtitle_language', flat=True).distinct())
-        new_languages = list(SubtitleLanguage.objects.filter(video__in=team.videos_since(since)).values_list('language_code', 'subtitles_complete'))
-    query_sl = query_sl.values_list('language_code', 'subtitles_complete')
-    languages = list(query_sl)
-
-    def first_member(x):
-        return x[0]
-    complete_languages = map(first_member, filter(lambda x: x[1], languages))
-    incomplete_languages = map(first_member, filter(lambda x: not x[1], languages))
-    new_languages = map(first_member, new_languages)
-    if since:
-        return (complete_languages, incomplete_languages, new_languages)
-    else:
-        return (complete_languages, incomplete_languages)
-
 def statistics(request, slug, tab='teamstats'):
     def strip_strings_chrome(s):
         if len(s) > 11:
@@ -943,7 +922,7 @@ def statistics(request, slug, tab='teamstats'):
     graph_additional_recent = None
     summary_additional = None
     if tab == 'videosstats':
-        (complete_languages, incomplete_languages) = _get_team_languages(team)
+        (complete_languages, incomplete_languages) = team.get_team_languages()
         languages = complete_languages + incomplete_languages
         unique_languages = set(languages)
         total = 0
@@ -957,7 +936,7 @@ def statistics(request, slug, tab='teamstats'):
         title = "Top 20 languages"
         graph = plot(numbers, title=title, graph_type='HorizontalBar', labels=True, max_entries=20)
 
-        (complete_languages_recent, incomplete_languages_recent, new_languages) = _get_team_languages(team, since=30)
+        (complete_languages_recent, incomplete_languages_recent, new_languages) = team.get_team_languages(since=30)
         languages_recent = complete_languages_recent + incomplete_languages_recent
         unique_languages_recent = set(languages_recent)
         summary_recent = "Last 30 days"
