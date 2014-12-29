@@ -621,7 +621,7 @@ LOGGING = {
             'handlers': ['sentry', 'console'],
             'propagate': False
         },
-        'youtube': {
+        'utils.youtube': {
             'level': 'INFO',
             'handlers': ['sentry', 'console'],
             'propagate': False
