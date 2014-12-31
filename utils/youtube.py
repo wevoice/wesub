@@ -238,6 +238,9 @@ def _parse_8601_duration(duration):
 
 def get_video_info(video_id):
     try:
+        logger.info("youtube.get_video_info()", extra={
+            'stack': True,
+        })
         return _get_video_info(video_id)
     except APIError, e:
         logger.error("Youtube API Error: %s", e)
