@@ -147,6 +147,10 @@ class CustomUser(BaseUser):
         return self.unread_messages(hidden_meassage_id).count()
 
     @classmethod
+    def displayable_users(self, ids):
+        return self.objects.filter(pk__in=ids).values_list('pk', 'first_name', 'last_name', 'username')
+
+    @classmethod
     def video_followers_change_handler(cls, sender, instance, action, reverse, model, pk_set, **kwargs):
         from videos.models import SubtitleLanguage
 
