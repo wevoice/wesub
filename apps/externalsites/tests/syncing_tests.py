@@ -1013,3 +1013,33 @@ class RefetchYoutubeChannelIDTest(TestCase):
         self.assertEquals(
             self.video.get_primary_videourl_obj().owner_username,
             'test-channel-id')
+
+class ResyncTest(TestCase):
+    def setUp(self):
+        self.account = YouTubeAccountFactory(user=UserFactory(),
+                                             channel_id='test-channel-id')
+        self.video = YouTubeVideoFactory()
+        version = pipeline.add_subtitles(self.video, 'en', None)
+        self.language = version.subtitle_language
+        self.video_url = self.video.get_primary_videourl_obj()
+
+        SyncHistory.objects.create_for_error(
+            ValueError("Fake Error"), account=self.account,
+            video_url=self.video_url, language=self.language,
+            version=version, action=SyncHistory.ACTION_UPDATE_SUBTITLES,
+            retry=True)
+
+    def test_resync(self):
+        # test resyncing a failed attempt from the SyncHistory
+        sh = SyncHistory.objects.get_attempt_to_resync()
+        assert_equal(sh.get_account(), self.account)
+        assert_equal(sh.video_url, self.video_url)
+        assert_equal(sh.language, self.language)
+
+    def test_clear_retry_flag(self):
+        # test that we clear the retry flag when get_attempt_to_resync()
+        # returns it.  This ensures that we don't keep retry values in the
+        # system for a bunch of corner cases, for example when the language is
+        # deleted so there won't be a retry attempt.
+        SyncHistory.objects.get_attempt_to_resync()
+        assert_false(SyncHistory.objects.filter(retry=True).exists())

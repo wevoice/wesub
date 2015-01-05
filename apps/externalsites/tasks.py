@@ -23,7 +23,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from externalsites import credit
 from externalsites import subfetch
-from externalsites.models import get_account, get_sync_account
+from externalsites.models import get_account, get_sync_account, SyncHistory
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from utils import youtube
 from videos.models import VideoUrl
@@ -131,3 +131,13 @@ def add_amara_credit(video_url_id):
 @task
 def fetch_subs(video_url_id):
     subfetch.fetch_subs(VideoUrl.objects.get(id=video_url_id))
+
+@task
+def retry_failed_sync():
+    sh = SyncHistory.objects.get_attempt_to_resync()
+    if sh is None:
+        logging.info("retry_failed_sync: nothing to resync")
+        return
+    logging.info("retry_failed_sync: resyncing %s", sh)
+    account = sh.get_account()
+    account.update_subtitles(sh.video_url, sh.language)
