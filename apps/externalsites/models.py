@@ -676,8 +676,9 @@ class SyncHistoryManager(models.Manager):
             to retry.  We will clear the retry flag before returning the
             SyncHistory object.
         """
+        qs = self.filter(retry=True)[:1]
         try:
-            sh = self.select_related('video_url', 'language').get(retry=True)
+            sh = qs.select_related('video_url', 'language').get()
         except SyncHistory.DoesNotExist:
             return None
         sh.retry = False

@@ -1036,6 +1036,23 @@ class ResyncTest(TestCase):
         assert_equal(sh.video_url, self.video_url)
         assert_equal(sh.language, self.language)
 
+    def test_multiple_rows_with_retry(self):
+        # test that we don't throw an exception with multiple rows with retry
+        # set.  We should pick one of the rows to return arbitrarily
+
+        version = pipeline.add_subtitles(self.video, 'en', None)
+        SyncHistory.objects.create_for_error(
+            ValueError("Fake Error"), account=self.account,
+            video_url=self.video_url, language=self.language,
+            version=version, action=SyncHistory.ACTION_UPDATE_SUBTITLES,
+            retry=True)
+        sh = SyncHistory.objects.get_attempt_to_resync()
+        # Both SyncHistory objects are for the same account and language, so
+        # the following tests will match for either one
+        assert_equal(sh.get_account(), self.account)
+        assert_equal(sh.video_url, self.video_url)
+        assert_equal(sh.language, self.language)
+
     def test_clear_retry_flag(self):
         # test that we clear the retry flag when get_attempt_to_resync()
         # returns it.  This ensures that we don't keep retry values in the
