@@ -3,6 +3,7 @@
 .top-banner h1 {
 	margin-top: 80px;
 	width: 90%;
+	font-weight: 300;
 }
 
 .whitespace-tall {
@@ -42,6 +43,10 @@ ul {
 	color: #ffffff;
 	min-height: 360px;
 	background: url(../images/index-bg-hands.png) no-repeat center;
+}
+
+#index-banner h5 {
+	font-weight: 200;
 }
 
 #index-two-tone {

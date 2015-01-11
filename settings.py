@@ -402,7 +402,6 @@ MEDIA_BUNDLES = {
     },
     "hands_home.css": {
         "files": (
-            "css/hands-header-footer.css",
             "css/hands-static.css",
             "css/hands-main.css",
          )
