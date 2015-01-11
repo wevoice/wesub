@@ -130,6 +130,10 @@ class EditorPage(UnisubsPage):
         self.select_option_by_text(self._REFERENCE_SELECT, language)
         time.sleep(2)
 
+    def reference_languages(self):
+        els = self.get_elements_list(self._REFERENCE_SELECT)
+        return [el.text for el in els]
+
     def select_ref_version(self, version_no):
         """Choose a reference version from the list. """
 
@@ -407,7 +411,7 @@ class EditorPage(UnisubsPage):
         return self.is_element_visible(self._COLLAB_PANEL)
 
     def collab_action(self, action):
-        els = self.get_elements_list("div.actions button")
+        els = self.get_elements_list("button[ng-repeat='action in actions']")
         [el.click() for el in els if el.text == action]
 
     def action_buttons(self):
@@ -473,8 +477,8 @@ class EditorPage(UnisubsPage):
         for el in buttons:
             if el.text == action:
                 el.click()
-                self.wait_for_element_not_present(self._SESSION_BUTTONS)
-                time.sleep(2)
+                time.sleep(3)
+                self.wait_for_element_not_present("aside.freeze-box", 30)
                 return
             else:
                 self.logger.info("%s button not found" % action)

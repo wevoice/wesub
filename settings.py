@@ -122,7 +122,6 @@ TEMPLATE_LOADERS = (
 
 
 MIDDLEWARE_CLASSES = (
-    'middleware.ResponseTimeMiddleware',
     'middleware.StripGoogleAnalyticsCookieMiddleware',
     'utils.ajaxmiddleware.AjaxErrorMiddleware',
     'localeurl.middleware.LocaleURLMiddleware',
@@ -130,11 +129,11 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'auth.middleware.AmaraAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'openid_consumer.middleware.OpenIDMiddleware',
     'middleware.P3PHeaderMiddleware',
     'middleware.UserUUIDMiddleware',
-    'middleware.SaveUserIp',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
@@ -191,6 +190,7 @@ INSTALLED_APPS = (
     'amaradotorg',
     'amaracelery',
     'api',
+    'caching',
     'comments',
     'externalsites',
     'messages',
@@ -276,6 +276,9 @@ FACEBOOK_SECRET_KEY = ''
 VIMEO_API_KEY = None
 VIMEO_API_SECRET = None
 
+# NOTE: all of these backends store the User.id value in the session data,
+# which we rely on in AmaraAuthenticationMiddleware.  Other backends should
+# use the same system.
 AUTHENTICATION_BACKENDS = (
    'auth.backends.CustomUserBackend',
    'thirdpartyaccounts.auth_backends.TwitterAuthBackend',
@@ -429,6 +432,12 @@ MEDIA_BUNDLES = {
             "js/unisubs.site.js",
         ),
     },
+    "graphs.js": {
+        "files": (
+            "js/libs/pygal-tooltips.js",
+            "js/libs/svg.jquery.js",
+        ),
+    },
     "teams.js": {
         "files": (
             "js/libs/ICanHaz.js",
@@ -445,7 +454,7 @@ MEDIA_BUNDLES = {
             'src/js/third-party/jquery-1.10.1.js',
             'js/jquery.form.js',
             'src/js/third-party/jquery.autosize.js',
-            'src/js/third-party/angular.1.2.0.js',
+            'src/js/third-party/angular.1.2.7.js',
             'src/js/third-party/angular-cookies.js',
             'src/js/third-party/underscore.1.4.4.js',
             'src/js/third-party/popcorn.js',
@@ -582,7 +591,7 @@ LOGGING = {
             'formatter': 'verbose'
         },
         'sentry': {
-            'level': 'INFO',
+            'level': 'WARN',
             'class': 'raven.contrib.django.handlers.SentryHandler',
         },
     },
@@ -612,7 +621,7 @@ LOGGING = {
             'handlers': ['sentry', 'console'],
             'propagate': False
         },
-        'youtube': {
+        'utils.youtube': {
             'level': 'INFO',
             'handlers': ['sentry', 'console'],
             'propagate': False

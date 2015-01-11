@@ -56,6 +56,7 @@ class TestCaseManualTasks(WebdriverTestCase):
 
 
     def setUp(self):
+        management.call_command('clear_cache')
         management.call_command('update_index', interactive=False)
         self.videos_tab.open_videos_tab(self.team.slug)
 
@@ -219,7 +220,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         cls.tasks_tab.open_team_page(cls.team.slug)
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
         if self.team.subtitle_policy > 10:
             self.team.subtitle_policy = 10
             self.team.save() 
@@ -289,7 +289,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.assertEqual(self.tasks_tab.disabled_task('Transcribe Subtitles', 
                          tv.title), 
                          "You don't have permission to perform this task.")
-
 
     def test_transcription_complete(self):
         """Translation tasks are created for preferred languages, on complete.
@@ -478,11 +477,11 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
 
     def setUp(self):
+        management.call_command('clear_cache')
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert(action='accept')
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
         if self.workflow.approve_allowed != 10:
             self.workflow.approve_allowed = 10
             self.workflow.save()
@@ -491,7 +490,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         """Review task is created on transcription submission. """
         video = VideoFactory(primary_audio_language_code='en')
         tv = TeamVideoFactory(team=self.team, video=video)
-        self.data_utils.add_subs(video=video, committer=self.member)
+        self.data_utils.add_subs(video=video, committer=self.member, complete=True)
         self.tasks_tab.log_in(self.manager.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
 
@@ -1107,6 +1106,7 @@ class TestCaseAutomaticTasksLegacyEditor(WebdriverTestCase):
 
 
     def setUp(self):
+        management.call_command('clear_cache')
         self.tasks_tab.open_page('teams/%s' % self.team.slug, True)
 
 
@@ -1215,11 +1215,11 @@ class TestCaseModeratedTasksLegacyEditor(WebdriverTestCase):
         cls.accepted_approve = 'and they are now published!'
 
     def setUp(self):
+        management.call_command('clear_cache')
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert(action='accept')
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
         if self.workflow.approve_allowed != 10:
             self.workflow.approve_allowed = 10
             self.workflow.save()
@@ -1277,7 +1277,6 @@ class TestCaseModeratedTasksLegacyEditor(WebdriverTestCase):
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.perform_task('Review Original English ' 
                                                'Subtitles', video.title)
-        self.browser.get_screenshot_as_file("webdriver_before_legacy.png")
         self.editor_pg.legacy_editor()
         self.sub_editor.continue_to_next_step() #to subtitle info 
         self.sub_editor.complete_review(result='Accept')

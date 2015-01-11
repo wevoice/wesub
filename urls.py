@@ -20,6 +20,7 @@ from django import http
 from django.conf.urls.defaults import include, patterns, url
 from django.conf import settings
 from django.contrib import admin
+from django.shortcuts import render
 from django.template import RequestContext, loader
 from django.views.generic.simple import direct_to_template, redirect_to
 from sitemaps import sitemaps, sitemap_view, sitemap_index
@@ -171,8 +172,14 @@ urlpatterns = patterns('',
 
 urlpatterns += optionalapps.get_urlpatterns()
 
-if settings.DEBUG:
+try:
     import debug_toolbar
+except ImportError:
+    urlpatterns += patterns('',
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    )
+
+if settings.DEBUG:
     urlpatterns += patterns('',
         (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
          {'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
@@ -180,9 +187,10 @@ if settings.DEBUG:
          {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
         (r'^raw_template/(?P<template>.*)',
             'django.views.generic.simple.direct_to_template'),
-        url(r'^__debug__/', include(debug_toolbar.urls)),
     )
 
-def handler500(request, template_name='500.html'):
-    t = loader.get_template(template_name)
-    return http.HttpResponseServerError(t.render(RequestContext(request)))
+def handler500(request):
+    return render(request, '500.html', status=500)
+
+def handler403(request):
+    return render(request, '403.html', status=403)

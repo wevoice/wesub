@@ -44,61 +44,17 @@ from django.core.urlresolvers import reverse
 
 from tastypie.models import ApiKey
 
+from caching import CacheGroup, ModelCacheManager
 from utils.tasks import send_templated_email_async
+from utils import translation
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 EMAIL_CONFIRMATION_DAYS = getattr(settings, 'EMAIL_CONFIRMATION_DAYS', 3)
 
-class UserCache(object):
-    """Handle per-user caching
-
-    There are several things that we want to cache on a per-user basis.
-    UserCache optimizes this a bit by allowing all cache values to be fetched
-    at once, instead of one at a time.
-
-    If you want to cache something for a user you should:
-        - add the key you want to use to UserCache.keys_to_fetch
-        - use User.cache.get/set/delete to manage the key
-
-    Note: to make keys unique per-user, we will prepend each key with the
-    string "user-<id>:" when accessing the cache
-    """
-
-    keys_to_fetch = []
-    def __init__(self, user_id):
-        self.user_id = user_id
-        self.cached_values = None
-
-    def get(self, key, default=None):
-        if self.cached_values is None:
-            self._get_cached_values()
-        value = self.cached_values.get(self._cache_key(key))
-        if value is not None:
-            return value
-        else:
-            return default
-
-    def _get_cached_values(self):
-        cache_keys = [self._cache_key(key) for key in self.keys_to_fetch]
-        self.cached_values = cache.get_many(cache_keys)
-
-    def set(self, key, value, expiration):
-        cache.set(self._cache_key(key), value, expiration)
-
-    def delete(self, key):
-        cache.delete(self._cache_key(key))
-
-    def _cache_key(self, key):
-        return 'user-{0}:{1}'.format(self.user_id, key)
-
-    @classmethod
-    def delete_by_id(cls, user_id, key):
-        """Delete a cache value using a user id
-
-        This method allows cache values to be deleted from the cache without
-        loading the User object from the DB.
-        """
-        cls(user_id).delete(key)
+class AnonymousUserCacheGroup(CacheGroup):
+    def __init__(self):
+        super(AnonymousUserCacheGroup, self).__init__('user:anon',
+                                                      cache_pattern='user')
 
 class CustomUser(BaseUser):
     AUTOPLAY_ON_BROWSER = 1
@@ -139,12 +95,10 @@ class CustomUser(BaseUser):
 
     objects = UserManager()
 
+    cache = ModelCacheManager(default_cache_pattern='user')
+
     class Meta:
         verbose_name = 'User'
-
-    def __init__(self, *args, **kwargs):
-        super(CustomUser, self).__init__(*args, **kwargs)
-        self.cache = UserCache(self.id)
 
     def __unicode__(self):
         if not self.is_active:
@@ -197,6 +151,10 @@ class CustomUser(BaseUser):
 
     def unread_messages_count(self, hidden_meassage_id=None):
         return self.unread_messages(hidden_meassage_id).count()
+
+    @classmethod
+    def displayable_users(self, ids):
+        return self.objects.filter(pk__in=ids).values_list('pk', 'first_name', 'last_name', 'username')
 
     @classmethod
     def video_followers_change_handler(cls, sender, instance, action, reverse, model, pk_set, **kwargs):
@@ -263,19 +221,27 @@ class CustomUser(BaseUser):
                 .exclude(customuser__followed_languages__video=instance.video).delete()
 
     def get_languages(self):
-        """
-        Just to control this query
-        """
-        languages = cache.get('user_languages_%s' % self.pk)
+        """Get a list of language codes that the user speaks."""
+        return self.cache.get_or_calc("languages", self.calc_languages)
 
-        if languages is None:
-            languages = self.userlanguage_set.all()
-            cache.set('user_languages_%s' % self.pk, languages, 60*24*7)
+    def calc_languages(self):
+        return list(self.userlanguage_set.values_list('language', flat=True))
 
-        return languages
+    def get_language_names(self):
+        """Get a list of language names that the user speaks."""
+        return [translation.get_language_label(lc)
+                for lc in self.get_languages()]
 
     def speaks_language(self, language_code):
         return language_code in [l.language for l in self.get_languages()]
+
+    def is_team_manager(self):
+        cached_value = self.cache.get('is-manager')
+        if cached_value is not None:
+            return cached_value
+        is_manager = self.managed_teams().exists()
+        self.cache.set('is-manager', is_manager)
+        return is_manager
 
     def managed_teams(self, include_manager=True):
         from teams.models import TeamMember
@@ -335,18 +301,15 @@ class CustomUser(BaseUser):
         if user_languages:
             return user_languages[0].language
 
-        from utils.translation import get_user_languages_from_request
-
         if request:
-            languages = get_user_languages_from_request(request)
+            languages = translation.get_user_languages_from_request(request)
             if languages:
                 return languages[0]
 
         return 'en'
 
     def guess_is_rtl(self, request=None):
-        from utils.translation import is_rtl
-        return is_rtl(self.guess_best_lang(request))
+        return translation.is_rtl(self.guess_best_lang(request))
 
     @models.permalink
     def profile_url(self):
@@ -462,11 +425,11 @@ class UserLanguage(models.Model):
 
     def save(self, *args, **kwargs):
         super(UserLanguage, self).save(*args, **kwargs)
-        cache.delete('user_languages_%s' % self.user_id)
+        CustomUser.cache.invalidate_by_pk(self.user_id)
 
     def delete(self, *args, **kwargs):
-        cache.delete('user_languages_%s' % self.user_id)
-        return super(UserLanguage, self).delete(*args, **kwargs)
+        super(UserLanguage, self).delete(*args, **kwargs)
+        CustomUser.cache.invalidate_by_pk(self.user_id)
 
 class Announcement(models.Model):
     content = models.CharField(max_length=500)

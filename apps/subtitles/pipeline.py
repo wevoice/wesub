@@ -318,19 +318,6 @@ def _update_followers(subtitle_language, author):
     if author:
         subtitle_language.followers.add(author)
 
-def _update_video_data(subtitle_language, version):
-    if version.is_public() and subtitle_language.is_primary_audio_language():
-        video = version.video
-        video_changed = False
-        if version.title and video.title != version.title:
-            video.title = version.title
-            video_changed = True
-        if version.description and video.description != version.description:
-            video.description = version.description
-            video_changed = True
-        if video_changed:
-            video.save()
-
 def _fork_dependents(subtitle_language):
     for dsl in subtitle_language.get_dependent_subtitle_languages(direct=True):
         dsl.fork()
@@ -423,7 +410,6 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
         action.validate(author, video, sl, version)
         action.update_language(author, video, sl, version)
 
-    _update_video_data(sl, version)
     _update_followers(sl, author)
 
     if origin in (ORIGIN_UPLOAD, ORIGIN_API):
@@ -560,8 +546,8 @@ def add_subtitles(video, language_code, subtitles,
                                  created, note, origin, metadata, action)
     if action:
         action.perform(author, video, version.subtitle_language, version)
+    video.cache.invalidate()
     return version
-
 
 def _calc_action_for_add_subtitles(video, language_code, author, complete,
                                    action_name):
@@ -615,6 +601,8 @@ def rollback_to(video, language_code, version_number,
 
     """
     with transaction.commit_on_success():
-        return _rollback_to(video, language_code, version_number,
-                            rollback_author)
+        version = _rollback_to(video, language_code, version_number,
+                               rollback_author)
+    video.cache.invalidate()
+    return version
 

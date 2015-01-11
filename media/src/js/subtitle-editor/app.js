@@ -81,7 +81,7 @@ var angular = angular || null;
         $scope.uploadError = false;
         $scope.exiting = false;
         $scope.translating = function() {
-            return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
+            return ($scope.referenceSubtitles.language && $scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         }
         if (EditorData.customCss)
             $scope.customCSSs = [{"href": EditorData.customCss}];

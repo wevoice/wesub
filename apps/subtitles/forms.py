@@ -71,11 +71,9 @@ class SubtitlesUploadForm(forms.Form):
         self.fields['language_code'].choices = all_languages
         self.fields['primary_audio_language_code'].choices = all_languages
 
-        language_qs = (SubtitleLanguage.objects.having_public_versions()
-                       .filter(video=video))
         choices = [
-            (sl.language_code, sl.get_language_code_display())
-            for sl in language_qs
+            (language_code, get_language_label(language_code))
+            for language_code in video.languages_with_versions()
         ]
         if allow_transcription:
             choices.append(('', 'None (Direct from Video)'))
@@ -323,10 +321,10 @@ class SubtitlesUploadForm(forms.Form):
 
         if subtitle_language:
             previous_version = subtitle_language.get_tip()
-            metadata = subtitle_language.get_metadata(public=False)
             if previous_version:
                 title = previous_version.title
                 description = previous_version.description
+                metadata = previous_version.get_metadata()
 
         return title, description, metadata
 

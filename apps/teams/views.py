@@ -52,7 +52,7 @@ from teams.forms import (
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
     make_billing_report_form, TaskCreateSubtitlesForm,
-    TeamMultiVideoCreateSubtitlesForm, MoveVideosForm
+    TeamMultiVideoCreateSubtitlesForm, MoveVideosForm, AddVideoToTeamForm,
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -65,7 +65,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
-    can_delete_language, can_move_videos, can_sort_by_primary_language
+    can_delete_language, can_move_videos, can_sort_by_primary_language, can_view_stats_tab
 )
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
@@ -84,6 +84,7 @@ from utils.translation import (
     get_language_choices, get_language_choices_as_dicts, languages_with_labels, get_user_languages_from_request
 )
 from utils.chunkediter import chunkediter
+from utils.graphing import plot
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
 from videos.models import Action, VideoUrl, Video, VideoFeed
@@ -110,7 +111,7 @@ UNASSIGNED_TASKS_ON_PAGE = getattr(settings, 'UNASSIGNED_TASKS_ON_PAGE', 15)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
 DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
-
+ALL_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 
 def get_team_for_view(slug, user, exclude_private=True):
@@ -741,6 +742,23 @@ def move_videos(request, slug, project_slug=None, languages=None):
                     record._team_video.completed_langs = record.video_completed_langs
     return extra_context
 
+@login_required
+def add_video_to_team(request, video_id):
+    video = get_object_or_404(Video, video_id=video_id)
+    if request.method == 'POST':
+        form = AddVideoToTeamForm(request.user, request.POST)
+        if form.is_valid():
+            team = Team.objects.get(id=form.cleaned_data['team'])
+            team_video = TeamVideo.objects.create(video=video, team=team)
+            update_one_team_video.delay(team_video.pk)
+            return redirect(video.get_absolute_url())
+    else:
+        form = AddVideoToTeamForm(request.user)
+    return render(request, 'teams/add-video-to-team.html', {
+        'video': video,
+        'form': form,
+    })
+
 @render_to('teams/add_video.html')
 @login_required
 def add_video(request, slug):
@@ -889,8 +907,145 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
+@login_required
+def statistics(request, slug, tab='teamstats'):
+    """computes a bunch of statistics for the team, either at the video or member levels.
+    """
+    def strip_strings_chrome(s):
+        if len(s) > 11:
+            return s[:9] + u'...'
+        else:
+            return s
+    team = get_team_for_view(slug, request.user)
+    summary = ''
+    graph = ''
+    graph_recent = ''
+    summary_recent = ''
+    graph_additional = None
+    graph_additional_recent = None
+    summary_additional = None
+    if tab == 'videosstats':
+        (complete_languages, incomplete_languages) = team.get_team_languages()
+        languages = complete_languages + incomplete_languages
+        unique_languages = set(languages)
+        total = 0
+        numbers = []
+        for l in unique_languages:
+            count_complete = complete_languages.count(l)
+            count_incomplete = incomplete_languages.count(l)
+            numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete + count_incomplete, "%s - %s published" % (ALL_LANGUAGES_DICT[l], count_complete)))
+            total += count_complete + count_incomplete
+        summary = _(u'%s videos, %s languages, %s captions and translations' % (team.videos_count, len(unique_languages), total))
+        title = "Top 20 languages"
+        graph = plot(numbers, title=title, graph_type='HorizontalBar', labels=True, max_entries=20)
+
+        (complete_languages_recent, incomplete_languages_recent, new_languages) = team.get_team_languages(since=30)
+        languages_recent = complete_languages_recent + incomplete_languages_recent
+        unique_languages_recent = set(languages_recent)
+        summary_recent = "Last 30 days"
+        numbers_recent = []
+        total_recent = 0
+        for l in unique_languages_recent:
+            count_complete_recent = complete_languages_recent.count(l)
+            count_incomplete_recent = incomplete_languages_recent.count(l)
+            numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete_recent + count_incomplete_recent, "%s - %s published" % (ALL_LANGUAGES_DICT[l], count_complete_recent)))
+            total_recent += count_complete_recent + count_incomplete_recent
+        title_recent = _(u"%s videos, %s new languages, %s languages edited") % (team.videos_count_since(30), len(set(new_languages)), len(unique_languages_recent))
+        graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)
+    elif tab == 'teamstats':
+        if not can_view_stats_tab(team, request.user):
+            return HttpResponseForbidden("Not allowed")
+        languages = list(team.languages())
+        unique_languages = set(languages)
+        summary = _(u'%s members speaking %s languages' % (team.members_count, len(unique_languages)))
+        numbers = []
+        for l in unique_languages:
+            numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), languages.count(l), ALL_LANGUAGES_DICT[l]))
+        title = ''
+        graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25, labels=True)
+        languages_recent = list(team.languages(members_joined_since=30))
+        unique_languages_recent = set(languages_recent)
+        summary_recent = _(u'Last 30 days: %s new members speaking %s languages' % (team.members_count_since(30), len(unique_languages_recent)))
+        numbers_recent = []
+        for l in unique_languages_recent:
+            numbers_recent.append(
+                (strip_strings_chrome(ALL_LANGUAGES_DICT[l]),
+                 languages_recent.count(l),
+                 ALL_LANGUAGES_DICT[l],
+                 "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse('teams:detail_members', args=[], kwargs={'slug': team.slug}) + "?sort=-joined&lang=%s" % l))
+                )
+        title_recent = ''
+        graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True, xlinks=True)
+
+        active_users = {}
+        for sv in team.active_users():
+            if sv[0] in active_users:
+                active_users[sv[0]].add(sv[1])
+            else:
+                active_users[sv[0]] = set([sv[1]])
+
+        most_active_users = active_users.items()
+        most_active_users.sort(reverse=True, key=lambda x: len(x[1]))
+        if len(most_active_users) > 20:
+            most_active_users = most_active_users[:20]
+
+        active_users_recent = {}
+        for sv in team.active_users(since=30):
+            if sv[0] in active_users_recent:
+                active_users_recent[sv[0]].add(sv[1])
+            else:
+                active_users_recent[sv[0]] = set([sv[1]])
+
+        most_active_users_recent = active_users_recent.items()
+        most_active_users_recent.sort(reverse=True, key=lambda x: len(x[1]))
+        if len(most_active_users_recent) > 20:
+            most_active_users_recent = most_active_users_recent[:20]
+
+        def displayable_user(user, users_details):
+            user_details = users_details[user[0]]
+            return (strip_strings_chrome("%s %s (%s)" % (user_details[1], user_details[2], user_details[3])),
+                    len(user[1]),
+                    "%s %s (%s)" % (user_details[1], user_details[2], user_details[3]),
+                    "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse("profiles:profile", kwargs={'user_id': str(user[0])}))
+            )
+
+        user_details = User.displayable_users(map(lambda x: int(x[0]), most_active_users))
+        user_details_dict = {}
+        for user in user_details:
+            user_details_dict[user[0]] = user
+
+        most_active_users = map(lambda x: displayable_user(x, user_details_dict), most_active_users)
+
+        title_additional = "Top %s contributors" % len(most_active_users)
+        y_title = "Number of Captions and Translations"
+        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title, labels=True, xlinks=True)
+
+
+        user_details_recent = User.displayable_users(map(lambda x: int(x[0]), most_active_users_recent))
+        user_details_dict_recent = {}
+        for user in user_details_recent:
+            user_details_dict_recent[user[0]] = user
+
+        most_active_users_recent = map(lambda x: displayable_user(x, user_details_dict_recent), most_active_users_recent)
+
+        title_additional_recent = "Last 30 days: top %s contributors" % len(most_active_users_recent)
+        graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title=title_additional_recent, y_title=y_title, labels=True, xlinks=True)
+
+    context = {
+        'summary': summary,
+        'summary_recent': summary_recent,
+        'activity_tab': tab,
+        'team': team,
+        'graph': graph,
+        'graph_recent': graph_recent,
+        'graph_additional': graph_additional,
+        'graph_additional_recent': graph_additional_recent,
+    }
+    return render(request, 'teams/statistics.html', context)
+
 def activity(request, slug, tab='videos'):
     team = get_team_for_view(slug, request.user)
+
     try:
         page = int(request.GET['page'])
     except (ValueError, KeyError):
@@ -909,7 +1064,14 @@ def activity(request, slug, tab='videos'):
     if tab == 'team':
         action_qs = Action.objects.filter(team=team)
     else:
-        action_qs = Action.objects.for_team_videos(team)
+        video_language = request.GET.get('video_language')
+        if video_language == 'any':
+            video_language = None
+        subtitles_language = request.GET.get('subtitles_language')
+        if subtitles_language == 'any':
+            subtitles_language = None
+        action_qs = team.fetch_video_actions(video_language,
+                                             subtitles_language)
     end = page * ACTIONS_ON_PAGE
     start = end - ACTIONS_ON_PAGE
 
@@ -917,11 +1079,6 @@ def activity(request, slug, tab='videos'):
         action_qs = action_qs.filter(action_type = int(request.GET.get('action_type')))
 
     action_qs = action_qs.select_related('new_language', 'video')
-    if tab == 'videos':
-        if request.GET.get('video_language') and request.GET.get('video_language') != 'any':
-            action_qs = action_qs.filter(video__primary_audio_language_code = request.GET.get('video_language'))
-        if request.GET.get('subtitles_language') and request.GET.get('subtitles_language') != 'any':
-            action_qs = action_qs.filter(new_language__isnull = False, new_language__language_code = request.GET.get('subtitles_language'))
 
     sort = request.GET.get('sort', '-created')
     action_qs = action_qs.order_by(sort)
@@ -955,7 +1112,7 @@ def activity(request, slug, tab='videos'):
         'member': member,
         'activity_tab': tab,
         'next_page': page + 1,
-        'has_more': has_more,
+        'has_more': has_more
     }
     if not request.is_ajax():
         return render(request, 'teams/activity.html', context)
@@ -966,6 +1123,10 @@ def activity(request, slug, tab='videos'):
 
 def team_activity(request, slug):
     return activity(request, slug, tab='team')
+def teamstatistics_activity(request, slug):
+    return statistics(request, slug, tab='teamstats')
+def videosstatistics_activity(request, slug):
+    return statistics(request, slug, tab='videosstats')
 
 # Members
 @timefn
@@ -1441,7 +1602,7 @@ def _tasks_list(request, team, project, filters, user):
         if filters['language'] != 'all':
             tasks = tasks.filter(language=filters['language'])
     elif request.user.is_authenticated() and request.user.get_languages():
-        languages = [ul.language for ul in request.user.get_languages()] + ['']
+        languages = request.user.get_languages() + ['']
         tasks = tasks.filter(language__in=languages)
 
     if filters.get('q'):
@@ -1584,7 +1745,7 @@ def old_dashboard(request, team):
             for tv in team_videos:
                 videos.append(tv.teamvideo)
         else:
-            lang_list = [l.language for l in user_languages]
+            lang_list = user_languages
 
             for video in team_videos.all():
                 subtitled_languages = (video.newsubtitlelanguage_set
@@ -1593,7 +1754,7 @@ def old_dashboard(request, team):
                                                  .values_list("language_code", flat=True))
                 if len(subtitled_languages) != len(user_languages):
                     tv = video.teamvideo
-                    tv.languages = [l for l in user_languages if l.language not in subtitled_languages]
+                    tv.languages = [l for l in user_languages if l not in subtitled_languages]
                     videos.append(tv)
     else:
         videos = []

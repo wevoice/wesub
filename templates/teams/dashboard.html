@@ -1,6 +1,6 @@
 {% extends "teams/base.html" %}
 
-{% load i18n to_json utils_tags teams_tags paginator markup media_bundle profiles_tags videos_tags %}
+{% load i18n i18n_tags to_json utils_tags teams_tags paginator markup media_bundle profiles_tags videos_tags %}
 
 {% block title %}
     {% trans 'Dashboard' %} - {{ team }} | Amara
@@ -26,16 +26,14 @@
 
 {% block view_content %}
 
- {% if not team|is_team_member:user or not videos %}
     {% block select_language_dialog %}
-      {% if not team|is_team_member:user %}
-        {% url teams:join_team slug=team.slug as redirect_url %}
-        {% select_language_dialog hide_link="True" redirect=redirect_url %}
-    {% else %}
-        {% select_language_dialog hide_link="True" %}
-    {% endif %}
+        {% if not team|is_team_member:user %}
+            {% url teams:join_team slug=team.slug as redirect_url %}
+            {% select_language_dialog hide_link="True" redirect=redirect_url %}
+        {% else %}
+            {% select_language_dialog hide_link="True" %}
+        {% endif %}
     {% endblock %}
-  {% endif %}
     <div class="grid_8 view omega{% if team.get_workflow.requires_review_or_approval %} moderated{% endif %}{% if team.workflow_enabled %} task-enabled{% endif %}">
         {% if member or team.is_visible %}
             {% with "dashboard" as current %}
@@ -175,14 +173,14 @@
                                                 <ul>
                                                     {% for lang in team_video.languages %}
                                                         <li>
-                                                            <a href="{% url subtitles:subtitle-editor video_id=team_video.video.video_id language_code=lang.language %}" title="Get started now">{% blocktrans with language=lang.get_language_display %}Create {{ language }} Subtitles{% endblocktrans %}</a>
+                                                            <a href="{% url subtitles:subtitle-editor video_id=team_video.video.video_id language_code=lang %}" title="Get started now">{% blocktrans with language=lang|to_localized_display %}Create {{ language }} Subtitles{% endblocktrans %}</a>
                                                         </li>
                                                     {% endfor %}
                                                 </ul>
                                             </div>
                                         {% else %} {# there is only one language user can work on #}
                                             {% with lang=team_video.languages.0 %}
-                                                <a href="{% url subtitles:subtitle-editor video_id=team_video.video.video_id language_code=lang.language %}" title="Get started now">{% blocktrans with language=lang.get_language_display %}Create {{ language }} Subtitles{% endblocktrans %}</a>
+                                                <a href="{% url subtitles:subtitle-editor video_id=team_video.video.video_id language_code=lang %}" title="Get started now">{% blocktrans with language=lang|to_localized_display %}Create {{ language }} Subtitles{% endblocktrans %}</a>
                                             {% endwith %}
                                         {% endif %}
                                     {% endif %}
