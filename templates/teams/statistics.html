@@ -22,6 +22,21 @@
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph }}"></object>
 	  <p class="summary">{{ summary_recent }}</p>
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_recent }}"></object>
+	  {% if summary_table %}
+	  <table class="statistics">
+	    {% for raw in summary_table %}
+	    <tr>
+	      {% for cell in raw %}
+	      {% if cell.header %}
+	      <th>{{ cell }}</th>
+	      {% else %}
+	      <td>{{ cell }}</td>
+	      {% endif %}
+	      {% endfor %}
+	    </tr>
+	    {% endfor %}
+	  </table>
+	  {% endif %}
 	  {% if graph_additional %}
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_additional }}"></object>
 	  {% endif %}

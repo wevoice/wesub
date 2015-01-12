@@ -924,6 +924,7 @@ def statistics(request, slug, tab='teamstats'):
     graph_additional = None
     graph_additional_recent = None
     summary_additional = None
+    summary_table = None
     if tab == 'videosstats':
         (complete_languages, incomplete_languages) = team.get_team_languages()
         languages = complete_languages + incomplete_languages
@@ -957,7 +958,7 @@ def statistics(request, slug, tab='teamstats'):
             return HttpResponseForbidden("Not allowed")
         languages = list(team.languages())
         unique_languages = set(languages)
-        summary = _(u'%s members speaking %s languages' % (team.members_count, len(unique_languages)))
+        summary = u'Members by language (all time)'
         numbers = []
         for l in unique_languages:
             numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), languages.count(l), ALL_LANGUAGES_DICT[l]))
@@ -965,7 +966,7 @@ def statistics(request, slug, tab='teamstats'):
         graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25, labels=True)
         languages_recent = list(team.languages(members_joined_since=30))
         unique_languages_recent = set(languages_recent)
-        summary_recent = _(u'Last 30 days: %s new members speaking %s languages' % (team.members_count_since(30), len(unique_languages_recent)))
+        summary_recent = u'New members by language (past 30 days)'
         numbers_recent = []
         for l in unique_languages_recent:
             numbers_recent.append(
@@ -976,6 +977,17 @@ def statistics(request, slug, tab='teamstats'):
                 )
         title_recent = ''
         graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True, xlinks=True)
+
+        class TableCell():
+            def __init__(self, content, header=False):
+                self.content = content
+                self.header = header
+            def __repr__(self):
+                return str(self.content)
+        summary_table = []
+        summary_table.append([TableCell("", header=True), TableCell("all time", header=True), TableCell("past 30 days", header=True)])
+        summary_table.append([TableCell("members joined", header=True), TableCell(str(team.members_count)), TableCell(str(team.members_count_since(30)))])
+        summary_table.append([TableCell("member languages", header=True), TableCell(str(len(unique_languages))), TableCell(str(len(unique_languages_recent)))])
 
         active_users = {}
         for sv in team.active_users():
@@ -1016,9 +1028,8 @@ def statistics(request, slug, tab='teamstats'):
 
         most_active_users = map(lambda x: displayable_user(x, user_details_dict), most_active_users)
 
-        title_additional = "Top %s contributors" % len(most_active_users)
-        y_title = "Number of Captions and Translations"
-        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title, labels=True, xlinks=True)
+        title_additional = u'Top contributors (all time)'
+        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, labels=True, xlinks=True)
 
 
         user_details_recent = User.displayable_users(map(lambda x: int(x[0]), most_active_users_recent))
@@ -1028,8 +1039,8 @@ def statistics(request, slug, tab='teamstats'):
 
         most_active_users_recent = map(lambda x: displayable_user(x, user_details_dict_recent), most_active_users_recent)
 
-        title_additional_recent = "Last 30 days: top %s contributors" % len(most_active_users_recent)
-        graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title=title_additional_recent, y_title=y_title, labels=True, xlinks=True)
+        title_additional_recent = u'Top contributors (past 30 days)'
+        graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title=title_additional_recent, labels=True, xlinks=True)
 
     context = {
         'summary': summary,
@@ -1040,6 +1051,7 @@ def statistics(request, slug, tab='teamstats'):
         'graph_recent': graph_recent,
         'graph_additional': graph_additional,
         'graph_additional_recent': graph_additional_recent,
+        'summary_table': summary_table,
     }
     return render(request, 'teams/statistics.html', context)
 

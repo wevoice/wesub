@@ -74,7 +74,6 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
     if max_entries and (len(data) > max_entries):
         remaining_data = reduce(lambda x, y: ('',x[1]+y[1]), data[max_entries:])
         data = data[:max_entries]
-        chart.x_title = 'Displaying first %s items' % max_entries
     for item in data:
         label = ''
         if labels:
