@@ -916,6 +916,15 @@ def statistics(request, slug, tab='teamstats'):
             return s[:9] + u'...'
         else:
             return s
+
+    class TableCell():
+        """Convenience class to pass
+        table data to template"""
+        def __init__(self, content, header=False):
+            self.content = content
+            self.header = header
+        def __repr__(self):
+            return str(self.content)
     team = get_team_for_view(slug, request.user)
     summary = ''
     graph = ''
@@ -931,19 +940,20 @@ def statistics(request, slug, tab='teamstats'):
         unique_languages = set(languages)
         total = 0
         numbers = []
+        y_title = "Number of created subtitles"
         for l in unique_languages:
             count_complete = complete_languages.count(l)
             count_incomplete = incomplete_languages.count(l)
             numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete + count_incomplete, "%s - %s published" % (ALL_LANGUAGES_DICT[l], count_complete)))
             total += count_complete + count_incomplete
-        summary = _(u'%s videos, %s languages, %s captions and translations' % (team.videos_count, len(unique_languages), total))
-        title = "Top 20 languages"
-        graph = plot(numbers, title=title, graph_type='HorizontalBar', labels=True, max_entries=20)
+        summary = 'Top languages (all time)'
+        title = ""
+        graph = plot(numbers, title=title, graph_type='HorizontalBar', labels=True, max_entries=20, y_title=y_title)
 
         (complete_languages_recent, incomplete_languages_recent, new_languages) = team.get_team_languages(since=30)
         languages_recent = complete_languages_recent + incomplete_languages_recent
         unique_languages_recent = set(languages_recent)
-        summary_recent = "Last 30 days"
+        summary_recent = "Top languages (past 30 days)"
         numbers_recent = []
         total_recent = 0
         for l in unique_languages_recent:
@@ -951,8 +961,15 @@ def statistics(request, slug, tab='teamstats'):
             count_incomplete_recent = incomplete_languages_recent.count(l)
             numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete_recent + count_incomplete_recent, "%s - %s published" % (ALL_LANGUAGES_DICT[l], count_complete_recent)))
             total_recent += count_complete_recent + count_incomplete_recent
-        title_recent = _(u"%s videos, %s new languages, %s languages edited") % (team.videos_count_since(30), len(set(new_languages)), len(unique_languages_recent))
-        graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)
+        title_recent = ""
+        graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20, y_title=y_title)
+
+        summary_table = []
+        summary_table.append([TableCell("", header=True), TableCell("all time", header=True), TableCell("past 30 days", header=True)])
+        summary_table.append([TableCell("videos added", header=True), TableCell(str(team.videos_count)), TableCell(str(team.videos_count_since(30)))])
+        summary_table.append([TableCell("languages edited", header=True), TableCell(str(len(unique_languages))), TableCell(str(len(unique_languages_recent)))])
+        summary_table.append([TableCell("subtitles published", header=True), TableCell(str(total)), TableCell(str(total_recent))])
+
     elif tab == 'teamstats':
         if not can_view_stats_tab(team, request.user):
             return HttpResponseForbidden("Not allowed")
@@ -978,12 +995,6 @@ def statistics(request, slug, tab='teamstats'):
         title_recent = ''
         graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True, xlinks=True)
 
-        class TableCell():
-            def __init__(self, content, header=False):
-                self.content = content
-                self.header = header
-            def __repr__(self):
-                return str(self.content)
         summary_table = []
         summary_table.append([TableCell("", header=True), TableCell("all time", header=True), TableCell("past 30 days", header=True)])
         summary_table.append([TableCell("members joined", header=True), TableCell(str(team.members_count)), TableCell(str(team.members_count_since(30)))])
