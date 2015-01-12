@@ -21,6 +21,7 @@ import random
 
 import babelsubs
 from datetime import datetime, timedelta
+from django.utils.timezone import utc
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -40,6 +41,7 @@ from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri, force_unicode
 from django.views.generic.list_detail import object_list
+from django.views.decorators.cache import cache_page
 
 import widget
 from auth.models import UserLanguage, CustomUser as User
@@ -907,6 +909,8 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
+#@cache_page(60 * 60 * 24)
+@cache_page(60)
 @login_required
 def statistics(request, slug, tab='teamstats'):
     """computes a bunch of statistics for the team, either at the video or member levels.
@@ -1054,6 +1058,7 @@ def statistics(request, slug, tab='teamstats'):
         graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title=title_additional_recent, labels=True, xlinks=True)
 
     context = {
+        'computed_on': datetime.utcnow().replace(tzinfo=utc).strftime("%A %d. %B %Y %H:%M:%S UTC"),
         'summary': summary,
         'summary_recent': summary_recent,
         'activity_tab': tab,
