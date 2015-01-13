@@ -944,7 +944,7 @@ def statistics(request, slug, tab='teamstats'):
         unique_languages = set(languages)
         total = 0
         numbers = []
-        y_title = "Number of created subtitles"
+        y_title = "Number of edited subtitles"
         for l in unique_languages:
             count_complete = complete_languages.count(l)
             count_incomplete = incomplete_languages.count(l)
@@ -972,7 +972,7 @@ def statistics(request, slug, tab='teamstats'):
         summary_table.append([TableCell("", header=True), TableCell("all time", header=True), TableCell("past 30 days", header=True)])
         summary_table.append([TableCell("videos added", header=True), TableCell(str(team.videos_count)), TableCell(str(team.videos_count_since(30)))])
         summary_table.append([TableCell("languages edited", header=True), TableCell(str(len(unique_languages))), TableCell(str(len(unique_languages_recent)))])
-        summary_table.append([TableCell("subtitles published", header=True), TableCell(str(total)), TableCell(str(total_recent))])
+        summary_table.append([TableCell("subtitles edited", header=True), TableCell(str(total)), TableCell(str(total_recent))])
 
     elif tab == 'teamstats':
         if not can_view_stats_tab(team, request.user):

@@ -30,11 +30,14 @@ custom_css = '''
 {{ id }}.tooltip rect {
   fill: gray !important;
 }
-
-{{ id }} .value:before {
-  content: "Hello" !important;
-}
 '''
+
+def strip_strings_chrome(s):
+  if len(s) > 19:
+    return s[:17] + u'...'
+  else:
+    return s
+
 custom_css_file = '/tmp/pygal_custom_style.css'
 with open(custom_css_file, 'w') as f:
   f.write(custom_css)
@@ -80,15 +83,17 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
             label = item[2]
         else:
             label = item[0]
+        logger.error(item[1])
+        logger.error(label)
         if xlinks:
           chart.add(item[0], [{'value': item[1],
-                               'label': label,
+                               'label': strip_strings_chrome(label),
                                'value 2': "Total: ",
                                'xlink': {
                                  'href': item[3],
                                  'target': '_blank'}}])
         else:
-          chart.add(item[0], [{'value': item[1], 'label': unicodedata.normalize('NFKD', label).encode('ascii', 'ignore'), 'value 2': "Total: "}])
+          chart.add(item[0], [{'value': item[1], 'label': unicodedata.normalize('NFKD', strip_strings_chrome(label)).encode('ascii', 'ignore'), 'value 2': "Total: "}])
     if y_title:
         chart.y_title = y_title
     if len(data) < 4:
