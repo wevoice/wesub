@@ -13,6 +13,12 @@
         <a href="{% url teams:settings_permissions slug=team.slug %}">{% trans "Workflows" %}</a>
     </li>
 
+    {% for page in team.new_workflow.extra_settings_pages %}
+    <li{% if current_sub == page.name %} class="current" {% endif %}>
+        <a href="{{ page.url }}">{{ page.title }}</a>
+    </li>
+    {% endfor %}
+
     <li {% if current_sub == "languages" %}class="current"{% endif %}>
         <a href="{% url teams:settings_languages slug=team.slug %}">{% trans "Languages" %}</a>
     </li>
