@@ -41,7 +41,6 @@ from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri, force_unicode
 from django.views.generic.list_detail import object_list
-from django.views.decorators.cache import cache_page
 
 import widget
 from auth.models import UserLanguage, CustomUser as User
@@ -909,7 +908,6 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
-@cache_page(60 * 60 * 24)
 @login_required
 def statistics(request, slug, tab='teamstats'):
     """computes a bunch of statistics for the team, either at the video or member levels.
