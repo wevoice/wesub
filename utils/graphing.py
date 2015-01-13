@@ -83,8 +83,6 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
             label = item[2]
         else:
             label = item[0]
-        logger.error(item[1])
-        logger.error(label)
         if xlinks:
           chart.add(item[0], [{'value': item[1],
                                'label': strip_strings_chrome(label),
