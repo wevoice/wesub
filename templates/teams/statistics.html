@@ -18,7 +18,6 @@
             {% include 'teams/_subnav_activity.html' with current_sub=activity_tab %}
         </div>
 	<div>
-	  <p class="time-tag">Computed on {{ computed_on }}</p>
 	  <p class="summary">{{ summary }}</p>
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph }}"></object>
 	  <p class="summary">{{ summary_recent }}</p>
@@ -44,6 +43,7 @@
 	  {% if graph_additional_recent %}
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_additional_recent }}"></object>
 	  {% endif %}
+	  <p class="time-tag">Last updated on {{ computed_on }}</p>
 	</div>
   </div>
 {% endblock %}

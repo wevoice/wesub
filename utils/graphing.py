@@ -30,19 +30,25 @@ custom_css = '''
 {{ id }}.tooltip rect {
   fill: gray !important;
 }
+{{ id }}.tooltip text {
+  font-size: 13px !important;
+}
 '''
 
 def strip_strings_chrome(s):
-  if len(s) > 19:
-    return s[:17] + u'...'
-  else:
-    return s
+  labels = s.split(' - ')
+  if len(labels) > 1:
+    if len(labels[0]) > 15:
+      return labels[0][:13] + u'... ' + labels[1]
+  elif len(s) > 19:
+      return s[:17] + u'...'
+  return s
 
 custom_css_file = '/tmp/pygal_custom_style.css'
 with open(custom_css_file, 'w') as f:
   f.write(custom_css)
 
-def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Other", y_title=None, labels=False, xlinks=False):
+def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Other", y_title=None, labels=False, xlinks=False, total_label="Edited: "):
     custom_style = Style(
         background='transparent',
         font_family='sans-serif',
@@ -86,12 +92,12 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
         if xlinks:
           chart.add(item[0], [{'value': item[1],
                                'label': strip_strings_chrome(label),
-                               'value 2': "Total: ",
+                               'value 2': total_label,
                                'xlink': {
                                  'href': item[3],
                                  'target': '_blank'}}])
         else:
-          chart.add(item[0], [{'value': item[1], 'label': unicodedata.normalize('NFKD', strip_strings_chrome(label)).encode('ascii', 'ignore'), 'value 2': "Total: "}])
+          chart.add(item[0], [{'value': item[1], 'label': unicodedata.normalize('NFKD', strip_strings_chrome(label)).encode('ascii', 'ignore'), 'value 2': total_label}])
     if y_title:
         chart.y_title = y_title
     if len(data) < 4:
