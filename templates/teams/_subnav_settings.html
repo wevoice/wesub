@@ -19,10 +19,6 @@
     </li>
     {% endfor %}
 
-    <li {% if current_sub == "languages" %}class="current"{% endif %}>
-        <a href="{% url teams:settings_languages slug=team.slug %}">{% trans "Languages" %}</a>
-    </li>
-
     <li {% if current_sub == "projects" %}class="current"{% endif %}>
         <a href="{% url teams:settings_projects slug=team.slug %}">{% trans "Projects" %}</a>
     </li>
