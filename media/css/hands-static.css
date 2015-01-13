@@ -208,6 +208,150 @@ ul {
 	max-width: 883px;
 }
 
+/* SIGN IN/SIGN UP PAGE */
+
+#login-bg {
+	background-color: #FFF;
+	border-top: solid 2px #BBB;
+}
+
+#login .content {
+	text-align: center;
+}
+
+#login .providers, #login h2, #login h3, #login h5, #login p {
+	clear: both;
+	font-weight: normal;
+	color: #656565;
+	text-align: center;
+}
+
+#login h2 {
+	margin-top: 0px;
+	margin-bottom: 5px;
+}
+
+#login h3 {
+	margin-top: 3em;
+}
+
+#login h5 {
+	font-weight: 200;
+	font-size: 15px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+#login .spacer-top {
+	border-top: 1px solid #BBB;
+	padding-top: 12px;
+}
+
+#login .sso {
+	margin: 0 auto;
+	margin-top: 2em;
+	padding: 1.5em 2em;
+	background: #f7f7f7;
+	border-radius: 3px;
+	border: 1px solid #eee;
+	zoom: 1;
+	max-width: 550px;
+}
+#login .sso:after, #login .sso:before {
+	content: " ";
+	display: table;
+}
+#login .sso:after {
+	clear: both;
+}
+.providers {
+	float: left;
+	position: relative;
+	left: 50%;
+	padding: 1em 0;
+}
+.toggle-additional {
+	padding-top: 1em;
+	border-top: 1px solid #eee;
+}
+.toggle-additional a {
+	text-decoration: none;
+	color: #999;
+}
+.toggle-additional a:hover {
+	color: #555;
+}
+.providers.additional {
+	padding-top: 0;
+	/*display: none;*/
+}
+.providers li {
+	float: left;
+	position: relative;
+	right: 50%;
+	padding: 0;
+}
+#login .provider {
+	display: block;
+	float: left;
+	height: 0;
+	margin: 0 .5em;
+	overflow: hidden;
+	padding-top: 31px;
+	width: 91px;
+
+	box-shadow: 0 1px 3px #fee;
+}
+#twitter {
+	background: url(../images/social_login.png) 0px 0px no-repeat
+}
+#facebook {
+	background: url(../images/social_login.png) -102px 0px no-repeat;
+}
+#ted {
+	background: url('../images/partner_login.png') 0 0 no-repeat;
+}
+#udacity {
+	background: url('../images/partner_login.png') -109px 0 no-repeat;
+}
+#google {
+	background: url(../images/social_login.png) -204px 0px no-repeat
+}
+#open-id {
+	background: url(../images/social_login.png) -306px 0px no-repeat
+}
+input.open-id {
+	background: url(../images/social_login.png) -306px 0px no-repeat;
+	display: block;
+	float: left;
+	height: 0 !important;
+	margin-top: 10px;
+	overflow: hidden;
+	padding: 33px 0 0 0;
+	width: 102px;
+}
+#login .content form p {
+	margin-top: 1em;
+}
+#login .content form p.help {
+	color: #999;
+	margin: -.5em 0 1em;
+}
+#login .content form {
+	margin: 0 140px;
+}
+#login button.green_button {
+	float: none;
+	margin-top: 2em;
+}
+#create .prompt {
+	clear: both;
+	margin-top: 4em;
+	text-align: center;
+	font-size: 1.25em;
+}
+
+
 /* CREATE PAGE */
 
 #create-banner {
