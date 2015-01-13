@@ -41,7 +41,7 @@ from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri, force_unicode
 from django.views.generic.list_detail import object_list
-
+from django.core.cache import get_cache
 import widget
 from auth.models import UserLanguage, CustomUser as User
 from videos.templatetags.paginator import paginate
@@ -97,6 +97,7 @@ from teams import workflows
 from teams.bulk_actions import complete_approve_tasks
 
 logger = logging.getLogger("teams.views")
+cache = get_cache('default')
 
 
 TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
@@ -908,8 +909,7 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
-@login_required
-def statistics(request, slug, tab='teamstats'):
+def compute_statistics(request, slug, tab, cache_key=''):
     """computes a bunch of statistics for the team, either at the video or member levels.
     """
     def strip_strings_chrome(s):
@@ -931,10 +931,11 @@ def statistics(request, slug, tab='teamstats'):
     graph = ''
     graph_recent = ''
     summary_recent = ''
-    graph_additional = None
-    graph_additional_recent = None
-    summary_additional = None
-    summary_table = None
+    graph_additional = ''
+    graph_additional_recent = ''
+    summary_additional = ''
+    summary_additional_recent = ''
+    summary_table = ''
     if tab == 'videosstats':
         (complete_languages, incomplete_languages) = team.get_team_languages()
         languages = complete_languages + incomplete_languages
@@ -972,8 +973,6 @@ def statistics(request, slug, tab='teamstats'):
         summary_table.append([TableCell("subtitles edited", header=True), TableCell(str(total)), TableCell(str(total_recent))])
 
     elif tab == 'teamstats':
-        if not can_view_stats_tab(team, request.user):
-            return HttpResponseForbidden("Not allowed")
         languages = list(team.languages())
         unique_languages = set(languages)
         summary = u'Members by language (all time)'
@@ -1040,8 +1039,8 @@ def statistics(request, slug, tab='teamstats'):
 
         most_active_users = map(lambda x: displayable_user(x, user_details_dict), most_active_users)
 
-        title_additional = u'Top contributors (all time)'
-        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, labels=True, xlinks=True)
+        summary_additional = u'Top contributors (all time)'
+        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title='', labels=True, xlinks=True)
 
 
         user_details_recent = User.displayable_users(map(lambda x: int(x[0]), most_active_users_recent))
@@ -1051,21 +1050,48 @@ def statistics(request, slug, tab='teamstats'):
 
         most_active_users_recent = map(lambda x: displayable_user(x, user_details_dict_recent), most_active_users_recent)
 
-        title_additional_recent = u'Top contributors (past 30 days)'
-        graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title=title_additional_recent, labels=True, xlinks=True)
-
+        summary_additional_recent = u'Top contributors (past 30 days)'
+        graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title='', labels=True, xlinks=True)
     context = {
-        'computed_on': datetime.utcnow().replace(tzinfo=utc).strftime("%A %d. %B %Y %H:%M:%S UTC"),
-        'summary': summary,
-        'summary_recent': summary_recent,
-        'activity_tab': tab,
-        'team': team,
-        'graph': graph,
-        'graph_recent': graph_recent,
-        'graph_additional': graph_additional,
-        'graph_additional_recent': graph_additional_recent,
-        'summary_table': summary_table,
+        cache_key + 'computed_on': datetime.utcnow().replace(tzinfo=utc).strftime("%A %d. %B %Y %H:%M:%S UTC"),
+        cache_key + 'summary': summary,
+        cache_key + 'summary_recent': summary_recent,
+        cache_key + 'activity_tab': tab,
+        cache_key + 'team': team,
+        cache_key + 'graph': graph,
+        cache_key + 'graph_recent': graph_recent,
+        cache_key + 'graph_additional': graph_additional,
+        cache_key + 'graph_additional_recent': graph_additional_recent,
+        cache_key + 'summary_additional': summary_additional,
+        cache_key + 'summary_additional_recent': summary_additional_recent,
+        cache_key + 'summary_table': summary_table,
     }
+    return context
+
+@login_required
+def statistics(request, slug, tab='teamstats'):
+    team = get_team_for_view(slug, request.user)
+    if tab == 'teamstats' and not can_view_stats_tab(team, request.user):
+        return HttpResponseForbidden("Not allowed")
+    cache_key = 'stats-' + slug + '-' + tab
+    cached_context = cache.get_many([cache_key + 'computed_on', cache_key + 'summary', cache_key + 'summary_recent', cache_key + 'activity_tab', cache_key + 'team', cache_key + 'graph', cache_key + 'graph_recent', cache_key + 'graph_additional', cache_key + 'graph_additional_recent', cache_key + 'summary_additional', cache_key + 'summary_additional_recent', cache_key + 'summary_table'])
+    if not cached_context:
+        cached_context = compute_statistics(request, slug, tab='teamstats', cache_key=cache_key)
+        cache.set_many(cached_context, 60)
+    context = {}
+    context['computed_on'] = cached_context[cache_key + 'computed_on']
+    context['summary'] = cached_context[cache_key + 'summary']
+    context['summary_recent'] = cached_context[cache_key + 'summary_recent']
+    context['activity_tab'] = cached_context[cache_key + 'activity_tab']
+    context['team'] = cached_context[cache_key + 'team']
+    context['graph'] = cached_context[cache_key + 'graph']
+    context['graph_recent'] = cached_context[cache_key + 'graph_recent']
+    context['graph_additional'] = cached_context[cache_key + 'graph_additional']
+    context['graph_additional_recent'] = cached_context[cache_key + 'graph_additional_recent']
+    context['summary_additional'] = cached_context[cache_key + 'summary_additional']
+    context['summary_additional_recent'] = cached_context[cache_key + 'summary_additional_recent']
+    context['summary_table'] = cached_context[cache_key + 'summary_table']
+    logger.error(context)
     return render(request, 'teams/statistics.html', context)
 
 def activity(request, slug, tab='videos'):

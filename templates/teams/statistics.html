@@ -1,6 +1,6 @@
 {% extends "teams/base.html" %}
 
-{% load i18n media_bundle cache %}
+{% load i18n media_bundle %}
 
 {% block html_attrs %}id="teams_activity"{% endblock %}
 {% block body_attrs %}id="teams" class="v1"{% endblock %}
@@ -17,8 +17,8 @@
         <div class="tools subnav">
             {% include 'teams/_subnav_activity.html' with current_sub=activity_tab %}
         </div>
-	{% cache 86400 stats %}
 	<div>
+	  <p class="time-tag">Last updated on {{ computed_on }}</p>
 	  <p class="summary">{{ summary }}</p>
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph }}"></object>
 	  <p class="summary">{{ summary_recent }}</p>
@@ -39,13 +39,13 @@
 	  </table>
 	  {% endif %}
 	  {% if graph_additional %}
+	  <p class="summary">{{ summary_additional }}</p>
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_additional }}"></object>
 	  {% endif %}
 	  {% if graph_additional_recent %}
+	  <p class="summary">{{ summary_additional_recent }}</p>
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_additional_recent }}"></object>
 	  {% endif %}
-	  <p class="time-tag">Last updated on {{ computed_on }}</p>
 	</div>
-	{% endcache %}
   </div>
 {% endblock %}
