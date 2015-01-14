@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2013 Participatory Culture Foundation
+# Copyright (C) 2014 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,25 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-from datetime import timedelta
 
-from celery.schedules import crontab
-from celery.task import task
+"""Extra generic view classes."""
 
-from django.db.models import Count
+from django.views.generic.base import TemplateView
 
-from statistic.models import (
-    EmailShareStatistic, TweeterShareStatistic, FBShareStatistic,
-)
-from utils.metrics import Gauge
+class JSTemplateView(TemplateView):
+    def render_to_response(self, context, **response_kwargs):
+        if 'content_type' not in response_kwargs:
+            response_kwargs['content_type'] = 'application/javascript'
+        return super(JSTemplateView, self).render_to_response(
+            context, **response_kwargs)
 
-@task
-def gauge_statistic():
-    Gauge('statistic.shares.twitter').report(TweeterShareStatistic.objects.count())
-    Gauge('statistic.shares.facebook').report(FBShareStatistic.objects.count())
-    Gauge('statistic.shares.email').report(EmailShareStatistic.objects.count())
-
-def graphite_slugify(s):
-    for c in ' -.,:':
-        s = s.replace(c, '_')
-    return s
