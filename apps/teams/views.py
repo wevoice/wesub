@@ -39,7 +39,7 @@ from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri, force_unicode
 from django.views.generic.list_detail import object_list
-from django.core.cache import get_cache
+from django.core.cache import cache
 import widget
 from auth.models import UserLanguage, CustomUser as User
 from videos.templatetags.paginator import paginate
@@ -95,7 +95,6 @@ from statistics import compute_statistics
 from teams.bulk_actions import complete_approve_tasks
 
 logger = logging.getLogger("teams.views")
-cache = get_cache('default')
 
 TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
