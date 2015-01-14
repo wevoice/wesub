@@ -30,16 +30,25 @@ custom_css = '''
 {{ id }}.tooltip rect {
   fill: gray !important;
 }
-
-{{ id }} .value:before {
-  content: "Hello" !important;
+{{ id }}.tooltip text {
+  font-size: 13px !important;
 }
 '''
+
+def strip_strings_chrome(s):
+  labels = s.split(' - ')
+  if len(labels) > 1:
+    if len(labels[0]) > 15:
+      return labels[0][:13] + u'... ' + labels[1]
+  elif len(s) > 19:
+      return s[:17] + u'...'
+  return s
+
 custom_css_file = '/tmp/pygal_custom_style.css'
 with open(custom_css_file, 'w') as f:
   f.write(custom_css)
 
-def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Other", y_title=None, labels=False, xlinks=False):
+def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Other", y_title=None, labels=False, xlinks=False, total_label="Edited: "):
     custom_style = Style(
         background='transparent',
         font_family='sans-serif',
@@ -74,7 +83,6 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
     if max_entries and (len(data) > max_entries):
         remaining_data = reduce(lambda x, y: ('',x[1]+y[1]), data[max_entries:])
         data = data[:max_entries]
-        chart.x_title = 'Displaying first %s items' % max_entries
     for item in data:
         label = ''
         if labels:
@@ -83,13 +91,13 @@ def plot(data, title=None, graph_type='Pie', max_entries=None, other_label="Othe
             label = item[0]
         if xlinks:
           chart.add(item[0], [{'value': item[1],
-                               'label': label,
-                               'value 2': "Total: ",
+                               'label': strip_strings_chrome(label),
+                               'value 2': total_label,
                                'xlink': {
                                  'href': item[3],
                                  'target': '_blank'}}])
         else:
-          chart.add(item[0], [{'value': item[1], 'label': unicodedata.normalize('NFKD', label).encode('ascii', 'ignore'), 'value 2': "Total: "}])
+          chart.add(item[0], [{'value': item[1], 'label': unicodedata.normalize('NFKD', strip_strings_chrome(label)).encode('ascii', 'ignore'), 'value 2': total_label}])
     if y_title:
         chart.y_title = y_title
     if len(data) < 4:

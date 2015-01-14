@@ -29,7 +29,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core.files import File
 from django.db import models
-from django.db.models import query
+from django.db.models import query, Q
 from django.db.models.signals import post_save, post_delete, pre_delete
 from django.http import Http404
 from django.template.loader import render_to_string
@@ -334,8 +334,10 @@ class Team(models.Model):
             users = self.users.all()
         return UserLanguage.objects.filter(user__in=users).values_list('language', flat=True)
 
-    def active_users(self, since=None):
+    def active_users(self, since=None, published=True):
         sv = NewSubtitleVersion.objects.filter(video__in=self.videos.all())
+        if published:
+            sv = sv.filter(Q(visibility_override='public') | Q(visibility='public'))
         if since:
             sv = sv.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=since))
         return sv.exclude(author__username="anonymous").values_list('author', 'subtitle_language')
