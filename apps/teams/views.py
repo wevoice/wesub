@@ -15,12 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-import functools
-import logging
-import random
+import functools, logging, random, pickle
+from datetime import datetime, timedelta
 
 import babelsubs
-from datetime import datetime, timedelta
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -40,7 +39,7 @@ from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri, force_unicode
 from django.views.generic.list_detail import object_list
-
+from django.core.cache import cache
 import widget
 from auth.models import UserLanguage, CustomUser as User
 from videos.templatetags.paginator import paginate
@@ -84,7 +83,6 @@ from utils.translation import (
     get_language_choices, get_language_choices_as_dicts, languages_with_labels, get_user_languages_from_request
 )
 from utils.chunkediter import chunkediter
-from utils.graphing import plot
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
 from videos.models import Action, VideoUrl, Video, VideoFeed
@@ -92,11 +90,11 @@ from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 from teams import workflows
+from statistics import compute_statistics
 
 from teams.bulk_actions import complete_approve_tasks
 
 logger = logging.getLogger("teams.views")
-
 
 TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
@@ -907,140 +905,35 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
+
+class TableCell():
+    """Convenience class to pass
+    table data to template, namely
+    cell contents and whether they are
+    headers.
+    """
+    def __init__(self, content, header=False):
+        self.content = content
+        self.header = header
+    def __repr__(self):
+        return str(self.content)
+
 @login_required
 def statistics(request, slug, tab='teamstats'):
-    """computes a bunch of statistics for the team, either at the video or member levels.
+    """For the team activity, statistics tabs
     """
-    def strip_strings_chrome(s):
-        if len(s) > 11:
-            return s[:9] + u'...'
-        else:
-            return s
     team = get_team_for_view(slug, request.user)
-    summary = ''
-    graph = ''
-    graph_recent = ''
-    summary_recent = ''
-    graph_additional = None
-    graph_additional_recent = None
-    summary_additional = None
-    if tab == 'videosstats':
-        (complete_languages, incomplete_languages) = team.get_team_languages()
-        languages = complete_languages + incomplete_languages
-        unique_languages = set(languages)
-        total = 0
-        numbers = []
-        for l in unique_languages:
-            count_complete = complete_languages.count(l)
-            count_incomplete = incomplete_languages.count(l)
-            numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete + count_incomplete, "%s - %s published" % (ALL_LANGUAGES_DICT[l], count_complete)))
-            total += count_complete + count_incomplete
-        summary = _(u'%s videos, %s languages, %s captions and translations' % (team.videos_count, len(unique_languages), total))
-        title = "Top 20 languages"
-        graph = plot(numbers, title=title, graph_type='HorizontalBar', labels=True, max_entries=20)
-
-        (complete_languages_recent, incomplete_languages_recent, new_languages) = team.get_team_languages(since=30)
-        languages_recent = complete_languages_recent + incomplete_languages_recent
-        unique_languages_recent = set(languages_recent)
-        summary_recent = "Last 30 days"
-        numbers_recent = []
-        total_recent = 0
-        for l in unique_languages_recent:
-            count_complete_recent = complete_languages_recent.count(l)
-            count_incomplete_recent = incomplete_languages_recent.count(l)
-            numbers_recent.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), count_complete_recent + count_incomplete_recent, "%s - %s published" % (ALL_LANGUAGES_DICT[l], count_complete_recent)))
-            total_recent += count_complete_recent + count_incomplete_recent
-        title_recent = _(u"%s videos, %s new languages, %s languages edited") % (team.videos_count_since(30), len(set(new_languages)), len(unique_languages_recent))
-        graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20)
-    elif tab == 'teamstats':
-        if not can_view_stats_tab(team, request.user):
-            return HttpResponseForbidden("Not allowed")
-        languages = list(team.languages())
-        unique_languages = set(languages)
-        summary = _(u'%s members speaking %s languages' % (team.members_count, len(unique_languages)))
-        numbers = []
-        for l in unique_languages:
-            numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), languages.count(l), ALL_LANGUAGES_DICT[l]))
-        title = ''
-        graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25, labels=True)
-        languages_recent = list(team.languages(members_joined_since=30))
-        unique_languages_recent = set(languages_recent)
-        summary_recent = _(u'Last 30 days: %s new members speaking %s languages' % (team.members_count_since(30), len(unique_languages_recent)))
-        numbers_recent = []
-        for l in unique_languages_recent:
-            numbers_recent.append(
-                (strip_strings_chrome(ALL_LANGUAGES_DICT[l]),
-                 languages_recent.count(l),
-                 ALL_LANGUAGES_DICT[l],
-                 "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse('teams:detail_members', args=[], kwargs={'slug': team.slug}) + "?sort=-joined&lang=%s" % l))
-                )
-        title_recent = ''
-        graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True, xlinks=True)
-
-        active_users = {}
-        for sv in team.active_users():
-            if sv[0] in active_users:
-                active_users[sv[0]].add(sv[1])
-            else:
-                active_users[sv[0]] = set([sv[1]])
-
-        most_active_users = active_users.items()
-        most_active_users.sort(reverse=True, key=lambda x: len(x[1]))
-        if len(most_active_users) > 20:
-            most_active_users = most_active_users[:20]
-
-        active_users_recent = {}
-        for sv in team.active_users(since=30):
-            if sv[0] in active_users_recent:
-                active_users_recent[sv[0]].add(sv[1])
-            else:
-                active_users_recent[sv[0]] = set([sv[1]])
-
-        most_active_users_recent = active_users_recent.items()
-        most_active_users_recent.sort(reverse=True, key=lambda x: len(x[1]))
-        if len(most_active_users_recent) > 20:
-            most_active_users_recent = most_active_users_recent[:20]
-
-        def displayable_user(user, users_details):
-            user_details = users_details[user[0]]
-            return (strip_strings_chrome("%s %s (%s)" % (user_details[1], user_details[2], user_details[3])),
-                    len(user[1]),
-                    "%s %s (%s)" % (user_details[1], user_details[2], user_details[3]),
-                    "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse("profiles:profile", kwargs={'user_id': str(user[0])}))
-            )
-
-        user_details = User.displayable_users(map(lambda x: int(x[0]), most_active_users))
-        user_details_dict = {}
-        for user in user_details:
-            user_details_dict[user[0]] = user
-
-        most_active_users = map(lambda x: displayable_user(x, user_details_dict), most_active_users)
-
-        title_additional = "Top %s contributors" % len(most_active_users)
-        y_title = "Number of Captions and Translations"
-        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title=title_additional, y_title=y_title, labels=True, xlinks=True)
-
-
-        user_details_recent = User.displayable_users(map(lambda x: int(x[0]), most_active_users_recent))
-        user_details_dict_recent = {}
-        for user in user_details_recent:
-            user_details_dict_recent[user[0]] = user
-
-        most_active_users_recent = map(lambda x: displayable_user(x, user_details_dict_recent), most_active_users_recent)
-
-        title_additional_recent = "Last 30 days: top %s contributors" % len(most_active_users_recent)
-        graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title=title_additional_recent, y_title=y_title, labels=True, xlinks=True)
-
-    context = {
-        'summary': summary,
-        'summary_recent': summary_recent,
-        'activity_tab': tab,
-        'team': team,
-        'graph': graph,
-        'graph_recent': graph_recent,
-        'graph_additional': graph_additional,
-        'graph_additional_recent': graph_additional_recent,
-    }
+    if tab == 'teamstats' and not can_view_stats_tab(team, request.user):
+        return HttpResponseForbidden("Not allowed")
+    cache_key = 'stats-' + slug + '-' + tab
+    cached_context = cache.get(cache_key)
+    if cached_context:
+        context = pickle.loads(cached_context)
+    else:
+        context = compute_statistics(team, stats_type=tab)
+        cache.set(cache_key, pickle.dumps(context), 60*60*24)
+    context['activity_tab'] = tab
+    context['team'] = team
     return render(request, 'teams/statistics.html', context)
 
 def activity(request, slug, tab='videos'):
