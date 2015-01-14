@@ -71,7 +71,7 @@ def compute_statistics(team, stats_type):
         for l in unique_languages:
             numbers.append((strip_strings_chrome(ALL_LANGUAGES_DICT[l]), languages.count(l), ALL_LANGUAGES_DICT[l]))
         title = ''
-        graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25, labels=True)
+        graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25, labels=True, total_label="Members: ")
         languages_recent = list(team.languages(members_joined_since=30))
         unique_languages_recent = set(languages_recent)
         summary_recent = u'New members by language (past 30 days)'
@@ -84,7 +84,7 @@ def compute_statistics(team, stats_type):
                  "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse('teams:detail_members', args=[], kwargs={'slug': team.slug}) + "?sort=-joined&lang=%s" % l))
                 )
         title_recent = ''
-        graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True, xlinks=True)
+        graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True, xlinks=True, total_label="Members: ")
 
         summary_table = []
         summary_table.append([TableCell("", header=True), TableCell("all time", header=True), TableCell("past 30 days", header=True)])
@@ -131,7 +131,7 @@ def compute_statistics(team, stats_type):
         most_active_users = map(lambda x: displayable_user(x, user_details_dict), most_active_users)
 
         summary_additional = u'Top contributors (all time)'
-        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title='', labels=True, xlinks=True)
+        graph_additional = plot(most_active_users, graph_type='HorizontalBar', title='', labels=True, xlinks=True, total_label="Contributions: ")
 
 
         user_details_recent = User.displayable_users(map(lambda x: int(x[0]), most_active_users_recent))
@@ -142,7 +142,8 @@ def compute_statistics(team, stats_type):
         most_active_users_recent = map(lambda x: displayable_user(x, user_details_dict_recent), most_active_users_recent)
 
         summary_additional_recent = u'Top contributors (past 30 days)'
-        graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title='', labels=True, xlinks=True)
+        graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title='', labels=True, xlinks=True, total_label="Contributions: ")
+
     statistics = {
         'computed_on': datetime.utcnow().replace(tzinfo=utc).strftime("%A %d. %B %Y %H:%M:%S UTC"),
         'summary': summary,
