@@ -1076,7 +1076,7 @@ def statistics(request, slug, tab='teamstats'):
     cache_key = 'stats-' + slug + '-' + tab
     cached_context = cache.get_many([cache_key + 'computed_on', cache_key + 'summary', cache_key + 'summary_recent', cache_key + 'activity_tab', cache_key + 'team', cache_key + 'graph', cache_key + 'graph_recent', cache_key + 'graph_additional', cache_key + 'graph_additional_recent', cache_key + 'summary_additional', cache_key + 'summary_additional_recent', cache_key + 'summary_table'])
     if not cached_context:
-        cached_context = compute_statistics(request, slug, tab='teamstats', cache_key=cache_key)
+        cached_context = compute_statistics(request, slug, tab=tab, cache_key=cache_key)
         cache.set_many(cached_context, 60*60*24)
     context = {}
     context['computed_on'] = cached_context[cache_key + 'computed_on']
