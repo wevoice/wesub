@@ -21,6 +21,7 @@ import random
 
 import babelsubs
 from datetime import datetime, timedelta
+import pickle
 from django.utils.timezone import utc
 from django.conf import settings
 from django.contrib import messages
@@ -909,6 +910,16 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
+
+class TableCell():
+    """Convenience class to pass
+    table data to template"""
+    def __init__(self, content, header=False):
+        self.content = content
+        self.header = header
+    def __repr__(self):
+        return str(self.content)
+
 def compute_statistics(request, slug, tab, cache_key=''):
     """computes a bunch of statistics for the team, either at the video or member levels.
     """
@@ -918,14 +929,6 @@ def compute_statistics(request, slug, tab, cache_key=''):
         else:
             return s
 
-    class TableCell():
-        """Convenience class to pass
-        table data to template"""
-        def __init__(self, content, header=False):
-            self.content = content
-            self.header = header
-        def __repr__(self):
-            return str(self.content)
     team = get_team_for_view(slug, request.user)
     summary = ''
     graph = ''
@@ -1064,7 +1067,7 @@ def compute_statistics(request, slug, tab, cache_key=''):
         cache_key + 'graph_additional_recent': graph_additional_recent,
         cache_key + 'summary_additional': summary_additional,
         cache_key + 'summary_additional_recent': summary_additional_recent,
-        cache_key + 'summary_table': summary_table,
+        cache_key + 'summary_table': pickle.dumps(summary_table),
     }
     return context
 
@@ -1090,8 +1093,7 @@ def statistics(request, slug, tab='teamstats'):
     context['graph_additional_recent'] = cached_context[cache_key + 'graph_additional_recent']
     context['summary_additional'] = cached_context[cache_key + 'summary_additional']
     context['summary_additional_recent'] = cached_context[cache_key + 'summary_additional_recent']
-    context['summary_table'] = cached_context[cache_key + 'summary_table']
-    logger.error(context)
+    context['summary_table'] = pickle.loads(cached_context[cache_key + 'summary_table'])
     return render(request, 'teams/statistics.html', context)
 
 def activity(request, slug, tab='videos'):
