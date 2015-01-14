@@ -913,23 +913,27 @@ def remove_video(request, team_video_pk):
 
 class TableCell():
     """Convenience class to pass
-    table data to template"""
+    table data to template, namely
+    cell contents and whether they are
+    headers.
+    """
     def __init__(self, content, header=False):
         self.content = content
         self.header = header
     def __repr__(self):
         return str(self.content)
 
-def compute_statistics(request, slug, tab, cache_key=''):
-    """computes a bunch of statistics for the team, either at the video or member levels.
+def compute_statistics(team, stats_type):
+    """computes a bunch of statistics for the team, either at
+    the video or member levels.
     """
+    # Workaround for issues in the graphing library
+    # displaying long strings.
     def strip_strings_chrome(s):
         if len(s) > 11:
             return s[:9] + u'...'
         else:
             return s
-
-    team = get_team_for_view(slug, request.user)
     summary = ''
     graph = ''
     graph_recent = ''
@@ -939,7 +943,7 @@ def compute_statistics(request, slug, tab, cache_key=''):
     summary_additional = ''
     summary_additional_recent = ''
     summary_table = ''
-    if tab == 'videosstats':
+    if stats_type == 'videosstats':
         (complete_languages, incomplete_languages) = team.get_team_languages()
         languages = complete_languages + incomplete_languages
         unique_languages = set(languages)
@@ -975,7 +979,7 @@ def compute_statistics(request, slug, tab, cache_key=''):
         summary_table.append([TableCell("languages edited", header=True), TableCell(str(len(unique_languages))), TableCell(str(len(unique_languages_recent)))])
         summary_table.append([TableCell("subtitles edited", header=True), TableCell(str(total)), TableCell(str(total_recent))])
 
-    elif tab == 'teamstats':
+    elif stats_type == 'teamstats':
         languages = list(team.languages())
         unique_languages = set(languages)
         summary = u'Members by language (all time)'
@@ -1056,18 +1060,17 @@ def compute_statistics(request, slug, tab, cache_key=''):
         summary_additional_recent = u'Top contributors (past 30 days)'
         graph_additional_recent = plot(most_active_users_recent, graph_type='HorizontalBar', title='', labels=True, xlinks=True)
     context = {
-        cache_key + 'computed_on': datetime.utcnow().replace(tzinfo=utc).strftime("%A %d. %B %Y %H:%M:%S UTC"),
-        cache_key + 'summary': summary,
-        cache_key + 'summary_recent': summary_recent,
-        cache_key + 'activity_tab': tab,
-        cache_key + 'team': team,
-        cache_key + 'graph': graph,
-        cache_key + 'graph_recent': graph_recent,
-        cache_key + 'graph_additional': graph_additional,
-        cache_key + 'graph_additional_recent': graph_additional_recent,
-        cache_key + 'summary_additional': summary_additional,
-        cache_key + 'summary_additional_recent': summary_additional_recent,
-        cache_key + 'summary_table': pickle.dumps(summary_table),
+        'computed_on': datetime.utcnow().replace(tzinfo=utc).strftime("%A %d. %B %Y %H:%M:%S UTC"),
+        'summary': summary,
+        'summary_recent': summary_recent,
+        'activity_tab': stats_type,
+        'graph': graph,
+        'graph_recent': graph_recent,
+        'graph_additional': graph_additional,
+        'graph_additional_recent': graph_additional_recent,
+        'summary_additional': summary_additional,
+        'summary_additional_recent': summary_additional_recent,
+        'summary_table': summary_table,
     }
     return context
 
@@ -1077,23 +1080,14 @@ def statistics(request, slug, tab='teamstats'):
     if tab == 'teamstats' and not can_view_stats_tab(team, request.user):
         return HttpResponseForbidden("Not allowed")
     cache_key = 'stats-' + slug + '-' + tab
-    cached_context = cache.get_many([cache_key + 'computed_on', cache_key + 'summary', cache_key + 'summary_recent', cache_key + 'activity_tab', cache_key + 'team', cache_key + 'graph', cache_key + 'graph_recent', cache_key + 'graph_additional', cache_key + 'graph_additional_recent', cache_key + 'summary_additional', cache_key + 'summary_additional_recent', cache_key + 'summary_table'])
-    if not cached_context:
-        cached_context = compute_statistics(request, slug, tab=tab, cache_key=cache_key)
-        cache.set_many(cached_context, 60*60*24)
-    context = {}
-    context['computed_on'] = cached_context[cache_key + 'computed_on']
-    context['summary'] = cached_context[cache_key + 'summary']
-    context['summary_recent'] = cached_context[cache_key + 'summary_recent']
-    context['activity_tab'] = cached_context[cache_key + 'activity_tab']
-    context['team'] = cached_context[cache_key + 'team']
-    context['graph'] = cached_context[cache_key + 'graph']
-    context['graph_recent'] = cached_context[cache_key + 'graph_recent']
-    context['graph_additional'] = cached_context[cache_key + 'graph_additional']
-    context['graph_additional_recent'] = cached_context[cache_key + 'graph_additional_recent']
-    context['summary_additional'] = cached_context[cache_key + 'summary_additional']
-    context['summary_additional_recent'] = cached_context[cache_key + 'summary_additional_recent']
-    context['summary_table'] = pickle.loads(cached_context[cache_key + 'summary_table'])
+    cached_context = cache.get(cache_key)
+    if cached_context:
+        context = pickle.loads(cached_context)
+    else:
+        context = compute_statistics(team, stats_type=tab)
+        cache.set(cache_key, pickle.dumps(context), 60)
+    context['activity_tab'] = tab
+    context['team'] = team
     return render(request, 'teams/statistics.html', context)
 
 def activity(request, slug, tab='videos'):
