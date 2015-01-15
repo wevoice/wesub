@@ -82,7 +82,7 @@ class DataHelpers(object):
         sub_items = subs.to_internal()
         defaults['subtitles'] = sub_items
         v = pipeline.add_subtitles(**defaults)
-        time.sleep(2)
+        time.sleep(.2)
         return v
 
     def create_video_with_subs(self, user, **kwargs ):
