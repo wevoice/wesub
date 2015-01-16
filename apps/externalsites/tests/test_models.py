@@ -26,7 +26,7 @@ from nose.tools import *
 from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import (BrightcoveAccount, YouTubeAccount,
                                   get_sync_accounts, account_models,
-                                  SyncHistory)
+                                  SyncHistory, SyncedSubtitleVersion)
 from subtitles import pipeline
 from teams.models import TeamMember
 from videos.models import VideoFeed
@@ -443,3 +443,35 @@ class YoutubeAccountFeedTest(TestCase):
         account.delete()
         self.assertEqual(VideoFeed.objects.count(), 0)
 
+class DeleteAccountRelatedModelTest(TestCase):
+    # Test that we delete our related objects when we delete our account.
+    # This test is important because we don't use an actual foreign key in the
+    # DB table.
+    def setUp(self):
+        self.account = YouTubeAccountFactory(user=UserFactory(),
+                                        channel_id='test-channel-id')
+        self.video = YouTubeVideoFactory()
+        self.video_url = self.video.get_primary_videourl_obj()
+        self.version = pipeline.add_subtitles(self.video, 'en',
+                                              SubtitleSetFactory())
+        self.language = self.version.subtitle_language
+
+    def test_synced_subtitle_version(self):
+        SyncedSubtitleVersion.objects.set_synced_version(
+            self.account, self.video_url, self.language, self.version)
+        self.account.delete()
+        assert_equal(SyncedSubtitleVersion.objects.all().count(), 0)
+
+    def test_sync_history(self):
+        sync_history_values = {
+            'account': self.account,
+            'video_url': self.video_url,
+            'language': self.language,
+            'action': SyncHistory.ACTION_UPDATE_SUBTITLES,
+            'version': self.version,
+        }
+        SyncHistory.objects.create_for_error(ValueError(),
+                                             **sync_history_values)
+        SyncHistory.objects.create_for_success(**sync_history_values)
+        self.account.delete()
+        assert_equal(SyncHistory.objects.all().count(), 0)
