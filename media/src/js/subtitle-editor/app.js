@@ -87,7 +87,7 @@ var angular = angular || null;
             if (typeof sendAnalytics !== 'undefined')
 		sendAnalytics.apply(this, Array.slice(arguments));
         };
-	$scope.analytics('debug-editor', 'debug-launched');
+        $scope.analytics('debug-editor', 'debug-launched');
         if (EditorData.customCss)
             $scope.customCSSs = [{"href": EditorData.customCss}];
         if (EditorData.teamAttributes) {
@@ -343,10 +343,12 @@ var angular = angular || null;
             notes: EditorData.savedNotes
         };
         $scope.exitEditor = function() {
+            $scope.analytics('debug-editor', 'debug-exit');
             $scope.exiting = true;
             $window.location = EditorData.redirectUrl;
         }
         $scope.exitToLegacyEditor = function() {
+            $scope.analytics('debug-editor', 'debug-exit-to-legacy');
             $scope.exiting = true;
             $window.location = EditorData.oldEditorURL;
         }
