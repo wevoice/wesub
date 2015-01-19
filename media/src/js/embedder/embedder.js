@@ -304,6 +304,10 @@
                 'click a.amara-transcript-line':         'transcriptLineClicked'
                 //'contextmenu a.amara-transcript-line':   'showTranscriptContextMenu'
             },
+	    analytics: function() {
+            if (typeof sendAnalytics !== 'undefined')
+                sendAnalytics.apply(undefined, Array.slice(arguments));
+            },
 	    initThumbnail: function() {
 		if (this.model.get('thumbnail')) {
 		    this.$thumbnailContainer.css('background', '#000000 url(' +  this.model.get('thumbnail') + ') no-repeat').css('background-size', '100%');
@@ -400,7 +404,7 @@
                         function() {
                             // Grab the subtitles for the initial language and do yo' thang.
                             if (that.model.get('is_on_amara') && that.model.get('initial_language')) {
-
+                                that.analytics('debug-embedder', 'debug-launched');
                                 // Build the language selection dropdown menu.
                                 that.buildLanguageSelector();
                                 // update the view on amara button
@@ -665,10 +669,9 @@
                 this.$autoScrollOnOff    = _$('span', this.$autoScrollButton);
             },
             changeLanguage: function(e) {
-
                 var that = this;
                 var language = _$(e.target).data('language');
-
+                this.analytics('debug-embedder', 'debug-change-language', language);
                 this.loadSubtitles(language);
             },
             loadSubtitles: function(language) {
@@ -929,6 +932,8 @@
 		if (this.model.get('initial_language')) {
                     // TODO: This button needs to be disabled unless we have subtitles to toggle.
                     this.$popSubtitlesContainer.toggle();
+                    this.analytics('debug-embedder', 'debug-subtitles-display',
+				   (this.$popSubtitlesContainer.is(":visible") ? "show" : "hide"));
                     this.$subtitlesButton.toggleClass('amara-button-enabled');
 		} else {
                     this.$subtitlesButton.removeClass('amara-button-enabled');
@@ -936,9 +941,10 @@
                 return false;
             },
             toggleTranscriptDisplay: function() {
-
                 // TODO: This button needs to be disabled unless we have a transcript to toggle.
                 this.$amaraTranscript.toggle();
+                this.analytics('debug-embedder', 'debug-transcript-display',
+                               (this.$amaraTranscript.is(":visible") ? "show" : "hide"));
                 this.$transcriptButton.toggleClass('amara-button-enabled');
                 sizeUpdated();
                 return false;
@@ -951,17 +957,20 @@
                     this.$popSubtitlesContainer.hide();
                     this.$subtitlesButton.removeClass('amara-button-enabled');
 		}
+                this.analytics('debug-embedder', 'debug-subtitles-display',
+                               (this.$popSubtitlesContainer.is(":visible") ? "show" : "hide"));
                 return false;
             },
             setTranscriptDisplay: function(show) {
 		if (show) {
-                this.$amaraTranscript.show();
-                this.$transcriptButton.addClass('amara-button-enabled');
+                    this.$amaraTranscript.show();
+                    this.$transcriptButton.addClass('amara-button-enabled');
 		} else {
                     this.$amaraTranscript.hide();
-		    
-                this.$transcriptButton.removeClass('amara-button-enabled');
+                    this.$transcriptButton.removeClass('amara-button-enabled');
 		}
+                this.analytics('debug-embedder', 'debug-transcript-display',
+                               (this.$amaraTranscript.is(":visible") ? "show" : "hide"));
 		sizeUpdated();
                 return false;
             },
@@ -1050,9 +1059,7 @@
                 this.$searchPrev.hide();
             },
             waitUntilVideoIsComplete: function(callback) {
-
                 var that = this;
-
                 // is_complete gets set as soon as the initial API call to build out the video
                 // instance has finished.
                 if (!this.model.get('is_complete')) {
