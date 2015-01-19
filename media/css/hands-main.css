@@ -100,18 +100,15 @@ textarea {
 body {
 	font-size: 14px;
 	font-weight: 200;
-	letter-spacing: .035em;
+	letter-spacing: .03em;
 	word-spacing: 0.04em;
-	font-family: "Helvetica Neue", Helvetica, sans-serif;
+	font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
 	background-color: #f2f2f3;
 	color: #f2f2f3;
 }
 
 h1, h2, h3 {
-	font-family:  'Raleway', "Helvetica Neue", Helvetica, sans-serif;
-}
-
-h1, h2, h3, h4, h5, h6 {
+	font-family:  "Raleway", "Helvetica Neue", "Roboto", Helvetica, Arial, "Liberation Sans", sans-serif;
 }
 
 h1 {
@@ -363,47 +360,12 @@ a, a:hover {
 
 /* Header & Footer */
 .navbar, #footer {
-	font-size: 14px;
-	font-weight: 300;
-	letter-spacing: .06em;
-	word-spacing: 0.04em;
-	font-family:  "Helvetica Neue", Helvetica, sans-serif;
 	background-color: #f2f2f3;
 	color: #f2f2f3;
 }
 
-.navbar h1, .navbar h2, .navbar h3, .navbar h4, .navbar h5, .navbar h6, #footer h1, #footer h2, #footer h3, #footer h4, #footer h5, #footer h6 {
-	letter-spacing: .06em;
-	font-weight: 300;
-}
-
-.navbar h1, #footer h1 {
-	font-size: 40px;
-}
-
-.navbar h2, #footer h2 {
-	font-size: 36px;
-}
-
-.navbar h3, #footer h3 {
-	font-size: 32px;
-}
-
-.navbar h4, #footer h4 {
-	font-size: 20px;
-}
-
-.navbar h5, #footer h5 {
-	font-size: 16px;
-	line-height: 1.7em;
-	font-weight: 200;
-}
-
 .navbar h6, #footer h6 {
-	font-size: 14px;
-	line-height: 1.4em;
 	font-weight: 200;
-	letter-spacing: .08em;
 }
 
 /*ANNOUNCE BANNER*/
@@ -413,7 +375,6 @@ a, a:hover {
 	padding: 0;
 	color: #656565;
 	margin: 0;
-	font-size: 14px;
 }
 
 #announce-banner li {
@@ -448,6 +409,7 @@ nav span {
 
 .navbar {
 	margin-bottom: 0;
+	border-bottom: 0;
 	background-color: #f2f2f3;
 	font-weight: 300;
 	font-size: 14.2px;

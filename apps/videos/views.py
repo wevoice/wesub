@@ -21,7 +21,7 @@ import string
 import urllib, urllib2
 from collections import namedtuple
 
-import simplejson as json
+import json
 from babelsubs.storage import diff as diff_subs
 from babelsubs.generators.html import HTMLGenerator
 from django.conf import settings
@@ -46,14 +46,12 @@ from django.utils.encoding import force_unicode
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.views.decorators.http import require_POST
-from django.views.generic.list_detail import object_list
 from gdata.service import RequestError
 from vidscraper.errors import Error as VidscraperError
 
 import widget
 from widget import rpc as widget_rpc
 from auth.models import CustomUser as User
-from statistic.models import EmailShareStatistic
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.permissions import (user_can_view_private_subtitles,
                                    user_can_edit_subtitles)
@@ -81,6 +79,7 @@ from utils import send_templated_email
 from utils.basexconverter import base62
 from utils.decorators import never_in_prod
 from utils.metrics import Meter
+from utils.objectlist import object_list
 from utils.rpc import RpcRouter
 from utils.text import fmt
 from utils.translation import get_user_languages_from_request
@@ -460,11 +459,6 @@ def email_friend(request):
     if request.method == 'POST':
         form = EmailFriendForm(request.POST, auto_id="email_friend_id_%s", label_suffix="")
         if form.is_valid():
-            email_st = EmailShareStatistic()
-            if request.user.is_authenticated():
-                email_st.user = request.user
-            email_st.save()
-
             form.send()
             messages.info(request, 'Email Sent!')
 
