@@ -15,8 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-import functools, logging, random, pickle
 from datetime import datetime, timedelta
+import functools
+import json
+import logging
+import random
+import pickle
 
 import babelsubs
 
@@ -35,11 +39,10 @@ from django.http import (
 from django.shortcuts import (get_object_or_404, redirect, render_to_response,
                               render)
 from django.template import RequestContext
-from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri, force_unicode
-from django.views.generic.list_detail import object_list
 from django.core.cache import cache
+
 import widget
 from auth.models import UserLanguage, CustomUser as User
 from videos.templatetags.paginator import paginate
@@ -76,6 +79,7 @@ from videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
 from utils.metrics import time as timefn
+from utils.objectlist import object_list
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from utils.text import fmt
