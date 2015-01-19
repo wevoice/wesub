@@ -18,14 +18,32 @@
             {% include 'teams/_subnav_activity.html' with current_sub=activity_tab %}
         </div>
 	<div>
+	  <p class="time-tag">Last updated on {{ computed_on }}</p>
 	  <p class="summary">{{ summary }}</p>
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph }}"></object>
 	  <p class="summary">{{ summary_recent }}</p>
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_recent }}"></object>
+	  {% if summary_table %}
+	  <table class="statistics">
+	    {% for raw in summary_table %}
+	    <tr>
+	      {% for cell in raw %}
+	      {% if cell.header %}
+	      <th>{{ cell }}</th>
+	      {% else %}
+	      <td>{{ cell }}</td>
+	      {% endif %}
+	      {% endfor %}
+	    </tr>
+	    {% endfor %}
+	  </table>
+	  {% endif %}
 	  {% if graph_additional %}
+	  <p class="summary">{{ summary_additional }}</p>
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_additional }}"></object>
 	  {% endif %}
 	  {% if graph_additional_recent %}
+	  <p class="summary">{{ summary_additional_recent }}</p>
 	  <object type="image/svg+xml" data="data:image/svg+xml;base64,{{ graph_additional_recent }}"></object>
 	  {% endif %}
 	</div>

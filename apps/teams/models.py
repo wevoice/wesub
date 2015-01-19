@@ -29,7 +29,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core.files import File
 from django.db import models
-from django.db.models import query
+from django.db.models import query, Q
 from django.db.models.signals import post_save, post_delete, pre_delete
 from django.http import Http404
 from django.template.loader import render_to_string
@@ -334,8 +334,10 @@ class Team(models.Model):
             users = self.users.all()
         return UserLanguage.objects.filter(user__in=users).values_list('language', flat=True)
 
-    def active_users(self, since=None):
+    def active_users(self, since=None, published=True):
         sv = NewSubtitleVersion.objects.filter(video__in=self.videos.all())
+        if published:
+            sv = sv.filter(Q(visibility_override='public') | Q(visibility='public'))
         if since:
             sv = sv.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=since))
         return sv.exclude(author__username="anonymous").values_list('author', 'subtitle_language')
@@ -2705,8 +2707,8 @@ class TeamLanguagePreference(models.Model):
     team = models.ForeignKey(Team, related_name="lang_preferences")
     language_code = models.CharField(max_length=16)
 
-    allow_reads = models.BooleanField()
-    allow_writes = models.BooleanField()
+    allow_reads = models.BooleanField(default=False)
+    allow_writes = models.BooleanField(default=False)
     preferred = models.BooleanField(default=False)
 
     objects = TeamLanguagePreferenceManager()
@@ -3271,7 +3273,7 @@ class BillingRecord(models.Model):
             blank=True, on_delete=models.SET_NULL)
 
     minutes = models.FloatField(blank=True, null=True)
-    is_original = models.BooleanField()
+    is_original = models.BooleanField(default=False)
     team = models.ForeignKey(Team)
     created = models.DateTimeField()
     source = models.CharField(max_length=255)

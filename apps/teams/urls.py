@@ -16,7 +16,8 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.conf.urls.defaults import url, patterns
+from django.views.generic.base import TemplateView
+from django.conf.urls import url, patterns
 from teams.rpc import rpc_router
 
 urlpatterns = patterns('teams.views',
@@ -86,9 +87,8 @@ urlpatterns = patterns('teams.views',
 )
 
 urlpatterns += patterns('',
-    (r'^t1$', 'django.views.generic.simple.direct_to_template', {
-        'template': 'jsdemo/teams_profile.html'
-    }),
+    (r'^t1$',
+     TemplateView.as_view(template_name='jsdemo/teams_profile.html')),
 )
 
 # settings views that are handled by other apps
