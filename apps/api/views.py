@@ -30,12 +30,15 @@ from subtitles.exceptions import ActionError
 from subtitles.models import SubtitleNote
 
 class ActionsSerializer(serializers.Serializer):
-    name = serializers.CharField()
-    label = serializers.CharField()
-    complete = serializers.BooleanField()
+    action = serializers.CharField(source='name')
+    label = serializers.CharField(read_only=True)
+    complete = serializers.BooleanField(read_only=True)
 
 class Actions(APIView):
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get_serializer(self, **kwargs):
+        return ActionsSerializer(**kwargs)
 
     def get(self, request, video_id, language_code, format=None):
         video = get_object_or_404(Video, video_id=video_id)
@@ -59,12 +62,15 @@ class Actions(APIView):
         return Response('')
 
 class NotesSerializer(serializers.Serializer):
-    user = serializers.CharField(source='user.username', required=False)
-    created = serializers.DateTimeField(required=False)
+    user = serializers.CharField(source='user.username', read_only=True)
+    created = serializers.DateTimeField(read_only=True)
     body = serializers.CharField()
 
     def transform_created(self, obj, value):
-        return obj.created.isoformat()
+        if obj:
+            return obj.created.isoformat()
+        else:
+            return None
 
     def restore_object(self, attrs, instance=None):
         if instance is None:
