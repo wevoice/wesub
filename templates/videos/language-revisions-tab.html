@@ -1,4 +1,4 @@
-{% load i18n paginator %}
+{% load i18n %}
 {% load url from future %}
 <div class="tab" id="revisions-tab">
     {% if revisions|length > 1 %}
@@ -57,7 +57,11 @@
         </li>
         {% endfor %}
     </ul>
-    {% paginator %}
+
+    {% if page_obj.has_next %}
+    <a class="" href="?tab=revisions&revisions_per_page={{ more }}&page=1" rel="next">&#8595; {% trans 'Show More' %} &#8595;</a>
+    {% endif %}
+
    {% else %}
    <p class="empty">{% trans 'No subtitles for this language.' %}</p>
    {% endif %}

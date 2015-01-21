@@ -626,8 +626,9 @@ class LanguagePageContextRevisions(LanguagePageContext):
         revisions_qs = revisions_qs.order_by('-version_number')
         revisions_per_page =  request.GET.get('revisions_per_page') or self.REVISIONS_PER_PAGE
         revisions, pagination_info = paginate(
-            revisions_qs, revisions_per_page, request.GET.get('page'), allow_more=(int(revisions_per_page) + 10))
+            revisions_qs, revisions_per_page, request.GET.get('page'))
         self.update(pagination_info)
+        self['more'] = int(revisions_per_page) + 10
         self['revisions'] = language.optimize_versions(revisions)
 
 class LanguagePageContextSyncHistory(LanguagePageContext):
