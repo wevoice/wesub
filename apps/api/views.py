@@ -66,21 +66,9 @@ class NotesSerializer(serializers.Serializer):
     created = serializers.DateTimeField(read_only=True)
     body = serializers.CharField()
 
-    def transform_created(self, obj, value):
-        if obj:
-            return obj.created.isoformat()
-        else:
-            return None
-
-    def restore_object(self, attrs, instance=None):
-        if instance is None:
-            instance = SubtitleNote()
-        instance.body = attrs['body']
-        return instance
-
-    def save(self, **kwargs):
-        self.object = self.context['editor_notes'].post(
-            self.context['user'], self.object.body)
+    def create(self, validated_data):
+        return self.context['editor_notes'].post(
+            self.context['user'], validated_data['body'])
 
 class NotesList(generics.ListCreateAPIView):
     serializer_class = NotesSerializer
