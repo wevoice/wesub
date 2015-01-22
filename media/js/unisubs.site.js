@@ -308,7 +308,7 @@ var Site = function(Site) {
     this.setupSearchBox = function() {
 	var closure = this;
         $('form.search-form').submit(function(ev) {
-	    closure.analytics('debug-website', 'debug-search', $('#id_q').val());
+	    closure.analytics('website', 'search', $('#id_q').val());
         });
     };
     this.setupModalDialogs = function($rootElt) {

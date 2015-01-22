@@ -24,8 +24,8 @@
 	if (e.data) {
 	    if (e.data.fromIframeController) {
 		hostPage = {origin: e.origin, source: e.source, index: e.data.index};
-                analytics('debug-embedder', 'debug-init-host', e.host);
-                analytics('debug-embedder', 'debug-init-href', e.href);
+                analytics('embedder', 'init-host', e.host);
+                analytics('embedder', 'init-href', e.href);
 		hostPage.source.postMessage({initDone: true, index: hostPage.index}, hostPage.origin);
 		window.removeEventListener('message', initReceiver, false);
 	    }
@@ -406,7 +406,7 @@
                         function() {
                             // Grab the subtitles for the initial language and do yo' thang.
                             if (that.model.get('is_on_amara') && that.model.get('initial_language')) {
-                                analytics('debug-embedder', 'debug-launched');
+                                analytics('embedder', 'launched');
                                 // Build the language selection dropdown menu.
                                 that.buildLanguageSelector();
                                 // update the view on amara button
@@ -673,7 +673,7 @@
             changeLanguage: function(e) {
                 var that = this;
                 var language = _$(e.target).data('language');
-                analytics('debug-embedder', 'debug-change-language', language);
+                analytics('embedder', 'change-language', language);
                 this.loadSubtitles(language);
             },
             loadSubtitles: function(language) {
@@ -934,7 +934,7 @@
 		if (this.model.get('initial_language')) {
                     // TODO: This button needs to be disabled unless we have subtitles to toggle.
                     this.$popSubtitlesContainer.toggle();
-                    analytics('debug-embedder', 'debug-subtitles-display',
+                    analytics('embedder', 'subtitles-display',
 				   (this.$popSubtitlesContainer.is(":visible") ? "show" : "hide"));
                     this.$subtitlesButton.toggleClass('amara-button-enabled');
 		} else {
@@ -945,7 +945,7 @@
             toggleTranscriptDisplay: function() {
                 // TODO: This button needs to be disabled unless we have a transcript to toggle.
                 this.$amaraTranscript.toggle();
-                analytics('debug-embedder', 'debug-transcript-display',
+                analytics('embedder', 'transcript-display',
                                (this.$amaraTranscript.is(":visible") ? "show" : "hide"));
                 this.$transcriptButton.toggleClass('amara-button-enabled');
                 sizeUpdated();
@@ -959,7 +959,7 @@
                     this.$popSubtitlesContainer.hide();
                     this.$subtitlesButton.removeClass('amara-button-enabled');
 		}
-                analytics('debug-embedder', 'debug-subtitles-display',
+                analytics('embedder', 'subtitles-display',
                                (this.$popSubtitlesContainer.is(":visible") ? "show" : "hide"));
                 return false;
             },
@@ -971,7 +971,7 @@
                     this.$amaraTranscript.hide();
                     this.$transcriptButton.removeClass('amara-button-enabled');
 		}
-                analytics('debug-embedder', 'debug-transcript-display',
+                analytics('embedder', 'transcript-display',
                                (this.$amaraTranscript.is(":visible") ? "show" : "hide"));
 		sizeUpdated();
                 return false;

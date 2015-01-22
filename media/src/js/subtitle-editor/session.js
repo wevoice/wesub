@@ -63,7 +63,7 @@ var angular = angular || null;
          */
 
         function saveSubtitles(action) {
-            $scope.analytics('debug-editor', 'debug-save', action);
+            $scope.analytics('editor', 'save', action);
             if($scope.overrides.forceSaveError) {
                 var deferred = $q.defer();
                 deferred.reject('Simulated Error');
