@@ -85,7 +85,7 @@ var angular = angular || null;
         };
         $scope.analytics = function() {
             if (typeof sendAnalytics !== 'undefined')
-		sendAnalytics.apply(this, Array.slice(arguments));
+		sendAnalytics.apply(this, Array.prototype.slice.call(arguments, 0));
         };
         $scope.analytics('editor', 'launched');
         if (EditorData.customCss)

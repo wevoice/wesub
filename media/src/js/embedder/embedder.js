@@ -18,14 +18,13 @@
     window.addEventListener('message', initReceiver, false);
     var analytics = function() {
         if (typeof sendAnalytics !== 'undefined')
-            sendAnalytics.apply(undefined, Array.slice(arguments));
+            sendAnalytics.apply(undefined, Array.prototype.slice.call(arguments, 0));
     };
     function initReceiver(e) {
 	if (e.data) {
 	    if (e.data.fromIframeController) {
 		hostPage = {origin: e.origin, source: e.source, index: e.data.index};
-                analytics('embedder', 'init-host', e.host);
-                analytics('embedder', 'init-href', e.href);
+                analytics('embedder', 'init-origin', e.origin);
 		hostPage.source.postMessage({initDone: true, index: hostPage.index}, hostPage.origin);
 		window.removeEventListener('message', initReceiver, false);
 	    }

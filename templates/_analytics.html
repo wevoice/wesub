@@ -19,10 +19,10 @@
   <!-- no analytics since we are running locally -->
   {% endif %}
   var sendAnalytics = function() {
-  analytics = Array.slice(arguments);
+  analytics = Array.prototype.slice.call(arguments, 0);
   sendIds.forEach(function(sendId) {
           ga.apply(undefined, [sendId + 'send', 'event'].concat(analytics));
-      });
+  });
   };
 </script>
 

@@ -303,7 +303,7 @@ var Site = function(Site) {
     };
     this.analytics = function() {
         if (typeof sendAnalytics !== 'undefined')
-            sendAnalytics.apply(undefined, Array.slice(arguments));
+            sendAnalytics.apply(undefined, Array.prototype.slice.call(arguments, 0));
     };
     this.setupSearchBox = function() {
 	var closure = this;
