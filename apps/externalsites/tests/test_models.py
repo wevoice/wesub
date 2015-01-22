@@ -20,7 +20,7 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 from django.core.exceptions import PermissionDenied
-from gdata.youtube.client import RequestError
+from gdata.client import RequestError
 from nose.tools import *
 
 from externalsites.exceptions import YouTubeAccountExistsError
