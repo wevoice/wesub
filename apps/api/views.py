@@ -18,12 +18,12 @@
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
-from rest_framework import permissions
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from api.pagination import AmaraPaginationMixin
 from videos.models import Video
 from subtitles import workflows
 from subtitles.exceptions import ActionError
@@ -35,7 +35,6 @@ class ActionsSerializer(serializers.Serializer):
     complete = serializers.BooleanField(read_only=True)
 
 class Actions(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
 
     def get_serializer(self, **kwargs):
         return ActionsSerializer(**kwargs)
@@ -72,7 +71,6 @@ class NotesSerializer(serializers.Serializer):
 
 class NotesList(generics.ListCreateAPIView):
     serializer_class = NotesSerializer
-    permission_classes = (permissions.IsAuthenticated,)
 
     @csrf_exempt
     def dispatch(self, request, **kwargs):
@@ -92,3 +90,11 @@ class NotesList(generics.ListCreateAPIView):
             'editor_notes': self.editor_notes,
             'user': self.request.user,
         }
+
+class VideosSerializer(serializers.Serializer):
+    id = serializers.CharField(source='video_id', read_only=True)
+
+class Videos(AmaraPaginationMixin, generics.ListCreateAPIView):
+    serializer_class = VideosSerializer
+    queryset = Video.objects.all()
+    paginate_by = 20
