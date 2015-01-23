@@ -1,11 +1,11 @@
 Beta API Documentation
 ======================
 
-Amara provides a REST API to interactive with the site.  Please contact us if
+Amara provides a REST API to interact with the site.  Please contact us if
 you’d like to use the Amara API for commercial purposes.
 
 .. note:: This documentation is for the upcoming Amara API.  It is currently
-  being actively developed and not yet fully functional. See
+  being actively developed and is not yet fully functional. See
   `the API changes blog post <http://about.amara.org/2015/01/20/api-changes/>`_
   for more info.
 
@@ -109,7 +109,7 @@ To get info about the video with id "foo" you can use
 
 Many of the available resources will allow you to filter the response by a
 certain field.  Filters are specified as GET parameters on the request.  For
-example, if you wanted to view all videos belong to a team called
+example, if you wanted to view all videos belonging to a team called
 "butterfly-club", you could do:
 
 .. http:get:: amara.org/api/videos/?team=butterfly-club
