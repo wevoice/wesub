@@ -509,6 +509,7 @@ Get the list of notes:
 Example response:
 
 .. code-block:: json
+
     [
         {
             "user": "Bob",
