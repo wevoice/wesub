@@ -646,7 +646,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
             team_videos = TeamVideo.objects.filter(
                 id__in=team_videos_pks,
                 video__primary_audio_language_code__in=["", None]).values_list('id', flat=True)
-        elif primary_audio_language_code == "any":
+        elif primary_audio_language_code == "+":
             team_videos = TeamVideo.objects.filter(id__in=team_videos_pks, video__primary_audio_language_code__gt="").values_list('id', flat=True)
         else:
             team_videos = TeamVideo.objects.filter(id__in=team_videos_pks, video__primary_audio_language_code=primary_audio_language_code).values_list('id', flat=True)
