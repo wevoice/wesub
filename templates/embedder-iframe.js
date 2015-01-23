@@ -67,7 +67,10 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		loadingDiv.style.paddingLeft = loadingDiv.style.paddingRight = "50px";
                 loadingDiv.style.textAlign = "center";
                 loadingImg = document.createElement("IMG");
-                loadingImg.src = "{% static_url %}images/embedder/loading.gif";
+                if ("{% static_url %}"[0] == "/")
+                    loadingImg.src = parser.protocol + "//" + parser.host + "{% static_url %}images/embedder/loading.gif";
+                else
+                    loadingImg.src = "{% static_url %}images/embedder/loading.gif";
                 loadingDiv.appendChild(loadingImg);
                 currentDiv.appendChild(loadingDiv); 
 
