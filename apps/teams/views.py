@@ -67,7 +67,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
-    can_delete_language, can_move_videos, can_sort_by_primary_language, can_view_stats_tab
+    can_delete_language, can_move_videos, can_view_stats_tab
 )
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
@@ -646,15 +646,13 @@ def move_videos(request, slug, project_slug=None, languages=None):
             team_videos = TeamVideo.objects.filter(
                 id__in=team_videos_pks,
                 video__primary_audio_language_code__in=["", None]).values_list('id', flat=True)
-        else:
+        elif primary_audio_language_code == "any":
             team_videos = TeamVideo.objects.filter(id__in=team_videos_pks, video__primary_audio_language_code__gt="").values_list('id', flat=True)
+        else:
+            team_videos = TeamVideo.objects.filter(id__in=team_videos_pks, video__primary_audio_language_code=primary_audio_language_code).values_list('id', flat=True)
         # This is necessary because team_video_pk is not indexed by solr
         qs = filter(lambda x: x.team_video_pk in team_videos, qs)
 
-    # This is a temporary restriction until we properly fix
-    # the performance issues there
-    if not can_sort_by_primary_language(team, request.user):
-        primary_audio_language_filter = None
     extra_context = {
         'team': team,
         'member': member,
