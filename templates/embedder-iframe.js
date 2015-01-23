@@ -52,7 +52,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		var currentDiv = elements[i];
 		var noanalytics = false;
                 var loadingDiv = document.createElement("DIV");
-                if (currentDiv.dataset.noanalytics)
+                if (currentDiv.dataset.noanalytics && (currentDiv.dataset.noanalytics == "true"))
                     noanalytics = true;
                 if (currentDiv.dataset.width)
                     currentDiv.style.width = currentDiv.dataset.width;
