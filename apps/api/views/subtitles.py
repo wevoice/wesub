@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
+
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
@@ -23,11 +25,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.pagination import AmaraPaginationMixin
 from videos.models import Video
 from subtitles import workflows
 from subtitles.exceptions import ActionError
-from subtitles.models import SubtitleNote
 
 class ActionsSerializer(serializers.Serializer):
     action = serializers.CharField(source='name')
@@ -89,11 +89,3 @@ class NotesList(generics.ListCreateAPIView):
             'editor_notes': self.editor_notes,
             'user': self.request.user,
         }
-
-class VideosSerializer(serializers.Serializer):
-    id = serializers.CharField(source='video_id', read_only=True)
-
-class Videos(AmaraPaginationMixin, generics.ListCreateAPIView):
-    serializer_class = VideosSerializer
-    queryset = Video.objects.all()
-    paginate_by = 20
