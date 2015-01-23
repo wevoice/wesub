@@ -35,7 +35,6 @@ class ActionsSerializer(serializers.Serializer):
     complete = serializers.BooleanField(read_only=True)
 
 class Actions(APIView):
-
     def get_serializer(self, **kwargs):
         return ActionsSerializer(**kwargs)
 

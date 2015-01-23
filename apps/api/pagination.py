@@ -89,12 +89,14 @@ class AmaraPaginationMixin(object):
 
     def paginate_queryset(self, queryset):
         limit = self.get_paginate_by()
+        if not limit:
+            return None
+        print self, limit
+
         offset = self.request.query_params.get('offset', 0)
         try:
             offset = int(offset)
         except ValueError:
             offset = 0
         return AmaraPage(queryset, offset, limit)
-
-
 

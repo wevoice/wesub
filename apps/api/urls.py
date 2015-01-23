@@ -19,11 +19,11 @@ from django.conf.urls import patterns, url
 from api import views
 
 urlpatterns = patterns('',
-    url(r'^videos/', views.Videos.as_view()),
+    url(r'^videos/$', views.Videos.as_view()),
     url(r'^videos/(?P<video_id>[\w\d_.-]+)'
-        '/languages/(?P<language_code>[\w\d-]+)/subtitles/actions/',
+        '/languages/(?P<language_code>[\w\d-]+)/subtitles/actions/$',
         views.Actions.as_view()),
     url(r'^videos/(?P<video_id>[\w\d_.-]+)'
-        '/languages/(?P<language_code>[\w\d-]+)/subtitles/notes/',
+        '/languages/(?P<language_code>[\w\d-]+)/subtitles/notes/$',
         views.NotesList.as_view()),
 )
