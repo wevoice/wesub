@@ -4,10 +4,9 @@ API Documentation
 This is the documentation of v2 of Amara's API. Please contact us
 if you’d like to use the Amara API for commercial purposes.
 
-.. note:: The v1 of the API is deprecated, but can still be accessed through
-    http://www.amara.org/api/1.0/documentation/ . Users should migrate
-    to the v2 of the API. If you're missing a feature on the API, please `let us
-    know <https://support.amara.org/>`_ .
+.. note:: This version of the API will be replaced in the near future.  See
+   `the API changes blog post <http://about.amara.org/2015/01/20/api-changes/>`_
+   for more info.
 
 Authentication
 --------------
@@ -358,7 +357,7 @@ Example response:
         ]
     }
 
-.. _subtitles-resource:
+.. _old-subtitles-resource:
 
 Subtitles Resource
 ~~~~~~~~~~~~~~~~~~
@@ -398,7 +397,7 @@ Creating new subtitles for a language:
         available for this language - optional, defaults to false.
     :form action: Name of the action to perform - optional.  If given,
         the is_complete param will be ignored.  See the 
-        :ref:`subtitles-action-resource` for details.
+        :ref:`old-subtitles-action-resource` for details.
 
 This will create a new subtitle version with the new subtitles.
 
@@ -444,7 +443,7 @@ Example response:
         "video_title": "The Golden Gate Way"
     }
 
-.. _subtitles-action-resource:
+.. _old-subtitles-action-resource:
 
 Subtitles Action Resource
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -455,7 +454,7 @@ reject, etc).  This resource is used to list and perform actions on the
 subtitle set.
 
 .. note:: You can also perform an action together a new set of subtitles using
-    the action param of the :ref:`subtitles-resource`.
+    the action param of the :ref:`old-subtitles-resource`.
 
 Get the list of possible actions:
 
