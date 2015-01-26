@@ -128,7 +128,7 @@ class Build(Command):
         subprocess.call(["docker", "build", "--no-cache", "-t", "amara-app", "."])
 
 class Bump(Command):
-    """Build the app container."""
+    """Bump the version of optional repository."""
 
     def run_inner(self, args, options):
         self.bump_repo('amara-enterprise')
