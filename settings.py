@@ -247,6 +247,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_SERIALIZER_CLASS':
         'api.pagination.AmaraPaginationSerializer',
+    'ORDERING_PARAM': 'order_by',
 }
 
 #################

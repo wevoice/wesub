@@ -79,6 +79,12 @@ exploring the API and debugging issues.  To view API endpoints in your
 browser simply log in to amara as usual then paste the API URL into your
 address bar.
 
+Value Formats
+-------------
+
+- Dates/times use ISO 8601 formatting
+- Language codes use BCP-47 formatting
+
 Use HTTPS
 ---------
 
@@ -150,10 +156,11 @@ And then, you can start referencing the video by the numeric id when
 interacting with the API. For example, the following call will retrieve the
 above video.
 
-
 .. http:get:: amara.org/api/videos/12345?usePartnerId=true
 
 Available Resources
 -------------------
 
 The following resources are available to end users:
+
+.. automodule:: api.views.videos
