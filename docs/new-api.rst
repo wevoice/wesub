@@ -59,17 +59,15 @@ Here's an example of request data formated as JSON:
 
     {"field1": "value1", "field2": "value2", ... }
 
-See :ref:`api-data-formats` for info about alternate input formats.
-
 By default we will return JSON output.  You can the ``Accept`` header to select
-a different output format.  You can also use ``Accept: text/html`` to get
-browser-friendly output (see below).
+a different output format.  You can also use the ``format`` query param to
+select the output formats.  The value is the format name in lower case (for
+example ``format=json``).
 
-.. note::
-    You can also use the deprecated ``format`` query param to select JSON,
-    XML, or YAML as for the output and input formats.  The value is the format
-    name in lower case.  For example, you can append ``?format=json`` to the
-    URL to use JSON for both the input and output formats.
+We also support text/html as an output format and
+application/x-www-form-urlencoded and multipart/form-data as input formats.
+However, this is only to support browser friendly endpoints.  It should not be
+used in API client code.
 
 Browser Friendly Endpoints
 --------------------------
