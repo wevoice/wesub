@@ -5,7 +5,6 @@
 *.orig
 *.db
 pip-log.txt
-deploy/src/*
 *.sqlite3
 *calcdeps.js
 .DS_Store
@@ -44,12 +43,10 @@ media/release
 media/static-cache
 media/teams/*
 media/videos/*
-deploy/fabric.log
 amara-fabric/
 disabled
 server_local_settings.py
 /mediabundles_list.py
-deploy/build/*
 celerybeat-schedule
 /media/js/site_base_js.js
 /media/docs/*
