@@ -67,7 +67,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
-    can_delete_language, can_move_videos, can_view_stats_tab
+    can_delete_language, can_move_videos, can_view_stats_tab, can_sort_by_primary_language
 )
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
@@ -623,7 +623,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
     query = request.GET.get('q', '')
     sort = request.GET.get('sort')
     language_filter = request.GET.get('lang')
-    primary_audio_language_filter = request.GET.get('primary-audio-lang', 'any')
+    primary_audio_language_filter = request.GET.get('primary-audio-lang', 'any' if can_sort_by_primary_language(team, request.user) else None)
     language_code = language_filter if language_filter != 'any' else None
     primary_audio_language_code = primary_audio_language_filter if primary_audio_language_filter != 'any' else None
     language_mode = request.GET.get('lang-mode', '+')

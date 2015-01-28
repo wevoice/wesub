@@ -355,10 +355,8 @@ def can_move_videos(team, user):
     role = get_role_for_target(user, team, None, None)
     return role in [ROLE_ADMIN, ROLE_OWNER]
 
-# Removed a temporary restriction because
-# of performance issues with large teams
 def can_sort_by_primary_language(team, user):
-    return True
+    return team.slug != "ted"
 
 def can_add_video(team, user, project=None):
     """Return whether the given user can add a video to the given target."""
