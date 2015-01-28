@@ -639,21 +639,18 @@ def move_videos(request, slug, project_slug=None, languages=None):
     # in queries to haystack or solr
     if primary_audio_language_code is not None:
         if primary_audio_language_code == "-":
-            team_videos = TeamVideo.objects.filter(
-                team=team).exclude(
-                    video__primary_audio_language_code="").values_list('id', flat=True)
+            team_videos = TeamVideo.get_videos_non_language_ids(team, "")
         elif primary_audio_language_code == "+":
-            team_videos = TeamVideo.objects.filter(
-                team=team).exclude(
-                    video__primary_audio_language_code__gt="").values_list('id', flat=True)
+            team_videos = TeamVideo.get_videos_non_language_ids(team, "", gt=True)
         else:
-            team_videos = TeamVideo.objects.filter(
-                team=team).exclude(
-                    video__primary_audio_language_code=primary_audio_language_code).values_list('id', flat=True)
+            team_videos = TeamVideo.get_videos_non_language_ids(team, primary_audio_language_code)
+
         # For longer lists, it gets too long for solr. So we have to exclude chunk by chunk
         # rather than filter.
         # Also we get around the missing team_video_pk index by using the id, which we
         # know how it is generated
+        # This does not work for very long lists though, that's why we block that
+        # feature for large teams
         for chunk in (team_videos[pos:pos + 1000] for pos in xrange(0, len(team_videos), 1000)):
             qs = qs.exclude(id__in=map(lambda x: "teams.teamvideo.%s" % x, chunk))
 
