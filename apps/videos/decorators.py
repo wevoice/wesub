@@ -1,10 +1,28 @@
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.http import Http404
-from django.shortcuts import get_object_or_404
 from django.utils.functional import wraps
 
 from videos.models import Video
 from subtitles.models import SubtitleVersion
+
+def get_object_or_403(request, qs, **params):
+    """Get an object or throw a PermissionDenied error
+
+    This function works similarly to Django's get_object_or_404.  However, if
+    the object is not found it will:
+        * Return a 403 error for non-staff users
+        * Return a 404 error for other users
+
+    This prevents telling non-staff users if a video id exists or not, which
+    is somewhat of a security concern (see pculture/amara-enteprise#97)
+    """
+    try:
+        return qs.get(**params)
+    except ObjectDoesNotExist:
+        if request.user.is_staff:
+            raise Http404()
+        else:
+            raise PermissionDenied()
 
 def get_video_from_code(func):
     """
@@ -15,7 +33,7 @@ def get_video_from_code(func):
     """
     def wrapper(request, video_id, *args, **kwargs):
         qs = Video.objects.select_related('teamvideo')
-        video = get_object_or_404(qs, video_id=video_id)
+        video = get_object_or_403(request, qs, video_id=video_id)
         if not video.can_user_see(request.user):
             raise PermissionDenied()
         return func(request, video, *args, **kwargs)
@@ -48,9 +66,10 @@ def get_video_revision(func):
     for the user on that request.
     """
     def wrapper(request, video_id=None, pk=None, *args, **kwargs):
-        version = get_object_or_404(SubtitleVersion.objects.extant(), pk=pk)
+        version = get_object_or_403(request, SubtitleVersion.objects.extant(),
+                                    pk=pk)
         id = video_id if video_id else version.video.video_id
-        video = get_object_or_404(Video, video_id=id)
+        video = get_object_or_403(request, Video, video_id=id)
 
         if not video.can_user_see(request.user):
             raise Http404
