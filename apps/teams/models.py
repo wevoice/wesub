@@ -452,6 +452,9 @@ class Team(models.Model):
         except KeyError:
             pass
 
+    def user_can_view_videos(self, user):
+        return self.is_visible or self.user_is_member(user)
+
     def _is_role(self, user, role=None):
         """Return whether the given user has the given role in this team.
 
