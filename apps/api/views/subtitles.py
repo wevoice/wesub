@@ -14,6 +14,65 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
+"""
+Subtitles Action Resource
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Actions are operations on subtitles.  Actions correspond to the buttons in the
+upper-right hand corner of the subtitle editor (save, save a draft, approve,
+reject, etc).  This resource is used to list and perform actions on the
+subtitle set.
+
+.. note:: You can also perform an action together a new set of subtitles using
+    the action param of the :ref:`old-subtitles-resource`.
+
+Get the list of possible actions:
+
+.. http:get:: /api/videos/[video-id]/languages/[lang-identifier]/subtitles/actions/
+
+    :param video-id: ID of the video
+    :param lang-identifier: subtitle language code
+    :>json action: Action name
+    :>json label: Human-friendly string for the action
+    :>json complete: Does this action complete the subtitles?  If true, then
+        when the action is performed, we will mark the subtitles complete.  If
+        false, we will mark them incomplete.  If null, then we will not change
+        the subtitles_complete flag.
+
+Perform an action on a subtitle set
+
+.. http:post:: /api/videos/[video-id]/languages/[lang-identifier]/subtitles/actions/
+
+    :query video-id: ID of the video
+    :query lang-identifier: subtitle language code
+    :<json action: name of the action to perform
+
+Subtitles Notes Resource
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Get/Create notes saved in the editor.
+
+.. note:: Subtitle notes are currently only supported for team videos
+
+Get the list of notes:
+
+.. http:get:: /api/videos/[video-id]/languages/[lang-identifier]/subtitles/notes
+
+    :query video-id: ID of the video
+    :query lang-identifier: subtitle language code
+    :>json user: Username of the note author
+    :>json created: date/time that the note was created
+    :>json body: text of the note.
+
+
+Create a new note
+
+.. http:post:: /api/videos/[video-id]/languages/[lang-identifier]/subtitles/actions/
+
+    :query video-id: ID of the video
+    :query lang-identifier: subtitle language code
+    :<json body: note body
+"""
 
 from __future__ import absolute_import
 
