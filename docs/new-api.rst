@@ -131,31 +131,6 @@ To update the video with video id `foo` use:
 
 .. http:put:: amara.org/api/videos/foo
 
-Partner video ids
------------------
-
-If you are a partner, you can set the ``id`` field for a video.  Simply supply
-the ``usePartnerId`` parameter in your request and we will use your id for look
-ups.  The parameter can be sent as a parameter to any kind of API call.  This
-is useful if you already have a database of video ids and don't want to
-maintain a mapping between those ids and Amara ids.
-
-For example, let's say you have an Amara video with the id of ``yxsSV807Dcho``.
-Your application uses numeric id internally and you would like to tell Amara to
-remember that this video has an id of ``12345`` on your system.  You can modify
-the video like this:
-
-.. http:put:: amara.org/api/videos/yxsSV807Dcho
-
-  :reqjson usePartnerId: true
-  :reqjson id: 12345
-
-And then, you can start referencing the video by the numeric id when
-interacting with the API. For example, the following call will retrieve the
-above video.
-
-.. http:get:: amara.org/api/videos/12345?usePartnerId=true
-
 Available Resources
 -------------------
 
