@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.db import models
 from django.http import Http404
 from django.utils.functional import wraps
 
@@ -16,6 +17,8 @@ def get_object_or_403(request, qs, **params):
     This prevents telling non-staff users if a video id exists or not, which
     is somewhat of a security concern (see pculture/amara-enteprise#97)
     """
+    if isinstance(qs, type) and issubclass(qs, models.Model):
+        qs = qs.objects.all()
     try:
         return qs.get(**params)
     except ObjectDoesNotExist:
