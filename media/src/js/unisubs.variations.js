@@ -16,28 +16,30 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-var analytics = function() {
+var doSendAnalytics = function() {
     if (typeof sendAnalytics !== 'undefined')
 	sendAnalytics.apply(this, Array.prototype.slice.call(arguments, 0));
 };
+var proamaraLink = '#proamara-link';
 
-var proamaraLink = $('#proamara-link');
 // Define JavaScript for each page variation of this experiment.
 var pageVariations = [
     function() {}, // Original: Do nothing. This will render the default, Professional Services.
     function() { // Variation 1
-	proamaraLink.innerHTML = 'Buy Subtitles';
+	$(proamaraLink).innerHTML = 'Buy Subtitles';
     },
     function() { // Variation 2
-	proamaraLink.innerHTML = 'Buy Captions';
+	$(proamaraLink).innerHTML = 'Buy Captions';
     },
     function() { // Variation 3
-	proamaraLink.innerHTML = 'Purchase Subtitles';
+	$(proamaraLink).innerHTML = 'Purchase Subtitles';
     }
 ];
 
-proamaraLink.click(function() {
-    analytics('outbound', 'click', 'pro.amara.conversion', { 'hitCallback': function() { document.location = '//pro.amara.org'; }});
-    return false;
+$( document ).ready(function() {
+    $(proamaraLink).click(function() {
+	var destination = $(proamaraLink).attr('href');
+	doSendAnalytics('outbound', 'click', 'pro.amara.conversion', { 'hitCallback': function() { document.location = destination; }});
+	return false;
+    }); 
 });
-
