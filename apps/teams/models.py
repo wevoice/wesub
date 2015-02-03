@@ -1076,6 +1076,15 @@ class TeamVideo(models.Model):
         else:
             return None
 
+    @staticmethod
+    def get_videos_non_language_ids(team, language_code, gt=False):
+        if gt:
+            return TeamVideo.objects.filter(
+                team=team).exclude(
+                    video__primary_audio_language_code__gt=language_code).values_list('id', flat=True)
+        return TeamVideo.objects.filter(
+            team=team).exclude(
+                video__primary_audio_language_code=language_code).values_list('id', flat=True)
 
 class TeamVideoMigration(models.Model):
     from_team = models.ForeignKey(Team, related_name='+')
