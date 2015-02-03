@@ -1077,8 +1077,8 @@ class TeamVideo(models.Model):
             return None
 
     @staticmethod
-    def get_videos_non_language_ids(team, language_code, gt=False):
-        if gt:
+    def get_videos_non_language_ids(team, language_code, non_empty_language_code=False):
+        if non_empty_language_code:
             return TeamVideo.objects.filter(
                 team=team).exclude(
                     video__primary_audio_language_code__gt=language_code).values_list('id', flat=True)
