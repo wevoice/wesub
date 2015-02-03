@@ -452,6 +452,9 @@ class Team(models.Model):
         except KeyError:
             pass
 
+    def user_can_view_videos(self, user):
+        return self.is_visible or self.user_is_member(user)
+
     def _is_role(self, user, role=None):
         """Return whether the given user has the given role in this team.
 
@@ -1073,6 +1076,15 @@ class TeamVideo(models.Model):
         else:
             return None
 
+    @staticmethod
+    def get_videos_non_language_ids(team, language_code, non_empty_language_code=False):
+        if non_empty_language_code:
+            return TeamVideo.objects.filter(
+                team=team).exclude(
+                    video__primary_audio_language_code__gt=language_code).values_list('id', flat=True)
+        return TeamVideo.objects.filter(
+            team=team).exclude(
+                video__primary_audio_language_code=language_code).values_list('id', flat=True)
 
 class TeamVideoMigration(models.Model):
     from_team = models.ForeignKey(Team, related_name='+')

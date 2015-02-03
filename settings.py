@@ -223,10 +223,31 @@ CELERY_SEND_TASK_ERROR_EMAILS = True
 BROKER_POOL_LIMIT = 10
 
 REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.YAMLParser',
+        'rest_framework.parsers.XMLParser',
+        'rest_framework.parsers.FormParser',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.YAMLRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework.renderers.XMLRenderer',
+    ),
+    'URL_FORMAT_OVERRIDE': 'format',
+    'DEFAULT_CONTENT_NEGOTIATION_CLASS':
+        'api.negotiation.AmaraContentNegotiation',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'api.auth.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-    )
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_PAGINATION_SERIALIZER_CLASS':
+        'api.pagination.AmaraPaginationSerializer',
+    'ORDERING_PARAM': 'order_by',
 }
 
 #################

@@ -65,6 +65,9 @@ name_to_type_value = dict((slugify(label), val)
 name_to_label = dict((slugify(label), label)
                      for val, label in metadata_type_choices)
 
+def all_names():
+    return name_to_type_value.keys()
+
 def type_name_is_valid(name):
     return name in name_to_type_value
 

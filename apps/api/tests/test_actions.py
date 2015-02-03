@@ -48,7 +48,7 @@ class TestActionsAPI(TestCase):
     def setup_video(self):
         self.video = VideoFactory()
         pipeline.add_subtitles(self.video, 'en', None)
-        self.api_path = ('/api2/partners/videos/{0}/languages/en'
+        self.api_path = ('/api/videos/{0}/languages/en'
                          '/subtitles/actions/'.format(self.video.video_id))
 
     def test_list(self):
@@ -63,7 +63,7 @@ class TestActionsAPI(TestCase):
 
     def api_data_for_action(self, action):
         return {
-            'name': action.name,
+            'action': action.name,
             'label': action.label,
             'complete': action.complete,
         }

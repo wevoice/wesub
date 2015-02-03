@@ -27,6 +27,8 @@ particular they control:
   Approve, Send back, etc).
 - Permissions -- Who can edit subtitles, who can view private subtitles
 
+Workflows
+--------_
 .. autoclass:: Workflow
     :members: get_work_mode, get_actions, action_for_add_subtitles,
         get_editor_notes, extra_tabs, get_add_language_mode,
@@ -71,9 +73,6 @@ from utils.behaviors import behavior
 
 class Workflow(object):
     """
-    Workflow
-    --------
-
     A workflow class controls the overall workflow for editing and publishing
     subtitles.  Workflows control the work modes, actions, and permissions for
     a set of subtitles.
