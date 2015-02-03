@@ -26,13 +26,13 @@ var proamaraLink = '#proamara-link';
 var pageVariations = [
     function() {}, // Original: Do nothing. This will render the default, Professional Services.
     function() { // Variation 1
-	$(proamaraLink).innerHTML = 'Buy Subtitles';
+	$(proamaraLink).html('Buy Subtitles');
     },
     function() { // Variation 2
-	$(proamaraLink).innerHTML = 'Buy Captions';
+	$(proamaraLink).html('Buy Captions');
     },
     function() { // Variation 3
-	$(proamaraLink).innerHTML = 'Purchase Subtitles';
+	$(proamaraLink).html('Purchase Subtitles');
     }
 ];
 
