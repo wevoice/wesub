@@ -352,7 +352,7 @@ class VideoSerializer(serializers.Serializer):
                                          project=project)
         video.clear_team_video_cache()
 
-class VideoViewSet(viewsets.ModelViewSet):
+class VideoViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
     serializer_class = VideoSerializer
     queryset = Video.objects.all()
     paginate_by = 20
