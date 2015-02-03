@@ -8,6 +8,7 @@
   ga('create', '{{ GOOGLE_ANALYTICS_NUMBER }}', 'auto');
   ga('send', 'pageview');
   sendIds.push('');
+
   {% if  GOOGLE_ANALYTICS_ADDITIONS %}
   {% for tracking_code in GOOGLE_ANALYTICS_ADDITIONS %}
   ga('create', '{{ tracking_code }}', 'auto', {'name': '{{ forloop.counter }}'});
@@ -26,3 +27,6 @@
   };
 </script>
 
+{% if EXPERIMENTS_CODE and not RUN_LOCALLY %}
+{% include "_experiments.html" %}
+{% endif %}

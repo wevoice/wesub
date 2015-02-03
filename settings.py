@@ -155,6 +155,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'utils.context_processors.custom',
     'utils.context_processors.user_languages',
     'utils.context_processors.run_locally',
+    'utils.context_processors.experiments',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.i18n',
     'staticmedia.context_processors.staticmedia',
@@ -439,6 +440,7 @@ MEDIA_BUNDLES = {
             "js/libs/chosen.ajax.jquery.js",
             "js/libs/jquery.cookie.js",
             "js/unisubs.site.js",
+            "src/js/unisubs.variations.js",
         ),
     },
     "graphs.js": {
