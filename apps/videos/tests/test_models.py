@@ -184,6 +184,7 @@ class TestModelsSaving(TestCase):
 
         # Until we run the proper tasks.
         video_changed_tasks.delay(video.pk)
+        test_utils.video_changed_tasks.run_original()
 
         # But we still need to refresh it to see the change.
         self.assertEqual(video.languages_count, 0)
@@ -193,6 +194,7 @@ class TestModelsSaving(TestCase):
     def test_subtitle_language_save(self):
         def _refresh(video):
             video_changed_tasks.delay(video.pk)
+            test_utils.video_changed_tasks.run_original()
             return Video.objects.get(pk=video.pk)
 
         # Start out with a video with one language.

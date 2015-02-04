@@ -26,7 +26,7 @@ from teams.cache import invalidate_lang_preferences
 from teams.models import (
     Team, Invite, TeamVideo, Application, TeamMember,
     TeamLanguagePreference, Partner, TeamNotificationSetting,
-    InviteExpiredException
+    InviteExpiredException, BillingRecord,
 )
 from teams.permissions import add_role
 from teams.rpc import TeamsApiClass
@@ -38,7 +38,9 @@ from utils.factories import *
 from utils.rpc import Error, Msg
 from videos import metadata_manager
 from videos.models import Video, SubtitleVersion
+from videos.tasks import video_changed_tasks
 from videos.search_indexes import VideoIndex
+
 
 LANGUAGE_RE = re.compile(r"S_([a-zA-Z\-]+)")
 
@@ -1606,9 +1608,6 @@ class PartnerTest(TestCase):
         self.assertTrue(sl_cs.pk in imported_pks)
 
     def test_incomplete_language(self):
-        from teams.models import BillingRecord
-        from videos.tasks import video_changed_tasks
-
         user = UserFactory()
         team = TeamFactory()
         tv = TeamVideoFactory(team=team, added_by=user)
@@ -1626,13 +1625,11 @@ class PartnerTest(TestCase):
         ]
         sv = add_subtitles(video, 'en', subs, complete=False)
         video_changed_tasks(video.pk, sv.pk)
+        test_utils.video_changed_tasks.run_original()
 
         self.assertEquals(0, BillingRecord.objects.count())
 
     def test_original_language(self):
-        from teams.models import BillingRecord
-        from videos.tasks import video_changed_tasks
-
         user = UserFactory()
         team = TeamFactory()
         tv = TeamVideoFactory(team=team, added_by=user,
@@ -1652,9 +1649,11 @@ class PartnerTest(TestCase):
 
         sv = add_subtitles(video, 'en', subs, complete=True)
         video_changed_tasks(video.pk, sv.pk)
+        test_utils.video_changed_tasks.run_original()
 
         sv = add_subtitles(video, 'cs', subs, complete=True)
         video_changed_tasks(video.pk, sv.pk)
+        test_utils.video_changed_tasks.run_original()
 
         self.assertEquals(2, BillingRecord.objects.count())
 
@@ -1667,9 +1666,6 @@ class PartnerTest(TestCase):
         self.assertFalse(br_cs.is_original)
 
     def test_get_minutes(self):
-        from teams.models import BillingRecord
-        from videos.tasks import video_changed_tasks
-
         user = UserFactory()
         team = TeamFactory()
         tv = TeamVideoFactory(team=team, added_by=user)
@@ -1687,6 +1683,7 @@ class PartnerTest(TestCase):
         ]
         sv = add_subtitles(video, 'en', subs, complete=True)
         video_changed_tasks(video.pk, sv.pk)
+        test_utils.video_changed_tasks.run_original()
 
         self.assertEquals(1, BillingRecord.objects.count())
 

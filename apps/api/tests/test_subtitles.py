@@ -37,12 +37,14 @@ class SubtitleLanguageSerializerTest(TestCase):
                                                 language_code='en')
         self.show_private_versions = mock.Mock(return_value=True)
         self.serializer_context = {
+            'video': self.video,
             'show_private_versions': self.show_private_versions
         }
+        self.serializer = SubtitleLanguageSerializer(
+            context=self.serializer_context)
 
     def get_serializer_data(self):
-        serializer = SubtitleLanguageSerializer(context=self.serializer_context)
-        return serializer.to_representation(self.language)
+        return self.serializer.to_representation(self.language)
 
     def test_fields(self):
         serializer_data = self.get_serializer_data()
@@ -145,18 +147,60 @@ class SubtitleLanguageSerializerTest(TestCase):
         assert_equal(serializer_data['approver'], 'user2')
 
     def test_create(self):
-        pass
+        language = self.serializer.create({
+            'language_code': 'es',
+            'is_primary_audio_language': True,
+            'subtitles_complete': True,
+        })
+        assert_equal(language.video, self.video)
+        assert_equal(language.language_code, 'es')
+        assert_equal(self.video.primary_audio_language_code, 'es')
+        assert_equal(language.subtitles_complete, True)
+        test_utils.assert_saved(language)
+        test_utils.assert_saved(self.video)
 
     def test_update(self):
-        pass
+        language = SubtitleLanguageFactory(video=self.video,
+                                           language_code='es')
+        self.serializer.update(language, {
+            'is_primary_audio_language': True,
+            'subtitles_complete': True,
+        })
+        assert_equal(language.subtitles_complete, True)
+        assert_equal(self.video.primary_audio_language_code, 'es')
+        test_utils.assert_saved(language)
+        test_utils.assert_saved(self.video)
 
-    def test_set_primary_audio_language(self):
-        pass
+    def test_cant_change_language_code(self):
+        language = SubtitleLanguageFactory(video=self.video,
+                                           language_code='es')
+        self.serializer.update(language, {
+            'language_code': 'fr',
+        })
+        assert_equal(language.language_code, 'es')
 
-    def test_set_original_language(self):
-        pass
+    def test_deprecated_aliases(self):
+        language = SubtitleLanguageFactory(video=self.video,
+                                           language_code='es')
+        self.serializer.update(language, {
+            'is_original': True,
+            'is_complete': True,
+        })
+        assert_equal(self.video.primary_audio_language_code, 'es')
+        assert_equal(language.subtitles_complete, True)
 
-class SubtitleLanguageViewsetPermissionsTest(TestCase):
+    def test_runs_tasks(self):
+        language = self.serializer.create({'language_code': 'es'})
+        assert_equal(test_utils.video_changed_tasks.delay.call_count, 1)
+        self.serializer.update(language, {})
+        assert_equal(test_utils.video_changed_tasks.delay.call_count, 2)
+
+    def test_language_code_read_only(self):
+        serializer = SubtitleLanguageSerializer(
+            context=self.serializer_context, instance=self.language)
+        assert_true(serializer.fields['language_code'].read_only)
+
+class SubtitleLanguageViewset(TestCase):
     @test_utils.patch_for_test('subtitles.workflows.get_workflow')
     def setUp(self, mock_get_workflow):
         self.video = VideoFactory()
@@ -204,7 +248,8 @@ class SubtitleLanguageViewsetPermissionsTest(TestCase):
                 mock.call(self.user, 'en'),
             ])
 
-    def test_serializer_context_includes_show_private_versions(self):
+    def test_serializer_context(self):
         serializer_context = self.viewset.get_serializer_context()
         assert_equal(serializer_context['show_private_versions'],
                      self.viewset.show_private_versions)
+        assert_equal(serializer_context['video'], self.video)

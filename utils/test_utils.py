@@ -118,6 +118,7 @@ delete_subtitles = mock.Mock()
 update_all_subtitles = mock.Mock()
 fetch_subs_task = mock.Mock()
 import_videos_from_feed = mock.Mock()
+video_changed_tasks = mock.Mock()
 get_language_facet_counts = mock.Mock(return_value=([], []))
 
 class MonkeyPatcher(object):
@@ -127,6 +128,7 @@ class MonkeyPatcher(object):
         # list of (function, mock object tuples)
         patch_info = [
             ('videos.tasks.save_thumbnail_in_s3', save_thumbnail_in_s3),
+            ('videos.tasks.video_changed_tasks', video_changed_tasks),
             ('teams.tasks.update_one_team_video', update_team_video),
             ('utils.celery_search_index.update_search_index',
              update_search_index),

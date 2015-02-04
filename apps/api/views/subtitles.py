@@ -65,9 +65,9 @@ Creating Video Languages
 
     :form language_code: bcp-47 code for the language
     :form is_primary_audio_language: Boolean indicating if this is the primary
-        spoken language of the video *optional, defaults to False*
+        spoken language of the video *(optional)*.
     :form subtitles_complete: Boolean indicating if the subtitles for this
-        languagge is complete *optional, defaults to False*
+        languagge is complete *(optional)*.
     :form is_original: Alias for is_primary_audio_language **(deprecated)**
     :form is_complete: Alias for subtitles_complete  **(deprecated)**
 
@@ -154,11 +154,14 @@ from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
+from api.pagination import AmaraPaginationMixin
 from api.views.videos import VideoMetadataSerializer
 from videos.models import Video
 from subtitles import compat
 from subtitles import workflows
+from subtitles.models import SubtitleLanguage
 from subtitles.exceptions import ActionError
+import videos.tasks
 
 class MiniSubtitleVersionSerializer(serializers.Serializer):
     """Serialize a subtitle version for SubtitleLanguageSerializer """
@@ -192,6 +195,11 @@ class SubtitleLanguageSerializer(serializers.Serializer):
     subtitles_complete = serializers.BooleanField()
     versions = MiniSubtitleVersionsField(read_only=True)
     resource_uri = serializers.SerializerMethodField()
+
+    def __init__(self, *args, **kwargs):
+        super(SubtitleLanguageSerializer, self).__init__(*args, **kwargs)
+        if self.instance:
+            self.fields['language_code'].read_only = True
 
     def get_version_list(self, language):
         show_private_versions = self.context['show_private_versions']
@@ -231,10 +239,31 @@ class SubtitleLanguageSerializer(serializers.Serializer):
             if approver:
                 data['approver'] = approver.username
 
-class SubtitleLanguageViewSet(mixins.CreateModelMixin,
-                              mixins.ListModelMixin,
-                              mixins.RetrieveModelMixin,
-                              viewsets.GenericViewSet):
+    def create(self, validated_data):
+        language = SubtitleLanguage(
+            video=self.context['video'],
+            language_code=validated_data['language_code'])
+        return self.update(language, validated_data)
+
+    def update(self, language, validated_data):
+        subtitles_complete = validated_data.get(
+            'subtitles_complete',
+            validated_data.get('is_complete', None))
+        primary_audio_language = validated_data.get(
+            'is_primary_audio_language',
+            validated_data.get('is_original', None))
+
+        video = self.context['video']
+        if subtitles_complete is not None:
+            language.subtitles_complete = subtitles_complete
+            language.save()
+        if primary_audio_language is not None:
+            video.primary_audio_language_code = language.language_code
+            video.save()
+        videos.tasks.video_changed_tasks.delay(video.pk)
+        return language
+
+class SubtitleLanguageViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
     serializer_class = SubtitleLanguageSerializer
     paginate_by = 20
 
@@ -247,7 +276,6 @@ class SubtitleLanguageViewSet(mixins.CreateModelMixin,
             self._video = get_object_or_404(Video,
                                             video_id=self.kwargs['video_id'])
         return self._video
-
 
     def get_queryset(self):
         workflow = self.video.get_workflow()
@@ -262,6 +290,7 @@ class SubtitleLanguageViewSet(mixins.CreateModelMixin,
 
     def get_serializer_context(self):
         return {
+            'video': self.video,
             'show_private_versions': self.show_private_versions,
         }
 
