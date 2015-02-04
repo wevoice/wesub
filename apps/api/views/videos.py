@@ -238,10 +238,14 @@ class VideoSerializer(serializers.Serializer):
         if self.instance:
             # video_url should only be sent for creation
             self.fields['video_url'].read_only = True
-            self.team_video = self.instance.get_team_video()
-        else:
-            self.team_video = None
         self.user = self.context['request'].user
+
+    @property
+    def team_video(self):
+        if self.instance:
+            return self.instance.get_team_video()
+        else:
+            return None
 
     def get_all_urls(self, video):
         video_urls = list(video.get_video_urls())
@@ -348,7 +352,7 @@ class VideoSerializer(serializers.Serializer):
                                          project=project)
         video.clear_team_video_cache()
 
-class VideoViewSet(viewsets.ModelViewSet):
+class VideoViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
     serializer_class = VideoSerializer
     queryset = Video.objects.all()
     paginate_by = 20

@@ -355,10 +355,8 @@ def can_move_videos(team, user):
     role = get_role_for_target(user, team, None, None)
     return role in [ROLE_ADMIN, ROLE_OWNER]
 
-# this is a temporary restriction until we properly
-# fix performance issues with large teams
 def can_sort_by_primary_language(team, user):
-    return team.slug == "tedxtalks-import"
+    return team.slug != "ted"
 
 def can_add_video(team, user, project=None):
     """Return whether the given user can add a video to the given target."""
@@ -749,7 +747,7 @@ def can_assign_tasks(team, user, project=None, lang=None):
     return role in _perms_equal_or_greater(role_required)
 
 
-def can_perform_task_for(user, type, team_video, language):
+def can_perform_task_for(user, type, team_video, language, allow_own=False):
     """Return whether the given user can perform the given type of task."""
 
     if type:
@@ -760,11 +758,11 @@ def can_perform_task_for(user, type, team_video, language):
     elif type == Task.TYPE_IDS['Translate']:
         return can_create_and_edit_translations(user, team_video, language)
     elif type == Task.TYPE_IDS['Review']:
-        return can_review(team_video, user, language)
+        return can_review(team_video, user, language, allow_own=allow_own)
     elif type == Task.TYPE_IDS['Approve']:
         return can_approve(team_video, user, language)
 
-def can_perform_task(user, task):
+def can_perform_task(user, task, allow_own=False):
     """Return whether the given user can perform the given task."""
 
     # Hacky check to account for the following case:
@@ -785,7 +783,8 @@ def can_perform_task(user, task):
         if task.assignee == user:
             return True
 
-    return can_perform_task_for(user, task.type, task.team_video, task.language)
+    return can_perform_task_for(user, task.type, task.team_video,
+                                task.language, allow_own)
 
 def can_assign_task(task, user):
     """Return whether the given user can assign the given task.
@@ -798,7 +797,8 @@ def can_assign_task(task, user):
     """
     team, project, lang = task.team, task.team_video.project, task.language
 
-    return can_assign_tasks(team, user, project, lang) and can_perform_task(user, task)
+    return (can_assign_tasks(team, user, project, lang)
+            and can_perform_task(user, task, allow_own=True))
 
 def can_decline_task(task, user):
     """Return whether the given user can decline the given task.
@@ -830,7 +830,6 @@ def can_delete_task(task, user):
             return can_delete
 
     return can_delete and can_perform_task(user, task)
-
 
 def _user_can_create_task_subtitle(user, team_video):
     role = get_role_for_target(user, team_video.team, team_video.project, None)
