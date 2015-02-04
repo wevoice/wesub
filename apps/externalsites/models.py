@@ -100,6 +100,17 @@ class ExternalAccount(models.Model):
 
     objects = ExternalAccountManager()
 
+    def delete(self):
+        models_to_delete = [
+            SyncedSubtitleVersion,
+            SyncHistory,
+        ]
+        for model in models_to_delete:
+            qs = model.objects.filter(account_type=self.account_type,
+                                      account_id=self.id)
+            qs.delete()
+        super(ExternalAccount, self).delete()
+
     @property
     def team(self):
         if self.type == ExternalAccount.TYPE_TEAM:

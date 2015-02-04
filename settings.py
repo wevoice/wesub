@@ -155,6 +155,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'utils.context_processors.custom',
     'utils.context_processors.user_languages',
     'utils.context_processors.run_locally',
+    'utils.context_processors.experiments',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.i18n',
     'staticmedia.context_processors.staticmedia',
@@ -333,6 +334,7 @@ ANONYMOUS_USER_ID = 10000
 
 #Use on production
 GOOGLE_ANALYTICS_NUMBER = 'UA-163840-22'
+EXPERIMENTS_CODE = "QL2-1BUpSyeABVHp9b6G8w"
 MIXPANEL_TOKEN = '44205f56e929f08b602ccc9b4605edc3'
 
 try:
@@ -439,6 +441,7 @@ MEDIA_BUNDLES = {
             "js/libs/chosen.ajax.jquery.js",
             "js/libs/jquery.cookie.js",
             "js/unisubs.site.js",
+            "src/js/unisubs.variations.js",
         ),
     },
     "graphs.js": {
