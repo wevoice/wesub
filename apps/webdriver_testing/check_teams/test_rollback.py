@@ -73,6 +73,10 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data') 
 
+    def tearDown(self):
+        self.team.task_assign_policy=10
+        self.team.save()
+
     def test_rollback_draft_assignee(self):
         """Rollback available for task assignee.
 
@@ -152,7 +156,12 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(self.member.username, 'password')
         self.video_lang_pg.open_page(v1.get_absolute_url())
+        self.assertTrue(self.video_lang_pg.rollback_exists())
+        self.team.task_assign_policy=20
+        self.team.save()
+        self.video_lang_pg.open_page(v1.get_absolute_url())
         self.assertFalse(self.video_lang_pg.rollback_exists())
+        
 
     def test_diffing_rollback_review_unstarted_transcriber(self):
         """No Rollback on diffing page for transcriber when waiting review.
@@ -164,8 +173,11 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(self.member.username, 'password')
         self.diffing_pg.open_diffing_page(v1.id, v2.id)
+        self.assertTrue(self.diffing_pg.rollback_exists())
+        self.team.task_assign_policy=20
+        self.team.save()
+        self.diffing_pg.open_diffing_page(v1.id, v2.id)
         self.assertFalse(self.diffing_pg.rollback_exists())
-
 
     def test_approver_sent_back_reviewer(self):
         """Rollback active for reviewer after transcript fails approve.
@@ -299,7 +311,7 @@ class TestCaseWorkflowPermissions(WebdriverTestCase):
             cls.data_utils.complete_review_task(tv, 20, cls.admin)
         if cls.workflow.approve_enabled:
             cls.data_utils.complete_approve_task(tv, 20, cls.admin)
-
+        
     def test_public_admin_approve(self):
         """Rollback available to admin and above when Admin must approve.
 
@@ -418,7 +430,7 @@ class TestCaseWorkflowPermissions(WebdriverTestCase):
         """Rollback for admin and above when Admin must review (no approve).
         """
 
-        self.workflow.approve_allowed = 00 # not required
+        self.workflow.approve_allowed = 0 # not required
         self.workflow.review_allowed = 30 # admin
         self.workflow.save()
         self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
@@ -1090,6 +1102,12 @@ class TestCaseRollbackRevision(WebdriverTestCase):
                     }
         self.data_utils.upload_subs(user, **data)
 
+
+    def tearDown(self):
+        if self.team.task_assign_policy > 10:
+            self.team.task_assign_policy=10
+            self.team.save()
+
     def test_unstarted_review_transcriber_rollback(self):
         """No rollback for transcriber on revision when draft in review.
 
@@ -1101,6 +1119,10 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(self.member.username, 'password')
 
+        self.video_lang_pg.open_page(v1.get_absolute_url())
+        self.assertTrue(self.video_lang_pg.rollback_exists())
+        self.team.task_assign_policy=20
+        self.team.save()
         self.video_lang_pg.open_page(v1.get_absolute_url())
         self.assertFalse(self.video_lang_pg.rollback_exists())
 
@@ -1116,7 +1138,12 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         self.video_lang_pg.log_in(self.member.username, 'password')
 
         self.diffing_pg.open_diffing_page(v1.id, v2.id)
+        self.assertTrue(self.diffing_pg.rollback_exists())
+        self.team.task_assign_policy=20
+        self.team.save()
+        self.diffing_pg.open_diffing_page(v1.id, v2.id)
         self.assertFalse(self.diffing_pg.rollback_exists())
+
 
     def test_failed_approve_reviewer_rollback(self):
         """Reviewer can rollback after transcript fails approve.

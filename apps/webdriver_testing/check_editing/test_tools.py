@@ -25,7 +25,7 @@ class TestCaseTools(WebdriverTestCase):
         cls.editor_pg = editor_page.EditorPage(cls)
         cls.video_pg = video_page.VideoPage(cls)
         cls.user = UserFactory.create()
-        cls.video_pg.open_page('auth/login/', alert_check=True)
+        cls.video_pg.open_page('auth/login/')
         cls.video_pg.log_in(cls.user.username, 'password')
         data = { 'video_url': 'http://www.youtube.com/watch?v=5CKwCfLUwj4',
                  'title': 'Open Source Philosophy' }
