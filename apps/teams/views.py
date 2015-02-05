@@ -641,7 +641,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
         if primary_audio_language_code == "-":
             team_videos = TeamVideo.get_videos_non_language_ids(team, "")
         elif primary_audio_language_code == "+":
-            team_videos = TeamVideo.get_videos_non_language_ids(team, "", gt=True)
+            team_videos = TeamVideo.get_videos_non_language_ids(team, "", non_empty_language_code=True)
         else:
             team_videos = TeamVideo.get_videos_non_language_ids(team, primary_audio_language_code)
 
