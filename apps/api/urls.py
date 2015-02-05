@@ -23,7 +23,7 @@ from api import views
 router = routers.SimpleRouter()
 router.register(r'videos', views.VideoViewSet)
 router.register(r'videos/(?P<video_id>[\w\d]+)/languages',
-                views.SubtitleLanguageViewSet, base_name='video-language')
+                views.SubtitleLanguageViewSet, base_name='subtitle-language')
 
 urlpatterns = router.urls + patterns('',
     url(r'^videos/(?P<video_id>[\w\d]+)'

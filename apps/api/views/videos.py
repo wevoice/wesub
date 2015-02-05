@@ -132,6 +132,7 @@ from rest_framework import generics
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.reverse import reverse
 import json
 
 from api.pagination import AmaraPaginationMixin
@@ -150,9 +151,12 @@ class VideoLanguageShortSerializer(serializers.Serializer):
     resource_uri = serializers.SerializerMethodField()
 
     def get_resource_uri(self, language):
-        # hack until we re-implement the video language resource
-        from apiv2.api import VideoLanguageResource
-        return VideoLanguageResource('partners').get_resource_uri(language)
+        kwargs = {
+            'video_id': language.video.video_id,
+            'language_code': language.language_code,
+        }
+        return reverse('api:subtitle-language-detail', kwargs=kwargs,
+                       request=self.context['request'])
 
     def get_subtitles_uri(self, language):
         # hack until we re-implement the subtitles resource
@@ -238,7 +242,6 @@ class VideoSerializer(serializers.Serializer):
         if self.instance:
             # video_url should only be sent for creation
             self.fields['video_url'].read_only = True
-        self.user = self.context['request'].user
 
     @property
     def team_video(self):
@@ -309,7 +312,7 @@ class VideoSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         video, created = Video.get_or_create_for_url(
-            validated_data['video_url'], user=self.user
+            validated_data['video_url'], user=self.context['user'],
         )
         if not created:
             self.fail('video-exists', url=validated_data['video_url'])
@@ -362,6 +365,12 @@ class VideoViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
 
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = ('title', 'created')
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'user': self.request.user,
+        }
 
     def get_queryset(self):
         query_params = self.request.query_params

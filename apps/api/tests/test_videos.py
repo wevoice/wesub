@@ -39,42 +39,28 @@ class VideoSerializerTest(TestCase):
         self.video_moved_from_team_to_team_handler = mock.Mock()
         teams.signals.video_moved_from_team_to_team.connect(
             self.video_moved_from_team_to_team_handler, weak=False)
+        self.serializer_context = {
+            'request': APIRequestFactory().get("/mock-url/"),
+            'user': self.user,
+        }
         self.addCleanup(
             teams.signals.video_moved_from_team_to_team.disconnect,
             self.video_moved_from_team_to_team_handler)
 
-    def video_detail_request(self):
-        request = APIRequestFactory().get('/videos/{0}'.format(
-            self.video.video_id
-        ))
-        request.user = self.user
-        return request
-
-    def video_list_request(self):
-        request = APIRequestFactory().get('/videos/')
-        request.user = self.user
-        return request
-
     def get_serialized_data(self):
-        context = { 'request': self.video_detail_request() }
         video_serializer = VideoSerializer(test_utils.reload_obj(self.video), 
-                                           context=context)
+                                           context=self.serializer_context)
         return video_serializer.data
 
     def run_create(self, data):
-        context = {
-            'request': self.video_list_request()
-        }
-        video_serializer = VideoSerializer(data=data, context=context)
+        video_serializer = VideoSerializer(data=data,
+                                           context=self.serializer_context)
         video_serializer.is_valid(raise_exception=True)
         return video_serializer.save()
 
     def run_update(self, data):
-        context = {
-            'request': self.video_list_request()
-        }
         video_serializer = VideoSerializer(instance=self.video, data=data,
-                                           context=context)
+                                           context=self.serializer_context)
         video_serializer.is_valid(raise_exception=True)
         return video_serializer.save()
 
@@ -161,13 +147,15 @@ class VideoSerializerTest(TestCase):
                                visibility='private')
 
         data = self.get_serialized_data()
-        lang_url_root = ('/api2/partners/videos/{0}/'
+        lang_url_root = 'http://testserver/api/videos/{}/languages/'.format(
+            self.video.video_id)
+        old_lang_url_root = ('/api2/partners/videos/{0}/'
                          'languages/'.format(self.video.video_id))
         assert_items_equal(data['languages'], [
             {
                 'code': 'en',
                 'name': 'English',
-                u'subtitles_uri': lang_url_root + 'en/subtitles/',
+                u'subtitles_uri': old_lang_url_root + 'en/subtitles/',
                 'dir': 'ltr',
                 'visible': True,
                 'resource_uri':  lang_url_root + 'en/'
@@ -175,7 +163,7 @@ class VideoSerializerTest(TestCase):
             {
                 'code': 'he',
                 'name': 'Hebrew',
-                u'subtitles_uri': lang_url_root + 'he/subtitles/',
+                u'subtitles_uri': old_lang_url_root + 'he/subtitles/',
                 'dir': 'rtl',
                 'visible': False,
                 'resource_uri':  lang_url_root + 'he/'
@@ -247,7 +235,7 @@ class VideoSerializerTest(TestCase):
 
     def test_writable_fields(self):
         video_serializer = VideoSerializer(data={},
-                                           context={'request': mock.Mock()})
+                                           context=self.serializer_context)
         writable_fields = [
             name for (name, field) in video_serializer.fields.items()
             if not field.read_only
@@ -266,7 +254,7 @@ class VideoSerializerTest(TestCase):
 
     def test_writable_fields_update(self):
         video_serializer = VideoSerializer(instance=VideoFactory(), data={},
-                                           context={'request': mock.Mock()})
+                                           context=self.serializer_context)
         writable_fields = [
             name for (name, field) in video_serializer.fields.items()
             if not field.read_only
@@ -404,7 +392,8 @@ class VideoSerializerTeamChangeTest(TestCase):
 
     def make_serializer(self, instance, data):
         serializer = VideoSerializer(instance=instance, data=data, context={
-            'request': mock.Mock(),
+            'request': None,
+            'user': None,
         })
         serializer.is_valid(raise_exception=True)
         return serializer

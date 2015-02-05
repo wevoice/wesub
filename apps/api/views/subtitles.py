@@ -142,7 +142,6 @@ Create a new note
 
 from __future__ import absolute_import
 
-from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
@@ -153,6 +152,7 @@ from rest_framework import views
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from api.pagination import AmaraPaginationMixin
 from api.views.videos import VideoMetadataSerializer
@@ -216,10 +216,12 @@ class SubtitleLanguageSerializer(serializers.Serializer):
         return compat.subtitlelanguage_original_language_code(language)
 
     def get_resource_uri(self, language):
-        return reverse('api:video-language-detail', kwargs={
+        kwargs = {
             'video_id': language.video.video_id,
             'language_code': language.language_code,
-        })
+        }
+        return reverse('api:subtitle-language-detail', kwargs=kwargs,
+                       request=self.context['request'])
 
     def to_representation(self, language):
         data = super(SubtitleLanguageSerializer, self).to_representation(
@@ -290,6 +292,7 @@ class SubtitleLanguageViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
 
     def get_serializer_context(self):
         return {
+            'request': self.request,
             'video': self.video,
             'show_private_versions': self.show_private_versions,
         }

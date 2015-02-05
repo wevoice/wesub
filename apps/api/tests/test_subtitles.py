@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.core.urlresolvers import reverse
 from django.test import TestCase
 from nose.tools import *
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.reverse import reverse
 from rest_framework.test import APIRequestFactory
 import mock
 
@@ -38,7 +38,8 @@ class SubtitleLanguageSerializerTest(TestCase):
         self.show_private_versions = mock.Mock(return_value=True)
         self.serializer_context = {
             'video': self.video,
-            'show_private_versions': self.show_private_versions
+            'show_private_versions': self.show_private_versions,
+            'request': APIRequestFactory().get("/mock-url/"),
         }
         self.serializer = SubtitleLanguageSerializer(
             context=self.serializer_context)
@@ -73,12 +74,10 @@ class SubtitleLanguageSerializerTest(TestCase):
             serializer_data['original_language_code'],
             compat.subtitlelanguage_original_language_code(self.language))
         assert_equal(serializer_data['resource_uri'],
-                     reverse('api:video-language-detail', kwargs={
-                         'video_id': self.video.video_id,
-                         'language_code': self.language.language_code,
-                     })
-        )
-
+                     reverse('api:subtitle-language-detail', kwargs={
+                             'video_id': self.video.video_id,
+                             'language_code': self.language.language_code,
+                     }, request=APIRequestFactory().get("/")))
 
     def make_version(self, language_code, **kwargs):
         return pipeline.add_subtitles(self.video, language_code,
