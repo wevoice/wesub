@@ -193,10 +193,20 @@ class VideoSerializerTest(TestCase):
     def test_cant_create_with_existing_video_url(self):
         url = 'http://example.com/existing-video.mp4'
         VideoFactory(video_url__url=url)
-        with assert_raises(ValidationError):
+        with assert_raises(ValidationError) as cm:
             self.run_create({
                 'video_url': url,
             })
+        assert_in('Video already exists', str(cm.exception))
+
+    def test_cant_create_with_invalid_video_url(self):
+        url = 'http://junk.com/junky/fake1.mov'
+        VideoFactory(video_url__url=url)
+        with assert_raises(ValidationError) as cm:
+            self.run_create({
+                'video_url': url,
+            })
+        assert_in('Invalid URL', str(cm.exception))
 
     def test_update(self):
         data = {

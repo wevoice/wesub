@@ -314,10 +314,10 @@ class VideoSerializer(serializers.Serializer):
         video, created = Video.get_or_create_for_url(
             validated_data['video_url'], user=self.context['user'],
         )
-        if not created:
-            self.fail('video-exists', url=validated_data['video_url'])
         if video is None:
             self.fail('invalid-url', url=validated_data['video_url'])
+        if not created:
+            self.fail('video-exists', url=validated_data['video_url'])
         return self._update(video, validated_data)
 
     def update(self, video, validated_data):
