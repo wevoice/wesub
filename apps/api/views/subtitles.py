@@ -270,7 +270,7 @@ class SubtitleLanguageViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
     paginate_by = 20
 
     lookup_field = 'language_code'
-    lookup_value_regex = r'\w+'
+    lookup_value_regex = r'[\w-]+'
 
     @property
     def video(self):
