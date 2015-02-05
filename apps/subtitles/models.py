@@ -634,7 +634,31 @@ class SubtitleLanguage(models.Model):
 
     def has_public_version(self):
         """Check if there are any public versions for this language."""
+        if hasattr(self, '_has_public_version'):
+            return self._has_public_version
         return self.get_tip(public=True) is not None
+
+    @classmethod
+    def bulk_has_public_version(self, languages):
+        """Check for public verisons in a list of languages
+
+        This method will do a single query to check for all languages.
+        Afterwards, calling has_public_version() won't require any DB work.
+        """
+        sql = """\
+EXISTS(
+    SELECT * FROM subtitles_subtitleversion sv
+    WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+        AND (sv.visibility_override='public'
+            OR (sv.visibility_override = '' AND sv.visibility='public')))"""
+
+        qs = (SubtitleLanguage.objects
+              .filter(id__in=[l.id for l in languages])
+              .extra(where=[sql])
+              .values_list('id', flat=True))
+        with_public_versions = set(qs)
+        for l in languages:
+            l._has_public_version = l.id in with_public_versions
 
     def is_complete_and_synced(self, public=False):
         """Return whether this language's subtitles are complete and fully synced."""

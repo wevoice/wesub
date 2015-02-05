@@ -138,6 +138,7 @@ import json
 from api.pagination import AmaraPaginationMixin
 from teams import permissions as team_perms
 from teams.models import Team, TeamVideo, Project
+from subtitles.models import SubtitleLanguage
 from videos import metadata
 from videos.models import Video
 import videos.tasks
@@ -206,6 +207,26 @@ class ProjectSerializer(serializers.CharField):
         else:
             return team_video.project.slug
 
+class VideoListSerializer(serializers.ListSerializer):
+    def to_representation(self, qs):
+        # Do some optimizations to reduce the number of queries before passing
+        # the result to the default to_representation() method
+
+        # Note: we have to use prefetch_related the teamvideo attributes,
+        # otherwise it will filter out non-team videos.  I think this is a
+        # django 1.4 bug.
+        qs = (qs.select_related('teamvideo')
+              .prefetch_related('teamvideo__team', 'teamvideo__project',
+                                'newsubtitlelanguage_set', 'videourl_set'))
+        # run bulk_has_public_version(), otherwise we have a query for each
+        # language of each video
+        videos = list(qs)
+        all_languages = []
+        for v in videos:
+            all_languages.extend(v.all_subtitle_languages())
+        SubtitleLanguage.bulk_has_public_version(all_languages)
+        return super(VideoListSerializer, self).to_representation(videos)
+
 class VideoSerializer(serializers.Serializer):
     # Note we could try to use ModelSerializer, but we are so far from the
     # default implementation that it makes more sense to not inherit.
@@ -236,6 +257,9 @@ class VideoSerializer(serializers.Serializer):
         'video-exists': 'Video already exists for {url}',
         'invalid-url': 'Invalid URL: {url}',
     }
+
+    class Meta:
+        list_serializer_class = VideoListSerializer
 
     def __init__(self, *args, **kwargs):
         super(VideoSerializer, self).__init__(*args, **kwargs)
@@ -413,7 +437,9 @@ class VideoViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
 
     def get_object(self):
         try:
-            video = Video.objects.get(video_id=self.kwargs['video_id'])
+            video = (Video.objects
+                     .select_related('teamvideo')
+                     .get(video_id=self.kwargs['video_id']))
         except Video.DoesNotExist:
             if self.request.user.is_staff:
                 raise http.Http404
@@ -422,6 +448,8 @@ class VideoViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
         workflow = video.get_workflow()
         if not workflow.user_can_view_video(self.request.user):
             raise PermissionDenied()
+        SubtitleLanguage.bulk_has_public_version(
+            video.all_subtitle_languages())
         return video
 
     def check_save_permissions(self, serializer):

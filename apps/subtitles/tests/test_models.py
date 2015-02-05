@@ -24,6 +24,7 @@ from __future__ import absolute_import
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
+from nose.tools import *
 
 from babelsubs.storage import SubtitleSet
 
@@ -1903,6 +1904,72 @@ class TestFetchAndJoin(TestCase):
                 if version is not None:
                     self.assertEquals(version._subtitle_language_cache.id,
                                       lang.id)
+
+class TestBulkHasPublicVersion(TestCase):
+    def setUp(self):
+        self.video = VideoFactory()
+
+    def check_bulk_has_public_version(self, **correct_values):
+        languages = list(self.video.newsubtitlelanguage_set.all())
+        SubtitleLanguage.bulk_has_public_version(languages)
+        assert_equal(
+            dict((l.language_code, l._has_public_version) for l in languages),
+            correct_values
+        )
+
+    def test_no_versions(self):
+        SubtitleLanguageFactory(video=self.video, language_code='en')
+        self.check_bulk_has_public_version(en=False)
+
+    def test_visibility_public(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        self.check_bulk_has_public_version(en=True)
+
+    def test_visibility_private(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='private')
+        self.check_bulk_has_public_version(en=False)
+
+    def test_visibility_override_public(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='private',
+                               visibility_override='public')
+        self.check_bulk_has_public_version(en=True)
+
+    def test_visibility_override_private(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public',
+                               visibility_override='private')
+        self.check_bulk_has_public_version(en=False)
+
+    def test_visibility_override_deleted(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public',
+                               visibility_override='deleted')
+        self.check_bulk_has_public_version(en=False)
+
+    def test_one_version_public(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        pipeline.add_subtitles(self.video, 'en', None, visibility='private')
+        self.check_bulk_has_public_version(en=True)
+
+    def test_multiple_languages(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        pipeline.add_subtitles(self.video, 'en', None, visibility='private')
+        pipeline.add_subtitles(self.video, 'es', None, visibility='private')
+        pipeline.add_subtitles(self.video, 'fr', None, visibility='public',
+                               visibility_override='private')
+        pipeline.add_subtitles(self.video, 'de', None, visibility='private',
+                               visibility_override='public')
+        self.check_bulk_has_public_version(en=True, es=False, fr=False,
+                                           de=True)
+
+    def test_has_public_version_is_optimized(self):
+        # test that calling has_public_version() doesn't result in any db
+        # queries
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        pipeline.add_subtitles(self.video, 'fr', None, visibility='private')
+        languages = list(self.video.newsubtitlelanguage_set.all())
+        SubtitleLanguage.bulk_has_public_version(languages)
+        with self.assertNumQueries(0):
+            assert_true(languages[0].has_public_version())
+            assert_false(languages[1].has_public_version())
 
 class TestTeamInteractions(TestCase):
     def setUp(self):
