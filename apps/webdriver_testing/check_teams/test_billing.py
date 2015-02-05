@@ -225,7 +225,7 @@ class TestCaseBilling(WebdriverTestCase):
         report.save()
         report.process()
         bill = csv.DictReader(open('user-data/%s' %report.csv_file))
-        expected_fields = ['Video Title', 'Video ID', 'Language', 'Minutes', 
+        expected_fields = ['Video Title', 'Video ID', 'Project', 'Language', 'Minutes', 
                            'Original', 'Language number', 'Team', 'Created', 'Source', 'User']
         self.assertEqual(expected_fields, bill.fieldnames)
 
@@ -246,15 +246,14 @@ class TestCaseBilling(WebdriverTestCase):
                                                   end.strftime("%Y-%m-%d"),
                                                   'Crowd sourced')
         report_dl = self.billing_pg.check_latest_report_url()
-        new_headers = ['Language', 'Language number', 'Created', 'Video ID', 
-                       'Video Title', 'Source', 'User', 'Team', 'Minutes', 
-                       'Original']
+        expected_fields = ['Video Title', 'Video ID', 'Project', 'Language', 'Minutes', 
+                           'Original', 'Language number', 'Team', 'Created', 'Source', 'User']
         self.assertEqual(5, len(report_dl))
-        self.assertEqual(new_headers, report_dl[0].keys())
+        self.assertEqual(sorted(expected_fields), sorted(report_dl[0].keys()))
      
 
 
-    def test_download__multi_team_new(self):
+    def test_download_multi_team_new(self):
         """Create a report for several teams.
 
         """
@@ -279,11 +278,10 @@ class TestCaseBilling(WebdriverTestCase):
                                                   end.strftime("%Y-%m-%d"),
                                                   'Crowd sourced')
         report_dl = self.billing_pg.check_latest_report_url()
-        new_headers = ['Language', 'Language number', 'Created', 'Video ID', 
-                       'Video Title', 'Source', 'User', 'Team', 'Minutes', 
-                       'Original']
+        expected_fields = ['Video Title', 'Video ID', 'Project', 'Language', 'Minutes', 
+                           'Original', 'Language number', 'Team', 'Created', 'Source', 'User']
         self.assertEqual(7, len(report_dl))
-        self.assertEqual(new_headers, report_dl[0].keys())
+        self.assertEqual(sorted(expected_fields), sorted(report_dl[0].keys()))
 
 
 class TestCaseDemandReports(WebdriverTestCase):
@@ -443,7 +441,7 @@ class TestCaseDemandReports(WebdriverTestCase):
         bill = 'user-data/%s' % report.csv_file
         entries = self._bill_dict(bill)
         user_tasks = []
-        unwanted_fields = ['Video ID', 'Team', 'Video Title', 'Approver', 'Date']
+        unwanted_fields = ['Video ID', 'Project', 'Team', 'Video Title', 'Approver', 'Date']
         for e in entries:
             [e.pop(x) for x in unwanted_fields]
             user_tasks.append(e)
@@ -501,7 +499,7 @@ class TestCaseDemandReports(WebdriverTestCase):
         bill = 'user-data/%s' % report.csv_file
         entries = self._bill_dict(bill)
         team_data = []
-        unwanted_fields = ['Video ID', 'Team', 'Video Title', 'Approver', 'Date']
+        unwanted_fields = ['Video ID', 'Project', 'Team', 'Video Title', 'Approver', 'Date']
         for e in entries:
             [e.pop(x) for x in unwanted_fields]
             team_data.append(e)
