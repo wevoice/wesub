@@ -2900,6 +2900,7 @@ class BillingReport(models.Model):
             'Team',
             'Video Title',
             'Video ID',
+            'Project',
             'Language',
             'Minutes',
             'Original',
@@ -2910,6 +2911,7 @@ class BillingReport(models.Model):
         rows = [header]
         for approve_task in self._get_approved_tasks():
             video = approve_task.team_video.video
+            project = approve_task.team_video.project.name if approve_task.team_video.project else _('none')
             version = approve_task.new_subtitle_version
             language = version.subtitle_language
             subtitle_task = (Task.objects.complete_subtitle_or_translate()
@@ -2920,6 +2922,7 @@ class BillingReport(models.Model):
                 approve_task.team.name,
                 video.title_display(),
                 video.video_id,
+                project,
                 approve_task.language,
                 get_minutes_for_version(version, False),
                 language.is_primary_audio_language(),
@@ -2936,6 +2939,7 @@ class BillingReport(models.Model):
             'Team',
             'Video Title',
             'Video ID',
+            'Project',
             'Language',
             'Minutes',
             'Original',
@@ -2947,6 +2951,7 @@ class BillingReport(models.Model):
         data_rows = []
         for approve_task in self._get_approved_tasks():
             video = approve_task.team_video.video
+            project = approve_task.team_video.project.name if approve_task.team_video.project else _('none')
             version = approve_task.get_subtitle_version()
             language = version.subtitle_language
 
@@ -2976,6 +2981,7 @@ class BillingReport(models.Model):
                     approve_task.team.name,
                     video.title_display(),
                     video.video_id,
+                    project,
                     language.language_code,
                     get_minutes_for_version(version, False),
                     language.is_primary_audio_language(),
@@ -3072,6 +3078,7 @@ class BillingReportGenerator(object):
         return [
             'Video Title',
             'Video ID',
+            'Project',
             'Language',
             'Minutes',
             'Original',
@@ -3086,6 +3093,7 @@ class BillingReportGenerator(object):
         return [
             (video and video.title_display()) or "----",
             (video and video.video_id) or "deleted",
+            (record.project.name if record.project else _('none')),
             (record.new_subtitle_language and record.new_subtitle_language.language_code) or "----",
             record.minutes,
             record.is_original,
@@ -3133,6 +3141,7 @@ NOT EXISTS (
         return [
             video.title_display(),
             video.video_id,
+            _('none'),
             language.language_code,
             0,
             language.is_primary_audio_language(),
@@ -3218,9 +3227,10 @@ class BillingRecordManager(models.Manager):
         is_original = language.is_primary_audio_language()
         source = version.origin
         team = tv.team
-
+        project = tv.project
         new_record = BillingRecord.objects.create(
             video=video,
+            project = project,
             new_subtitle_version=version,
             new_subtitle_language=language,
             is_original=is_original, team=team,
@@ -3273,7 +3283,7 @@ def get_minutes_for_version(version, round_up_to_integer):
 class BillingRecord(models.Model):
     # The billing record should still exist if the video is deleted
     video = models.ForeignKey(Video, blank=True, null=True, on_delete=models.SET_NULL)
-
+    project = models.ForeignKey(Project, blank=True, null=True, on_delete=models.SET_NULL)
     subtitle_version = models.ForeignKey(SubtitleVersion, null=True,
             blank=True, on_delete=models.SET_NULL)
     new_subtitle_version = models.ForeignKey(NewSubtitleVersion, null=True,
