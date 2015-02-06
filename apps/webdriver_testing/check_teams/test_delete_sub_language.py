@@ -122,12 +122,13 @@ class TestCaseWorkflows(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(self.video.video_id, 'sv')
         self.assertTrue(self.video_lang_pg.delete_subtitles_language_exists())
 
-
     def test_delete_button_team_owners(self):
         """Team Owners can Delete Subtitle Language.
 
         """
-        self.video_lang_pg.log_in(self.admin.username, 'password')
+
+        owner = TeamMemberFactory(team=self.team).user
+        self.video_lang_pg.log_in(owner.username, 'password')
         self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
         self.assertTrue(self.video_lang_pg.delete_subtitles_language_exists())
         self.video_lang_pg.open_video_lang_page(self.video.video_id, 'sv')

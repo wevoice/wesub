@@ -2,6 +2,7 @@ import time
 from django.core import mail
 from django.core import management
 
+from subtitles import pipeline
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
 from utils.factories import *
@@ -69,15 +70,9 @@ class TestCaseBulkApprove(WebdriverTestCase):
             tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
             for lc in lang_list:
-                defaults = {
-                            'video': tv.video,
-                            'language_code': lc,
-                            'complete': True, 
-                            'visibility': 'private',
-                            'committer': self.admin,
-                           }
-
-                self.data_utils.add_subs(**defaults)
+                pipeline.add_subtitles(video, lc, SubtitleSetFactory(),
+                                   complete=True, visibility='private', 
+                                   committer=self.admin)
                 self.complete_review_tasks(tv)
 
         self.tasks_tab.open_page('teams/%s/approvals/' %self.team.slug)
