@@ -624,15 +624,13 @@
                 line.classList.add('amara-transcript-line');
                 line.innerHTML = subtitle.text;
                 line.title = formatTime(subtitle.start);
+                // On transcript, we do not want thos new lines
+                _$(line).find("br").replaceWith(" ");
+                var container = this.$transcriptBody;
+                if ((container.children().length == 0) || (subtitle.meta.new_paragraph))
+                    container.append(document.createElement('p'));
+                var currentParagraph = container.children().last();
 
-                var container = this.$transcriptBody.get(0);
-                // If this subtitle has indicated that it's the beginning of a
-                // paragraph, prepend two line breaks before the subtitle.
-                if (subtitle.start_of_paragraph) {
-                    container.appendChild(document.createElement('br'));
-                    container.appendChild(document.createElement('br'));
-                }
-                // Clicking the link should seek to its time.
                 var pop = this.pop;
                 line.addEventListener('click', function(e) {
                     pop.currentTime(subtitle.start / 1000.0);
@@ -640,7 +638,7 @@
                     return false;
                 }, false);
                 // Add the subtitle to the transcript container.
-                container.appendChild(line);
+                currentParagraph.append(line);
                 this.subtitleLines.push({
                     line: line,
                     subtitle: subtitle,
