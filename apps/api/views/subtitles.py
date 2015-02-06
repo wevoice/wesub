@@ -159,7 +159,7 @@ from api.views.videos import VideoMetadataSerializer
 from videos.models import Video
 from subtitles import compat
 from subtitles import workflows
-from subtitles.models import SubtitleLanguage
+from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.exceptions import ActionError
 import videos.tasks
 
@@ -174,7 +174,36 @@ class MiniSubtitleVersionsField(serializers.ListField):
     child = MiniSubtitleVersionSerializer()
 
     def get_attribute(self, language):
-        return self.parent.get_version_list(language)
+        versions = self.context['versions'][language.id]
+        if self.context['show_private_versions'](language.language_code):
+            return versions
+        else:
+            return [v for v in versions if v.is_public()]
+
+def _fetch_versions(languages, context):
+    """Fetch all SubtitleVersion objects that we need to display.
+
+    This method optimizes a bunch of things to avoid extra queries in the
+    list/detail views.
+
+    Args:
+        languages: list of languages
+        context: serializer context.  We will store a dict mapping language
+            ids to versions using the "versions" key
+
+    """
+    context['versions'] = SubtitleVersion.objects.fetch_for_languages(
+        languages, video=context['video'],
+        order_by='-version_number',
+        select_related=('author',),
+        prefetch_related=('metadata',))
+
+class SubtitleLanguageListSerializer(serializers.ListSerializer):
+    def to_representation(self, qs):
+        languages = list(qs)
+        _fetch_versions(languages, self.context)
+        super_class = super(SubtitleLanguageListSerializer, self)
+        return super_class.to_representation(languages)
 
 class SubtitleLanguageSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
@@ -196,18 +225,13 @@ class SubtitleLanguageSerializer(serializers.Serializer):
     versions = MiniSubtitleVersionsField(read_only=True)
     resource_uri = serializers.SerializerMethodField()
 
+    class Meta:
+        list_serializer_class = SubtitleLanguageListSerializer
+
     def __init__(self, *args, **kwargs):
         super(SubtitleLanguageSerializer, self).__init__(*args, **kwargs)
         if self.instance:
             self.fields['language_code'].read_only = True
-
-    def get_version_list(self, language):
-        show_private_versions = self.context['show_private_versions']
-        if show_private_versions(language.language_code):
-            qs = language.subtitleversion_set.extant()
-        else:
-            qs = language.subtitleversion_set.public()
-        return qs.order_by('-version_number')
 
     def get_is_translation(self, language):
         return compat.subtitlelanguage_is_translation(language)
@@ -224,6 +248,11 @@ class SubtitleLanguageSerializer(serializers.Serializer):
                        request=self.context['request'])
 
     def to_representation(self, language):
+        if 'versions' not in self.context:
+            # For the list view, the SubtitleLanguageListSerializer generates
+            # versions, for the detail view we need to generate versions
+            # ourselves
+            _fetch_versions([language], self.context)
         data = super(SubtitleLanguageSerializer, self).to_representation(
             language)
         data['num_versions'] = len(data['versions'])
@@ -233,7 +262,7 @@ class SubtitleLanguageSerializer(serializers.Serializer):
 
     def add_reviewer_and_approver(self, data, language):
         """Add the reviewer/approver fields."""
-        for version in self.get_version_list(language):
+        for version in self.context['versions'][language.id]:
             reviewer = version.get_reviewed_by()
             approver = version.get_approved_by()
             if reviewer:
@@ -275,7 +304,8 @@ class SubtitleLanguageViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
     @property
     def video(self):
         if not hasattr(self, '_video'):
-            self._video = get_object_or_404(Video,
+            qs = Video.objects.select_related("teamvideo")
+            self._video = get_object_or_404(qs,
                                             video_id=self.kwargs['video_id'])
         return self._video
 
