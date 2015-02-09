@@ -648,7 +648,7 @@ LOGGING = {
 
 from task_settings import *
 
-try:
+if DEBUG:
     import debug_toolbar
 
     INSTALLED_APPS += ('debug_toolbar',)
@@ -676,7 +676,5 @@ try:
         'HIDE_DJANGO_SQL': False,
         'TAG': 'div',
     }
-except ImportError:
-    pass
 
 optionalapps.add_extra_settings(globals(), locals())
