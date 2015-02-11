@@ -9,6 +9,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	var loadingDivs = [];
 	var timers = [];
 	var iframeDomain = '';
+	var absoluteURL = new RegExp('^(?:[a-z]+:)?//', 'i');
 	var resize = function(index, width, height) {
             if (iframes[index].style.visibility == "visible")
                 iframes[index].parentNode.style.height = "";
@@ -67,10 +68,10 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		loadingDiv.style.paddingLeft = loadingDiv.style.paddingRight = "50px";
                 loadingDiv.style.textAlign = "center";
                 loadingImg = document.createElement("IMG");
-                if ("{% static_url %}"[0] == "/")
-                    loadingImg.src = parser.protocol + "//" + parser.host + "{% static_url %}images/embedder/loading.gif";
-                else
+                if (absoluteURL.test("{% static_url %}"))
                     loadingImg.src = "{% static_url %}images/embedder/loading.gif";
+                else
+                    loadingImg.src = parser.protocol + "//" + parser.host + "{% static_url %}images/embedder/loading.gif";
                 loadingDiv.appendChild(loadingImg);
                 currentDiv.appendChild(loadingDiv); 
 
