@@ -336,7 +336,7 @@ class ContainerManager(object):
             # for production we start up many instances, spread across the
             # hosts
             host_iter = itertools.cycle(self.env.docker_hosts())
-            for i in range(self.env.PRODUCTION_NUM_INSTANCES):
+            for i in range(int(self.env.PRODUCTION_NUM_INSTANCES)):
                 host = host_iter.next()
                 self.start_app_container(host, str(i + 1))
         elif self.env.BRANCH == 'staging':
