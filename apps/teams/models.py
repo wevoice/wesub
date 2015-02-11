@@ -3141,7 +3141,7 @@ NOT EXISTS (
         return [
             video.title_display(),
             video.video_id,
-            _('none'),
+            'none',
             language.language_code,
             0,
             language.is_primary_audio_language(),
