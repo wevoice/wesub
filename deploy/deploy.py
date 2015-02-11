@@ -435,10 +435,12 @@ class Deploy(object):
         old_containers = self.container_manager.find_old_containers()
         if self.env.MIGRATIONS == 'DONT_MIGRATE':
             self.container_manager.start_new_containers()
+            time.sleep(30)
             self.container_manager.shutdown_old_containers(old_containers)
         elif self.env.MIGRATIONS == 'MIGRATE_WHILE_RUNNING_OLD_CODE':
             self.container_manager.run_app_command('migrate')
             self.container_manager.start_new_containers()
+            time.sleep(30)
             self.container_manager.shutdown_old_containers(old_containers)
         elif self.env.MIGRATIONS == 'STOP_SERVERS_TO_MIGRATE':
             self.container_manager.shutdown_old_containers(old_containers)
