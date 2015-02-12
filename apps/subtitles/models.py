@@ -1524,6 +1524,15 @@ class SubtitleVersion(models.Model):
         elif video_needs_save:
             self.video.save()
 
+    def is_rtl(self):
+        return translation.is_rtl(self.language_code)
+
+    def dir(self):
+        if self.is_rtl():
+            return 'rtl'
+        else:
+            return 'ltr'
+
     def get_ancestors(self):
         """Return all ancestors of this version.  WARNING: MAY EAT YOUR DB!
 

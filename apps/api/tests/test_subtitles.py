@@ -15,15 +15,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+import json
+
+from django.http import Http404
 from django.test import TestCase
 from nose.tools import *
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.reverse import reverse
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIClient, APIRequestFactory
+import babelsubs
 import mock
 
 from api.views.subtitles import (SubtitleLanguageSerializer,
-                                 SubtitleLanguageViewSet)
+                                 SubtitleLanguageViewSet,
+                                 SubtitlesSerializer,
+                                 SubtitlesView)
 from subtitles import compat
 from subtitles import pipeline
 from utils import test_utils
@@ -252,3 +258,155 @@ class SubtitleLanguageViewset(TestCase):
         assert_equal(serializer_context['show_private_versions'],
                      self.viewset.show_private_versions)
         assert_equal(serializer_context['video'], self.video)
+
+class SubtitlesSerializerTest(TestCase):
+    def setUp(self):
+        self.video = VideoFactory(title='test-video-title',
+                                  description='test-video-description')
+        self.version = pipeline.add_subtitles(
+            self.video, 'en', SubtitleSetFactory(),
+            title='test-title', description='test-description',
+            metadata={'location': 'test-location'})
+        self.context = {
+            'request': None,
+            'version_number': None,
+            'sub_format': 'srt',
+        }
+        self.serializer = SubtitlesSerializer(context=self.context)
+
+    def test_simple_fields(self):
+        data = self.serializer.to_representation(self.version)
+        assert_equal(data['version_number'], self.version.version_number)
+        assert_equal(data['title'], self.version.title)
+        assert_equal(data['description'], self.version.description)
+        assert_equal(data['metadata'], self.version.get_metadata())
+        assert_equal(data['video_title'], self.video.title)
+        assert_equal(data['video_description'], self.video.description)
+        assert_equal(data['resource_uri'],
+                     reverse('api:subtitles', kwargs={
+                             'video_id': self.video.video_id,
+                             'language_code': self.version.language_code,
+                     }))
+        assert_equal(data['site_uri'],
+                     reverse('videos:subtitleversion_detail', kwargs={
+                         'video_id': self.video.video_id,
+                         'lang': self.version.language_code,
+                         'lang_id': self.version.subtitle_language_id,
+                         'version_id': self.version.id,
+                     }))
+        assert_equal(data['language'], {
+            'code': 'en',
+            'name': 'English',
+            'dir': 'ltr',
+        })
+
+    def test_subtitles(self):
+        # test the subtitles and sub_format fields
+        self.context['sub_format'] = 'vtt'
+        data = self.serializer.to_representation(self.version)
+        assert_equal(data['subtitles'],
+                     babelsubs.to(self.version.get_subtitles(), 'vtt'))
+        assert_equal(data['sub_format'], 'vtt')
+
+    def test_json_sub_format(self):
+        # for the json sub_format, we should return actual JSON data, not a
+        # that data encoded as a string
+        self.context['sub_format'] = 'json'
+        data = self.serializer.to_representation(self.version)
+        json_encoding = babelsubs.to(self.version.get_subtitles(), 'json')
+        assert_equal(data['subtitles'], json.loads(json_encoding))
+
+class SubtitlesViewTest(TestCase):
+    def setUp(self):
+        self.video = VideoFactory()
+        self.version = pipeline.add_subtitles(self.video, 'en',
+                                              SubtitleSetFactory(num_subs=1))
+        self.user = UserFactory()
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
+        self.url = reverse('api:subtitles', kwargs={
+            'video_id': self.video.video_id,
+            'language_code': 'en',
+        })
+
+    def test_raw_format(self):
+        # if we request a format like text/srt that's a subtile format, then
+        # we should just return the subtitle data, nothing else
+        response = self.client.get(self.url, HTTP_ACCEPT='text/srt')
+        assert_equal(response.content,
+                     babelsubs.to(self.version.get_subtitles(), 'srt'))
+
+    def test_raw_format_with_format_param(self):
+        response = self.client.get(self.url + "?format=dfxp")
+        assert_equal(response.content,
+                     babelsubs.to(self.version.get_subtitles(), 'dfxp'))
+
+    def test_normal_format(self):
+        # if we're not using a raw subtitle format, we should just return json
+        response = self.client.get(self.url)
+        # assume we're good if this next statement doesn't crash
+        json.loads(response.content)
+
+    def run_get_object(self, version_number=None):
+        view = SubtitlesView()
+        view.kwargs = {
+            'video_id': self.video.video_id,
+            'language_code': 'en',
+        }
+        view.request = APIRequestFactory().get(self.url)
+        if version_number is None:
+            view.request.query_params = {}
+        else:
+            view.request.query_params = {
+                'version_number': version_number
+            }
+        view.request.user = self.user
+        return view.get_object()
+
+    def test_version_number_param(self):
+        v2 = pipeline.add_subtitles(self.video, 'en',
+                                      SubtitleSetFactory(num_subs=1))
+        assert_equal(self.run_get_object(self.version.version_number),
+                     self.version)
+        assert_equal(self.run_get_object(v2.version_number), v2)
+
+    def test_deleted_version_raises_404(self):
+        v = pipeline.add_subtitles(self.video, 'en',
+                                   SubtitleSetFactory(num_subs=1),
+                                   visibility='public',
+                                   visibility_override='deleted')
+        with assert_raises(Http404):
+            self.run_get_object(v.version_number)
+
+    def test_no_public_tip_raises_404(self):
+        self.version.delete()
+        with assert_raises(Http404):
+            self.run_get_object(None)
+
+    def test_no_version_number_gets_public_tip(self):
+        # this version shouldn't be returned by default since it's private
+        pipeline.add_subtitles(self.video, 'en',
+                               SubtitleSetFactory(num_subs=1),
+                               visibility='private')
+        assert_equal(self.run_get_object(None), self.version)
+
+    def test_check_user_can_view_video_permission(self):
+        with test_utils.patch_get_workflow() as workflow:
+            workflow.user_can_view_video.return_value = False
+            with assert_raises(PermissionDenied):
+                self.run_get_object(None)
+            # check the call args
+            assert_equal(workflow.user_can_view_video.call_args,
+                         mock.call(self.user))
+
+    def test_check_user_can_view_private_versions_permission(self):
+        v = pipeline.add_subtitles(self.video, 'en',
+                                   SubtitleSetFactory(num_subs=1),
+                                   visibility='private')
+        with test_utils.patch_get_workflow() as workflow:
+            workflow.user_can_view_private_subtitles.return_value = False
+            with assert_raises(PermissionDenied):
+                self.run_get_object(v.version_number)
+            # check the call args
+            assert_equal(workflow.user_can_view_private_subtitles.call_args,
+                         mock.call(self.user))

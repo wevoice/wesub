@@ -27,9 +27,12 @@ router.register(r'videos/(?P<video_id>[\w\d]+)/languages',
 
 urlpatterns = router.urls + patterns('',
     url(r'^videos/(?P<video_id>[\w\d]+)'
-        '/languages/(?P<language_code>[\w\d]+)/subtitles/actions/$',
+        '/languages/(?P<language_code>[\w-]+)/subtitles/$',
+        views.SubtitlesView.as_view(), name='subtitles'),
+    url(r'^videos/(?P<video_id>[\w\d]+)'
+        '/languages/(?P<language_code>[\w-]+)/subtitles/actions/$',
         views.Actions.as_view(), name='subtitle-actions'),
     url(r'^videos/(?P<video_id>[\w\d]+)'
-        '/languages/(?P<language_code>[\w\d]+)/subtitles/notes/$',
+        '/languages/(?P<language_code>[\w-]+)/subtitles/notes/$',
         views.NotesList.as_view()),
 )

@@ -81,6 +81,91 @@ Getting details on a specific language
 
 .. seealso::  To list available languages, see ``Language Resource``.
 
+Subtitles Resource
+^^^^^^^^^^^^^^^^^^
+
+Get/create subtitles for a video
+
+Fetching subtitles for a given language
++++++++++++++++++++++++++++++++++++++++
+
+.. http:get:: /api2/partners/videos/[video-id]/languages/[language-code]/subtitles/
+
+    :param video-id: Amara Video ID
+    :param language-code: BCP-47 language code.  *deprecated:* you can also
+        specify the internal ID for a langauge
+    :query sub_format: The format to return the subtitles in.  This can be any
+        format that amara supports including dfxp, srt, vtt, and sbv.  The
+        default is json, which returns subtitle data encoded list of json
+        dicts.
+    :query version: version number to fetch.  Versions are listed in the
+        VideoLanguageResouce request.  If none is specified, the latest public
+        version will be returned.
+    :>json version_number: version number for the subtitles
+    :>json subtitles: Subtitle data (str)
+    :>json sub_format: Format of the subtitles
+    :>json language: Language data
+    :>json language.code: BCP-47 language code
+    :>json language.name: Human readable name for the language
+    :>json language.dir: Language direction ("ltr" or "rtl")
+    :>json title: Video title, translated into the subtitle's language
+    :>json description: Video description, translated into the subtitle's
+        language
+    :>json metadata: Video metadata, translated into the subtitle's language
+    :>json video_title: Video title, translated into the video's language
+    :>json video_description: Video description, translated into the video's
+        language
+    :>json resource_uri: API URI for the subtitles
+    :>json site_uri: URI to view the subtitles on site
+    :>json video: Copy of video_title *(deprecated)*
+    :>json version_no: Copy of version_number *(deprecated)*
+
+Getting subtitle data only
+++++++++++++++++++++++++++
+
+Sometimes you want just subtitles data without the rest of the data.
+This is possible using a special Accept headers or format query strings.  This
+can be used to download a DFXP, SRT, or any other subtitle format that Amara
+supports.  If one of these is used, then the sub_format param will be ignored.
+
+====================  ======================  ==================
+Format                Accept header           format query param
+====================  ======================  ==================
+DFXP                  application/ttml+xml    dfxp
+SBV                   text/sbv                sbv
+SRT                   text/srt                srt
+SSA                   text/ssa                ssa
+WEBVTT                text/vtt                vtt
+====================  ======================  ==================
+
+Examples:
+
+.. http:get:: /api2/partners/videos/abcdef/languages/en/subtitles/?format=dfxp
+
+.. http:get:: /api2/partners/videos/abcdef/languages/en/subtitles/
+
+   :reqheader Accept: text/vtt
+
+
+Creating new subtitles
+++++++++++++++++++++++
+
+.. http:get:: /api2/partners/videos/[video-id]/languages/[language-code]/subtitles/
+
+    :param video-id: Amara Video ID
+    :param language-code: BCP-47 language code.  *deprecated:* you can also
+        specify the internal ID for a langauge
+    :<json subtitles: The subtitles to submit
+    :<json sub_format: The format used to parse the subs. The same formats as
+        for fetching subtitles are accepted. Optional - defaults to ``srt``.
+    :<json title: Give a title to the new revision
+    :<json description: Give a description to the new revision
+    :<json is_complete: Boolean indicating if the complete subtitling set is
+        available for this language - optional, defaults to false.
+    :<json action: Name of the action to perform - optional.  If given,
+        the is_complete param will be ignored.  See the 
+        :ref:`old-subtitles-action-resource` for details.
+
 Subtitles Action Resource
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -142,10 +227,14 @@ Create a new note
 
 from __future__ import absolute_import
 
+import json
+
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
 from rest_framework import mixins
+from rest_framework import renderers
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework import views
@@ -161,6 +250,8 @@ from subtitles import compat
 from subtitles import workflows
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.exceptions import ActionError
+import babelsubs
+from babelsubs.storage import SubtitleSet
 import videos.tasks
 
 class MiniSubtitleVersionSerializer(serializers.Serializer):
@@ -326,6 +417,144 @@ class SubtitleLanguageViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
             'video': self.video,
             'show_private_versions': self.show_private_versions,
         }
+
+class SubtitleRenderer(renderers.BaseRenderer):
+    """Render SubtitleSets using babelsubs."""
+    def render(self, data, media_type=None, renderer_context=None):
+        if isinstance(data, SubtitleSet):
+            return babelsubs.to(data, self.format)
+        else:
+            # Fall back to JSON renderer for other responses.  This handles
+            # things like permissions errors and 404 errors
+            return renderers.JSONRenderer().render(data)
+
+class DFXPRenderer(SubtitleRenderer):
+    media_type = 'application/ttml+xml'
+    format = 'dfxp'
+
+class SBVRenderer(SubtitleRenderer):
+    media_type = 'text/sbv'
+    format = 'sbv'
+
+class SRTRenderer(SubtitleRenderer):
+    media_type = 'text/srt'
+    format = 'srt'
+
+class SSARenderer(SubtitleRenderer):
+    media_type = 'text/ssa'
+    format = 'ssa'
+
+class VTTRenderer(SubtitleRenderer):
+    media_type = 'text/vtt'
+    format = 'vtt'
+
+class SubtitlesField(serializers.CharField):
+    def get_attribute(self, version):
+        return babelsubs.to(version.get_subtitles(),
+                            self.context['sub_format'])
+
+    def to_representation(self, value):
+        if self.context['sub_format'] == 'json':
+            # special case the json format.  We want to return actual JSON
+            # data rather than the string encoding of that data.
+            return json.loads(value)
+        else:
+            return value
+
+class SubFormatField(serializers.CharField):
+    def get_attribute(self, version):
+        return self.context['sub_format']
+
+class LanguageForSubtitlesSerializer(serializers.Serializer):
+    code = serializers.CharField(source='language_code')
+    name = serializers.CharField(source='get_language_code_display')
+    dir = serializers.CharField()
+
+class SubtitlesSerializer(serializers.Serializer):
+    version_number = serializers.IntegerField(read_only=True)
+    subtitles = SubtitlesField()
+    sub_format = SubFormatField()
+    language = LanguageForSubtitlesSerializer(source='*')
+    title = serializers.CharField()
+    description = serializers.CharField()
+    metadata = VideoMetadataSerializer(required=False, read_only=True)
+    video_title = serializers.CharField(source='video.title_display',
+                                        read_only=True)
+    video_description = serializers.CharField(source='video.description',
+                                              read_only=True)
+    resource_uri = serializers.SerializerMethodField()
+    site_uri = serializers.SerializerMethodField()
+
+    def get_resource_uri(self, version):
+        kwargs = {
+            'video_id': version.video.video_id,
+            'language_code': version.language_code,
+        }
+        uri = reverse('api:subtitles', kwargs=kwargs,
+                      request=self.context['request'])
+        if self.context['version_number']:
+            uri += '?version_number={}'.format(self.context['version_number'])
+        return uri
+
+    def get_site_uri(self, version):
+        kwargs = {
+            'video_id': version.video.video_id,
+            'lang': version.language_code,
+            'lang_id': version.subtitle_language_id,
+            'version_id': version.id,
+        }
+        return reverse('videos:subtitleversion_detail', kwargs=kwargs,
+                       request=self.context['request'])
+
+    def to_representation(self, version):
+        data = super(SubtitlesSerializer, self).to_representation(version)
+        # copy a fields to deprecated names
+        data['video'] = data['video_title']
+        data['version_no'] = data['version_number']
+        return data
+
+class SubtitlesView(generics.UpdateAPIView):
+    serializer_class = SubtitlesSerializer
+    renderer_classes = views.APIView.renderer_classes + [
+        DFXPRenderer, SBVRenderer, SSARenderer, SRTRenderer, VTTRenderer
+    ]
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'sub_format': self.request.query_params.get('sub_format', 'json'),
+            'version_number': None,
+        }
+
+    def get(self, request, *args, **kwargs):
+        version = self.get_object()
+        # If we're rendering the subtitles directly, then we skip creating a
+        # serializer and return the subtitles instead
+        if isinstance(request.accepted_renderer, SubtitleRenderer):
+            return Response(version.get_subtitles())
+        serializer = self.get_serializer(version)
+        return Response(serializer.data)
+
+    def get_object(self):
+        video = Video.objects.get(video_id=self.kwargs['video_id'])
+        workflow = workflows.get_workflow(video)
+        if not workflow.user_can_view_video(self.request.user):
+            raise PermissionDenied()
+        if 'version_number' in self.request.query_params:
+            version = video.newsubtitleversion_set.get(
+                language_code=self.kwargs['language_code'],
+                version_number=self.request.query_params['version_number'])
+        else:
+            language = video.subtitle_language(self.kwargs['language_code'])
+            version = language.get_public_tip()
+            if version is None:
+                raise Http404
+        if version.is_deleted():
+            raise Http404
+        if (not version.is_public() and
+            not workflow.user_can_view_private_subtitles(self.request.user)):
+            raise PermissionDenied()
+        return version
 
 class ActionsSerializer(serializers.Serializer):
     action = serializers.CharField(source='name')

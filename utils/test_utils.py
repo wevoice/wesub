@@ -1,4 +1,5 @@
 import collections
+import contextlib
 import functools
 import json
 import os
@@ -290,6 +291,33 @@ def patch_for_test(spec):
         return wrapper
     return decorator
 patch_for_test.__test__ = False
+
+@contextlib.contextmanager
+def patch_get_workflow():
+    """Context manage to patch subtitles.workflows.get_workflow.
+
+    This function creates a mock workflow, then forces get_workflow() to
+    return that.
+
+    Usage:
+
+        with patch_get_workflow() as mock_workflow:
+            mock_workflow.user_can_view_video.return_value = False
+            # test code that should call user_can_view_video
+        # get_workflow() is no longer patched
+    """
+
+    mock_workflow = mock.Mock()
+    mock_workflow.user_can_view_private_subtitles.return_value = True
+    mock_workflow.user_can_view_video.return_value = True
+
+    patcher = mock.patch('subtitles.workflows.get_workflow',
+                         mock.Mock(return_value=mock_workflow))
+    patcher.start()
+    try:
+        yield mock_workflow
+    finally:
+        patcher.stop()
 
 ExpectedRequest = collections.namedtuple(
     "ExpectedRequest", "method url params data headers body status_code")
