@@ -151,7 +151,6 @@ class EditorPage(UnisubsPage):
         return [el.text for el in buttons] 
 
     def legacy_editor(self):
-        time.sleep(4)
         buttons = self.browser.find_elements_by_css_selector(self._SESSION_BUTTONS)
         for el in buttons:
             if 'Legacy Editor' in el.text:

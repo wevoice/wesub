@@ -68,21 +68,22 @@ class DataHelpers(object):
         except:
             c.login(**self.super_user())
         response = c.post(reverse('videos:upload_subtitles'), defaults)
+        time.sleep(1)
 
     def add_subs(self, **kwargs):
         defaults = {
                     'language_code': 'en',
                    }
         defaults.update(kwargs)
-        default_subs = ('apps/webdriver_testing/subtitle_data'
-                       '/basic_subs.dfxp')
-        s = defaults.get('subtitles', default_subs)
-        
-        subs = load_from_file(s, language=defaults['language_code'])
-        sub_items = subs.to_internal()
-        defaults['subtitles'] = sub_items
+        s = defaults.get('subtitles', None)
+        if s:
+            subs = load_from_file(s, language=defaults['language_code'])
+            sub_items = subs.to_internal()
+            defaults['subtitles'] = sub_items
+        else:
+            defaults['subtitles'] = SubtitleSetFactory()
         v = pipeline.add_subtitles(**defaults)
-        time.sleep(.2)
+        time.sleep(1)
         return v
 
     def create_video_with_subs(self, user, **kwargs ):

@@ -8,7 +8,7 @@ from celery.task import Task
 from django.conf import settings
 from django.core.cache import cache
 from nose.plugins import Plugin
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true
 from xvfbwrapper import Xvfb
 import mock
 import mock
@@ -19,6 +19,10 @@ import optionalapps
 
 def reload_obj(model_obj):
     return model_obj.__class__.objects.get(pk=model_obj.pk)
+
+def assert_saved(model_obj):
+    assert_true(model_obj.__class__.objects.filter(pk=model_obj.pk).exists())
+    assert_equal(model_obj, reload_obj(model_obj))
 
 REQUEST_CALLBACKS = []
 

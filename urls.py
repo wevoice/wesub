@@ -171,7 +171,7 @@ urlpatterns = patterns('',
                             app_name='staticmedia')),
     url(r'^auth/', include('auth.urls', namespace='auth', app_name='auth')),
     url(r'^auth/', include('thirdpartyaccounts.urls', namespace='thirdpartyaccounts', app_name='thirdpartyaccounts')),
-    url(r'^api2/partners/', include('api.urls', namespace='api')),
+    url(r'^api/', include('api.urls', namespace='api')),
     ## Video shortlinks
     url(r'^v/(?P<encoded_pk>\w+)/$', 'videos.views.shortlink', name='shortlink')
 )
@@ -181,6 +181,8 @@ urlpatterns += optionalapps.get_urlpatterns()
 try:
     import debug_toolbar
 except ImportError:
+    pass
+else:
     urlpatterns += patterns('',
         url(r'^__debug__/', include(debug_toolbar.urls)),
     )

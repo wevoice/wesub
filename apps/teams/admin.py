@@ -275,6 +275,7 @@ class ApplicationAdmin(admin.ModelAdmin):
 class BillingRecordAdmin(admin.ModelAdmin):
     list_display = (
         'video',
+        'project',
         'new_subtitle_language',
         'minutes',
         'is_original',
@@ -287,7 +288,7 @@ class BillingRecordAdmin(admin.ModelAdmin):
     list_filter = ('team', 'created', 'source', 'is_original',)
     raw_id_fields = ('user', 'subtitle_language',
                      'new_subtitle_language', 'subtitle_version',
-                    'new_subtitle_version', 'video' ,
+                     'new_subtitle_version', 'video', 'project',
     )
 
 

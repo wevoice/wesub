@@ -35,8 +35,8 @@ class TestCaseFollowing(WebdriverTestCase):
         """Video submitter is following video by default.
 
         """
-        self.create_pg.open_create_page()
         self.create_pg.log_in(self.user.username, 'password')
+        self.create_pg.open_create_page()
         url = 'http://www.youtube.com/watch?v=WqJineyEszo'
         self.create_pg.submit_video(url)
         self.assertEqual(self.FOLLOWING, self.video_pg.follow_text())

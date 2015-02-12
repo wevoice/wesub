@@ -155,6 +155,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'utils.context_processors.custom',
     'utils.context_processors.user_languages',
     'utils.context_processors.run_locally',
+    'utils.context_processors.experiments',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.i18n',
     'staticmedia.context_processors.staticmedia',
@@ -223,10 +224,31 @@ CELERY_SEND_TASK_ERROR_EMAILS = True
 BROKER_POOL_LIMIT = 10
 
 REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.YAMLParser',
+        'rest_framework.parsers.XMLParser',
+        'rest_framework.parsers.FormParser',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.YAMLRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework.renderers.XMLRenderer',
+    ),
+    'URL_FORMAT_OVERRIDE': 'format',
+    'DEFAULT_CONTENT_NEGOTIATION_CLASS':
+        'api.negotiation.AmaraContentNegotiation',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'api.auth.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-    )
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_PAGINATION_SERIALIZER_CLASS':
+        'api.pagination.AmaraPaginationSerializer',
+    'ORDERING_PARAM': 'order_by',
 }
 
 #################
@@ -312,6 +334,7 @@ ANONYMOUS_USER_ID = 10000
 
 #Use on production
 GOOGLE_ANALYTICS_NUMBER = 'UA-163840-22'
+EXPERIMENTS_CODE = "QL2-1BUpSyeABVHp9b6G8w"
 MIXPANEL_TOKEN = '44205f56e929f08b602ccc9b4605edc3'
 
 try:
@@ -418,6 +441,7 @@ MEDIA_BUNDLES = {
             "js/libs/chosen.ajax.jquery.js",
             "js/libs/jquery.cookie.js",
             "js/unisubs.site.js",
+            "src/js/unisubs.variations.js",
         ),
     },
     "graphs.js": {
@@ -624,7 +648,7 @@ LOGGING = {
 
 from task_settings import *
 
-try:
+if DEBUG:
     import debug_toolbar
 
     INSTALLED_APPS += ('debug_toolbar',)
@@ -652,7 +676,5 @@ try:
         'HIDE_DJANGO_SQL': False,
         'TAG': 'div',
     }
-except ImportError:
-    pass
 
 optionalapps.add_extra_settings(globals(), locals())

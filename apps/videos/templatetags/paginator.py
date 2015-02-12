@@ -19,7 +19,7 @@ from django import template
 from django.core.paginator import Paginator, EmptyPage
 register = template.Library()
 
-def paginate(items, per_page, page, allow_more=0):
+def paginate(items, per_page, page):
     if page != 'last':
         page = int(page) if page else 1
 
@@ -69,7 +69,6 @@ def paginator(context, adjacent_pages=3):
             getvars = "&%s" % GET_vars.urlencode()
 
     return {
-        'more': context['more'] if 'more' in context else None,
         'page_obj': page_obj,
         'paginator': paginator,
         'hits': paginator.count,

@@ -25,7 +25,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import query, Q
 from django.utils.translation import ugettext_lazy as _
-from gdata.youtube.client import RequestError
+from gdata.client import RequestError
 import babelsubs
 # because of our insane circular imports we need to import haystack right here
 # or else things blow up
@@ -99,6 +99,17 @@ class ExternalAccount(models.Model):
     owner_id = models.IntegerField()
 
     objects = ExternalAccountManager()
+
+    def delete(self):
+        models_to_delete = [
+            SyncedSubtitleVersion,
+            SyncHistory,
+        ]
+        for model in models_to_delete:
+            qs = model.objects.filter(account_type=self.account_type,
+                                      account_id=self.id)
+            qs.delete()
+        super(ExternalAccount, self).delete()
 
     @property
     def team(self):

@@ -8,6 +8,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.common.keys import Keys
 
@@ -185,7 +186,11 @@ class Page(object):
         """
         elem = self._safe_find(element)
         self.logger.info( 'submit')
-        elem.submit()
+        try:
+            elem.submit()
+        except TimeoutException as e:
+            self.logger.info(e)
+            pass
         self.logger.info( '** done')
 
     def clear_text(self, element):
@@ -492,14 +497,16 @@ class Page(object):
         except NoSuchElementException:
             return None
 
-    def open_page(self, url, alert_check=False):
+    def open_page(self, url):
         """Open a page by the full url.
 
         """
         #self.browser.execute_script("window.stop()")
-        self.browser.get(self.get_absolute_url(url))
-        if alert_check:
-            self.handle_js_alert('accept')
+        try:
+            self.browser.get(self.get_absolute_url(url))
+        except TimeoutException as e:
+            self.logger.info(e)
+            pass
 
     def go_back(self):
         """Go back to previous page.  """

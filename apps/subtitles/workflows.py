@@ -27,6 +27,8 @@ particular they control:
   Approve, Send back, etc).
 - Permissions -- Who can edit subtitles, who can view private subtitles
 
+Workflows
+--------_
 .. autoclass:: Workflow
     :members: get_work_mode, get_actions, action_for_add_subtitles,
         get_editor_notes, extra_tabs, get_add_language_mode,
@@ -71,9 +73,6 @@ from utils.behaviors import behavior
 
 class Workflow(object):
     """
-    Workflow
-    --------
-
     A workflow class controls the overall workflow for editing and publishing
     subtitles.  Workflows control the work modes, actions, and permissions for
     a set of subtitles.
@@ -295,43 +294,39 @@ class Action(object):
     Other components can define new actions by subclassing Action, setting the
     class attributes, and optionally implementing perform().
 
+    Attributes:
+
+        name: Machine-friendly name
+
+        label: human-friendly label.  Strings should be run through ugettext_lazy()
+        in_progress_text: text to display in the editor while this action is
+            being performed.  Strings should be run through ugettext_lazy()
+
+        visual_class: visual class to render the action with.  This controls
+            things like the icon we use in our editor button.  Must be one of
+            the `CLASS_` constants
+
+        complete: how to handle subtitles_complete. There are 3 options:
+
+            - True -- this action sets subtitles_complete
+            - False -- this action unsets subtitles_complete
+            - None (default) - this action doesn't change subtitles_complete
+
+        subtitle_visibility: Visibility value for newly created
+        SubtitleVersions ("public" or "private")
+
+        CLASS_ENDORSE: visual class constant for endorse/approve buttons
+        CLASS_SEND_BACK: visual class constant for reject/send-back buttons
     """
 
     name = NotImplemented 
-    """Machine-friendly name"""
-
     label = NotImplemented
-    """human-friendly label.  Strings should be run through ugettext_lazy()
-    """
     in_progress_text = NotImplemented
-    """text to display in the editor while this action is being performed.
-    Strings should be run through ugettext_lazy()
-    """
-
     visual_class = None
-    """
-    visual class to render the action with.  This controls things like the
-    icon we use in our editor button.  Must be one of the `CLASS_` constants
-    """
-
     complete = None
-    """
-    complete defines how to handle subtitles_complete. There are 3 options:
-
-        - True -- this action sets subtitles_complete
-        - False -- this action unsets subtitles_complete
-        - None (default) - this action doesn't change subtitles_complete
-    """
-
-    subtitle_visibility = 'public'
-    """
-    Visibility value for newly created SubtitleVerisons.
-    """
-
     CLASS_ENDORSE = 'endorse'
-    """endorse/approve buttons"""
     CLASS_SEND_BACK = 'send-back'
-    """reject/send-back buttons"""
+    subtitle_visibility = 'public'
 
     def validate(self, user, video, subtitle_language, saved_version):
         """Check if we can perform this action.

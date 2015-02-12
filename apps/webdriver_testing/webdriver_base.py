@@ -87,7 +87,8 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         #Otherwise just running locally - setup the browser to use.
         test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
         cls.browser = getattr(webdriver, test_browser)()
-        cls.browser.set_page_load_timeout(60)
+        cls.browser.set_page_load_timeout(20)
+        cls.browser.implicitly_wait(3) # seconds
                     
     @classmethod
     def destroy_browser(cls):

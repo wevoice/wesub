@@ -67,7 +67,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
-    can_delete_language, can_move_videos, can_sort_by_primary_language, can_view_stats_tab
+    can_delete_language, can_move_videos, can_view_stats_tab, can_sort_by_primary_language
 )
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
@@ -623,7 +623,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
     query = request.GET.get('q', '')
     sort = request.GET.get('sort')
     language_filter = request.GET.get('lang')
-    primary_audio_language_filter = request.GET.get('primary-audio-lang', 'any')
+    primary_audio_language_filter = request.GET.get('primary-audio-lang', 'any' if can_sort_by_primary_language(team, request.user) else None)
     language_code = language_filter if language_filter != 'any' else None
     primary_audio_language_code = primary_audio_language_filter if primary_audio_language_filter != 'any' else None
     language_mode = request.GET.get('lang-mode', '+')
@@ -634,27 +634,26 @@ def move_videos(request, slug, project_slug=None, languages=None):
                                      language_code, language_mode,
                                      sort)
 
-    # TODO: This needs to be improved but should not be too bad
-    # because it only applies on already filtered videos, and
-    # only in case there is a primary_audio_language_code filter
-    #
-    # It is to check the primary_audio_language_code
-    # which is part of video, not team_video
+    # This part is a little insane, because we have the constrain
+    # of not changing the index, and there is a shorter limit
+    # in queries to haystack or solr
     if primary_audio_language_code is not None:
-        team_videos_pks = qs.values_list('team_video_pk', flat=True)
         if primary_audio_language_code == "-":
-            team_videos = TeamVideo.objects.filter(
-                id__in=team_videos_pks,
-                video__primary_audio_language_code__in=["", None]).values_list('id', flat=True)
+            team_videos = TeamVideo.get_videos_non_language_ids(team, "")
+        elif primary_audio_language_code == "+":
+            team_videos = TeamVideo.get_videos_non_language_ids(team, "", non_empty_language_code=True)
         else:
-            team_videos = TeamVideo.objects.filter(id__in=team_videos_pks, video__primary_audio_language_code__gt="").values_list('id', flat=True)
-        # This is necessary because team_video_pk is not indexed by solr
-        qs = filter(lambda x: x.team_video_pk in team_videos, qs)
+            team_videos = TeamVideo.get_videos_non_language_ids(team, primary_audio_language_code)
 
-    # This is a temporary restriction until we properly fix
-    # the performance issues there
-    if not can_sort_by_primary_language(team, request.user):
-        primary_audio_language_filter = None
+        # For longer lists, it gets too long for solr. So we have to exclude chunk by chunk
+        # rather than filter.
+        # Also we get around the missing team_video_pk index by using the id, which we
+        # know how it is generated
+        # This does not work for very long lists though, that's why we block that
+        # feature for large teams
+        for chunk in (team_videos[pos:pos + 1000] for pos in xrange(0, len(team_videos), 1000)):
+            qs = qs.exclude(id__in=map(lambda x: "teams.teamvideo.%s" % x, chunk))
+
     extra_context = {
         'team': team,
         'member': member,
