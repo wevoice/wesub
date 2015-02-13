@@ -206,3 +206,52 @@ def patch_get_workflow():
         yield mock_workflow
     finally:
         patcher.stop()
+
+class _MockSignalHandler(object):
+    def __init__(self, signal):
+        self.signal = signal
+        self.handler = mock.Mock()
+
+    # implement the context manager
+    def __enter__(self):
+        self.signal.connect(self.handler, weak=False)
+        return self.handler
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.signal.disconnect(self.handler)
+
+    # implement the test case method wrapping
+    def __call__(self, func):
+        signal = self.signal
+        handler = self.handler
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            signal.connect(handler, weak=False)
+            self.addCleanup(signal.disconnect, handler)
+            return func(self, handler, *args, **kwargs)
+        return wrapper
+
+def mock_handler(signal):
+    """Connect a mock object to a signal
+
+    This function can be used as a context manager to connect and disconnect
+    to a signal.
+
+    This function can also be used as a function wrapper for a unittest.
+    If so, the handler will be active during the test and disconnected with
+    addCleanup().  The mock handler will be passed in as an argument for the
+    function.  Because we use addCleanup(), you can wrap the setUp() method to
+    cause the 
+
+    Usage:
+
+        >>> with mock_handler(my_signal) as mock_handler:
+        >>>     # run some code
+        >>>     mock_handler.assert_called_with(arg1, arg2)
+
+        >>> @mock_handler(my_signal)
+        >>> def test_something(self, mock_handler):
+        >>>     # run some code
+        >>>     mock_handler.assert_called_with(arg1, arg2)
+    """
+    return _MockSignalHandler(signal)

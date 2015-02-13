@@ -36,16 +36,10 @@ class VideoSerializerTest(TestCase):
             duration=100,
             thumbnail='http://example.com/image.jpg',
         )
-        self.video_moved_from_team_to_team_handler = mock.Mock()
-        teams.signals.video_moved_from_team_to_team.connect(
-            self.video_moved_from_team_to_team_handler, weak=False)
         self.serializer_context = {
             'request': APIRequestFactory().get("/mock-url/"),
             'user': self.user,
         }
-        self.addCleanup(
-            teams.signals.video_moved_from_team_to_team.disconnect,
-            self.video_moved_from_team_to_team_handler)
 
     def get_serialized_data(self):
         video_serializer = VideoSerializer(test_utils.reload_obj(self.video), 
@@ -294,13 +288,14 @@ class VideoSerializerTest(TestCase):
         self.run_update({ 'team': 'test-team', })
         assert_equal(self.video.get_team_video().team, team)
 
-    def test_move_team(self):
+    @test_utils.mock_handler(teams.signals.video_moved_from_team_to_team)
+    def test_move_team(self, mock_handler):
         team1 = TeamFactory(slug='team1')
         team2 = TeamFactory(slug='team2')
         TeamVideoFactory(video=self.video, team=team1)
         self.run_update({ 'team': 'team2' })
         assert_equal(self.video.get_team_video().team, team2)
-        assert_equal(self.video_moved_from_team_to_team_handler.call_count, 1)
+        assert_equal(mock_handler.call_count, 1)
 
     def test_remove_team(self):
         team = TeamFactory(slug='team')
