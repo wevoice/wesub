@@ -520,7 +520,7 @@ class Cleanup(object):
 
     def should_skip_image(self, image, tags):
         for tag in tags:
-            if tag.endswith("-latest"):
+            if tag.endswith(":latest"):
                 log("skipping {} because of tag {}", image, tag)
                 return True
         return False
