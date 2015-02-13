@@ -73,11 +73,12 @@ EOF
     git branch --track $REV origin/$REV
     git checkout --force $REV
     git pull --ff-only origin $REV
-    ./bin/update-integration.py --clone-missing
     s3cmd -c /etc/s3cfg get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
     # get transifex config
     s3cmd -c /etc/s3cfg get --force s3://amara/settings/transifexrc /.transifexrc
 fi
+
+./bin/update-integration.py --clone-missing
 
 cd $APP_DIR
 python ./deploy/create_commit_file.py
