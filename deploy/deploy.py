@@ -336,7 +336,7 @@ class ContainerManager(object):
             # for production we start up many instances, spread across the
             # hosts
             host_iter = itertools.cycle(self.env.docker_hosts())
-            for i in range(self.env.PRODUCTION_NUM_INSTANCES):
+            for i in range(int(self.env.PRODUCTION_NUM_INSTANCES)):
                 host = host_iter.next()
                 self.start_app_container(host, str(i + 1))
         elif self.env.BRANCH == 'staging':
@@ -435,10 +435,12 @@ class Deploy(object):
         old_containers = self.container_manager.find_old_containers()
         if self.env.MIGRATIONS == 'DONT_MIGRATE':
             self.container_manager.start_new_containers()
+            time.sleep(30)
             self.container_manager.shutdown_old_containers(old_containers)
         elif self.env.MIGRATIONS == 'MIGRATE_WHILE_RUNNING_OLD_CODE':
             self.container_manager.run_app_command('migrate')
             self.container_manager.start_new_containers()
+            time.sleep(30)
             self.container_manager.shutdown_old_containers(old_containers)
         elif self.env.MIGRATIONS == 'STOP_SERVERS_TO_MIGRATE':
             self.container_manager.shutdown_old_containers(old_containers)

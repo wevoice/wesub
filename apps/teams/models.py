@@ -2911,7 +2911,7 @@ class BillingReport(models.Model):
         rows = [header]
         for approve_task in self._get_approved_tasks():
             video = approve_task.team_video.video
-            project = approve_task.team_video.project.name if approve_task.team_video.project else _('none')
+            project = approve_task.team_video.project.name if approve_task.team_video.project else 'none'
             version = approve_task.new_subtitle_version
             language = version.subtitle_language
             subtitle_task = (Task.objects.complete_subtitle_or_translate()
@@ -2951,7 +2951,7 @@ class BillingReport(models.Model):
         data_rows = []
         for approve_task in self._get_approved_tasks():
             video = approve_task.team_video.video
-            project = approve_task.team_video.project.name if approve_task.team_video.project else _('none')
+            project = approve_task.team_video.project.name if approve_task.team_video.project else 'none'
             version = approve_task.get_subtitle_version()
             language = version.subtitle_language
 
@@ -3093,7 +3093,7 @@ class BillingReportGenerator(object):
         return [
             (video and video.title_display()) or "----",
             (video and video.video_id) or "deleted",
-            (record.project.name if record.project else _('none')),
+            (record.project.name if record.project else 'none'),
             (record.new_subtitle_language and record.new_subtitle_language.language_code) or "----",
             record.minutes,
             record.is_original,
@@ -3141,7 +3141,7 @@ NOT EXISTS (
         return [
             video.title_display(),
             video.video_id,
-            _('none'),
+            'none',
             language.language_code,
             0,
             language.is_primary_audio_language(),

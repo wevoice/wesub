@@ -1301,7 +1301,7 @@ class TestInvites(TestCase):
         self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
 
 
-class TestApplication(TestCase, test_utils.TestCaseMessagesMixin):
+class TestApplication(TestCase):
     def setUp(self):
         self.team, c = Team.objects.get_or_create(name='test', slug='test',membership_policy=Team.APPLICATION )
         self.owner = UserFactory(username='test-owner')
