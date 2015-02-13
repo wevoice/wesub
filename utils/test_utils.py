@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import collections
 import contextlib
 import functools
@@ -12,10 +13,10 @@ from nose.plugins import Plugin
 from nose.tools import assert_equal, assert_true
 from xvfbwrapper import Xvfb
 import mock
-import mock
 import requests
 import utils.youtube
 
+from subtitles.workflows import SaveDraft
 import optionalapps
 
 def reload_obj(model_obj):
@@ -310,6 +311,7 @@ def patch_get_workflow():
     mock_workflow = mock.Mock()
     mock_workflow.user_can_view_private_subtitles.return_value = True
     mock_workflow.user_can_view_video.return_value = True
+    mock_workflow.action_for_add_subtitles.return_value = SaveDraft()
 
     patcher = mock.patch('subtitles.workflows.get_workflow',
                          mock.Mock(return_value=mock_workflow))

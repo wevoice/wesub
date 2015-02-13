@@ -20,7 +20,8 @@ import json
 from django.http import Http404
 from django.test import TestCase
 from nose.tools import *
-from rest_framework.exceptions import PermissionDenied
+from rest_framework import status
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient, APIRequestFactory
 import babelsubs
@@ -32,6 +33,7 @@ from api.views.subtitles import (SubtitleLanguageSerializer,
                                  SubtitlesView)
 from subtitles import compat
 from subtitles import pipeline
+from subtitles.models import ORIGIN_API, ORIGIN_WEB_EDITOR
 from utils import test_utils
 from utils.factories import *
 
@@ -261,6 +263,7 @@ class SubtitleLanguageViewset(TestCase):
 
 class SubtitlesSerializerTest(TestCase):
     def setUp(self):
+        self.user = UserFactory()
         self.video = VideoFactory(title='test-video-title',
                                   description='test-video-description')
         self.version = pipeline.add_subtitles(
@@ -268,6 +271,9 @@ class SubtitlesSerializerTest(TestCase):
             title='test-title', description='test-description',
             metadata={'location': 'test-location'})
         self.context = {
+            'user': self.user,
+            'video': self.video,
+            'language_code': 'en',
             'request': None,
             'version_number': None,
             'sub_format': 'srt',
@@ -315,6 +321,68 @@ class SubtitlesSerializerTest(TestCase):
         data = self.serializer.to_representation(self.version)
         json_encoding = babelsubs.to(self.version.get_subtitles(), 'json')
         assert_equal(data['subtitles'], json.loads(json_encoding))
+
+    def run_create(self, data):
+        serializer = SubtitlesSerializer(data=data, context=self.context)
+        serializer.is_valid(raise_exception=True)
+        return serializer.save()
+
+    def test_create(self):
+        subtitles = SubtitleSetFactory(num_subs=2)
+        data = {
+            'sub_format': 'dfxp',
+            'subtitles': subtitles.to_xml(),
+            'title': 'test-title',
+            'description': 'test-description',
+            'metadata': {
+                'location': 'test-location',
+            },
+        }
+        version = self.run_create(data)
+        assert_equal(version.get_subtitles(), subtitles)
+        assert_equal(version.video, self.video)
+        assert_equal(version.language_code, 'en')
+        assert_equal(version.title, data['title'])
+        assert_equal(version.description, data['description'])
+        assert_equal(version.get_metadata(), data['metadata'])
+        assert_equal(version.author, self.user)
+        assert_equal(version.origin, ORIGIN_API)
+
+    def test_from_editor(self):
+        version = self.run_create({
+            'subtitles': SubtitleSetFactory().to_xml(),
+            'from_editor': True
+        })
+        assert_equal(version.origin, ORIGIN_WEB_EDITOR)
+
+    def test_sub_format(self):
+        subtitles = SubtitleSetFactory(num_subs=2)
+        version = self.run_create({
+            'sub_format': 'vtt',
+            'subtitles': babelsubs.to(subtitles, 'vtt'),
+        })
+        assert_equal(version.get_subtitles(), subtitles)
+
+    def test_action(self):
+        version = self.run_create({
+            'subtitles': SubtitleSetFactory().to_xml(),
+            'action': 'publish',
+        })
+        assert_true(version.subtitle_language.subtitles_complete)
+
+    def test_is_complete(self):
+        version = self.run_create({
+            'subtitles': SubtitleSetFactory().to_xml(),
+            'is_complete': True,
+        })
+        assert_true(version.subtitle_language.subtitles_complete)
+
+    def test_invalid_subtitles(self):
+        with assert_raises(ValidationError):
+            self.run_create({
+                'sub_format': 'dfxp',
+                'subtitles': 'bad-dfxp-data',
+            })
 
 class SubtitlesViewTest(TestCase):
     def setUp(self):
@@ -393,8 +461,8 @@ class SubtitlesViewTest(TestCase):
     def test_check_user_can_view_video_permission(self):
         with test_utils.patch_get_workflow() as workflow:
             workflow.user_can_view_video.return_value = False
-            with assert_raises(PermissionDenied):
-                self.run_get_object(None)
+            response = self.client.get(self.url)
+            assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
             # check the call args
             assert_equal(workflow.user_can_view_video.call_args,
                          mock.call(self.user))
@@ -405,8 +473,21 @@ class SubtitlesViewTest(TestCase):
                                    visibility='private')
         with test_utils.patch_get_workflow() as workflow:
             workflow.user_can_view_private_subtitles.return_value = False
-            with assert_raises(PermissionDenied):
-                self.run_get_object(v.version_number)
+            response = self.client.get(self.url, {
+                'version_number': v.version_number,
+            })
+            assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
             # check the call args
             assert_equal(workflow.user_can_view_private_subtitles.call_args,
                          mock.call(self.user))
+
+    def test_check_user_can_edit_subtitles_permission(self):
+        with test_utils.patch_get_workflow() as workflow:
+            workflow.user_can_edit_subtitles.return_value = False
+            response = self.client.post(self.url, {
+                'subtitles': SubtitleSetFactory().to_xml()
+            })
+            assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+            # check the call args
+            assert_equal(workflow.user_can_edit_subtitles.call_args,
+                         mock.call(self.user, 'en'))

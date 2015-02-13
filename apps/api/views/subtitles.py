@@ -81,6 +81,8 @@ Getting details on a specific language
 
 .. seealso::  To list available languages, see ``Language Resource``.
 
+.. _subtitles-resource:
+
 Subtitles Resource
 ^^^^^^^^^^^^^^^^^^
 
@@ -157,14 +159,17 @@ Creating new subtitles
         specify the internal ID for a langauge
     :<json subtitles: The subtitles to submit
     :<json sub_format: The format used to parse the subs. The same formats as
-        for fetching subtitles are accepted. Optional - defaults to ``srt``.
+        for fetching subtitles are accepted. Optional - defaults to ``dfxp``.
     :<json title: Give a title to the new revision
     :<json description: Give a description to the new revision
+    :<json action: Name of the action to perform - optional, but recommended.
+        If given, the is_complete param will be ignored.  See the
+        :ref:`subtitles-action-resource` for details.
     :<json is_complete: Boolean indicating if the complete subtitling set is
         available for this language - optional, defaults to false.
-    :<json action: Name of the action to perform - optional.  If given,
-        the is_complete param will be ignored.  See the 
-        :ref:`old-subtitles-action-resource` for details.
+        *(deprecated, use action instead)*
+
+.. _subtitles-action-resource:
 
 Subtitles Action Resource
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -175,7 +180,7 @@ reject, etc).  This resource is used to list and perform actions on the
 subtitle set.
 
 .. note:: You can also perform an action together a new set of subtitles using
-    the action param of the :ref:`old-subtitles-resource`.
+    the action param of the :ref:`subtitles-resource`.
 
 Get the list of possible actions:
 
@@ -247,11 +252,14 @@ from api.pagination import AmaraPaginationMixin
 from api.views.videos import VideoMetadataSerializer
 from videos.models import Video
 from subtitles import compat
+from subtitles import pipeline
 from subtitles import workflows
-from subtitles.models import SubtitleLanguage, SubtitleVersion
+from subtitles.models import (SubtitleLanguage, SubtitleVersion,
+                              ORIGIN_WEB_EDITOR, ORIGIN_API)
 from subtitles.exceptions import ActionError
 import babelsubs
 from babelsubs.storage import SubtitleSet
+from utils.subtitles import load_subtitles
 import videos.tasks
 
 class MiniSubtitleVersionSerializer(serializers.Serializer):
@@ -449,6 +457,12 @@ class VTTRenderer(SubtitleRenderer):
     format = 'vtt'
 
 class SubtitlesField(serializers.CharField):
+    def __init__(self):
+        super(SubtitlesField, self).__init__(style={
+            'base_template': 'textarea.html',
+            'rows': 10,
+        })
+
     def get_attribute(self, version):
         return babelsubs.to(version.get_subtitles(),
                             self.context['sub_format'])
@@ -461,7 +475,19 @@ class SubtitlesField(serializers.CharField):
         else:
             return value
 
-class SubFormatField(serializers.CharField):
+    def to_internal_value(self, value):
+        try:
+            return load_subtitles(
+                self.context['language_code'], value,
+                self.context['sub_format'])
+        except babelsubs.SubtitleParserError:
+            raise serializers.ValidationError("Invalid subtitle data")
+
+class SubFormatField(serializers.ChoiceField):
+    def __init__(self, **kwargs):
+        kwargs['choices'] = babelsubs.get_available_formats()
+        super(SubFormatField, self).__init__(**kwargs)
+
     def get_attribute(self, version):
         return self.context['sub_format']
 
@@ -472,12 +498,19 @@ class LanguageForSubtitlesSerializer(serializers.Serializer):
 
 class SubtitlesSerializer(serializers.Serializer):
     version_number = serializers.IntegerField(read_only=True)
+    sub_format = SubFormatField(required=False, default='dfxp', initial='dfxp')
     subtitles = SubtitlesField()
-    sub_format = SubFormatField()
-    language = LanguageForSubtitlesSerializer(source='*')
-    title = serializers.CharField()
-    description = serializers.CharField()
-    metadata = VideoMetadataSerializer(required=False, read_only=True)
+    action = serializers.CharField(required=False, write_only=True,
+                                   allow_blank=True)
+    is_complete = serializers.BooleanField(required=False, write_only=True)
+    from_editor = serializers.BooleanField(
+        required=False, write_only=True,
+        help_text=("Check to flag this version as coming from the "
+                   "amara editor."))
+    language = LanguageForSubtitlesSerializer(source='*', read_only=True)
+    title = serializers.CharField(required=False, allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True)
+    metadata = VideoMetadataSerializer(required=False)
     video_title = serializers.CharField(source='video.title_display',
                                         read_only=True)
     video_description = serializers.CharField(source='video.description',
@@ -513,14 +546,53 @@ class SubtitlesSerializer(serializers.Serializer):
         data['version_no'] = data['version_number']
         return data
 
-class SubtitlesView(generics.UpdateAPIView):
+    def to_internal_value(self, data):
+        # set sub_format from the inputted data.  We need this to properly
+        # parse the subtitles param
+        if data.get('sub_format'):
+            self.context['sub_format'] = data['sub_format']
+        else:
+            self.context['sub_format'] = 'dfxp'
+        return super(SubtitlesSerializer, self).to_internal_value(data)
+
+    def create(self, validated_data):
+        if validated_data.get('from_editor'):
+            origin = ORIGIN_WEB_EDITOR
+        else:
+            origin = ORIGIN_API
+        action = complete = None
+        if 'action' in validated_data:
+            action = validated_data.get("action")
+        elif 'is_complete' in validated_data:
+            complete = validated_data['is_complete']
+
+        return pipeline.add_subtitles(
+            self.context['video'], self.context['language_code'],
+            validated_data['subtitles'],
+            action=action, complete=complete,
+            title=validated_data.get('title'),
+            description=validated_data.get('description'),
+            metadata=validated_data.get('metadata'),
+            author=self.context['user'],
+            committer=self.context['user'],
+            origin=origin)
+
+class SubtitlesView(generics.CreateAPIView):
     serializer_class = SubtitlesSerializer
     renderer_classes = views.APIView.renderer_classes + [
         DFXPRenderer, SBVRenderer, SSARenderer, SRTRenderer, VTTRenderer
     ]
 
+    def get_video(self):
+        if not hasattr(self, '_video'):
+            self._video = Video.objects.get(video_id=self.kwargs['video_id'])
+        return self._video
+
     def get_serializer_context(self):
         return {
+            'video': self.get_video(),
+            'language_code': self.kwargs['language_code'],
+            'user': self.request.user,
             'request': self.request,
             'sub_format': self.request.query_params.get('sub_format', 'json'),
             'version_number': None,
@@ -536,7 +608,7 @@ class SubtitlesView(generics.UpdateAPIView):
         return Response(serializer.data)
 
     def get_object(self):
-        video = Video.objects.get(video_id=self.kwargs['video_id'])
+        video = self.get_video()
         workflow = workflows.get_workflow(video)
         if not workflow.user_can_view_video(self.request.user):
             raise PermissionDenied()
@@ -555,6 +627,14 @@ class SubtitlesView(generics.UpdateAPIView):
             not workflow.user_can_view_private_subtitles(self.request.user)):
             raise PermissionDenied()
         return version
+
+    def create(self, request, *args, **kwargs):
+        video = self.get_video()
+        workflow = workflows.get_workflow(video)
+        if not workflow.user_can_edit_subtitles(
+            self.request.user, self.kwargs['language_code']):
+            raise PermissionDenied()
+        return super(SubtitlesView, self).create(request, *args, **kwargs)
 
 class ActionsSerializer(serializers.Serializer):
     action = serializers.CharField(source='name')
