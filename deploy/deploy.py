@@ -479,12 +479,12 @@ class Cleanup(object):
 
     def remove_image(self, host, image):
         try:
-            self.docker.run(host, 'rmi', tag)
+            self.docker.run(host, 'rmi', image)
         except subprocess.CalledProcessError:
             # removing an image can fail if another container was started that
             # uses the image after get the list.  Just print a warning and
             # continue on
-            log("Warning: error removing image {}", tag)
+            log("Warning: error removing image {}", image)
 
     def remove_unused_images(self, host):
         log("checking for unused images")
