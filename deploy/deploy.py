@@ -477,7 +477,7 @@ class Cleanup(object):
             self.docker.run(host, 'rm', '-v', container['Id'])
 
 
-    def remove_image(self, image):
+    def remove_image(self, host, image):
         try:
             self.docker.run(host, 'rmi', tag)
         except subprocess.CalledProcessError:
@@ -511,10 +511,10 @@ class Cleanup(object):
             else:
                 for tag in tags:
                     log("Untagging {}", tag)
-                    self.remove_image(tag)
+                    self.remove_image(host, tag)
                 if self.docker.image_exists(host, image):
                     log("removing unused image: {}", image)
-                    self.remove_image(tag)
+                    self.remove_image(host, tag)
                 else:
                     log("image removed from untagging: {}", image)
 
