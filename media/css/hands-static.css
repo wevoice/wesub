@@ -208,90 +208,134 @@ ul {
 	max-width: 883px;
 }
 
-/* SIGN IN/SIGN UP PAGE */
+/* SIGN IN/CREATE ACCOUNT PAGE */
 
 #login-bg {
 	background-color: #FFF;
 	border-top: solid 2px #BBB;
+	color: #656565;
 }
 
-#login .content {
+#login-bg .content {
 	text-align: center;
 }
 
-#login .providers, #login h2, #login h3, #login h5, #login p {
+#login-bg .providers, #login-bg h2, #login-bg h5, {
 	clear: both;
 	font-weight: normal;
-	color: #656565;
 	text-align: center;
 }
 
-#login h2 {
+#login-bg h2 {
 	margin-top: 0px;
 	margin-bottom: 5px;
 }
 
-#login h3 {
-	margin-top: 3em;
-}
 
-#login h5 {
+#login-bg h5 {
 	font-weight: 200;
 	font-size: 15px;
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
 
-#login .spacer-top {
-	border-top: 1px solid #BBB;
+#login-bg .help {
+	text-align: center;
+}
+
+#login-bg .spacer-top {
+	border-top: 1px solid #ddd;
 	padding-top: 12px;
 }
 
-#login .sso {
+#login-bg .sso {
 	margin: 0 auto;
 	margin-top: 2em;
 	padding: 1.5em 2em;
 	background: #f7f7f7;
 	border-radius: 3px;
-	border: 1px solid #eee;
+	border: 1px solid #ddd;
 	zoom: 1;
 	max-width: 550px;
 }
-#login .sso:after, #login .sso:before {
+#login-bg .sso:after, #login-bg .sso:before {
 	content: " ";
 	display: table;
 }
-#login .sso:after {
+#login-bg .sso:after {
 	clear: both;
 }
-.providers {
+
+#login-bg label {
+	display: none;
+}
+
+#login-bg ul.sign-in-form,  #login-bg ul.create-account-form {
+	padding-left: 0;
+}
+
+#login-bg ul.sign-in-form li input,  #login-bg ul.create-account-form li input {
+	margin: 0;
+	padding: 4px 4px 4px 10px;
+	border: 2px solid #bbb;
+	border-radius: 3px;
+	font-size: 24px;
+	color: #656565;
+}
+
+/*Selects the sign-in/create account button li's*/
+#login-bg ul.sign-in-form > li:last-of-type, #login-bg ul.create-account-form > li:last-of-type {
+	text-align: center;
+}
+
+#login-bg ul.sign-in-form li, #login-bg ul.create-account-form li {
+	margin: 18px auto 18px auto;
+}
+
+#login-bg ul.sign-in-form li, #login-bg ul.create-account-form li, #login-bg ul.sign-in-form li input, #login-bg ul.create-account-form li input {
+	width: 355px;
+}
+
+#login-bg ul.sign-in-form li, #login-bg ul.create-account-form li span {
+	display: block;
+	font-size: 11px;
+	text-align: center;
+}
+
+#login-bg .providers {
 	float: left;
 	position: relative;
 	left: 50%;
 	padding: 1em 0;
 }
-.toggle-additional {
+
+#login-bg .toggle-additional {
 	padding-top: 1em;
 	border-top: 1px solid #eee;
 }
-.toggle-additional a {
+
+#login-bg .toggle-additional a {
 	text-decoration: none;
 	color: #999;
 }
-.toggle-additional a:hover {
+
+#login-bg .toggle-additional a:hover {
 	color: #555;
 }
-.providers.additional {
+
+#login-bg .providers.additional {
 	padding-top: 0;
 	/*display: none;*/
 }
-.providers li {
+
+#login-bg .providers li {
 	float: left;
 	position: relative;
 	right: 50%;
 	padding: 0;
 }
-#login .provider {
+
+#login-bg .provider {
 	display: block;
 	float: left;
 	height: 0;
@@ -302,26 +346,33 @@ ul {
 
 	box-shadow: 0 1px 3px #fee;
 }
-#twitter {
-	background: url(../images/social_login.png) 0px 0px no-repeat
+
+#login-bg #twitter {
+	background: url('../images/soc_login.png') 0px 0px no-repeat
 }
-#facebook {
-	background: url(../images/social_login.png) -102px 0px no-repeat;
+
+#login-bg #facebook {
+	background: url('../images/soc_login.png') -102px 0px no-repeat;
 }
-#ted {
+
+#login-bg #ted {
 	background: url('../images/partner_login.png') 0 0 no-repeat;
 }
-#udacity {
+
+#login-bg #udacity {
 	background: url('../images/partner_login.png') -109px 0 no-repeat;
 }
-#google {
-	background: url(../images/social_login.png) -204px 0px no-repeat
+
+#login-bg #google {
+	background: url('../images/soc_login.png') -204px 0 no-repeat;
 }
-#open-id {
-	background: url(../images/social_login.png) -306px 0px no-repeat
+
+#login-bg #open-id {
+	background: url('../images/soc_login.png') -306px 0px no-repeat
 }
-input.open-id {
-	background: url(../images/social_login.png) -306px 0px no-repeat;
+
+#login-bg input.open-id {
+	background: url('../images/soc_login.png') -306px 0px no-repeat;
 	display: block;
 	float: left;
 	height: 0 !important;
@@ -330,27 +381,48 @@ input.open-id {
 	padding: 33px 0 0 0;
 	width: 102px;
 }
-#login .content form p {
+
+#login-bg .content form p {
 	margin-top: 1em;
 }
-#login .content form p.help {
+
+#login-bg .content form p.help {
 	color: #999;
 	margin: -.5em 0 1em;
 }
-#login .content form {
+
+#login-bg .content form {
 	margin: 0 140px;
 }
-#login button.green_button {
+
+#login-bg button, #login-bg button[disabled]:hover {
 	float: none;
-	margin-top: 2em;
+	margin-top: 0;
+	padding: 8px 16px;
+	border: 1px solid #578e57;
+	border-radius: 5px;
+	background: -moz-linear-gradient(center top , #98d98a, #6bba6a) repeat scroll 0 0 rgba(0, 0, 0, 0);
+	box-shadow: 0 1px 0 #9cabae, 0 1px 0 #b7e4ac inset;
+	color: #23441e !important;
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 15px;
+	text-decoration: none;
+	text-shadow: 0 1px 0 #aedbaa;
+	text-decoration: none !important;
+	cursor: pointer;
 }
-#create .prompt {
+
+#login-bg #create .prompt {
 	clear: both;
 	margin-top: 4em;
 	text-align: center;
 	font-size: 1.25em;
 }
 
+#login-bg .sso:last-of-type {
+	margin-bottom: 30px;
+}
 
 /* CREATE PAGE */
 
