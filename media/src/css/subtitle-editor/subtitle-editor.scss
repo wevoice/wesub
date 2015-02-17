@@ -1639,6 +1639,28 @@ body.loading-finished aside.freeze-box#loading {
     display: none;
 }
 
+aside.overlay {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 11000;
+    &.shown {
+        display: block;
+    }
+}
+
+aside.overlay#tutorial {
+    display: block;
+}
+
+body.tutorial-hidden aside.overlay#tutorial {
+    display: none;
+}
+
 aside.modal {
     textarea.dfxp-string {
         background: #E3E6E9;

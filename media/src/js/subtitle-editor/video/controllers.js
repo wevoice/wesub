@@ -57,7 +57,9 @@
         $scope.$root.$on("app-click", function() {
             $scope.showOverlay = false;
         });
-
+        $scope.$root.$on("user-action", function() {
+	    $scope.toggleTutorial(true);
+	});
 
         $scope.playPauseClicked = function(event) {
             VideoPlayer.togglePlay();

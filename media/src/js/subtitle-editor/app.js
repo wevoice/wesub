@@ -77,6 +77,7 @@ var angular = angular || null;
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
         $scope.scrollingSynced = true;
         $scope.loadingFinished = false;
+        $scope.tutorialHidden = true;
         $scope.uploading = false;
         $scope.uploadError = false;
         $scope.exiting = false;
@@ -115,20 +116,23 @@ var angular = angular || null;
             if (($scope.teamGuidelines) && ($scope.teamName))
                 return true;
             return false; 
-        }
+        };
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
         $scope.warningsShown = true;
         $scope.timelineShown = $scope.workflow.stage != 'typing';
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
-        }
+        };
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown;
-        }
+        };
         $scope.toggleWarningsShown = function() {
             $scope.warningsShown = !$scope.warningsShown;
 	    $scope.workingSubtitles.subtitleList.emitChange("reload", null);
-        }
+        };
+        $scope.toggleTutorial = function(finished) {
+           $scope.tutorialHidden = (typeof finished === "undefined") ? (!$scope.tutorialHidden) : finished;
+        };
         $scope.keepHeaderSizeSync = function() {
             var newHeaderSize = Math.max($('div.subtitles.reference .content').outerHeight(),
                                          $('div.subtitles.working .content').outerHeight());
@@ -377,6 +381,7 @@ var angular = angular || null;
         // everything
         $scope.$evalAsync(function() {
             $scope.loadingFinished = true;
+            $scope.toggleTutorial(false);
         });
         // Overrides for debugging
         $scope.overrides = {
@@ -535,7 +540,7 @@ var angular = angular || null;
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
             $scope.minutesIdle = 0;
-
+            $scope.$root.$emit("user-action");
             if (evt.keyCode == 9 && !evt.shiftKey) {
                 VideoPlayer.togglePlay();
             } else if (evt.keyCode === 32 && evt.shiftKey) {
@@ -576,6 +581,7 @@ var angular = angular || null;
             // Reset the lock timer.
             $scope.minutesIdle = 0;
             $scope.$root.$emit("app-click");
+            $scope.$root.$emit("user-action");
         };
     }]);
 

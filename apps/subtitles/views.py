@@ -176,6 +176,9 @@ class SubtitleEditorBase(View):
                 'video_id': self.video.video_id,
                 'language_code': self.editing_language.language_code,
             }),
+            'preferences': {
+                'showTutorial': True,
+            },
             'staticURL': settings.STATIC_URL,
             'notesHeading': 'Editor Notes',
             'redirectUrl': self.get_redirect_url(),
