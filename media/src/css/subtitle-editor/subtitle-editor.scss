@@ -1659,11 +1659,11 @@ aside.overlay {
 }
 
 aside.overlay#tutorial {
-    display: block;
+    display: none;
 }
 
-body.tutorial-hidden aside.overlay#tutorial {
-    display: none;
+body.tutorial-shown aside.overlay#tutorial {
+    display: block;
 }
 
 aside.modal {
@@ -1791,7 +1791,7 @@ aside#tutorial {
 	border-right: 20px solid transparent;
 	border-bottom: 20px solid $reddish-pink-tutorial;
 	position: relative;
-	top: -53px;
+	top: -52px;
     }
   }
   div.banner {

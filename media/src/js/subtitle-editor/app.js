@@ -77,7 +77,7 @@ var angular = angular || null;
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
         $scope.scrollingSynced = true;
         $scope.loadingFinished = false;
-        $scope.tutorialHidden = true;
+        $scope.tutorialShown = false;
         $scope.uploading = false;
         $scope.uploadError = false;
         $scope.exiting = false;
@@ -130,8 +130,8 @@ var angular = angular || null;
             $scope.warningsShown = !$scope.warningsShown;
 	    $scope.workingSubtitles.subtitleList.emitChange("reload", null);
         };
-        $scope.toggleTutorial = function(finished) {
-           $scope.tutorialHidden = (typeof finished === "undefined") ? (!$scope.tutorialHidden) : finished;
+        $scope.toggleTutorial = function(shown) {
+           $scope.tutorialShown = (typeof shown === "undefined") ? (!$scope.tutorialShown) : shown;
         };
         $scope.keepHeaderSizeSync = function() {
             var newHeaderSize = Math.max($('div.subtitles.reference .content').outerHeight(),
@@ -381,7 +381,7 @@ var angular = angular || null;
         // everything
         $scope.$evalAsync(function() {
             $scope.loadingFinished = true;
-            $scope.toggleTutorial(false);
+            $scope.toggleTutorial(true);
         });
         // Overrides for debugging
         $scope.overrides = {

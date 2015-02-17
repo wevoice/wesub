@@ -1,0 +1,19 @@
+{% load i18n %}
+<div class="banner" ><h1>{% trans "Click anywhere to get started!" %}</h1>
+  <div class="badge" ng-click="handleBadgeMouseClick($event)">
+    <label>{% trans "Hide next time" %}
+    <input type="checkbox"></label>
+  </div>
+</div>
+<div class="bubble play" >
+  <h1>{% trans "1. Play the video" %}</h1>
+  <h2>{% trans "Listen to dialogue" %}</h2>
+</div>
+<div class="bubble typing" >
+  <h1>{% trans "2. Type what you hear" %}</h1>
+  <h2>{% trans "Press enter when line is full, don't worry about timing." %}</h2>
+</div>
+<div class="bubble done" >
+  <h1>{% trans "3. Done typing?" %}</h1>
+  <h2>{% trans "Click for next step" %}</h2>
+</div>

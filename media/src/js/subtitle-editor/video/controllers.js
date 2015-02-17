@@ -58,7 +58,7 @@
             $scope.showOverlay = false;
         });
         $scope.$root.$on("user-action", function() {
-	    $scope.toggleTutorial(true);
+	    $scope.toggleTutorial(false);
 	});
 
         $scope.playPauseClicked = function(event) {
