@@ -315,7 +315,10 @@ var angular = angular || null;
              }
             $scope.$root.$emit('work-done');
         };
-
+        $scope.showTutorial = function($event) {
+            $scope.toggleTutorial(true);
+            $event.stopPropagation();
+        };
         $scope.showResetModal = function($event) {
             $scope.dialogManager.openDialog('confirmChangesReset', {
                 continueButton: $scope.resetToLastSavedVersion
