@@ -20,7 +20,7 @@
 
     var module = angular.module('amara.SubtitleEditor.video.controllers', []);
 
-    module.controller('VideoController', ['$scope', '$sce', 'EditorData', 'VideoPlayer', function($scope, $sce, EditorData, VideoPlayer) {
+    module.controller('VideoController', ['$scope', '$sce', 'EditorData', 'VideoPlayer', 'PreferencesService', function($scope, $sce, EditorData, VideoPlayer, PreferencesService) {
         $scope.subtitleText = null;
         $scope.showSubtitle = false;
         if(EditorData.work_mode.type == 'normal') {
@@ -58,7 +58,11 @@
             $scope.showOverlay = false;
         });
         $scope.$root.$on("user-action", function() {
-	    $scope.toggleTutorial(false);
+            $scope.toggleTutorial(false);
+            if ($scope.hideTutorialNextTime) {
+                PreferencesService.tutorialShown();
+                $scope.hideTutorialNextTime = false;
+	    }
 	});
 
         $scope.playPauseClicked = function(event) {

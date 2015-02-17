@@ -25,6 +25,7 @@ var angular = angular || null;
         'amara.SubtitleEditor.modal',
         'amara.SubtitleEditor.dom',
         'amara.SubtitleEditor.lock',
+        'amara.SubtitleEditor.preferences',
         'amara.SubtitleEditor.notes',
         'amara.SubtitleEditor.session',
         'amara.SubtitleEditor.workflow',
@@ -381,7 +382,7 @@ var angular = angular || null;
         // everything
         $scope.$evalAsync(function() {
             $scope.loadingFinished = true;
-            $scope.toggleTutorial(true);
+            $scope.toggleTutorial(EditorData.preferences.showTutorial);
         });
         // Overrides for debugging
         $scope.overrides = {

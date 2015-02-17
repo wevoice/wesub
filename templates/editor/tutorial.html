@@ -2,7 +2,7 @@
 <div class="banner" ><h1>{% trans "Click anywhere to get started!" %}</h1>
   <div class="badge" ng-click="handleBadgeMouseClick($event)">
     <label>{% trans "Hide next time" %}
-    <input type="checkbox"></label>
+    <input type="checkbox" ng-model="hideTutorialNextTime"></label>
   </div>
 </div>
 <div class="bubble play" >
