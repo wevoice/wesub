@@ -583,6 +583,9 @@ var angular = angular || null;
             $scope.$root.$emit("app-click");
             $scope.$root.$emit("user-action");
         };
+        $scope.handleBadgeMouseClick = function(evt) {
+            evt.stopPropagation();
+        };
     }]);
 
     module.controller("AppControllerSubtitles", ["$scope", "$timeout", "EditorData", "SubtitleStorage", "CurrentEditManager", "SubtitleBackupStorage", "SubtitleVersionManager", function($scope, $timeout,

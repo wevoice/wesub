@@ -65,6 +65,7 @@ $sync-help-height: 54px;
 $span-key-height: 32px;
 $text-color: #565758;
 $reddish-pink: #d24655;
+$reddish-pink-tutorial: #d24655;
 $lighter-blue: #29b0bf;
 $warning-color: #ff6000;
 $blue: #126295;
@@ -73,6 +74,10 @@ $semi-dark-grey: #888;
 $light-grey: #F3F4F5;
 $dark-grey: #333;
 $off-white: #f3f3f3;
+
+$tutorial-banner-height: 50px;
+$tutorial-play-height: 70px;
+$tutorial-top: 500px;
 
 // Mixins
 @mixin border-radius($radius: 5px) {
@@ -1723,4 +1728,83 @@ aside.modal#guidelines-modal {
 .warning {
     color: $warning-color;
     font-size: 10px;
+}
+
+aside#tutorial {
+  div {
+    color: white;
+    text-align: center;
+    background: $reddish-pink-tutorial;
+    h1 {
+      font-size: 16px;
+    }
+    h2 {
+      font-size: 12px;
+    }
+  }
+  div.bubble {
+    padding: 18px;
+    position: absolute;
+  }
+  div.play {
+    width: 160px;
+    height: 80px;
+    top: $top-section-height - $tutorial-banner-height - 80px;
+    left: 33%;
+    &:after {
+        content: "";
+        width: 0;
+	height: 0;
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	border-top: 20px solid $reddish-pink-tutorial;
+	position: relative;
+	top: 54px;
+    }
+  }
+  div.typing {
+    width: 230px;
+    height: 80px;
+    top: $top-section-height - $tutorial-banner-height + 40px;
+    left: 55%;
+    &:after {
+        content: "";
+        width: 0;
+	height: 0;
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	border-top: 20px solid $reddish-pink-tutorial;
+	position: relative;
+	top: 40px;
+    }
+  }
+  div.done {
+    width: 160px;
+    height: 80px;
+    top: $top-section-height - $tutorial-banner-height - 80px;
+    left: 78%;
+    &:before {
+        content: "";
+        width: 0;
+	height: 0;
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	border-bottom: 20px solid $reddish-pink-tutorial;
+	position: relative;
+	top: -53px;
+    }
+  }
+  div.banner {
+    position: absolute;
+    padding-top: 18px;
+    top: $tutorial-top;
+    height: $tutorial-banner-height;
+    left: 0;
+    right: 0;
+    div.badge {
+    position: relative;
+    top: -10px;
+    float: right;
+    }
+  }
 }
