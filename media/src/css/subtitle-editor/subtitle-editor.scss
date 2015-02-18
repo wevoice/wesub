@@ -65,7 +65,7 @@ $sync-help-height: 54px;
 $span-key-height: 32px;
 $text-color: #565758;
 $reddish-pink: #d24655;
-$reddish-pink-tutorial: #d24655;
+$teal-tutorial: teal;
 $lighter-blue: #29b0bf;
 $warning-color: #ff6000;
 $blue: #126295;
@@ -1737,7 +1737,7 @@ aside#tutorial {
   div {
     color: white;
     text-align: center;
-    background: $reddish-pink-tutorial;
+    background: $teal-tutorial;
     h1 {
       font-size: 16px;
     }
@@ -1760,7 +1760,7 @@ aside#tutorial {
 	height: 0;
 	border-left: 20px solid transparent;
 	border-right: 20px solid transparent;
-	border-top: 20px solid $reddish-pink-tutorial;
+	border-top: 20px solid $teal-tutorial;
 	position: relative;
 	top: 54px;
     }
@@ -1776,7 +1776,7 @@ aside#tutorial {
 	height: 0;
 	border-left: 20px solid transparent;
 	border-right: 20px solid transparent;
-	border-top: 20px solid $reddish-pink-tutorial;
+	border-top: 20px solid $teal-tutorial;
 	position: relative;
 	top: 40px;
     }
@@ -1792,7 +1792,7 @@ aside#tutorial {
 	height: 0;
 	border-left: 20px solid transparent;
 	border-right: 20px solid transparent;
-	border-bottom: 20px solid $reddish-pink-tutorial;
+	border-bottom: 20px solid $teal-tutorial;
 	position: relative;
 	top: -52px;
     }
