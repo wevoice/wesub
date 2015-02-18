@@ -138,3 +138,4 @@ The following resources are available to end users:
 
 .. automodule:: api.views.videos
 .. automodule:: api.views.subtitles
+.. automodule:: api.views.languages

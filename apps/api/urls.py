@@ -35,4 +35,5 @@ urlpatterns = router.urls + patterns('',
     url(r'^videos/(?P<video_id>[\w\d]+)'
         '/languages/(?P<language_code>[\w-]+)/subtitles/notes/$',
         views.NotesList.as_view()),
+    url(r'^languages/$', views.languages, name='languages'),
 )
