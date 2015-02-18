@@ -476,6 +476,16 @@ class Cleanup(object):
             log("removing stopped container: {}", container['Id'])
             self.docker.run(host, 'rm', '-v', container['Id'])
 
+
+    def remove_image(self, host, image):
+        try:
+            self.docker.run(host, 'rmi', image)
+        except subprocess.CalledProcessError:
+            # removing an image can fail if another container was started that
+            # uses the image after get the list.  Just print a warning and
+            # continue on
+            log("Warning: error removing image {}", image)
+
     def remove_unused_images(self, host):
         log("checking for unused images")
         container_ids = [
@@ -501,16 +511,16 @@ class Cleanup(object):
             else:
                 for tag in tags:
                     log("Untagging {}", tag)
-                    self.docker.run(host, 'rmi', tag)
+                    self.remove_image(host, tag)
                 if self.docker.image_exists(host, image):
                     log("removing unused image: {}", image)
-                    self.docker.run(host, 'rmi', image)
+                    self.remove_image(host, tag)
                 else:
                     log("image removed from untagging: {}", image)
 
     def should_skip_image(self, image, tags):
         for tag in tags:
-            if not tag.startswith("amara/amara:"):
+            if tag.endswith(":latest"):
                 log("skipping {} because of tag {}", image, tag)
                 return True
         return False

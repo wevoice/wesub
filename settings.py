@@ -649,32 +649,35 @@ LOGGING = {
 from task_settings import *
 
 if DEBUG:
-    import debug_toolbar
+    try:
+        import debug_toolbar
+    except ImportError:
+        pass
+    else:
+        INSTALLED_APPS += ('debug_toolbar',)
+        MIDDLEWARE_CLASSES = (
+            ('debug_toolbar.middleware.DebugToolbarMiddleware',) +
+            MIDDLEWARE_CLASSES
+        )
+        DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
-    INSTALLED_APPS += ('debug_toolbar',)
-    MIDDLEWARE_CLASSES = (
-        ('debug_toolbar.middleware.DebugToolbarMiddleware',) +
-        MIDDLEWARE_CLASSES
-    )
-    DEBUG_TOOLBAR_PATCH_SETTINGS = False
+        DEBUG_TOOLBAR_PANELS = (
+            'debug_toolbar.panels.timer.TimerPanel',
+            'debug_toolbar.panels.request.RequestPanel',
+            'debug_toolbar.panels.templates.TemplatesPanel',
+            'debug_toolbar.panels.sql.SQLPanel',
+            'caching.debug_toolbar_panels.CachePanel',
+        )
 
-    DEBUG_TOOLBAR_PANELS = (
-        'debug_toolbar.panels.timer.TimerPanel',
-        'debug_toolbar.panels.request.RequestPanel',
-        'debug_toolbar.panels.templates.TemplatesPanel',
-        'debug_toolbar.panels.sql.SQLPanel',
-        'caching.debug_toolbar_panels.CachePanel',
-    )
+        def custom_show_toolbar(request):
+            return 'debug_toolbar' in request.GET
 
-    def custom_show_toolbar(request):
-        return 'debug_toolbar' in request.GET
-
-    DEBUG_TOOLBAR_CONFIG = {
-        'INTERCEPT_REDIRECTS': False,
-        'SHOW_TOOLBAR_CALLBACK': 'settings.custom_show_toolbar',
-        'EXTRA_SIGNALS': [],
-        'HIDE_DJANGO_SQL': False,
-        'TAG': 'div',
-    }
+        DEBUG_TOOLBAR_CONFIG = {
+            'INTERCEPT_REDIRECTS': False,
+            'SHOW_TOOLBAR_CALLBACK': 'settings.custom_show_toolbar',
+            'EXTRA_SIGNALS': [],
+            'HIDE_DJANGO_SQL': False,
+            'TAG': 'div',
+        }
 
 optionalapps.add_extra_settings(globals(), locals())
