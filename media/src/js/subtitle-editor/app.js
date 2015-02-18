@@ -584,7 +584,6 @@ var angular = angular || null;
         $scope.handleAppMouseClick = function(evt) {
             // Reset the lock timer.
             $scope.minutesIdle = 0;
-            $scope.$root.$emit("app-click");
             $scope.$root.$emit("user-action");
         };
         $scope.handleBadgeMouseClick = function(evt) {

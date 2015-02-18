@@ -23,11 +23,6 @@
     module.controller('VideoController', ['$scope', '$sce', 'EditorData', 'VideoPlayer', 'PreferencesService', function($scope, $sce, EditorData, VideoPlayer, PreferencesService) {
         $scope.subtitleText = null;
         $scope.showSubtitle = false;
-        if(EditorData.work_mode.type == 'normal') {
-            $scope.showOverlay = true;
-        } else {
-            $scope.showOverlay = false;
-        }
 
         $scope.videoState = {
             loaded: false,
@@ -50,12 +45,6 @@
         });
         $scope.$root.$on("video-volume-update", function(evt, volume) {
             $scope.videoState.volume = volume;
-        });
-        $scope.$root.$on("video-playback-changes", function() {
-            $scope.showOverlay = false;
-        });
-        $scope.$root.$on("app-click", function() {
-            $scope.showOverlay = false;
         });
         $scope.$root.$on("user-action", function() {
             $scope.toggleTutorial(false);

@@ -28,33 +28,4 @@
         <div class="slice2"></div>
         <div class="slice3"></div>
     </div>
-    <div class="instructions-overlay" ng-show="showOverlay">
-        <div ng-show="workflow.stage == 'typing'">
-            <h1>{% trans "How to start making subtitles." %}</h1>
-            <ul>
-                <li>{% trans "Play the video and type what you hear." %}</li>
-                <li>{% trans "Press Enter to complete a subtitle." %}</li>
-                <li>{% trans "Use the guide on the right to move to the next step." %}</li>
-            </ul>
-            <h1>{% trans "Press the TAB key to start!" %}</h1>
-        </div>
-        <div ng-show="workflow.stage == 'syncing'">
-            <h1>{% trans "Subtitle Syncing" %}</h1>
-            <ul>
-                <li>{% trans "Tap the DOWN arrow to start a subtitle." %}</li>
-                <li>{% trans "Tap the UP arrow to set the end time (optional)." %}</li>
-                <li>{% trans "Use the Tools menu to hide the timeline for typing mode." %}</li>
-            </ul>
-            <h1>{% trans "Press the TAB key to start!" %}</h1>
-        </div>
-        <div ng-show="workflow.stage == 'review'">
-            <h1>{% trans "Review your work" %}</h1>
-            <ul>
-                <li>{% trans "Watch the video and make corrections." %}</li>
-                <li>{% trans "Click Complete to sign off on your work." %}</li>
-                <li>{% trans "Use the Save button to save and finish later." %}</li>
-            </ul>
-            <h1>{% trans "Press the TAB key to start!" %}</h1>
-        </div>
-    </div>
 </div>
