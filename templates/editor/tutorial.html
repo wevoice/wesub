@@ -1,13 +1,15 @@
 {% load i18n %}
-<div class="banner" ><h1>{% trans "Click anywhere to get started!" %}</h1>
-  <div class="badge" ng-click="handleBadgeMouseClick($event)">
-    <label>{% trans "Hide next time" %}
-    <input type="checkbox" ng-model="hideTutorialNextTime"></label>
-  </div>
+<div class="banner" >
+  <h1>{% trans "New to Amara? Here are some pointers to get you started." %}</h1>
+  <h2>{% trans "Click anywhere to hide me and get going." %}</h2>
+  <h2 ng-click="handleBadgeMouseClick($event)">
+    <label>{% trans "Please go away forever" %}
+      <input type="checkbox" ng-model="hideTutorialNextTime"></label>
+  </h2>
 </div>
 <div class="bubble play" >
   <h1>{% trans "1. Play the video" %}</h1>
-  <h2>{% trans "Listen to dialogue" %}</h2>
+  <h2>{% trans "Use the tab key to pause if you get behind" %}</h2>
 </div>
 <div class="bubble typing" >
   <h1>{% trans "2. Type what you hear" %}</h1>
@@ -15,5 +17,5 @@
 </div>
 <div class="bubble done" >
   <h1>{% trans "3. Done typing?" %}</h1>
-  <h2>{% trans "Click for next step" %}</h2>
+  <h2>{% trans "Click to start next step" %}</h2>
 </div>

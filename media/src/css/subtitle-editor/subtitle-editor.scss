@@ -1740,34 +1740,33 @@ aside#tutorial {
     background: $teal-tutorial;
     h1 {
       font-size: 16px;
+      line-height: 1.6em;
     }
     h2 {
       font-size: 12px;
     }
   }
   div.bubble {
-    padding: 18px;
+    padding: 0 10px 10px 10px;
     position: absolute;
   }
   div.play {
     width: 160px;
-    height: 80px;
-    top: $top-section-height - $tutorial-banner-height - 80px;
-    left: 33%;
-    &:after {
+    top: 140px;
+    left: 20%;
+    &:before {
         content: "";
         width: 0;
 	height: 0;
 	border-left: 20px solid transparent;
 	border-right: 20px solid transparent;
-	border-top: 20px solid $teal-tutorial;
+	border-bottom: 20px solid $teal-tutorial;
 	position: relative;
-	top: 54px;
+	top: -35px;
     }
   }
   div.typing {
     width: 230px;
-    height: 80px;
     top: $top-section-height - $tutorial-banner-height + 40px;
     left: 55%;
     &:after {
@@ -1783,7 +1782,6 @@ aside#tutorial {
   }
   div.done {
     width: 160px;
-    height: 80px;
     top: $top-section-height - $tutorial-banner-height - 80px;
     left: 78%;
     &:before {
@@ -1794,14 +1792,13 @@ aside#tutorial {
 	border-right: 20px solid transparent;
 	border-bottom: 20px solid $teal-tutorial;
 	position: relative;
-	top: -52px;
+	top: -35px;
     }
   }
   div.banner {
     position: absolute;
-    padding-top: 18px;
+    padding: 18px 0;
     top: $tutorial-top;
-    height: $tutorial-banner-height;
     left: 0;
     right: 0;
     div.badge {
