@@ -267,7 +267,7 @@ ul {
 }
 
 #login-bg label {
-	display: none;
+
 }
 
 #login-bg ul.sign-in-form,  #login-bg ul.create-account-form {
@@ -277,8 +277,7 @@ ul {
 #login-bg ul.sign-in-form li input,  #login-bg ul.create-account-form li input {
 	margin: 0;
 	padding: 4px 4px 4px 10px;
-	border: 2px solid #bbb;
-	border-radius: 3px;
+	border: 2px solid #ddd;
 	font-size: 24px;
 	color: #656565;
 }
@@ -296,10 +295,9 @@ ul {
 	width: 355px;
 }
 
-#login-bg ul.sign-in-form li, #login-bg ul.create-account-form li span {
+#login-bg ul.sign-in-form li span, #login-bg ul.create-account-form li span {
 	display: block;
 	font-size: 11px;
-	text-align: center;
 }
 
 #login-bg .providers {
@@ -397,20 +395,12 @@ ul {
 
 #login-bg button, #login-bg button[disabled]:hover {
 	float: none;
-	margin-top: 0;
-	padding: 8px 16px;
-	border: 1px solid #578e57;
-	border-radius: 5px;
-	background: -moz-linear-gradient(center top , #98d98a, #6bba6a) repeat scroll 0 0 rgba(0, 0, 0, 0);
-	box-shadow: 0 1px 0 #9cabae, 0 1px 0 #b7e4ac inset;
-	color: #23441e !important;
+	margin-top: 6px;
+	background-color: #277f6a;
+	border: medium none;
+	color: #f2f2f3;
 	font-size: 14px;
-	font-weight: bold;
-	line-height: 15px;
-	text-decoration: none;
-	text-shadow: 0 1px 0 #aedbaa;
-	text-decoration: none !important;
-	cursor: pointer;
+	padding: 10px 20px;
 }
 
 #login-bg #create .prompt {
