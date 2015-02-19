@@ -1,0 +1,9 @@
+input.enable-field[type=checkbox] {
+    width: auto;
+}
+
+.checkbox-field input[type=checkbox] {
+    margin-top: 8px;
+    width: 15px;
+    height: 15px;
+}
