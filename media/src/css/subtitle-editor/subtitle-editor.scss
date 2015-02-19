@@ -1795,6 +1795,67 @@ aside#tutorial {
 	top: -35px;
     }
   }
+  div.subtitlessync {
+    width: 200px;
+    top: $top-section-height - $tutorial-banner-height - 80px;
+    left: 22%;
+    &:after {
+        content: "";
+        width: 0;
+	height: 0;
+	border-left: 20px solid $teal-tutorial;
+	border-top: 20px solid transparent;
+	border-bottom: 20px solid transparent;
+	position: relative;
+	top: -25px;
+	left: 110px;
+    }
+  }
+  div.reviewtitletut {
+    width: 160px;
+    top: 60px;
+    left: 20%;
+    &:before {
+        content: "";
+        width: 0;
+	height: 0;
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	border-bottom: 20px solid $teal-tutorial;
+	position: relative;
+	top: -35px;
+    }
+  }
+  div.reviewsubstut {
+    width: 200px;
+    top: $top-section-height - $tutorial-banner-height - 60px;
+    left: 50%;
+    &:after {
+        content: "";
+        width: 0;
+	height: 0;
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	border-top: 20px solid $teal-tutorial;
+	position: relative;
+	top: 45px;
+    }
+  }
+  div.timelinetut {
+    width: 200px;
+    top: $top-section-height - $tutorial-banner-height - 60px;
+    left: 50%;
+    &:after {
+        content: "";
+        width: 0;
+	height: 0;
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	border-top: 20px solid $teal-tutorial;
+	position: relative;
+	top: 45px;
+    }
+  }
   div.banner {
     position: absolute;
     padding: 18px 0;

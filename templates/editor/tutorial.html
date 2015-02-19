@@ -7,15 +7,31 @@
       <input type="checkbox" ng-model="hideTutorialNextTime"></label>
   </h2>
 </div>
-<div class="bubble play">
+<div class="bubble play" ng-show="workflow.stage == 'typing'">
   <h1>{% trans "1. Play the video" %}</h1>
   <h2>{% trans "Use the tab key to pause if you get behind" %}</h2>
 </div>
-<div class="bubble typing">
+<div class="bubble typing" ng-show="workflow.stage == 'typing'">
   <h1>{% trans "2. Type what you hear" %}</h1>
   <h2>{% trans "Press enter when line is full, don't worry about timing." %}</h2>
 </div>
-<div class="bubble done">
+<div class="bubble done" ng-show="workflow.stage == 'typing'">
   <h1>{% trans "3. Done typing?" %}</h1>
   <h2>{% trans "Click to start next step" %}</h2>
+</div>
+<div class="bubble subtitlessync" ng-show="workflow.stage == 'syncing'">
+  <h1>{% trans "Sync subtitles" %}</h1>
+  <h2>{% trans "Press up and down arrows while playing to set start and end time of subtitles" %}</h2>
+</div>
+<div class="bubble timelinetut" ng-show="workflow.stage == 'syncing'">
+  <h1>{% trans "Adjust subtitles" %}</h1>
+  <h2>{% trans "Drag subtitles or adjust their boundaries if needed directly on the timeline" %}</h2>
+</div>
+<div class="bubble reviewtitletut" ng-show="workflow.stage == 'review'">
+  <h1>{% trans "Review title and description" %}</h1>
+  <h2>{% trans "Make sure title, description and other metadata are correct" %}</h2>
+</div>
+<div class="bubble reviewsubstut" ng-show="workflow.stage == 'review'">
+  <h1>{% trans "Review Subtitles" %}</h1>
+  <h2>{% trans "Watch the video again and verify that the subtitles are complete and correct" %}</h2>
 </div>
