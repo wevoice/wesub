@@ -58,6 +58,11 @@ class VideoFactory(DjangoModelFactory):
     video_url = factory.RelatedFactory(VideoURLFactory, 'video', primary=True)
 
     @factory.post_generation
+    def set_follower(video, create, extracted, **kwargs):
+        if video.user:
+            video.followers.add(video.user)
+
+    @factory.post_generation
     def with_many_visibility_combinations(video, create, extracted, **kwargs):
         """Make languages with many different combinations of
         visibility/visibility_override_choices

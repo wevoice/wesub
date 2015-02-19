@@ -229,6 +229,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.YAMLParser',
         'rest_framework.parsers.XMLParser',
         'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',

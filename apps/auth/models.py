@@ -326,6 +326,9 @@ class CustomUser(BaseUser):
     def get_api_key(self):
         return ApiKey.objects.get_or_create(user=self)[0].key
 
+    def ensure_api_key_created(self):
+        ApiKey.objects.get_or_create(user=self)
+
 def create_custom_user(sender, instance, created, **kwargs):
     if created:
         values = {}
