@@ -25,21 +25,6 @@ var angular = angular || null;
 
     var module = angular.module('amara.SubtitleEditor.subtitles.services', []);
 
-    var getSubtitleFetchAPIUrl = function(videoId, languageCode, versionNumber) {
-        var url = API_BASE_PATH_VIDEOS + videoId +
-            '/languages/' + languageCode + '/subtitles/' +
-            '?format=json&sub_format=dfxp';
-
-        if (versionNumber) {
-            url = url + '&version=' + versionNumber;
-        }
-        return url;
-    };
-    var getSubtitleSaveAPIUrl = function(videoId, languageCode) {
-        var url = API_BASE_PATH_VIDEOS + videoId +
-            '/languages/' + languageCode + '/subtitles/';
-        return url;
-    };
     var getTaskSaveAPIUrl = function(teamSlug, taskID) {
         return API_BASE_PATH_TEAMS + teamSlug + '/tasks/' + taskID + '/';
     };
@@ -50,6 +35,14 @@ var angular = angular || null;
         return ('/api/videos/' + videoId +
                 '/languages/' + languageCode + '/subtitles/');
     };
+    var getSubtitlesFetchAPIURL = function(videoId, languageCode, versionNumber) {
+        var url = getSubtitlesAPIURL(videoId, languageCode);
+        url += '?format=json&sub_format=dfxp';
+        if (versionNumber) {
+            url = url + '&version=' + versionNumber;
+        }
+        return url
+    }
     var getActionAPIUrl = function(videoId, languageCode) {
         return getSubtitlesAPIURL(videoId, languageCode) + 'actions/';
     };
@@ -210,7 +203,7 @@ var angular = angular || null;
                 if(cacheData) {
                    callback(cacheData);
                 } else {
-                    var url = getSubtitleFetchAPIUrl(EditorData.video.id, languageCode, versionNumber);
+                    var url = getSubtitlesFetchAPIURL(EditorData.video.id, languageCode, versionNumber);
                     $http.get(url).success(function(response) {
                         cachedSubtitleData[languageCode][versionNum] = response;
                         callback(response)
@@ -244,7 +237,7 @@ var angular = angular || null;
                 var videoID = EditorData.video.id;
                 var languageCode = EditorData.editingVersion.languageCode;
 
-                var url = getSubtitleSaveAPIUrl(videoID, languageCode);
+                var url = getSubtitlesAPIURL(videoID, languageCode);
                 // if isComplete is not specified as true or false, we send
                 // null, which means keep the complete flag the same as before
                 if(isComplete !== true && isComplete !== false) {
@@ -263,7 +256,6 @@ var angular = angular || null;
                         description: description,
                         from_editor: true,
                         metadata: metadata,
-                        is_complete: isComplete,
                         action: action,
                     }
                 });

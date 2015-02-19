@@ -160,9 +160,12 @@ class VideoLanguageShortSerializer(serializers.Serializer):
                        request=self.context['request'])
 
     def get_subtitles_uri(self, language):
-        # hack until we re-implement the subtitles resource
-        from apiv2.api import SubtitleResource
-        return SubtitleResource('partners').get_resource_uri(language)
+        kwargs = {
+            'video_id': language.video.video_id,
+            'language_code': language.language_code,
+        }
+        return reverse('api:subtitles', kwargs=kwargs,
+                       request=self.context['request'])
 
 class VideoMetadataSerializer(serializers.Serializer):
     default_error_messages = {

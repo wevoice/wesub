@@ -377,6 +377,23 @@ class SubtitlesSerializerTest(TestCase):
         })
         assert_true(version.subtitle_language.subtitles_complete)
 
+    def test_is_complete_null(self):
+        # when is_complete is None, we leave subtitles_complete alone
+        language = self.video.subtitle_language('en')
+        language.subtitles_complete = False
+        language.save()
+        data = {
+            'subtitles': SubtitleSetFactory().to_xml(),
+            'is_complete': None,
+        }
+        self.run_create(data)
+        assert_false(test_utils.reload_obj(language).subtitles_complete)
+
+        language.subtitles_complete = True
+        language.save()
+        self.run_create(data)
+        assert_true(test_utils.reload_obj(language).subtitles_complete)
+
     def test_invalid_subtitles(self):
         with assert_raises(ValidationError):
             self.run_create({

@@ -143,13 +143,11 @@ class VideoSerializerTest(TestCase):
         data = self.get_serialized_data()
         lang_url_root = 'http://testserver/api/videos/{}/languages/'.format(
             self.video.video_id)
-        old_lang_url_root = ('/api2/partners/videos/{0}/'
-                         'languages/'.format(self.video.video_id))
         assert_items_equal(data['languages'], [
             {
                 'code': 'en',
                 'name': 'English',
-                u'subtitles_uri': old_lang_url_root + 'en/subtitles/',
+                u'subtitles_uri': lang_url_root + 'en/subtitles/',
                 'dir': 'ltr',
                 'visible': True,
                 'resource_uri':  lang_url_root + 'en/'
@@ -157,7 +155,7 @@ class VideoSerializerTest(TestCase):
             {
                 'code': 'he',
                 'name': 'Hebrew',
-                u'subtitles_uri': old_lang_url_root + 'he/subtitles/',
+                u'subtitles_uri': lang_url_root + 'he/subtitles/',
                 'dir': 'rtl',
                 'visible': False,
                 'resource_uri':  lang_url_root + 'he/'

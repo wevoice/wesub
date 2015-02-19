@@ -502,7 +502,8 @@ class SubtitlesSerializer(serializers.Serializer):
     subtitles = SubtitlesField()
     action = serializers.CharField(required=False, write_only=True,
                                    allow_blank=True)
-    is_complete = serializers.BooleanField(required=False, write_only=True)
+    is_complete = serializers.NullBooleanField(required=False,
+                                               write_only=True)
     from_editor = serializers.BooleanField(
         required=False, write_only=True,
         help_text=("Check to flag this version as coming from the "
