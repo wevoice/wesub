@@ -1795,22 +1795,6 @@ aside#tutorial {
 	top: -35px;
     }
   }
-  div.subtitlessync {
-    width: 200px;
-    top: $top-section-height - $tutorial-banner-height - 80px;
-    left: 22%;
-    &:after {
-        content: "";
-        width: 0;
-	height: 0;
-	border-left: 20px solid $teal-tutorial;
-	border-top: 20px solid transparent;
-	border-bottom: 20px solid transparent;
-	position: relative;
-	top: -25px;
-	left: 110px;
-    }
-  }
   div.reviewtitletut {
     width: 160px;
     top: 60px;
@@ -1828,7 +1812,7 @@ aside#tutorial {
   }
   div.reviewsubstut {
     width: 200px;
-    top: $top-section-height - $tutorial-banner-height - 60px;
+    top: $top-section-height - $tutorial-banner-height - 400;
     left: 50%;
     &:after {
         content: "";
@@ -1836,9 +1820,24 @@ aside#tutorial {
 	height: 0;
 	border-left: 20px solid transparent;
 	border-right: 20px solid transparent;
-	border-top: 20px solid $teal-tutorial;
+	border-bottom: 20px solid $teal-tutorial;
 	position: relative;
-	top: 45px;
+	top: -45px;
+    }
+  }
+  div.subtitlessync {
+    width: 400px;
+    top: $top-section-height - $tutorial-banner-height + 220;
+    left: 45%;
+    &:after {
+        content: "";
+        width: 0;
+	height: 0;
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	border-bottom: 20px solid $teal-tutorial;
+	position: relative;
+	top: -85px;
     }
   }
   div.timelinetut {

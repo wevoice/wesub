@@ -1,27 +1,28 @@
 {% load i18n %}
 <div class="banner" ng-show="showHideNextTime">
   <h1>{% trans "New to Amara? Here are some pointers to get you started." %}</h1>
-  <h2>{% trans "Click anywhere to hide me and get going." %}</h2>
+  <h2>{% trans "Click anywhere to hide me. Find me again in the tools menu for help with any step." %}</h2>
   <h2 ng-click="handleBadgeMouseClick($event)">
     <label>{% trans "Please go away forever" %}
       <input type="checkbox" ng-model="hideTutorialNextTime"></label>
   </h2>
 </div>
-<div class="bubble play" ng-show="workflow.stage == 'typing'">
+<div class="bubble play" ng-show="workflow.stage == 'typing' || workflow.stage == 'syncing'">
   <h1>{% trans "1. Play the video" %}</h1>
-  <h2>{% trans "Use the tab key to pause if you get behind" %}</h2>
+  <h2>{% trans "Use the tab key to pause if you need to" %}</h2>
 </div>
 <div class="bubble typing" ng-show="workflow.stage == 'typing'">
   <h1>{% trans "2. Type what you hear" %}</h1>
-  <h2>{% trans "Press enter when line is full, don't worry about timing." %}</h2>
+  <h2>{% trans "Once you fill a line, hit enter. Don't worry about timing." %}</h2>
 </div>
 <div class="bubble done" ng-show="workflow.stage == 'typing'">
   <h1>{% trans "3. Done typing?" %}</h1>
-  <h2>{% trans "Click to start next step" %}</h2>
+  <h2>{% trans "Click to start syncing your subtitles" %}</h2>
 </div>
 <div class="bubble subtitlessync" ng-show="workflow.stage == 'syncing'">
-  <h1>{% trans "Sync subtitles" %}</h1>
-  <h2>{% trans "Press up and down arrows while playing to set start and end time of subtitles" %}</h2>
+  <h1>{% trans "2. Press the Down Arrow to start each subtitle" %}</h1>
+  <h2>{% trans "Don't worry about small mistakes, we can adjust them later." %}</h2>
+  <h2>{% trans "If you need start over, use clear timing from the tools menu." %}</h2>
 </div>
 <div class="bubble timelinetut" ng-show="workflow.stage == 'syncing'">
   <h1>{% trans "Adjust subtitles" %}</h1>
