@@ -414,6 +414,25 @@ ul {
 	margin-bottom: 30px;
 }
 
+#login-bg .errorlist {
+    background: url("../images/red_arrow.png") no-repeat scroll left bottom rgba(0, 0, 0, 0);
+    clear: both;
+    margin: 10px 0;
+    padding: 0 0 8px;
+		font-size: 12px;
+		line-height: 15px;
+}
+
+#login-bg ul.sign-in-form .errorlist li, #login-bg ul.create-account-form .errorlist li {
+    background: none repeat scroll 0 0 #d75b5b;
+    clear: both;
+    color: #fff;
+    font-weight: 400;
+    list-style: outside none none;
+    margin: 0;
+    padding: 10px 13px;
+}
+
 /* CREATE PAGE */
 
 #create-banner {
