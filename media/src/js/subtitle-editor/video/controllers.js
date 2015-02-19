@@ -51,6 +51,7 @@
             if ($scope.hideTutorialNextTime) {
                 PreferencesService.tutorialShown();
                 $scope.hideTutorialNextTime = false;
+                $scope.hideNextTime();
 	    }
 	});
 

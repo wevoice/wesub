@@ -75,6 +75,7 @@ var angular = angular || null;
 
         $scope.videoId = EditorData.video.id;
         $scope.canSync = EditorData.canSync;
+        $scope.showHideNextTime = EditorData.preferences.showTutorial
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
         $scope.scrollingSynced = true;
         $scope.loadingFinished = false;
@@ -82,6 +83,9 @@ var angular = angular || null;
         $scope.uploading = false;
         $scope.uploadError = false;
         $scope.exiting = false;
+        $scope.hideNextTime = function() {
+            $scope.showHideNextTime = false;
+        };
         $scope.translating = function() {
             return ($scope.referenceSubtitles.language && $scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         };
