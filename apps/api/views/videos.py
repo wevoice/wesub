@@ -129,6 +129,7 @@ from django import http
 from django.db.models import Q
 from rest_framework import filters
 from rest_framework import generics
+from rest_framework import mixins
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
@@ -382,7 +383,12 @@ class VideoSerializer(serializers.Serializer):
                                          project=project)
         video.clear_team_video_cache()
 
-class VideoViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
+class VideoViewSet(AmaraPaginationMixin,
+                   mixins.CreateModelMixin,
+                   mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
+                   mixins.ListModelMixin,
+                   viewsets.GenericViewSet):
     serializer_class = VideoSerializer
     queryset = Video.objects.all()
     paginate_by = 20

@@ -393,7 +393,12 @@ class SubtitleLanguageSerializer(serializers.Serializer):
         videos.tasks.video_changed_tasks.delay(video.pk)
         return language
 
-class SubtitleLanguageViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
+class SubtitleLanguageViewSet(AmaraPaginationMixin,
+                              mixins.CreateModelMixin,
+                              mixins.RetrieveModelMixin,
+                              mixins.UpdateModelMixin,
+                              mixins.ListModelMixin,
+                              viewsets.GenericViewSet):
     serializer_class = SubtitleLanguageSerializer
     paginate_by = 20
 
