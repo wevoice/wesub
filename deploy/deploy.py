@@ -60,6 +60,28 @@ def log(msg, *args, **kwargs):
     sys.stdout.write("* {}\n".format(msg))
     sys.stdout.flush()
 
+class LoggingTimer(object):
+    """Measure times and write them to stdout."""
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.start_time = time.time()
+
+    def log_time(self, msg, *args, **kwargs):
+        total_time = time.time() - self.start_time
+        mins, secs = divmod(total_time, 60)
+        msg = msg.format(*args, **kwargs)
+        log("{}: {}:{:0.1f}s", msg, int(mins), secs)
+        self.reset()
+
+def log_dot(newline=False):
+    if newline:
+        sys.stdout.write('.\n')
+    else:
+        sys.stdout.write('.')
+    sys.stdout.flush()
+
 ContainerInfo = collections.namedtuple('ContainerInfo', 'host name cid')
 
 class UnixDomainSocketHTTPConnection(httplib.HTTPConnection):
@@ -135,17 +157,26 @@ class Environment(object):
 class Docker(object):
     """Run docker commands.  """
 
+    def _build_command_line(self, host, cmdline):
+        return [ 'docker', '-H', host ] + list(cmdline)
+
     def run(self, host, *cmdline):
         """Run a docker command."""
-        full_cmdline = [ 'docker', '-H', host ] + list(cmdline)
+        full_cmdline = self._build_command_line(host, cmdline)
         log("{}", ' '.join(full_cmdline))
         subprocess.check_call(full_cmdline)
 
     def run_and_return_output(self, host, *cmdline):
         """Run a docker command."""
-        full_cmdline = [ 'docker', '-H', host ] + list(cmdline)
+        full_cmdline = self._build_command_line(host, cmdline)
         log("{}", ' '.join(full_cmdline))
         return subprocess.check_output(full_cmdline)
+
+    def Popen(self, host, *cmdline, **popen_args):
+        """Run a docker command."""
+        full_cmdline = self._build_command_line(host, cmdline)
+        log("{}", ' '.join(full_cmdline))
+        return subprocess.Popen(full_cmdline, **popen_args)
 
     def get_http_response(self, host, path, query=None):
         parsed_url = urlparse.urlparse(host)
@@ -200,22 +231,38 @@ class ImageBuilder(object):
         self.docker = Docker()
         self.env = env
         self.commit_id = commit_id
-        self.image_name = 'amara/amara:{}'.format(commit_id)
-
-    def send_auth(self, host):
-        self.docker.run(host, 'login',
-                        '-u', self.env.DOCKER_AUTH_USERNAME,
-                        '-e', self.env.DOCKER_AUTH_EMAIL,
-                        '-p', self.env.DOCKER_AUTH_PASSWORD)
+        self.image_name = 'amara:{}'.format(commit_id)
 
     def setup_images(self):
+        timer = LoggingTimer()
         self.docker.run(BUILDER_DOCKER_HOST, 'build',
                         '--no-cache', '-t', self.image_name, '.')
-        self.send_auth(BUILDER_DOCKER_HOST)
-        self.docker.run(BUILDER_DOCKER_HOST, 'push', self.image_name)
-        for host in self.env.docker_hosts():
-            self.send_auth(host)
-            self.docker.run(host, 'pull', self.image_name)
+        timer.log_time('image build')
+        # Send the image from builder to the other docker hosts
+        log('sending image from builder to docker hosts')
+        save_proc = self.docker.Popen(BUILDER_DOCKER_HOST, 'save',
+                                      self.image_name, stdout=subprocess.PIPE)
+        load_procs = [
+            self.docker.Popen(host, 'load', stdin=subprocess.PIPE)
+            for host in self.env.docker_hosts()
+        ]
+        BUF_SIZE = 4096
+        while True:
+            data = save_proc.stdout.read(BUF_SIZE)
+            if not data:
+                break
+            for proc in load_procs:
+                proc.stdin.write(data)
+        for proc in load_procs:
+            proc.stdin.close()
+        if save_proc.wait() != 0:
+            raise subprocess.CalledProcessError(
+                "docker save error: {}".format(save_proc.return_code))
+        for proc in load_procs:
+            if proc.wait() != 0:
+                raise subprocess.CalledProcessError(
+                    "docker load error: {}".format(proc.return_code))
+        timer.log_time('image save/load')
 
 class ContainerManager(object):
     """Start/stop docker containers """
