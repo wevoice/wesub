@@ -432,28 +432,32 @@ class SubtitlesViewTest(TestCase):
         # assume we're good if this next statement doesn't crash
         json.loads(response.content)
 
-    def run_get_object(self, version_number=None):
+    def run_get_object(self, **query_params):
         view = SubtitlesView()
         view.kwargs = {
             'video_id': self.video.video_id,
             'language_code': 'en',
         }
         view.request = APIRequestFactory().get(self.url)
-        if version_number is None:
-            view.request.query_params = {}
-        else:
-            view.request.query_params = {
-                'version_number': version_number
-            }
+        view.request.query_params = query_params
         view.request.user = self.user
         return view.get_object()
 
     def test_version_number_param(self):
         v2 = pipeline.add_subtitles(self.video, 'en',
                                       SubtitleSetFactory(num_subs=1))
-        assert_equal(self.run_get_object(self.version.version_number),
-                     self.version)
-        assert_equal(self.run_get_object(v2.version_number), v2)
+        returned_object = self.run_get_object(
+            version_number=self.version.version_number)
+        assert_equal(returned_object, self.version)
+        assert_equal(self.run_get_object(version_number=v2.version_number), v2)
+
+    def test_version_param(self):
+        # verison should work the same as version_number
+        pipeline.add_subtitles(self.video, 'en',
+                               SubtitleSetFactory(num_subs=1))
+        returned_object = self.run_get_object(
+            version=self.version.version_number)
+        assert_equal(returned_object, self.version)
 
     def test_deleted_version_raises_404(self):
         v = pipeline.add_subtitles(self.video, 'en',
@@ -461,24 +465,24 @@ class SubtitlesViewTest(TestCase):
                                    visibility='public',
                                    visibility_override='deleted')
         with assert_raises(Http404):
-            self.run_get_object(v.version_number)
+            self.run_get_object(version_number=v.version_number)
 
     def test_no_public_tip_raises_404(self):
         self.version.delete()
         with assert_raises(Http404):
-            self.run_get_object(None)
+            self.run_get_object()
 
     def test_no_language_raises_404(self):
         self.version.subtitle_language.delete()
         with assert_raises(Http404):
-            self.run_get_object(None)
+            self.run_get_object()
 
     def test_no_version_number_gets_public_tip(self):
         # this version shouldn't be returned by default since it's private
         pipeline.add_subtitles(self.video, 'en',
                                SubtitleSetFactory(num_subs=1),
                                visibility='private')
-        assert_equal(self.run_get_object(None), self.version)
+        assert_equal(self.run_get_object(), self.version)
 
     def test_check_user_can_view_video_permission(self):
         with test_utils.patch_get_workflow() as workflow:

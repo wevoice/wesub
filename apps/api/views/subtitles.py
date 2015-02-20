@@ -94,15 +94,16 @@ Fetching subtitles for a given language
 .. http:get:: /api2/partners/videos/[video-id]/languages/[language-code]/subtitles/
 
     :param video-id: Amara Video ID
-    :param language-code: BCP-47 language code.  *deprecated:* you can also
+    :param language-code: BCP-47 language code.  **deprecated:** you can also
         specify the internal ID for a langauge
     :query sub_format: The format to return the subtitles in.  This can be any
         format that amara supports including dfxp, srt, vtt, and sbv.  The
         default is json, which returns subtitle data encoded list of json
         dicts.
-    :query version: version number to fetch.  Versions are listed in the
+    :query version_number: version number to fetch.  Versions are listed in the
         VideoLanguageResouce request.  If none is specified, the latest public
         version will be returned.
+    :query version: Alias for version_number **(deprecated)**
     :>json version_number: version number for the subtitles
     :>json subtitles: Subtitle data (str)
     :>json sub_format: Format of the subtitles
@@ -119,8 +120,8 @@ Fetching subtitles for a given language
         language
     :>json resource_uri: API URI for the subtitles
     :>json site_uri: URI to view the subtitles on site
-    :>json video: Copy of video_title *(deprecated)*
-    :>json version_no: Copy of version_number *(deprecated)*
+    :>json video: Copy of video_title **(deprecated)**
+    :>json version_no: Copy of version_number **(deprecated)**
 
 Getting subtitle data only
 ++++++++++++++++++++++++++
@@ -155,7 +156,7 @@ Creating new subtitles
 .. http:get:: /api2/partners/videos/[video-id]/languages/[language-code]/subtitles/
 
     :param video-id: Amara Video ID
-    :param language-code: BCP-47 language code.  *deprecated:* you can also
+    :param language-code: BCP-47 language code.  **deprecated:** you can also
         specify the internal ID for a langauge
     :<json subtitles: The subtitles to submit
     :<json sub_format: The format used to parse the subs. The same formats as
@@ -167,7 +168,7 @@ Creating new subtitles
         :ref:`subtitles-action-resource` for details.
     :<json is_complete: Boolean indicating if the complete subtitling set is
         available for this language - optional, defaults to false.
-        *(deprecated, use action instead)*
+        **(deprecated, use action instead)**
 
 .. _subtitles-action-resource:
 
@@ -618,10 +619,13 @@ class SubtitlesView(generics.CreateAPIView):
         workflow = workflows.get_workflow(video)
         if not workflow.user_can_view_video(self.request.user):
             raise PermissionDenied()
-        if 'version_number' in self.request.query_params:
+        version_number = self.request.query_params.get('version_number')
+        if version_number is None:
+            version_number = self.request.query_params.get('version')
+        if version_number is not None:
             version = video.newsubtitleversion_set.get(
                 language_code=self.kwargs['language_code'],
-                version_number=self.request.query_params['version_number'])
+                version_number=version_number)
         else:
             language = video.subtitle_language(self.kwargs['language_code'])
             if language is None:
