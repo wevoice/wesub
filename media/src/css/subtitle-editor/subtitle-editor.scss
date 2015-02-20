@@ -143,6 +143,47 @@ $tutorial-top: 500px;
     border-radius: 3px;
 }
 
+@mixin triangle-left($color) {
+  content: "";
+  width: 0;
+  height: 0;
+  font-size: 0;
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+  border-right: 20px solid $color;
+  position: relative;
+}
+
+@mixin triangle-right($color) {
+  content: "";
+  width: 0;
+  height: 0;
+  font-size: 0;
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+  border-left: 20px solid $color;
+  position: relative;
+}
+
+@mixin triangle-top($color) {
+  content: "";
+  width: 0;
+  height: 0;
+  border-right: 20px solid transparent;
+  border-left: 20px solid transparent;
+  border-bottom: 20px solid $color;
+  position: relative;
+}
+
+@mixin triangle-bottom($color) {
+  content: "";
+  width: 0;
+  height: 0;
+  border-right: 20px solid transparent;
+  border-left: 20px solid transparent;
+  border-top: 20px solid $color;
+  position: relative;
+}
 
 // Page
 body {
@@ -1795,34 +1836,34 @@ aside#tutorial {
 	top: -35px;
     }
   }
-  div.reviewtitletut {
-    width: 160px;
-    top: 60px;
-    left: 20%;
+  div.tut-review-1 {
+    width: 200px;
+    top: 190px;
+    left: 11%;
     &:before {
-        content: "";
-        width: 0;
-	height: 0;
-	border-left: 20px solid transparent;
-	border-right: 20px solid transparent;
-	border-bottom: 20px solid $teal-tutorial;
-	position: relative;
-	top: -35px;
+        @include triangle-left($teal-tutorial);
+	left: -110px;
+	top: 50px;
     }
   }
-  div.reviewsubstut {
-    width: 200px;
-    top: $top-section-height - $tutorial-banner-height - 400;
+  div.tut-review-2 {
+    width: 230px;
+    top: 180px;
     left: 50%;
-    &:after {
-        content: "";
-        width: 0;
-	height: 0;
-	border-left: 20px solid transparent;
-	border-right: 20px solid transparent;
-	border-bottom: 20px solid $teal-tutorial;
-	position: relative;
-	top: -45px;
+    &:before {
+        @include triangle-bottom($teal-tutorial);
+	left: 0;
+	top: 108px;
+    }
+  }
+  div.tut-review-3 {
+    width: 250px;
+    top: 100px;
+    left: 70%;
+    &:before {
+        @include triangle-bottom($teal-tutorial);
+	left: 0;
+	top: 123px;
     }
   }
   div.subtitlessync {

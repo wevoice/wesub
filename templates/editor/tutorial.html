@@ -28,14 +28,14 @@
   <h1>{% trans "3. Are all lines completed and timed?" %}</h1>
   <h2>{% trans "Click to review and make corrections." %}</h2>
 </div>
-<div class="bubble reviewtitletut" ng-show="isReviewing() || isTranslatingReviewing()">
+<div class="bubble tut-review-1" ng-show="isReviewing() || isTranslatingReviewing()">
   <h1>{% trans "1. Checkout the guidelines for tips on making quality subtitles" %}</h1>
 </div>
-<div class="bubble reviewsubstut" ng-show="isReviewing() || isTranslatingReviewing()">
+<div class="bubble tut-review-2" ng-show="isReviewing() || isTranslatingReviewing()">
   <h1>{% trans "2. Adjust the subtitle times" %}</h1>
   <h2>{% trans "Click on a bubble to drag the whole thing or just grab move the edges for fine-tuning." %}</h2>
 </div>
-<div class="bubble" ng-show="isTranslatingTyping()">
+<div class="bubble tut-review-3" ng-show="isReviewing() || isTranslatingReviewing()">
   <h1>{% trans "3. Click when you are done subtitling." %}</h1>
   <h2>{% trans "Or click Save Draft to come back and finish later." %}</h2>
 </div>
