@@ -624,6 +624,8 @@ class SubtitlesView(generics.CreateAPIView):
                 version_number=self.request.query_params['version_number'])
         else:
             language = video.subtitle_language(self.kwargs['language_code'])
+            if language is None:
+                raise Http404
             version = language.get_public_tip()
             if version is None:
                 raise Http404

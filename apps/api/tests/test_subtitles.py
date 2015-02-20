@@ -468,6 +468,11 @@ class SubtitlesViewTest(TestCase):
         with assert_raises(Http404):
             self.run_get_object(None)
 
+    def test_no_language_raises_404(self):
+        self.version.subtitle_language.delete()
+        with assert_raises(Http404):
+            self.run_get_object(None)
+
     def test_no_version_number_gets_public_tip(self):
         # this version shouldn't be returned by default since it's private
         pipeline.add_subtitles(self.video, 'en',
