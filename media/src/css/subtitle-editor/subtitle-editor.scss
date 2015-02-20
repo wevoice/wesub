@@ -1866,8 +1866,8 @@ aside#tutorial {
     left: 3%;
     &:before {
         @include triangle-top($teal-tutorial);
-	left: 0;
-	top: -34px;
+        left: 0;
+        top: -34px;
     }
   }
   div.tut-trans-type-2 {
@@ -1876,19 +1876,19 @@ aside#tutorial {
     left: 50%;
     &:before {
         @include triangle-bottom($teal-tutorial);
-	left: 0;
-	top: 98px;
+        left: 0;
+        top: 98px;
     }
   }
-  
+
   div.tut-trans-type-3 {
     width: 250px;
     top: 20px;
     left: 70%;
     &:before {
         @include triangle-bottom($teal-tutorial);
-	left: 0;
-	top: 84px;
+        left: 0;
+        top: 84px;
     }
   }
   div.subtitlessync {
@@ -1906,19 +1906,14 @@ aside#tutorial {
 	top: -85px;
     }
   }
-  div.timelinetut {
-    width: 200px;
-    top: $top-section-height - $tutorial-banner-height - 60px;
-    left: 50%;
+  div.tut-sync-3 {
+    width: 300px;
+    top: 130px;
+    left: 55%;
     &:after {
-        content: "";
-        width: 0;
-	height: 0;
-	border-left: 20px solid transparent;
-	border-right: 20px solid transparent;
-	border-top: 20px solid $teal-tutorial;
-	position: relative;
-	top: 45px;
+        @include triangle-right($teal-tutorial);
+        top: -15px;
+        left: 160px;
     }
   }
   div.banner {
