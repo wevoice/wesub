@@ -89,6 +89,12 @@ var angular = angular || null;
         $scope.translating = function() {
             return ($scope.referenceSubtitles.language && $scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         };
+        $scope.isTranslatingTyping = function() {return $scope.translating() && ($scope.workflow.stage == "typing");};
+        $scope.isTranslatingSyncing = function() {return $scope.translating() && ($scope.workflow.stage == "syncing");};
+        $scope.isTranslatingReviewing = function() {return $scope.translating() && ($scope.workflow.stage == "review");};
+        $scope.isTyping = function() {return (!$scope.translating()) && ($scope.workflow.stage == "typing");};
+        $scope.isSyncing = function() {return (!$scope.translating()) && ($scope.workflow.stage == "syncing");};
+        $scope.isReviewing = function() {return (!$scope.translating()) && ($scope.workflow.stage == "review");};
         $scope.analytics = function() {
             if (typeof sendAnalytics !== 'undefined')
 		sendAnalytics.apply(this, Array.prototype.slice.call(arguments, 0));
