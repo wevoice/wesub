@@ -93,6 +93,7 @@ exception of username.
 """
 
 from __future__ import absolute_import
+import re
 
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import PermissionDenied
@@ -124,10 +125,20 @@ class UserWriteSerializer(UserSerializer):
     create_login_token = serializers.BooleanField(write_only=True,
                                                   required=False)
 
+    default_error_messages = {
+        'invalid-username': 'Invalid Username: {username}',
+    }
+
     def __init__(self, *args, **kwargs):
         super(UserSerializer, self).__init__(*args, **kwargs)
         if self.instance is not None:
             self.fields['username'].read_only = True
+
+    valid_username_re = re.compile(r'[\w\-@\.\+]+$')
+    def validate_username(self, username):
+        if not self.valid_username_re.match(username):
+            self.fail('invalid-username', username=username)
+        return username
 
     def create(self, validated_data):
         user = self._update(User(), validated_data)
@@ -164,7 +175,7 @@ class UserWriteSerializer(UserSerializer):
             'email', 'api_key', 'password', 'create_login_token',
         )
         extra_kwargs = {
-            'password': { 'required': False },
+            'password': { 'required': False, 'write_only':True },
         }
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -178,8 +189,8 @@ class UserViewSet(mixins.RetrieveModelMixin,
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return UserSerializer
-        elif self.request.method in ('POST', 'PUT'):
+        elif self.request.method in ('POST', 'PUT', 'PATCH'):
             return UserWriteSerializer
         else:
             raise ValueError("Invalid request method: {}".format(
-                self.request.method()))
+                self.request.method))

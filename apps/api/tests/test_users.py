@@ -107,12 +107,26 @@ class UserAPITest(TestCase):
             'password': 'test-password',
             'first_name': 'Test',
             'last_name': 'User',
+            'full_name': 'Test User',
+            'bio': 'test-bio',
+            'homepage': 'http://example.com/test/'
         })
 
     def test_create_user_partial_data(self):
         self.check_post({
             'username': 'test-user',
             'email': 'test@example.com',
+        })
+
+    def test_create_user_blank_data(self):
+        self.check_post({
+            'username': 'test-user',
+            'email': 'test@example.com',
+            'first_name': '',
+            'last_name': '',
+            'full_name': '',
+            'bio': '',
+            'homepage': '',
         })
 
     def test_login_token(self):
