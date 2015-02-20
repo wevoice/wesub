@@ -7,7 +7,7 @@
       <input type="checkbox" ng-model="hideTutorialNextTime"></label>
   </h2>
 </div>
-<div class="bubble play" ng-show="isTyping() || isSyncing() || isTranslatingSyncing()">
+<div class="bubble tut-play" ng-show="isTyping() || isSyncing() || isTranslatingTyping() || isTranslatingSyncing()">
   <h1>{% trans "1. Play the video" %}</h1>
   <h2>{% trans "Use the tab key to pause if you need to" %}</h2>
 </div>
@@ -39,14 +39,14 @@
   <h1>{% trans "3. Click when you are done subtitling." %}</h1>
   <h2>{% trans "Or click Save Draft to come back and finish later." %}</h2>
 </div>
-<div class="bubble" ng-show="isTranslatingTyping()">
+<div class="bubble tut-trans-type-ref" ng-show="isTranslatingTyping()">
   <h1>{% trans "Choose a Reference language" %}</h1>
 </div>
-<div class="bubble" ng-show="isTranslatingTyping()">
+<div class="bubble tut-trans-type-2" ng-show="isTranslatingTyping()">
   <h1>{% trans "2. Type in your translated text" %}</h1>
   <h2>{% trans "Use the tools menu copy timings if you have changed the reference language." %}</h2>
 </div>
-<div class="bubble" ng-show="isTranslatingTyping()">
+<div class="bubble tut-trans-type-3" ng-show="isTranslatingTyping()">
   <h1>{% trans "3. Done translating?" %}</h1>
   <h2>{% trans "Click to adjust the timing." %}</h2>
 </div>
