@@ -243,7 +243,12 @@ class ContainerManager(object):
             # files into the docker image
             '-e', 'REVISION=' + self.env.BRANCH,
         ]
-        if self.building_preview():
+        if self.env.BRANCH == 'production':
+            params.extend(['-e',
+                           'INTERLOCK_DATA={"alias_domains": '
+                           '["www.amara.org", "universalsubtitles.org", '
+                           '"www.universalsubtitles.org"]}'])
+        elif self.building_preview():
             # SETTINGS_REVISION controls how to download the
             # server_local_settings.py file (see .docker/config_env.sh)
             params.extend(['-e', 'SETTINGS_REVISION=staging'])
