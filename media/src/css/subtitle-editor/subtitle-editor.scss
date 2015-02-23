@@ -148,8 +148,8 @@ $tutorial-top: 540px;
   width: 0;
   height: 0;
   font-size: 0;
-  border-top: 20px solid transparent;
-  border-bottom: 20px solid transparent;
+  border-top: 20px dotted transparent;
+  border-bottom: 20px dotted transparent;
   border-right: 20px solid $color;
   position: relative;
 }
@@ -159,8 +159,8 @@ $tutorial-top: 540px;
   width: 0;
   height: 0;
   font-size: 0;
-  border-top: 20px solid transparent;
-  border-bottom: 20px solid transparent;
+  border-top: 20px dotted transparent;
+  border-bottom: 20px dotted transparent;
   border-left: 20px solid $color;
   position: relative;
 }
@@ -169,8 +169,8 @@ $tutorial-top: 540px;
   content: "";
   width: 0;
   height: 0;
-  border-right: 20px solid transparent;
-  border-left: 20px solid transparent;
+  border-right: 20px dotted transparent;
+  border-left: 20px dotted transparent;
   border-bottom: 20px solid $color;
   position: relative;
 }
@@ -179,8 +179,8 @@ $tutorial-top: 540px;
   content: "";
   width: 0;
   height: 0;
-  border-right: 20px solid transparent;
-  border-left: 20px solid transparent;
+  border-right: 20px dotted transparent;
+  border-left: 20px dotted transparent;
   border-top: 20px solid $color;
   position: relative;
 }
