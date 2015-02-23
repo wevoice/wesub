@@ -1792,78 +1792,68 @@ aside#tutorial {
     position: absolute;
   }
   div.tut-play {
-    width: 160px;
+    width: 210px;
     top: 140px;
-    left: 20%;
+    left: 10%;
     &:before {
         @include triangle-top($teal-tutorial);
         top: -33px;
     }
   }
   div.typing {
-    width: 230px;
+    width: 240px;
     top: $top-section-height - $tutorial-banner-height + 40px;
-    left: 55%;
-    &:after {
-        content: "";
-        width: 0;
-	height: 0;
-	border-left: 20px solid transparent;
-	border-right: 20px solid transparent;
-	border-top: 20px solid $teal-tutorial;
-	position: relative;
-	top: 40px;
+    left: 45%;
+    &:before {
+        @include triangle-bottom($teal-tutorial);
+	left: 0px;
+	top: 98px;
     }
   }
   div.done {
-    width: 160px;
-    top: $top-section-height - $tutorial-banner-height - 80px;
-    left: 78%;
+    width: 220px;
+    top: 90px;
+    left: 60%;
     &:before {
-        content: "";
-        width: 0;
-	height: 0;
-	border-left: 20px solid transparent;
-	border-right: 20px solid transparent;
-	border-bottom: 20px solid $teal-tutorial;
-	position: relative;
-	top: -35px;
+        @include triangle-right($teal-tutorial);
+	left: 110px;
+	top: 25px;
     }
   }
   div.tut-review-1 {
-    width: 200px;
-    top: 190px;
-    left: 11%;
+    width: 230px;
+    top: 165px;
+    left: 3%;
     &:before {
-        @include triangle-left($teal-tutorial);
-	left: -110px;
-	top: 50px;
+        @include triangle-bottom($teal-tutorial);
+	left: 0px;
+	top: 84px;
     }
   }
   div.tut-review-2 {
-    width: 230px;
-    top: 180px;
-    left: 50%;
+    width: 330px;
+    top: 282px;
+    left: 20%;
     &:before {
-        @include triangle-bottom($teal-tutorial);
-	left: 0;
-	top: 108px;
+        @include triangle-right($teal-tutorial);
+	left: 170px;
+	top: 22px;
     }
   }
   div.tut-review-3 {
-    width: 250px;
-    top: 100px;
-    left: 70%;
+    width: 280px;
+    top: 205px;
+    left: 52%;
     &:before {
-        @include triangle-bottom($teal-tutorial);
-	left: 0;
-	top: 123px;
+        @include triangle-right($teal-tutorial);
+	left: 145px;
+	top: 22px;
     }
   }
   div.tut-trans-type-ref {
-    width: 200px;
-    top: 420px;
-    left: 3%;
+    width: 260px;
+    top: 335px;
+    left: 4%;
     &:before {
         @include triangle-top($teal-tutorial);
         left: 0;
@@ -1871,49 +1861,54 @@ aside#tutorial {
     }
   }
   div.tut-trans-type-2 {
-    width: 300px;
-    top: 310px;
-    left: 50%;
+    width: 260px;
+    top: 380px;
+    left: 40%;
     &:before {
-        @include triangle-bottom($teal-tutorial);
+        @include triangle-top($teal-tutorial);
         left: 0;
-        top: 98px;
+        top: -34px;
     }
   }
 
   div.tut-trans-type-3 {
-    width: 250px;
-    top: 20px;
-    left: 70%;
+    width: 180px;
+    top: 165px;
+    left: 74%;
     &:before {
-        @include triangle-bottom($teal-tutorial);
+        @include triangle-top($teal-tutorial);
         left: 0;
-        top: 84px;
+        top: -34px;
     }
   }
   div.subtitlessync {
-    width: 400px;
-    top: $top-section-height - $tutorial-banner-height + 220;
-    left: 45%;
-    &:after {
-        content: "";
-        width: 0;
-	height: 0;
-	border-left: 20px solid transparent;
-	border-right: 20px solid transparent;
-	border-bottom: 20px solid $teal-tutorial;
-	position: relative;
-	top: -85px;
+    width: 320px;
+    top: 240px;
+    left: 3%;
+    &:before {
+        @include triangle-top($teal-tutorial);
+        left: 0;
+        top: -34px;
+    }
+  }
+  div.synctools {
+    width: 280px;
+    top: 410px;
+    left: 60%;
+    &:before {
+        @include triangle-top($teal-tutorial);
+        left: 0;
+        top: -34px;
     }
   }
   div.tut-sync-3 {
-    width: 300px;
+    width: 260px;
     top: 130px;
-    left: 55%;
+    left: 54%;
     &:after {
         @include triangle-right($teal-tutorial);
         top: -15px;
-        left: 160px;
+        left: 140px;
     }
   }
   div.banner {
