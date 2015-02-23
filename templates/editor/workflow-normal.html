@@ -1,8 +1,10 @@
 {% load i18n %}
 <ol ng-switch-when="normal">
     <li ng-class="workflow.stageCSSClass('typing')">
-        <h3>{% trans "Type what you hear" %}</h3>
-        <p>{% trans "Is all the content subtitled?" %}</p>
+        <h3 ng-show="!translating()">{% trans "Type what you hear" %}</h3>
+        <h3 ng-show="translating()">{% trans "Translate what you hear" %}</h3>
+        <p ng-show="!translating()">{% trans "Is all the content subtitled?" %}</p>
+        <p ng-show="translating()">{% trans "Is all the content translated?" %}</p>
         <button ng-class="{disabled:!workflow.canCompleteStage('typing')}"
             ng-click="workflow.canCompleteStage('typing') && workflow.completeStage('typing')">
             {% trans "Yes, start syncing" %}
