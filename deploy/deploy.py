@@ -87,18 +87,18 @@ class Environment(object):
 
     env_var_names = [
         # Global jenkins config
-        'DOCKER_HOSTS',
-        'DOCKER_HOST_1',
-        'DOCKER_HOST_2',
-        'PRODUCTION_NUM_INSTANCES',
-        # Build config
         'AWS_ACCESS_ID',
         'AWS_SECRET_KEY',
-        'BUILD_NUMBER',
-        'DOCKER_AUTH_USERNAME',
         'DOCKER_AUTH_EMAIL',
         'DOCKER_AUTH_PASSWORD',
-        # Build parameters
+        'DOCKER_AUTH_USERNAME',
+        'DOCKER_HOST_1',
+        'DOCKER_HOST_2',
+        'DOCKER_HOSTS',
+        'NEW_RELIC_LICENSE_KEY',
+        'PRODUCTION_NUM_INSTANCES',
+        # Build config/parameters
+        'BUILD_NUMBER',
         'BRANCH',
         'MIGRATIONS',
     ]
@@ -244,10 +244,14 @@ class ContainerManager(object):
             '-e', 'REVISION=' + self.env.BRANCH,
         ]
         if self.env.BRANCH == 'production':
-            params.extend(['-e',
-                           'INTERLOCK_DATA={"alias_domains": '
-                           '["www.amara.org", "universalsubtitles.org", '
-                           '"www.universalsubtitles.org"]}'])
+            params.extend([
+                '-e', ('INTERLOCK_DATA={"alias_domains": '
+                       '["www.amara.org", "universalsubtitles.org", '
+                       '"www.universalsubtitles.org"]}'),
+                '-e', 'NEW_RELIC_APP_NAME=AmaraVPC',
+                '-e', ('NEW_RELIC_LICENSE_KEY=' +
+                       self.env.NEW_RELIC_LICENSE_KEY)
+            ])
         elif self.building_preview():
             # SETTINGS_REVISION controls how to download the
             # server_local_settings.py file (see .docker/config_env.sh)
