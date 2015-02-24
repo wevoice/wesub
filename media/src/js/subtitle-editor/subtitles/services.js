@@ -204,7 +204,9 @@ var angular = angular || null;
                    callback(cacheData);
                 } else {
                     var url = getSubtitlesFetchAPIURL(EditorData.video.id, languageCode, versionNumber);
-                    $http.get(url).success(function(response) {
+                    $http.get(url, {
+                        headers: authHeaders()
+                    }).success(function(response) {
                         cachedSubtitleData[languageCode][versionNum] = response;
                         callback(response)
                     });
