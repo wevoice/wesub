@@ -495,6 +495,7 @@ MEDIA_BUNDLES = {
             'src/js/subtitle-editor/dom.js',
             'src/js/subtitle-editor/help.js',
             'src/js/subtitle-editor/lock.js',
+            'src/js/subtitle-editor/preferences.js',
             'src/js/subtitle-editor/modal.js',
             'src/js/subtitle-editor/notes.js',
             'src/js/subtitle-editor/blob.js',

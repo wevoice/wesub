@@ -86,6 +86,7 @@ class CustomUser(BaseUser):
     is_partner = models.BooleanField(default=False)
     pay_rate_code = models.CharField(max_length=3, blank=True, default='')
     can_send_messages = models.BooleanField(default=True)
+    show_tutorial = models.BooleanField(default=True)
 
     objects = UserManager()
 
@@ -145,6 +146,10 @@ class CustomUser(BaseUser):
 
     def unread_messages_count(self, hidden_meassage_id=None):
         return self.unread_messages(hidden_meassage_id).count()
+
+    @classmethod
+    def tutorial_was_shown(self, id):
+        self.objects.filter(pk=id).update(show_tutorial=False)
 
     @classmethod
     def displayable_users(self, ids):

@@ -25,6 +25,7 @@ var angular = angular || null;
         'amara.SubtitleEditor.modal',
         'amara.SubtitleEditor.dom',
         'amara.SubtitleEditor.lock',
+        'amara.SubtitleEditor.preferences',
         'amara.SubtitleEditor.notes',
         'amara.SubtitleEditor.session',
         'amara.SubtitleEditor.workflow',
@@ -74,15 +75,26 @@ var angular = angular || null;
 
         $scope.videoId = EditorData.video.id;
         $scope.canSync = EditorData.canSync;
+        $scope.showHideNextTime = EditorData.preferences.showTutorial
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
         $scope.scrollingSynced = true;
         $scope.loadingFinished = false;
+        $scope.tutorialShown = false;
         $scope.uploading = false;
         $scope.uploadError = false;
         $scope.exiting = false;
+        $scope.hideNextTime = function() {
+            $scope.showHideNextTime = false;
+        };
         $scope.translating = function() {
             return ($scope.referenceSubtitles.language && $scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         };
+        $scope.isTranslatingTyping = function() {return $scope.translating() && ($scope.workflow.stage == "typing");};
+        $scope.isTranslatingSyncing = function() {return $scope.translating() && ($scope.workflow.stage == "syncing");};
+        $scope.isTranslatingReviewing = function() {return $scope.translating() && ($scope.workflow.stage == "review");};
+        $scope.isTyping = function() {return (!$scope.translating()) && ($scope.workflow.stage == "typing");};
+        $scope.isSyncing = function() {return (!$scope.translating()) && ($scope.workflow.stage == "syncing");};
+        $scope.isReviewing = function() {return (!$scope.translating()) && ($scope.workflow.stage == "review");};
         $scope.analytics = function() {
             if (typeof sendAnalytics !== 'undefined')
 		sendAnalytics.apply(this, Array.prototype.slice.call(arguments, 0));
@@ -115,20 +127,23 @@ var angular = angular || null;
             if (($scope.teamGuidelines) && ($scope.teamName))
                 return true;
             return false; 
-        }
+        };
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
         $scope.warningsShown = true;
         $scope.timelineShown = $scope.workflow.stage != 'typing';
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
-        }
+        };
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown;
-        }
+        };
         $scope.toggleWarningsShown = function() {
             $scope.warningsShown = !$scope.warningsShown;
 	    $scope.workingSubtitles.subtitleList.emitChange("reload", null);
-        }
+        };
+        $scope.toggleTutorial = function(shown) {
+           $scope.tutorialShown = (typeof shown === "undefined") ? (!$scope.tutorialShown) : shown;
+        };
         $scope.keepHeaderSizeSync = function() {
             var newHeaderSize = Math.max($('div.subtitles.reference .content').outerHeight(),
                                          $('div.subtitles.working .content').outerHeight());
@@ -310,7 +325,10 @@ var angular = angular || null;
              }
             $scope.$root.$emit('work-done');
         };
-
+        $scope.showTutorial = function($event) {
+            $scope.toggleTutorial(true);
+            $event.stopPropagation();
+        };
         $scope.showResetModal = function($event) {
             $scope.dialogManager.openDialog('confirmChangesReset', {
                 continueButton: $scope.resetToLastSavedVersion
@@ -377,6 +395,7 @@ var angular = angular || null;
         // everything
         $scope.$evalAsync(function() {
             $scope.loadingFinished = true;
+            $scope.toggleTutorial(EditorData.preferences.showTutorial);
         });
         // Overrides for debugging
         $scope.overrides = {
@@ -535,7 +554,7 @@ var angular = angular || null;
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
             $scope.minutesIdle = 0;
-
+            $scope.$root.$emit("user-action");
             if (evt.keyCode == 9 && !evt.shiftKey) {
                 VideoPlayer.togglePlay();
             } else if (evt.keyCode === 32 && evt.shiftKey) {
@@ -575,7 +594,10 @@ var angular = angular || null;
         $scope.handleAppMouseClick = function(evt) {
             // Reset the lock timer.
             $scope.minutesIdle = 0;
-            $scope.$root.$emit("app-click");
+            $scope.$root.$emit("user-action");
+        };
+        $scope.handleBadgeMouseClick = function(evt) {
+            evt.stopPropagation();
         };
     }]);
 

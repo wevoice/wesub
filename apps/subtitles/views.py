@@ -81,6 +81,12 @@ def release_lock(request, video_id, language_code):
 
     return HttpResponse(json.dumps({'url': reverse('videos:video', args=(video_id,))}))
 
+@login_required
+@require_POST
+def tutorial_shown(request):
+    User.tutorial_was_shown(request.user.id)
+    return HttpResponse(json.dumps({'success': True}))
+
 def old_editor(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
     language = get_object_or_404(SubtitleLanguage, video=video,
@@ -176,6 +182,9 @@ class SubtitleEditorBase(View):
                 'video_id': self.video.video_id,
                 'language_code': self.editing_language.language_code,
             }),
+            'preferences': {
+                'showTutorial': self.request.user.show_tutorial,
+            },
             'staticURL': settings.STATIC_URL,
             'notesHeading': 'Editor Notes',
             'redirectUrl': self.get_redirect_url(),
