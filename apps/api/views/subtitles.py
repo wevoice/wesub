@@ -235,8 +235,10 @@ from __future__ import absolute_import
 
 import json
 
+from django.db import IntegrityError
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
 from rest_framework import mixins
@@ -325,6 +327,10 @@ class SubtitleLanguageSerializer(serializers.Serializer):
     versions = MiniSubtitleVersionsField(read_only=True)
     resource_uri = serializers.SerializerMethodField()
 
+    default_error_messages = {
+        'language-exists': _('Language already created: {language_code}'),
+    }
+
     class Meta:
         list_serializer_class = SubtitleLanguageListSerializer
 
@@ -387,7 +393,11 @@ class SubtitleLanguageSerializer(serializers.Serializer):
         video = self.context['video']
         if subtitles_complete is not None:
             language.subtitles_complete = subtitles_complete
-            language.save()
+            try:
+                language.save()
+            except IntegrityError:
+                self.fail('language-exists',
+                          language_code=language.language_code)
         if primary_audio_language is not None:
             video.primary_audio_language_code = language.language_code
             video.save()

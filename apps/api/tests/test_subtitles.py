@@ -166,6 +166,16 @@ class SubtitleLanguageSerializerTest(TestCase):
         test_utils.assert_saved(language)
         test_utils.assert_saved(self.video)
 
+    def test_try_recreate(self):
+        language = SubtitleLanguageFactory(video=self.video,
+                                           language_code='es')
+        with assert_raises(ValidationError):
+            self.serializer.create({
+                'language_code': 'es',
+                'is_primary_audio_language': True,
+                'subtitles_complete': True,
+            })
+
     def test_update(self):
         language = SubtitleLanguageFactory(video=self.video,
                                            language_code='es')
