@@ -1,7 +1,7 @@
 {% load i18n %}
 <div class="banner" ng-show="showHideNextTime">
   <h1>{% trans "New to Amara? Here are some pointers." %}</h1>
-  <h2>{% trans "Click anywhere to hide.  You can reopen from the tools menu " %}<img width="12px" height="12px" src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png"></img>{% trans "  show tutorial, anytime." %}</h2>
+  <h2>{% trans "Click to hide.  Reopen anytime from the tools menu " %}(<img width="12px" height="12px" src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png"></img> &gt; {% trans "Show tutorial" %}).</h2>
   <h2 ng-click="handleBadgeMouseClick($event)">
     <label>{% trans "Please go away." %}
       <input type="checkbox" ng-model="hideTutorialNextTime"></label>
@@ -37,7 +37,7 @@
 </div>
 <div class="bubble tut-review-1" ng-show="isReviewing() || isTranslatingReviewing()">
   <h1>{% trans "1. Review the guidelines" %} </h1>
-  <h2>{% trans "It has tips for improving subtitles." %}</h2>
+  <h2>{% trans "They include tips for improving subtitles." %}</h2>
 </div>
 <div class="bubble tut-review-2" ng-show="isReviewing() || isTranslatingSyncing() || isTranslatingReviewing()">
   <h1>{% trans "2. Check the timing" %}</h1>
@@ -49,8 +49,8 @@
 </div>
 <div class="bubble tut-trans-type-ref" ng-show="isTranslatingTyping()">
   <h1>{% trans "1. Select a reference language" %}</h1>
-  <h2>{% trans "Use " %}  
-      <img width="12px" height="12px" src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png"></img> {% trans "copy timings to  update the times." %}</h2>
+  <h2>{% trans "If you change the reference language, use " %}
+      <img width="12px" height="12px" src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png"></img> &gt; {% trans "Copy Timings" %} {% trans "to  update the translation timing." %}</h2>
 </div>
 <div class="bubble tut-trans-type-2" ng-show="isTranslatingTyping()">
   <h1>{% trans "2. Type the translation" %}</h1>
