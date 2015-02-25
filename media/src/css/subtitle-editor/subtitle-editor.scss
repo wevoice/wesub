@@ -65,6 +65,7 @@ $sync-help-height: 54px;
 $span-key-height: 32px;
 $text-color: #565758;
 $reddish-pink: #d24655;
+$teal-tutorial: teal;
 $lighter-blue: #29b0bf;
 $warning-color: #ff6000;
 $blue: #126295;
@@ -73,6 +74,10 @@ $semi-dark-grey: #888;
 $light-grey: #F3F4F5;
 $dark-grey: #333;
 $off-white: #f3f3f3;
+
+$tutorial-banner-height: 50px;
+$tutorial-play-height: 70px;
+$tutorial-top: 540px;
 
 // Mixins
 @mixin border-radius($radius: 5px) {
@@ -138,6 +143,47 @@ $off-white: #f3f3f3;
     border-radius: 3px;
 }
 
+@mixin triangle-left($color) {
+  content: "";
+  width: 0;
+  height: 0;
+  font-size: 0;
+  border-top: 20px dotted transparent;
+  border-bottom: 20px dotted transparent;
+  border-right: 20px solid $color;
+  position: relative;
+}
+
+@mixin triangle-right($color) {
+  content: "";
+  width: 0;
+  height: 0;
+  font-size: 0;
+  border-top: 20px dotted transparent;
+  border-bottom: 20px dotted transparent;
+  border-left: 20px solid $color;
+  position: relative;
+}
+
+@mixin triangle-top($color) {
+  content: "";
+  width: 0;
+  height: 0;
+  border-right: 20px dotted transparent;
+  border-left: 20px dotted transparent;
+  border-bottom: 20px solid $color;
+  position: relative;
+}
+
+@mixin triangle-bottom($color) {
+  content: "";
+  width: 0;
+  height: 0;
+  border-right: 20px dotted transparent;
+  border-left: 20px dotted transparent;
+  border-top: 20px solid $color;
+  position: relative;
+}
 
 // Page
 body {
@@ -1278,6 +1324,9 @@ div.workspace-tools {
                    &.show-warnings {
                      background: url('../images/subtitle-editor/glyphicons_196_circle_exclamation_mark.png') 10px no-repeat;
                    }
+                   &.show-tutorial {
+                     background: url('../images/subtitle-editor/glyphicons_194_circle_question_mark.png') 10px no-repeat;
+                   }
                    &:hover {
                       background: #C5C5C5;
                       color: $dark-grey;
@@ -1639,6 +1688,28 @@ body.loading-finished aside.freeze-box#loading {
     display: none;
 }
 
+aside.overlay {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 11000;
+    &.shown {
+        display: block;
+    }
+}
+
+aside.overlay#tutorial {
+    display: none;
+}
+
+body.tutorial-shown aside.overlay#tutorial {
+    display: block;
+}
+
 aside.modal {
     textarea.dfxp-string {
         background: #E3E6E9;
@@ -1701,4 +1772,158 @@ aside.modal#guidelines-modal {
 .warning {
     color: $warning-color;
     font-size: 10px;
+}
+
+aside#tutorial {
+  div {
+    color: white;
+    text-align: center;
+    background: $teal-tutorial;
+    h1 {
+      font-size: 16px;
+      line-height: 1.6em;
+    }
+    h2 {
+      font-size: 12px;
+    }
+  }
+  div.bubble {
+    padding: 0 10px 10px 10px;
+    position: absolute;
+  }
+  div.tut-play {
+    width: 210px;
+    top: 140px;
+    left: 10%;
+    &:before {
+        @include triangle-top($teal-tutorial);
+        top: -33px;
+    }
+  }
+  div.typing {
+    width: 240px;
+    top: $top-section-height - $tutorial-banner-height + 40px;
+    left: 45%;
+    &:before {
+        @include triangle-bottom($teal-tutorial);
+	left: 0px;
+	top: 98px;
+    }
+  }
+  div.done {
+    width: 220px;
+    top: 90px;
+    left: 60%;
+    &:before {
+        @include triangle-right($teal-tutorial);
+	left: 110px;
+	top: 25px;
+    }
+  }
+  div.tut-review-1 {
+    width: 230px;
+    top: 165px;
+    left: 3%;
+    &:before {
+        @include triangle-bottom($teal-tutorial);
+	left: 0px;
+	top: 84px;
+    }
+  }
+  div.tut-review-2 {
+    width: 330px;
+    top: 282px;
+    left: 20%;
+    &:before {
+        @include triangle-right($teal-tutorial);
+	left: 170px;
+	top: 22px;
+    }
+  }
+  div.tut-review-3 {
+    width: 280px;
+    top: 205px;
+    left: 52%;
+    &:before {
+        @include triangle-right($teal-tutorial);
+	left: 145px;
+	top: 22px;
+    }
+  }
+  div.tut-trans-type-ref {
+    width: 260px;
+    top: 335px;
+    left: 4%;
+    &:before {
+        @include triangle-top($teal-tutorial);
+        left: 0;
+        top: -34px;
+    }
+  }
+  div.tut-trans-type-2 {
+    width: 260px;
+    top: 380px;
+    left: 40%;
+    &:before {
+        @include triangle-top($teal-tutorial);
+        left: 0;
+        top: -34px;
+    }
+  }
+
+  div.tut-trans-type-3 {
+    width: 180px;
+    top: 165px;
+    left: 74%;
+    &:before {
+        @include triangle-top($teal-tutorial);
+        left: 0;
+        top: -34px;
+    }
+  }
+  div.subtitlessync {
+    width: 320px;
+    top: 240px;
+    left: 3%;
+    &:before {
+        @include triangle-top($teal-tutorial);
+        left: 0;
+        top: -34px;
+    }
+  }
+  div.synctools {
+    width: 280px;
+    top: 410px;
+    left: 60%;
+    &:before {
+        @include triangle-top($teal-tutorial);
+        left: 0;
+        top: -34px;
+    }
+  }
+  div.tut-sync-3 {
+    width: 260px;
+    top: 130px;
+    left: 54%;
+    &:after {
+        @include triangle-right($teal-tutorial);
+        top: -15px;
+        left: 140px;
+    }
+  }
+  div.banner {
+    position: absolute;
+    padding: 18px 0;
+    top: $tutorial-top;
+    left: 0;
+    right: 0;
+    div.badge {
+    position: relative;
+    top: -10px;
+    float: right;
+    }
+    img {
+      vertical-align: top;
+    }
+  }
 }
