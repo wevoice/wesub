@@ -26,7 +26,7 @@ import mock
 
 from utils import test_utils
 from utils.subtitles import load_subtitles
-import utils.youtube
+from externalsites import google
 
 class YouTubeTestCase(TestCase):
     def test_request_token_url(self):
@@ -44,7 +44,7 @@ class YouTubeTestCase(TestCase):
         }
         correct_url = ("https://accounts.google.com/o/oauth2/auth?" +
             urllib.urlencode(correct_params))
-        self.assertEqual(utils.youtube.request_token_url(redirect_uri, state),
+        self.assertEqual(google.request_token_url(redirect_uri, state),
                          correct_url)
 
     def test_get_new_access_token(self):
@@ -61,9 +61,9 @@ class YouTubeTestCase(TestCase):
                 'access_token': 'test-access-token',
             }),
         )
-        utils.youtube.get_new_access_token.run_original_for_test()
+        google.get_new_access_token.run_original_for_test()
         with mocker:
-            access_token = utils.youtube.get_new_access_token(
+            access_token = google.get_new_access_token(
                 'test-refresh-token')
         self.assertEqual(access_token, 'test-access-token')
 
@@ -81,10 +81,10 @@ class YouTubeTestCase(TestCase):
                 'error': 'test-error',
             }),
         )
-        utils.youtube.get_new_access_token.run_original_for_test()
+        google.get_new_access_token.run_original_for_test()
         with mocker:
-            self.assertRaises(utils.youtube.OAuthError,
-                              utils.youtube.get_new_access_token,
+            self.assertRaises(google.OAuthError,
+                              google.get_new_access_token,
                               'test-refresh-token')
 
     def test_revoke_auth_token(self):
@@ -92,9 +92,9 @@ class YouTubeTestCase(TestCase):
         mocker.expect_request(
             'get', 'https://accounts.google.com/o/oauth2/revoke',
             params={'token': 'test-token'})
-        test_utils.youtube_revoke_auth_token.run_original_for_test()
+        google.revoke_auth_token.run_original_for_test()
         with mocker:
-            utils.youtube.revoke_auth_token('test-token')
+            google.revoke_auth_token('test-token')
 
     def test_get_user_info(self):
         mocker = test_utils.RequestsMocker()
@@ -115,9 +115,9 @@ class YouTubeTestCase(TestCase):
                 ]
             })
         )
-        utils.youtube.get_user_info.run_original_for_test()
+        google.get_user_info.run_original_for_test()
         with mocker:
-            user_info = utils.youtube.get_user_info('test-access-token')
+            user_info = google.get_user_info('test-access-token')
         self.assertEqual(user_info, ('test-channel-id', 'test-username'))
 
     def test_get_video_info(self):
@@ -147,9 +147,9 @@ class YouTubeTestCase(TestCase):
                 ]
             })
         )
-        utils.youtube.get_video_info.run_original_for_test()
+        google.get_video_info.run_original_for_test()
         with mocker:
-            video_info = utils.youtube.get_video_info('test-video-id')
+            video_info = google.get_video_info('test-video-id')
         self.assertEqual(video_info.channel_id, 'test-channel-id')
         self.assertEqual(video_info.title, 'test-title')
         self.assertEqual(video_info.description, 'test-description')
@@ -164,10 +164,10 @@ class YouTubeTestCase(TestCase):
                 'id': 'test-video-id',
                 'key': settings.YOUTUBE_API_KEY,
             }, body="Invalid body")
-        utils.youtube.get_video_info.run_original_for_test()
+        google.get_video_info.run_original_for_test()
         with mocker:
-            with assert_raises(utils.youtube.APIError):
-                utils.youtube.get_video_info('test-video-id')
+            with assert_raises(google.APIError):
+                google.get_video_info('test-video-id')
 
     def test_get_video_info_no_items(self):
         mocker = test_utils.RequestsMocker()
@@ -181,10 +181,10 @@ class YouTubeTestCase(TestCase):
                 ]
             })
         )
-        utils.youtube.get_video_info.run_original_for_test()
+        google.get_video_info.run_original_for_test()
         with mocker:
-            with assert_raises(utils.youtube.APIError):
-                utils.youtube.get_video_info('test-video-id')
+            with assert_raises(google.APIError):
+                google.get_video_info('test-video-id')
 
     def test_update_video_description(self):
         mocker = test_utils.RequestsMocker()
@@ -231,15 +231,15 @@ class YouTubeTestCase(TestCase):
                 }
             })
         )
-        utils.youtube.update_video_description.run_original_for_test()
+        google.update_video_description.run_original_for_test()
         with mocker:
-            utils.youtube.update_video_description('test-video-id',
+            google.update_video_description('test-video-id',
                                                    'test-access-token',
                                                    'test-updated-description')
 
 class HandleCallbackTest(TestCase):
     def setUp(self):
-        utils.youtube.get_user_info.run_original_for_test()
+        google.get_user_info.run_original_for_test()
 
     def test_normal_case(self):
         redirect_uri = 'http://example.com/my-callback'
@@ -283,7 +283,7 @@ class HandleCallbackTest(TestCase):
             'state': json.dumps(state)
         })
         with mocker:
-            callback_data = utils.youtube.handle_callback(request,
+            callback_data = google.handle_callback(request,
                                                           redirect_uri)
         self.assertEqual(callback_data.refresh_token, 'test-refresh-token')
         self.assertEqual(callback_data.access_token, 'test-access-token')
@@ -313,8 +313,8 @@ class HandleCallbackTest(TestCase):
             'code': 'test-authorization-code',
         })
         with mocker:
-            self.assertRaises(utils.youtube.OAuthError,
-                              utils.youtube.handle_callback,
+            self.assertRaises(google.OAuthError,
+                              google.handle_callback,
                               request, redirect_uri)
 
     def test_status_code_error(self):
@@ -337,20 +337,20 @@ class HandleCallbackTest(TestCase):
             'code': 'test-authorization-code',
         })
         with mocker:
-            self.assertRaises(utils.youtube.OAuthError,
-                              utils.youtube.handle_callback,
+            self.assertRaises(google.OAuthError,
+                              google.handle_callback,
                               request, redirect_uri)
 
 
 class TestTimeParsing(TestCase):
     def test_with_minutes(self):
-        self.assertEqual(utils.youtube._parse_8601_duration('PT10M10S'), 610)
+        self.assertEqual(google._parse_8601_duration('PT10M10S'), 610)
 
     def test_without_minutes(self):
-        self.assertEqual(utils.youtube._parse_8601_duration('PT10S'), 10)
+        self.assertEqual(google._parse_8601_duration('PT10S'), 10)
 
     def test_invalid(self):
-        self.assertEqual(utils.youtube._parse_8601_duration('foo'), None)
+        self.assertEqual(google._parse_8601_duration('foo'), None)
 
 class FetchSubtitleTest(TestCase):
     def test_get_subtitled_languages(self):
@@ -368,7 +368,7 @@ class FetchSubtitleTest(TestCase):
 </transcript_list>"""
         )
         with mocker:
-            langs = utils.youtube.get_subtitled_languages('test-video-id')
+            langs = google.get_subtitled_languages('test-video-id')
         # check the return value.  Note that the bcp47 language code "ak"
         # should not be converted to our internal representation
         self.assertEqual(set(langs), set(['en', 'fr', 'ak']))
@@ -389,6 +389,6 @@ Line 2
             { 'v': 'test-video-id', 'lang': 'en', 'fmt': 'srt' },
             body=srt_data)
         with mocker:
-            subs = utils.youtube.get_subtitles('test-video-id', 'en')
+            subs = google.get_subtitles('test-video-id', 'en')
         self.assertEquals(subs.to_xml(),
                           load_subtitles('en', srt_data, 'srt').to_xml())

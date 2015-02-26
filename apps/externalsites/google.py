@@ -16,7 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-"""utils.youtube -- YouTube API handling."""
+"""externalsites.google -- Google API handling."""
 
 from collections import namedtuple
 from lxml import etree

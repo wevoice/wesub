@@ -40,7 +40,7 @@ from videos.types.mp3 import Mp3VideoType
 from videos.types.vimeo import VimeoVideoType
 from videos.types.youtube import YoutubeVideoType
 from utils import test_utils
-from utils import youtube
+from externalsites import google
 
 class YoutubeVideoTypeTest(TestCase):
     def setUp(self):
@@ -60,11 +60,11 @@ class YoutubeVideoTypeTest(TestCase):
         }]
         self.shorter_url = "http://youtu.be/HaAVZ2yXDBo"
 
-    @test_utils.patch_for_test('utils.youtube.get_video_info')
+    @test_utils.patch_for_test('externalsites.google.get_video_info')
     def test_set_values(self, mock_get_video_info):
-        video_info = youtube.VideoInfo('test-channel-id', 'title',
-                                       'description', 100,
-                                       'http://example.com/thumb.png')
+        video_info = google.VideoInfo('test-channel-id', 'title',
+                                      'description', 100,
+                                      'http://example.com/thumb.png')
         mock_get_video_info.return_value = video_info
 
         video, created = Video.get_or_create_for_url(
@@ -77,12 +77,12 @@ class YoutubeVideoTypeTest(TestCase):
         self.assertEqual(video.duration, video_info.duration)
         self.assertEqual(video.thumbnail, video_info.thumbnail_url)
 
-    @test_utils.patch_for_test('utils.youtube.get_video_info')
+    @test_utils.patch_for_test('externalsites.google.get_video_info')
     def test_get_video_info_exception(self, mock_get_video_info):
-        video_info = youtube.VideoInfo('test-channel-id', 'title',
-                                       'description', 100,
-                                       'http://example.com/thumb.png')
-        mock_get_video_info.side_effect = youtube.APIError()
+        video_info = google.VideoInfo('test-channel-id', 'title',
+                                      'description', 100,
+                                      'http://example.com/thumb.png')
+        mock_get_video_info.side_effect = google.APIError()
 
         video, created = Video.get_or_create_for_url(
             'http://www.youtube.com/watch?v=_ShmidkrcY0')

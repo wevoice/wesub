@@ -32,12 +32,12 @@ import babelsubs
 import haystack
 
 from auth.models import CustomUser as User
+from externalsites import google
 from externalsites import syncing
 from externalsites.exceptions import (SyncingError, RetryableSyncingError,
                                       YouTubeAccountExistsError)
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from teams.models import Team
-from utils import youtube
 from utils.text import fmt
 from videos.models import VideoUrl, VideoFeed
 import videos.models
@@ -479,7 +479,7 @@ class YouTubeAccount(ExternalAccount):
 
         Subclasses must implement this method.
         """
-        access_token = youtube.get_new_access_token(self.oauth_refresh_token)
+        access_token = google.get_new_access_token(self.oauth_refresh_token)
         try:
             syncing.youtube.update_subtitles(video_url.videoid, access_token,
                                              version)
@@ -496,12 +496,12 @@ class YouTubeAccount(ExternalAccount):
             raise
 
     def do_delete_subtitles(self, video_url, language):
-        access_token = youtube.get_new_access_token(self.oauth_refresh_token)
+        access_token = google.get_new_access_token(self.oauth_refresh_token)
         syncing.youtube.delete_subtitles(video_url.videoid, access_token,
                                          language.language_code)
 
     def delete(self):
-        youtube.revoke_auth_token(self.oauth_refresh_token)
+        google.revoke_auth_token(self.oauth_refresh_token)
         if self.import_feed is not None:
             self.import_feed.delete()
         super(YouTubeAccount, self).delete()

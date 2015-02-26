@@ -19,7 +19,7 @@ import re
 from urlparse import urlparse
 
 from base import VideoType
-from utils import youtube
+from externalsites import google
 
 class YoutubeVideoType(VideoType):
 
@@ -69,13 +69,13 @@ class YoutubeVideoType(VideoType):
 
     def get_video_info(self):
         if not hasattr(self, '_video_info'):
-            self._video_info = youtube.get_video_info(self.video_id)
+            self._video_info = google.get_video_info(self.video_id)
         return self._video_info
 
     def set_values(self, video, fetch_subs_async=True):
         try:
             video_info = self.get_video_info()
-        except youtube.APIError:
+        except google.APIError:
             return
         video.title = video_info.title
         video.description = video_info.description
@@ -85,7 +85,7 @@ class YoutubeVideoType(VideoType):
     def owner_username(self):
         try:
             return self.get_video_info().channel_id
-        except youtube.APIError:
+        except google.APIError:
             return None
 
     @classmethod

@@ -58,15 +58,15 @@ class ShouldAddCreditTest(TestCase):
                          False)
 
 class BaseCreditTest(TestCase):
-    @test_utils.patch_for_test('utils.youtube.update_video_description')
-    @test_utils.patch_for_test('utils.youtube.get_video_info')
+    @test_utils.patch_for_test('externalsites.google.update_video_description')
+    @test_utils.patch_for_test('externalsites.google.get_video_info')
     def setUp(self, mock_get_video_info, mock_update_video_description):
         self.mock_get_video_info = mock_get_video_info
         self.mock_update_video_description = mock_update_video_description
         self.mock_get_video_info.return_value = YouTubeVideoInfoFactory()
 
 class AddCreditTest(BaseCreditTest):
-    @test_utils.patch_for_test('utils.youtube.get_new_access_token')
+    @test_utils.patch_for_test('externalsites.google.get_new_access_token')
     def setUp(self, mock_get_new_access_token):
         BaseCreditTest.setUp(self)
         self.mock_get_new_access_token = mock_get_new_access_token

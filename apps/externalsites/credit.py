@@ -24,8 +24,8 @@ Right now the only site we handle is YouTube
 from django.utils.translation import ugettext as _
 from django.utils import translation
 
+from externalsites import google
 from externalsites import models
-from utils import youtube
 from utils.text import fmt
 from videos.templatetags.videos_tags import shortlink_for_video
 
@@ -50,13 +50,13 @@ def add_credit_to_video_url(video_url, account):
     """
     if videourl_has_credit(video_url):
         return
-    access_token = youtube.get_new_access_token(account.oauth_refresh_token)
+    access_token = google.get_new_access_token(account.oauth_refresh_token)
     video_id = video_url.videoid
     credit_text = calc_credit_text(video_url.video)
-    current_description = youtube.get_video_info(video_id).description
+    current_description = google.get_video_info(video_id).description
     if credit_text not in current_description:
         new_description = '%s\n\n%s' % (current_description, credit_text)
-        youtube.update_video_description(video_id, access_token,
-                                         new_description)
+        google.update_video_description(video_id, access_token,
+                                        new_description)
 
     models.CreditedVideoUrl.objects.create(video_url=video_url)

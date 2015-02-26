@@ -37,8 +37,8 @@ import externalsites.models
 import subtitles.models
 import teams.models
 import videos.models
+from externalsites import google
 from subtitles import pipeline
-from utils import youtube
 
 class VideoURLFactory(DjangoModelFactory):
     FACTORY_FOR = videos.models.VideoUrl
@@ -308,7 +308,7 @@ class CommentFactory(DjangoModelFactory):
     submit_date = datetime.datetime(2000, 1, 1)
 
 class YouTubeVideoInfoFactory(Factory):
-    FACTORY_FOR = youtube.VideoInfo
+    FACTORY_FOR = google.VideoInfo
 
     channel_id = 'test-channel-id'
     title = 'test title'

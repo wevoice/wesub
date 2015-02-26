@@ -28,13 +28,13 @@ from django.utils.translation import ugettext as _
 
 from auth.models import CustomUser as User
 from externalsites import forms
+from externalsites import google
 from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import get_sync_account, YouTubeAccount
 from localeurl.utils import universal_url
 from teams.models import Team
 from teams.permissions import can_change_team_settings
 from teams.views import settings_page
-from utils import youtube
 from utils.text import fmt
 from videos.models import VideoUrl
 
@@ -99,12 +99,12 @@ def youtube_add_account(request):
     else:
         logging.error("youtube_add_account: Unknown owner")
         raise Http404()
-    return redirect(youtube.request_token_url(youtube_callback_url(), state))
+    return redirect(google.request_token_url(youtube_callback_url(), state))
 
 def youtube_callback(request):
     try:
-        auth_info = youtube.handle_callback(request, youtube_callback_url())
-    except youtube.APIError, e:
+        auth_info = google.handle_callback(request, youtube_callback_url())
+    except google.APIError, e:
         logging.error("youtube_callback_team: %s" % e)
         messages.error(request, e.message)
         # there's no good place to redirect the user to since we don't know

@@ -39,13 +39,13 @@ import functools
 
 from celery.task import Task
 import mock
-import utils.youtube
+import externalsites.google
 
 save_thumbnail_in_s3 = mock.Mock()
 update_team_video = mock.Mock()
 update_search_index = mock.Mock()
 
-test_video_info = utils.youtube.VideoInfo(
+test_video_info = externalsites.google.VideoInfo(
     'test-channel-id', 'test-title', 'test-description', 60,
     'http://example.com/youtube-thumb.png')
 youtube_get_video_info = mock.Mock(return_value=test_video_info)
@@ -78,12 +78,13 @@ class MonkeyPatcher(object):
             ('teams.tasks.update_one_team_video', update_team_video),
             ('utils.celery_search_index.update_search_index',
              update_search_index),
-            ('utils.youtube.get_video_info', youtube_get_video_info),
-            ('utils.youtube.get_user_info', youtube_get_user_info),
-            ('utils.youtube.get_new_access_token',
+            ('externalsites.google.get_video_info', youtube_get_video_info),
+            ('externalsites.google.get_user_info', youtube_get_user_info),
+            ('externalsites.google.get_new_access_token',
              youtube_get_new_access_token),
-            ('utils.youtube.revoke_auth_token', youtube_revoke_auth_token),
-            ('utils.youtube.update_video_description',
+            ('externalsites.google.revoke_auth_token',
+             youtube_revoke_auth_token),
+            ('externalsites.google.update_video_description',
              youtube_update_video_description),
             ('utils.applock.acquire_lock', acquire_lock),
             ('utils.applock.release_lock', release_lock),
