@@ -8,7 +8,9 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         # Existing users should not see the tutorial by default
+        db.start_transaction()
         orm.CustomUser.objects.raw('UPDATE auth_customuser SET show_tutorial=0')
+        db.commit_transaction()
 
     def backwards(self, orm):
         # The value does not matter if running backwards
