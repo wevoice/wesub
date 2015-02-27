@@ -75,13 +75,6 @@ class LoggingTimer(object):
         log("{}: {}:{:0.1f}s", msg, int(mins), secs)
         self.reset()
 
-def log_dot(newline=False):
-    if newline:
-        sys.stdout.write('.\n')
-    else:
-        sys.stdout.write('.')
-    sys.stdout.flush()
-
 ContainerInfo = collections.namedtuple('ContainerInfo', 'host name cid')
 
 class UnixDomainSocketHTTPConnection(httplib.HTTPConnection):
@@ -235,6 +228,8 @@ class ImageBuilder(object):
 
     def setup_images(self):
         timer = LoggingTimer()
+        # make sure amara-enterprise is on the correct commit
+        subprocess.check_call('bin/update-integration.py')
         self.docker.run(BUILDER_DOCKER_HOST, 'build',
                         '--no-cache', '-t', self.image_name, '.')
         timer.log_time('image build')

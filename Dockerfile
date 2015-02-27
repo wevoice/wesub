@@ -31,6 +31,8 @@ ADD .docker/entry.sh /usr/local/bin/entry
 RUN easy_install pip
 RUN pip install uwsgi
 RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements.txt)
+RUN (cd $APP_DIR && python deploy/create_commit_file.py)
+
 # this fixes the nose bug (https://github.com/django-nose/django-nose/issues/54)
 RUN rm /usr/local/man
 ADD .docker/run.sh /usr/local/bin/run
