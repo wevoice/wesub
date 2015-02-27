@@ -292,6 +292,7 @@ VIMEO_API_SECRET = None
 # use the same system.
 AUTHENTICATION_BACKENDS = (
    'auth.backends.CustomUserBackend',
+   'externalsites.auth_backends.OpenIDConnectBackend',
    'thirdpartyaccounts.auth_backends.TwitterAuthBackend',
    'thirdpartyaccounts.auth_backends.FacebookAuthBackend',
    'auth.backends.OpenIdBackend',

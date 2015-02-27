@@ -755,3 +755,8 @@ class CreditedVideoUrl(models.Model):
     """
 
     video_url = models.ForeignKey(VideoUrl, primary_key=True)
+
+class OpenIDConnectLink(models.Model):
+    """Link a user to an OpenID Connect ID."""
+    sub = models.CharField(max_length=255, primary_key=True)
+    user = models.OneToOneField(User, related_name='openid_connect_link')

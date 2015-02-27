@@ -26,8 +26,13 @@ from nose.tools import *
 import mock
 import jwt
 
+from utils.factories import *
 from utils.test_utils import *
 from externalsites import google
+from externalsites.auth_backends import (OpenIDConnectInfo,
+                                         OpenIDConnectBackend)
+from externalsites.models import OpenIDConnectLink
+from socialauth.models import OpenidProfile
 
 class TestRequestTokenURL(TestCase):
     def test_online_access(self):
@@ -213,3 +218,72 @@ class AccessTokenTest(TestCase):
         google.revoke_auth_token.run_original_for_test()
         with mocker:
             google.revoke_auth_token('test-token')
+
+class OpenIDConnectAuthBackendTest(TestCase):
+    # Test logging a user in with Google OpenID Connect
+    def run_authenticate(self, sub, email, openid_key=None, **profile_data):
+        backend = OpenIDConnectBackend()
+        return backend.authenticate(openid_connect_info=OpenIDConnectInfo(
+            sub, email, openid_key, profile_data))
+
+    def test_create_account(self):
+        user = self.run_authenticate('123', 'test@example.com')
+        assert_equal(user.username, 'test@example.com')
+        assert_equal(user.email, 'test@example.com')
+        assert_equal(user.openid_connect_link.sub, '123')
+
+    def test_set_profile_data(self):
+        # When creating a new user, we should set their profile data based on
+        # the OpenID profile data
+        user = self.run_authenticate('123', 'test@example.com',
+                                                    first_name='Pat',
+                                                    last_name='Patterson',
+                                                    full_name='Pat Patterson')
+        assert_equal(user.first_name, 'Pat')
+        assert_equal(user.last_name, 'Patterson')
+        assert_equal(user.full_name, 'Pat Patterson')
+
+    def test_create_account_with_non_unique_username(self):
+        # Test generating a unique username for a new account
+        UserFactory(username='test@example.com')
+        for i in xrange(0, 5):
+            UserFactory(username='test{}@example.com'.format(i))
+        user = self.run_authenticate('123', 'test@example.com')
+        assert_equal(user.username, 'test5@example.com')
+        assert_equal(user.email, 'test@example.com')
+
+    def test_login_existing_account(self):
+        user = UserFactory(email='test@example.com', first_name='Sam')
+        OpenIDConnectLink.objects.create(sub='123', user=user)
+        login_user = self.run_authenticate(
+            '123', 'test@example.com', first_name='Pat')
+        assert_equal(user, login_user)
+        # If the user object already exists, we shouldn't overwrite their
+        # profile data
+        assert_equal(login_user.first_name, 'Sam')
+
+    def test_openid_migrate(self):
+        # We used to use openid, but google is in the process of discontinuing
+        # it.  If a user was has previously logged in then they will have an
+        # OpenidProfile object associated with them.  We should migrate to the
+        # OpenIDConnectLink
+        user = UserFactory(username='test@example.com')
+        OpenidProfile.objects.create(openid_key='test-key', user=user)
+        login_user = self.run_authenticate(
+            '123', 'test@example.com', openid_key='test-key')
+        assert_equal(user, login_user)
+        assert_equal(user.openid_connect_link.sub, '123')
+
+    def test_openid_profile_not_created(self):
+        # If the openid_key isn't in the database, we should just ignore it
+        user = self.run_authenticate(
+            '123', 'test@example.com', openid_key='test-key')
+        assert_equal(user.openid_connect_link.sub, '123')
+
+    def test_openid_migrate_sets_profile_data(self):
+        user = UserFactory(username='test@example.com')
+        OpenidProfile.objects.create(openid_key='test-key', user=user)
+        login_user = self.run_authenticate(
+            '123', 'test@example.com', openid_key='test-key',
+            first_name='Pat')
+        assert_equal(login_user.first_name, 'Pat')

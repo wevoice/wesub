@@ -19,16 +19,19 @@
 import logging
 
 from django.contrib import messages
+from django.contrib import auth
 from django.contrib.admin.views.decorators import staff_member_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import is_safe_url
 from django.utils.translation import ugettext as _
 
 from auth.models import CustomUser as User
 from externalsites import forms
 from externalsites import google
+from externalsites.auth_backends import OpenIDConnectInfo
 from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import get_sync_account, YouTubeAccount
 from localeurl.utils import universal_url
@@ -101,15 +104,23 @@ def google_login(request):
 
 def handle_login_callback(request, auth_info):
     profile_info = google.get_openid_profile(auth_info.access_token)
-    raise NotImplementedError("Need to handle data: {}", format({
-        'openid_id': auth_info.openid_id,
-        'sub': auth_info.sub,
-        'profile-sub': profile_info.sub,
-        'email': profile_info.email,
-        'full_name': profile_info.full_name,
-        'first_name': profile_info.first_name,
-        'last_name': profile_info.last_name,
-    }))
+    openid_connect_info = OpenIDConnectInfo(
+        auth_info.sub, profile_info.email, auth_info.openid_id, {
+            'full_name': profile_info.full_name,
+            'first_name': profile_info.first_name,
+            'last_name': profile_info.last_name
+        }
+    )
+    user = auth.authenticate(openid_connect_info=openid_connect_info)
+    if not user:
+        messages.error(request, _("OpenID Connect error"))
+        return redirect('videos.videos.index')
+    auth.login(request, user)
+    next_url = auth_info.state.get('next')
+    if next_url and is_safe_url(next_url):
+        return HttpResponseRedirect(next_url)
+    else:
+        return redirect('videos.videos.index')
 
 def youtube_add_account(request):
     if 'team_slug' in request.GET:
