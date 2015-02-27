@@ -280,10 +280,12 @@ class OpenIDConnectAuthBackendTest(TestCase):
             '123', 'test@example.com', openid_key='test-key')
         assert_equal(user.openid_connect_link.sub, '123')
 
-    def test_openid_migrate_sets_profile_data(self):
-        user = UserFactory(username='test@example.com')
+    def test_openid_migrate_sets_profile_data_if_blank(self):
+        user = UserFactory(username='test@example.com', first_name='Sam',
+                           last_name='')
         OpenidProfile.objects.create(openid_key='test-key', user=user)
         login_user = self.run_authenticate(
             '123', 'test@example.com', openid_key='test-key',
-            first_name='Pat')
-        assert_equal(login_user.first_name, 'Pat')
+            first_name='Pat', last_name='Patterson')
+        assert_equal(login_user.first_name, 'Sam')
+        assert_equal(login_user.last_name, 'Patterson')

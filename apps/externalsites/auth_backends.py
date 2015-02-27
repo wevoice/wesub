@@ -62,7 +62,8 @@ class OpenIDConnectBackend(CustomUserBackend):
         user = User.objects.get(
             openidprofile__openid_key=connect_info.openid_key)
         for name, value in connect_info.profile_data.items():
-            setattr(user, name, value)
+            if not getattr(user, name):
+                setattr(user, name, value)
         user.save()
         OpenIDConnectLink.objects.create(user=user, sub=connect_info.sub)
         return user
