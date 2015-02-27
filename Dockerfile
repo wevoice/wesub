@@ -13,6 +13,7 @@ RUN mkdir -p /opt/extras/videos
 ENV REVISION staging
 ENV APP_DIR /opt/apps/unisubs
 ENV CLOSURE_PATH /opt/google-closure
+ENV DJANGO_SETTINGS_MODULE=unisubs_settings
 RUN git clone https://github.com/google/closure-library $CLOSURE_PATH
 RUN (cd $CLOSURE_PATH && git checkout adbcc8ef6530ea16bac9f877901fe6b32995c5ff)
 RUN ln -sf $CLOSURE_PATH $APP_DIR/media/js/closure-library
