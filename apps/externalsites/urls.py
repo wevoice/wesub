@@ -22,5 +22,6 @@ urlpatterns = patterns('externalsites.views',
     url(r'^resync/(?P<video_url_id>\d+)/(?P<language_code>[\w-]+)/$', 'resync', name='resync'),
     url(r'^youtube-add-account/', 'youtube_add_account',
         name='youtube-add-account'),
-    url(r'^youtube-callback/', 'youtube_callback', name='youtube-callback'),
+    url(r'^google-callback/', 'google_callback', name='google-callback'),
+    url(r'^google-login/', 'google_login', name='google-login'),
 )

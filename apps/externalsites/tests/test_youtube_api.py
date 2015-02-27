@@ -17,85 +17,16 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import json
-import urllib
 
 from django.conf import settings
 from django.test import TestCase
 from nose.tools import *
-import mock
 
 from utils import test_utils
 from utils.subtitles import load_subtitles
 from externalsites import google
 
 class YouTubeTestCase(TestCase):
-    def test_request_token_url(self):
-        redirect_uri = 'http://example.com/my-callback'
-        state = {'foo': 'bar', 'baz': 3}
-
-        correct_params = {
-            "client_id": settings.YOUTUBE_CLIENT_ID,
-            "redirect_uri": redirect_uri,
-            "scope": "openid https://www.googleapis.com/auth/youtube",
-            "state": json.dumps(state),
-            "response_type": "code",
-            "approval_prompt": "force",
-            "access_type": "offline",
-        }
-        correct_url = ("https://accounts.google.com/o/oauth2/auth?" +
-            urllib.urlencode(correct_params))
-        self.assertEqual(google.request_token_url(redirect_uri, state),
-                         correct_url)
-
-    def test_get_new_access_token(self):
-        mocker = test_utils.RequestsMocker()
-        mocker.expect_request(
-            'post', "https://accounts.google.com/o/oauth2/token", data={
-                'client_id': settings.YOUTUBE_CLIENT_ID,
-                'client_secret': settings.YOUTUBE_CLIENT_SECRET,
-                'grant_type': 'refresh_token',
-                'refresh_token': 'test-refresh-token',
-            }, headers={
-                "Content-Type": "application/x-www-form-urlencoded"
-            }, body=json.dumps({
-                'access_token': 'test-access-token',
-            }),
-        )
-        google.get_new_access_token.run_original_for_test()
-        with mocker:
-            access_token = google.get_new_access_token(
-                'test-refresh-token')
-        self.assertEqual(access_token, 'test-access-token')
-
-    def test_get_new_access_token_error(self):
-        mocker = test_utils.RequestsMocker()
-        mocker.expect_request(
-            'post', "https://accounts.google.com/o/oauth2/token", data={
-                'client_id': settings.YOUTUBE_CLIENT_ID,
-                'client_secret': settings.YOUTUBE_CLIENT_SECRET,
-                'grant_type': 'refresh_token',
-                'refresh_token': 'test-refresh-token',
-            }, headers={
-                "Content-Type": "application/x-www-form-urlencoded"
-            }, body=json.dumps({
-                'error': 'test-error',
-            }),
-        )
-        google.get_new_access_token.run_original_for_test()
-        with mocker:
-            self.assertRaises(google.OAuthError,
-                              google.get_new_access_token,
-                              'test-refresh-token')
-
-    def test_revoke_auth_token(self):
-        mocker = test_utils.RequestsMocker()
-        mocker.expect_request(
-            'get', 'https://accounts.google.com/o/oauth2/revoke',
-            params={'token': 'test-token'})
-        google.revoke_auth_token.run_original_for_test()
-        with mocker:
-            google.revoke_auth_token('test-token')
-
     def test_get_user_info(self):
         mocker = test_utils.RequestsMocker()
         mocker.expect_request(
@@ -115,9 +46,9 @@ class YouTubeTestCase(TestCase):
                 ]
             })
         )
-        google.get_user_info.run_original_for_test()
+        google.get_youtube_user_info.run_original_for_test()
         with mocker:
-            user_info = google.get_user_info('test-access-token')
+            user_info = google.get_youtube_user_info('test-access-token')
         self.assertEqual(user_info, ('test-channel-id', 'test-username'))
 
     def test_get_video_info(self):
@@ -236,111 +167,6 @@ class YouTubeTestCase(TestCase):
             google.update_video_description('test-video-id',
                                                    'test-access-token',
                                                    'test-updated-description')
-
-class HandleCallbackTest(TestCase):
-    def setUp(self):
-        google.get_user_info.run_original_for_test()
-
-    def test_normal_case(self):
-        redirect_uri = 'http://example.com/my-callback'
-
-        mocker = test_utils.RequestsMocker()
-        mocker.expect_request(
-            'post', "https://accounts.google.com/o/oauth2/token", data={
-                'client_id': settings.YOUTUBE_CLIENT_ID,
-                'client_secret': settings.YOUTUBE_CLIENT_SECRET,
-                'code': 'test-authorization-code',
-                'grant_type': 'authorization_code',
-                'redirect_uri': redirect_uri,
-            }, headers={
-                "Content-Type": "application/x-www-form-urlencoded"
-            }, body=json.dumps({
-                'access_token': 'test-access-token',
-                'refresh_token': 'test-refresh-token',
-            }),
-        )
-        mocker.expect_request(
-            'get', 'https://www.googleapis.com/youtube/v3/channels', params={
-                'part': 'id,snippet',
-                'mine': 'true',
-            }, headers={
-                'Authorization': 'Bearer test-access-token',
-            }, body=json.dumps({
-                'items': [
-                    {
-                        'id': 'test-channel-id',
-                        'snippet': {
-                            'title': 'test-username',
-                        },
-                    }
-                ]
-            })
-        )
-
-        state = {'foo': 'test-state'}
-        request = mock.Mock(GET={
-            'code': 'test-authorization-code',
-            'state': json.dumps(state)
-        })
-        with mocker:
-            callback_data = google.handle_callback(request,
-                                                          redirect_uri)
-        self.assertEqual(callback_data.refresh_token, 'test-refresh-token')
-        self.assertEqual(callback_data.access_token, 'test-access-token')
-        self.assertEqual(callback_data.channel_id, 'test-channel-id')
-        self.assertEqual(callback_data.username, 'test-username')
-        self.assertEqual(callback_data.state, state)
-
-    def test_error(self):
-        redirect_uri = 'http://example.com/my-callback'
-
-        mocker = test_utils.RequestsMocker()
-        mocker.expect_request(
-            'post', "https://accounts.google.com/o/oauth2/token", data={
-                'client_id': settings.YOUTUBE_CLIENT_ID,
-                'client_secret': settings.YOUTUBE_CLIENT_SECRET,
-                'code': 'test-authorization-code',
-                'grant_type': 'authorization_code',
-                'redirect_uri': redirect_uri,
-            }, headers={
-                "Content-Type": "application/x-www-form-urlencoded"
-            }, body=json.dumps({
-                'error': 'test-error',
-            }),
-        )
-
-        request = mock.Mock(GET={
-            'code': 'test-authorization-code',
-        })
-        with mocker:
-            self.assertRaises(google.OAuthError,
-                              google.handle_callback,
-                              request, redirect_uri)
-
-    def test_status_code_error(self):
-        redirect_uri = 'http://example.com/my-callback'
-
-        mocker = test_utils.RequestsMocker()
-        mocker.expect_request(
-            'post', "https://accounts.google.com/o/oauth2/token", data={
-                'client_id': settings.YOUTUBE_CLIENT_ID,
-                'client_secret': settings.YOUTUBE_CLIENT_SECRET,
-                'code': 'test-authorization-code',
-                'grant_type': 'authorization_code',
-                'redirect_uri': redirect_uri,
-            }, headers={
-                "Content-Type": "application/x-www-form-urlencoded"
-            }, status_code=400
-        )
-
-        request = mock.Mock(GET={
-            'code': 'test-authorization-code',
-        })
-        with mocker:
-            self.assertRaises(google.OAuthError,
-                              google.handle_callback,
-                              request, redirect_uri)
-
 
 class TestTimeParsing(TestCase):
     def test_with_minutes(self):

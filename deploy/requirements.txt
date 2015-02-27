@@ -61,6 +61,7 @@ markdown2==2.0.0
 -e git+https://github.com/pculture/babelsubs.git#egg=babelsubs
 -e git+https://github.com/pculture/unilangs.git#egg=unilangs
 pytz==2012f
+PyJWT==0.4.3
 pygal
 # Documentation
 sphinxcontrib-httpdomain==1.3.0
