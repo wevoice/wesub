@@ -36,7 +36,7 @@ def run_git_clone(repo_name):
 
 def run_git_reset(repo_name, skip_fetch):
     os.chdir(repo_dir(repo_name))
-    if not skip_fetch
+    if not skip_fetch:
         print "{0}: fetching".format(repo_name)
         run_command("git", "fetch", "origin")
     else:
@@ -47,7 +47,7 @@ def run_git_reset(repo_name, skip_fetch):
 
 def make_option_parser():
     parser = optparse.OptionParser()
-    parser.add_option("--skip-fetch'", help="skip_fetch",
+    parser.add_option("--skip-fetch'", dest="skip_fetch",
                       action='store_true', help="don't run git fetch")
     parser.add_option("--clone-missing", dest="clone_missing",
                       action='store_true', help="clone missing repositories")
