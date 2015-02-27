@@ -229,7 +229,7 @@ class ImageBuilder(object):
     def setup_images(self):
         timer = LoggingTimer()
         # make sure amara-enterprise is on the correct commit
-        subprocess.check_call('bin/update-integration.py')
+        subprocess.check_call('bin/update-integration.py', '--skip-fetch')
         self.docker.run(BUILDER_DOCKER_HOST, 'build',
                         '--no-cache', '-t', self.image_name, '.')
         timer.log_time('image build')
