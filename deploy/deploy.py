@@ -459,6 +459,11 @@ class Deploy(object):
         self.start_and_stop_containers()
         self.container_manager.print_report()
 
+    def stop(self):
+        self.setup()
+        old_containers = self.container_manager.find_old_containers()
+        self.container_manager.shutdown_old_containers(old_containers)
+
     def setup(self):
         self.cd_to_project_root()
         self.env = Environment()
@@ -587,6 +592,8 @@ def main(argv):
             command = 'deploy'
         if command == 'deploy':
             Deploy().run()
+        elif command == 'stop-deploy':
+            StopDeploy().run()
         elif command == 'cleanup':
             Cleanup().run()
         else:
