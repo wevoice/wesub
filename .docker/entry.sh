@@ -30,6 +30,7 @@ elif [ "$ACTION" = "update_translations" ]; then
     /usr/local/bin/update_translations
 elif [ "$ACTION" = "shell" ]; then
     echo "Running shell..."
+    echo "source /usr/local/bin/config_env" >> ~/.bash_profile
     /bin/bash -l
 else
     echo "Unknown action: $ACTION"
