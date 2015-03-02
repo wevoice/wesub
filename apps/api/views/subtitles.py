@@ -311,7 +311,7 @@ class SubtitleLanguageSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     created = serializers.DateTimeField(read_only=True)
     language_code = serializers.CharField()
-    is_primary_audio_language = serializers.BooleanField()
+    is_primary_audio_language = serializers.BooleanField(required=False)
     is_rtl = serializers.BooleanField(read_only=True)
     is_translation = serializers.SerializerMethodField()
     original_language_code = serializers.SerializerMethodField()
@@ -323,7 +323,7 @@ class SubtitleLanguageSerializer(serializers.Serializer):
     metadata = VideoMetadataSerializer(required=False, read_only=True)
     subtitle_count = serializers.IntegerField(read_only=True,
                                               source='get_subtitle_count')
-    subtitles_complete = serializers.BooleanField()
+    subtitles_complete = serializers.BooleanField(required=False)
     versions = MiniSubtitleVersionsField(read_only=True)
     resource_uri = serializers.SerializerMethodField()
 

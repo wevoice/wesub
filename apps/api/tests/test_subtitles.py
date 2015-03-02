@@ -153,8 +153,14 @@ class SubtitleLanguageSerializerTest(TestCase):
         assert_equal(serializer_data['reviewer'], 'user1')
         assert_equal(serializer_data['approver'], 'user2')
 
+    def run_create(self, data):
+        serializer = SubtitleLanguageSerializer(
+            data=data, context=self.serializer_context)
+        serializer.is_valid(raise_exception=True)
+        return serializer.save()
+
     def test_create(self):
-        language = self.serializer.create({
+        language = self.run_create({
             'language_code': 'es',
             'is_primary_audio_language': True,
             'subtitles_complete': True,
@@ -166,11 +172,20 @@ class SubtitleLanguageSerializerTest(TestCase):
         test_utils.assert_saved(language)
         test_utils.assert_saved(self.video)
 
+    def test_create_with_only_language_code(self):
+        language = self.run_create({
+            'language_code': 'es',
+        })
+        assert_equal(language.video, self.video)
+        assert_equal(language.language_code, 'es')
+        assert_equal(self.video.primary_audio_language_code, 'en')
+        assert_equal(language.subtitles_complete, False)
+
     def test_try_recreate(self):
         language = SubtitleLanguageFactory(video=self.video,
                                            language_code='es')
         with assert_raises(ValidationError):
-            self.serializer.create({
+            self.run_create({
                 'language_code': 'es',
                 'is_primary_audio_language': True,
                 'subtitles_complete': True,
@@ -207,7 +222,7 @@ class SubtitleLanguageSerializerTest(TestCase):
         assert_equal(language.subtitles_complete, True)
 
     def test_runs_tasks(self):
-        language = self.serializer.create({'language_code': 'es'})
+        language = self.run_create({'language_code': 'es'})
         assert_equal(test_utils.video_changed_tasks.delay.call_count, 1)
         self.serializer.update(language, {})
         assert_equal(test_utils.video_changed_tasks.delay.call_count, 2)
