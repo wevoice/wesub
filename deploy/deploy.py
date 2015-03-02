@@ -400,6 +400,7 @@ class ContainerManager(object):
             # for preview branches we start 1 instance on the builder host.
             # Also we don't start up the workers
             self.start_app_container(BUILDER_DOCKER_HOST, 'preview')
+            return
 
         self.start_worker_container(self.env.DOCKER_HOST_1, 'master-worker',
                                     'master_worker')
