@@ -413,10 +413,7 @@ class ContainerManager(object):
         Returns a list of (host, container_id) tuples.
         """
         old_containers = []
-        if not self.building_preview():
-            hosts_to_search = self.env.docker_hosts()
-        else:
-            hosts_to_search = [BUILDER_DOCKER_HOST]
+        hosts_to_search = [BUILDER_DOCKER_HOST] + self.env.docker_hosts()
         for host in hosts_to_search:
             for container in self.docker.get_containers(host):
                 try:
