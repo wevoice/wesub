@@ -49,7 +49,7 @@ FLOWPLAYER_JS = os.path.join(
 COMPILER_PATH = os.path.join(settings.PROJECT_ROOT,  "closure", "compiler.jar")
 
 
-LAST_COMMIT_GUID = get_current_commit_hash() or settings.LAST_COMMIT_GUID.split('/')[-1]
+LAST_COMMIT_GUID = get_current_commit_hash() or settings.LAST_COMMIT_GUID
 
 # Old settings that we need to do the builds, but we don't want to keep in
 # settings.py

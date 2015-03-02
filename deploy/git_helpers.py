@@ -7,11 +7,14 @@ def get_current_commit_hash(short=True, skip_sanity_checks=False):
             sys.stderr.write('WARNING: .git is a symlink.  '
                             'Things may not work correctly.\n')
 
-    process = Popen(["git", "rev-parse", "HEAD"], stdout=PIPE)
+    if short:
+        cmdline = ["git", "rev-parse", "--short=8", "HEAD"]
+    else:
+        cmdline = ["git", "rev-parse", "HEAD"]
+
+    process = Popen(cmdline, stdout=PIPE)
 
     guid =  process.communicate()[0].strip()
-    if guid:
-        guid = guid[:8]
 
     if not skip_sanity_checks:
         try:
@@ -37,8 +40,3 @@ def get_current_branch():
     branch = re.search(r"\* ([^\n]+)", branches).group(1)
 
     return branch
-
-def get_guid(skip_sanity_checks=False):
-    guid = get_current_commit_hash(skip_sanity_checks=skip_sanity_checks)
-    branch = get_current_branch()
-    return "%s/%s" % (branch, guid)
