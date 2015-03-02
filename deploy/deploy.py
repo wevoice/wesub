@@ -333,7 +333,7 @@ class ContainerManager(object):
             command: command to pass to our entrypoint.  The entrypoint is a
                 copy of .docker/entry.sh
         """
-        cmd_line = [ 'run', '-it', '--rm', ]
+        cmd_line = [ 'run', '-t', '--rm', ]
         cmd_line += self.app_env_params()
         cmd_line += [self.image_name, command]
         self.docker.run(self.env.DOCKER_HOST_1, *cmd_line)
@@ -350,9 +350,11 @@ class ContainerManager(object):
                 master_worker)
 
         """
+        host_name = '{}-{}.amara.org'.format(self.env.BRANCH, name)
         name = self.container_name_prefix_for_build() + name
         cmd_line = [
-            'run', '-it', '-d',
+            'run', '-t', '-d',
+            '-h', host_name,
             '--name', name,
             '--restart=always',
         ] + self.app_env_params() + [self.image_name, command]
@@ -371,7 +373,7 @@ class ContainerManager(object):
         """
         name = self.container_name_prefix_for_build() + name
         cmd_line = [
-            'run', '-it', '-d', '-P',
+            'run', '-t', '-d', '-P',
             '-h', self.app_hostname(),
             '--name', name,
             '--restart=always',
