@@ -542,3 +542,6 @@ class SubtitlesViewTest(TestCase):
             # check the call args
             assert_equal(workflow.user_can_edit_subtitles.call_args,
                          mock.call(self.user, 'en'))
+
+    def test_runs_tasks(self):
+        raise NotImplementedError()

@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import
 
+from .api import *
 from .monkeypatch import *
 from .plugin import *
 from .requests import *
