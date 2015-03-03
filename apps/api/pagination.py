@@ -91,7 +91,6 @@ class AmaraPaginationMixin(object):
         limit = self.get_paginate_by()
         if not limit:
             return None
-        print self, limit
 
         offset = self.request.query_params.get('offset', 0)
         try:

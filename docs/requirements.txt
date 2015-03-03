@@ -11,7 +11,7 @@ django-haystack==1.2.7
 django-extensions
 pysolr==2.0.14
 South==0.7.4
-djangorestframework==2.4.2
+djangorestframework==3.0.3
 django-tastypie==0.9.11
 boto==2.1.0
 redis==2.4.5

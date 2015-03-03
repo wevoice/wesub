@@ -31,6 +31,7 @@ from django.dispatch import receiver
 from django.db import models, IntegrityError
 from django.db.models.signals import post_save, pre_delete
 from django.db.models import Q
+from django.db.models import query
 from django.db import IntegrityError
 from django.utils.dateformat import format as date_format
 from django.conf import settings
@@ -123,9 +124,24 @@ class AlreadyEditingException(Exception):
 
 
 # Video
-class PublicVideoManager(models.Manager):
+class VideoManager(models.Manager):
     def get_query_set(self):
-        return super(PublicVideoManager, self).get_query_set().filter(is_public=True)
+        return VideoQueryset(self.model, using=self._db)
+
+class VideoQueryset(query.QuerySet):
+    def select_has_public_version(self):
+        """Add a subquery to check if there is a public version for this video
+
+        This will speed up the has_public_version() method.
+        """
+        sql = """\
+EXISTS(
+    SELECT * FROM subtitles_subtitleversion sv
+    WHERE sv.video_id = videos_video.id
+        AND (sv.visibility_override='public'
+            OR (sv.visibility_override = '' AND sv.visibility='public')))"""
+
+        return self.extra({ '_has_public_version': sql })
 
 class SubtitleLanguageFetcher(object):
     """Fetches/caches subtitle languages for videos."""
@@ -277,8 +293,7 @@ class Video(models.Model):
 
     cache = VideoCacheManager()
 
-    objects = models.Manager()
-    public  = PublicVideoManager()
+    objects = VideoManager()
 
     def __init__(self, *args, **kwargs):
         super(Video, self).__init__(*args, **kwargs)
@@ -766,10 +781,9 @@ class Video(models.Model):
 
     def has_public_version(self):
         """Check if there are any public versions for any language."""
-        for language in self.newsubtitlelanguage_set.all():
-            if language.has_public_version():
-                return True
-        return False
+        if hasattr(self, '_has_public_version'):
+            return bool(self._has_public_version)
+        return self.newsubtitlelanguage_set.having_public_versions().exists()
 
     def subtitles(self, version_number=None, language_code=None, language_pk=None):
         if language_pk is None:

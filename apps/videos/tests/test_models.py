@@ -184,6 +184,7 @@ class TestModelsSaving(TestCase):
 
         # Until we run the proper tasks.
         video_changed_tasks.delay(video.pk)
+        test_utils.video_changed_tasks.run_original()
 
         # But we still need to refresh it to see the change.
         self.assertEqual(video.languages_count, 0)
@@ -193,6 +194,7 @@ class TestModelsSaving(TestCase):
     def test_subtitle_language_save(self):
         def _refresh(video):
             video_changed_tasks.delay(video.pk)
+            test_utils.video_changed_tasks.run_original()
             return Video.objects.get(pk=video.pk)
 
         # Start out with a video with one language.
@@ -340,6 +342,56 @@ class TestSubtitleLanguageCaching(TestCase):
                 lang.get_tip(public=True).video
                 lang.get_tip(public=False).video
 
+class TestSelectHasPublicVersion(TestCase):
+    def setUp(self):
+        self.video = VideoFactory()
+
+    def check_has_public_version(self, correct_value):
+        qs = Video.objects.filter(pk=self.video.pk).select_has_public_version()
+        assert_equal(bool(qs[0]._has_public_version), correct_value)
+
+    def test_no_versions(self):
+        self.check_has_public_version(False)
+
+    def test_visibility_public(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        self.check_has_public_version(True)
+
+    def test_visibility_private(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='private')
+        self.check_has_public_version(False)
+
+    def test_visibility_override_public(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='private',
+                               visibility_override='public')
+        self.check_has_public_version(True)
+
+    def test_visibility_override_private(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public',
+                               visibility_override='private')
+        self.check_has_public_version(False)
+
+    def test_visibility_override_deleted(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public',
+                               visibility_override='deleted')
+        self.check_has_public_version(False)
+
+    def test_one_version_public(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        pipeline.add_subtitles(self.video, 'en', None, visibility='private')
+        self.check_has_public_version(True)
+
+    def test_has_public_version_is_optimized(self):
+        # test that calling has_public_version() doesn't result in any db
+        # queries
+        other_video = VideoFactory()
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        pipeline.add_subtitles(other_video, 'en', None, visibility='private')
+        videos = list(Video.objects.all().select_has_public_version()
+                      .order_by('id'))
+        with self.assertNumQueries(0):
+            assert_true(videos[0].has_public_version())
+            assert_false(videos[1].has_public_version())
 
 class TestGetMergedDFXP(TestCase):
     def test_get_merged_dfxp(self):

@@ -634,7 +634,31 @@ class SubtitleLanguage(models.Model):
 
     def has_public_version(self):
         """Check if there are any public versions for this language."""
+        if hasattr(self, '_has_public_version'):
+            return self._has_public_version
         return self.get_tip(public=True) is not None
+
+    @classmethod
+    def bulk_has_public_version(self, languages):
+        """Check for public verisons in a list of languages
+
+        This method will do a single query to check for all languages.
+        Afterwards, calling has_public_version() won't require any DB work.
+        """
+        sql = """\
+EXISTS(
+    SELECT * FROM subtitles_subtitleversion sv
+    WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+        AND (sv.visibility_override='public'
+            OR (sv.visibility_override = '' AND sv.visibility='public')))"""
+
+        qs = (SubtitleLanguage.objects
+              .filter(id__in=[l.id for l in languages])
+              .extra(where=[sql])
+              .values_list('id', flat=True))
+        with_public_versions = set(qs)
+        for l in languages:
+            l._has_public_version = l.id in with_public_versions
 
     def is_complete_and_synced(self, public=False):
         """Return whether this language's subtitles are complete and fully synced."""
@@ -1162,6 +1186,71 @@ subtitles_subtitleversion.version_number = (
             'subtitles_subtitleversion.subtitle_language_id)'])
         return qs.values_list('subs_total', flat=True)[0]
 
+    def fetch_for_languages(self, languages, select_related=None,
+                            prefetch_related=None, order_by=None,
+                            public_only=False, video=None):
+        """Fetch all versions for a list of languages
+
+        This method is an efficient way to fetch all versions for a list of
+        languages.  It caches several things to avoid future DB queries:
+            - The public/private tip of each language
+            - The language object for each version
+            - The video for each language/version (if given)
+
+        Arguments:
+            languages: list of languages to fetch versions for
+            select_related: list of select_related names for the
+                SubtitleVersion query
+            prefetch_related: list of prefetch_related names for the
+                SubtitleVersion query
+            order_by: Change the ordering of the versions
+            public_only: Only fetch public versions
+            video: Video to set for all versions/languages.  Use this if you
+                know that they all belong to a single video to avoid some DB
+                queries.
+
+        Returns:
+            dict mapping language IDs -> version objects
+        """
+        rv = dict((l.id, []) for l in languages)
+        language_map = dict((l.id, l) for l in languages)
+        if public_only:
+            version_qs = self.public()
+        else:
+            version_qs = self.full()
+        version_qs = version_qs.filter(subtitle_language__in=languages)
+        if select_related:
+            version_qs = version_qs.select_related(*select_related)
+        if prefetch_related:
+            version_qs = version_qs.prefetch_related(*prefetch_related)
+        if order_by:
+            version_qs = version_qs.order_by(order_by)
+        for version in version_qs:
+            language = language_map[version.subtitle_language_id]
+            version.subtitle_language = language
+            rv[version.subtitle_language_id].append(version)
+            if video is not None:
+                version.video = video
+        def last_version(version_list):
+            if version_list:
+                return max(version_list, key=lambda v: v.version_number)
+            else:
+                return None
+        for language in languages:
+            if video is not None:
+                language.video = video
+            # set the tip cache
+            if public_only:
+                language.set_tip_cache('public',
+                                       last_version(rv[language.id]))
+            else:
+                extant = [v for v in rv[language.id] if not v.is_deleted()]
+                public = [v for v in extant if v.is_public()]
+                if not public_only:
+                    language.set_tip_cache('extant', last_version(extant))
+                language.set_tip_cache('public', last_version(public))
+        return rv
+
 ORIGIN_API = 'api'
 ORIGIN_IMPORTED = 'imported'
 ORIGIN_LEGACY_EDITOR = 'web-legacy-editor'
@@ -1435,6 +1524,15 @@ class SubtitleVersion(models.Model):
         elif video_needs_save:
             self.video.save()
 
+    def is_rtl(self):
+        return translation.is_rtl(self.language_code)
+
+    def dir(self):
+        if self.is_rtl():
+            return 'rtl'
+        else:
+            return 'ltr'
+
     def get_ancestors(self):
         """Return all ancestors of this version.  WARNING: MAY EAT YOUR DB!
 
@@ -1594,6 +1692,14 @@ class SubtitleVersion(models.Model):
     # name in videos.models for more information.
     def _get_metadata(self, key):
         """Return the metadata for this version for the given key, or None."""
+        if self.metadata.all()._result_cache is not None:
+            # We've already fetched the metadata objects, probably because of
+            # a prefetch_related() call.  Use those instead of doing another
+            # query.
+            for m in self.metadata.all():
+                if m.key == SubtitleVersionMetadata.KEY_IDS[key]:
+                    return m.get_data()
+            return None
         try:
             m = self.metadata.get(key=SubtitleVersionMetadata.KEY_IDS[key])
             return m.get_data()
