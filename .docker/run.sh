@@ -18,7 +18,6 @@ no-orphans = true
 vacuum = true
 pythonpath = $APP_ROOT
 wsgi-file = $APP_DIR/deploy/unisubs.wsgi
-env = DJANGO_SETTINGS_MODULE=unisubs_settings
 static-map = /static=/usr/local/lib/python2.7/site-packages/django/contrib/admin/static
 EOF
 

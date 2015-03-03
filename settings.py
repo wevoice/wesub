@@ -341,7 +341,7 @@ try:
     from commit import LAST_COMMIT_GUID
 except ImportError:
     sys.stderr.write("deploy/create_commit_file must be ran before boostrapping django")
-    LAST_COMMIT_GUID = "dev/dev"
+    LAST_COMMIT_GUID = "dev"
 
 AWS_ACCESS_KEY_ID = ''
 AWS_SECRET_ACCESS_KEY = ''
