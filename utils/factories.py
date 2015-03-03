@@ -115,6 +115,7 @@ class UserFactory(DjangoModelFactory):
     notify_by_email = True
     valid_email = True
     password = 'password'
+    show_tutorial = False
 
     @classmethod
     def _generate(cls, create, attrs):
