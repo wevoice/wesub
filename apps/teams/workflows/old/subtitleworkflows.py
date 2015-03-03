@@ -30,7 +30,7 @@ from localeurl.utils import universal_url
 from messages.models import Message
 from subtitles.signals import subtitles_published
 from teams.models import Task
-from teams.permissions import can_add_version
+from teams.permissions import can_add_version, can_assign_task
 from teams.workflows.notes import TeamEditorNotes
 from utils import send_templated_email
 from utils import translation
@@ -47,7 +47,7 @@ def _complete_task(user, video, subtitle_language, saved_version, approved):
     task = (team_video.task_set
             .incomplete_review_or_approve()
             .get(language=subtitle_language.language_code))
-    if task.assignee is None:
+    if task.assignee is None and can_assign_task(task, user):
         task.assignee = user
     elif task.assignee != user:
         raise ValueError("Task not assigned to user")
