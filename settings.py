@@ -229,11 +229,12 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.YAMLParser',
         'rest_framework.parsers.XMLParser',
         'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.YAMLRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+        'api.renderers.AmaraBrowsableAPIRenderer',
         'rest_framework.renderers.XMLRenderer',
     ),
     'URL_FORMAT_OVERRIDE': 'format',
@@ -341,7 +342,7 @@ try:
     from commit import LAST_COMMIT_GUID
 except ImportError:
     sys.stderr.write("deploy/create_commit_file must be ran before boostrapping django")
-    LAST_COMMIT_GUID = "dev/dev"
+    LAST_COMMIT_GUID = "dev"
 
 AWS_ACCESS_KEY_ID = ''
 AWS_SECRET_ACCESS_KEY = ''
@@ -418,6 +419,11 @@ MEDIA_BUNDLES = {
             "css/hands-main.css",
          )
     },
+    "api.css": {
+        "files": (
+            "src/css/api.css",
+        ),
+    },
     "hands_home.js": {
         "files": (
             "js/hands-plugins.js",
@@ -442,6 +448,12 @@ MEDIA_BUNDLES = {
             "js/libs/jquery.cookie.js",
             "js/unisubs.site.js",
             "src/js/unisubs.variations.js",
+        ),
+    },
+    "api.js": {
+        "files": (
+            "js/jquery-1.4.3.js",
+            "src/js/api.js",
         ),
     },
     "graphs.js": {

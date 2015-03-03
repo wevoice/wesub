@@ -35,13 +35,17 @@ function.  For example:
     > monkeypatch.update_one_team_video.run_original()
 """
 
+import contextlib
 import functools
 
 from celery.task import Task
 import mock
+
+from subtitles.workflows import SaveDraft
 import utils.youtube
 
 save_thumbnail_in_s3 = mock.Mock()
+video_changed_tasks = mock.Mock()
 update_team_video = mock.Mock()
 update_search_index = mock.Mock()
 
@@ -75,6 +79,7 @@ class MonkeyPatcher(object):
         # list of (function, mock object tuples)
         patch_info = [
             ('videos.tasks.save_thumbnail_in_s3', save_thumbnail_in_s3),
+            ('videos.tasks.video_changed_tasks', video_changed_tasks),
             ('teams.tasks.update_one_team_video', update_team_video),
             ('utils.celery_search_index.update_search_index',
              update_search_index),
@@ -173,3 +178,80 @@ def patch_for_test(spec):
         return wrapper
     return decorator
 patch_for_test.__test__ = False
+
+@contextlib.contextmanager
+def patch_get_workflow():
+    """Context manage to patch subtitles.workflows.get_workflow.
+
+    This function creates a mock workflow, then forces get_workflow() to
+    return that.
+
+    Usage:
+
+        with patch_get_workflow() as mock_workflow:
+            mock_workflow.user_can_view_video.return_value = False
+            # test code that should call user_can_view_video
+        # get_workflow() is no longer patched
+    """
+
+    mock_workflow = mock.Mock()
+    mock_workflow.user_can_view_private_subtitles.return_value = True
+    mock_workflow.user_can_view_video.return_value = True
+    mock_workflow.action_for_add_subtitles.return_value = SaveDraft()
+
+    patcher = mock.patch('subtitles.workflows.get_workflow',
+                         mock.Mock(return_value=mock_workflow))
+    patcher.start()
+    try:
+        yield mock_workflow
+    finally:
+        patcher.stop()
+
+class _MockSignalHandler(object):
+    def __init__(self, signal):
+        self.signal = signal
+        self.handler = mock.Mock()
+
+    # implement the context manager
+    def __enter__(self):
+        self.signal.connect(self.handler, weak=False)
+        return self.handler
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.signal.disconnect(self.handler)
+
+    # implement the test case method wrapping
+    def __call__(self, func):
+        signal = self.signal
+        handler = self.handler
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            signal.connect(handler, weak=False)
+            self.addCleanup(signal.disconnect, handler)
+            return func(self, handler, *args, **kwargs)
+        return wrapper
+
+def mock_handler(signal):
+    """Connect a mock object to a signal
+
+    This function can be used as a context manager to connect and disconnect
+    to a signal.
+
+    This function can also be used as a function wrapper for a unittest.
+    If so, the handler will be active during the test and disconnected with
+    addCleanup().  The mock handler will be passed in as an argument for the
+    function.  Because we use addCleanup(), you can wrap the setUp() method to
+    cause the 
+
+    Usage:
+
+        >>> with mock_handler(my_signal) as mock_handler:
+        >>>     # run some code
+        >>>     mock_handler.assert_called_with(arg1, arg2)
+
+        >>> @mock_handler(my_signal)
+        >>> def test_something(self, mock_handler):
+        >>>     # run some code
+        >>>     mock_handler.assert_called_with(arg1, arg2)
+    """
+    return _MockSignalHandler(signal)

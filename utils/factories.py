@@ -38,6 +38,7 @@ import subtitles.models
 import teams.models
 import videos.models
 from subtitles import pipeline
+from utils import translation
 from utils import youtube
 
 class VideoURLFactory(DjangoModelFactory):
@@ -55,6 +56,82 @@ class VideoFactory(DjangoModelFactory):
     allow_community_edits = False
 
     video_url = factory.RelatedFactory(VideoURLFactory, 'video', primary=True)
+
+    @factory.post_generation
+    def set_follower(video, create, extracted, **kwargs):
+        if video.user:
+            video.followers.add(video.user)
+
+    @factory.post_generation
+    def with_many_visibility_combinations(video, create, extracted, **kwargs):
+        """Make languages with many different combinations of
+        visibility/visibility_override_choices
+
+        This method creates languages with all possible combinations with 0,
+        1, and 2 versions and some combinations using more versions.
+
+        This method will also set the tips/public_tips attributes on the
+        video.  They will map language ids to the version number of the
+        correct tip for each language.
+        """
+        if not extracted:
+            return
+        now = datetime.datetime.now()
+        language_codes = iter(translation.ALL_LANGUAGE_CODES)
+        visibility_choices = ['public', 'private']
+        visibility_override_choices = ['', 'public', 'private', 'deleted']
+        combo_choices = [
+            (v, vo)
+            for v in visibility_choices
+            for vo in visibility_override_choices
+        ]
+        all_versions = []
+        video.public_tips = {}
+        video.tips = {}
+        def make_language(visibility_list):
+            language = SubtitleLanguageFactory(
+                video=video, language_code=language_codes.next(),
+            )
+            public_tip = tip = None
+            for i, visibilities in enumerate(visibility_list):
+                version = subtitles.models.SubtitleVersion(
+                    video=video, subtitle_language=language,
+                    language_code=language.language_code,
+                    created=now, visibility=visibilities[0],
+                    visibility_override=visibilities[1],
+                    version_number=i+1)
+                if version.is_public():
+                    public_tip = version.version_number
+                if not version.is_deleted():
+                    tip = version.version_number
+                all_versions.append(version)
+            video.tips[language.id] = tip
+            video.public_tips[language.id] = public_tip
+
+        # make all combinations of 0, 1, and 2 versions
+        make_language([])
+        for choice in combo_choices:
+            make_language([choice])
+            for choice2 in combo_choices:
+                make_language([choice, choice2])
+        # make a copule languages with many public/private versions
+        make_language([('public', '') for i in range(4)])
+        make_language([('private', '') for i in range(4)])
+        # language that had private verisons, then the last was published
+        make_language([
+            ('private', ''), ('private', ''), ('private', 'public'),
+        ])
+        # language that had got published, then had a post-edit
+        make_language([
+            ('private', ''), ('private', ''), ('private', ''),
+            ('private', 'public'), ('public', ''),
+        ])
+        # language that had public verisons, but they were deleted
+        make_language([
+            ('public', 'deleted'), ('public', 'deleted'),
+            ('public', 'deleted'), ('public', 'deleted'),
+        ])
+        subtitles.models.SubtitleVersion.objects.bulk_create(all_versions)
 
 class KalturaVideoFactory(VideoFactory):
     FACTORY_HIDDEN_ARGS = ('name',)
@@ -115,6 +192,7 @@ class UserFactory(DjangoModelFactory):
     notify_by_email = True
     valid_email = True
     password = 'password'
+    show_tutorial = False
 
     @classmethod
     def _generate(cls, create, attrs):
