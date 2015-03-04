@@ -2398,6 +2398,8 @@ class Task(models.Model):
                 _create_translation_tasks(self.team_video, sv)
 
             task = None
+            # Notify the appropriate users.
+            notifier.approved_notification.delay(self.pk, approval)
         else:
             # Send the subtitles back for improvement.
             task = self._send_back()
@@ -2407,8 +2409,6 @@ class Task(models.Model):
         if self.assignee:
             sv.set_approved_by(self.assignee)
 
-        # Notify the appropriate users.
-        notifier.approved_notification.delay(self.pk, approval)
         return task
 
     def _ensure_language_complete(self, subtitle_language):
