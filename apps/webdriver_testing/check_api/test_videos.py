@@ -9,6 +9,7 @@ import itertools
 import time
 from rest_framework.test import APILiveServerTestCase, APIClient
 
+from caching.tests.utils import assert_invalidates_model_cache
 from videos.models import *
 from utils.factories import *
 from subtitles import pipeline
@@ -122,4 +123,111 @@ class TestCaseVideos(APILiveServerTestCase, WebdriverTestCase):
         self.assertEqual(data['title'], video.title)
         self.assertEqual(data['description'], video.description)
         self.assertEqual(data['duration'], video.duration)
+
+
+    def test_get_urls(self):
+        """Verify video urls for a particular video are listed.
+
+        GET /api/videos/[video-id]/urls/
+        """
+        video = VideoFactory()
+        url = '/api/videos/%s/urls/' % video.video_id
+        r = self._get(url)
+        urls = [x['url'] for x in r]
+        self.assertIn(video.get_video_url(), urls)
+
+    def test_url_post(self):
+        """Add an additional new url.  """
+        video = VideoFactory()
+        new_url = 'http://unisubs.example.com/newurl.mp4' 
+        url = '/api/videos/%s/urls/' % video.video_id
+        data = { 'url': new_url }
+        with assert_invalidates_model_cache(video):
+            r = self._post(url, data)
+        r = self._get(url)
+        urls = [x['url'] for x in r]
+        self.logger.info(r)
+        self.assertIn(video.get_video_url(), urls)
+        self.assertIn(new_url, urls)
+
+
+    def test_update_primary_url(self):
+        """Can not change the primary url with a put request.
+        """
+        video = VideoFactory()
+        new_url = 'http://unisubs.example.com/newurl.mp4' 
+        url = '/api/videos/%s/urls/' % video.video_id
+        data = { 'url': new_url }
+        r = self._post(url, data)
+
+        #Put an updated url on the video and set it as primary 
+        data = { 'url': 'http://unisubs.example.com/newerurl.mp4'}
+        self.client.force_authenticate(self.user)
+        response = self.client.put(url, data)
+        response.render()
+        r = (json.loads(response.content))
+        self.assertEqual(r, {u'detail': u"Method 'PUT' not allowed."})
+
+        #Old message:  'Changing the URL of a VideoURLResource is not permitted', r)
+
+    def test_switch_primary_url(self):
+        """Use PUT request to switch primary url
+
+           PUT /api2/partners/videos/[video-id]/urls/[url-id]/
+        """
+        #Post an additional url to the video
+        video = VideoFactory()
+        new_url = 'http://unisubs.example.com/newurl.mp4' 
+        url = '/api/videos/%s/urls/' % video.video_id
+        data = { 'url': new_url }
+        r = self._post(url, data)
+
+        #Set the new url as as primary 
+        put_url = '/api/videos/{0}/urls/{1}/'.format(video.video_id, r['id'])
+        put_data = { 'url': new_url,
+                     'primary': True }
+        with assert_invalidates_model_cache(video):
+            self.client.force_authenticate(self.user)
+            response = self.client.put(put_url, put_data)
+            response.render()
+            r = (json.loads(response.content))
+        self.assertEqual(new_url, video.get_video_url())
+
+    def test_url_delete(self):
+        """Delete a url.
+        """
+        video = VideoFactory()
+        new_url = 'http://unisubs.example.com/newurl.mp4' 
+        url = '/api/videos/%s/urls/' % video.video_id
+        data = { 'url': new_url }
+        r = self._post(url, data)
+
+        update_url = '/api/videos/{0}/urls/{1}/'.format(video.video_id, r['id'])
+        with assert_invalidates_model_cache(video):
+            self.client.force_authenticate(self.user)
+            response = self.client.delete(update_url, data)
+            self.logger.info(response)
+
+        r = self._get(url)
+        urls = [x['url'] for x in r]
+        self.logger.info(r)
+        self.assertIn(video.get_video_url(), urls)
+        self.assertNotIn(new_url, urls)
+
+    def test_url_delete_primary(self):
+        """Can not delete the primary url. 
+        """
+        video = VideoFactory()
+        new_url = 'http://unisubs.example.com/newurl.mp4' 
+        url = '/api/videos/%s/urls/' % video.video_id
+        data = { 'url': new_url,
+                 'primary': True }
+        r = self._post(url, data)
+        update_url = '/api/videos/{0}/urls/{1}/'.format(video.video_id, r['id'])
+        self.client.force_authenticate(self.user)
+        response = self.client.delete(update_url, {'url': new_url})
+        response.render()
+        r = (json.loads(response.content))
+        self.assertEqual(["Can't delete the primary URL"], r)
+
 
