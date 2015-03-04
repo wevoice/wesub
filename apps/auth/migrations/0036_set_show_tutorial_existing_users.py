@@ -2,13 +2,15 @@
 import datetime
 from south.db import db
 from south.v2 import DataMigration
-from django.db import models
+from django.db import models, connection, transaction
 
 class Migration(DataMigration):
 
     def forwards(self, orm):
         # Existing users should not see the tutorial by default
-        orm.CustomUser.objects.raw('UPDATE auth_customuser SET show_tutorial=0')
+        cursor = connection.cursor()
+        cursor.execute('UPDATE auth_customuser SET show_tutorial=0')
+        transaction.commit_unless_managed()
 
     def backwards(self, orm):
         # The value does not matter if running backwards

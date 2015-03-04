@@ -97,7 +97,7 @@ class SearchForm(forms.Form):
         return choices
 
     def queryset_from_query(self):
-        q = self.data.get('q')
+        q = self.data.get('q', '').strip()
         if q:
             qs = VideoIndex.public()
             return (qs

@@ -24,6 +24,7 @@ from __future__ import absolute_import
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
+from nose.tools import *
 
 from babelsubs.storage import SubtitleSet
 
@@ -1830,79 +1831,262 @@ class TestSubtitleLanguageCaching(TestCase):
         self.assert_(hasattr(tip, '_subtitle_language_cache'))
         self.assertEquals(tip.video.id, self.video.id)
 
-class TestFetchAndJoin(TestCase):
+def assert_tip_cache_correct(video, subtitle_language, public_tip,
+                             private_tip):
+    """Check that the tip cache is correct for a subtitle language
+
+    Args:
+        video -- video created with_many_visibility_combinations flag
+        subtitle_language -- SubtitleLanguage to check
+        public_tip -- should the public tip be in the cache?
+        private_tip -- should the private tip be in the cache?
+    """
+
+    lang_id = subtitle_language.id
+    corrent_tip_versions = {}
+    if public_tip:
+        corrent_tip_versions['public'] = video.public_tips[lang_id]
+    if private_tip:
+        corrent_tip_versions['extant'] = video.tips[lang_id]
+    cached_tip_versions = dict(
+        (k, v.version_number if v else None)
+        for k, v in subtitle_language._tip_cache.items()
+    )
+    if cached_tip_versions == corrent_tip_versions:
+        return
+    # Generate a nice error message for debugging
+    lines = []
+    lines.append("Subtitle tip cache wrong:")
+    lines.append("cached: {}".format(cached_tip_versions))
+    lines.append("correct: {}".format(corrent_tip_versions))
+    lines.append("")
+    line_fmt = '{:<20}{:<20}{:<20}'
+    lines.append(
+        line_fmt.format('version', 'visibility', 'visibility_override'))
+    lines.append('-' * 60)
+    for v in subtitle_language.subtitleversion_set.full():
+        lines.append(line_fmt.format(v.version_number, v.visibility,
+                                     v.visibility_override))
+    raise AssertionError('\n'.join(lines))
+
+class FetchAndJoinTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Use a class fixture to create our video since it's relatively
+        # expensize to do
+        cls.video = VideoFactory(with_many_visibility_combinations=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.video.delete()
+
+    def run_fetch_and_join(self, *args, **kwargs):
+        qs = self.video.newsubtitlelanguage_set.all()
+        return qs.fetch_and_join(*args, **kwargs)
+
+    def languages_correct(self):
+        correct_language_codes = (self.video.newsubtitlelanguage_set.all()
+                                  .values_list('language_code', flat=True))
+        languages = self.run_fetch_and_join()
+        assert_items_equal([l.language_code for l in languages],
+                           correct_language_codes)
+
+    def test_public_tip_cache(self):
+        for lang in self.run_fetch_and_join(public_tips=True):
+            assert_tip_cache_correct(self.video, lang, True, False)
+
+    def test_private_tip_cache(self):
+        for lang in self.run_fetch_and_join(private_tips=True):
+            assert_tip_cache_correct(self.video, lang, False, True)
+
+    def test_both_tip_cache(self):
+        for lang in self.run_fetch_and_join(private_tips=True,
+                                            public_tips=True):
+            assert_tip_cache_correct(self.video, lang, True, True)
+
+    def test_language_cached(self):
+        # check that the subtitle_language attribute is set, so we don't
+        # need an extra query to fetch it
+        for lang in self.run_fetch_and_join(public_tips=True,
+                                            private_tips=True):
+            with self.assertNumQueries(0):
+                for v in lang._tip_cache.values():
+                    if v is not None:
+                        v.subtitle_language
+
+    def test_video_cached(self):
+        # check that the video attribute is set, so we don't need an extra
+        # query to fetch it
+        for lang in self.run_fetch_and_join(video=self.video,
+                                            public_tips=True,
+                                            private_tips=True):
+            with self.assertNumQueries(0):
+                lang.video
+                for v in lang._tip_cache.values():
+                    if v is not None:
+                        v.video
+
+class FetchForLanguagesTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Use a class fixture to create our video since it's relatively
+        # expensize to do
+        cls.video = VideoFactory(with_many_visibility_combinations=True)
+        cls.languages = list(cls.video.newsubtitlelanguage_set.all())
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.video.delete()
+
     def setUp(self):
-        self.videos, self.langs, self.versions = bulk_subs({
-            'v': {
-                'en': [
-                    {},
-                    {},
-                    {}
-                ],
-                'fr': [
-                    {},
-                    {'visibility': 'private'},
-                ],
-                'de': [
-                    {'visibility': 'private'},
-                ],
-                'es': [
-                    {'visibility': 'private',
-                     'visibility_override': 'public'},
-                ],
-            },
-        })
-        self.public_tips = {
-            'en': self.versions['v', 'en', 3],
-            'fr': self.versions['v', 'fr', 1],
-            'es': self.versions['v', 'es', 1],
-        }
-        self.private_tips = {
-            'en': self.versions['v', 'en', 3],
-            'fr': self.versions['v', 'fr', 2],
-            'de': self.versions['v', 'de', 1],
-            'es': self.versions['v', 'es', 1],
-        }
+        for l in self.languages:
+            l.clear_tip_cache()
 
-    def test_fetch_and_join_returns_correct_languages(self):
-        video = self.videos['v']
-        qs = video.newsubtitlelanguage_set.all()
-        languages = qs.fetch_and_join(public_tips=True, private_tips=True,
-                                      video=video)
-        self.assertEquals(set(map(repr, languages)),
-                          set(map(repr, self.langs.values())))
+    def run_fetch_for_languages(self, *args, **kwargs):
+        return SubtitleVersion.objects.fetch_for_languages(self.languages,
+                                                           *args, **kwargs)
 
-    def test_fetch_and_join_sets_tip_cache(self):
-        video = self.videos['v']
-        qs = video.newsubtitlelanguage_set.all()
-        languages = qs.fetch_and_join(public_tips=True, private_tips=True,
-                                      video=video)
-        for l in languages:
-            self.assertEquals(repr(l._tip_cache['public']),
-                              repr(self.public_tips.get(l.language_code)))
-            self.assertEquals(repr(l._tip_cache['extant']),
-                              repr(self.private_tips.get(l.language_code)))
+    def test_versions(self):
+        versions = self.run_fetch_for_languages()
+        assert_items_equal(versions.keys(), [l.id for l in self.languages])
+        for language_id, version_list in versions.items():
+            version_qs = (SubtitleVersion.objects
+                          .filter(subtitle_language_id=language_id))
+            assert_equal(version_list, list(version_qs))
 
-    def test_fetch_and_join_sets_cached_video(self):
-        video = self.videos['v']
-        qs = video.newsubtitlelanguage_set.all()
-        languages = qs.fetch_and_join(public_tips=True, private_tips=True,
-                                      video=video)
-        for lang in languages:
-            self.assert_(hasattr(lang, '_video_cache'))
-            for version in lang._tip_cache.values():
-                if version is not None:
-                    self.assertEquals(version._video_cache.id, video.id)
+    def test_order_by(self):
+        versions = self.run_fetch_for_languages(order_by='-version_number')
+        for language_id, version_list in versions.items():
+            version_qs = (SubtitleVersion.objects
+                          .filter(subtitle_language_id=language_id)
+                          .order_by('-version_number'))
+            assert_equal(version_list, list(version_qs))
 
-    def test_fetch_and_join_sets_cached_language(self):
-        video = self.videos['v']
-        qs = video.newsubtitlelanguage_set.all()
-        languages = qs.fetch_and_join(public_tips=True, private_tips=True)
-        for lang in languages:
-            for version in lang._tip_cache.values():
-                if version is not None:
-                    self.assertEquals(version._subtitle_language_cache.id,
-                                      lang.id)
+    def test_select_related(self):
+        versions = self.run_fetch_for_languages(select_related=('author',))
+        for language_id, version_list in versions.items():
+            for version in version_list:
+                with self.assertNumQueries(0):
+                    version.author.username
+
+    def test_prefetch_related(self):
+        versions = self.run_fetch_for_languages(prefetch_related=('author',))
+        fetched_any_author = False
+        for language_id, version_list in versions.items():
+            for version in version_list:
+                # The first time we fetch an author it should run a query to
+                # fetch them all
+                if not fetched_any_author:
+                    version.author
+                with self.assertNumQueries(0):
+                    version.author.username
+
+    def test_tip_cache(self):
+        self.run_fetch_for_languages()
+        for language in self.languages:
+            assert_tip_cache_correct(self.video, language, True, True)
+
+    def test_tip_cache_with_order_by(self):
+        # test that ordering the versions differently doesn't mess up the tip
+        # cache
+        self.run_fetch_for_languages(order_by='-title')
+        for language in self.languages:
+            assert_tip_cache_correct(self.video, language, True, True)
+
+    def test_public_only(self):
+        versions = self.run_fetch_for_languages(public_only=True)
+        for language in self.languages:
+            assert_tip_cache_correct(self.video, language, True, False)
+            version_qs = (SubtitleVersion.objects.public()
+                          .filter(subtitle_language_id=language.id))
+            assert_equal(versions[language.id], list(version_qs))
+
+    def test_set_video(self):
+        # test that fetch_for_languages() sets the video attribute, so
+        # accessing it doesn't require an extra db query
+        versions = self.run_fetch_for_languages(video=self.video)
+        for lang in self.languages:
+            with self.assertNumQueries(0):
+                assert_equals(lang.video, self.video)
+        for language_id, versions in versions.items():
+            for version in versions:
+                with self.assertNumQueries(0):
+                    assert_equal(version.video, self.video)
+
+    def test_fetch_for_languages_sets_cached_language(self):
+        # test that fetch_for_languages() sets the subtitle_language
+        # attribute, so accessing it doesn't require an extra db query
+        versions = self.run_fetch_for_languages()
+        for language_id, versions in versions.items():
+            for version in versions:
+                with self.assertNumQueries(0):
+                    assert_equal(version.subtitle_language.id, language_id)
+
+class TestBulkHasPublicVersion(TestCase):
+    def setUp(self):
+        self.video = VideoFactory()
+
+    def check_bulk_has_public_version(self, **correct_values):
+        languages = list(self.video.newsubtitlelanguage_set.all())
+        SubtitleLanguage.bulk_has_public_version(languages)
+        assert_equal(
+            dict((l.language_code, l._has_public_version) for l in languages),
+            correct_values
+        )
+
+    def test_no_versions(self):
+        SubtitleLanguageFactory(video=self.video, language_code='en')
+        self.check_bulk_has_public_version(en=False)
+
+    def test_visibility_public(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        self.check_bulk_has_public_version(en=True)
+
+    def test_visibility_private(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='private')
+        self.check_bulk_has_public_version(en=False)
+
+    def test_visibility_override_public(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='private',
+                               visibility_override='public')
+        self.check_bulk_has_public_version(en=True)
+
+    def test_visibility_override_private(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public',
+                               visibility_override='private')
+        self.check_bulk_has_public_version(en=False)
+
+    def test_visibility_override_deleted(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public',
+                               visibility_override='deleted')
+        self.check_bulk_has_public_version(en=False)
+
+    def test_one_version_public(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        pipeline.add_subtitles(self.video, 'en', None, visibility='private')
+        self.check_bulk_has_public_version(en=True)
+
+    def test_multiple_languages(self):
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        pipeline.add_subtitles(self.video, 'en', None, visibility='private')
+        pipeline.add_subtitles(self.video, 'es', None, visibility='private')
+        pipeline.add_subtitles(self.video, 'fr', None, visibility='public',
+                               visibility_override='private')
+        pipeline.add_subtitles(self.video, 'de', None, visibility='private',
+                               visibility_override='public')
+        self.check_bulk_has_public_version(en=True, es=False, fr=False,
+                                           de=True)
+
+    def test_has_public_version_is_optimized(self):
+        # test that calling has_public_version() doesn't result in any db
+        # queries
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        pipeline.add_subtitles(self.video, 'fr', None, visibility='private')
+        languages = list(self.video.newsubtitlelanguage_set.all())
+        SubtitleLanguage.bulk_has_public_version(languages)
+        with self.assertNumQueries(0):
+            assert_true(languages[0].has_public_version())
+            assert_false(languages[1].has_public_version())
 
 class TestTeamInteractions(TestCase):
     def setUp(self):

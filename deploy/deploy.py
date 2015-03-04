@@ -75,13 +75,6 @@ class LoggingTimer(object):
         log("{}: {}:{:0.1f}s", msg, int(mins), secs)
         self.reset()
 
-def log_dot(newline=False):
-    if newline:
-        sys.stdout.write('.\n')
-    else:
-        sys.stdout.write('.')
-    sys.stdout.flush()
-
 ContainerInfo = collections.namedtuple('ContainerInfo', 'host name cid')
 
 class UnixDomainSocketHTTPConnection(httplib.HTTPConnection):
@@ -235,6 +228,8 @@ class ImageBuilder(object):
 
     def setup_images(self):
         timer = LoggingTimer()
+        # make sure amara-enterprise is on the correct commit
+        subprocess.check_call(['bin/update-integration.py', '--skip-fetch'])
         self.docker.run(BUILDER_DOCKER_HOST, 'build',
                         '--no-cache', '-t', self.image_name, '.')
         timer.log_time('image build')
@@ -338,7 +333,7 @@ class ContainerManager(object):
             command: command to pass to our entrypoint.  The entrypoint is a
                 copy of .docker/entry.sh
         """
-        cmd_line = [ 'run', '-it', '--rm', ]
+        cmd_line = [ 'run', '-t', '--rm', ]
         cmd_line += self.app_env_params()
         cmd_line += [self.image_name, command]
         self.docker.run(self.env.DOCKER_HOST_1, *cmd_line)
@@ -355,9 +350,11 @@ class ContainerManager(object):
                 master_worker)
 
         """
+        host_name = '{}-{}.amara.org'.format(self.env.BRANCH, name)
         name = self.container_name_prefix_for_build() + name
         cmd_line = [
-            'run', '-it', '-d',
+            'run', '-t', '-d',
+            '-h', host_name,
             '--name', name,
             '--restart=always',
         ] + self.app_env_params() + [self.image_name, command]
@@ -376,7 +373,7 @@ class ContainerManager(object):
         """
         name = self.container_name_prefix_for_build() + name
         cmd_line = [
-            'run', '-it', '-d', '-P',
+            'run', '-t', '-d', '-P',
             '-h', self.app_hostname(),
             '--name', name,
             '--restart=always',
@@ -403,6 +400,7 @@ class ContainerManager(object):
             # for preview branches we start 1 instance on the builder host.
             # Also we don't start up the workers
             self.start_app_container(BUILDER_DOCKER_HOST, 'preview')
+            return
 
         self.start_worker_container(self.env.DOCKER_HOST_1, 'master-worker',
                                     'master_worker')
@@ -415,10 +413,7 @@ class ContainerManager(object):
         Returns a list of (host, container_id) tuples.
         """
         old_containers = []
-        if not self.building_preview():
-            hosts_to_search = self.env.docker_hosts()
-        else:
-            hosts_to_search = [BUILDER_DOCKER_HOST]
+        hosts_to_search = [BUILDER_DOCKER_HOST] + self.env.docker_hosts()
         for host in hosts_to_search:
             for container in self.docker.get_containers(host):
                 try:
@@ -460,6 +455,11 @@ class Deploy(object):
             self.container_manager.run_app_command("build_media")
         self.start_and_stop_containers()
         self.container_manager.print_report()
+
+    def stop_old_containers(self):
+        self.setup()
+        old_containers = self.container_manager.find_old_containers()
+        self.container_manager.shutdown_old_containers(old_containers)
 
     def setup(self):
         self.cd_to_project_root()
@@ -589,6 +589,8 @@ def main(argv):
             command = 'deploy'
         if command == 'deploy':
             Deploy().run()
+        elif command == 'stop-deploy':
+            Deploy().stop_old_containers()
         elif command == 'cleanup':
             Cleanup().run()
         else:

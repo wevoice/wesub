@@ -20,15 +20,21 @@ from rest_framework import routers
 
 from api import views
 
-
 router = routers.SimpleRouter()
 router.register(r'videos', views.VideoViewSet)
+router.register(r'videos/(?P<video_id>[\w\d]+)/languages',
+                views.SubtitleLanguageViewSet, base_name='subtitle-language')
+router.register(r'users', views.UserViewSet, base_name='users')
 
 urlpatterns = router.urls + patterns('',
-    url(r'^videos/(?P<video_id>[\w\d_.-]+)'
-        '/languages/(?P<language_code>[\w\d-]+)/subtitles/actions/$',
+    url(r'^videos/(?P<video_id>[\w\d]+)'
+        '/languages/(?P<language_code>[\w-]+)/subtitles/$',
+        views.SubtitlesView.as_view(), name='subtitles'),
+    url(r'^videos/(?P<video_id>[\w\d]+)'
+        '/languages/(?P<language_code>[\w-]+)/subtitles/actions/$',
         views.Actions.as_view(), name='subtitle-actions'),
-    url(r'^videos/(?P<video_id>[\w\d_.-]+)'
-        '/languages/(?P<language_code>[\w\d-]+)/subtitles/notes/$',
+    url(r'^videos/(?P<video_id>[\w\d]+)'
+        '/languages/(?P<language_code>[\w-]+)/subtitles/notes/$',
         views.NotesList.as_view()),
+    url(r'^languages/$', views.languages, name='languages'),
 )

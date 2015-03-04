@@ -129,14 +129,17 @@ from django import http
 from django.db.models import Q
 from rest_framework import filters
 from rest_framework import generics
+from rest_framework import mixins
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.reverse import reverse
 import json
 
 from api.pagination import AmaraPaginationMixin
 from teams import permissions as team_perms
 from teams.models import Team, TeamVideo, Project
+from subtitles.models import SubtitleLanguage
 from videos import metadata
 from videos.models import Video
 import videos.tasks
@@ -150,14 +153,20 @@ class VideoLanguageShortSerializer(serializers.Serializer):
     resource_uri = serializers.SerializerMethodField()
 
     def get_resource_uri(self, language):
-        # hack until we re-implement the video language resource
-        from apiv2.api import VideoLanguageResource
-        return VideoLanguageResource('partners').get_resource_uri(language)
+        kwargs = {
+            'video_id': language.video.video_id,
+            'language_code': language.language_code,
+        }
+        return reverse('api:subtitle-language-detail', kwargs=kwargs,
+                       request=self.context['request'])
 
     def get_subtitles_uri(self, language):
-        # hack until we re-implement the subtitles resource
-        from apiv2.api import SubtitleResource
-        return SubtitleResource('partners').get_resource_uri(language)
+        kwargs = {
+            'video_id': language.video.video_id,
+            'language_code': language.language_code,
+        }
+        return reverse('api:subtitles', kwargs=kwargs,
+                       request=self.context['request'])
 
 class VideoMetadataSerializer(serializers.Serializer):
     default_error_messages = {
@@ -202,6 +211,26 @@ class ProjectSerializer(serializers.CharField):
         else:
             return team_video.project.slug
 
+class VideoListSerializer(serializers.ListSerializer):
+    def to_representation(self, qs):
+        # Do some optimizations to reduce the number of queries before passing
+        # the result to the default to_representation() method
+
+        # Note: we have to use prefetch_related the teamvideo attributes,
+        # otherwise it will filter out non-team videos.  I think this is a
+        # django 1.4 bug.
+        qs = (qs.select_related('teamvideo')
+              .prefetch_related('teamvideo__team', 'teamvideo__project',
+                                'newsubtitlelanguage_set', 'videourl_set'))
+        # run bulk_has_public_version(), otherwise we have a query for each
+        # language of each video
+        videos = list(qs)
+        all_languages = []
+        for v in videos:
+            all_languages.extend(v.all_subtitle_languages())
+        SubtitleLanguage.bulk_has_public_version(all_languages)
+        return super(VideoListSerializer, self).to_representation(videos)
+
 class VideoSerializer(serializers.Serializer):
     # Note we could try to use ModelSerializer, but we are so far from the
     # default implementation that it makes more sense to not inherit.
@@ -233,12 +262,14 @@ class VideoSerializer(serializers.Serializer):
         'invalid-url': 'Invalid URL: {url}',
     }
 
+    class Meta:
+        list_serializer_class = VideoListSerializer
+
     def __init__(self, *args, **kwargs):
         super(VideoSerializer, self).__init__(*args, **kwargs)
         if self.instance:
             # video_url should only be sent for creation
             self.fields['video_url'].read_only = True
-        self.user = self.context['request'].user
 
     @property
     def team_video(self):
@@ -309,12 +340,12 @@ class VideoSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         video, created = Video.get_or_create_for_url(
-            validated_data['video_url'], user=self.user
+            validated_data['video_url'], user=self.context['user'],
         )
-        if not created:
-            self.fail('video-exists', url=validated_data['video_url'])
         if video is None:
             self.fail('invalid-url', url=validated_data['video_url'])
+        if not created:
+            self.fail('video-exists', url=validated_data['video_url'])
         return self._update(video, validated_data)
 
     def update(self, video, validated_data):
@@ -352,7 +383,12 @@ class VideoSerializer(serializers.Serializer):
                                          project=project)
         video.clear_team_video_cache()
 
-class VideoViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
+class VideoViewSet(AmaraPaginationMixin,
+                   mixins.CreateModelMixin,
+                   mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
+                   mixins.ListModelMixin,
+                   viewsets.GenericViewSet):
     serializer_class = VideoSerializer
     queryset = Video.objects.all()
     paginate_by = 20
@@ -362,6 +398,12 @@ class VideoViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
 
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = ('title', 'created')
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'user': self.request.user,
+        }
 
     def get_queryset(self):
         query_params = self.request.query_params
@@ -404,7 +446,9 @@ class VideoViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
 
     def get_object(self):
         try:
-            video = Video.objects.get(video_id=self.kwargs['video_id'])
+            video = (Video.objects
+                     .select_related('teamvideo')
+                     .get(video_id=self.kwargs['video_id']))
         except Video.DoesNotExist:
             if self.request.user.is_staff:
                 raise http.Http404
@@ -413,6 +457,8 @@ class VideoViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
         workflow = video.get_workflow()
         if not workflow.user_can_view_video(self.request.user):
             raise PermissionDenied()
+        SubtitleLanguage.bulk_has_public_version(
+            video.all_subtitle_languages())
         return video
 
     def check_save_permissions(self, serializer):

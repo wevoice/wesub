@@ -60,30 +60,8 @@ EOF
     chown root:root /etc/s3cfg
     chmod 600 /etc/s3cfg
 
-    mkdir -p /root/.ssh
-    # get private key from s3 to clone private repo
-    s3cmd -c /etc/s3cfg get --force s3://amara/admin/keys/git-pcf /root/.ssh/git_id_rsa
-    chmod 600 /root/.ssh/git_id_rsa
-    cat << EOF > /root/.ssh/config
-Host github.com
-    IdentityFile /root/.ssh/git_id_rsa
-EOF
     cd $APP_DIR
-    git fetch
-    git branch --track $REV origin/$REV
-    git checkout --force $REV
-    git pull --ff-only origin $REV
     s3cmd -c /etc/s3cfg get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
     # get transifex config
     s3cmd -c /etc/s3cfg get --force s3://amara/settings/transifexrc /.transifexrc
 fi
-
-./bin/update-integration.py --clone-missing
-
-cd $APP_DIR
-python ./deploy/create_commit_file.py
-
-pushd deploy
-# install dependencies
-pip install -r requirements.txt
-popd

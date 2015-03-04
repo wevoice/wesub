@@ -39,7 +39,7 @@ def s3_subdirectory():
     """
     if commit is None:
         raise AssertionError("No commit module")
-    return commit.LAST_COMMIT_GUID.split('/')[1]
+    return commit.LAST_COMMIT_GUID
 
 def static_url():
     """Get the base URL for static media

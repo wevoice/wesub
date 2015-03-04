@@ -174,9 +174,13 @@ class Page(object):
                wait_for_element, wait for a passed in element to display
         """
         elem = self._safe_find(element)
-        elem.click()
-        if wait_for_element:
-            self.wait_for_element_present(wait_for_element)
+        try:
+            elem.click()
+            if wait_for_element:
+                self.wait_for_element_present(wait_for_element)
+        except TimeoutException as e:
+            self.logger.info(e)
+            pass
 
     def submit_by_css(self, element):
         """Submit a form based on the css given.
