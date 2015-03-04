@@ -121,6 +121,67 @@ target team.
 .. note::
     To move a video to a different project, the team must be specified in the
     payload even if it doesn't change.
+
+Video URL Resource
+^^^^^^^^^^^^^^^^^^
+
+Listing video urls
+++++++++++++++++++
+
+.. http:get:: /api2/partners/videos/[video-id]/urls/
+
+  :param video-id: Amara video ID
+  :>json created: creation date/time
+  :>json url: URL string
+  :>json primary: is this the primary URL for the video?
+  :>json original: was this the URL that was created with the video?
+  :>json resource_uri: API URL for the video URL
+  :>json id: Internal ID for the object **(deprecated, use resource_uri
+       instead to create URLs for the object)**
+
+Adding a video url
++++++++++++++++++++
+
+.. http:post:: /api2/partners/videos/[video-id]/urls/
+
+    :param video-id: Amara Video ID
+
+    :<json url: Video URL.  This can be any URL that works in the add video
+        form for the site (mp4 files, youtube, vimeo, etc).  Note: The URL
+        cannot be in use by another video.
+    :<json primary: If True, this URL will be made the primary URL
+    :<json original: Is this is the first url for the video?
+
+Get details on a single URL
++++++++++++++++++++++++++++
+
+.. http:get:: [url-resource-uri]
+
+    :param url-resource-url: resource_uri returned from the video URLs listing
+
+    The response fields are the same as for the list endpoint
+
+Make a URL the primary URL for a video
+++++++++++++++++++++++++++++++++++++++
+
+.. http:put:: [url-resource-uri]
+
+    :param url-resource-url: resource_uri returned from the video URLs listing
+    :<json primary: True to make the URL the primary URL.  This will unset the
+                    primary flag for all other URLs.
+    :<json original: Is this is the first url for the video?
+
+Deleting URLs
++++++++++++++
+
+.. http:delete:: [url-resource-uri]
+
+    :param url-resource-url: resource_uri returned from the video URLs listing
+
+.. note:
+
+    A video must have a primary URL.  If this the primary URL for a video, the
+    request will fail with a 400 code.
 """
 
 from __future__ import absolute_import
@@ -142,6 +203,7 @@ from teams.models import Team, TeamVideo, Project
 from subtitles.models import SubtitleLanguage
 from videos import metadata
 from videos.models import Video
+from videos.types import video_type_registrar
 import videos.tasks
 
 class VideoLanguageShortSerializer(serializers.Serializer):
@@ -481,3 +543,74 @@ class VideoViewSet(AmaraPaginationMixin,
         video = serializer.save()
         videos.tasks.video_changed_tasks.delay(video.pk)
         return video
+
+class VideoURLSerializer(serializers.Serializer):
+    created = serializers.DateTimeField(read_only=True)
+    url = serializers.CharField()
+    primary = serializers.BooleanField(required=False)
+    original = serializers.BooleanField(required=False)
+    id = serializers.IntegerField(read_only=True)
+    resource_uri = serializers.SerializerMethodField()
+
+    def get_resource_uri(self, video_url):
+        return reverse('api:video-url-detail', kwargs={
+            'video_id': self.context['video'].video_id,
+            'pk': video_url.id,
+        }, request=self.context['request'])
+
+    def create(self, validated_data):
+        vt = video_type_registrar.video_type_for_url(validated_data['url'])
+
+        new_url = self.context['video'].videourl_set.create(
+            url=validated_data['url'],
+            original=validated_data.get('original', False),
+            type=vt.abbreviation,
+            added_by=self.context['user'],
+        )
+        if validated_data.get('primary'):
+            new_url.make_primary()
+        return new_url
+
+    def update(self, video_url, validated_data):
+        if ('original' in validated_data and
+            validated_data['original'] != video_url.original):
+            video_url.original = validated_data['original']
+            video_url.save()
+
+        if validated_data.get('primary'):
+            video_url.make_primary()
+
+        return video_url
+
+class VideoURLUpdateSerializer(VideoURLSerializer):
+    url = serializers.CharField(read_only=True)
+
+class VideoURLViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
+
+    def get_serializer_class(self):
+        if 'pk' in self.kwargs:
+            return VideoURLUpdateSerializer
+        else:
+            return VideoURLSerializer
+
+    @property
+    def video(self):
+        if not hasattr(self, '_video'):
+            self._video = Video.objects.get(video_id=self.kwargs['video_id'])
+        return self._video
+
+    def get_queryset(self):
+        return self.video.videourl_set.all().select_related('video')
+
+    def perform_destroy(self, instance):
+        if instance.primary:
+            raise serializers.ValidationError("Can't delete the primary URL")
+        instance.delete()
+
+    def get_serializer_context(self):
+        return {
+            'video': self.video,
+            'user': self.request.user,
+            'request': self.request,
+        }
+

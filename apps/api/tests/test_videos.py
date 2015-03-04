@@ -17,7 +17,9 @@
 
 from django.test import TestCase
 from nose.tools import *
+from rest_framework import status
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.reverse import reverse
 from rest_framework.test import APIClient, APIRequestFactory
 import mock
 
@@ -25,6 +27,7 @@ from api.views.videos import VideoSerializer, VideoViewSet
 from subtitles import pipeline
 from utils.factories import *
 from utils import test_utils
+from utils.test_utils.api import *
 import teams.signals
 
 class VideoSerializerTest(TestCase):
@@ -618,3 +621,112 @@ class ViewSetCreateUpdateTestCase(TestCase):
         assert_equal(mock_video_changed_tasks.delay.call_count, 1)
         assert_equal(mock_video_changed_tasks.delay.call_args,
                      mock.call(video.pk))
+
+class VideoURLTestCase(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.video = VideoFactory()
+        self.primary_url = self.video.get_primary_videourl_obj()
+        self.other_url = VideoURLFactory(video=self.video)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.list_url = reverse('api:video-url-list',
+                                args=(self.video.video_id,))
+
+    def detail_url(self, video_url):
+        return reverse('api:video-url-detail', kwargs={
+            'video_id': video_url.video.video_id,
+            'pk': video_url.id,
+        }, request=APIRequestFactory().get('/'))
+
+    def correct_data(self, video_url):
+        return {
+            'created': video_url.created.isoformat(),
+            'url': video_url.url,
+            'primary': video_url.primary,
+            'original': video_url.original,
+            'id': video_url.id,
+            'resource_uri': self.detail_url(video_url),
+        }
+
+    def test_list_urls(self):
+        response = self.client.get(self.list_url)
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_items_equal(response.data, [
+            self.correct_data(self.primary_url),
+            self.correct_data(self.other_url)
+        ])
+
+    def test_get_detail(self):
+        response = self.client.get(self.detail_url(self.primary_url))
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_items_equal(response.data, self.correct_data(self.primary_url))
+
+    def test_add_url(self):
+        url = 'http://example.com/added-video.mp4'
+        response = self.client.post(self.list_url, {'url': url})
+        assert_equal(response.status_code, status.HTTP_201_CREATED)
+        qs = self.video.videourl_set.filter(url=url)
+        assert_equal(qs.count(), 1)
+        assert_equal(qs[0].added_by, self.user)
+
+    def check_primary_url(self, url):
+        qs = self.video.videourl_set.filter(primary=True)
+        assert_equal([vurl.url for vurl in qs], [url])
+
+    def test_add_primary_url(self):
+        url = 'http://example.com/added-video.mp4'
+        response = self.client.post(self.list_url, {
+            'url': url,
+            'primary': True}
+        )
+        assert_equal(response.status_code, status.HTTP_201_CREATED)
+        self.check_primary_url(url)
+
+    def test_add_with_original(self):
+        url = 'http://example.com/added-video.mp4'
+        response = self.client.post(self.list_url, {
+            'url': url,
+            'original': True}
+        )
+        assert_equal(response.status_code, status.HTTP_201_CREATED)
+        assert_true(self.video.videourl_set.get(url=url).original)
+
+    def test_set_primary(self):
+        response = self.client.put(self.detail_url(self.other_url), {
+            'primary': True
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        self.check_primary_url(self.other_url.url)
+
+    def test_set_original(self):
+        response = self.client.put(self.detail_url(self.other_url), {
+            'original': True
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        assert_true(test_utils.reload_obj(self.other_url).original)
+
+    def test_delete_url(self):
+        response = self.client.delete(self.detail_url(self.other_url))
+        assert_equal(response.status_code, status.HTTP_204_NO_CONTENT,
+                     response.content)
+        assert_equal(list(self.video.videourl_set.all()), [self.primary_url])
+
+    def test_cant_delete_primary_url(self):
+        response = self.client.delete(self.detail_url(self.primary_url))
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST,
+                     response.content)
+        assert_items_equal(self.video.videourl_set.all(),
+                           [self.primary_url, self.other_url])
+
+    def test_writeable_fields(self):
+        response = self.client.options(self.list_url)
+        assert_writable_fields(response, 'POST',
+                               ['url', 'original', 'primary'])
+
+    def test_writeable_fields_details(self):
+        response = self.client.options(self.detail_url(self.primary_url))
+        assert_writable_fields(response, 'PUT',
+                               ['original', 'primary'])
