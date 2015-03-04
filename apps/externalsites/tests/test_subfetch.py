@@ -35,8 +35,8 @@ class SubFetchTestCase(TestCase):
         self.assertEqual(should_fetch_subs(youtube_url), True)
         self.assertEqual(should_fetch_subs(video_url), False)
 
-    @test_utils.patch_for_test("utils.youtube.get_subtitled_languages")
-    @test_utils.patch_for_test("utils.youtube.get_subtitles")
+    @test_utils.patch_for_test("externalsites.google.get_subtitled_languages")
+    @test_utils.patch_for_test("externalsites.google.get_subtitles")
     def test_fetch_subs(self, mock_get_subtitles,
                         mock_get_subtitled_languages):
         mock_get_subtitled_languages.return_value = ['en', 'fr']
@@ -82,8 +82,8 @@ class SubFetchTestCase(TestCase):
         self.assertEqual(lang_en.get_tip().note, "From youtube")
         self.assertEqual(lang_fr.get_tip().note, "From youtube")
 
-    @test_utils.patch_for_test("utils.youtube.get_subtitled_languages")
-    @test_utils.patch_for_test("utils.youtube.get_subtitles")
+    @test_utils.patch_for_test("externalsites.google.get_subtitled_languages")
+    @test_utils.patch_for_test("externalsites.google.get_subtitles")
     def test_fetch_subs_skips_existing_languages(self, mock_get_subtitles,
                                                  mock_get_subtitled_languages):
         # test that we don't try to get subtitles for languages that already
@@ -98,8 +98,8 @@ class SubFetchTestCase(TestCase):
         self.assertEqual(video.subtitle_language('en').get_tip(),
                          existing_version)
 
-    @test_utils.patch_for_test("utils.youtube.get_subtitled_languages")
-    @test_utils.patch_for_test("utils.youtube.get_subtitles")
+    @test_utils.patch_for_test("externalsites.google.get_subtitled_languages")
+    @test_utils.patch_for_test("externalsites.google.get_subtitles")
     def test_fetch_subs_handles_bcp47_codes(self, mock_get_subtitles,
                                             mock_get_subtitled_languages):
         # youtube uses BCP-47 language codes.  Ensure that we use this code

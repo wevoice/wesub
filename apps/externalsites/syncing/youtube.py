@@ -32,10 +32,10 @@ from utils.metrics import Meter, Occurrence
 
 # NOTE
 # It would be nice to use API version 3 for this and also to use the
-# utils.youtube module to handle it.  However, captions are currently only
-# supported on version 2 -- even though its deprecated.  So this is basically
-# code copied from the old videos.types.youtube module and it uses the version
-# 2 client library.
+# externalsites.google module to handle it.  However, captions are currently
+# only supported on version 2 -- even though its deprecated.  So this is
+# basically code copied from the old videos.types.youtube module and it uses
+# the version 2 client library.
 
 AMARA_CREDIT = translation.ugettext_lazy("Subtitles by the Amara.org community")
 AMARA_DESCRIPTON_CREDIT = translation.ugettext_lazy(

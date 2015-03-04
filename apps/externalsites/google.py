@@ -16,17 +16,19 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-"""utils.youtube -- YouTube API handling."""
+"""externalsites.google -- Google API handling."""
 
 from collections import namedtuple
 from lxml import etree
 import json
 import logging
 import urllib
+import urlparse
 import re
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
+import jwt
 import requests
 
 from utils.subtitles import load_subtitles
@@ -40,15 +42,20 @@ class OAuthError(APIError):
     """Error handling YouTube's OAuth."""
     pass
 
-OAuthCallbackData = namedtuple('OAuthCallbackData', [
-    'refresh_token', 'access_token', 'channel_id', 'username', 'state'
-])
+OAuthCallbackData = namedtuple(
+    'OAuthCallbackData', 'refresh_token access_token openid_id sub state')
+YoutubeUserInfo = namedtuple('YoutubeUserInfo', 'channel_id username')
 VideoInfo = namedtuple('VideoInfo',
                        'channel_id title description duration thumbnail_url')
+OpenIDProfile = namedtuple('OpenIDProfile',
+                           'sub email full_name first_name last_name')
 
 logger = logging.getLogger('utils.youtube')
 
-def request_token_url(redirect_uri, state):
+def youtube_scope():
+    return "https://www.googleapis.com/auth/youtube"
+
+def request_token_url(redirect_uri, access_type, state, extra_scopes=()):
     """Get the URL to for the request token
 
     We should redirect the user's browser to this URL when trying to initiate
@@ -64,16 +71,22 @@ def request_token_url(redirect_uri, state):
     :param state: dict of state info.  This will get returned back from
     handle_callback()
     """
+    scopes = ['openid']
+    scopes.extend(extra_scopes)
+    redirect_uri_parsed = urlparse.urlparse(redirect_uri)
 
     params = {
         "client_id": settings.YOUTUBE_CLIENT_ID,
         "redirect_uri": redirect_uri,
-        "scope": "openid https://www.googleapis.com/auth/youtube",
+        "scope": ' '.join(scopes),
         "state": json.dumps(state),
         "response_type": "code",
-        "approval_prompt": "force",
-        "access_type": "offline",
+        "access_type": access_type,
+        'openid.realm': "{}://{}/".format(redirect_uri_parsed.scheme,
+                                          redirect_uri_parsed.netloc),
     }
+    if access_type == 'offline':
+        params["approval_prompt"] = "force"
 
     return ("https://accounts.google.com/o/oauth2/auth?" + 
             urllib.urlencode(params))
@@ -134,15 +147,14 @@ def handle_callback(request, redirect_uri):
     # exchange the auth code for refresh/access tokens
     response = _oauth_token_post(code=code, grant_type='authorization_code',
                                  redirect_uri=redirect_uri)
-
-
-    user_info = get_user_info(response.json['access_token'])
-
+    # decode the id_token.  We can skip verification since we used HTTPS to
+    # connect to google
+    token_data = jwt.decode(response.json['id_token'], verify=False)
     return OAuthCallbackData(
-        response.json['refresh_token'],
+        response.json.get('refresh_token'),
         response.json['access_token'],
-        user_info[0],
-        user_info[1],
+        token_data['openid_id'],
+        token_data['sub'],
         state,
     )
 
@@ -155,15 +167,14 @@ def revoke_auth_token(refresh_token):
     requests.get('https://accounts.google.com/o/oauth2/revoke',
                  params={'token': refresh_token})
 
-YOUTUBE_REQUEST_URL_BASE = 'https://www.googleapis.com/youtube/v3/'
-def _make_api_request(method, access_token, url_path, data=None, params=None,
+def _make_api_request(method, access_token, url, data=None, params=None,
                       headers=None):
     """Make a youtube API request
 
     :param method: HTTP method to use
     :param access_token: access token to use, or None for APIs that don't
     need authentication
-    :param url_path: url path relative to YOUTUBE_REQUEST_URL_BASE
+    :param url: URL to use
     :param data: data to send to the server
     :param params: params to add to the URL
     :param headers: headers to send to the server
@@ -177,7 +188,6 @@ def _make_api_request(method, access_token, url_path, data=None, params=None,
         if params is None:
             params = {}
         params['key'] = settings.YOUTUBE_API_KEY
-    url = YOUTUBE_REQUEST_URL_BASE + url_path
     response = requests.request(method, url, data=data, params=params,
                                 headers=headers)
     if response.status_code != 200:
@@ -191,14 +201,19 @@ def _make_api_request(method, access_token, url_path, data=None, params=None,
         raise APIError(message)
     return response
 
+def _make_youtube_api_request(method, access_token, url_path, data=None,
+                              params=None, headers=None):
+    url = 'https://www.googleapis.com/youtube/v3/' + url_path
+    return _make_api_request(method, access_token, url, data, params, headers)
+
 def channel_get(access_token, part, mine='true'):
-    return _make_api_request('get', access_token, 'channels', params={
+    return _make_youtube_api_request('get', access_token, 'channels', params={
         'part': ','.join(part),
         'mine': mine,
     })
 
 def video_get(access_token, video_id, part):
-    return _make_api_request('get', access_token, 'videos', params={
+    return _make_youtube_api_request('get', access_token, 'videos', params={
         'id': video_id,
         'part': ','.join(part),
     })
@@ -206,13 +221,13 @@ def video_get(access_token, video_id, part):
 def video_put(access_token, video_id, **data):
     part = '.'.join(data.keys())
     data['id'] = video_id
-    return _make_api_request('put', access_token, 'videos', params={
+    return _make_youtube_api_request('put', access_token, 'videos', params={
         'part': part,
     }, data=json.dumps(data), headers={
         'content-type': 'application/json'
     })
 
-def get_user_info(access_token):
+def get_youtube_user_info(access_token):
     """Get info about a user logged in with access_token
 
     google/youtube have this concept of "channel IDs" which uniquely identify
@@ -224,7 +239,22 @@ def get_user_info(access_token):
     """
     response = channel_get(access_token, part=['id','snippet'])
     channel = response.json['items'][0]
-    return channel['id'], channel['snippet']['title']
+    return YoutubeUserInfo(channel['id'], channel['snippet']['title'])
+
+def get_openid_profile(access_token):
+    """Get OpenID info from an access token
+
+    :returns: OpenIDProfile
+    """
+    url = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect'
+    response = _make_api_request('get', access_token, url)
+    return OpenIDProfile(
+        response.json['sub'],
+        response.json['email'],
+        response.json.get('name', ''),
+        response.json.get('given_name', ''),
+        response.json.get('family_name', ''),
+    )
 
 def _parse_8601_duration(duration):
     """Convert a duration in iso 8601 format to seconds as an integer."""

@@ -41,7 +41,7 @@ from utils import test_utils
 from utils.factories import *
 from utils.test_utils import patch_for_test
 import babelsubs
-import utils.youtube
+import externalsites.google
 import subtitles.signals
 
 class SyncingTriggerTest(TestCase):
@@ -977,9 +977,9 @@ class RefetchYoutubeChannelIDTest(TestCase):
     # general.  For the existing VideoUrl objects, we set the username to
     # NULL with the expectation that it would be refetched on the next
     # sync
-    @patch_for_test('utils.youtube.get_video_info')
+    @patch_for_test('externalsites.google.get_video_info')
     def setUp(self, mock_get_video_info):
-        mock_get_video_info.return_value = utils.youtube.VideoInfo(
+        mock_get_video_info.return_value = externalsites.google.VideoInfo(
             'test-channel-id', 'title', 'description', 10,
             'http://example.com/thumbnail.png')
         self.mock_get_video_info = mock_get_video_info

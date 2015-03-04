@@ -19,22 +19,25 @@
 import logging
 
 from django.contrib import messages
+from django.contrib import auth
 from django.contrib.admin.views.decorators import staff_member_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import is_safe_url
 from django.utils.translation import ugettext as _
 
 from auth.models import CustomUser as User
 from externalsites import forms
+from externalsites import google
+from externalsites.auth_backends import OpenIDConnectInfo
 from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import get_sync_account, YouTubeAccount
 from localeurl.utils import universal_url
 from teams.models import Team
 from teams.permissions import can_change_team_settings
 from teams.views import settings_page
-from utils import youtube
 from utils.text import fmt
 from videos.models import VideoUrl
 
@@ -86,10 +89,38 @@ def settings_page_redirect_url(team, formset):
             'slug': team.slug,
         })
 
-def youtube_callback_url():
+def google_callback_url():
     return universal_url(
-        'externalsites:youtube-callback',
+        'externalsites:google-callback',
         protocol_override=settings.OAUTH_CALLBACK_PROTOCOL)
+
+def google_login(request):
+    state = {
+        'type': 'login',
+        'next': request.GET.get('next')
+    }
+    return redirect(google.request_token_url(
+        google_callback_url(), 'online', state, ['profile', 'email']))
+
+def handle_login_callback(request, auth_info):
+    profile_info = google.get_openid_profile(auth_info.access_token)
+    openid_connect_info = OpenIDConnectInfo(
+        auth_info.sub, profile_info.email, auth_info.openid_id, {
+            'full_name': profile_info.full_name,
+            'first_name': profile_info.first_name,
+            'last_name': profile_info.last_name
+        }
+    )
+    user = auth.authenticate(openid_connect_info=openid_connect_info)
+    if not user:
+        messages.error(request, _("OpenID Connect error"))
+        return redirect('videos.videos.index')
+    auth.login(request, user)
+    next_url = auth_info.state.get('next')
+    if next_url and is_safe_url(next_url):
+        return HttpResponseRedirect(next_url)
+    else:
+        return redirect('videos.videos.index')
 
 def youtube_add_account(request):
     if 'team_slug' in request.GET:
@@ -99,22 +130,24 @@ def youtube_add_account(request):
     else:
         logging.error("youtube_add_account: Unknown owner")
         raise Http404()
-    return redirect(youtube.request_token_url(youtube_callback_url(), state))
+    state['type'] = 'add-account'
+    return redirect(google.request_token_url(
+        google_callback_url(), 'offline', state,
+        ['https://www.googleapis.com/auth/youtube']))
 
-def youtube_callback(request):
+def handle_add_account_callback(request, auth_info):
     try:
-        auth_info = youtube.handle_callback(request, youtube_callback_url())
-    except youtube.APIError, e:
-        logging.error("youtube_callback_team: %s" % e)
+        user_info = google.get_youtube_user_info(auth_info.access_token)
+    except google.APIError, e:
+        logging.error("handle_add_account_callback: %s" % e)
         messages.error(request, e.message)
         # there's no good place to redirect the user to since we don't know
         # what team/user they were trying to add the account for.  I guess the
         # homepage is as good as any.
         return redirect('videos.views.index')
-
     account_data = {
-        'username': auth_info.username,
-        'channel_id': auth_info.channel_id,
+        'username': user_info.username,
+        'channel_id': user_info.channel_id,
         'oauth_refresh_token': auth_info.refresh_token,
     }
     if 'team_slug' in auth_info.state:
@@ -128,7 +161,7 @@ def youtube_callback(request):
         account_data['user'] = user
         redirect_url = reverse('profiles:account')
     else:
-        logger.error("youtube_callback: invalid state data: %s" %
+        logger.error("google_callback: invalid state data: %s" %
                      auth_info.state)
         messages.error(request, _("Error in auth callback"))
         return redirect('videos.views.index')
@@ -142,7 +175,28 @@ def youtube_callback(request):
         if 'username' in auth_info.state:
             account.create_feed()
 
-    return redirect(redirect_url)
+    return HttpResponseRedirect(redirect_url)
+
+def google_callback(request):
+    try:
+        auth_info = google.handle_callback(request, google_callback_url())
+    except google.APIError, e:
+        logging.error("google_callback: %s" % e)
+        messages.error(request, e.message)
+        # there's no good place to redirect the user to since we don't know
+        # what team/user they were trying to add the account for.  I guess the
+        # homepage is as good as any.
+        return redirect('videos.views.index')
+
+    callback_type = auth_info.state.get('type')
+    if callback_type == 'login':
+        return handle_login_callback(request, auth_info)
+    elif callback_type == 'add-account':
+        return handle_add_account_callback(request, auth_info)
+    else:
+        messages.warning(request,
+                         _("Google Login Complete, but no next step"))
+        return redirect('videos.views.index')
 
 def already_linked_message(user, other_account):
     if other_account.user is not None:

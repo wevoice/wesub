@@ -22,10 +22,10 @@ from celery.task import task
 from django.core.exceptions import ObjectDoesNotExist
 
 from externalsites import credit
+from externalsites import google
 from externalsites import subfetch
 from externalsites.models import get_account, get_sync_account, SyncHistory
 from subtitles.models import SubtitleLanguage, SubtitleVersion
-from utils import youtube
 from videos.models import VideoUrl
 
 logger = logging.getLogger(__name__)
