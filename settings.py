@@ -479,7 +479,7 @@ MEDIA_BUNDLES = {
             'src/js/third-party/jquery-1.10.1.js',
             'js/jquery.form.js',
             'src/js/third-party/jquery.autosize.js',
-            'src/js/third-party/angular.1.2.7.js',
+            'src/js/third-party/angular.1.2.9.js',
             'src/js/third-party/angular-cookies.js',
             'src/js/third-party/underscore.1.4.4.js',
             'src/js/third-party/popcorn.js',
