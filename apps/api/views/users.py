@@ -137,7 +137,8 @@ class UserWriteSerializer(UserSerializer):
     valid_username_re = re.compile(r'[\w\-@\.\+]+$')
     def validate_username(self, username):
         if not self.valid_username_re.match(username):
-            self.fail('invalid-username', username=username)
+            self.fail('invalid-username',
+                      username=username.encode('ascii', 'replace'))
         return username
 
     def create(self, validated_data):
