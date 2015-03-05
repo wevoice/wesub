@@ -363,11 +363,13 @@ var angular = angular || null;
         $scope.exitEditor = function() {
             $scope.analytics('editor', 'exit');
             $scope.exiting = true;
+            $scope.releaseLock();
             $window.location = EditorData.redirectUrl;
         }
         $scope.exitToLegacyEditor = function() {
             $scope.analytics('editor', 'exit-to-legacy');
             $scope.exiting = true;
+            $scope.releaseLock();
             $window.location = EditorData.oldEditorURL;
         }
         $scope.showDebugModal = function(evt) {
@@ -417,7 +419,7 @@ var angular = angular || null;
 
         $scope.minutesIdle = 0;
 
-        function releaseLock() {
+        $scope.releaseLock = function() {
             LockService.releaseLock($scope.videoId, 
                     EditorData.editingVersion.languageCode);
         }
@@ -503,7 +505,7 @@ var angular = angular || null;
         }
 
         $scope.showCloseSessionModal = function() {
-            releaseLock();
+            $scope.releaseLock();
             var dialogManager = $scope.dialogManager;
 
             dialogManager.openDialog('sessionEnded', {
@@ -518,10 +520,6 @@ var angular = angular || null;
 
         startUserIdleTimer();
         startRegainLockTimer();
-
-        $window.onunload = function() {
-            releaseLock();
-        }
     }]);
 
     module.controller("AppControllerEvents", ["$scope", "VideoPlayer", function($scope, VideoPlayer) {
