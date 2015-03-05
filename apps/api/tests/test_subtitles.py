@@ -530,7 +530,7 @@ class SubtitlesViewTest(TestCase):
             assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
             # check the call args
             assert_equal(workflow.user_can_view_private_subtitles.call_args,
-                         mock.call(self.user))
+                         mock.call(self.user, 'en'))
 
     def test_check_user_can_edit_subtitles_permission(self):
         with test_utils.patch_get_workflow() as workflow:
