@@ -185,6 +185,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
 
     queryset = User.objects.all()
     lookup_field = 'username'
+    lookup_value_regex = r'[\w\-@\.\+]+'
 
     def get_serializer_class(self):
         if self.request.method == 'GET':

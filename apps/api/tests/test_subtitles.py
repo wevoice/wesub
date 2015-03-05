@@ -544,4 +544,9 @@ class SubtitlesViewTest(TestCase):
                          mock.call(self.user, 'en'))
 
     def test_runs_tasks(self):
-        raise NotImplementedError()
+        test_utils.video_changed_tasks.delay.reset_mock()
+        response = self.client.post(self.url, {
+            'subtitles': SubtitleSetFactory().to_xml()
+        })
+        assert_equal(test_utils.video_changed_tasks.delay.call_args,
+                     mock.call(self.video.pk))
