@@ -21,7 +21,7 @@ describe('The SubtitleStorage service', function() {
         videoId = EditorData.video.id;
         languageCode = EditorData.editingVersion.languageCode;
 
-        subtitlesURL = ('/api2/partners/videos/' + videoId + '/languages/' +
+        subtitlesURL = ('/api/videos/' + videoId + '/languages/' +
             languageCode + '/subtitles/');
         actionsURL = subtitlesURL + 'actions/';
         notesURL = subtitlesURL + 'notes/';
@@ -30,26 +30,6 @@ describe('The SubtitleStorage service', function() {
     afterEach(function() {
         $httpBackend.verifyNoOutstandingExpectation();
         $httpBackend.verifyNoOutstandingRequest();
-    });
-
-    it('saves subtitles', function() {
-        SubtitleStorage.saveSubtitles('dfxp-string', 'title', 'description',
-            'metadata', true, null);
-        $httpBackend.expectPOST(subtitlesURL, {
-            video: videoId,
-            language: languageCode,
-            subtitles: 'dfxp-string',
-            sub_format: 'dfxp',
-            title: 'title',
-            description: 'description',
-            from_editor: true,
-            metadata: 'metadata',
-            is_complete: true,
-            action: null,
-
-        }).respond('200', '');
-        $rootScope.$digest();
-        $httpBackend.flush();
     });
 
     it('saves subtitles with actions', function() {
@@ -64,7 +44,6 @@ describe('The SubtitleStorage service', function() {
             description: 'description',
             from_editor: true,
             metadata: 'metadata',
-            is_complete: true,
             action: 'test-action',
         }).respond('200', '');
         $rootScope.$digest();

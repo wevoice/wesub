@@ -17,7 +17,7 @@ module.exports = function(config) {
     files: [
         'third-party/jquery-1.10.1.js',
         'third-party/angular.*.js',
-        'third-party/angular-mocks.js',
+        'third-party/angular-mocks.*.js',
         'third-party/angular-cookies.js',
         'third-party/jquery.autosize.js',
         'third-party/underscore.1.4.4.js',

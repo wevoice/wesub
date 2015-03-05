@@ -144,9 +144,11 @@ describe('when up and down sync subtitles', function() {
 
     it('syncs when the timeline is shown', inject(function(MockEvents) {
         $scope.handleAppKeyDown(MockEvents.keydown(40));
-        expect($scope.$root.$emit).not.toHaveBeenCalled();
+        expect($scope.$root.$emit).not.toHaveBeenCalledWith("sync-next-start-time");
+        expect($scope.$root.$emit).not.toHaveBeenCalledWith("sync-next-end-time");
         $scope.handleAppKeyDown(MockEvents.keydown(38));
-        expect($scope.$root.$emit).not.toHaveBeenCalled();
+        expect($scope.$root.$emit).not.toHaveBeenCalledWith("sync-next-start-time");
+        expect($scope.$root.$emit).not.toHaveBeenCalledWith("sync-next-end-time");
 
         $scope.timelineShown = true;
         $scope.handleAppKeyDown(MockEvents.keydown(40));
