@@ -627,6 +627,7 @@ class SubtitlesView(generics.CreateAPIView):
     def get_object(self):
         video = self.get_video()
         workflow = workflows.get_workflow(video)
+        language_code = self.kwargs['language_code']
         if not workflow.user_can_view_video(self.request.user):
             raise PermissionDenied()
         version_number = self.request.query_params.get('version_number')
@@ -634,10 +635,10 @@ class SubtitlesView(generics.CreateAPIView):
             version_number = self.request.query_params.get('version')
         if version_number is not None:
             version = video.newsubtitleversion_set.get(
-                language_code=self.kwargs['language_code'],
+                language_code=language_code,
                 version_number=version_number)
         else:
-            language = video.subtitle_language(self.kwargs['language_code'])
+            language = video.subtitle_language(language_code)
             if language is None:
                 raise Http404
             version = language.get_public_tip()
@@ -646,7 +647,8 @@ class SubtitlesView(generics.CreateAPIView):
         if version.is_deleted():
             raise Http404
         if (not version.is_public() and
-            not workflow.user_can_view_private_subtitles(self.request.user)):
+            not workflow.user_can_view_private_subtitles(self.request.user,
+                                                         language_code)):
             raise PermissionDenied()
         return version
 
