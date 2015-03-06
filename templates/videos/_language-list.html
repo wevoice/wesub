@@ -1,7 +1,7 @@
 {% load amara_cache i18n subtitles_tags videos_tags %}
 {% if language_list %}
     <h3>
-        {% include '_embed_link.html' %}
+        {% embedder-code video %}
         {% blocktrans count count=language_list|length %}
             {{ count }} Language
         {% plural %}

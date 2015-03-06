@@ -29,8 +29,7 @@ from staticmedia import utils
 from utils.basexconverter import base62
 from videos.views import LanguageList
 from videos.types import video_type_registrar, VideoTypeError
-from videos import permissions
-from videos import share_utils
+from videos import permissions, share_utils, video_size
 
 @register.inclusion_tag('videos/_feature_video.html', takes_context=True)
 def feature_video(context, video):
@@ -218,6 +217,21 @@ def language_list(video):
         'STATIC_URL': utils.static_url(),
     })
     video.cache.set('language-list', content)
+    return content
+
+@register.simple_tag(name='embedder-code')
+def embedder_code(video):
+    cached = video.cache.get('embedder_code')
+    if cached is not None:
+        return cached
+    video.prefetch_languages(with_public_tips=True,
+                             with_private_tips=True)
+    content = render_to_string('videos/_embed_link.html', {
+        'video_url': video.get_video_url(),
+        'height': video_size["large"]["height"],
+        'width': video_size["large"]["width"],
+    })
+    video.cache.set('embedder_code', content)
     return content
 
 @register.simple_tag(name='video-metadata', takes_context=True)
