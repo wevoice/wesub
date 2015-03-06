@@ -67,9 +67,14 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('username', 'email', 'password1', 'password2')}
         ),
     )
+    actions = ['remove_staff_access']
 
     def get_changelist(self, request, **kwargs):
         return UserChangeList
+
+    def remove_staff_access(self, request, queryset):
+        queryset.update(is_staff=False, is_superuser=False)
+    remove_staff_access.short_description = _(u'Remove Staff Access')
 
 class AnnouncementAdmin(admin.ModelAdmin):
     formfield_overrides = {
