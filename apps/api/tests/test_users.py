@@ -129,6 +129,13 @@ class UserAPITest(TestCase):
             'homepage': '',
         })
 
+    def test_create_user_non_ascii_username(self):
+        response = self.client.post(self.list_url, {
+            'username': '\xc4\x8devap\xc4\x8di\xc4\x87i',
+            'email': 'test@example.com',
+        }, format='json')
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_login_token(self):
         user, response = self.check_post({
             'username': 'test-user',
