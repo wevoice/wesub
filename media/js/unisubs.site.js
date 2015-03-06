@@ -450,6 +450,14 @@ var Site = function(Site) {
                     window.location = $(this).children('option:selected').attr('value');
                 });
             }
+            $('.notes textarea').keypress(function(evt) {
+                if(evt.which == 13 && !evt.shiftKey) {
+                    evt.preventDefault();
+                    evt.stopPropagation();
+                    $(this).closest('form').submit();
+                    return true;
+                }
+            });
             that.setupModalDialogs();
             that.setupSearchBox();
             $.fn.tabs = function(options){
