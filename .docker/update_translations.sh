@@ -1,5 +1,8 @@
 #!/bin/bash
 source /usr/local/bin/config_env
+# install client
+echo "Installing latest Transifex client..."
+pip install transifex-client
 # update
 cd $APP_DIR
 # get private key from s3 to clone private repo
@@ -16,6 +19,23 @@ cat << EOF > /root/.gitconfig
     email = admin@amara.org
 EOF
 
-sed -i 's/.*url.*/url = git@github.com:pculture\/unisubs/g' $APP_DIR/.git/config
+echo "Running makemessages"
+python manage.py makemessages -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
+python manage.py makemessages -d djangojs -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
 
-./deploy/update_translations.sh
+echo "Uploading to transifex"
+tx push --source
+
+echo "Pulling from transifex"
+tx pull -a -f
+
+echo "Compiling messages"
+python manage.py compilemessages
+
+echo "Committing and pushing to repository"
+date
+git pull
+git add locale/*/LC_MESSAGES/django.*o
+git commit -m "Updated transifex translations -- through update_translations.sh"
+git push
+echo "Translations updated..."
