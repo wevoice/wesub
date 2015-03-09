@@ -85,6 +85,7 @@ from utils.text import fmt
 from utils.translation import get_user_languages_from_request
 
 from teams.permissions import can_edit_video, can_add_version, can_rollback_language
+from . import video_size
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -305,8 +306,8 @@ class VideoPageContext(dict):
             self.update(setup_tab_method(request, video, video_url))
 
     def setup_tab_video(self, request, video, video_url):
-        self['width'] = "620"
-        self['height'] = "370"
+        self['width'] = video_size["large"]["width"]
+        self['height'] = video_size["large"]["height"]
 
 @get_video_from_code
 def redirect_to_video(request, video):
@@ -554,8 +555,8 @@ class LanguagePageContext(dict):
         self['revision_count'] = language.version_count()
         self['page_title'] = self.page_title(language)
         self['edit_url'] = language.get_widget_url()
-        self['width'] = "289"
-        self['height'] = "173"
+        self['width'] = video_size["thumb"]["width"]
+        self['height'] = video_size["thumb"]["height"]
         self['video_url'] = video.get_video_url()
         self['language'] = language
         share_utils.add_share_panel_context_for_history(self, video, language)
@@ -760,8 +761,8 @@ def diffing(request, first_version, second_pk):
     else:
         context['rollback_allowed'] = True
 
-    context['width'] = "480"
-    context['height'] = "360"
+    context['width'] = video_size["small"]["width"]
+    context['height'] = video_size["small"]["height"]
     context['video_url'] = video.get_video_url()
 
     return render_to_response('videos/diffing.html', context,

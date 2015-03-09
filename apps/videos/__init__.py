@@ -16,3 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+video_size = {"large": {"width": "620", "height": "370"},
+              "small": {"width": "480", "height": "360"},
+              "thumb": {"width": "289", "height": "173"}}
