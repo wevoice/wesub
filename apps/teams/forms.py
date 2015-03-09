@@ -231,8 +231,19 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         video = self.fields['video_url'].video
 
         if video:
-            if TeamVideo.objects.filter(video=video, team__deleted=False).exists():
-                msg = _(u'This video already belongs to a team.')
+            team_video = video.get_team_video()
+            if team_video and not team_video.team.deleted:
+                team = team_video.team
+                if team.user_can_view_videos(self.user):
+                    link = '<a href="{}">{}</a>.').format(
+                            team_video.team.get_absolute_url(),
+                            team_video.team.slug)
+                    msg = mark_safe(
+                        fmt(_(u'This video already belongs to the '
+                              '%(team_link)s team.'),
+                            team_link=link))
+                else:
+                    msg = _(u'This video already belongs to a team.')
                 self._errors['video_url'] = self.error_class([msg])
 
             original_sl = video.subtitle_language()
