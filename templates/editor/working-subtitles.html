@@ -72,8 +72,8 @@
 	<div class="warning-text">
 	  <p ng-show="showWarning(currentEdit.draft, 'lines')">{% trans "Avoid more than 2 lines per subtitle; split the subtitle into two." %}</p>
 	  <p ng-show="showWarning(currentEdit.draft, 'timing')">{% trans "Briefly displayed subtitles are hard to read; the duration should be more than 700ms." %}</p>
-	  <p ng-show="showWarning(currentEdit.draft, 'characterRate') && !(showWarning(currentEdit.draft, 'timing'))">{% trans "The reading rate should be kept below 22 characters / second; lengthen the duration or split the subtitles." %}</p>
-	  <p ng-show="showWarning(currentEdit.draft, 'longline')">{% trans "Keep subtitle line length less than 43 characters; Add a line break if necessary." %}</p>
+	  <p ng-show="showWarning(currentEdit.draft, 'characterRate') && !(showWarning(currentEdit.draft, 'timing'))">{% trans "Reading rate shouldn't exceed 21 characters / sec; lengthen duration, reduce text or split the subtitle." %}</p>
+	  <p ng-show="showWarning(currentEdit.draft, 'longline')">{% trans "Line length shouldn't exceed 42 characters; add a line break if necessary." %}</p>
 	</div>
     </div>
 
