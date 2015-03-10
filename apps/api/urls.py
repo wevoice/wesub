@@ -26,6 +26,7 @@ router.register(r'videos/(?P<video_id>[\w\d]+)/languages',
                 views.SubtitleLanguageViewSet, base_name='subtitle-language')
 router.register(r'videos/(?P<video_id>[\w\d]+)/urls',
                 views.VideoURLViewSet, base_name='video-url')
+router.register(r'teams', views.TeamViewSet, base_name='teams')
 router.register(r'users', views.UserViewSet, base_name='users')
 
 urlpatterns = router.urls + patterns('',
