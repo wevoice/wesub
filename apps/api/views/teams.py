@@ -130,9 +130,11 @@ class TeamUpdateSerializer(TeamSerializer):
     slug = serializers.SlugField(required=False)
 
 class TeamViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
-    queryset = Team.objects.all()
     lookup_field = 'slug'
     paginate_by = 20
+
+    def get_queryset(self):
+        return Team.objects.for_user(self.request.user)
 
     def get_serializer_class(self):
         if 'slug' in self.kwargs:

@@ -59,7 +59,23 @@ class TeamAPITest(TestCase):
         assert_equal(data['video_policy'], team.get_video_policy_display())
 
     def test_get_list(self):
-        teams = [TeamFactory() for i in range(3)]
+        # we should display these teams
+        teams = [
+            TeamFactory(is_visible=True),
+            TeamFactory(is_visible=False, membership_policy=Team.OPEN),
+            TeamFactory(is_visible=False, membership_policy=Team.APPLICATION),
+            TeamFactory(is_visible=False,
+                        membership_policy=Team.INVITATION_BY_MANAGER,
+                        member=self.user),
+        ]
+        # we should not display these teams
+        TeamFactory(is_visible=False,
+                    membership_policy=Team.INVITATION_BY_ALL)
+        TeamFactory(is_visible=False,
+                    membership_policy=Team.INVITATION_BY_MANAGER)
+        TeamFactory(is_visible=False,
+                    membership_policy=Team.INVITATION_BY_ADMIN)
+
         team_map = dict((t.slug, t) for t in teams)
         response = self.client.get(self.list_url)
         assert_equal(response.status_code, status.HTTP_200_OK)
