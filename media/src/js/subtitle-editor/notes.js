@@ -34,7 +34,7 @@ var angular = angular || null;
 
         function convertBody(body) {
             body = _.escape(body);
-            body = body.replace("\n", "<br />");
+            body = body.replace(/\n/g, "<br />");
             return $sce.trustAsHtml(body);
         }
 
