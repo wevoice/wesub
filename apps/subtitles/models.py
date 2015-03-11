@@ -1154,11 +1154,6 @@ class SubtitleVersionManager(models.Manager):
         assert False, ('all() is disabled on SubtitleVersion sets.  '
                        'Use full(), extant(), or public() instead.')
 
-    def tip(self, video, language_code):
-        """Returns the tip of the subtitles for the given video
-        """
-        return self.public_tips().filter(video=video, language_code=language_code)
-
     def private_tips(self):
         tip_where = """\
 subtitles_subtitleversion.version_number = (

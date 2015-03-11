@@ -70,9 +70,7 @@ from subtitles import signals
 from subtitles.exceptions import ActionError
 from subtitles.models import SubtitleNote
 from utils.behaviors import behavior
-from subtitles.models import (
-    SubtitleLanguage, SubtitleVersion
-)
+
 class Workflow(object):
     """
     A workflow class controls the overall workflow for editing and publishing
@@ -385,10 +383,10 @@ class Action(object):
             subtitle_language.save()
             # In case an action requiring building a billing record
             # was performed with incomplete subtitles
-            tip = SubtitleVersion.objects.tip(video, subtitle_language.language_code)
-            if tip and len(tip) == 1:
+            tip = subtitle_language.get_public_tip()
+            if tip:
                 from teams.models import BillingRecord
-                BillingRecord.objects.insert_record(tip[0])
+                BillingRecord.objects.insert_record(tip)
 
     def editor_data(self):
         """Get a dict of data to pass to the editor for this action."""
