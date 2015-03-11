@@ -22,7 +22,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 import mock
 
-from teams.models import Team
+from teams.models import Team, TeamMember
 from utils import test_utils
 from utils.factories import *
 
@@ -173,3 +173,148 @@ class TeamAPITest(TestCase):
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
         assert_equal(self.mock_can_delete_team.call_args,
                      mock.call(team, self.user))
+
+class TeamMemberAPITest(TestCase):
+    @test_utils.patch_for_test('teams.permissions.can_add_member')
+    @test_utils.patch_for_test('teams.permissions.can_assign_role')
+    @test_utils.patch_for_test('teams.permissions.can_remove_member')
+    def setUp(self, mock_can_remove_member, mock_can_assign_role,
+              mock_can_add_member):
+        self.user = UserFactory()
+        self.team = TeamFactory(owner=self.user)
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
+        self.list_url = reverse('api:team-members-list', kwargs={
+            'team_slug': self.team.slug,
+        })
+
+        self.mock_can_add_member = mock_can_add_member
+        self.mock_can_assign_role = mock_can_assign_role
+        self.mock_can_remove_member = mock_can_remove_member
+        mock_can_add_member.return_value = True
+        mock_can_assign_role.return_value = True
+        mock_can_remove_member.return_value = True
+
+    def detail_url(self, user):
+        return reverse('api:team-members-detail', kwargs={
+            'team_slug': self.team.slug,
+            'username': user.username,
+        })
+
+    def test_add_team_member(self):
+        user = UserFactory()
+        response = self.client.post(self.list_url, data={
+            'username': user.username,
+            'role': 'contributor',
+        })
+        assert_equal(response.status_code, status.HTTP_201_CREATED,
+                     response.content)
+        member = self.team.members.get(user=user)
+        assert_equal(member.role, TeamMember.ROLE_CONTRIBUTOR)
+
+    def test_add_existing_team_member(self):
+        user = TeamMemberFactory(team=self.team).user
+        response = self.client.post(self.list_url, data={
+            'username': user.username,
+            'role': 'contributor',
+        })
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_change_role(self):
+        member = TeamMemberFactory(team=self.team,
+                                   role=TeamMember.ROLE_CONTRIBUTOR)
+        response = self.client.put(self.detail_url(member.user), data={
+            'role': 'admin',
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        assert_equal(test_utils.reload_obj(member).role,
+                     TeamMember.ROLE_ADMIN)
+
+    def test_username_in_put(self):
+        # test the username field being in a PUT request.  It doesn't really
+        # make sense in this case so we should just ignore it
+        member = TeamMemberFactory(team=self.team,
+                                   role=TeamMember.ROLE_CONTRIBUTOR)
+        response = self.client.put(self.detail_url(member.user), data={
+            'username': 'foo',
+            'role': 'admin',
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        assert_equal(test_utils.reload_obj(member).role,
+                     TeamMember.ROLE_ADMIN)
+
+    def test_remove_member(self):
+        member = TeamMemberFactory(team=self.team,
+                                   role=TeamMember.ROLE_CONTRIBUTOR)
+        user = member.user
+        response = self.client.delete(self.detail_url(member.user))
+        assert_equal(response.status_code, status.HTTP_204_NO_CONTENT,
+                     response.content)
+        assert_false(self.team.members.filter(user=user).exists())
+    
+    def test_cant_remove_owner(self):
+        member = TeamMemberFactory(team=self.team, role=TeamMember.ROLE_OWNER)
+        response = self.client.delete(self.detail_url(member.user))
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST,
+                     response.content)
+        assert_true(self.team.members.filter(
+            user=member.user, role=TeamMember.ROLE_OWNER).exists())
+
+    def test_cant_remove_self(self):
+        response = self.client.delete(self.detail_url(self.user))
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST,
+                     response.content)
+        assert_true(self.team.members.filter(
+            user=self.user, role=TeamMember.ROLE_OWNER).exists())
+
+    def test_view_list_permissions(self):
+        # only members can view the membership list
+        non_member = UserFactory()
+        self.client.force_authenticate(user=non_member)
+        response = self.client.get(self.list_url)
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_view_details_permissions(self):
+        # only members can view details on a member
+        non_member = UserFactory()
+        self.client.force_authenticate(user=non_member)
+        response = self.client.get(self.detail_url(self.user))
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_add_checks_permissions(self):
+        self.mock_can_add_member.return_value = False
+        response = self.client.post(self.list_url, data={
+            'username': UserFactory().username,
+            'role': 'contributor',
+        })
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert_equal(self.mock_can_add_member.call_args,
+                     mock.call(self.team, self.user))
+
+    def test_change_checks_permissions(self):
+#def can_assign_role(team, user, role, to_user):
+        self.mock_can_assign_role.return_value = False
+        member = TeamMemberFactory(team=self.team,
+                                   role=TeamMember.ROLE_CONTRIBUTOR)
+        response = self.client.put(self.detail_url(member.user), data={
+            'username': member.user,
+            'role': TeamMember.ROLE_ADMIN,
+        })
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert_equal(test_utils.reload_obj(member).role,
+                     TeamMember.ROLE_CONTRIBUTOR)
+        assert_equal(self.mock_can_assign_role.call_args,
+                     mock.call(self.team, self.user, TeamMember.ROLE_ADMIN,
+                               member.user))
+
+    def test_remove_checks_permissions(self):
+        self.mock_can_remove_member.return_value = False
+        member = TeamMemberFactory(team=self.team,
+                                   role=TeamMember.ROLE_CONTRIBUTOR)
+        response = self.client.delete(self.detail_url(member.user))
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert_true(self.team.members.filter(user=member.user).exists())
+        assert_equal(self.mock_can_remove_member.call_args,
+                     mock.call(self.team, self.user))

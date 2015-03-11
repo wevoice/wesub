@@ -65,15 +65,68 @@ Video policy:
 * ``Any team member``
 * ``Managers and admins``
 * ``Admins only``
+
+Team Member Resource
+^^^^^^^^^^^^^^^^^^^^
+
+Get info on a team member
++++++++++++++++++++++++++
+
+.. http:get:: /api2/partners/teams/[team-slug]/members/[username]
+
+    :<json username: username
+    :<json role: One of: ``owner``, ``admin``, ``manager``, or ``contributor``
+
+Litsing all team members
+++++++++++++++++++++++++
+
+.. http:get:: /api2/partners/teams/[team-slug]/members/
+
+    Returns a list of team member data.  Each item is the same as above.
+
+Add a new member to a team
+++++++++++++++++++++++++++
+
+.. http:post:: /api2/partners/teams/[team-slug]/members/
+
+    :>json username: username of the user to add
+    :>json role: One of: ``owner``, ``admin``, ``manager``, or ``contributor``
+
+
+Change a team member's role
++++++++++++++++++++++++++++
+
+.. http:put:: /api2/partners/teams/[team-slug]/members/[username]/
+
+    :>json role: One of: ``owner``, ``admin``, ``manager``, or ``contributor``
+
+Removing a user from a team
++++++++++++++++++++++++++++
+
+.. http:delete:: /api2/partners/teams/[team-slug]/members/[username]/
+
+Safe Team Member Resource
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This resource behaves the same as the normal Team Member resource except with
+couple differences for the POST action to add members
+
+* An invitation is sent to the user to join the team instead of simply adding
+  them
+* If no user exists with the username, and an ``email`` field is included in
+  the POST data, we will create a user and send an email to the email account.
 """
 
 from __future__ import absolute_import
 from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework import viewsets
 
 from api.pagination import AmaraPaginationMixin
-from teams.models import Team
+from auth.models import CustomUser as User
+from teams.models import Team, TeamMember
 import teams.permissions as team_permissions
 
 class MappedChoiceField(serializers.ChoiceField):
@@ -157,3 +210,93 @@ class TeamViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
         if not team_permissions.can_delete_team(instance, self.request.user):
             raise PermissionDenied()
         instance.delete()
+
+class TeamMemberSerializer(serializers.Serializer):
+    default_error_messages = {
+        'user-does-not-exist': "User does not exist: {username}",
+        'user-already-member': "User is already a team member",
+    }
+
+    ROLE_CHOICES = (
+         TeamMember.ROLE_OWNER,
+         TeamMember.ROLE_ADMIN,
+         TeamMember.ROLE_MANAGER,
+         TeamMember.ROLE_CONTRIBUTOR,
+    )
+
+    username = serializers.CharField(source='user.username')
+    role = serializers.ChoiceField(ROLE_CHOICES)
+
+    def validate_username(self, username):
+        try:
+            self.user = User.objects.get(username=username)
+            return username
+        except User.DoesNotExist:
+            self.fail('user-does-not-exist', username=username)
+
+    def create(self, validated_data):
+        try:
+            return self.context['team'].members.create(
+                user=self.user,
+                role=validated_data['role'],
+            )
+        except IntegrityError:
+            self.fail('user-already-member')
+
+class TeamMemberUpdateSerializer(TeamMemberSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+
+    def update(self, instance, validated_data):
+        instance.role = validated_data['role']
+        instance.save()
+        return instance
+
+class TeamMemberViewSet(viewsets.ModelViewSet):
+    lookup_field = 'username'
+
+    def initial(self, request, *args, **kwargs):
+        super(TeamMemberViewSet, self).initial(request, *args, **kwargs)
+        self.team = get_object_or_404(Team, slug=kwargs['team_slug'])
+
+    def get_serializer_class(self):
+        if 'username' in self.kwargs:
+            return TeamMemberUpdateSerializer
+        else:
+            return TeamMemberSerializer
+
+    def get_serializer_context(self):
+        return {
+            'team': self.team,
+        }
+
+    def get_queryset(self):
+        if not self.team.user_is_member(self.request.user):
+            raise PermissionDenied()
+        return self.team.members.all()
+
+    def get_object(self):
+        if not self.team.user_is_member(self.request.user):
+            raise PermissionDenied()
+        member = get_object_or_404(self.team.members,
+                                   user__username=self.kwargs['username'])
+        return member
+
+    def perform_create(self, serializer):
+        if not team_permissions.can_add_member(self.team, self.request.user):
+            raise PermissionDenied()
+        serializer.save()
+
+    def perform_update(self, serializer):
+        if not team_permissions.can_assign_role(
+            self.team, self.request.user, serializer.validated_data['role'],
+            serializer.instance.user):
+            raise PermissionDenied()
+        serializer.save()
+
+    def perform_destroy(self, member):
+        if not team_permissions.can_remove_member(self.team,
+                                                  self.request.user):
+            raise PermissionDenied()
+        if member.role == TeamMember.ROLE_OWNER:
+            raise serializers.ValidationError("Can't remove team owner")
+        member.delete()

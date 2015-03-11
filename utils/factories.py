@@ -226,6 +226,15 @@ class TeamFactory(DjangoModelFactory):
         return team
 
     @factory.post_generation
+    def owner(self, create, extracted, **kwargs):
+        if extracted:
+            assert create
+            TeamMemberFactory.create(
+                user=extracted, team=self,
+                role=teams.models.TeamMember.ROLE_OWNER,
+            )
+
+    @factory.post_generation
     def admin(self, create, extracted, **kwargs):
         if extracted:
             assert create
