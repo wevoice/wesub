@@ -122,11 +122,13 @@ from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework import status
 from rest_framework import viewsets
 
 from api.pagination import AmaraPaginationMixin
 from auth.models import CustomUser as User
 from teams.models import Team, TeamMember
+import messages.tasks
 import teams.permissions as team_permissions
 
 class MappedChoiceField(serializers.ChoiceField):
@@ -267,6 +269,7 @@ class TeamMemberViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         return {
             'team': self.team,
+            'user': self.request.user,
         }
 
     def get_queryset(self):
@@ -300,3 +303,51 @@ class TeamMemberViewSet(viewsets.ModelViewSet):
         if member.role == TeamMember.ROLE_OWNER:
             raise serializers.ValidationError("Can't remove team owner")
         member.delete()
+
+class SafeTeamMemberSerializer(TeamMemberSerializer):
+    email = serializers.EmailField(required=False, write_only=True)
+
+    default_error_messages = {
+        'email-required': "Email required to create user",
+    }
+
+    def validate_username(self, username):
+        return username
+
+    def validate(self, attrs):
+        try:
+            self.user = User.objects.get(username=attrs['user']['username'])
+        except User.DoesNotExist:
+            if 'email' not in attrs:
+                self.fail('email-required')
+            self.user = User.objects.create(
+                username=attrs['user']['username'],
+                email=attrs['email'])
+        return attrs
+
+    def create(self, validated_data):
+        team = self.context['team']
+        if team.members.filter(user=self.user).exists():
+            self.fail('user-already-member')
+        invite = team.invitations.create(user=self.user,
+                                         author=self.context['user'],
+                                         role=validated_data['role'])
+        messages.tasks.team_invitation_sent.delay(invite.id)
+        # return an unsaved TeamMember for serialization purposes
+        return TeamMember(user=self.user, team=team,
+                          role=validated_data['role'])
+
+class SafeTeamMemberViewSet(TeamMemberViewSet):
+    def get_serializer_class(self):
+        if 'username' in self.kwargs:
+            return TeamMemberUpdateSerializer
+        else:
+            return SafeTeamMemberSerializer
+
+    def create(self, request, *args, **kwargs):
+        response = super(SafeTeamMemberViewSet, self).create(request, *args,
+                                                             **kwargs)
+        # use 202 status code since we invited the user instead of created a
+        # membership
+        response.status_code = status.HTTP_202_ACCEPTED
+        return response

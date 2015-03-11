@@ -22,6 +22,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 import mock
 
+from auth.models import CustomUser as User
 from teams.models import Team, TeamMember
 from utils import test_utils
 from utils.factories import *
@@ -318,3 +319,64 @@ class TeamMemberAPITest(TestCase):
         assert_true(self.team.members.filter(user=member.user).exists())
         assert_equal(self.mock_can_remove_member.call_args,
                      mock.call(self.team, self.user))
+
+class SafeTeamMemberAPITest(TeamMemberAPITest):
+    # The safe team member API should work the same as the regular team member
+    # API for the most part.  So we subclass the unittest, but use different
+    # URLs to test against
+
+    @test_utils.patch_for_test('messages.tasks.team_invitation_sent')
+    def setUp(self, mock_team_invitation_sent):
+        super(SafeTeamMemberAPITest, self).setUp()
+        self.mock_team_invitation_sent = mock_team_invitation_sent
+        self.list_url = reverse('api:safe-team-members-list', kwargs={
+            'team_slug': self.team.slug,
+        })
+
+    def detail_url(self, user):
+        return reverse('api:safe-team-members-detail', kwargs={
+            'team_slug': self.team.slug,
+            'username': user.username,
+        })
+
+    def check_invitation(self, user):
+        assert_false(self.team.members.filter(user=user).exists())
+        invitation = self.team.invitations.get(user=user)
+        assert_equal(self.mock_team_invitation_sent.delay.call_args,
+                     mock.call(invitation.pk))
+
+    def test_add_team_member(self):
+        # When adding a team member, we should send an invite instead of
+        # directly adding them
+        user = UserFactory()
+        response = self.client.post(self.list_url, data={
+            'username': user.username,
+            'role': 'contributor',
+        })
+        # we should return HTTP 202, since we created haven't created the team
+        # member object yet
+        assert_equal(response.status_code, status.HTTP_202_ACCEPTED,
+                     response.content)
+        self.check_invitation(user)
+
+    def test_add_nonexistant_user(self):
+        # We should create a user if the username doesn't exist
+        response = self.client.post(self.list_url, data={
+            'username': 'new-username',
+            'email': 'new-user@example.com',
+            'role': 'contributor',
+        })
+        assert_equal(response.status_code, status.HTTP_202_ACCEPTED,
+                     response.content)
+        user = User.objects.get(username='new-username')
+        assert_equal(user.email, 'new-user@example.com')
+        self.check_invitation(user)
+
+    def test_need_email_if_user_doesnt_exist(self):
+        # When creating a user, require the email.  Otherwise there is no way
+        # to for the person to login since there's no password recovery.
+        response = self.client.post(self.list_url, data={
+            'username': 'new-username',
+            'role': 'contributor',
+        })
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
