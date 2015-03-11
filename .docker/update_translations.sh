@@ -38,10 +38,10 @@ echo "Compiling messages"
 python manage.py compilemessages
 
 echo "Committing and pushing to repository"
-git fetch
 git checkout $1
-git reset --hard origin/$1
 git add locale/*/LC_MESSAGES/django.*o
 git commit -m "Updated transifex translations -- through update_translations.sh"
+git fetch
+git rebase origin/$1
 git push origin $1
 echo "Translations updated..."
