@@ -27,23 +27,33 @@ from teams.models import Team, TeamMember
 from utils import test_utils
 from utils.factories import *
 
-class TeamAPITest(TestCase):
-    @test_utils.patch_for_test('teams.permissions.can_delete_team')
-    @test_utils.patch_for_test('teams.permissions.can_change_team_settings')
-    @test_utils.patch_for_test('teams.permissions.can_create_team')
-    def setUp(self, mock_can_create_team, mock_can_change_team_settings,
-             mock_can_delete_team):
+class TeamAPITestBase(TestCase):
+    permissions_to_mock = []
+    def setUp(self):
         self.user = UserFactory()
         self.client = APIClient()
         self.client.force_authenticate(self.user)
-        self.list_url = reverse('api:teams-list')
 
-        self.mock_can_create_team = mock_can_create_team
-        self.mock_can_delete_team = mock_can_delete_team
-        self.mock_can_change_team_settings = mock_can_change_team_settings
-        mock_can_create_team.return_value = True
-        mock_can_delete_team.return_value = True
-        mock_can_change_team_settings.return_value = True
+        self.patch_permission_functions()
+
+    def patch_permission_functions(self):
+        for name in self.permissions_to_mock:
+            spec = 'teams.permissions.' + name
+            mock_obj = mock.Mock(return_value=True)
+            patcher = mock.patch(spec, mock_obj)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+            setattr(self, name, mock_obj)
+
+class TeamAPITest(TeamAPITestBase):
+    permissions_to_mock = [
+        'can_delete_team',
+        'can_change_team_settings',
+        'can_create_team',
+    ]
+    def setUp(self):
+        TeamAPITestBase.setUp(self)
+        self.list_url = reverse('api:teams-list')
 
     def detail_url(self, team):
         return reverse('api:teams-detail', kwargs={
@@ -149,52 +159,44 @@ class TeamAPITest(TestCase):
         assert_false(Team.objects.filter(id=team_id).exists())
 
     def test_create_team_permissions(self):
-        self.mock_can_create_team.return_value = False
+        self.can_create_team.return_value = False
         response = self.client.post(self.list_url, data={
             'slug': 'new-slug',
             'name': 'New Name',
         })
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
-        assert_equal(self.mock_can_create_team.call_args, mock.call(self.user))
+        assert_equal(self.can_create_team.call_args, mock.call(self.user))
 
     def test_update_team_permissions(self):
         team = TeamFactory()
-        self.mock_can_change_team_settings.return_value = False
+        self.can_change_team_settings.return_value = False
         response = self.client.put(self.detail_url(team), data={
             'name': 'New Name',
         })
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
-        assert_equal(self.mock_can_change_team_settings.call_args,
+        assert_equal(self.can_change_team_settings.call_args,
                      mock.call(team, self.user))
 
     def test_delete_team_permissions(self):
         team = TeamFactory()
-        self.mock_can_delete_team.return_value = False
+        self.can_delete_team.return_value = False
         response = self.client.delete(self.detail_url(team))
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
-        assert_equal(self.mock_can_delete_team.call_args,
+        assert_equal(self.can_delete_team.call_args,
                      mock.call(team, self.user))
 
-class TeamMemberAPITest(TestCase):
-    @test_utils.patch_for_test('teams.permissions.can_add_member')
-    @test_utils.patch_for_test('teams.permissions.can_assign_role')
-    @test_utils.patch_for_test('teams.permissions.can_remove_member')
-    def setUp(self, mock_can_remove_member, mock_can_assign_role,
-              mock_can_add_member):
-        self.user = UserFactory()
+class TeamMemberAPITest(TeamAPITestBase):
+    permissions_to_mock = [
+        'can_add_member',
+        'can_assign_role',
+        'can_remove_member',
+    ]
+    def setUp(self):
+        TeamAPITestBase.setUp(self)
         self.team = TeamFactory(owner=self.user)
-        self.client = APIClient()
-        self.client.force_authenticate(self.user)
         self.list_url = reverse('api:team-members-list', kwargs={
             'team_slug': self.team.slug,
         })
-
-        self.mock_can_add_member = mock_can_add_member
-        self.mock_can_assign_role = mock_can_assign_role
-        self.mock_can_remove_member = mock_can_remove_member
-        mock_can_add_member.return_value = True
-        mock_can_assign_role.return_value = True
-        mock_can_remove_member.return_value = True
 
     def detail_url(self, user):
         return reverse('api:team-members-detail', kwargs={
@@ -285,18 +287,18 @@ class TeamMemberAPITest(TestCase):
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_add_checks_permissions(self):
-        self.mock_can_add_member.return_value = False
+        self.can_add_member.return_value = False
         response = self.client.post(self.list_url, data={
             'username': UserFactory().username,
             'role': 'contributor',
         })
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
-        assert_equal(self.mock_can_add_member.call_args,
+        assert_equal(self.can_add_member.call_args,
                      mock.call(self.team, self.user))
 
     def test_change_checks_permissions(self):
 #def can_assign_role(team, user, role, to_user):
-        self.mock_can_assign_role.return_value = False
+        self.can_assign_role.return_value = False
         member = TeamMemberFactory(team=self.team,
                                    role=TeamMember.ROLE_CONTRIBUTOR)
         response = self.client.put(self.detail_url(member.user), data={
@@ -306,18 +308,18 @@ class TeamMemberAPITest(TestCase):
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
         assert_equal(test_utils.reload_obj(member).role,
                      TeamMember.ROLE_CONTRIBUTOR)
-        assert_equal(self.mock_can_assign_role.call_args,
+        assert_equal(self.can_assign_role.call_args,
                      mock.call(self.team, self.user, TeamMember.ROLE_ADMIN,
                                member.user))
 
     def test_remove_checks_permissions(self):
-        self.mock_can_remove_member.return_value = False
+        self.can_remove_member.return_value = False
         member = TeamMemberFactory(team=self.team,
                                    role=TeamMember.ROLE_CONTRIBUTOR)
         response = self.client.delete(self.detail_url(member.user))
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
         assert_true(self.team.members.filter(user=member.user).exists())
-        assert_equal(self.mock_can_remove_member.call_args,
+        assert_equal(self.can_remove_member.call_args,
                      mock.call(self.team, self.user))
 
 class SafeTeamMemberAPITest(TeamMemberAPITest):
