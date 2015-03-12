@@ -22,7 +22,7 @@ Team Resource
 Get a list of teams
 +++++++++++++++++++
 
-.. http:get:: /api2/partners/teams/
+.. http:get:: /api/teams/
 
     :>json name: Name of the team
     :>json slug: Machine name for the team slug (used in URLs)
@@ -33,14 +33,14 @@ Get a list of teams
 
 Get a list of teams
 +++++++++++++++++++
-.. http:get:: /api2/partners/teams/[team-slug]/
+.. http:get:: /api/teams/[team-slug]/
 
     Returns one entry from the team list resource data.
 
 Updating a team
 +++++++++++++++
 
-.. http:put:: /api2/partners/teams/[team-slug]:
+.. http:put:: /api/teams/[team-slug]:
 
     :<json name: (required) Name of the team
     :<json slug: (required) Manchine name for the team (used in URLs)
@@ -72,7 +72,7 @@ Team Member Resource
 Get info on a team member
 +++++++++++++++++++++++++
 
-.. http:get:: /api2/partners/teams/[team-slug]/members/[username]
+.. http:get:: /api/teams/[team-slug]/members/[username]
 
     :<json username: username
     :<json role: One of: ``owner``, ``admin``, ``manager``, or ``contributor``
@@ -80,14 +80,14 @@ Get info on a team member
 Litsing all team members
 ++++++++++++++++++++++++
 
-.. http:get:: /api2/partners/teams/[team-slug]/members/
+.. http:get:: /api/teams/[team-slug]/members/
 
     Returns a list of team member data.  Each item is the same as above.
 
 Add a new member to a team
 ++++++++++++++++++++++++++
 
-.. http:post:: /api2/partners/teams/[team-slug]/members/
+.. http:post:: /api/teams/[team-slug]/members/
 
     :>json username: username of the user to add
     :>json role: One of: ``owner``, ``admin``, ``manager``, or ``contributor``
@@ -96,14 +96,14 @@ Add a new member to a team
 Change a team member's role
 +++++++++++++++++++++++++++
 
-.. http:put:: /api2/partners/teams/[team-slug]/members/[username]/
+.. http:put:: /api/teams/[team-slug]/members/[username]/
 
     :>json role: One of: ``owner``, ``admin``, ``manager``, or ``contributor``
 
 Removing a user from a team
 +++++++++++++++++++++++++++
 
-.. http:delete:: /api2/partners/teams/[team-slug]/members/[username]/
+.. http:delete:: /api/teams/[team-slug]/members/[username]/
 
 Safe Team Member Resource
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -115,6 +115,54 @@ couple differences for the POST action to add members
   them
 * If no user exists with the username, and an ``email`` field is included in
   the POST data, we will create a user and send an email to the email account.
+
+Project Resource
+^^^^^^^^^^^^^^^^
+
+List a team's projects
+++++++++++++++++++++++
+
+.. http:get:: /api/teams/[team-slug]/projects/
+
+    :>jsonarr name: project name
+    :>jsonarr slug: machine-name for the project
+    :>jsonarr description: project description
+    :>jsonarr guidelines: Project guidelines for users working on it
+    :>jsonarr resource_uri: API URI for project details
+    :>jsonarr created: datetime when the project was created
+    :>jsonarr modified: datetime when the project was last changed
+    :>jsonarr workflow_enabled: Are tasks enabled for this project?
+
+Get details on a project
+++++++++++++++++++++++++
+
+.. http:get:: /api/teams/[team-slug]/projects/[project-slug]/
+
+    Returns the same data as the project list resource
+
+
+Create a new project
+++++++++++++++++++++
+
+.. http:post:: /api/teams/[team-slug]/projects/
+
+    :<json name: project name
+    :<json slug: machine-name for the project
+    :<json description: project description *(optional)*
+    :<json guidelines: Project guidelines for users working on it *(optional)*
+
+Updating a project
+++++++++++++++++++
+
+.. http:put:: /api/teams/[team-slug]/projects/[project-slug]/
+
+    Inputs the same data is the create project resource
+
+Delete a project
+++++++++++++++++
+
+.. http:delete:: /api/teams/[team-slug]/projects/[project-slug]/
+
 """
 
 from __future__ import absolute_import
