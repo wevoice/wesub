@@ -172,10 +172,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.reverse import reverse
 
 from api.pagination import AmaraPaginationMixin
 from auth.models import CustomUser as User
-from teams.models import Team, TeamMember
+from teams.models import Team, TeamMember, Project
 import messages.tasks
 import teams.permissions as team_permissions
 
@@ -399,3 +400,82 @@ class SafeTeamMemberViewSet(TeamMemberViewSet):
         # membership
         response.status_code = status.HTTP_202_ACCEPTED
         return response
+
+class ProjectSerializer(serializers.ModelSerializer):
+    resource_uri = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Project
+        fields = ('name', 'slug', 'description', 'guidelines',
+                  'modified', 'created', 'workflow_enabled', 'resource_uri')
+        # Based on the model code, slug can be blank, but this seems bad to
+        # allow for API requests
+        read_only_fields = ('modified', 'created')
+        extra_kwargs = {
+            'slug': { 'required': True },
+        }
+
+    def get_resource_uri(self, project):
+        return reverse('api:projects-detail', kwargs={
+            'team_slug': self.context['team'].slug,
+            'slug': project.slug,
+        }, request=self.context['request'])
+
+    def create(self, validated_data):
+        return Project.objects.create(team=self.context['team'],
+                                      **validated_data)
+
+class ProjectUpdateSerializer(ProjectSerializer):
+    class Meta(ProjectSerializer.Meta):
+        extra_kwargs = {
+            'name': { 'required': False },
+            'slug': { 'required': False },
+        }
+
+class ProjectViewSet(viewsets.ModelViewSet):
+    lookup_field = 'slug'
+
+    def initial(self, request, *args, **kwargs):
+        super(ProjectViewSet, self).initial(request, *args, **kwargs)
+        self.team = get_object_or_404(Team, slug=kwargs['team_slug'])
+
+    def get_queryset(self):
+        if not self.team.user_is_member(self.request.user):
+            raise PermissionDenied()
+        return Project.objects.for_team(self.team)
+
+    def get_serializer_class(self):
+        if 'slug' in self.kwargs:
+            return ProjectUpdateSerializer
+        else:
+            return ProjectSerializer
+
+    def get_serializer_context(self):
+        return {
+            'team': self.team,
+            'request': self.request,
+        }
+
+    def get_object(self):
+        if not self.team.user_is_member(self.request.user):
+            raise PermissionDenied()
+        return super(ProjectViewSet, self).get_object()
+
+    def perform_create(self, serializer):
+        if not team_permissions.can_create_project(
+            self.request.user, self.team):
+            raise PermissionDenied()
+        serializer.save()
+
+    def perform_update(self, serializer):
+        if not team_permissions.can_edit_project(
+            self.team, self.request.user, serializer.instance):
+            raise PermissionDenied()
+        serializer.save()
+
+    def perform_destroy(self, project):
+        if not team_permissions.can_delete_project(
+            self.request.user, self.team, project):
+            raise PermissionDenied()
+        project.delete()
+

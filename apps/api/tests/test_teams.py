@@ -19,12 +19,13 @@ from django.test import TestCase
 from nose.tools import *
 from rest_framework import status
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APIRequestFactory
 import mock
 
 from auth.models import CustomUser as User
 from teams.models import Team, TeamMember
 from utils import test_utils
+from utils.test_utils.api import *
 from utils.factories import *
 
 class TeamAPITestBase(TestCase):
@@ -382,3 +383,134 @@ class SafeTeamMemberAPITest(TeamMemberAPITest):
             'role': 'contributor',
         })
         assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+class ProjectAPITest(TeamAPITestBase):
+    permissions_to_mock = [
+        'can_create_project',
+        'can_edit_project',
+        'can_delete_project',
+    ]
+    def setUp(self):
+        TeamAPITestBase.setUp(self)
+        self.team = TeamFactory(owner=self.user)
+        self.list_url = reverse('api:projects-list', kwargs={
+            'team_slug': self.team.slug,
+        })
+
+    def detail_url(self, project):
+        return reverse('api:projects-detail', kwargs={
+            'team_slug': self.team.slug,
+            'slug': project.slug,
+        })
+
+    def check_project_data(self, data, project):
+        assert_equal(data['name'], project.name)
+        assert_equal(data['slug'], project.slug)
+        assert_equal(data['description'], project.description)
+        assert_equal(data['guidelines'], project.guidelines)
+        assert_equal(data['created'], project.created.isoformat())
+        assert_equal(data['modified'], project.modified.isoformat())
+        assert_equal(data['workflow_enabled'], project.workflow_enabled)
+        assert_equal(data['resource_uri'],
+                     reverse('api:projects-detail', kwargs={
+                         'team_slug': self.team.slug,
+                         'slug': project.slug,
+                     }, request=APIRequestFactory().get('/')))
+
+    def test_list(self):
+        projects = [ProjectFactory(team=self.team) for i in xrange(3)]
+        project_slug_map = dict((p.slug, p) for p in projects)
+        response = self.client.get(self.list_url)
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_items_equal([p['slug'] for p in response.data],
+                           project_slug_map.keys())
+        for project_data in response.data:
+            self.check_project_data(project_data,
+                                    project_slug_map[project_data['slug']])
+
+    def test_get(self):
+        project = ProjectFactory(team=self.team)
+        response = self.client.get(self.detail_url(project))
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        self.check_project_data(response.data, project)
+
+    def test_create(self):
+        response = self.client.post(self.list_url, data={
+            'name': 'Test project',
+            'slug': 'test-project',
+            'description': 'test-description',
+            'guidelines': 'test-guidelines',
+        })
+        assert_equal(response.status_code, status.HTTP_201_CREATED)
+        project = self.team.project_set.get(slug='test-project')
+        assert_equal(project.name, 'Test project')
+        assert_equal(project.description, 'test-description')
+        assert_equal(project.guidelines, 'test-guidelines')
+
+    def test_update(self):
+        project = ProjectFactory(team=self.team)
+        response = self.client.put(self.detail_url(project), data={
+            'description': 'New description',
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        assert_equal(test_utils.reload_obj(project).description,
+                     'New description')
+
+    def test_delete(self):
+        project = ProjectFactory(team=self.team, slug='test-slug')
+        response = self.client.delete(self.detail_url(project))
+        assert_equal(response.status_code, status.HTTP_204_NO_CONTENT,
+                     response.content)
+        assert_false(self.team.project_set
+                     .filter(slug='project-slug').exists())
+
+    def test_list_permissions(self):
+        self.client.force_authenticate(user=UserFactory())
+        response = self.client.get(self.list_url)
+        assert_equals(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_permissions(self):
+        project = ProjectFactory(team=self.team)
+        self.client.force_authenticate(user=UserFactory())
+        response = self.client.get(self.detail_url(project))
+        assert_equals(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_required_fields(self):
+        response = self.client.options(self.list_url)
+        assert_required_fields(response, 'POST', ['name', 'slug'])
+
+    def test_update_required_fields(self):
+        project = ProjectFactory(team=self.team)
+        response = self.client.options(self.detail_url(project))
+        assert_required_fields(response, 'PUT', [])
+
+    def test_create_permissions(self):
+        self.can_create_project.return_value = False
+        response = self.client.post(self.list_url, data={
+            'name': 'Test project',
+            'slug': 'test-project',
+        })
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert_equal(self.can_create_project.call_args,
+                     mock.call(self.user, self.team))
+
+    def test_update_permissions(self):
+        project = ProjectFactory(team=self.team)
+        self.can_edit_project.return_value = False
+        response = self.client.put(self.detail_url(project), data={
+            'name': 'Test project',
+        })
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN,
+                     response.content)
+        assert_equal(self.can_edit_project.call_args,
+                     mock.call(self.team, self.user, project))
+
+    def test_delete_permissions(self):
+        project = ProjectFactory(team=self.team)
+        self.can_delete_project.return_value = False
+        response = self.client.delete(self.detail_url(project))
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN,
+                     response.content)
+        assert_equal(self.can_delete_project.call_args,
+                     mock.call(self.user, self.team, project))
