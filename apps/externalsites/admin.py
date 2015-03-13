@@ -63,8 +63,14 @@ class SyncHistoryAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+class OpenIDConnectLinkAdmin(admin.ModelAdmin):
+    raw_id_fields = (
+        'user',
+    )
+
 admin.site.register(models.KalturaAccount)
 admin.site.register(models.BrightcoveAccount)
 admin.site.register(models.YouTubeAccount)
 admin.site.register(models.SyncedSubtitleVersion)
 admin.site.register(models.SyncHistory, SyncHistoryAdmin)
+admin.site.register(models.OpenIDConnectLink, OpenIDConnectLinkAdmin)
