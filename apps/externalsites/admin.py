@@ -64,6 +64,9 @@ class SyncHistoryAdmin(admin.ModelAdmin):
         return False
 
 class OpenIDConnectLinkAdmin(admin.ModelAdmin):
+    search_fields = (
+        'user__username',
+    )
     raw_id_fields = (
         'user',
     )
