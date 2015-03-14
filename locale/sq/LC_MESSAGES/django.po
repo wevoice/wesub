@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-11 15:28-0500\n"
+"POT-Creation-Date: 2015-03-13 07:35-0500\n"
 "PO-Revision-Date: 2014-03-24 23:06+0000\n"
 "Last-Translator: Edion Mucelli <nickel8924@gmail.com>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/"
@@ -1344,35 +1344,35 @@ msgid ""
 "subtitles"
 msgstr "Një tjetër përdorues po kryen veprimin %s tmbi këto titra"
 
-#: apps/subtitles/workflows.py:401
+#: apps/subtitles/workflows.py:407
 #, fuzzy
 msgid "Publish"
 msgstr "Të botuar"
 
-#: apps/subtitles/workflows.py:402 apps/subtitles/workflows.py:417
-#: apps/subtitles/workflows.py:424 apps/subtitles/workflows.py:437
+#: apps/subtitles/workflows.py:408 apps/subtitles/workflows.py:423
+#: apps/subtitles/workflows.py:430 apps/subtitles/workflows.py:443
 #: apps/teams/subtitle_actions.py:30
 #: apps/teams/workflows/old/subtitleworkflows.py:68
 #, fuzzy
 msgid "Saving"
 msgstr "Po ruhet..."
 
-#: apps/subtitles/workflows.py:416
+#: apps/subtitles/workflows.py:422
 #, fuzzy
 msgid "Unpublish"
 msgstr " dhe u botuan"
 
-#: apps/subtitles/workflows.py:423 templates/editor/header.html:17
+#: apps/subtitles/workflows.py:429 templates/editor/header.html:17
 #, fuzzy
 msgid "Save Draft"
 msgstr "skica më e re"
 
-#: apps/subtitles/workflows.py:436
+#: apps/subtitles/workflows.py:442
 #, fuzzy
 msgid "API Complete"
 msgstr "të paplotë"
 
-#: apps/subtitles/workflows.py:466
+#: apps/subtitles/workflows.py:472
 msgid "Notes"
 msgstr ""
 

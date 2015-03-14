@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-11 16:30-0500\n"
+"POT-Creation-Date: 2015-03-13 03:21-0500\n"
 "PO-Revision-Date: 2014-04-05 12:11+0000\n"
 "Last-Translator: Kristaps\n"
 "Language-Team: Latvian (Latvia) (http://www.transifex.com/projects/p/"
@@ -1338,35 +1338,35 @@ msgid ""
 "subtitles"
 msgstr "Šo subtitru %s uzdevumu jau veic kāds cits lietotājs"
 
-#: apps/subtitles/workflows.py:401
+#: apps/subtitles/workflows.py:407
 #, fuzzy
 msgid "Publish"
 msgstr "Publicēts"
 
-#: apps/subtitles/workflows.py:402 apps/subtitles/workflows.py:417
-#: apps/subtitles/workflows.py:424 apps/subtitles/workflows.py:437
+#: apps/subtitles/workflows.py:408 apps/subtitles/workflows.py:423
+#: apps/subtitles/workflows.py:430 apps/subtitles/workflows.py:443
 #: apps/teams/subtitle_actions.py:30
 #: apps/teams/workflows/old/subtitleworkflows.py:68
 #, fuzzy
 msgid "Saving"
 msgstr "Saglabā..."
 
-#: apps/subtitles/workflows.py:416
+#: apps/subtitles/workflows.py:422
 #, fuzzy
 msgid "Unpublish"
 msgstr "un publicēti"
 
-#: apps/subtitles/workflows.py:423 templates/editor/header.html:17
+#: apps/subtitles/workflows.py:429 templates/editor/header.html:17
 #, fuzzy
 msgid "Save Draft"
 msgstr "jaunāko versiju"
 
-#: apps/subtitles/workflows.py:436
+#: apps/subtitles/workflows.py:442
 #, fuzzy
 msgid "API Complete"
 msgstr "Gatavs"
 
-#: apps/subtitles/workflows.py:466
+#: apps/subtitles/workflows.py:472
 msgid "Notes"
 msgstr ""
 
