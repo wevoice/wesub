@@ -564,7 +564,6 @@ def get_sync_account(video, video_url):
 def can_sync_videourl(video_url):
     return video_url.type in _video_type_to_account_model
 
-
 class SyncedSubtitleVersionManager(models.Manager):
     def set_synced_version(self, account, video_url, language, version):
         """Set the synced version for a given account/language."""
