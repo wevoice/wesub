@@ -69,14 +69,33 @@ class TestCaseEdit(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.add_video(dup_url)
         self.assertEqual(self.videos_tab.error_message(), 
-            'This video already belongs to a team.')
+                         'This video already belongs to the %s team.' 
+                         % self.team.slug)
 
+
+    def test_add_private_team_duplicate(self):
+        """Duplicate videos are not added again.
+
+        """
+        user = UserFactory()
+        dup_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
+        video = VideoFactory(video_url=dup_url)
+        team = TeamFactory(admin=user, is_visible=False)
+        self.videos_tab.log_in(user.username, 'password')
+        self.videos_tab.open_videos_tab(team.slug)
+        self.videos_tab.add_video(dup_url)
+        self.videos_tab.log_in(self.admin.username, 'password')
+        self.videos_tab.open_videos_tab(self.team.slug)
+        #Open the new team and try to submit the video 
+        self.videos_tab.add_video(dup_url)
+        self.assertEqual(self.videos_tab.error_message(), 
+                         'This video already belongs to a team.')
 
     def test_add_team_duplicate(self):
         """Duplicate videos are not added again.
 
         """
-        dup_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
+        dup_url = 'https://www.youtube.com/watch?v=QP2GejkLdwA'
 
         self.videos_tab.log_in(self.admin.username, 'password')
         self.videos_tab.open_videos_tab(self.team.slug)
@@ -87,7 +106,8 @@ class TestCaseEdit(WebdriverTestCase):
         self.videos_tab.open_videos_tab(team2.slug)
         self.videos_tab.add_video(dup_url)
         self.assertEqual(self.videos_tab.error_message(), 
-                         'This video already belongs to a team.')
+                         'This video already belongs to the %s team.' 
+                         % self.team.slug)
 
     def test_remove_site(self):
         """Remove video from team and site, total destruction!

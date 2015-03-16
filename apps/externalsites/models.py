@@ -760,3 +760,6 @@ class OpenIDConnectLink(models.Model):
     """Link a user to an OpenID Connect ID."""
     sub = models.CharField(max_length=255, primary_key=True)
     user = models.OneToOneField(User, related_name='openid_connect_link')
+
+    def __unicode__(self):
+        return u'OpenIDConnectLink: {}'.format(self.user.username)

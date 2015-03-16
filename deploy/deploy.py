@@ -226,6 +226,9 @@ class ImageBuilder(object):
         self.commit_id = commit_id
         self.image_name = 'amara:{}'.format(commit_id)
 
+    def tag_name(self):
+        return 'amara-{}:latest'.format(self.env.BRANCH)
+
     def setup_images(self):
         timer = LoggingTimer()
         # make sure amara-enterprise is on the correct commit
@@ -258,6 +261,12 @@ class ImageBuilder(object):
                 raise subprocess.CalledProcessError(
                     "docker load error: {}".format(proc.return_code))
         timer.log_time('image save/load')
+        if self.env.BRANCH in ('staging', 'production'):
+            # Tag the image with amara-<branch>:latest
+            # We use the tags to run periodic tasks, like updating
+            # translations
+            for host in [BUILDER_DOCKER_HOST] + self.env.docker_hosts():
+                self.docker.run(host, 'tag', self.image_name, self.tag_name())
 
 class ContainerManager(object):
     """Start/stop docker containers """
@@ -285,20 +294,24 @@ class ContainerManager(object):
             # files into the docker image
             '-e', 'REVISION=' + self.env.BRANCH,
         ]
+        if self.building_preview():
+            # SETTINGS_REVISION controls how to download the
+            # server_local_settings.py file (see .docker/config_env.sh)
+            params.extend(['-e', 'SETTINGS_REVISION=staging'])
+        return params
+
+    def interlock_params(self):
         if self.env.BRANCH == 'production':
-            params.extend([
+            return [
                 '-e', ('INTERLOCK_DATA={"alias_domains": '
                        '["www.amara.org", "universalsubtitles.org", '
                        '"www.universalsubtitles.org"]}'),
                 '-e', 'NEW_RELIC_APP_NAME=AmaraVPC',
                 '-e', ('NEW_RELIC_LICENSE_KEY=' +
                        self.env.NEW_RELIC_LICENSE_KEY)
-            ])
-        elif self.building_preview():
-            # SETTINGS_REVISION controls how to download the
-            # server_local_settings.py file (see .docker/config_env.sh)
-            params.extend(['-e', 'SETTINGS_REVISION=staging'])
-        return params
+            ]
+        else:
+            return []
 
     def app_hostname(self):
         """Hostname for app containers.
@@ -377,7 +390,7 @@ class ContainerManager(object):
             '-h', self.app_hostname(),
             '--name', name,
             '--restart=always',
-        ] + self.app_env_params() + [self.image_name]
+        ] + self.app_env_params() + self.interlock_params() + [self.image_name]
         cid = self.docker.run_and_return_output(host, *cmd_line).strip()
         log("container id: {}", cid)
         self.containers_started.append(ContainerInfo(host, name, cid))

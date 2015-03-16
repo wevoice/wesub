@@ -55,10 +55,10 @@ describe('The Notes Controller', function() {
     });
 
     it('converts linebreaks to <br>s', function() {
-        $scope.newNoteText = 'line 1\nline2';
+        $scope.newNoteText = 'line 1\nline2\nline3';
         $scope.postNote();
         var lastNote = $scope.notes[$scope.notes.length-1];
-        expect($sce.getTrustedHtml(lastNote.body)).toEqual('line 1<br />line2');
+        expect($sce.getTrustedHtml(lastNote.body)).toEqual('line 1<br />line2<br />line3');
     });
 
     it('escapes html', function() {

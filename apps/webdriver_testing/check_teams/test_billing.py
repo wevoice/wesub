@@ -3,12 +3,12 @@ import datetime
 import csv
 from collections import defaultdict
 import time
-
+import os
 from utils.factories import *
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.data_factories import BillingFactory
 from webdriver_testing.data_factories import TeamLangPrefFactory
-
+from webdriver_testing.pages.site_pages import editor_page
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages import billing_page
 
@@ -21,6 +21,7 @@ class TestCaseBilling(WebdriverTestCase):
         super(TestCaseBilling, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
         cls.billing_pg = billing_page.BillingPage(cls)
+        cls.editor_pg = editor_page.EditorPage(cls)
         cls.admin = UserFactory()
         cls.manager = UserFactory()
         cls.member = UserFactory()
@@ -30,6 +31,8 @@ class TestCaseBilling(WebdriverTestCase):
 
         cls.terri = UserFactory(is_staff=True, is_superuser=True)
         TeamMemberFactory(team=cls.team, user=cls.terri)
+
+        cls.billing_pg.open_page('/')
         cls.video, cls.tv = cls._create_tv_with_original_subs(cls.member, cls.team)
         cls._upload_sv_translation(cls.video, cls.member, complete=True)
 
@@ -55,35 +58,34 @@ class TestCaseBilling(WebdriverTestCase):
     @classmethod
     def _create_tv_with_original_subs(cls, user, team, complete=True):
 
-        vid_data = {'primary_audio_language_code': 'en' }
-        video = cls.data_utils.create_video(**vid_data)
-        tv = TeamVideoFactory.create(
+        video=VideoFactory(primary_audio_language_code='en')
+        tv = TeamVideoFactory(
             team=team, 
             video=video, 
             added_by=user)
-
-        data = {
-                    'primary_audio_language_code': 'en',
-                    'language_code': 'en',
-                    'complete': int(complete), 
-                    'is_complete': complete,
-                    'video': video.pk,
-                    'draft': open('apps/webdriver_testing/subtitle_data/Timed_text.en.srt')
-                }
-        cls.data_utils.upload_subs(user, **data)
+        subs_file = os.path.join(os.getcwd(), 'apps','webdriver_testing',
+                                    'subtitle_data', 'Timed_text.en.srt')
+        cls.editor_pg.log_in(user.username, 'password')
+        cls.editor_pg.open_editor_page(video.video_id, 'en')
+        cls.editor_pg.upload_subtitles(subs_file)
+        time.sleep(3)
+        if not complete:
+            cls.editor_pg.exit()
+        else:
+            cls.editor_pg.endorse_subs()
         return video, tv
 
     @classmethod
     def _upload_sv_translation(cls, video, user, complete=False):
-
-        data = {
-                'language_code': 'sv',
-                'from_language_code': 'en',
-                'video': video.pk,
-                'subtitles': open('apps/webdriver_testing/subtitle_data/'
-                              'Timed_text.sv.dfxp'),
-                'complete': complete}
-        cls.data_utils.upload_subs(user, **data)
+        subs_file = os.path.join(os.getcwd(), 'apps','webdriver_testing',
+                                    'subtitle_data', 'Timed_text.sv.dfxp')
+        cls.editor_pg.log_in(user.username, 'password')
+        cls.editor_pg.open_editor_page(video.video_id, 'sv')
+        cls.editor_pg.upload_subtitles(subs_file)
+        if complete:
+            cls.editor_pg.endorse_subs()
+        else:
+            cls.editor_pg.exit()
 
     @classmethod
     def _bill_dict(cls, bill_file):
@@ -134,7 +136,7 @@ class TestCaseBilling(WebdriverTestCase):
                          self.bill_dict[self.video.video_id]['sv']['Original'])
 
 
-    def test_translation__complete(self):
+    def test_translation_complete(self):
         """Billing record added for complete translations
 
         """

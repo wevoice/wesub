@@ -27,7 +27,7 @@ elif [ "$ACTION" = "worker" ]; then
     /usr/local/bin/worker
 elif [ "$ACTION" = "update_translations" ]; then
     echo "Updating translations..."
-    /usr/local/bin/update_translations
+    /usr/local/bin/update_translations $2
 elif [ "$ACTION" = "shell" ]; then
     echo "Running shell..."
     echo "source /usr/local/bin/config_env" >> ~/.bash_profile

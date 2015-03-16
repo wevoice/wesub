@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# Copyright 2014 Participatory Culture Foundation, All Rights Reserved
 # -*- coding: utf-8 -*-
 
 import os
@@ -34,7 +33,8 @@ class TestCaseUsers(APILiveServerTestCase, WebdriverTestCase):
 
     def _post(self, url='/api/users/', data=None):
         self.client.force_authenticate(self.user)
-        response = self.client.post(url, data)
+        response = self.client.post(url, json.dumps(data),
+                                    content_type="application/json;  charset=utf-8")
         response.render()
         r = (json.loads(response.content))
         return r
@@ -49,7 +49,41 @@ class TestCaseUsers(APILiveServerTestCase, WebdriverTestCase):
         user  = UserFactory()
         url = '/api/users/%s/' % user.username
         r = self._get(url)
-        self.assertEqual(1, r['meta']['total_count'])
+        self.logger.info(r)
+        self.assertEqual(user.username, r['username'])
+        self.assertEqual(user.first_name, r['first_name'])
+        self.assertEqual(user.last_name, r['last_name'])
+
+    def test_create_username_chars(self):
+        """Create a user via the api.
+
+        """
+        errors = []
+        users = ['auserwithaverysuperreallyquitelongusername', 
+                 'i-am-me', 
+                 'I_M_A_USER', 
+                 'monkey.girl@gmail.com', 
+                 'monkey.girl', 
+                 'user@vimeo.com', 
+                 '@PCFQA',
+                 u'čevapčići',
+                  ]
+        for username in users:
+            data = {'username': username,
+                    'email': 'newuser@example.com',
+                    }
+            r = self._post(data=data)
+            try:
+                self.assertEqual(r['username'], data['username'])
+            except AssertionError as e:
+                errors.append(r)
+        self.logger.info(errors)
+        expected_errors = [
+                           {u'username': [u'Ensure this field has no more than 30 characters.']},
+                           {u'username': [u'Invalid Username: ?evap?i?i']}
+                          ]
+        self.assertEqual(errors, expected_errors)
+
 
     def test_create(self):
         """Create a user via the api.
@@ -60,7 +94,7 @@ class TestCaseUsers(APILiveServerTestCase, WebdriverTestCase):
                 'first_name': 'New',
                 'last_name': 'User_1',
                 }
-        r = self._post(data)
+        r = self._post(data=data)
         self.assertEqual(r['username'], data['username'])
 
     def test_create_login_token(self):
@@ -73,13 +107,15 @@ class TestCaseUsers(APILiveServerTestCase, WebdriverTestCase):
                 'last_name': 'User_1',
                 'create_login_token': True
                 }
-        r = self._post(data)
+        r = self._post(data=data)
         personal_pg = profile_personal_page.ProfilePersonalPage(self)
-        personal_pg.open_page(r['auto_login_url'])
-        fullname = ' '.join([new_user['first_name'], new_user['last_name']])
+        self.logger.info(r['auto_login_url'])
+        self.logger.info(self.base_url)
+        login_url = r['auto_login_url'].replace('http://testserver/en/', self.base_url)
+        self.logger.info(login_url)
+        personal_pg.open_page(login_url)
+        fullname = ' '.join([data['first_name'], data['last_name']])
         self.assertEqual(fullname, personal_pg.username())
-        self.assertEqual(fullname, user_data['full_name'])
-
 
     def test_create_invalid_email(self):
         data = {'username': 'newuser',
@@ -87,8 +123,8 @@ class TestCaseUsers(APILiveServerTestCase, WebdriverTestCase):
                 'first_name': 'New',
                 'last_name': 'User_1',
                 }
-        r = self._post(data)
-        self.assertEqual('Enter a valid e-mail address.', r['email'][0])
+        r = self._post(data=data)
+        self.assertEqual('Enter a valid email address.', r['email'][0])
 
 
 

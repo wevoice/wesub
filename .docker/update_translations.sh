@@ -1,4 +1,9 @@
 #!/bin/bash
+if [ -z "$1" ]
+then
+        echo "Must specify the branch name as an argument"
+        exit 1
+fi
 source /usr/local/bin/config_env
 # install client
 echo "Installing latest Transifex client..."
@@ -33,9 +38,10 @@ echo "Compiling messages"
 python manage.py compilemessages
 
 echo "Committing and pushing to repository"
-date
-git pull
+git checkout $1
 git add locale/*/LC_MESSAGES/django.*o
 git commit -m "Updated transifex translations -- through update_translations.sh"
-git push
+git fetch
+git rebase origin/$1
+git push origin $1
 echo "Translations updated..."
