@@ -158,11 +158,11 @@ class TeamAPITest(TeamAPITestBase):
         team = test_utils.reload_obj(team)
         assert_equal(team.name, 'New Name')
 
-    def test_delete_team(self):
+    def test_delete_team_not_allowed(self):
         team = TeamFactory()
         team_id = team.id
         response = self.client.delete(self.detail_url(team))
-        assert_false(Team.objects.filter(id=team_id).exists())
+        assert_equal(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_create_team_permissions(self):
         self.can_create_team.return_value = False
@@ -181,14 +181,6 @@ class TeamAPITest(TeamAPITestBase):
         })
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
         assert_equal(self.can_change_team_settings.call_args,
-                     mock.call(team, self.user))
-
-    def test_delete_team_permissions(self):
-        team = TeamFactory()
-        self.can_delete_team.return_value = False
-        response = self.client.delete(self.detail_url(team))
-        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
-        assert_equal(self.can_delete_team.call_args,
                      mock.call(team, self.user))
 
 class TeamMemberAPITest(TeamAPITestBase):

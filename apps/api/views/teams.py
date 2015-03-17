@@ -253,6 +253,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from rest_framework import mixins
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework import viewsets
@@ -318,7 +319,12 @@ class TeamUpdateSerializer(TeamSerializer):
     name = serializers.CharField(required=False)
     slug = serializers.SlugField(required=False)
 
-class TeamViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
+class TeamViewSet(AmaraPaginationMixin,
+                  mixins.CreateModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  mixins.ListModelMixin,
+                  viewsets.GenericViewSet):
     lookup_field = 'slug'
     paginate_by = 20
 
