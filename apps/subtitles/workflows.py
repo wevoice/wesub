@@ -468,7 +468,8 @@ class EditorNotes(object):
 
     def fetch_notes(self):
         return list(SubtitleNote.objects
-                    .filter(video=video, language_code=language_code)
+                    .filter(video=self.video,
+                            language_code=self.language_code)
                     .order_by('created')
                     .select_related('user'))
 
