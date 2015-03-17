@@ -163,9 +163,92 @@ Delete a project
 
 .. http:delete:: /api/teams/[team-slug]/projects/[project-slug]/
 
+Task Resource
+^^^^^^^^^^^^^
+
+List all tasks for a given team
++++++++++++++++++++++++++++++++
+
+.. http:get:: /api2/partners/teams/[team-slug]/tasks/
+
+    :query assignee: Show only tasks assigned to a username
+    :query priority: Show only tasks with a given priority
+    :query type: Show only tasks of a given type
+    :query video_id: Show only tasks that pertain to a given video
+    :query order_by: Apply sorting to the task list.  Possible values:
+
+        * ``created``   Creation date
+        * ``-created``  Creation date (descending)
+        * ``priority``  Priority
+        * ``-priority`` Priority (descending)
+        * ``type``      Task type (details below)
+        * ``-type``     Task type (descending)
+
+    :query completed: Show only complete tasks
+    :query completed-before: Show only tasks completed before a given date
+        (unix timestamp)
+    :query completed-after: Show only tasks completed before a given date
+        (unix timestamp)
+    :query open: Show only incomplete tasks
+
+    :>jsonarr video_id: ID of the video being worked on
+    :>jsonarr language: Language code being worked on
+    :>jsonarr id: ID for the task
+    :>jsonarr type: type of task.  One of ``Subtitle``, ``Translate``,
+         ``Review``, or ``Approve``
+    :>jsonarr assignee: username of the task assignee (or null)
+    :>jsonarr priority: Integer priority for the task
+    :>jsonarr completed: Date/time when the task was completed (or null)
+    :>jsonarr approved: Approval status of the task.  One of ``In Progress``,
+        ``Approved``, or ``Rejected``
+    :>jsonarr resource_uri: API URL for the task
+
+Task detail
++++++++++++
+
+.. http:get:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
+
+    Returns the same data as the task list API
+
+Create a new task
++++++++++++++++++
+
+.. http:post:: /api2/partners/teams/[team-slug]/tasks/
+
+    :<json video_id: Video ID
+    :<json language: language code
+    :<json type: task type to create.  Must be ``Subtitle`` or ``Translate``
+    :<json assignee: Username of the task assignee *(optional)*
+    :<json priority: Priority for the task *(optional)*
+
+Update an existing task
++++++++++++++++++++++++
+
+.. http:put:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
+
+    :<json assignee: Username of the task assignee or null to unassign
+    :<json priority: priority of the task
+    :<json send_back: send a truthy value to send the back back *(optional)*
+    :<json complete: send a truthy value to complete/approve the task
+        *(optional)*
+    :<json version_number: Specify the version number of the subtitles that
+        were created for this task *(optional)*
+
+.. note::
+
+    If both send_back and approved are specified, then send_back will take
+    preference.
+
+Delete an existing task
++++++++++++++++++++++++
+
+.. http:delete:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
+
 """
 
 from __future__ import absolute_import
+from datetime import datetime
+
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
@@ -176,9 +259,10 @@ from rest_framework.reverse import reverse
 
 from api.pagination import AmaraPaginationMixin
 from auth.models import CustomUser as User
-from teams.models import Team, TeamMember, Project
+from teams.models import Team, TeamMember, Project, Task, TeamVideo
 import messages.tasks
 import teams.permissions as team_permissions
+import videos.tasks
 
 class MappedChoiceField(serializers.ChoiceField):
     """Choice field that maps internal values to choices."""
@@ -479,3 +563,204 @@ class ProjectViewSet(viewsets.ModelViewSet):
             raise PermissionDenied()
         project.delete()
 
+class TeamVideoField(serializers.Field):
+    default_error_messages = {
+        'unknown-video': "Unknown video: {video_id}",
+    }
+
+    def to_internal_value(self, video_id):
+        team = self.context['team']
+        try:
+            return team.teamvideo_set.get(video__video_id=video_id)
+        except TeamVideo.DoesNotExist:
+            self.fail('unknown-video', video_id=video_id)
+
+    def to_representation(self, team_video):
+        return team_video.video.video_id
+
+class TeamMemberField(serializers.Field):
+    default_error_messages = {
+        'unknown-member': "Unknown member: {username}",
+    }
+
+    def to_internal_value(self, username):
+        team = self.context['team']
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            self.fail('unknown-member', username=username)
+        if not team.user_is_member(user):
+            self.fail('unknown-member', username=username)
+        return user
+
+    def to_representation(self, user):
+        return user.username
+
+class TaskSerializer(serializers.ModelSerializer):
+    resource_uri = serializers.SerializerMethodField()
+    video_id = TeamVideoField(source='team_video')
+    assignee = TeamMemberField(required=False)
+    type = MappedChoiceField(Task.TYPE_CHOICES)
+    approved = MappedChoiceField(
+        Task.APPROVED_CHOICES, required=False,
+        default=Task._meta.get_field('approved').get_default(),
+    )
+
+    class Meta:
+        model = Task
+        fields = (
+            'id', 'video_id', 'language', 'type', 'assignee', 'priority',
+            'completed', 'approved', 'resource_uri',
+        )
+        read_only_fields = (
+            'completed',
+        )
+
+    def get_resource_uri(self, task):
+        return reverse('api:tasks-detail', kwargs={
+            'team_slug': self.context['team'].slug,
+            'id': task.id,
+        }, request=self.context['request'])
+
+    def create(self, validated_data):
+        validated_data['team'] = self.context['team']
+        return super(TaskSerializer, self).create(validated_data)
+
+class TaskUpdateSerializer(TaskSerializer):
+    video_id = TeamVideoField(source='team_video', required=False,
+                              read_only=True)
+    type = MappedChoiceField(Task.TYPE_CHOICES, required=False,
+                             read_only=True)
+    complete = serializers.BooleanField(required=False)
+    send_back = serializers.BooleanField(required=False)
+
+    class Meta(TaskSerializer.Meta):
+        fields = TaskSerializer.Meta.fields + (
+            'complete', 'send_back',
+        )
+
+    def update(self, task, validated_data):
+        send_back = validated_data.pop('send_back', False)
+        complete = validated_data.pop('complete', False)
+        self.check_max_tasks(task, validated_data.get('assignee'))
+        task = super(TaskUpdateSerializer, self).update(task, validated_data)
+        if send_back:
+            task.approved = Task.APPROVED_IDS['Rejected']
+            self._complete_task(task)
+        elif complete:
+            task.approved = Task.APPROVED_IDS['Approved']
+            self._complete_task(task)
+        return task
+
+    def check_max_tasks(self, task, assignee):
+        if not assignee:
+            return
+        member = self.context['team'].get_member(assignee)
+        if member.has_max_tasks() and task.assignee != assignee:
+            raise PermissionDenied()
+
+    def _complete_task(self, task):
+        if task.assignee is None:
+            task.assignee = self.context['user']
+        task.complete()
+
+class TaskViewSet(viewsets.ModelViewSet):
+    lookup_field = 'id'
+
+    def initial(self, request, *args, **kwargs):
+        super(TaskViewSet, self).initial(request, *args, **kwargs)
+        self.team = get_object_or_404(Team, slug=kwargs['team_slug'])
+
+    def get_queryset(self):
+        if not self.team.user_is_member(self.request.user):
+            raise PermissionDenied()
+        return (self.order_queryset(self.team.task_set.all())
+                .select_related('team_video__video', 'assignee'))
+
+    def order_queryset(self, qs):
+        valid_orderings = set(['created', 'priority', 'type'])
+        reverse_orderings = set('-' + o for o in valid_orderings)
+        order_by = self.request.query_params.get('order_by')
+        if order_by in valid_orderings.union(reverse_orderings):
+            return qs.order_by(order_by)
+        else:
+            return qs
+
+    def _convert_timestamp(self, value):
+        return datetime.fromtimestamp(int(value))
+
+    def filter_queryset(self, qs):
+        params = self.request.query_params
+        if 'assignee' in params:
+            qs = qs.filter(assignee__username=params['assignee'])
+        if 'priority' in params:
+            qs = qs.filter(priority=params['priority'])
+        if 'type' in params:
+            try:
+                qs = qs.filter(type=Task.TYPE_IDS[params['type']])
+            except KeyError:
+                qs = qs.none()
+        if 'video_id' in params:
+            qs = qs.filter(team_video__video__video_id=params['video_id'])
+        if 'completed' in params:
+            qs = qs.filter(completed__isnull=False)
+        if 'completed_after' in params:
+            try:
+                qs = qs.filter(completed__gte=self._convert_timestamp(
+                    params['completed_after']))
+            except (TypeError, ValueError):
+                qs = qs.none()
+        if 'completed_before' in params:
+            try:
+                qs = qs.filter(completed__lt=self._convert_timestamp(
+                    params['completed_before']))
+            except (TypeError, ValueError):
+                qs = qs.none()
+        if 'open' in params:
+            qs = qs.filter(completed__isnull=True)
+        return qs
+
+    def get_serializer_class(self):
+        if 'id' not in self.kwargs:
+            return TaskSerializer
+        else:
+            return TaskUpdateSerializer
+
+    def get_serializer_context(self):
+        return {
+            'team': self.team,
+            'user': self.request.user,
+            'request': self.request,
+        }
+
+    def perform_create(self, serializer):
+        team_video = serializer.validated_data['team_video']
+        if not team_permissions.can_assign_tasks(
+            self.team, self.request.user, team_video.project):
+            raise PermissionDenied()
+        self.task_was_assigned = False
+        task = serializer.save()
+        self._post_save(task)
+
+    def perform_update(self, serializer):
+        team_video = serializer.instance.team_video
+        if not team_permissions.can_assign_tasks(
+            self.team, self.request.user, team_video.project):
+            raise PermissionDenied()
+        self.task_was_assigned = serializer.instance.assignee is not None
+        task = serializer.save()
+        self._post_save(task)
+
+    def perform_destroy(self, instance):
+        if not team_permissions.can_delete_tasks(
+            self.team, self.request.user, instance.team_video.project,
+            instance.language):
+            raise PermissionDenied()
+        instance.delete()
+
+    def _post_save(self, task):
+        if task.assignee and not self.task_was_assigned:
+            messages.tasks.team_task_assigned.delay(task.id)
+            task.set_expiration()
+            task.save()
+        videos.tasks.video_changed_tasks.delay(task.team_video.video_id)

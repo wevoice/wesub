@@ -15,15 +15,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+from datetime import datetime, timedelta
+import time
+
 from django.test import TestCase
 from nose.tools import *
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient, APIRequestFactory
+import factory
 import mock
 
 from auth.models import CustomUser as User
-from teams.models import Team, TeamMember
+from subtitles import pipeline
+from teams.models import Team, TeamMember, Task
 from utils import test_utils
 from utils.test_utils.api import *
 from utils.factories import *
@@ -514,3 +519,423 @@ class ProjectAPITest(TeamAPITestBase):
                      response.content)
         assert_equal(self.can_delete_project.call_args,
                      mock.call(self.user, self.team, project))
+
+class TasksAPITest(TeamAPITestBase):
+    TYPE_SUBTITLE = Task.TYPE_IDS['Subtitle']
+    TYPE_TRANSLATE = Task.TYPE_IDS['Translate']
+    TYPE_REVIEW = Task.TYPE_IDS['Review']
+    TYPE_APPROVAL = Task.TYPE_IDS['Approve']
+
+    permissions_to_mock = [
+        'can_assign_tasks',
+        'can_delete_tasks',
+    ]
+
+    @test_utils.patch_for_test('messages.tasks.team_task_assigned')
+    @test_utils.patch_for_test('teams.models.Task.now')
+    def setUp(self, mock_now, mock_team_task_assigned):
+        TeamAPITestBase.setUp(self)
+        self.member = UserFactory()
+        self.manager = UserFactory()
+        self.admin = UserFactory()
+        self.team = TeamFactory(
+            workflow_type='O', workflow_enabled=True, task_expiration=1,
+            owner=self.user, admin=self.admin, manager=self.manager,
+            member=self.member,
+        )
+        workflow = self.team.get_workflow()
+        workflow.review_allowed = 20 # manager must review
+        workflow.approve_allowed = 20 # admin must approve
+        workflow.save()
+        self.list_url = reverse('api:tasks-list', kwargs={
+            'team_slug': self.team.slug,
+        })
+        self.project = ProjectFactory(team=self.team)
+        self.team_video = TeamVideoFactory(team=self.team,
+                                           project=self.project)
+        self.task_factory = factory.make_factory(
+            TaskFactory, team=self.team, team_video=self.team_video)
+        mock_now.return_value = self.now = datetime(2015, 1, 1)
+        self.mock_team_task_assigned = mock_team_task_assigned
+
+    def detail_url(self, task):
+        return reverse('api:tasks-detail', kwargs={
+            'team_slug': self.team.slug,
+            'id': task.id,
+        })
+
+    def check_task_data(self, data, task):
+        assert_equal(data['video_id'], task.team_video.video.video_id)
+        assert_equal(data['language'], task.language)
+        assert_equal(data['id'], task.id)
+        assert_equal(data['type'], task.get_type_display())
+        if task.assignee:
+            assert_equal(data['assignee'], task.assignee.username)
+        else:
+            assert_equal(data['assignee'], None)
+        assert_equal(data['priority'], task.priority)
+        if task.completed:
+            assert_equal(data['completed'], task.completed.isoformat())
+        else:
+            assert_equal(data['completed'], None)
+        assert_equal(data['approved'], task.get_approved_display())
+        assert_equal(data['resource_uri'],
+                     reverse('api:tasks-detail', kwargs={
+                         'team_slug': self.team.slug,
+                         'id': task.id,
+                     }, request=APIRequestFactory().get('/')))
+
+    def make_a_bunch_of_tasks(self):
+        """Make a bunch of tasks in different states."""
+        return [
+            self.task_factory(language='en'),
+            self.task_factory(language='es', assignee=self.member, priority=1),
+            self.task_factory(language='fr', assignee=self.manager,
+                              type=self.TYPE_REVIEW, priority=-1),
+            self.task_factory(language='de', assignee=self.admin,
+                              type=self.TYPE_APPROVAL),
+            self.task_factory(language='pt-br', assignee=self.member,
+                              completed=datetime(2015, 1, 1))
+        ]
+
+    def check_list_results(self, correct_tasks, **params):
+        task_map = dict((t.id, t) for t in correct_tasks)
+        response = self.client.get(self.list_url, params)
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_items_equal([t['id'] for t in response.data], task_map.keys())
+        for task_data in response.data:
+            self.check_task_data(task_data, task_map[task_data['id']])
+
+    def test_list(self):
+        self.check_list_results(self.make_a_bunch_of_tasks())
+
+    def test_assignee_filter(self):
+        correct_tasks = [
+            self.task_factory(language='es', assignee=self.member),
+            self.task_factory(language='fr', assignee=self.member,
+                              completed=datetime(2015, 1, 1))
+        ]
+        incorrect_tasks = [
+            self.task_factory(language='en'),
+            self.task_factory(language='fr', assignee=self.admin),
+        ]
+        self.check_list_results(correct_tasks, assignee=self.member.username)
+
+    def test_priority_filter(self):
+        correct_tasks = [
+            t for t in self.make_a_bunch_of_tasks()
+            if t.priority == 1
+        ]
+        self.check_list_results(correct_tasks, priority=1)
+
+    def check_subtitle_filter(self, type_value, type_label):
+        correct_tasks = [
+            t for t in self.make_a_bunch_of_tasks()
+            if t.type==type_value
+        ]
+        self.check_list_results(correct_tasks, type=type_label)
+
+    def test_subtitle_type_filter(self):
+        self.check_subtitle_filter(self.TYPE_SUBTITLE, 'Subtitle')
+
+    def test_translate_type_filter(self):
+        self.check_subtitle_filter(self.TYPE_TRANSLATE, 'Translate')
+
+    def test_review_type_filter(self):
+        self.check_subtitle_filter(self.TYPE_REVIEW, 'Review')
+
+    def test_approve_type_filter(self):
+        self.check_subtitle_filter(self.TYPE_APPROVAL, 'Approve')
+
+    def test_invalid_type_filter(self):
+        self.make_a_bunch_of_tasks()
+        self.check_list_results([], type='invalid-type-name')
+
+    def test_video_id_filter(self):
+        tasks = self.make_a_bunch_of_tasks()
+        self.check_list_results(tasks,
+                                video_id=self.team_video.video.video_id)
+
+    def test_video_id_filter_video_not_in_team(self):
+        # if the video isn't in the team, we should return no tasks
+        self.make_a_bunch_of_tasks()
+        team_video = TeamVideoFactory()
+        TaskFactory(team=team_video.team, team_video=team_video,
+                    type=self.TYPE_SUBTITLE)
+        self.check_list_results([], video_id=team_video.video.video_id)
+
+    def test_completed_filter(self):
+        correct_tasks = [
+            t for t in self.make_a_bunch_of_tasks()
+            if t.completed
+        ]
+        self.check_list_results(correct_tasks, completed=1)
+
+    def _make_timestamp(self, datetime):
+        return int(time.mktime(datetime.timetuple()))
+
+    def test_completed_before_filter(self):
+        corrrect_tasks = [
+            self.task_factory(language='en', assignee=self.member,
+                              completed=datetime(2014, 12, 31)),
+        ]
+        incorrect_tasks = [
+            self.task_factory(language='es', assignee=self.member),
+            self.task_factory(language='fr', assignee=self.member,
+                              completed=datetime(2015, 1, 1))
+        ]
+        self.check_list_results(
+            corrrect_tasks,
+            completed_before=self._make_timestamp(datetime(2015,1,1)))
+
+    def test_completed_after_filter(self):
+        corrrect_tasks = [
+            self.task_factory(language='en', assignee=self.member,
+                              completed=datetime(2015, 1, 1))
+        ]
+        incorrect_tasks = [
+            self.task_factory(language='es', assignee=self.member),
+            self.task_factory(language='fr', assignee=self.member,
+                              completed=datetime(2014, 12, 31)),
+        ]
+        self.check_list_results(
+            corrrect_tasks,
+            completed_after=self._make_timestamp(datetime(2015,1,1)))
+
+    def test_open_filter(self):
+        correct_tasks = [
+            t for t in self.make_a_bunch_of_tasks()
+            if not t.completed
+        ]
+        self.check_list_results(correct_tasks, open=1)
+
+    def check_list_order(self, order_param):
+        task_qs = self.team.task_set.all().order_by(order_param)
+        response = self.client.get(self.list_url, {'order_by': order_param})
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_equal([t['id'] for t in response.data],
+                     [t.id for t in task_qs])
+
+    def test_order_by_filter(self):
+        tasks = self.make_a_bunch_of_tasks()
+        self.check_list_order('created')
+        self.check_list_order('-created')
+        self.check_list_order('priority')
+        self.check_list_order('-priority')
+        self.check_list_order('type')
+        self.check_list_order('-type')
+
+    def test_detail(self):
+        tasks = self.make_a_bunch_of_tasks()
+        for task in tasks:
+            response = self.client.get(self.detail_url(task))
+            assert_equal(response.status_code, status.HTTP_200_OK)
+            self.check_task_data(response.data, task)
+
+    def check_task_creation_extra(self, task, assigned):
+        """Check that extra tasks were run for the task."""
+        if assigned:
+            assert_equal(self.mock_team_task_assigned.delay.call_args,
+                         mock.call(task.id))
+            # since the task was assigned, we should set the expiration date
+            assert_equal(task.expiration_date,
+                         self.now + timedelta(days=self.team.task_expiration))
+        else:
+            assert_equal(self.mock_team_task_assigned.delay.call_count, 0)
+            assert_equal(task.expiration_date, None)
+
+        assert_equal(test_utils.video_changed_tasks.delay.call_args,
+                     mock.call(task.team_video.video_id))
+
+    def test_create(self):
+        response = self.client.post(self.list_url, {
+            'video_id': self.team_video.video.video_id,
+            'type': 'Subtitle',
+            'priority': 3,
+        })
+        assert_equal(response.status_code, status.HTTP_201_CREATED,
+                     response.content)
+        task = Task.objects.get(id=response.data['id'])
+        assert_equal(task.team_video, self.team_video)
+        assert_equal(task.team, self.team)
+        assert_equal(task.language, '')
+        assert_equal(task.type, self.TYPE_SUBTITLE)
+        assert_equal(task.priority, 3)
+        self.check_task_data(response.data, task)
+        self.check_task_creation_extra(task, assigned=False)
+
+    def test_create_and_assign(self):
+        response = self.client.post(self.list_url, {
+            'video_id': self.team_video.video.video_id,
+            'language': 'en',
+            'type': 'Subtitle',
+            'assignee': self.member.username,
+        })
+        assert_equal(response.status_code, status.HTTP_201_CREATED,
+                     response.content)
+        task = Task.objects.get(id=response.data['id'])
+        assert_equal(task.assignee, self.member)
+        self.check_task_creation_extra(task, assigned=True)
+
+    def test_create_with_invalid_video_id(self):
+        # try creating with a video that's not in our team
+        video = VideoFactory()
+        response = self.client.post(self.list_url, {
+            'video_id': video.video_id,
+            'language': 'en',
+            'type': 'Subtitle',
+            'priority': 3,
+        })
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_with_invalid_assignee(self):
+        # try creating with a user that's not in our team
+        user = UserFactory()
+        response = self.client.post(self.list_url, {
+            'video_id': self.team_video.video.video_id,
+            'language': 'en',
+            'type': 'Subtitle',
+            'assignee': user.username,
+        })
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update(self):
+        task = self.task_factory(language='es')
+        response = self.client.put(self.detail_url(task), {
+            'priority': 3
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        assert_equal(test_utils.reload_obj(task).priority, 3)
+        self.check_task_creation_extra(task, assigned=False)
+
+    def test_set_approved(self):
+        # I have no clue why a client would change the approved field
+        # manually, but the old API supported it.
+        task = self.task_factory(language='es')
+        response = self.client.put(self.detail_url(task), {
+            'approved': 'Rejected',
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        assert_equal(test_utils.reload_obj(task).approved,
+                     Task.APPROVED_IDS['Rejected'])
+        self.check_task_creation_extra(task, assigned=False)
+
+    def test_assign(self):
+        task = self.task_factory(language='es')
+        response = self.client.put(self.detail_url(task), {
+            'assignee': self.member.username,
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        task = test_utils.reload_obj(task)
+        assert_equal(task.assignee, self.member)
+        self.check_task_creation_extra(task, assigned=True)
+
+    def test_assign_with_max_tasks(self):
+        self.team.max_tasks_per_member = 1
+        self.team.save()
+        self.task_factory(language='en', assignee=self.member)
+        task = self.task_factory(language='es')
+        response = self.client.put(self.detail_url(task), {
+            'assignee': self.member.username,
+        })
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_complete(self):
+        task = self.task_factory(language='es', assignee=self.member)
+        pipeline.add_subtitles(self.team_video.video, 'es', None,
+                               author=self.member)
+        response = self.client.put(self.detail_url(task), {
+            'complete': 1,
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        task = test_utils.reload_obj(task)
+        assert_not_equal(task.completed, None)
+        assert_equal(task.approved, Task.APPROVED_IDS['Approved'])
+        self.check_task_creation_extra(task, assigned=False)
+
+    def test_complete_assigns_task(self):
+        task = self.task_factory(language='es')
+        pipeline.add_subtitles(self.team_video.video, 'es', None,
+                               author=self.member)
+        response = self.client.put(self.detail_url(task), {
+            'complete': 1,
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        task = test_utils.reload_obj(task)
+        assert_equal(task.approved, Task.APPROVED_IDS['Approved'])
+        assert_equal(task.assignee, self.user)
+
+    def test_send_back(self):
+        task = self.task_factory(language='es', assignee=self.member)
+        pipeline.add_subtitles(self.team_video.video, 'es', None,
+                               author=self.member)
+        task.approved = Task.APPROVED_IDS['Approved']
+        task.complete()
+        review_task = self.team_video.task_set.incomplete().get()
+        response = self.client.put(self.detail_url(review_task), {
+            'send_back': 1,
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        assert_equal(test_utils.reload_obj(review_task).approved,
+                     Task.APPROVED_IDS['Rejected'])
+
+    def test_delete(self):
+        task = self.task_factory(language='es', assignee=self.member)
+        response = self.client.delete(self.detail_url(task))
+        assert_equal(response.status_code, status.HTTP_204_NO_CONTENT)
+        assert_equal(self.team_video.task_set.all().count(), 0)
+
+    def test_create_fields(self):
+        response = self.client.options(self.list_url)
+        assert_writable_fields(response, 'POST', [
+            'video_id', 'language', 'type', 'assignee', 'priority',
+            'approved',
+        ])
+        assert_required_fields(response, 'POST', [
+            'video_id', 'type',
+        ])
+
+    def test_update_writable_fields(self):
+        task = self.task_factory()
+        response = self.client.options(self.detail_url(task))
+        assert_writable_fields(response, 'PUT', [
+            'language', 'assignee', 'priority', 'send_back', 'complete',
+            'approved',
+        ])
+        assert_required_fields(response, 'PUT', [])
+
+    # these permissions checks seem strange, but I tried to match what the old
+    # API code did
+    def test_create_checks_can_assign_permission(self):
+        self.can_assign_tasks.return_value = False
+        response = self.client.post(self.list_url, data={
+            'video_id': self.team_video.video.video_id,
+            'type': 'Subtitle',
+        })
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert_equal(self.can_assign_tasks.call_args,
+                     mock.call(self.team, self.user, self.team_video.project))
+
+    def test_update_checks_can_assign_permission(self):
+        self.can_assign_tasks.return_value = False
+        task = self.task_factory()
+        response = self.client.put(self.detail_url(task), data={})
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN,
+                     response.content)
+        assert_equal(self.can_assign_tasks.call_args,
+                     mock.call(self.team, self.user, self.team_video.project))
+
+    def test_delete_checks_can_assign_permission(self):
+        self.can_delete_tasks.return_value = False
+        task = self.task_factory(language='en')
+        response = self.client.delete(self.detail_url(task))
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN,
+                     response.content)
+        assert_equal(self.can_delete_tasks.call_args, mock.call(
+            self.team, self.user, self.team_video.project, task.language))

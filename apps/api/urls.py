@@ -33,6 +33,8 @@ router.register(r'teams/(?P<team_slug>[\w\d\-]+)/safe-members',
                 views.SafeTeamMemberViewSet, base_name='safe-team-members')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/projects',
                 views.ProjectViewSet, base_name='projects')
+router.register(r'teams/(?P<team_slug>[\w\d\-]+)/tasks',
+                views.TaskViewSet, base_name='tasks')
 router.register(r'users', views.UserViewSet, base_name='users')
 
 urlpatterns = router.urls + patterns('',
