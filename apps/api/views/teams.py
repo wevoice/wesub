@@ -251,6 +251,7 @@ from datetime import datetime
 
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework import status
@@ -386,24 +387,30 @@ class TeamMemberUpdateSerializer(TeamMemberSerializer):
         instance.save()
         return instance
 
-class TeamMemberViewSet(viewsets.ModelViewSet):
-    lookup_field = 'username'
-
+class TeamSubview(viewsets.ModelViewSet):
     def initial(self, request, *args, **kwargs):
-        super(TeamMemberViewSet, self).initial(request, *args, **kwargs)
-        self.team = get_object_or_404(Team, slug=kwargs['team_slug'])
+        super(TeamSubview, self).initial(request, *args, **kwargs)
+        try:
+            self.team = Team.objects.get(slug=kwargs['team_slug'])
+        except Team.DoesNotExist:
+            self.team = None
+            raise Http404
+
+    def get_serializer_context(self):
+        return {
+            'team': self.team,
+            'user': self.request.user,
+            'request': self.request,
+        }
+
+class TeamMemberViewSet(TeamSubview):
+    lookup_field = 'username'
 
     def get_serializer_class(self):
         if 'username' in self.kwargs:
             return TeamMemberUpdateSerializer
         else:
             return TeamMemberSerializer
-
-    def get_serializer_context(self):
-        return {
-            'team': self.team,
-            'user': self.request.user,
-        }
 
     def get_queryset(self):
         if not self.team.user_is_member(self.request.user):
@@ -516,12 +523,8 @@ class ProjectUpdateSerializer(ProjectSerializer):
             'slug': { 'required': False },
         }
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class ProjectViewSet(TeamSubview):
     lookup_field = 'slug'
-
-    def initial(self, request, *args, **kwargs):
-        super(ProjectViewSet, self).initial(request, *args, **kwargs)
-        self.team = get_object_or_404(Team, slug=kwargs['team_slug'])
 
     def get_queryset(self):
         if not self.team.user_is_member(self.request.user):
@@ -533,12 +536,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return ProjectUpdateSerializer
         else:
             return ProjectSerializer
-
-    def get_serializer_context(self):
-        return {
-            'team': self.team,
-            'request': self.request,
-        }
 
     def get_object(self):
         if not self.team.user_is_member(self.request.user):
@@ -664,12 +661,8 @@ class TaskUpdateSerializer(TaskSerializer):
             task.assignee = self.context['user']
         task.complete()
 
-class TaskViewSet(viewsets.ModelViewSet):
+class TaskViewSet(TeamSubview):
     lookup_field = 'id'
-
-    def initial(self, request, *args, **kwargs):
-        super(TaskViewSet, self).initial(request, *args, **kwargs)
-        self.team = get_object_or_404(Team, slug=kwargs['team_slug'])
 
     def get_queryset(self):
         if not self.team.user_is_member(self.request.user):
@@ -725,13 +718,6 @@ class TaskViewSet(viewsets.ModelViewSet):
             return TaskSerializer
         else:
             return TaskUpdateSerializer
-
-    def get_serializer_context(self):
-        return {
-            'team': self.team,
-            'user': self.request.user,
-            'request': self.request,
-        }
 
     def perform_create(self, serializer):
         team_video = serializer.validated_data['team_video']
