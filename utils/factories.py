@@ -267,7 +267,7 @@ class TeamMemberFactory(DjangoModelFactory):
 class TeamContributorMemberFactory(DjangoModelFactory):
     FACTORY_FOR = teams.models.TeamMember
 
-    role = teams.models.TeamMember.ROLE_OWNER
+    role = teams.models.TeamMember.ROLE_CONTRIBUTOR
     user = factory.SubFactory(UserFactory)
     team = factory.SubFactory(TeamFactory)
 
