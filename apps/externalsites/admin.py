@@ -18,9 +18,14 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 
+from django import forms
 from django.contrib import admin
+from django.contrib import messages
+from django.utils.translation import ugettext as _
 
 from externalsites import models
+from externalsites import tasks
+from teams.models import Team
 
 class SyncHistoryAdmin(admin.ModelAdmin):
     fields = (
@@ -71,9 +76,34 @@ class OpenIDConnectLinkAdmin(admin.ModelAdmin):
         'user',
     )
 
+class YoutubeAccountForm(forms.ModelForm):
+    resync_subtitles = forms.BooleanField(required=False)
+    sync_teams = forms.ModelMultipleChoiceField(Team.objects.all(),
+                                                required=False)
+
+    def save(self, commit=True):
+        account = super(YoutubeAccountForm, self).save(commit=commit)
+        if self.cleaned_data.get('resync_subtitles'):
+            tasks.update_all_subtitles.delay(account.account_type, account.id)
+        return account
+
+    class Meta:
+        model = models.YouTubeAccount
+
+
+class YouTubeAccountAdmin(admin.ModelAdmin):
+    form = YoutubeAccountForm
+
+    def save_model(self, request, obj, form, change):
+        account = super(YouTubeAccountAdmin, self).save_model(
+            request, obj, form, change)
+        if form.cleaned_data.get('resync_subtitles'):
+            messages.info(request, _(u'Resyncing subtitles'))
+        return account
+
 admin.site.register(models.KalturaAccount)
 admin.site.register(models.BrightcoveAccount)
-admin.site.register(models.YouTubeAccount)
+admin.site.register(models.YouTubeAccount, YouTubeAccountAdmin)
 admin.site.register(models.SyncedSubtitleVersion)
 admin.site.register(models.SyncHistory, SyncHistoryAdmin)
 admin.site.register(models.OpenIDConnectLink, OpenIDConnectLinkAdmin)
