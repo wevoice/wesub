@@ -93,6 +93,15 @@ class YoutubeAccountForm(forms.ModelForm):
 
 class YouTubeAccountAdmin(admin.ModelAdmin):
     form = YoutubeAccountForm
+    fields = (
+        'type',
+        'owner_id',
+        'channel_id',
+        'username',
+        'oauth_refresh_token',
+        'sync_teams',
+        'resync_subtitles',
+    )
 
     def save_model(self, request, obj, form, change):
         account = super(YouTubeAccountAdmin, self).save_model(
