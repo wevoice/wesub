@@ -620,6 +620,13 @@ class TasksAPITest(TeamAPITestBase):
         ]
         self.check_list_results(correct_tasks, priority=1)
 
+    def test_language_filter(self):
+        correct_tasks = [
+            t for t in self.make_a_bunch_of_tasks()
+            if t.language == 'en'
+        ]
+        self.check_list_results(correct_tasks, language='en')
+
     def check_subtitle_filter(self, type_value, type_label):
         correct_tasks = [
             t for t in self.make_a_bunch_of_tasks()

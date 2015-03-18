@@ -694,6 +694,8 @@ class TaskViewSet(TeamSubview):
             qs = qs.filter(assignee__username=params['assignee'])
         if 'priority' in params:
             qs = qs.filter(priority=params['priority'])
+        if 'language' in params:
+            qs = qs.filter(language=params['language'])
         if 'type' in params:
             try:
                 qs = qs.filter(type=Task.TYPE_IDS[params['type']])
