@@ -237,7 +237,13 @@ class Workflow(object):
 
     def editor_video_urls(self, language_code):
         """Get video URLs to send to the editor."""
-        return [v.url for v in self.video.get_video_urls()]
+        video_urls = list(self.video.get_video_urls())
+        video_urls.sort(key=lambda vurl: vurl.primary, reverse=True)
+        if video_urls and video_urls[0].is_html5():
+            # If the primary video URL is HTML5, then only send html5 video
+            # URLs (see #2089)
+            video_urls = [vurl for vurl in video_urls if vurl.is_html5()]
+        return [v.url for v in video_urls]
 
 @behavior
 def get_workflow(video):
