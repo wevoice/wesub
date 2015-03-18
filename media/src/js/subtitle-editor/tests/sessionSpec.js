@@ -158,6 +158,7 @@ describe('The SessionController', function() {
             'performAction',
         ];
         $scope.sessionBackend = {};
+        $scope.analytics = jasmine.createSpy('analytics');
         _.each(backendMethods, function(methodName) {
             var spy = jasmine.createSpy().andCallFake(function(arg) {
                 if(methodName == 'saveSubtitles'
