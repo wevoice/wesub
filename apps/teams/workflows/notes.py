@@ -36,7 +36,7 @@ class TeamEditorNotes(EditorNotes):
     def fetch_notes(self):
         return list(TeamSubtitleNote.objects
                     .filter(video=self.video, team=self.team,
-                            language_code=language_code)
+                            language_code=self.language_code)
                     .order_by('created')
                     .select_related('user'))
 
