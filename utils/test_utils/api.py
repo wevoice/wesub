@@ -24,4 +24,11 @@ def assert_writable_fields(options_response, method, correct_writable_fields):
     ]
     assert_items_equal(writable_fields, correct_writable_fields)
 
-__all__ = ['assert_writable_fields']
+def assert_required_fields(options_response, method, correct_required_fields):
+    field_data =  options_response.data['actions'][method]
+    required_fields = [
+        name for name in field_data if field_data[name]['required']
+    ]
+    assert_items_equal(required_fields, correct_required_fields)
+
+__all__ = ['assert_writable_fields', 'assert_required_fields']
