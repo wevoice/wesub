@@ -8,7 +8,7 @@ import json
 import itertools
 import time
 from rest_framework.test import APILiveServerTestCase, APIClient
-
+from django.core import management
 from caching.tests.utils import assert_invalidates_model_cache
 from videos.models import *
 from utils.factories import *
@@ -22,6 +22,7 @@ class TestCaseVideos(APILiveServerTestCase, WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseVideos, cls).setUpClass()
+        management.call_command('flush', interactive=False)
         cls.user = UserFactory()
         cls.client = APIClient
         for x in range(5):
@@ -76,21 +77,28 @@ class TestCaseVideos(APILiveServerTestCase, WebdriverTestCase):
         self.assertEqual(sorted(subtitle_langs), sorted(languages))
 
     def test_sort(self):
+        video = VideoFactory(title="ZZZZ test video")
         """Results are sorted as requested"""
-        url = '/api/videos/'
-        r = self._get(url)
-        video_urls = [v['all_urls'][0] for v in r['objects']]
         # order by title
         url = '/api/videos/?order_by=-title'
         r = self._get(url)
-        sorted_data = [v['all_urls'][0] for v in r['objects']]
-        self.assertEqual(video_urls[::-1], sorted_data)
+        sorted_data = [v['title'] for v in r['objects']]
+        self.assertEqual(sorted_data[0], video.title)
 
-        # order by created, newest first
+        url = '/api/videos/?order_by=title'
+        r = self._get(url)
+        sorted_data = [v['title'] for v in r['objects']]
+        self.assertEqual(sorted_data[-1], video.title)
+
         url = '/api/videos/?order_by=-created'
         r = self._get(url)
-        sorted_data = [v['all_urls'][0] for v in r['objects']]
-        self.assertEqual(video_urls[::-1], sorted_data)
+        sorted_data = [v['title'] for v in r['objects']]
+        self.assertEqual(sorted_data[0], video.title)
+
+        url = '/api/videos/?order_by=created'
+        r = self._get(url)
+        sorted_data = [v['title'] for v in r['objects']]
+        self.assertEqual(sorted_data[-1], video.title)
 
     def test_post(self):
         """post a new video with all metadata for public video""" 

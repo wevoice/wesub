@@ -9,6 +9,7 @@ from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from webdriver_testing.pages.site_pages.teams import members_tab
 from webdriver_testing.pages.site_pages import user_messages_page
+from webdriver_testing.pages.site_pages.teams import ATeamPage
 
 class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
     """TestSuite for teams api  """
@@ -17,7 +18,7 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseTeams, cls).setUpClass()
-
+        cls.team_pg = ATeamPage(cls)
         cls.user = UserFactory()
         cls.staff = UserFactory(is_staff=True, is_superuser=True)
         cls.partner = UserFactory(is_partner=True)
@@ -47,9 +48,12 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
     def _delete(self, url='/api/teams/', user=None):
         self.client.force_authenticate(user)
         response = self.client.delete(url)
-        response.render()
-        r = (json.loads(response.content))
-        return r
+        try:
+            response.render()
+            r = (json.loads(response.content))
+            return r
+        except:
+            return response.status_code
 
     def test_create_team_user(self):
         """Regular user can not create a team
@@ -208,23 +212,20 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         url = '/api/teams/%s/' % team.slug
         #check regular user can't delete the team.
         r = self._delete(url=url, user=self.user)
-        self.assertEqual(r, {u'detail': u'Not found'})
+        self.assertEqual(r, {u'detail': u"Method 'DELETE' not allowed."})
 
         #check member can't delete the team
         r = self._delete(url=url, user=member)
-        self.assertEqual(r, {u'detail': u'Permission denied'})
+        self.assertEqual(r, {u'detail': u"Method 'DELETE' not allowed."})
 
         #admin can't delete the team.
         r = self._delete(url=url, user=admin)
-        self.assertEqual(r, {u'detail': u'Permission denied'})
+        self.assertEqual(r, {u'detail': u"Method 'DELETE' not allowed."})
 
-        #owner can delete the team.
+        #owner can't delete the team.
         owner = TeamMemberFactory(team=team).user
-        self.client.force_authenticate(owner)
-        response = self.client.delete(url)
-        response.render()
-        self.logger.info(response.status_code)
-        self.assertEqual(response.status_code, 204)
+        r = self._delete(url=url, user=owner)
+        self.assertEqual(r, {u'detail': u"Method 'DELETE' not allowed."})
 
     def test_members_list(self):
         """List off the existing team members.
@@ -344,12 +345,13 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         response.render()
         self.assertEqual(response.status_code, 204)
 
-    def test_post(self):
-        """post a new video with all metadata for public video""" 
+    def test_add_team_video(self):
+        """add a video to a team and project""" 
         admin = UserFactory()
         member = UserFactory()
         team = TeamFactory(admin=admin,
                            member=member)
+        project = ProjectFactory(team=team)
         url = "/api/videos/"
 
         data = {
@@ -359,7 +361,8 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
                 "description": "The description of the test video", 
                 "duration": 320, 
                 "thumbnail": "https://i.ytimg.com/vi/BXMPp0TLSEo/hqdefault.jpg",
-                "team": team.slug
+                "team": team.slug,
+                "project": project.slug
                 }
         r = self._post(url=url, data=data, user=admin)
 
@@ -370,7 +373,7 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         self.assertEqual(data['duration'], r['duration'])
         self.assertEqual(data['thumbnail'], r['thumbnail'])
         self.assertEqual(data['video_url'], r['all_urls'][0])
-        self.assertEqual(None, r['project'])
+        self.assertEqual(project.slug, r['project'])
         self.assertEqual(team.slug, r['team'])
         self.assertEqual('en', r['original_language'])
         self.assertEqual({}, r['metadata'])
@@ -382,3 +385,98 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         self.assertEqual(data['title'], video.title)
         self.assertEqual(data['description'], video.description)
         self.assertEqual(data['duration'], video.duration)
+
+
+    def test_project_list(self):
+        """List off the teams projects.
+        """
+        admin = UserFactory()
+        member = UserFactory()
+        team = TeamFactory(admin=admin,
+                           member=member)
+        for x in range(3):
+            ProjectFactory(team=team)
+
+        url = "/api/teams/%s/projects/" % team.slug
+        r = self._get(url=url, user=admin)
+        self.assertEqual(3, len(r))
+
+
+    def test_project_details(self):
+        """Get the details of a project.
+        """
+        admin = UserFactory()
+        member = UserFactory()
+        team = TeamFactory(admin=admin,
+                           member=member)
+        project = ProjectFactory(team=team, 
+                       description='initial team project',
+                       guidelines='these are guidelines')
+        url = '/api/teams/{0}/projects/{1}/'.format(team.slug, project.slug)
+        r = self._get(url=url, user=admin)
+        self.logger.info(r)
+        self.assertEqual(r['description'], project.description)
+        self.assertEqual(r['slug'], project.slug)
+
+    def test_project_create(self):
+        """Create a new project for the team.
+        """
+
+        admin = UserFactory()
+        member = UserFactory()
+        team = TeamFactory(admin=admin,
+                           member=member)
+        url = '/api/teams/%s/projects/' % team.slug
+        data = {
+                     "name": "Project name",
+                     "slug": "project-slug",
+                     "description": "This is an example project.",
+                }
+        r = self._post(url=url, data=data, user=admin)
+        self.team_pg.open_page('/')
+        self.team_pg.log_in(admin.username, 'password')
+        self.team_pg.open_team_page(team.slug)
+        self.assertTrue(self.team_pg.has_project(data['slug']))
+
+
+    def test_project_update(self):
+        """Update a projects information.
+        """
+        admin = UserFactory()
+        member = UserFactory()
+        team = TeamFactory(admin=admin,
+                           member=member)
+        project = ProjectFactory.create(team=team, 
+                       description='initial team project',
+                       guidelines='these are guidelines')
+        url = '/api/teams/{0}/projects/{1}/'.format(team.slug, project.slug)
+        self.logger.info(project.description) 
+        data = {
+            'description': 'updated description' 
+            } 
+        r = self._put(url=url, data=data, user=admin)
+        self.team_pg.open_page('/')
+        self.team_pg.log_in(admin.username, 'password')
+        self.team_pg.open_page("/teams/{0}/settings/projects/{1}".format(team.slug, project.slug))
+        self.assertTrue(self.team_pg.is_text_present("textarea", data['description']))
+
+    def test_project_delete(self):
+        """Delete a team project.
+        """
+        admin = UserFactory()
+        member = UserFactory()
+        team = TeamFactory(admin=admin,
+                           member=member)
+        project1 = ProjectFactory(team=team, 
+                       description='initial team project')
+        project2 = ProjectFactory(team=team, 
+                       description='project 2')
+        url = '/api/teams/{0}/projects/{1}/'.format(team.slug, project2.slug)
+        r = self._delete(url=url, user=admin)
+        self.team_pg.open_page('/')
+        self.team_pg.log_in(admin.username, 'password')
+        self.team_pg.open_team_page(team.slug)
+        #Verify project 1 is still present
+        self.assertTrue(self.team_pg.has_project(project1.slug)) 
+        #Verify project2 is deleted
+        self.assertFalse(self.team_pg.has_project(project2.slug)) 
