@@ -555,9 +555,6 @@ var angular = angular || null;
             $scope.$root.$emit("user-action");
             if (evt.keyCode == 9 && !evt.shiftKey) {
                 VideoPlayer.togglePlay();
-            } else if (evt.keyCode === 32 && evt.shiftKey) {
-                VideoPlayer.togglePlay();
-                // Shift+Space or Tab: toggle play / pause.
             } else if (evt.keyCode === 9 && evt.shiftKey) {
                 // Shift+Tab, go back 2 seconds
                 VideoPlayer.seek(VideoPlayer.currentTime() - 2000);
@@ -571,7 +568,10 @@ var angular = angular || null;
                 return;
             }
             // Shortcuts that should be disabled while editing a subtitle
-            else if ((evt.keyCode == 40) && ($scope.timelineShown)) {
+            else if (evt.keyCode === 32) {
+                VideoPlayer.togglePlay();
+                // Space: toggle play / pause.
+            } else if ((evt.keyCode == 40) && ($scope.timelineShown)) {
                 $scope.$root.$emit("sync-next-start-time");
             } else if ((evt.keyCode == 38) && ($scope.timelineShown)) {
                 $scope.$root.$emit("sync-next-end-time");
