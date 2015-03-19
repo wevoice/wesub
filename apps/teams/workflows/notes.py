@@ -31,11 +31,14 @@ class TeamEditorNotes(EditorNotes):
         self.video = video
         self.language_code = language_code
         self.heading = _('Team Notes')
-        self.notes = list(TeamSubtitleNote.objects
-                          .filter(video=self.video, team=self.team,
-                                  language_code=language_code)
-                          .order_by('created')
-                          .select_related('user'))
+        self.notes = self.fetch_notes()
+
+    def fetch_notes(self):
+        return list(TeamSubtitleNote.objects
+                    .filter(video=self.video, team=self.team,
+                            language_code=self.language_code)
+                    .order_by('created')
+                    .select_related('user'))
 
     def post(self, user, body):
         return TeamSubtitleNote.objects.create(

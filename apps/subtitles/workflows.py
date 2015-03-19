@@ -476,10 +476,14 @@ class EditorNotes(object):
         self.video = video
         self.language_code = language_code
         self.heading = _('Notes')
-        self.notes = list(SubtitleNote.objects
-                          .filter(video=video, language_code=language_code)
-                          .order_by('created')
-                          .select_related('user'))
+        self.notes = self.fetch_notes()
+
+    def fetch_notes(self):
+        return list(SubtitleNote.objects
+                    .filter(video=self.video,
+                            language_code=self.language_code)
+                    .order_by('created')
+                    .select_related('user'))
 
     def post(self, user, body):
         """Add a new note.
