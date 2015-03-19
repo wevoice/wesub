@@ -112,12 +112,15 @@ class UserSerializer(serializers.ModelSerializer):
         source='get_languages', read_only=True)
     resource_uri = serializers.HyperlinkedIdentityField(
         view_name='api:users-detail', lookup_field='username')
+    created_by = serializers.CharField(source='created_by.username',
+                                       read_only=True)
 
     class Meta:
         model = User
         fields = (
             'username', 'full_name', 'first_name', 'last_name', 'biography',
             'homepage', 'avatar', 'languages', 'num_videos', 'resource_uri',
+            'created_by',
         )
 
 class UserWriteSerializer(UserSerializer):
@@ -142,7 +145,8 @@ class UserWriteSerializer(UserSerializer):
         return username
 
     def create(self, validated_data):
-        user = self._update(User(), validated_data)
+        user = User(created_by=self.context['request'].user)
+        user = self._update(user, validated_data)
         user.ensure_api_key_created()
         return user
 
@@ -184,7 +188,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
                   viewsets.GenericViewSet):
 
-    queryset = User.objects.all()
+    queryset = User.objects.all().select_related('created_by')
     lookup_field = 'username'
     lookup_value_regex = r'[\w\-@\.\+]+'
 

@@ -38,13 +38,18 @@ class UserAPITest(TestCase):
 
     def assert_response_data_correct(self, response, user, get=True):
         for field in ('username', 'full_name', 'first_name', 'last_name',
-                      'biography', 'homepage',):
+                      'biography', 'homepage'):
             value = getattr(user, field)
             response_value = response.data[field]
             assert_equal(response_value, value,
                          '{} != {} (field: {})'.format(
                              response_value, value, field))
 
+        if user.created_by:
+            assert_equal(response.data['created_by'],
+                         user.created_by.username)
+        else:
+            assert_equal(response.data['created_by'], None)
         assert_equal(response.data['avatar'], user.avatar())
         assert_equal(response.data['num_videos'], user.videos.count())
         assert_items_equal(response.data['languages'], user.get_languages())
@@ -97,6 +102,7 @@ class UserAPITest(TestCase):
                      response.content)
         user = User.objects.get(username=response.data['username'])
         self.check_user_data(user, data)
+        assert_equal(user.created_by, self.user)
         self.assert_response_data_correct(response, user, get=False)
         return user, response
 
@@ -154,6 +160,7 @@ class UserAPITest(TestCase):
                      response.content)
         user = test_utils.reload_obj(self.user)
         self.check_user_data(user, data, orig_user_data)
+        assert_equals(user.created_by, None)
         self.assert_response_data_correct(response, user, get=False)
 
     def test_update_user(self):
