@@ -2025,6 +2025,11 @@ ol.subtitles-diff {
 ol.subtitles-diff li{
     padding: 1em 0;
     border-bottom: 1px solid #F3F6F8;
+
+    img {
+        float: right;
+        margin-left: 10px;
+    }
 }
 
 /* Delete Language page */

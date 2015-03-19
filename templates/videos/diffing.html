@@ -189,10 +189,16 @@
     {% for item in diff_data.subtitle_data %}
       <li>
         <div class="left_column">
-                  {% render_subtitle_diff item 0 %}
+          {% render_subtitle_diff item 0 %}
         </div>
         <div class="right_column">
-                  {% render_subtitle_diff item 1 %}
+          {% render_subtitle_diff item 1 %}
+          {% if item.time_changed %}
+          <img src="{{ STATIC_URL }}images/glyphicons_054_clock.png">
+          {% endif %}
+          {% if item.text_changed %}
+          <img src="{{ STATIC_URL }}images/glyphicons_107_text_resize.png">
+          {% endif %}
         </div>
         <div style="clear: both"></div>
       </li>
