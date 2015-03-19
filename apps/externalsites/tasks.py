@@ -114,12 +114,13 @@ def update_all_subtitles(account_type, account_id):
     for video in videos.all():
         for video_url in video.get_video_urls():
             video_url.fix_owner_username()
-            if account.should_sync_video_url(video, video_url):
-                _sync_all_languages(account, video_url, video)
-
-def _sync_all_languages(account, video_url, video):
-    for language in video.newsubtitlelanguage_set.having_public_versions():
-        account.update_subtitles(video_url, language)
+            if not account.should_sync_video_url(video, video_url):
+                continue
+            language_qs = (video.newsubtitlelanguage_set
+                           .having_public_versions())
+            for language in language_qs:
+                update_subtitles.delay(account_type, account_id,
+                                       video_url.id, language.id)
 
 @task
 def add_amara_credit(video_url_id):
