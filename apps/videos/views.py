@@ -74,7 +74,7 @@ from videos.search_indexes import VideoIndex
 from videos import share_utils
 from videos.tasks import video_changed_tasks
 from widget.views import base_widget_params
-from externalsites.models import can_sync_videourl
+from externalsites.models import can_sync_videourl, get_sync_account
 from utils import send_templated_email
 from utils.basexconverter import base62
 from utils.decorators import never_in_prod
@@ -308,6 +308,15 @@ class VideoPageContext(dict):
     def setup_tab_video(self, request, video, video_url):
         self['width'] = video_size["large"]["width"]
         self['height'] = video_size["large"]["height"]
+
+    def setup_tab_urls(self, request, video, video_url):
+        self['create_videourl_form'] = CreateVideoUrlForm(request.user, initial={
+            'video': video.pk,
+        })
+        self['video_urls'] = [
+            (vurl, get_sync_account(video, vurl))
+            for vurl in video.videourl_set.all()
+        ]
 
 @get_video_from_code
 def redirect_to_video(request, video):
