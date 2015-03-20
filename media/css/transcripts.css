@@ -1,10 +1,8 @@
 
 .time-span{
   float: left;
-  margin-right: 20px;
-  width: 130px;
-  cursor: pointer;
-  }
+  margin-right: 50px;
+}
 
 .time-span .data{ display: none;}
 
