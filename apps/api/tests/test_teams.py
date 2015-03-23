@@ -590,7 +590,7 @@ class TasksAPITest(TeamAPITestBase):
                               completed=datetime(2015, 1, 1))
         ]
 
-    def check_list_results(self, correct_tasks, **params):
+    def check_list_results(self, correct_tasks, params=None):
         task_map = dict((t.id, t) for t in correct_tasks)
         response = self.client.get(self.list_url, params)
         assert_equal(response.status_code, status.HTTP_200_OK)
@@ -611,28 +611,36 @@ class TasksAPITest(TeamAPITestBase):
             self.task_factory(language='en'),
             self.task_factory(language='fr', assignee=self.admin),
         ]
-        self.check_list_results(correct_tasks, assignee=self.member.username)
+        self.check_list_results(correct_tasks, {
+            'assignee': self.member.username,
+        })
 
     def test_priority_filter(self):
         correct_tasks = [
             t for t in self.make_a_bunch_of_tasks()
             if t.priority == 1
         ]
-        self.check_list_results(correct_tasks, priority=1)
+        self.check_list_results(correct_tasks, {
+            'priority': 1,
+        })
 
     def test_language_filter(self):
         correct_tasks = [
             t for t in self.make_a_bunch_of_tasks()
             if t.language == 'en'
         ]
-        self.check_list_results(correct_tasks, language='en')
+        self.check_list_results(correct_tasks, {
+            'language': 'en',
+        })
 
     def check_subtitle_filter(self, type_value, type_label):
         correct_tasks = [
             t for t in self.make_a_bunch_of_tasks()
             if t.type==type_value
         ]
-        self.check_list_results(correct_tasks, type=type_label)
+        self.check_list_results(correct_tasks, {
+            'type': type_label,
+        })
 
     def test_subtitle_type_filter(self):
         self.check_subtitle_filter(self.TYPE_SUBTITLE, 'Subtitle')
@@ -648,12 +656,15 @@ class TasksAPITest(TeamAPITestBase):
 
     def test_invalid_type_filter(self):
         self.make_a_bunch_of_tasks()
-        self.check_list_results([], type='invalid-type-name')
+        self.check_list_results([], {
+            'type': 'invalid-type-name',
+        })
 
     def test_video_id_filter(self):
         tasks = self.make_a_bunch_of_tasks()
-        self.check_list_results(tasks,
-                                video_id=self.team_video.video.video_id)
+        self.check_list_results(tasks, {
+            'video_id': self.team_video.video.video_id,
+        })
 
     def test_video_id_filter_video_not_in_team(self):
         # if the video isn't in the team, we should return no tasks
@@ -661,14 +672,18 @@ class TasksAPITest(TeamAPITestBase):
         team_video = TeamVideoFactory()
         TaskFactory(team=team_video.team, team_video=team_video,
                     type=self.TYPE_SUBTITLE)
-        self.check_list_results([], video_id=team_video.video.video_id)
+        self.check_list_results([], {
+            'video_id': team_video.video.video_id,
+        })
 
     def test_completed_filter(self):
         correct_tasks = [
             t for t in self.make_a_bunch_of_tasks()
             if t.completed
         ]
-        self.check_list_results(correct_tasks, completed=1)
+        self.check_list_results(correct_tasks, {
+            'completed': 1,
+        })
 
     def _make_timestamp(self, datetime):
         return int(time.mktime(datetime.timetuple()))
@@ -683,9 +698,9 @@ class TasksAPITest(TeamAPITestBase):
             self.task_factory(language='fr', assignee=self.member,
                               completed=datetime(2015, 1, 1))
         ]
-        self.check_list_results(
-            corrrect_tasks,
-            completed_before=self._make_timestamp(datetime(2015,1,1)))
+        self.check_list_results(corrrect_tasks, {
+            'completed-before': self._make_timestamp(datetime(2015,1,1)),
+        })
 
     def test_completed_after_filter(self):
         corrrect_tasks = [
@@ -697,16 +712,18 @@ class TasksAPITest(TeamAPITestBase):
             self.task_factory(language='fr', assignee=self.member,
                               completed=datetime(2014, 12, 31)),
         ]
-        self.check_list_results(
-            corrrect_tasks,
-            completed_after=self._make_timestamp(datetime(2015,1,1)))
+        self.check_list_results(corrrect_tasks, {
+            'completed-after': self._make_timestamp(datetime(2015,1,1)),
+        })
 
     def test_open_filter(self):
         correct_tasks = [
             t for t in self.make_a_bunch_of_tasks()
             if not t.completed
         ]
-        self.check_list_results(correct_tasks, open=1)
+        self.check_list_results(correct_tasks, {
+            'open': 1,
+        })
 
     def check_list_order(self, order_param):
         task_qs = self.team.task_set.all().order_by(order_param)

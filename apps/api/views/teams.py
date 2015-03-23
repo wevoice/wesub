@@ -266,6 +266,9 @@ import messages.tasks
 import teams.permissions as team_permissions
 import videos.tasks
 
+def timestamp_to_datetime(timestamp):
+    return datetime.fromtimestamp(int(timestamp))
+
 class MappedChoiceField(serializers.ChoiceField):
     """Choice field that maps internal values to choices."""
 
@@ -685,9 +688,6 @@ class TaskViewSet(TeamSubview):
         else:
             return qs
 
-    def _convert_timestamp(self, value):
-        return datetime.fromtimestamp(int(value))
-
     def filter_queryset(self, qs):
         params = self.request.query_params
         if 'assignee' in params:
@@ -705,16 +705,16 @@ class TaskViewSet(TeamSubview):
             qs = qs.filter(team_video__video__video_id=params['video_id'])
         if 'completed' in params:
             qs = qs.filter(completed__isnull=False)
-        if 'completed_after' in params:
+        if 'completed-after' in params:
             try:
-                qs = qs.filter(completed__gte=self._convert_timestamp(
-                    params['completed_after']))
+                qs = qs.filter(completed__gte=timestamp_to_datetime(
+                    params['completed-after']))
             except (TypeError, ValueError):
                 qs = qs.none()
-        if 'completed_before' in params:
+        if 'completed-before' in params:
             try:
-                qs = qs.filter(completed__lt=self._convert_timestamp(
-                    params['completed_before']))
+                qs = qs.filter(completed__lt=timestamp_to_datetime(
+                    params['completed-before']))
             except (TypeError, ValueError):
                 qs = qs.none()
         if 'open' in params:
