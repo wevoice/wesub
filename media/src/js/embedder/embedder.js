@@ -459,7 +459,7 @@
                         url += '&controls=1';
                     }
                 }
-                pop = _Popcorn.smart(this.$popContainer.attr('id'), url);
+                pop = _Popcorn.smart(this.$popContainer.attr('id'), url, {frameAnimation: true});
                 pop.controls(true);
                 return pop;
             },

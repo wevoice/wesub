@@ -35,15 +35,13 @@ var Popcorn = Popcorn || null;
                 createDefaultContainer(this);
             }
         },
-        start: function(event, options){
-            // popcorn will call start on two ocasions:
-            // - on startup, where options.id is set
-            // - during playback, where options id is not set
-            // we only need to change the text at that time, so:
-            if (!options.id &&options.text !== '') {
+	frame: function(event, options){
+            if ((options.text !== '') && (options.text !== newdiv.innerHTML)) {
                 newdiv.style.display = 'inline-block';
                 newdiv.innerHTML = options.text || '';
-            }
+	    }
+	},
+        start: function(event, options){
         },
         end: function(event, options) {
             newdiv.style.display = 'none';
