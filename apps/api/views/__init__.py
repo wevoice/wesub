@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from .activity import ActivityViewSet
 from .languages import languages
 from .subtitles import (Actions, NotesList, SubtitleLanguageViewSet,
                         SubtitlesView)

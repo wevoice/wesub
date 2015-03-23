@@ -36,6 +36,7 @@ router.register(r'teams/(?P<team_slug>[\w\d\-]+)/projects',
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/tasks',
                 views.TaskViewSet, base_name='tasks')
 router.register(r'users', views.UserViewSet, base_name='users')
+router.register(r'activity', views.ActivityViewSet, base_name='activity')
 
 urlpatterns = router.urls + patterns('',
     url(r'^videos/(?P<video_id>[\w\d]+)'
