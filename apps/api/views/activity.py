@@ -25,16 +25,16 @@ List activity items:
 
 .. http:get:: /api/activity/
 
-    :query team (slug): Show only items related to a given team
+    :query slug team: Show only items related to a given team
     :query team-activity: If team is given, we normally return activity on the
        team's videos.  If you want to see activity for the team itself (members
        joining/leaving and team video deletions, then add team-activity=1)
-    :query video (video-id): Show only items related to a given video
-    :query type (integer): Show only items with a given activity type (see
+    :query video-id video: Show only items related to a given video
+    :query integer type: Show only items with a given activity type (see
         below for values)
-    :query language (language code): Show only items with a given language
-    :query before (integer): A unix timestamp in seconds
-    :query after (integer): A unix timestamp in seconds
+    :query language-code language: Show only items with a given language
+    :query integer before: A unix timestamp in seconds
+    :query integer after: A unix timestamp in seconds
 
     :>jsonarr type: activity type as an integer
     :>jsonarr created: date/time of the activity
