@@ -169,7 +169,7 @@ Task Resource
 List all tasks for a given team
 +++++++++++++++++++++++++++++++
 
-.. http:get:: /api2/partners/teams/[team-slug]/tasks/
+.. http:get:: /api/teams/[team-slug]/tasks/
 
     :query assignee: Show only tasks assigned to a username
     :query priority: Show only tasks with a given priority
@@ -206,14 +206,14 @@ List all tasks for a given team
 Task detail
 +++++++++++
 
-.. http:get:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
+.. http:get:: /api/teams/[team-slug]/tasks/[task-id]/
 
     Returns the same data as the task list API
 
 Create a new task
 +++++++++++++++++
 
-.. http:post:: /api2/partners/teams/[team-slug]/tasks/
+.. http:post:: /api/teams/[team-slug]/tasks/
 
     :<json video_id: Video ID
     :<json language: language code
@@ -224,7 +224,7 @@ Create a new task
 Update an existing task
 +++++++++++++++++++++++
 
-.. http:put:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
+.. http:put:: /api/teams/[team-slug]/tasks/[task-id]/
 
     :<json assignee: Username of the task assignee or null to unassign
     :<json priority: priority of the task
@@ -242,7 +242,7 @@ Update an existing task
 Delete an existing task
 +++++++++++++++++++++++
 
-.. http:delete:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
+.. http:delete:: /api/teams/[team-slug]/tasks/[task-id]/
 
 """
 
