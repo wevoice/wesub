@@ -49,4 +49,5 @@ urlpatterns = router.urls + patterns('',
         '/languages/(?P<language_code>[\w-]+)/subtitles/notes/$',
         views.NotesList.as_view()),
     url(r'^languages/$', views.languages, name='languages'),
+    url(r'^message/$', views.Messages.as_view(), name='messages'),
 )

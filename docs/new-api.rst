@@ -142,3 +142,4 @@ The following resources are available to end users:
 .. automodule:: api.views.users
 .. automodule:: api.views.teams
 .. automodule:: api.views.activity
+.. automodule:: api.views.messages
