@@ -189,10 +189,10 @@
     {% for item in diff_data.subtitle_data %}
       <li>
         <div class="left_column">
-                  {% render_subtitle_diff item 0 %}
+          {% render_subtitle_diff item 0 %}
         </div>
-        <div class="right_column">
-                  {% render_subtitle_diff item 1 %}
+        <div class="right_column{% if item.time_changed %} time-change{% endif %}{% if item.text_changed %} text-change{% endif %}">
+          {% render_subtitle_diff item 1 %}
         </div>
         <div style="clear: both"></div>
       </li>

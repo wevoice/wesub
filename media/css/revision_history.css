@@ -84,11 +84,13 @@ a.new_edit {
     border: 3px solid #9e381d;
     font-size: 14px;
 }
-.time_change, div.changed {
-    color: #e45129
+.time-change .time-span {
+    border: 1px dashed #e45129;
+    padding: 4px;
+    margin: -5px 45px -5px -5px;
 }
-div.time_change {
-    padding-left: 150px;
+.text-change span.text {
+    color: #e45129;
 }
 .diff_title {
     font-weight: normal
