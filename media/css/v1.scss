@@ -3212,3 +3212,30 @@ a.truncated-expand {
   text-align: right;
   margin-bottom: 1.5em;
 }
+/* Comments */
+.v1 .notes {
+    ul {
+        padding: 0.5em;
+    }
+
+    li {
+        margin-bottom: 2em;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+
+    p.byline {
+        color: $light;
+        font-style: italic;
+    }
+
+    textarea {
+        width: 100%;
+        resize: vertical;
+        height: 4em;
+        padding: 0.5em;
+        box-sizing: border-box;
+    }
+}

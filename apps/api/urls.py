@@ -26,6 +26,15 @@ router.register(r'videos/(?P<video_id>[\w\d]+)/languages',
                 views.SubtitleLanguageViewSet, base_name='subtitle-language')
 router.register(r'videos/(?P<video_id>[\w\d]+)/urls',
                 views.VideoURLViewSet, base_name='video-url')
+router.register(r'teams', views.TeamViewSet, base_name='teams')
+router.register(r'teams/(?P<team_slug>[\w\d\-]+)/members',
+                views.TeamMemberViewSet, base_name='team-members')
+router.register(r'teams/(?P<team_slug>[\w\d\-]+)/safe-members',
+                views.SafeTeamMemberViewSet, base_name='safe-team-members')
+router.register(r'teams/(?P<team_slug>[\w\d\-]+)/projects',
+                views.ProjectViewSet, base_name='projects')
+router.register(r'teams/(?P<team_slug>[\w\d\-]+)/tasks',
+                views.TaskViewSet, base_name='tasks')
 router.register(r'users', views.UserViewSet, base_name='users')
 
 urlpatterns = router.urls + patterns('',

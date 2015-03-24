@@ -30,10 +30,12 @@ particular they control:
 Workflows
 --------_
 .. autoclass:: Workflow
+
     :members: get_work_mode, get_actions, action_for_add_subtitles,
         get_editor_notes, extra_tabs, get_add_language_mode,
         user_can_view_video, user_can_edit_subtitles,
         user_can_view_private_subtitles
+
 .. autofunction:: get_workflow(video)
 
 Editor Notes
@@ -476,10 +478,14 @@ class EditorNotes(object):
         self.video = video
         self.language_code = language_code
         self.heading = _('Notes')
-        self.notes = list(SubtitleNote.objects
-                          .filter(video=video, language_code=language_code)
-                          .order_by('created')
-                          .select_related('user'))
+        self.notes = self.fetch_notes()
+
+    def fetch_notes(self):
+        return list(SubtitleNote.objects
+                    .filter(video=self.video,
+                            language_code=self.language_code)
+                    .order_by('created')
+                    .select_related('user'))
 
     def post(self, user, body):
         """Add a new note.
