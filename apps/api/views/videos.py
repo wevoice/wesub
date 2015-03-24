@@ -24,35 +24,37 @@ Get info for a specific video
 
 .. http:get:: /api2/partners/videos/[video-id]/
 
-  :>json id: Amara video id
-  :>json primary_audio_language_code: language code for the audio language
-  :>json title: Video title
-  :>json description: Video description
-  :>json duration: Video duration in seconds (or null if not known)
-  :>json thumbnail: URL to the video thumbnail
-  :>json created: Video creation date/time
-  :>json team: Slug of the Video's team (or null)
-  :>json metadata: Dict mapping metadata names to values
-  :>json languages: List of languages that have subtitles started (see below)
-  :>json all_urls: List of URLs for the video (the first one is the primary
+    :>json id: Amara video id
+    :>json primary_audio_language_code: language code for the audio language
+    :>json title: Video title
+    :>json description: Video description
+    :>json duration: Video duration in seconds (or null if not known)
+    :>json thumbnail: URL to the video thumbnail
+    :>json created: Video creation date/time
+    :>json team: Slug of the Video's team (or null)
+    :>json metadata: Dict mapping metadata names to values
+    :>json languages: List of languages that have subtitles started (see below)
+    :>json all_urls: List of URLs for the video (the first one is the primary
      video URL)
-  :>json resource_uri: API uri for the video
-  :>json original_language: contains a copy of the primary_audio_language_code
+    :>json resource_uri: API uri for the video
+    :>json original_language: contains a copy of the primary_audio_language_code
       data **(deprecated)**
 
-  **Language data:**
+    **Language data:**
 
-  :>json code: Language code
-  :>json name: Human readable label for the language
-  :>json visibile: Are the subtitles publicly viewable?
-  :>json dir: Language direction ("ltr" or "rtl")
-  :>json subtitles_uri: API URI for the subtitles
-  :>json resource_uri: API URI for the video language
+    :>json code: Language code
+    :>json name: Human readable label for the language
+    :>json visibile: Are the subtitles publicly viewable?
+    :>json dir: Language direction ("ltr" or "rtl")
+    :>json subtitles_uri: API URI for the subtitles
+    :>json resource_uri: API URI for the video language
 
 Listing videos
 ++++++++++++++
 
 .. http:get:: /api2/partners/videos/
+
+    ``paginated``
 
     :query video_url:  list only videos with the given URL, useful for finding out information about a video already on Amara.
     :query team:       Only show videos that belong to a team identified by ``slug``.
@@ -129,6 +131,8 @@ Listing video urls
 ++++++++++++++++++
 
 .. http:get:: /api2/partners/videos/[video-id]/urls/
+
+  ``paginated``
 
   :param video-id: Amara video ID
   :>json created: creation date/time

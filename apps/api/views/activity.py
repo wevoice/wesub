@@ -25,6 +25,8 @@ List activity items:
 
 .. http:get:: /api/activity/
 
+    ``paginated``
+
     :query slug team: Show only items related to a given team
     :query team-activity: If team is given, we normally return activity on the
        team's videos.  If you want to see activity for the team itself (members

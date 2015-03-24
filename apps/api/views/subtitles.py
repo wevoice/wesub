@@ -26,6 +26,8 @@ Listing video languages
 
 .. http:get:: /api2/partners/videos/[video-id]/languages/
 
+    ``paginated``
+
     :>json language_code: BCP 47 code for this language
     :>json name: Human-readable name for this language
     :>json is_primary_audio_language: Is this language the primary language

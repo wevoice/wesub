@@ -24,6 +24,8 @@ Get a list of teams
 
 .. http:get:: /api/teams/
 
+    ``paginated``
+
     :>json name: Name of the team
     :>json slug: Machine name for the team slug (used in URLs)
     :>json description: Team description
@@ -253,6 +255,8 @@ List applications
 +++++++++++++++++
 
 .. http:get:: /api/teams/[team-slug]/applications
+
+    ``paginated``
 
     :query status: Include only applications with this status
     :query timestamp integer before: Include only applications submitted before
