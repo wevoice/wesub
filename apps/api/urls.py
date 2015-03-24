@@ -35,6 +35,8 @@ router.register(r'teams/(?P<team_slug>[\w\d\-]+)/projects',
                 views.ProjectViewSet, base_name='projects')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/tasks',
                 views.TaskViewSet, base_name='tasks')
+router.register(r'teams/(?P<team_slug>[\w\d\-]+)/applications',
+                views.TeamApplicationViewSet, base_name='team-application')
 router.register(r'users', views.UserViewSet, base_name='users')
 router.register(r'activity', views.ActivityViewSet, base_name='activity')
 

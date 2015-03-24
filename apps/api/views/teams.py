@@ -244,6 +244,50 @@ Delete an existing task
 
 .. http:delete:: /api/teams/[team-slug]/tasks/[task-id]/
 
+Team Applications resource
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For teams with membership by application only.
+
+List applications
++++++++++++++++++
+
+.. http:get:: /api/teams/[team-slug]/applications
+
+    :query status: Include only applications with this status
+    :query timestamp integer before: Include only applications submitted before
+        this time.
+    :query timestamp after: Include only applications submitted after this
+        time.
+    :query username user: Include only applications from this user
+    :>jsonarr user: Username of the applicant
+    :>jsonarr note: note given by the applicant
+    :>jsonarr status: status value.  Possible values are ``Denied``,
+        ``Approved``, ``Pending``, ``Member Removed`` and ``Member Left``
+    :>jsonarr id: application ID
+    :>jsonarr created: creation date/time
+    :>jsonarr modified: last modified date/time
+    :>jsonarr resource_uri: API URI for the application
+
+Get details on a single application
++++++++++++++++++++++++++++++++++++
+
+.. http:get:: /api/teams/[team-slug]/applications/[application-id]/:
+
+    Returns the same data as one entry from the listing endpoint.
+
+Delete an Application
++++++++++++++++++++++
+
+.. http:delete:: /api/teams/[team-slug]/applications/[application-id]/
+
+Approve/Deny an application
++++++++++++++++++++++++++++
+
+.. http:put:: /api/teams/[team-slug]/applications/[application-id]/
+
+    :<json status: ``Denied`` to deny the application and ``Approved`` to
+        approve it.
 """
 
 from __future__ import absolute_import
@@ -261,7 +305,8 @@ from rest_framework.reverse import reverse
 
 from api.pagination import AmaraPaginationMixin
 from auth.models import CustomUser as User
-from teams.models import Team, TeamMember, Project, Task, TeamVideo
+from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
+                          Application)
 import messages.tasks
 import teams.permissions as team_permissions
 import videos.tasks
@@ -396,9 +441,9 @@ class TeamMemberUpdateSerializer(TeamMemberSerializer):
         instance.save()
         return instance
 
-class TeamSubview(viewsets.ModelViewSet):
+class TeamSubviewMixin(object):
     def initial(self, request, *args, **kwargs):
-        super(TeamSubview, self).initial(request, *args, **kwargs)
+        super(TeamSubviewMixin, self).initial(request, *args, **kwargs)
         try:
             self.team = Team.objects.get(slug=kwargs['team_slug'])
         except Team.DoesNotExist:
@@ -411,6 +456,9 @@ class TeamSubview(viewsets.ModelViewSet):
             'user': self.request.user,
             'request': self.request,
         }
+
+class TeamSubview(TeamSubviewMixin, viewsets.ModelViewSet):
+    pass
 
 class TeamMemberViewSet(TeamSubview):
     lookup_field = 'username'
@@ -758,3 +806,86 @@ class TaskViewSet(TeamSubview):
             task.set_expiration()
             task.save()
         videos.tasks.video_changed_tasks.delay(task.team_video.video_id)
+
+class ApplicationSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source='user.username', read_only=True)
+    status = MappedChoiceField(
+        Application.STATUSES,
+        default=Application._meta.get_field('status').get_default())
+    resource_uri = serializers.SerializerMethodField()
+
+    default_error_messages = {
+        'invalid-status-choice': "Unknown status: {status}",
+        'not-pending': "Application not pending",
+    }
+
+    def get_resource_uri(self, application):
+        return reverse('api:team-application-detail', kwargs={
+            'team_slug': self.context['team'].slug,
+            'id': application.id,
+        }, request=self.context['request'])
+
+    class Meta:
+        model = Application
+        fields = (
+            'id', 'status', 'user', 'note', 'created', 'modified',
+            'resource_uri',
+        )
+        read_only_fields = (
+            'id', 'note', 'created', 'modified',
+        )
+
+    def validate_status(self, status):
+        if status not in (Application.STATUS_APPROVED,
+                          Application.STATUS_DENIED):
+            self.fail('invalid-status-choice', status=status)
+        return status
+
+    def update(self, instance, validated_data):
+        if instance.status != Application.STATUS_PENDING:
+            self.fail('not-pending')
+        if validated_data['status'] == Application.STATUS_APPROVED:
+            instance.approve(self.context['user'], 'API')
+        elif validated_data['status'] == Application.STATUS_DENIED:
+            instance.deny(self.context['user'], 'API')
+        return instance
+
+class TeamApplicationViewSet(TeamSubviewMixin,
+                             AmaraPaginationMixin,
+                             mixins.RetrieveModelMixin,
+                             mixins.UpdateModelMixin,
+                             mixins.ListModelMixin,
+                             viewsets.GenericViewSet):
+    serializer_class = ApplicationSerializer
+    lookup_field = 'id'
+    paginate_by = 20
+
+    def get_queryset(self):
+        self.check_read_permission()
+        if self.team.membership_policy != Team.APPLICATION:
+            return self.team.applications.none()
+        return self.team.applications.all().select_related('user')
+
+    def get_object(self):
+        self.check_read_permission()
+        return super(TeamApplicationViewSet, self).get_object()
+
+    def check_read_permission(self):
+        if not team_permissions.can_invite(self.team, self.request.user):
+            raise PermissionDenied()
+
+    def filter_queryset(self, qs):
+        params = self.request.query_params
+        if 'user' in params:
+            qs = qs.filter(user__username=params['user'])
+        if 'status' in params:
+            try:
+                status_id = Application.STATUSES_IDS[params['status']]
+                qs = qs.filter(status=status_id)
+            except KeyError:
+                qs = qs.none()
+        if 'after' in params:
+            qs = qs.filter(created__gte=timestamp_to_datetime(params['after']))
+        if 'before' in params:
+            qs = qs.filter(created__lt=timestamp_to_datetime(params['before']))
+        return qs
