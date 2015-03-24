@@ -4,7 +4,7 @@ html5lib==0.95
 # this will be removed after the rollout of amqp
 vendor/amqplib-1.0.2-patched.tar.gz
 amqp==1.0.8
-Django==1.4.13
+Django==1.4.20
 Fabric==1.4.0
 PyRSS2Gen==1.0.0
 PyYAML==3.10
