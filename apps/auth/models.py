@@ -87,6 +87,8 @@ class CustomUser(BaseUser):
     pay_rate_code = models.CharField(max_length=3, blank=True, default='')
     can_send_messages = models.BooleanField(default=True)
     show_tutorial = models.BooleanField(default=True)
+    created_by = models.ForeignKey('self', null=True, blank=True,
+                                   related_name='created_users')
 
     objects = UserManager()
 
