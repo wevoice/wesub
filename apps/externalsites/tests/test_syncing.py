@@ -252,42 +252,6 @@ class SubtitleTaskTest(TestCase):
         ])
         self.check_synced_version(language, version)
 
-    def test_upload_all_subtitles(self):
-        to_sync = [self.video.subtitle_language('en').get_tip()]
-        pipeline.add_subtitles(self.video, 'fr', None)
-        to_sync.append(pipeline.add_subtitles(self.video, 'fr', None))
-        to_sync.append(pipeline.add_subtitles(self.video, 'de', None))
-        to_sync.append(pipeline.add_subtitles(self.video, 'es', None))
-        pipeline.add_subtitles(self.video, 'es', None, visibility='private')
-        pipeline.add_subtitles(self.video, 'pt-br', None, visibility='private')
-        self.reset_history()
-
-        now_values = {}
-
-        def update_subtitles(video_url, language, tip):
-            now_values[language.id] = self.now
-            if language.language_code == 'es':
-                raise SyncingError('Error')
-        self.mock_update_subtitles.side_effect = update_subtitles
-
-        self.run_update_all_subtitles()
-        self.assertEquals(self.mock_update_subtitles.call_count,
-                          len(to_sync))
-        for version in to_sync:
-            language = version.subtitle_language
-            self.mock_update_subtitles.assert_any_call(self.video_url,
-                                                       language, version)
-            if language.language_code != 'es':
-                self.check_sync_history(language, [
-                    ('U', 'S', now_values[language.id], version, '')
-                ])
-                self.check_synced_version(language, version)
-            else:
-                self.check_sync_history(language, [
-                    ('U', 'E', now_values[language.id], version, 'Error'),
-                ])
-                self.check_no_synced_version(language)
-
     def test_history(self):
         en_1 = self.video.subtitle_language('en').get_tip()
         en_2 = pipeline.add_subtitles(self.video, 'en', None)
@@ -999,14 +963,14 @@ class RefetchYoutubeChannelIDTest(TestCase):
         self.assertEquals(account, self.account)
         self.check_username_fixed()
 
-    @patch_for_test('externalsites.models.YouTubeAccount.update_subtitles')
-    def test_update_all_subtitles(self, mock_update_subtitles):
+    def test_update_all_subtitles(self):
         # we also need to refetch the id in update_all_subtitles(), which
         # bypasses get_sync_account()
         test_utils.update_all_subtitles.original_func.apply(
             args=(self.account.account_type, self.account.id))
-        mock_update_subtitles.assert_called_with(
-            self.video_url, self.video.subtitle_language('en'))
+        test_utils.update_subtitles.delay.assert_called_with(
+            self.account.account_type, self.account.id,
+            self.video_url.id, self.video.subtitle_language('en').id)
         self.check_username_fixed()
 
     def check_username_fixed(self):
