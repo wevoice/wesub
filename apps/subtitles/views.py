@@ -120,8 +120,8 @@ class SubtitleEditorBase(View):
         return self.workflow.editor_video_urls(self.language_code)
 
     def get_redirect_url(self):
-        if 'redirect_url' in self.request.GET:
-            return self.request.GET['redirect_url']
+        if 'return_url' in self.request.GET:
+            return self.request.GET['return_url']
         else:
             return self.video.get_absolute_url()
 
