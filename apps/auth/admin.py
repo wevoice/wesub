@@ -21,7 +21,6 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin import widgets
 from django.contrib.admin.views.main import ChangeList
-from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import models
@@ -56,18 +55,36 @@ class UserChangeList(ChangeList):
         # Username is a unique key so the sort will be fast and deterministic.
         return ['username']
 
-class CustomUserAdmin(UserAdmin):
-    add_form = CustomUserCreationForm
+class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff',
                     'is_superuser', 'last_ip', 'partner')
     search_fields = ('username', 'first_name', 'last_name', 'email', 'id')
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username', 'email', 'password1', 'password2')}
-        ),
+    raw_id_fields = ('created_by',)
+
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
+                                       'groups', 'user_permissions')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        (_('Amara'), {'fields': ('is_partner', 'created_by')}),
     )
+
     actions = ['remove_staff_access']
+
+    def get_form(self, request, obj=None, **kwargs):
+        """
+        Use special form during user creation
+        """
+        defaults = {}
+        if obj is None:
+            defaults.update({
+                'form': CustomUserCreationForm,
+                'fields': admin.util.flatten_fieldsets(self.add_fieldsets),
+            })
+        defaults.update(kwargs)
+        return super(CustomUserAdmin, self).get_form(request, obj, **defaults)
+
 
     def get_changelist(self, request, **kwargs):
         return UserChangeList
@@ -102,5 +119,7 @@ class AnnouncementAdmin(admin.ModelAdmin):
     make_hidden.short_description = _(u'Hide')
 
 admin.site.register(Announcement, AnnouncementAdmin)
-admin.site.unregister(User)
 admin.site.register(CustomUser, CustomUserAdmin)
+
+import django.contrib.auth.admin
+admin.site.unregister(User)
