@@ -16,31 +16,33 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.contrib.auth.models import UserManager, User as BaseUser
-from django.core.cache import cache
-from django.db import models
-from django.db.models.signals import post_save
-from django.conf import settings
-import urllib
+from datetime import datetime, timedelta
 import hashlib
 import hmac
+import random
+import string
+import urllib
 import uuid
-from django.utils.translation import ugettext_lazy as _, ugettext
-from django.utils.http import urlquote
-from django.core.exceptions import MultipleObjectsReturned
-from utils.amazon import S3EnabledImageField
-from datetime import datetime, timedelta
-from django.core.cache import cache
-from utils.metrics import Meter
-from random import random
-from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
 
+from django.conf import settings
+from django.contrib.auth.models import UserManager, User as BaseUser
+from django.contrib.sites.models import Site
+from django.core.cache import cache
+from django.core.cache import cache
+from django.core.exceptions import MultipleObjectsReturned
+from django.core.urlresolvers import reverse
+from django.db import IntegrityError
+from django.db import models
+from django.db.models.signals import post_save
+from django.utils.http import urlquote
+from django.utils.translation import ugettext_lazy as _, ugettext
 from tastypie.models import ApiKey
 
 from caching import CacheGroup, ModelCacheManager
-from utils.tasks import send_templated_email_async
+from utils.amazon import S3EnabledImageField
 from utils import translation
+from utils.metrics import Meter
+from utils.tasks import send_templated_email_async
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 EMAIL_CONFIRMATION_DAYS = getattr(settings, 'EMAIL_CONFIRMATION_DAYS', 3)
@@ -49,6 +51,44 @@ class AnonymousUserCacheGroup(CacheGroup):
     def __init__(self):
         super(AnonymousUserCacheGroup, self).__init__('user:anon',
                                                       cache_pattern='user')
+
+class CustomUserManager(UserManager):
+    def create_with_unique_username(self, **kwargs):
+        username = kwargs.pop('username')
+        for username_try in self._unique_username_iter(username):
+            try:
+                return self.create(username=username_try, **kwargs)
+            except IntegrityError:
+                continue
+        raise AssertionError("Ran out of username tries")
+
+    def _unique_username_iter(self, username):
+        """Yield potential usernames for create_with_unique_username.
+
+        We generate usernames as follows:
+
+            - First try the username unchanged
+            - Then try the username with "00", "01", ..., "99" appended to it
+            - Then try appending random 6-character strings to the username
+            - If there is an "@" symbol in the username, then we insert the
+                extra chars before the "@" instead of appending them
+        """
+        yield username
+        if '@' in username:
+            at_split = username.split('@', 1)
+            part1 = at_split[0]
+            part2 = '@' + at_split[1]
+        else:
+            part1 = username
+            part2 = ''
+
+        for i in xrange(100):
+            yield '{}{:0>2d}{}'.format(part1, i, part2)
+        while True:
+            rand_string = ''.join(random.choice(string.ascii_letters +
+                                                string.digits)
+                                  for i in xrange(6))
+            yield '{}{}{}'.format(part1, rand_string, part2)
 
 class CustomUser(BaseUser):
     AUTOPLAY_ON_BROWSER = 1
@@ -90,7 +130,7 @@ class CustomUser(BaseUser):
     created_by = models.ForeignKey('self', null=True, blank=True,
                                    related_name='created_users')
 
-    objects = UserManager()
+    objects = CustomUserManager()
 
     cache = ModelCacheManager(default_cache_pattern='user')
 
@@ -502,7 +542,7 @@ class EmailConfirmationManager(models.Manager):
 
         self.filter(user=user).delete()
 
-        salt = hashlib.sha1(str(random())+settings.SECRET_KEY).hexdigest()[:5]
+        salt = hashlib.sha1(str(random.random())+settings.SECRET_KEY).hexdigest()[:5]
         confirmation_key = hashlib.sha1(salt + user.email.encode('utf-8')).hexdigest()
         try:
             current_site = Site.objects.get_current()

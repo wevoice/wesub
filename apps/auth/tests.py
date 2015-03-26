@@ -18,6 +18,8 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from datetime import datetime, timedelta
 from urlparse import urlparse
+from nose.tools import *
+import re
 
 from django.core.urlresolvers import reverse
 from django.core import mail
@@ -26,6 +28,7 @@ from auth.models import CustomUser as User, UserLanguage
 from auth.models import LoginToken
 from caching.tests.utils import assert_invalidates_model_cache
 from utils.factories import *
+from utils import test_utils
 
 class VideosFieldTest(TestCase):
     def setUp(self):
@@ -75,6 +78,51 @@ class UserCreationTest(TestCase):
         user.set_password("secret")
         user.save()
         self.assertEqual(len(mail.outbox), 1)
+
+class UniqueUsernameTest(TestCase):
+    def test_username_already_unique(self):
+        # if the username is unique to begin with, we should use that
+        user = User.objects.create_with_unique_username(username='test')
+        assert_equal(user.username, 'test')
+
+    def test_strategy1(self):
+        # If the username is not unique, we should try to append "00", "01",
+        # "02", ... until "99" to the username
+        UserFactory(username='test')
+        for i in xrange(5):
+            UserFactory(username='test0{}'.format(i))
+        user = User.objects.create_with_unique_username(username='test')
+        assert_equal(user.username, 'test05')
+
+    def test_strategy2(self):
+        # If strategy1 doesn't produce a unique username, then we should
+        # append random strings until we find one
+        UserFactory(username='test')
+        for i in xrange(100):
+            UserFactory(username='test{:0>2d}'.format(i))
+        user = User.objects.create_with_unique_username(username='test')
+        assert_true(re.match(r'test[a-zA-Z0-9]{6}', user.username),
+                    user.username)
+
+    def test_at_symbol(self):
+        # if there is an "@" symbol in the username, we should insert our
+        # extra chars before it.
+        UserFactory(username='test@example.com')
+        for i in xrange(5):
+            UserFactory(username='test0{}@example.com'.format(i))
+        user = User.objects.create_with_unique_username(
+            username='test@example.com')
+        assert_equal(user.username, 'test05@example.com')
+
+    def test_at_symbol_strategy2(self):
+        UserFactory(username='test@example.com')
+        for i in xrange(100):
+            UserFactory(username='test{:0>2d}@example.com'.format(i))
+        user = User.objects.create_with_unique_username(
+            username='test@example.com')
+        assert_true(re.match(r'test[a-zA-Z0-9]{6}@example.com', user.username),
+                    user.username)
+
 
 class UserCacheTest(TestCase):
     def test_user_language_change_invalidates_cache(self):
