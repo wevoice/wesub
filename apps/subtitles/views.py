@@ -99,15 +99,31 @@ def old_editor(request, video_id, language_code):
 class SubtitleEditorBase(View):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
+        self.handle_special_user(request)
         return super(SubtitleEditorBase, self).dispatch(
             request, *args, **kwargs)
+
+    def handle_special_user(self, request):
+        if 'special_user' not in request.GET:
+            return
+        try:
+            special_user = User.objects.get(id=request.session['editor-user-id'])
+        except (KeyError, User.DoesNotExist):
+            raise PermissionDenied()
+        # We use the editor user for this requests, but still don't log them
+        # in.  Note that this will also control the auth headers that get sent
+        # to the editor, so the API calls will also use this user.
+        request.user = special_user
 
     def get_video_urls(self):
         """Get video URLs to send to the editor."""
         return self.workflow.editor_video_urls(self.language_code)
 
     def get_redirect_url(self):
-        return self.video.get_absolute_url()
+        if 'redirect_url' in self.request.GET:
+            return self.request.GET['redirect_url']
+        else:
+            return self.video.get_absolute_url()
 
     def get_custom_css(self):
         return ""
