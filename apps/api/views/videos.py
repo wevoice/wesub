@@ -401,19 +401,23 @@ class VideoSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
+        set_values = {}
+        for key in ('title', 'description', 'duration', 'thumbnail',
+                    'primary_audio_language_code', 'metadata'):
+            if key in validated_data:
+                set_values[key] = validated_data[key]
         video, created = Video.get_or_create_for_url(
             validated_data['video_url'], user=self.context['user'],
+            set_values=set_values,
         )
         if video is None:
             self.fail('invalid-url', url=validated_data['video_url'])
         if not created:
             self.fail('video-exists', url=validated_data['video_url'])
-        return self._update(video, validated_data)
+        self._update_team(video, validated_data)
+        return video
 
     def update(self, video, validated_data):
-        return self._update(video, validated_data)
-
-    def _update(self, video, validated_data):
         simple_fields = (
             'title', 'description', 'duration', 'thumbnail',
             'primary_audio_language_code',
@@ -425,12 +429,14 @@ class VideoSerializer(serializers.Serializer):
             video.update_metadata(validated_data['metadata'], commit=True)
         else:
             video.save()
-        if 'team' in validated_data:
-            self._update_team(video, validated_data['team'],
-                              validated_data.get('project'))
+        self._update_team(video, validated_data)
         return video
 
-    def _update_team(self, video, team, project):
+    def _update_team(self, video, validated_data):
+        if 'team' not in validated_data:
+            return
+        team = validated_data['team']
+        project = validated_data.get('project')
         team_video = video.get_team_video()
         if team is None:
             if team_video:

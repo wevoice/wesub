@@ -546,7 +546,10 @@ class Video(models.Model):
             vt.set_values(obj, **kwargs)
             if set_values:
                 for name, value in set_values.items():
-                    setattr(obj, name, value)
+                    if name == 'metadata':
+                        self.update_metadata(value, commit=False)
+                    else:
+                        setattr(obj, name, value)
             if not obj.title:
                 obj.title = make_title_from_url(vt.convert_to_video_url())
             obj.user = user
