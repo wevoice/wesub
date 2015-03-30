@@ -22,7 +22,7 @@ Videos Resource
 Get info for a specific video
 +++++++++++++++++++++++++++++
 
-.. http:get:: /api2/partners/videos/[video-id]/
+.. http:get:: /api/videos/[video-id]/
 
     :>json id: Amara video id
     :>json primary_audio_language_code: language code for the audio language
@@ -52,7 +52,7 @@ Get info for a specific video
 Listing videos
 ++++++++++++++
 
-.. http:get:: /api2/partners/videos/
+.. http:get:: /api/videos/
 
     ``paginated``
 
@@ -70,7 +70,7 @@ Listing videos
 Creating Videos
 +++++++++++++++
 
-.. http:post:: /api2/partners/videos/
+.. http:post:: /api/videos/
 
     :<json video_url: The url for the video. Any url that Amara accepts will 
         work here. You can send the URL for a file (e.g.
@@ -104,7 +104,7 @@ from the original provider.
 Updating a video object
 +++++++++++++++++++++++
 
-.. http:put:: /api2/partners/videos/[video-id]/
+.. http:put:: /api/videos/[video-id]/
 
 With the same parameters for creation, excluding video_url. Note that through
 out our system, a video cannot have it's URLs changed. So you can change other
@@ -130,7 +130,7 @@ Video URL Resource
 Listing video urls
 ++++++++++++++++++
 
-.. http:get:: /api2/partners/videos/[video-id]/urls/
+.. http:get:: /api/videos/[video-id]/urls/
 
   ``paginated``
 
@@ -146,7 +146,7 @@ Listing video urls
 Adding a video url
 +++++++++++++++++++
 
-.. http:post:: /api2/partners/videos/[video-id]/urls/
+.. http:post:: /api/videos/[video-id]/urls/
 
     :param video-id: Amara Video ID
 
