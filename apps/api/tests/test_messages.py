@@ -20,16 +20,18 @@ from nose.tools import *
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
+import mock
 
 from messages.models import Message
+from utils.test_utils.monkeypatch import patch_for_test
 from utils.factories import *
 
 class ActivityTestCase(TestCase):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory(username='test-user')
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
-        self.team = TeamFactory()
+        self.team = TeamFactory(admin=self.user)
         self.team_members = [
             TeamMemberFactory(team=self.team).user
             for i in xrange(3)
@@ -65,6 +67,9 @@ class ActivityTestCase(TestCase):
             'content': 'test-content',
         })
         assert_equal(response.status_code, status.HTTP_201_CREATED)
+        # note that self.user is also a team member, but we shouldn't send a
+        # message to that user since they were the one who created the
+        # message.
         self.check_messages(self.team_members, 'test-subject', 'test-content')
 
     def test_invalid_user(self):
@@ -96,3 +101,17 @@ class ActivityTestCase(TestCase):
             'content': 'test-content',
         })
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+    @patch_for_test('teams.permissions.can_message_all_members')
+    def test_check_can_message_team_permission(self,
+                                               mock_can_message_all_members):
+        mock_can_message_all_members.return_value = False
+        response = self.client.post(self.url, {
+            'team': self.team.slug,
+            'subject': 'test-subject',
+            'content': 'test-content',
+        })
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert_equal(mock_can_message_all_members.call_args,
+                     mock.call(self.team, self.user))

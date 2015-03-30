@@ -43,6 +43,7 @@ from rest_framework.response import Response
 from auth.models import CustomUser as User
 from teams.models import Team
 from messages.models import Message
+import teams.permissions
 
 class MessagesSerializer(serializers.Serializer):
     user = serializers.CharField(required=False)
@@ -64,9 +65,13 @@ class MessagesSerializer(serializers.Serializer):
 
     def validate_team(self, slug):
         try:
-            return Team.objects.get(slug=slug)
+            team = Team.objects.get(slug=slug)
         except Team.DoesNotExist:
             self.fail('unknown-team', team=slug)
+        if not teams.permissions.can_message_all_members(
+            team, self.context['user']):
+            raise PermissionDenied()
+        return team
 
     def validate(self, data):
         if not ('team' in data or 'user' in data):
@@ -88,6 +93,7 @@ class MessagesSerializer(serializers.Serializer):
                     subject=self.validated_data['subject'],
                     author=self.context['user'])
             for user in self.recipients()
+            if user != self.context['user']
         ]
         Message.objects.bulk_create(messages)
 

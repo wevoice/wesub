@@ -280,11 +280,6 @@ Get details on a single application
 
     Returns the same data as one entry from the listing endpoint.
 
-Delete an Application
-+++++++++++++++++++++
-
-.. http:delete:: /api/teams/[team-slug]/applications/[application-id]/
-
 Approve/Deny an application
 +++++++++++++++++++++++++++
 
