@@ -97,14 +97,6 @@ class YoutubeAPIBridge(object):
 
         return caption_info
 
-    def get_youtube_language_code(self, language_code):
-        """Convert the language for a SubtitleVersion to a youtube code
-        """
-        lc = unilangs.LanguageCode(language_code.lower(), "unisubs")
-        return lc.encode("youtube")
-
-
-
     def create_track(self, video_id, title, language_code, content):
         self.client.create_track(video_id, title, language_code, content,
                                  settings.YOUTUBE_CLIENT_ID,
@@ -119,13 +111,7 @@ def update_subtitles(video_id, access_token, subtitle_version):
     """Push the subtitles for a language to YouTube """
 
     bridge = YoutubeAPIBridge(access_token)
-    try:
-        language_code = bridge.get_youtube_language_code(
-            subtitle_version.subtitle_language.language_code)
-    except KeyError:
-        logger.error("Couldn't encode LC %s to youtube" % language_code)
-        return
-
+    language_code = subtitle_version.subtitle_language.language_code)
     subs = subtitle_version.get_subtitles()
     if should_add_credit_to_subtitles(subtitle_version, subs):
         add_credit_to_subtitles(subtitle_version, subs)
@@ -146,12 +132,6 @@ def delete_subtitles(video_id, access_token, language_code):
     """Delete the subtitles for a language on YouTube """
 
     bridge = YoutubeAPIBridge(access_token)
-    try:
-        language_code = bridge.get_youtube_language_code(language_code)
-    except KeyError:
-        logger.error("Couldn't encode LC %s to youtube" % language_code)
-        return
-
     caption_info = bridge.get_caption_info(video_id)
     if language_code in caption_info:
         bridge.delete_track(video_id, caption_info[language_code]['track'])
