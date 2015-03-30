@@ -471,7 +471,7 @@ class TeamMemberViewSet(TeamSubview):
     def get_queryset(self):
         if not self.team.user_is_member(self.request.user):
             raise PermissionDenied()
-        return self.team.members.all()
+        return self.team.members.all().select_related("user")
 
     def get_object(self):
         if not self.team.user_is_member(self.request.user):
