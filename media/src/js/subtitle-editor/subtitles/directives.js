@@ -254,12 +254,15 @@ var USER_IDLE_MINUTES = 15;
             templateLI.append('<span class="subtitle-text" />');
             if(!readOnly) {
 		templateLI.append('<span class="warning">!</span>');
+		/*
                 templateLI.append(makeImageButton('remove-subtitle',
                     'images/editor/remove-subtitle.gif'));
                 templateLI.append(makeImageButton('insert-subtitle',
                     'images/editor/plus.gif'));
+*/
                 templateLI.append(
-                        '<button class="new-paragraph">&para;</button>');
+                    '<button class="new-paragraph">&para;</button>');
+                templateLI.append('<div class="sub-toolbox"><div class="sub-toolbox-inside"><a href="#"><img src="/media/images/subtitle-editor/glyphicons_halflings_135_wrench_light.png" alt="Tools"></img></a><ul class="sub-toolbox-menu"><li><a class="jump-to" title="seek to subtitle"></a></li><li><a class="insert-top" title="Insert subtitle above"></a></li><li><a title="Insert subtitle below" class="insert-down"></a></li><li><a title="Delete subtitle" class="remove"></a></li><li><a title="start note for current time" class="note-time"></a></li></ul></div></div>');
             } else {
                 templateLI.append('<span class="new-paragraph">&para;</span>');
             }

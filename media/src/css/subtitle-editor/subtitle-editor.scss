@@ -72,6 +72,7 @@ $blue: #126295;
 $teal: #15998e;
 $semi-dark-grey: #888;
 $light-grey: #F3F4F5;
+$light-grey-highlight: #EEE;
 $dark-grey: #333;
 $off-white: #f3f3f3;
 
@@ -681,13 +682,22 @@ div.subtitles {
                 text-decoration: none;
             }
 
+            .sub-toolbox {
+                display: none;
+                position: absolute;
+                top: 35px;
+                left: -100px;
+                color: #B0B0B0;
+                font: normal 13px $OpenSans;
+                text-decoration: none;
+            }
 
             &.paragraph-start .new-paragraph {
                display: block;
                color: #666;
             }
 
-            button {
+            button, div.sub-toolbox {
                 display: none;
                 padding: 0;
                 margin: 0;
@@ -704,7 +714,7 @@ div.subtitles {
                 }
             }
 
-            &:hover button {
+            &:hover button, &:hover div.sub-toolbox {
                 display: block;
             }
 
@@ -1927,3 +1937,64 @@ aside#tutorial {
     }
   }
 }
+
+    div.sub-toolbox {
+        padding-top: 5px;
+        padding-right: 10px;
+        float: right;
+        div.sub-toolbox-inside:hover ul.sub-toolbox-menu {
+          display:block;
+	  @include border-radius(6px);
+	  background-color: $light-grey-highlight;
+        }
+        div.sub-toolbox-inside {              
+           width: 150px;
+           position: relative;
+        }
+        div.sub-toolbox-inside > a {
+        color: black;
+        font-weight: 900;
+        font-size: 18px;
+        line-height: 1.34em;
+        text-decoration: none;
+        text-align: right;
+        position: absolute;
+        right: 20px;
+        padding: 8px 0px 10px 20px;
+        }
+
+
+        ul.sub-toolbox-menu {
+           list-style: none;
+           display:none;
+           position: absolute;
+           text-align: left;
+           top: 0;
+           right: -110px;
+           width: 150px;
+           z-index: 62;
+           li { 
+               list-style-type: none;
+               display: inline;
+               width:100%;
+               a {
+                   padding: 0 15px;
+                   &.jump-to {
+                     background: url('../images/subtitle-editor/glyphicons_halflings_160_log_in.png') 10px no-repeat;
+                   }
+                   &.insert-top {
+                     background: url('../images/subtitle-editor/glyphicons_halflings_132_circle-arrow-top.png') 10px no-repeat;
+                   }
+                   &.insert-down {
+                     background: url('../images/subtitle-editor/glyphicons_halflings_133_circle-arrow-down.png') 10px no-repeat;
+                   }
+                   &.remove {
+                     background: url('../images/subtitle-editor/glyphicons_halflings_087_remove-circle.png') 10px no-repeat;
+                   }
+                   &.note-time {
+                     background: url('../images/subtitle-editor/glyphicons_halflings_022_time.png') 10px no-repeat;
+                   }
+                  }
+              }
+        }
+    }
