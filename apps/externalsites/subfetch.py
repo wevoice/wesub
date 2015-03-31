@@ -46,10 +46,9 @@ def fetch_subs_youtube(video_url):
         video_url.video.newsubtitlelanguage_set.having_versions()
     )
 
-    for bcp47_lc in google.get_subtitled_languages(video_id):
-        language_code = LanguageCode(bcp47_lc, 'bcp47').encode('unisubs')
+    for language_code in google.get_subtitled_languages(video_id):
         if language_code not in existing_langs:
-            subs = google.get_subtitles(video_id, bcp47_lc)
-            pipeline.add_subtitles(video_url.video, language_code, subs,
+            subs = google.get_subtitles(video_id, language_code)
+            pipeline.add_subtitles(video_url.video, language_code.lower(), subs,
                                    note="From youtube", complete=True,
                                    origin=ORIGIN_IMPORTED)

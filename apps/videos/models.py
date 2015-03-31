@@ -512,7 +512,9 @@ class Video(models.Model):
         return self.videourl_set.count()
 
     @classmethod
-    def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None, fetch_subs_async=True):
+    def get_or_create_for_url(cls, video_url=None, vt=None, user=None,
+                              timestamp=None, fetch_subs_async=True,
+                              set_values=None):
         assert video_url or vt, 'should be video URL or VideoType'
         from types.base import VideoTypeError
         from videos.tasks import (
@@ -542,6 +544,12 @@ class Video(models.Model):
             if vt.CAN_IMPORT_SUBTITLES:
                 kwargs['fetch_subs_async'] = fetch_subs_async
             vt.set_values(obj, **kwargs)
+            if set_values:
+                for name, value in set_values.items():
+                    if name == 'metadata':
+                        self.update_metadata(value, commit=False)
+                    else:
+                        setattr(obj, name, value)
             if not obj.title:
                 obj.title = make_title_from_url(vt.convert_to_video_url())
             obj.user = user
