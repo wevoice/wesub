@@ -69,6 +69,45 @@ application/x-www-form-urlencoded and multipart/form-data as input formats.
 However, this is only to support browser friendly endpoints.  It should not be
 used in API client code.
 
+Paginated Responses
+-------------------
+
+Many listing API endpoints are paginated to prevent too much data from being
+fetched and returned at one time (for example the video listing API).  These
+endpoints are marked with ``paginated`` in their descriptions.  Paginated
+responses only return limited number of results per request, alongside links
+to the next/previous page.
+
+Here's an example paginated response from the Teams listing:
+
+.. sourcecode:: http
+
+    {
+        "meta": {
+            "previous": null,
+            "next": "http://amara.org/api/teams?limit=20&offset=20", 
+            "offset": 0,
+            "limit": 20,
+            "total_count": 151
+        },
+        "objects": [
+            {
+                "name": "",
+                "slug": "tedx-import",
+                "description": "",
+                "is_visible": true,
+                "membership_policy": "Open",
+                "video_policy": "Any team member"
+            },
+            ...
+        ]
+    }
+
+* The ``meta`` field contains pagination information, including next/previous
+  links, the total number of results, and how many results are listed per page
+* The ``objects`` field contains the objects for this particular page
+
+
 Browser Friendly Endpoints
 --------------------------
 
@@ -141,3 +180,5 @@ The following resources are available to end users:
 .. automodule:: api.views.languages
 .. automodule:: api.views.users
 .. automodule:: api.views.teams
+.. automodule:: api.views.activity
+.. automodule:: api.views.messages

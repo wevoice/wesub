@@ -24,7 +24,9 @@ Container for subtitles in a language for a video on Amara.
 Listing video languages
 +++++++++++++++++++++++
 
-.. http:get:: /api2/partners/videos/[video-id]/languages/
+.. http:get:: /api/videos/[video-id]/languages/
+
+    ``paginated``
 
     :>json language_code: BCP 47 code for this language
     :>json name: Human-readable name for this language
@@ -61,7 +63,7 @@ Listing video languages
 Creating Video Languages
 ++++++++++++++++++++++++
 
-.. http:post:: /api2/partners/videos/[video-id]/languages/
+.. http:post:: /api/videos/[video-id]/languages/
 
     :form language_code: bcp-47 code for the language
     :form is_primary_audio_language: Boolean indicating if this is the primary
@@ -74,7 +76,7 @@ Creating Video Languages
 Getting details on a specific language
 ++++++++++++++++++++++++++++++++++++++
 
-.. http:get:: /api2/partners/videos/[video-id]/languages/[lang-identifier]/
+.. http:get:: /api/videos/[video-id]/languages/[lang-identifier]/
 
     :param lang-identifier: language code to fetch.  **deprecated:** this can
         also be value from the id field
@@ -91,7 +93,7 @@ Get/create subtitles for a video
 Fetching subtitles for a given language
 +++++++++++++++++++++++++++++++++++++++
 
-.. http:get:: /api2/partners/videos/[video-id]/languages/[language-code]/subtitles/
+.. http:get:: /api/videos/[video-id]/languages/[language-code]/subtitles/
 
     :param video-id: Amara Video ID
     :param language-code: BCP-47 language code.  **deprecated:** you can also
@@ -143,9 +145,9 @@ WEBVTT                text/vtt                vtt
 
 Examples:
 
-.. http:get:: /api2/partners/videos/abcdef/languages/en/subtitles/?format=dfxp
+.. http:get:: /api/videos/abcdef/languages/en/subtitles/?format=dfxp
 
-.. http:get:: /api2/partners/videos/abcdef/languages/en/subtitles/
+.. http:get:: /api/videos/abcdef/languages/en/subtitles/
 
    :reqheader Accept: text/vtt
 
@@ -153,7 +155,7 @@ Examples:
 Creating new subtitles
 ++++++++++++++++++++++
 
-.. http:get:: /api2/partners/videos/[video-id]/languages/[language-code]/subtitles/
+.. http:get:: /api/videos/[video-id]/languages/[language-code]/subtitles/
 
     :param video-id: Amara Video ID
     :param language-code: BCP-47 language code.  **deprecated:** you can also

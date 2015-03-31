@@ -24,7 +24,7 @@ platform.
 
 Listing available languages:
 
-.. http:get:: /api2/partners/languages/
+.. http:get:: /api/languages/
 
    :<json languages: maps language codes to language names
 
