@@ -119,6 +119,11 @@ var angular = angular || null;
             $scope.$watch('videoState.currentTime', drawBar);
             $scope.$watch('videoState.duration', drawBar);
 
+            $scope.$root.$on('jump-to-subtitle', function(evt, subtitle) {
+		if(subtitle.isSynced())
+                    VideoPlayer.seek(subtitle.startTime);
+	    });
+
             function setProgressFromPageX(pageX) {
                 if($scope.videoState.duration === null) {
                     return;

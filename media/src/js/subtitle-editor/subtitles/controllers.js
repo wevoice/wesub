@@ -216,6 +216,10 @@ var angular = angular || null;
         $scope.onSubtitleClick = function(evt, subtitle, action) {
             var madeChange = false;
             switch(action) {
+                case 'jump-to':
+	            $scope.$root.$emit('jump-to-subtitle', subtitle);
+                    break;
+
                 case 'insert':
                     insertAndStartEdit(subtitle);
                     madeChange = true;
