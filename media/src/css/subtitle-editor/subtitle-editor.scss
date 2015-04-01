@@ -1968,29 +1968,29 @@ div.sub-toolbox {
         position: absolute;
         text-align: left;
         top: 0;
-        right: -110px;
-        width: 150px;
+        right: -90px;
+        width: 130px;
         z-index: 62;
         li {
             list-style-type: none;
             display: inline;
             width:100%;
             a {
-                padding: 0 15px;
+                padding: 0 12px;
                 &.jump-to {
-                    background: url('../images/subtitle-editor/glyphicons_halflings_160_log_in.png') 10px no-repeat;
+                    background: url('../images/subtitle-editor/glyphicons_halflings_160_log_in.png') 6px no-repeat;
                 }
                 &.insert-top {
-                    background: url('../images/subtitle-editor/glyphicons_halflings_132_circle-arrow-top.png') 10px no-repeat;
+                    background: url('../images/subtitle-editor/glyphicons_halflings_132_circle-arrow-top.png') 6px no-repeat;
                 }
                 &.insert-down {
-                    background: url('../images/subtitle-editor/glyphicons_halflings_133_circle-arrow-down.png') 10px no-repeat;
+                    background: url('../images/subtitle-editor/glyphicons_halflings_133_circle-arrow-down.png') 6px no-repeat;
                 }
                 &.remove {
-                    background: url('../images/subtitle-editor/glyphicons_halflings_087_remove-circle.png') 10px no-repeat;
+                    background: url('../images/subtitle-editor/glyphicons_halflings_087_remove-circle.png') 6px no-repeat;
                 }
                 &.note-time {
-                    background: url('../images/subtitle-editor/glyphicons_halflings_022_time.png') 10px no-repeat;
+                    background: url('../images/subtitle-editor/glyphicons_halflings_022_time.png') 6px no-repeat;
                 }
                 &:hover {
                     @include border-radius(6px);

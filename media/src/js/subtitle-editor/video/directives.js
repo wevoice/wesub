@@ -125,7 +125,6 @@ var angular = angular || null;
 	    });
 
             $scope.$root.$on('jump-to-time', function(evt, displayTime) {
-		console.log(displayTime);
 		var time = 0;
 		var seconds = displayTime.split('.');
 		if (seconds.length == 2) {
@@ -133,7 +132,6 @@ var angular = angular || null;
 		    var minutes = seconds[0].split(':');
 		    if (minutes.length > 1) {
 			time += (parseInt(minutes[1]) + 60*parseInt(minutes[0])) * 100;
-			console.log(time);
 			VideoPlayer.seek(time * 10);
 		    }
 		}
