@@ -221,6 +221,16 @@ var angular = angular || null;
                     madeChange = true;
                     break;
 
+                case 'insert-top':
+                    insertAndStartEdit(subtitle);
+                    madeChange = true;
+                    break;
+
+                case 'insert-down':
+                    insertAndStartEdit(subtitleList.nextSubtitle(subtitle));
+                    madeChange = true;
+                    break;
+
                 case 'changeParagraph':
                     subtitleList.updateSubtitleParagraph(subtitle);
                     madeChange = true;
