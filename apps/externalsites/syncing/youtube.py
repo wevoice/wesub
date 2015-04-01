@@ -111,7 +111,7 @@ def update_subtitles(video_id, access_token, subtitle_version):
     """Push the subtitles for a language to YouTube """
 
     bridge = YoutubeAPIBridge(access_token)
-    language_code = subtitle_version.subtitle_language.language_code)
+    language_code = subtitle_version.subtitle_language.language_code
     subs = subtitle_version.get_subtitles()
     if should_add_credit_to_subtitles(subtitle_version, subs):
         add_credit_to_subtitles(subtitle_version, subs)
