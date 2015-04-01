@@ -11,7 +11,7 @@ PyYAML==3.10
 South==0.7.4
 easy-thumbnails==1.4
 Pillow==2.6.0
-six==1.4.1
+six==1.9.0
 eventlet
 vendor/django-registration.tar.gz
 vendor/django-piston-0.2.3.tar.gz

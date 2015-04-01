@@ -35,7 +35,10 @@ router.register(r'teams/(?P<team_slug>[\w\d\-]+)/projects',
                 views.ProjectViewSet, base_name='projects')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/tasks',
                 views.TaskViewSet, base_name='tasks')
+router.register(r'teams/(?P<team_slug>[\w\d\-]+)/applications',
+                views.TeamApplicationViewSet, base_name='team-application')
 router.register(r'users', views.UserViewSet, base_name='users')
+router.register(r'activity', views.ActivityViewSet, base_name='activity')
 
 urlpatterns = router.urls + patterns('',
     url(r'^videos/(?P<video_id>[\w\d]+)'
@@ -48,4 +51,5 @@ urlpatterns = router.urls + patterns('',
         '/languages/(?P<language_code>[\w-]+)/subtitles/notes/$',
         views.NotesList.as_view()),
     url(r'^languages/$', views.languages, name='languages'),
+    url(r'^message/$', views.Messages.as_view(), name='messages'),
 )

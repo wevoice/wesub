@@ -22,37 +22,39 @@ Videos Resource
 Get info for a specific video
 +++++++++++++++++++++++++++++
 
-.. http:get:: /api2/partners/videos/[video-id]/
+.. http:get:: /api/videos/[video-id]/
 
-  :>json id: Amara video id
-  :>json primary_audio_language_code: language code for the audio language
-  :>json title: Video title
-  :>json description: Video description
-  :>json duration: Video duration in seconds (or null if not known)
-  :>json thumbnail: URL to the video thumbnail
-  :>json created: Video creation date/time
-  :>json team: Slug of the Video's team (or null)
-  :>json metadata: Dict mapping metadata names to values
-  :>json languages: List of languages that have subtitles started (see below)
-  :>json all_urls: List of URLs for the video (the first one is the primary
+    :>json id: Amara video id
+    :>json primary_audio_language_code: language code for the audio language
+    :>json title: Video title
+    :>json description: Video description
+    :>json duration: Video duration in seconds (or null if not known)
+    :>json thumbnail: URL to the video thumbnail
+    :>json created: Video creation date/time
+    :>json team: Slug of the Video's team (or null)
+    :>json metadata: Dict mapping metadata names to values
+    :>json languages: List of languages that have subtitles started (see below)
+    :>json all_urls: List of URLs for the video (the first one is the primary
      video URL)
-  :>json resource_uri: API uri for the video
-  :>json original_language: contains a copy of the primary_audio_language_code
+    :>json resource_uri: API uri for the video
+    :>json original_language: contains a copy of the primary_audio_language_code
       data **(deprecated)**
 
-  **Language data:**
+    **Language data:**
 
-  :>json code: Language code
-  :>json name: Human readable label for the language
-  :>json visibile: Are the subtitles publicly viewable?
-  :>json dir: Language direction ("ltr" or "rtl")
-  :>json subtitles_uri: API URI for the subtitles
-  :>json resource_uri: API URI for the video language
+    :>json code: Language code
+    :>json name: Human readable label for the language
+    :>json visibile: Are the subtitles publicly viewable?
+    :>json dir: Language direction ("ltr" or "rtl")
+    :>json subtitles_uri: API URI for the subtitles
+    :>json resource_uri: API URI for the video language
 
 Listing videos
 ++++++++++++++
 
-.. http:get:: /api2/partners/videos/
+.. http:get:: /api/videos/
+
+    ``paginated``
 
     :query video_url:  list only videos with the given URL, useful for finding out information about a video already on Amara.
     :query team:       Only show videos that belong to a team identified by ``slug``.
@@ -68,7 +70,7 @@ Listing videos
 Creating Videos
 +++++++++++++++
 
-.. http:post:: /api2/partners/videos/
+.. http:post:: /api/videos/
 
     :<json video_url: The url for the video. Any url that Amara accepts will 
         work here. You can send the URL for a file (e.g.
@@ -102,7 +104,7 @@ from the original provider.
 Updating a video object
 +++++++++++++++++++++++
 
-.. http:put:: /api2/partners/videos/[video-id]/
+.. http:put:: /api/videos/[video-id]/
 
 With the same parameters for creation, excluding video_url. Note that through
 out our system, a video cannot have it's URLs changed. So you can change other
@@ -128,7 +130,9 @@ Video URL Resource
 Listing video urls
 ++++++++++++++++++
 
-.. http:get:: /api2/partners/videos/[video-id]/urls/
+.. http:get:: /api/videos/[video-id]/urls/
+
+  ``paginated``
 
   :param video-id: Amara video ID
   :>json created: creation date/time
@@ -142,7 +146,7 @@ Listing video urls
 Adding a video url
 +++++++++++++++++++
 
-.. http:post:: /api2/partners/videos/[video-id]/urls/
+.. http:post:: /api/videos/[video-id]/urls/
 
     :param video-id: Amara Video ID
 
@@ -401,19 +405,23 @@ class VideoSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
+        set_values = {}
+        for key in ('title', 'description', 'duration', 'thumbnail',
+                    'primary_audio_language_code', 'metadata'):
+            if key in validated_data:
+                set_values[key] = validated_data[key]
         video, created = Video.get_or_create_for_url(
             validated_data['video_url'], user=self.context['user'],
+            set_values=set_values,
         )
         if video is None:
             self.fail('invalid-url', url=validated_data['video_url'])
         if not created:
             self.fail('video-exists', url=validated_data['video_url'])
-        return self._update(video, validated_data)
+        self._update_team(video, validated_data)
+        return video
 
     def update(self, video, validated_data):
-        return self._update(video, validated_data)
-
-    def _update(self, video, validated_data):
         simple_fields = (
             'title', 'description', 'duration', 'thumbnail',
             'primary_audio_language_code',
@@ -425,12 +433,14 @@ class VideoSerializer(serializers.Serializer):
             video.update_metadata(validated_data['metadata'], commit=True)
         else:
             video.save()
-        if 'team' in validated_data:
-            self._update_team(video, validated_data['team'],
-                              validated_data.get('project'))
+        self._update_team(video, validated_data)
         return video
 
-    def _update_team(self, video, team, project):
+    def _update_team(self, video, validated_data):
+        if 'team' not in validated_data:
+            return
+        team = validated_data['team']
+        project = validated_data.get('project')
         team_video = video.get_team_video()
         if team is None:
             if team_video:

@@ -28,7 +28,7 @@ import mock
 
 from auth.models import CustomUser as User
 from subtitles import pipeline
-from teams.models import Team, TeamMember, Task
+from teams.models import Team, TeamMember, Task, Application
 from utils import test_utils
 from utils.test_utils.api import *
 from utils.factories import *
@@ -51,6 +51,9 @@ class TeamAPITestBase(TestCase):
             self.addCleanup(patcher.stop)
             setattr(self, name, mock_obj)
 
+    def _make_timestamp(self, datetime):
+        return int(time.mktime(datetime.timetuple()))
+
 class TeamAPITest(TeamAPITestBase):
     permissions_to_mock = [
         'can_delete_team',
@@ -64,7 +67,7 @@ class TeamAPITest(TeamAPITestBase):
     def detail_url(self, team):
         return reverse('api:teams-detail', kwargs={
             'slug': team.slug,
-        })
+        }, request=APIRequestFactory().get('/'))
 
     def check_team_data(self, data, team):
         assert_equal(data['name'], team.name)
@@ -590,7 +593,7 @@ class TasksAPITest(TeamAPITestBase):
                               completed=datetime(2015, 1, 1))
         ]
 
-    def check_list_results(self, correct_tasks, **params):
+    def check_list_results(self, correct_tasks, params=None):
         task_map = dict((t.id, t) for t in correct_tasks)
         response = self.client.get(self.list_url, params)
         assert_equal(response.status_code, status.HTTP_200_OK)
@@ -611,28 +614,36 @@ class TasksAPITest(TeamAPITestBase):
             self.task_factory(language='en'),
             self.task_factory(language='fr', assignee=self.admin),
         ]
-        self.check_list_results(correct_tasks, assignee=self.member.username)
+        self.check_list_results(correct_tasks, {
+            'assignee': self.member.username,
+        })
 
     def test_priority_filter(self):
         correct_tasks = [
             t for t in self.make_a_bunch_of_tasks()
             if t.priority == 1
         ]
-        self.check_list_results(correct_tasks, priority=1)
+        self.check_list_results(correct_tasks, {
+            'priority': 1,
+        })
 
     def test_language_filter(self):
         correct_tasks = [
             t for t in self.make_a_bunch_of_tasks()
             if t.language == 'en'
         ]
-        self.check_list_results(correct_tasks, language='en')
+        self.check_list_results(correct_tasks, {
+            'language': 'en',
+        })
 
     def check_subtitle_filter(self, type_value, type_label):
         correct_tasks = [
             t for t in self.make_a_bunch_of_tasks()
             if t.type==type_value
         ]
-        self.check_list_results(correct_tasks, type=type_label)
+        self.check_list_results(correct_tasks, {
+            'type': type_label,
+        })
 
     def test_subtitle_type_filter(self):
         self.check_subtitle_filter(self.TYPE_SUBTITLE, 'Subtitle')
@@ -648,12 +659,15 @@ class TasksAPITest(TeamAPITestBase):
 
     def test_invalid_type_filter(self):
         self.make_a_bunch_of_tasks()
-        self.check_list_results([], type='invalid-type-name')
+        self.check_list_results([], {
+            'type': 'invalid-type-name',
+        })
 
     def test_video_id_filter(self):
         tasks = self.make_a_bunch_of_tasks()
-        self.check_list_results(tasks,
-                                video_id=self.team_video.video.video_id)
+        self.check_list_results(tasks, {
+            'video_id': self.team_video.video.video_id,
+        })
 
     def test_video_id_filter_video_not_in_team(self):
         # if the video isn't in the team, we should return no tasks
@@ -661,17 +675,18 @@ class TasksAPITest(TeamAPITestBase):
         team_video = TeamVideoFactory()
         TaskFactory(team=team_video.team, team_video=team_video,
                     type=self.TYPE_SUBTITLE)
-        self.check_list_results([], video_id=team_video.video.video_id)
+        self.check_list_results([], {
+            'video_id': team_video.video.video_id,
+        })
 
     def test_completed_filter(self):
         correct_tasks = [
             t for t in self.make_a_bunch_of_tasks()
             if t.completed
         ]
-        self.check_list_results(correct_tasks, completed=1)
-
-    def _make_timestamp(self, datetime):
-        return int(time.mktime(datetime.timetuple()))
+        self.check_list_results(correct_tasks, {
+            'completed': 1,
+        })
 
     def test_completed_before_filter(self):
         corrrect_tasks = [
@@ -683,9 +698,9 @@ class TasksAPITest(TeamAPITestBase):
             self.task_factory(language='fr', assignee=self.member,
                               completed=datetime(2015, 1, 1))
         ]
-        self.check_list_results(
-            corrrect_tasks,
-            completed_before=self._make_timestamp(datetime(2015,1,1)))
+        self.check_list_results(corrrect_tasks, {
+            'completed-before': self._make_timestamp(datetime(2015,1,1)),
+        })
 
     def test_completed_after_filter(self):
         corrrect_tasks = [
@@ -697,16 +712,18 @@ class TasksAPITest(TeamAPITestBase):
             self.task_factory(language='fr', assignee=self.member,
                               completed=datetime(2014, 12, 31)),
         ]
-        self.check_list_results(
-            corrrect_tasks,
-            completed_after=self._make_timestamp(datetime(2015,1,1)))
+        self.check_list_results(corrrect_tasks, {
+            'completed-after': self._make_timestamp(datetime(2015,1,1)),
+        })
 
     def test_open_filter(self):
         correct_tasks = [
             t for t in self.make_a_bunch_of_tasks()
             if not t.completed
         ]
-        self.check_list_results(correct_tasks, open=1)
+        self.check_list_results(correct_tasks, {
+            'open': 1,
+        })
 
     def check_list_order(self, order_param):
         task_qs = self.team.task_set.all().order_by(order_param)
@@ -938,3 +955,179 @@ class TasksAPITest(TeamAPITestBase):
                      response.content)
         assert_equal(self.can_delete_tasks.call_args, mock.call(
             self.team, self.user, self.team_video.project, task.language))
+
+class TeamApplicationAPITest(TeamAPITestBase):
+    permissions_to_mock = [
+        'can_invite',
+    ]
+    def setUp(self):
+        TeamAPITestBase.setUp(self)
+        self.team = TeamFactory(admin=self.user,
+                                membership_policy=Team.APPLICATION)
+        self.setup_applications()
+        self.list_url = reverse('api:team-application-list', kwargs={
+            'team_slug': self.team.slug,
+        })
+
+    def setup_applications(self):
+        self.applications = []
+        self.application_by_status = {}
+        # will map application status -> application objects
+        for status, label in Application.STATUSES:
+            if status == Application.STATUS_PENDING:
+                modified = None
+            else:
+                modified = datetime(2015, 2, 1)
+            app = Application.objects.create(
+                team=self.team, user=UserFactory(), note='test-note',
+                status=status, created=datetime(2015, 1, 1),
+                modified=modified)
+            self.applications.append(app)
+            self.application_by_status[status] = app
+
+    def detail_url(self, application):
+        return reverse('api:team-application-detail', kwargs={
+            'team_slug': self.team.slug,
+            'id': application.id,
+        }, request=APIRequestFactory().get('/'))
+
+    def check_application_data(self, data, application):
+        assert_equal(data['user'], application.user.username)
+        assert_equal(data['note'], application.note)
+        assert_equal(data['status'], application.get_status_display())
+        assert_equal(data['id'], application.id)
+        assert_equal(data['created'], application.created.isoformat())
+        if application.modified:
+            assert_equal(data['modified'], application.modified.isoformat())
+        else:
+            assert_equal(data['modified'], None)
+        assert_equal(data['resource_uri'], self.detail_url(application))
+
+    def test_list(self):
+        application_map = {a.id: a for a in self.applications}
+        response = self.client.get(self.list_url)
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_equal([a['id'] for a in response.data['objects']],
+                     application_map.keys())
+        for application_data in response.data['objects']:
+            self.check_application_data(
+                application_data, application_map[application_data['id']])
+
+    def test_details(self):
+        for application in self.applications:
+            response = self.client.get(self.detail_url(application))
+            assert_equal(response.status_code, status.HTTP_200_OK)
+            self.check_application_data(response.data, application)
+
+    def check_filter_result(self, filters, correct_applications):
+        response = self.client.get(self.list_url, filters)
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_equal([a['id'] for a in response.data['objects']],
+                     [a.id for a in correct_applications])
+
+    def test_user_filter(self):
+        user = self.applications[0].user
+        self.check_filter_result({'user': user.username},
+                                 [self.applications[0]])
+
+    def test_status_filter(self):
+        self.check_filter_result(
+            {'status': 'Denied'},
+            [self.application_by_status[Application.STATUS_DENIED]])
+
+    def test_invalid_status_filter(self):
+        self.check_filter_result({'status': 'Invalid-Value'}, [])
+
+    def test_before_filter(self):
+        app = self.applications[0]
+        app.created = datetime(2014, 1, 1)
+        app.save()
+        self.check_filter_result(
+            {'before': self._make_timestamp(datetime(2014, 1, 2))},
+            [app])
+
+    def test_after_filter(self):
+        app = self.applications[0]
+        app.created = datetime(2014, 1, 1)
+        app.save()
+        self.check_filter_result(
+            {'after': self._make_timestamp(datetime(2014, 1, 2))},
+            self.applications[1:])
+
+    def test_approve(self):
+        app = self.application_by_status[Application.STATUS_PENDING]
+        response = self.client.put(self.detail_url(app), {
+            'status': 'Approved',
+        })
+        app = test_utils.reload_obj(app)
+        assert_equal(app.status, Application.STATUS_APPROVED)
+        assert_not_equal(app.modified, None)
+        assert_true(self.team.user_is_member(app.user))
+
+    def test_deny(self):
+        app = self.application_by_status[Application.STATUS_PENDING]
+        response = self.client.put(self.detail_url(app), {
+            'status': 'Denied',
+        })
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        app = test_utils.reload_obj(app)
+        assert_equal(app.status, Application.STATUS_DENIED)
+        assert_not_equal(app.modified, None)
+
+    def test_cant_change_status_if_not_pending(self):
+        for status_value, label in Application.STATUSES:
+            if status_value == Application.STATUS_PENDING:
+                continue
+            app = self.application_by_status[status_value]
+            response = self.client.put(self.detail_url(app), {
+                'status': 'Denied',
+            })
+            assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST,
+                         response.content)
+
+    def test_get_list_checks_can_invite_permission(self):
+        self.can_invite.return_value = False
+        response = self.client.get(self.list_url)
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert_equal(self.can_invite.call_args,
+                     mock.call(self.team, self.user))
+
+    def test_get_detail_checks_can_invite_permission(self):
+        self.can_invite.return_value = False
+        response = self.client.get(self.detail_url(self.applications[0]))
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert_equal(self.can_invite.call_args,
+                     mock.call(self.team, self.user))
+
+    def test_put_checks_can_invite_permission(self):
+        self.can_invite.return_value = False
+        response = self.client.put(self.detail_url(self.applications[0]), {})
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert_equal(self.can_invite.call_args,
+                     mock.call(self.team, self.user))
+
+    def test_get_list_for_non_application_team(self):
+        # if the team is not an application team, we should always return 0
+        # applications for the listing
+        self.team.membership_policy = Team.INVITATION_BY_MANAGER
+        self.team.save()
+        response = self.client.get(self.list_url)
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_equal(response.data['objects'], [])
+
+    def test_get_detail_for_non_application_team(self):
+        # if the team is not an application team, we should always return 404
+        # errors for the detail request
+        self.team.membership_policy = Team.INVITATION_BY_MANAGER
+        self.team.save()
+        response = self.client.get(self.detail_url(self.applications[0]))
+        assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_cant_put_for_non_application_team(self):
+        # if the team is not an application team, we should always return 404
+        # errors for put requests
+        self.team.membership_policy = Team.INVITATION_BY_MANAGER
+        self.team.save()
+        response = self.client.put(self.detail_url(self.applications[0]), {})
+        assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)

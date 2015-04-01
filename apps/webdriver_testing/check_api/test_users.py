@@ -74,6 +74,7 @@ class TestCaseUsers(APILiveServerTestCase, WebdriverTestCase):
                     }
             r = self._post(data=data)
             try:
+                self.logger.info(r)
                 self.assertEqual(r['username'], data['username'])
             except AssertionError as e:
                 errors.append(r)
@@ -126,6 +127,31 @@ class TestCaseUsers(APILiveServerTestCase, WebdriverTestCase):
         r = self._post(data=data)
         self.assertEqual('Enter a valid email address.', r['email'][0])
 
+    def test_create_unique_user(self):
+        """option to always create unique username"""
+        usernames = []
+        data = {'username': 'imaunique@user.com',
+                'email': 'imaunique@user.com',
+                'password': 'password',
+                'find_unique_username': True
+                }
+        for x in range(110):
+            r = self._post(data=data)
+            usernames.append(r['username'])
+        self.assertIn('imaunique@user.com', usernames)
+        self.assertIn('imaunique00@user.com', usernames)
+        self.assertIn('imaunique99@user.com', usernames)
+        self.assertEqual(110, len(usernames))
+
+    def test_duplicates(self):
+        data = {'username': 'imaunique@user.com',
+                'email': 'imaunique@user.com',
+                'password': 'password',
+                }
+        r = self._post(data=data)
+        self.assertEqual('imaunique@user.com',r['username'])
+        r = self._post(data=data)
+        self.assertEqual([u'Username not unique: imaunique@user.com'], r)
 
 
 

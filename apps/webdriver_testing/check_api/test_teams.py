@@ -4,6 +4,7 @@ from django.core import mail
 from caching.tests.utils import assert_invalidates_model_cache
 from videos.models import *
 from utils.factories import *
+from webdriver_testing.data_factories import ApplicationFactory
 from subtitles import pipeline
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
@@ -106,7 +107,6 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         admin = UserFactory()
         member = UserFactory()
         for x in range(1,6):
-            self.logger.info(x)
             TeamFactory(admin=admin,
                         member=member,
                         membership_policy=x, 
@@ -117,12 +117,10 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
 
         #Verify member sees all teams + open team
         r = self._get(user=member)
-        self.logger.info(r)
         self.assertEqual(6,len(r['objects']))
        
         #Regular user sees open teams + application teams 
         r = self._get(user=self.user)
-        self.logger.info(r)
         self.assertEqual(3,len(r['objects']))
 
     def test_details(self):
@@ -155,7 +153,6 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
 
         url = '/api/teams/%s/' % team.slug
         r = self._get(url=url, user=member)
-        self.logger.info(r)
         for k, v in expected_details.iteritems():
             self.assertEqual(v, r[k])
 
@@ -187,7 +184,6 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
 
         #check member can't update the team
         r = self._put(url=url, data=data, user=member)
-        self.logger.info(r)
         self.assertEqual(r, {u'detail': u'Permission denied'})
 
         #admin can update the team.
@@ -315,7 +311,6 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         url= '/api/teams/%s/safe-members/' % team.slug
         
         r = self._post(url=url, data=data, user=admin)
-        self.logger.info(r)
         self.assertEqual(r, {u'non_field_errors': [u'Email required to create user']})
        
 
@@ -414,7 +409,6 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
                        guidelines='these are guidelines')
         url = '/api/teams/{0}/projects/{1}/'.format(team.slug, project.slug)
         r = self._get(url=url, user=admin)
-        self.logger.info(r)
         self.assertEqual(r['description'], project.description)
         self.assertEqual(r['slug'], project.slug)
 
@@ -450,7 +444,6 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
                        description='initial team project',
                        guidelines='these are guidelines')
         url = '/api/teams/{0}/projects/{1}/'.format(team.slug, project.slug)
-        self.logger.info(project.description) 
         data = {
             'description': 'updated description' 
             } 
@@ -480,3 +473,50 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         self.assertTrue(self.team_pg.has_project(project1.slug)) 
         #Verify project2 is deleted
         self.assertFalse(self.team_pg.has_project(project2.slug)) 
+
+
+
+    def test_applications(self):
+        """get update and delete team applications
+        """
+
+        admin = UserFactory()
+        member = UserFactory()
+        team = TeamFactory(admin=admin,
+                           member=member,
+                           workflow_enabled=False,
+                           membership_policy=1, # application-only team
+                           description="This is the description",
+                           is_visible=True)
+
+        for x in range(0,5):
+            ApplicationFactory(team = team,
+                               user = UserFactory.create(),
+                               status = x,
+                               note = 'let me in')
+        url = '/api/teams/%s/applications/' % team.slug
+        r = self._get(url=url, user=admin)
+        self.assertEqual(5, r['meta']['total_count'])
+        applications = r['objects']
+
+        #check the details of an app
+        pending_app = [app.get('id') for app in applications if app.get('status') == 'Pending'][0]
+        app_url = url + '%d/' % pending_app
+        r = self._get(url=app_url, user=admin)
+        user = r['user']
+        self.assertEqual("Pending", r['status'])
+        #Update the pending application to approved.
+        data = {'status': 'Approved' }
+        r = self._put(url=app_url, user=admin, data=data)
+        r = self._get(url=url, user=admin)
+        members_url = "/api/teams/%s/members/" % team.slug
+        r = self._get(url=members_url, user=admin)
+        self.assertIn(user, [member['username'] for member in r])
+        #Query for a specific user
+        query_url = url + '?user=%s' % user
+        r = self._get(url=query_url, user=admin)
+        self.assertEqual(1, r['meta']['total_count'])
+        #Query by status
+        query_url = url + '?status=Approved'
+        r = self._get(url=query_url, user=admin)
+        self.assertEqual(2, r['meta']['total_count'])

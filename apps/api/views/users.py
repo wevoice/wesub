@@ -22,7 +22,7 @@ Users Resource
 Fetching user data
 ++++++++++++++++++
 
-.. http:get:: /api2/partners/users/[username]/
+.. http:get:: /api/users/[username]/
 
     :>json username: username
     :>json first_name: First name
@@ -50,7 +50,7 @@ Fetching user data
 Creating Users
 ++++++++++++++
 
-.. http:post:: /api2/partners/users/
+.. http:post:: /api/users/
 
     :<json username: username.  30 chars or fewer
         alphanumeric chars, @, _ and - are accepted.
@@ -85,7 +85,7 @@ Creating Users
 Updating Your Account
 +++++++++++++++++++++
 
-.. http:put:: /api2/partners/users/[username]
+.. http:put:: /api/users/[username]
 
 Use PUT to update your user account.  ``username`` must match the username of
 the auth credentials sent.  PUT inputs the same fields as POST, with the
