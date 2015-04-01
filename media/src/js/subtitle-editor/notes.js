@@ -21,9 +21,13 @@ var angular = angular || null;
 (function() {
     var module = angular.module('amara.SubtitleEditor.notes', []);
 
+
     module.controller('NotesController', ["$sce", "$scope", "$timeout", "EditorData", "SubtitleStorage", function($sce, $scope, $timeout, EditorData, SubtitleStorage) {
         $scope.heading = EditorData.notesHeading;
         $scope.newNoteText = "";
+	$scope.$root.$on('set-note-heading', function(evt, heading) {
+            $scope.newNoteText = heading + "\n";
+	});
         $scope.notes = _.map(EditorData.notes, function(note) {
             return {
                 user: note.user,
@@ -63,7 +67,6 @@ var angular = angular || null;
 
 
     }]);
-
     module.directive('noteScroller', function() {
         return function link($scope, elm, attrs) {
             // For some reason using ng-keydown at the HTML tag doesn't work.

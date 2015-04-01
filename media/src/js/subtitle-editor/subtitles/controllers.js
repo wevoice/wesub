@@ -139,7 +139,7 @@ var angular = angular || null;
         $scope.$watch('versionNumber', $scope.versionNumberChanged);
     }]);
 
-    module.controller('WorkingSubtitlesController', ["$scope", "DomWindow", function($scope, DomWindow) {
+    module.controller('WorkingSubtitlesController', ["$scope", "DomWindow", "$filter", function($scope, DomWindow, $filter) {
         /**
          * Handles the subtitles the user is working on.
          */
@@ -218,6 +218,10 @@ var angular = angular || null;
             switch(action) {
                 case 'jump-to':
 	            $scope.$root.$emit('jump-to-subtitle', subtitle);
+                    break;
+
+                case 'note-time':
+                    $scope.$root.$emit('set-note-heading', $filter('displayTime')(subtitle.startTime));
                     break;
 
                 case 'insert':
