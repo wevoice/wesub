@@ -222,6 +222,7 @@ var angular = angular || null;
 
                 case 'note-time':
                     $scope.$root.$emit('set-note-heading', $filter('displayTime')(subtitle.startTime));
+                    $scope.$root.$emit('set-focus', "newNoteFocus");
                     break;
 
                 case 'insert':

@@ -67,6 +67,17 @@ var angular = angular || null;
 
 
     }]);
+
+    module.directive('newNoteFocus', function() {
+        return function(scope, elem, attr) {
+            scope.$root.$on('set-focus', function(e, name) {
+                if(name === attr.newNoteFocus) {
+                    elem[0].focus();
+                }
+             });
+        };
+    });
+
     module.directive('noteScroller', function() {
         return function link($scope, elm, attrs) {
             // For some reason using ng-keydown at the HTML tag doesn't work.
