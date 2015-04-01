@@ -124,6 +124,21 @@ var angular = angular || null;
                     VideoPlayer.seek(subtitle.startTime);
 	    });
 
+            $scope.$root.$on('jump-to-time', function(evt, displayTime) {
+		console.log(displayTime);
+		var time = 0;
+		var seconds = displayTime.split('.');
+		if (seconds.length == 2) {
+		    time += parseInt(seconds[1]);
+		    var minutes = seconds[0].split(':');
+		    if (minutes.length > 1) {
+			time += (parseInt(minutes[1]) + 60*parseInt(minutes[0])) * 100;
+			console.log(time);
+			VideoPlayer.seek(time * 10);
+		    }
+		}
+	    });
+
             function setProgressFromPageX(pageX) {
                 if($scope.videoState.duration === null) {
                     return;

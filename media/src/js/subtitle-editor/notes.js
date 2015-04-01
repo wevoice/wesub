@@ -39,6 +39,7 @@ var angular = angular || null;
         function convertBody(body) {
             body = _.escape(body);
             body = body.replace(/\n/g, "<br />");
+            body = body.replace(/^([\d\:\.]+)/, '<a class="note-link" data-target="$1" href="#">$1</a>');
             return $sce.trustAsHtml(body);
         }
 
@@ -59,6 +60,17 @@ var angular = angular || null;
         $scope.onPostClicked = function($event) {
             $scope.postNote();
             $event.preventDefault();
+        }
+
+        $scope.onNoteClicked = function($event) {
+	    var node = $event.target;
+	    var topLevelNode = $event.currentTarget;
+	    while(node && node != topLevelNode) {
+                if((node.tagName == 'A') && (node.className == "note-link") && (node.dataset) && (node.dataset.target)) {
+		    $scope.$root.$emit('jump-to-time', node.dataset.target);
+		}
+                node = node.parentNode;
+            }
         }
 
         $timeout(function() {
