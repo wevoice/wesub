@@ -65,7 +65,8 @@ Creating Users
     :<json find_unique_username: *optional*, if username is taken, we will
         find a similar, unused, username for the new user.  If passed, make
         sure you check the username returned since it might not be the same
-        one that you passed in.
+        one that you passed in.  If set, usernames can only be a maximum of 24
+        characters to make room for potential extra characters.
     :>json username: username
     :>json first_name: First name
     :>json last_name: Last name
@@ -152,7 +153,7 @@ class PasswordField(serializers.CharField):
         return make_password(password)
 
 class UserCreateSerializer(UserSerializer):
-    username = serializers.CharField()
+    username = serializers.CharField(max_length=30)
     password = PasswordField(required=False, write_only=True)
     api_key = serializers.CharField(source='api_key.key', read_only=True)
     create_login_token = serializers.BooleanField(write_only=True,
@@ -162,7 +163,16 @@ class UserCreateSerializer(UserSerializer):
 
     default_error_messages = {
         'username-not-unique': 'Username not unique: {username}',
+        'username-too-long': 'Username too long: {username}',
     }
+
+    def validate(self, data):
+        if data.get('find_unique_username'):
+            # if we need to find a unique username, then we should stricter
+            # limit on the username length
+            if len(data['username']) > 24:
+                self.fail('username-too-long', username=data['username'])
+        return data
 
     def create(self, validated_data):
         find_unique_username = validated_data.pop('find_unique_username',

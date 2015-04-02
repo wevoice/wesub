@@ -133,6 +133,25 @@ class UserAPITest(TestCase):
         })
         assert_equal(user.username, 'test-user00')
 
+    def test_username_max_length(self):
+        # we should only allow 30 chars for the username length
+        response = self.client.post(self.list_url, {
+            'username': 'a' * 31,
+            'find_unique_username': 1,
+            'email': 'test@example.com',
+        })
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_unique_username_max_length(self):
+        # we should only allow 24 chars for the username length, since we may
+        # add up to 6 extra to make it unique
+        response = self.client.post(self.list_url, {
+            'username': 'a' * 25,
+            'find_unique_username': 1,
+            'email': 'test@example.com',
+        })
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_create_user_partial_data(self):
         self.check_post({
             'username': 'test-user',
