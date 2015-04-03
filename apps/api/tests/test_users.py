@@ -118,6 +118,40 @@ class UserAPITest(TestCase):
             'homepage': 'http://example.com/test/'
         })
 
+    def test_create_user_with_unique_username(self):
+        UserFactory(username='test-user')
+        user, response = self.check_post({
+            'username': 'test-user',
+            'find_unique_username': 1,
+            'email': 'test@example.com',
+            'password': 'test-password',
+            'first_name': 'Test',
+            'last_name': 'User',
+            'full_name': 'Test User',
+            'bio': 'test-bio',
+            'homepage': 'http://example.com/test/'
+        })
+        assert_equal(user.username, 'test-user00')
+
+    def test_username_max_length(self):
+        # we should only allow 30 chars for the username length
+        response = self.client.post(self.list_url, {
+            'username': 'a' * 31,
+            'find_unique_username': 1,
+            'email': 'test@example.com',
+        })
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_unique_username_max_length(self):
+        # we should only allow 24 chars for the username length, since we may
+        # add up to 6 extra to make it unique
+        response = self.client.post(self.list_url, {
+            'username': 'a' * 25,
+            'find_unique_username': 1,
+            'email': 'test@example.com',
+        })
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_create_user_partial_data(self):
         self.check_post({
             'username': 'test-user',
@@ -134,6 +168,14 @@ class UserAPITest(TestCase):
             'bio': '',
             'homepage': '',
         })
+
+    def test_create_user_non_unique_username(self):
+        UserFactory(username='test-user')
+        response = self.client.post(self.list_url, {
+            'username': 'test-user',
+            'email': 'test@example.com',
+        })
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_user_non_ascii_username(self):
         response = self.client.post(self.list_url, {
@@ -181,7 +223,8 @@ class UserAPITest(TestCase):
         response = self.client.put(self.detail_url(other_user), data={
             'first_name': 'New',
         })
-        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN,
+                     response.content)
 
     def test_cant_change_username(self):
         orig_username = self.user.username
