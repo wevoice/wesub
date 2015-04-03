@@ -154,4 +154,16 @@ class TestCaseUsers(APILiveServerTestCase, WebdriverTestCase):
         self.assertEqual([u'Username not unique: imaunique@user.com'], r)
 
 
+    def test_unique_user_24chars(self):
+        """Create unique user length limited to 24 chars
+
+        """
+        data = {'username':'newuserwith30chars@example.com',
+                'email': 'newuserwith30chars@example.com',
+                'password': 'password',
+                'find_unique_username': True
+                    }
+        r = self._post(data=data)
+        self.assertEqual(r, {u'non_field_errors': [u'Username too long: newuserwith30chars@example.com']})
+
 
