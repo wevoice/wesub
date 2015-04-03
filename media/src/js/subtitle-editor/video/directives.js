@@ -126,12 +126,15 @@ var angular = angular || null;
 
             $scope.$root.$on('jump-to-time', function(evt, displayTime) {
 		var time = 0;
-		var seconds = displayTime.split('.');
-		if (seconds.length == 2) {
-		    time += parseInt(seconds[1]);
-		    var minutes = seconds[0].split(':');
-		    if (minutes.length > 1) {
-			time += (parseInt(minutes[1]) + 60*parseInt(minutes[0])) * 100;
+		var cents = displayTime.split('.');
+		if (cents.length == 2) {
+		    time += parseInt(cents[1]);
+		    var seconds = cents[0].split(':');
+		    if (seconds.length > 1) {
+			var s = 0;
+			for (var i = 0 ; i < seconds.length ; i++)
+			    s += parseInt(seconds[i]) * Math.pow(60, seconds.length -1 - i);
+			time += 100*s;
 			VideoPlayer.seek(time * 10);
 		    }
 		}

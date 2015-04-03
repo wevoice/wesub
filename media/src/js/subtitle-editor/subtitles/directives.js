@@ -256,7 +256,7 @@ var USER_IDLE_MINUTES = 15;
 		templateLI.append('<span class="warning">!</span>');
                 templateLI.append(
                     '<button class="new-paragraph">&para;</button>');
-                templateLI.append('<div class="sub-toolbox"><div class="sub-toolbox-inside"><a href="#"><img src="/media/images/subtitle-editor/glyphicons_halflings_135_wrench_light.png" alt="Tools"></img></a><ul class="sub-toolbox-menu"><li><a class="jump-to" title="seek to subtitle"></a></li><li><a class="insert-top" title="Insert subtitle above"></a></li><li><a title="Insert subtitle below" class="insert-down"></a></li><li><a title="Delete subtitle" class="remove"></a></li><li><a title="start note for current time" class="note-time"></a></li></ul></div></div>');
+		templateLI.append(makeSubtitleMenu());
             } else {
                 templateLI.append('<span class="new-paragraph">&para;</span>');
             }
@@ -302,13 +302,21 @@ var USER_IDLE_MINUTES = 15;
             subtitleList.addChangeCallback(onChange);
             reloadSubtitles();
 
-            function makeImageButton(cssClass, imageURLPath) {
-                var img = $('<img />');
-                img.prop('src', EditorData.staticURL + imageURLPath);
-                var button = $('<button />');
-                button.prop('class', cssClass);
-                button.append(img);
-                return button
+            function makeSubtitleMenu() {
+		var toolbox = $('<div />').prop('class', "sub-toolbox");
+		var icon = $('<a />');
+		icon.prop('href', '#');
+		icon.append($('<img />').prop('src', EditorData.staticURL + "images/subtitle-editor/glyphicons_halflings_135_wrench_light.png"));
+		var menu = $('<ul />').prop('class', "sub-toolbox-menu");
+		[["jump-to", "seek to subtitle"],
+		 ["insert-top", "Insert subtitle above"],
+		 ["insert-down", "Insert subtitle below"],
+		 ["remove", "Delete subtitle"],
+		 ["note-time", "Start note for current time"]].forEach(function(data) {
+		    menu.append($('<li />').append($('<a />').prop('class', data[0]).prop('title', data[1])));
+		});
+		toolbox.append($('<div />').prop('class', "sub-toolbox-inside").append(icon).append(menu));
+		return toolbox;
             }
 
             function createLIForSubtitle(subtitle) {
