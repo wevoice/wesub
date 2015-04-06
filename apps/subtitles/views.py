@@ -20,6 +20,7 @@ import json
 
 import babelsubs
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, Http404
@@ -97,9 +98,10 @@ def old_editor(request, video_id, language_code):
     return redirect("http://%s%s" % (request.get_host(), url_path))
 
 class SubtitleEditorBase(View):
-    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         self.handle_special_user(request)
+        if not request.user.is_authenticated():
+            return redirect_to_login(request.build_absolute_uri())
         return super(SubtitleEditorBase, self).dispatch(
             request, *args, **kwargs)
 
