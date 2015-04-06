@@ -61,6 +61,7 @@ def _version_data(version):
         'description': version.description,
     }
 
+@require_POST
 def regain_lock(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
     language = video.subtitle_language(language_code)
@@ -71,7 +72,6 @@ def regain_lock(request, video_id, language_code):
     language.writelock(request.user, request.browser_id, save=True)
     return HttpResponse(json.dumps({'ok': True}))
 
-@login_required
 @require_POST
 def release_lock(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
