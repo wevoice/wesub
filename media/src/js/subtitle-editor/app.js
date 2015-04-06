@@ -551,6 +551,9 @@ var angular = angular || null;
 
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
+	    var isDel = function(key) {
+		return ((key === 46) || (key === 8));
+	    };
             $scope.minutesIdle = 0;
             $scope.$root.$emit("user-action");
             if (evt.keyCode == 9 && !evt.shiftKey) {
@@ -574,6 +577,10 @@ var angular = angular || null;
 		if($scope.currentEdit.storedSubtitle())
 		    $scope.workingSubtitles.subtitleList.insertSubtitleBefore(
 			$scope.currentEdit.storedSubtitle());
+            } else if (isDel(evt.keyCode) && evt.altKey) {
+                // Alt+del, remove current subtitle
+		if($scope.currentEdit.storedSubtitle())
+		    $scope.workingSubtitles.subtitleList.removeSubtitle($scope.currentEdit.storedSubtitle());
             } else if (evt.target.type == 'textarea') {
                 return;
             }
