@@ -175,6 +175,16 @@
                 <td> {% trans "ESC" %}</td>
                 <td> {% trans "ESC" %}</td>
             </tr>
+            <tr>
+              <td> {% trans "Insert subtitle (above)" %}</td>
+              <td> {% trans "Alt + i" %}</td>
+              <td> {% trans "Alt + i" %}</td>
+            </tr>
+            <tr>
+              <td> {% trans "Insert subtitle (below)" %}</td>
+              <td> {% trans "Alt + Shift + i" %}</td>
+              <td> {% trans "Alt + Shift + i" %}</td>
+            </tr>
             </tbody>
         </table>
         <a class="expand-link" href="" ng-click="showBrowserShortcuts = true" ng-init="showBrowserShortcuts=false" ng-show="!showBrowserShortcuts">{% trans "Show Browser Shortcuts" %} &#x25B6;</a>
@@ -228,16 +238,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td> {% trans "Insert subtitle (above)" %}</td>
-                    <td> {% trans "Alt + i" %}</td>
-                    <td> {% trans "Alt + i" %}</td>
-                </tr>
-                <tr>
-                    <td> {% trans "Insert subtitle (below)" %}</td>
-                    <td> {% trans "Alt + Shift + i" %}</td>
-                    <td> {% trans "Alt + Shift + i" %}</td>
-                </tr>
                 <tr>
                     <td> {% trans "Delete current subtitle" %}</td>
                     <td> {% trans "Alt + Delete (or Backspace)" %}</td>

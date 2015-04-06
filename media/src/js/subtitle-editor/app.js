@@ -564,6 +564,16 @@ var angular = angular || null;
             } else if (evt.keyCode === 190 && evt.shiftKey && evt.ctrlKey) {
                 // Control+Shift+Period, go forward 4 seconds
                 VideoPlayer.seek(VideoPlayer.currentTime() + 4000);
+            } else if (evt.keyCode === 73 && evt.altKey && evt.shiftKey) {
+                // Alt+Shift+i, insert subtitle below
+		if($scope.currentEdit.storedSubtitle())
+		    $scope.workingSubtitles.subtitleList.insertSubtitleBefore(
+			$scope.workingSubtitles.subtitleList.nextSubtitle($scope.currentEdit.storedSubtitle()));
+            } else if (evt.keyCode === 73 && evt.altKey) {
+                // Alt+i, insert subtitle above
+		if($scope.currentEdit.storedSubtitle())
+		    $scope.workingSubtitles.subtitleList.insertSubtitleBefore(
+			$scope.currentEdit.storedSubtitle());
             } else if (evt.target.type == 'textarea') {
                 return;
             }
