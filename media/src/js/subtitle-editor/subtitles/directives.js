@@ -308,7 +308,7 @@ var USER_IDLE_MINUTES = 15;
 		icon.prop('href', '#');
 		icon.append($('<img />').prop('src', EditorData.staticURL + "images/subtitle-editor/glyphicons_halflings_135_wrench_light.png"));
 		var menu = $('<ul />').prop('class', "sub-toolbox-menu");
-		[["jump-to", "seek to subtitle"],
+		[["jump-to", "Seek to subtitle"],
 		 ["insert-top", "Insert subtitle above"],
 		 ["insert-down", "Insert subtitle below"],
 		 ["remove", "Delete subtitle"],
