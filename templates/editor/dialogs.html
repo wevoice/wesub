@@ -156,7 +156,7 @@
                 <td> {% trans "CMD + Shift + ." %}</td>
             </tr>
             <tr>
-                <td> {% trans "Navigate to the next subtitle" %}</td>
+                <td> {% trans "Navigate to the next subtitle or insert one at the end" %}</td>
                 <td> {% trans "ENTER" %}</td>
                 <td> {% trans "ENTER" %}</td>
             </tr>
@@ -189,6 +189,16 @@
               <td> {% trans "Delete current subtitle" %}</td>
               <td> {% trans "Alt + Delete (or Backspace)" %}</td>
               <td> {% trans "Alt + Delete (or Backspace)" %}</td>
+            </tr>
+            <tr>
+              <td> {% trans "Navigate to the previous subtitle" %}</td>
+              <td> {% trans "Alt + UP Arrow" %}</td>
+              <td> {% trans "Alt + UP Arrow" %}</td>
+            </tr>
+            <tr>
+              <td> {% trans "Navigate to the next subtitle" %}</td>
+              <td> {% trans "Alt + DOWN Arrow" %}</td>
+              <td> {% trans "Alt + DOWN Arrow" %}</td>
             </tr>
             </tbody>
         </table>
@@ -243,11 +253,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td> {% trans "Navigate to the previous line" %}</td>
-                    <td> {% trans "Alt + UP Arrow" %}</td>
-                    <td> {% trans "Alt + UP Arrow" %}</td>
-                </tr>
                 <tr>
                     <td> {% trans "Undo last action" %}</td>
                     <td> {% trans "CTRL + z" %}</td>
