@@ -45,7 +45,7 @@ var USER_IDLE_MINUTES = 15;
             var wrapper = $(elem);
 
             function getSubtitleTop(index) {
-                var li = $('li', subtitleList).eq(index);
+                var li = $('li.sub', subtitleList).eq(index);
                 var top = li.offset().top - wrapper.offset().top;
                 if(top < 0 || top + startHelper.height() >= wrapper.height()) {
                     return null;
@@ -329,7 +329,7 @@ var USER_IDLE_MINUTES = 15;
 
             function renderSubtitle(subtitle, elt) {
                 var content = subtitle.content();
-                var classes = [];
+                var classes = ["sub"];
 
                 if($scope.timeline.shownSubtitle === subtitle) {
                     classes.push('current-subtitle');
