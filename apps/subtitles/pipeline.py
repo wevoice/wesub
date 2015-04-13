@@ -63,6 +63,7 @@ from subtitles.models import (
 )
 from subtitles import signals
 from subtitles import workflows
+from teams.signals import api_subtitles_edited
 
 # Utility Functions -----------------------------------------------------------
 def _strip_nones(d):
@@ -470,7 +471,6 @@ def _rollback_to(video, language_code, version_number, rollback_author):
     if current.subtitle_count != target.subtitle_count:
         _fork_dependents(version.subtitle_language)
 
-    from teams.signals import api_subtitles_edited
     api_subtitles_edited.send(version)
 
     return version
@@ -547,6 +547,7 @@ def add_subtitles(video, language_code, subtitles,
     if action:
         action.perform(author, video, version.subtitle_language, version)
     video.cache.invalidate()
+    api_subtitles_edited.send(version)
     return version
 
 def _calc_action_for_add_subtitles(video, language_code, author, complete,
