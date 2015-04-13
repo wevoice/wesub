@@ -30,7 +30,13 @@
         <a class="edit-metadata" href="#" ng-click="onEditTitleClicked($event)">{% trans "Edit title and description." %}</a>
         </p>
         <p class="error" ng-show="!workflow.subtitleList.isComplete()">{% trans "Not all lines completed" %}</p>
-
+        <p class="error" ng-show="workflow.subtitleList.firstInvalidTiming()">
+	  <a class="invalid-subtitle-link" data-target="[[ workflow.subtitleList.firstInvalidTiming() && workflow.subtitleList.firstInvalidTiming().id ]]"
+	     href="#"
+	     ng-click="onSubtitleLinkClicked($event)">
+	    {% trans "Timing error in subtitle" %}
+	  </a>
+	</p>
         <button ng-repeat="action in actions" ng-class="action.class;{disabled:!action.canPerform()}" ng-click="action.canPerform() && action.perform()">
             [[ action.label ]]
         </button>

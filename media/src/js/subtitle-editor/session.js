@@ -43,7 +43,8 @@ var angular = angular || null;
                 return true;
             },
             subtitlesComplete: function() {
-                return $scope.workingSubtitles.subtitleList.isComplete();
+                return ($scope.workingSubtitles.subtitleList.isComplete() &&
+			($scope.workingSubtitles.subtitleList.firstInvalidTiming() == undefined));
             },
         };
     }]);
