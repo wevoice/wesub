@@ -348,6 +348,14 @@ var angular = angular || null;
                 return this.subtitles[i];
             }
         }
+	var startTimes = {};
+        for(var i=0; i < this.length(); i++) {
+            if(startTimes[this.subtitles[i].startTime]) {
+                return this.subtitles[i];
+            } else {
+		startTimes[this.subtitles[i].startTime] = true;
+	    }
+        }
 	return undefined;
     }
 
