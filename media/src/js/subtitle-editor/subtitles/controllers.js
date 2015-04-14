@@ -139,7 +139,7 @@ var angular = angular || null;
         $scope.$watch('versionNumber', $scope.versionNumberChanged);
     }]);
 
-    module.controller('WorkingSubtitlesController', ["$scope", "DomWindow", function($scope, DomWindow) {
+    module.controller('WorkingSubtitlesController', ["$scope", "DomWindow", "$filter", function($scope, DomWindow, $filter) {
         /**
          * Handles the subtitles the user is working on.
          */
@@ -216,8 +216,27 @@ var angular = angular || null;
         $scope.onSubtitleClick = function(evt, subtitle, action) {
             var madeChange = false;
             switch(action) {
+                case 'jump-to':
+	            $scope.$root.$emit('jump-to-subtitle', subtitle);
+                    break;
+
+                case 'note-time':
+                    $scope.$root.$emit('set-note-heading', $filter('displayTime')(subtitle.startTime));
+                    $scope.$root.$emit('set-focus', "newNoteFocus");
+                    break;
+
                 case 'insert':
                     insertAndStartEdit(subtitle);
+                    madeChange = true;
+                    break;
+
+                case 'insert-top':
+                    insertAndStartEdit(subtitle);
+                    madeChange = true;
+                    break;
+
+                case 'insert-down':
+                    insertAndStartEdit(subtitleList.nextSubtitle(subtitle));
                     madeChange = true;
                     break;
 

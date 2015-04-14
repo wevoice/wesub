@@ -21,9 +21,13 @@ var angular = angular || null;
 (function() {
     var module = angular.module('amara.SubtitleEditor.notes', []);
 
+
     module.controller('NotesController', ["$sce", "$scope", "$timeout", "EditorData", "SubtitleStorage", function($sce, $scope, $timeout, EditorData, SubtitleStorage) {
         $scope.heading = EditorData.notesHeading;
         $scope.newNoteText = "";
+	$scope.$root.$on('set-note-heading', function(evt, heading) {
+            $scope.newNoteText = heading + "\n";
+	});
         $scope.notes = _.map(EditorData.notes, function(note) {
             return {
                 user: note.user,
@@ -35,6 +39,7 @@ var angular = angular || null;
         function convertBody(body) {
             body = _.escape(body);
             body = body.replace(/\n/g, "<br />");
+            body = body.replace(/^([\d\:\.]+)/, '<a class="note-link" data-target="$1" href="#">$1</a>');
             return $sce.trustAsHtml(body);
         }
 
@@ -57,12 +62,33 @@ var angular = angular || null;
             $event.preventDefault();
         }
 
+        $scope.onNoteClicked = function($event) {
+	    var node = $event.target;
+	    var topLevelNode = $event.currentTarget;
+	    while(node && node != topLevelNode) {
+                if((node.tagName == 'A') && (node.className == "note-link") && (node.dataset) && (node.dataset.target)) {
+		    $scope.$root.$emit('jump-to-time', node.dataset.target);
+		}
+                node = node.parentNode;
+            }
+        }
+
         $timeout(function() {
             $scope.scrollToBottom();
         });
 
 
     }]);
+
+    module.directive('newNoteFocus', function() {
+        return function(scope, elem, attr) {
+            scope.$root.$on('set-focus', function(e, name) {
+                if(name === attr.newNoteFocus) {
+                    elem[0].focus();
+                }
+             });
+        };
+    });
 
     module.directive('noteScroller', function() {
         return function link($scope, elm, attrs) {
