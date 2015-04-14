@@ -199,6 +199,7 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.reverse import reverse
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 import json
 
 from api.pagination import AmaraPaginationMixin
@@ -467,7 +468,7 @@ class VideoViewSet(AmaraPaginationMixin,
 
     lookup_field = 'video_id'
     lookup_value_regex = r'(\w|-)+'
-
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = ('title', 'created')
 
@@ -489,8 +490,10 @@ class VideoViewSet(AmaraPaginationMixin,
         return qs
 
     def get_videos_for_user(self):
-        user_visible_teams = Team.objects.filter(
-            Q(is_visible=True) | Q(members__user=self.request.user))
+        visibility = Q(is_visible=True)
+        if not self.request.user.is_anonymous():
+            visibility = visibility | Q(members__user=self.request.user)
+        user_visible_teams = Team.objects.filter(visibility)
         return Video.objects.filter(
             Q(teamvideo__isnull=True) |
             Q(teamvideo__team__in=user_visible_teams))
