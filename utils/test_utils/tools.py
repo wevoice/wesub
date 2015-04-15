@@ -22,6 +22,9 @@ This module contains a nose-style assert_* functions and other utility
 functions.
 """
 
+import functools
+
+from django.core.management import call_command
 from nose.tools import *
 
 def reload_obj(model_obj):
@@ -30,3 +33,12 @@ def reload_obj(model_obj):
 def assert_saved(model_obj):
     assert_true(model_obj.__class__.objects.filter(pk=model_obj.pk).exists())
     assert_equal(model_obj, reload_obj(model_obj))
+
+def with_db_teardown(func):
+    teardown = functools.partial(call_command, 'flush', verbosity=0,
+                                 interactive=False)
+    return with_setup(setup=None, teardown=teardown)(func)
+
+__all__ = [
+    'reload_obj', 'assert_saved', 'with_db_teardown',
+]
