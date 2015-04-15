@@ -484,14 +484,13 @@ class VideoViewSet(AmaraPaginationMixin,
             qs = self.get_videos_for_user()
         else:
             qs = self.get_videos_for_team(query_params)
-
         if 'video_url' in query_params:
             qs = qs.filter(videourl__url=query_params['video_url'])
         return qs
 
     def get_videos_for_user(self):
         visibility = Q(is_visible=True)
-        if not self.request.user.is_anonymous():
+        if self.request.user.is_authenticated():
             visibility = visibility | Q(members__user=self.request.user)
         user_visible_teams = Team.objects.filter(visibility)
         return Video.objects.filter(

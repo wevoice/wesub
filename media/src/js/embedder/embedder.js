@@ -207,7 +207,6 @@
                 // internal ID, description, etc.
                 _$.ajax({
                     url: apiURL + encodeURIComponent(this.get('url')),
-                    //dataType: 'jsonp',
                     success: function(resp) {
                         if (resp.objects.length) {
                             // The video exists on Amara.
@@ -730,7 +729,6 @@
                 // TODO: If we already have subtitles in this language, don't do anything.
                 _$.ajax({
                     url: apiURL,
-                    //dataType: 'jsonp',
                     success: function(resp) {
                         // Save these subtitles to the video's 'subtitles' collection.
                         // TODO: Placeholder until we have the API return the language code.
