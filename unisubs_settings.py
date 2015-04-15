@@ -20,7 +20,6 @@ from datetime import timedelta
 from settings import *
 from server_local_settings import *
 
-
 DEBUG = False
 
 ADMINS = (
@@ -74,6 +73,8 @@ if INSTALLATION == STAGING or INSTALLATION == PRODUCTION or INSTALLATION == LOCA
     AWS_STORAGE_BUCKET_NAME = DEFAULT_BUCKET
     COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
     SOLR_ROOT = '/usr/share/'
+
+TEMPLATE_DEBUG = DEBUG
 
 CELERYD_LOG_LEVEL = 'INFO'
 CELERY_REDIRECT_STDOUTS = True
