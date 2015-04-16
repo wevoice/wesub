@@ -20,6 +20,8 @@ from __future__ import absolute_import
 
 from babelsubs import storage
 from django.test import TestCase
+from nose.tools import *
+import mock
 
 from externalsites.subfetch import should_fetch_subs, fetch_subs
 from subtitles import pipeline
@@ -27,96 +29,120 @@ from subtitles.models import ORIGIN_IMPORTED
 from utils import test_utils
 from utils.factories import *
 
+class ShouldFetchSubsTest(TestCase):
+    def test_should_fetch_subs_with_youtube_account(self):
+        YouTubeAccountFactory(channel_id="username", user=UserFactory())
+        video = YouTubeVideoFactory(channel_id="username")
+        assert_true(should_fetch_subs(video.get_primary_videourl_obj()))
+
+    def test_should_fetch_subs_no_youtube_account(self):
+        video = YouTubeVideoFactory(channel_id="username")
+        assert_false(should_fetch_subs(video.get_primary_videourl_obj()))
+
+    def test_should_fetch_subs_no_channel_id(self):
+        video = YouTubeVideoFactory(channel_id=None)
+        assert_false(should_fetch_subs(video.get_primary_videourl_obj()))
+
+    def test_should_fetch_subs_non_youtube_video(self):
+        video = VideoFactory()
+        assert_false(should_fetch_subs(video.get_primary_videourl_obj()))
+
+
 class SubFetchTestCase(TestCase):
-    def test_should_fetch_subs(self):
-        video_url = VideoFactory().get_primary_videourl_obj()
-        youtube_url = YouTubeVideoFactory().get_primary_videourl_obj()
+    @test_utils.patch_for_test("externalsites.google.get_new_access_token")
+    @test_utils.patch_for_test("externalsites.google.captions_list")
+    @test_utils.patch_for_test("externalsites.google.captions_download")
+    def setUp(self, mock_captions_download, mock_captions_list,
+              mock_get_new_access_token):
+        self.mock_captions_download = mock_captions_download
+        self.mock_captions_list = mock_captions_list
+        self.mock_get_new_access_token = mock_get_new_access_token
+        self.mock_get_new_access_token.return_value = 'test-access-token'
+        self.account = YouTubeAccountFactory(channel_id="username",
+                                             user=UserFactory())
+        self.video = YouTubeVideoFactory(channel_id="username")
+        self.video_url = self.video.get_primary_videourl_obj()
+        self.video_id = self.video_url.videoid
 
-        self.assertEqual(should_fetch_subs(youtube_url), True)
-        self.assertEqual(should_fetch_subs(video_url), False)
-
-    @test_utils.patch_for_test("externalsites.google.get_subtitled_languages")
-    @test_utils.patch_for_test("externalsites.google.get_subtitles")
-    def test_fetch_subs(self, mock_get_subtitles,
-                        mock_get_subtitled_languages):
-        mock_get_subtitled_languages.return_value = ['en', 'fr']
+    def test_fetch_subs(self):
+        self.mock_captions_list.return_value = [
+            ('caption-1', 'en', 'English'),
+            ('caption-2', 'fr', 'French'),
+        ]
 
         en_subs = storage.SubtitleSet('en')
         en_subs.append_subtitle(100, 200, 'text')
         fr_subs = storage.SubtitleSet('fr')
         fr_subs.append_subtitle(100, 200, 'french text')
-        def get_subtitles(video_id, language_code):
+        def captions_download(access_token, video_id, language_code):
             if language_code == 'en':
-                return en_subs
+                return en_subs.to_xml()
             elif language_code == 'fr':
-                return fr_subs
+                return fr_subs.to_xml()
             else:
                 raise ValueError(language_code)
-        mock_get_subtitles.side_effect = get_subtitles
+        self.mock_captions_download.side_effect = captions_download
 
-        video = YouTubeVideoFactory()
-        video_url = video.get_primary_videourl_obj()
-        fetch_subs(video_url)
+        fetch_subs(self.video_url)
         # check that we called the correct API methods
-        self.assertEqual(mock_get_subtitled_languages.called, True)
-        self.assertEqual(mock_get_subtitles.call_args_list, [
-            ((video_url.videoid, 'en'), {}),
-            ((video_url.videoid, 'fr'), {}),
+        assert_equal(self.mock_get_new_access_token.call_args,
+                     mock.call(self.account.oauth_refresh_token))
+
+        assert_equal(self.mock_captions_list.call_args,
+                     mock.call('test-access-token', self.video_id))
+        assert_equal(self.mock_captions_download.call_args_list, [
+            mock.call('test-access-token', self.video_id, 'en'),
+            mock.call('test-access-token', self.video_id, 'fr'),
         ])
         # check that we created the correct languages
-        self.assertEqual(set(l.language_code for l in
-                             video.all_subtitle_languages()),
-                         set(['en', 'fr']))
-        lang_en = video.subtitle_language('en')
-        lang_fr = video.subtitle_language('fr')
+        assert_equal(set(l.language_code for l in
+                         self.video.all_subtitle_languages()),
+                     set(['en', 'fr']))
+        lang_en = self.video.subtitle_language('en')
+        lang_fr = self.video.subtitle_language('fr')
         # check subtitle data
-        self.assertEqual(lang_en.get_tip().get_subtitles().to_xml(),
-                         en_subs.to_xml())
-        self.assertEqual(lang_fr.get_tip().get_subtitles().to_xml(),
-                         fr_subs.to_xml())
+        assert_equal(lang_en.get_tip().get_subtitles().to_xml(),
+                     en_subs.to_xml())
+        assert_equal(lang_fr.get_tip().get_subtitles().to_xml(),
+                     fr_subs.to_xml())
         # check additional data
-        self.assertEqual(lang_en.subtitles_complete, True)
-        self.assertEqual(lang_fr.subtitles_complete, True)
-        self.assertEqual(lang_en.get_tip().origin, ORIGIN_IMPORTED)
-        self.assertEqual(lang_fr.get_tip().origin, ORIGIN_IMPORTED)
-        self.assertEqual(lang_en.get_tip().note, "From youtube")
-        self.assertEqual(lang_fr.get_tip().note, "From youtube")
+        assert_equal(lang_en.subtitles_complete, True)
+        assert_equal(lang_fr.subtitles_complete, True)
+        assert_equal(lang_en.get_tip().origin, ORIGIN_IMPORTED)
+        assert_equal(lang_fr.get_tip().origin, ORIGIN_IMPORTED)
+        assert_equal(lang_en.get_tip().note, "From youtube")
+        assert_equal(lang_fr.get_tip().note, "From youtube")
 
-    @test_utils.patch_for_test("externalsites.google.get_subtitled_languages")
-    @test_utils.patch_for_test("externalsites.google.get_subtitles")
-    def test_fetch_subs_skips_existing_languages(self, mock_get_subtitles,
-                                                 mock_get_subtitled_languages):
+    def test_fetch_subs_skips_existing_languages(self):
         # test that we don't try to get subtitles for languages that already
         # have data in the DB
-        mock_get_subtitled_languages.return_value = ['en']
+        self.mock_captions_list.return_value = [
+            ('caption-1', 'en', 'English'),
+        ]
 
-        video = YouTubeVideoFactory()
-        video_url = video.get_primary_videourl_obj()
-        existing_version = pipeline.add_subtitles(video, 'en', None)
-        fetch_subs(video_url)
-        self.assertEqual(mock_get_subtitles.call_count, 0)
-        self.assertEqual(video.subtitle_language('en').get_tip(),
+        existing_version = pipeline.add_subtitles(self.video, 'en', None)
+        fetch_subs(self.video_url)
+        assert_equal(self.mock_captions_download.call_count, 0)
+        assert_equal(self.video.subtitle_language('en').get_tip(),
                          existing_version)
 
-    @test_utils.patch_for_test("externalsites.google.get_subtitled_languages")
-    @test_utils.patch_for_test("externalsites.google.get_subtitles")
-    def test_fetch_subs_handles_bcp47_codes(self, mock_get_subtitles,
-                                            mock_get_subtitled_languages):
+    def test_fetch_subs_handles_bcp47_codes(self):
         # youtube uses BCP-47 language codes.  Ensure that we use this code
         # when talking to youtube, but our own internal codes when storing
         # subtitles.
-        mock_get_subtitled_languages.return_value = ['pt-BR']
+        self.mock_captions_list.return_value = [
+            ('caption-1', 'pt-BR', 'Brazilian Portuguese'),
+        ]
 
         subs = storage.SubtitleSet('pt-br')
         subs.append_subtitle(100, 200, 'text')
-        mock_get_subtitles.return_value = subs
+        self.mock_captions_download.return_value = subs.to_xml()
 
-        video = YouTubeVideoFactory()
-        video_url = video.get_primary_videourl_obj()
+        fetch_subs(self.video_url)
+        assert_equal(
+            self.mock_captions_download.call_args,
+            mock.call('test-access-token', self.video_url.videoid, 'pt-BR'))
 
-        fetch_subs(video_url)
-        mock_get_subtitles.assert_called_with(video_url.videoid, 'pt-BR')
-
-        self.assertEqual(set(l.language_code for l in
-                             video.all_subtitle_languages()),
-                         set(['pt-br']))
+        assert_equal(
+            [l.language_code for l in self.video.all_subtitle_languages()],
+            ['pt-br'])

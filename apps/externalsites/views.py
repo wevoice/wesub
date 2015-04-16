@@ -133,7 +133,7 @@ def youtube_add_account(request):
     state['type'] = 'add-account'
     return redirect(google.request_token_url(
         google_callback_url(), 'offline', state,
-        ['https://www.googleapis.com/auth/youtube']))
+        [google.youtube_scope()]))
 
 def handle_add_account_callback(request, auth_info):
     try:
