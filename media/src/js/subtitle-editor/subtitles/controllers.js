@@ -295,20 +295,7 @@ var angular = angular || null;
                 }
                 evt.preventDefault();
                 evt.stopPropagation();
-            } else if (isAltPressed(evt) && ((evt.keyCode === 38) || (evt.keyCode === 40))) {
-		var nextSubtitle;
-		if (evt.keyCode === 38)
-		    nextSubtitle = subtitleList.prevSubtitle(subtitle);
-		else
-		    nextSubtitle = subtitleList.nextSubtitle(subtitle);
-		if (nextSubtitle) {
-                    finishEdit(true);
-                    $scope.currentEdit.start(nextSubtitle);
-                    $scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
-                    evt.preventDefault();
-                    evt.stopPropagation();
-		}
-	    } else if (evt.keyCode === 27) {
+            } else if (evt.keyCode === 27) {
                 // Escape cancels editing
                 finishEdit(false);
                 if ((subtitle.markdown == '') && (!subtitle.isSynced())) {
