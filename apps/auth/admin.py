@@ -23,23 +23,11 @@ from django.contrib.admin import widgets
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from models import CustomUser, Announcement
-
-
-class CustomUserCreationForm(UserCreationForm):
-    username = forms.RegexField(label=_("Username"), max_length=30, regex=r'^\w+$',
-        help_text = _("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."),
-        error_message = _("This value must contain only letters, numbers and underscores."))
-    password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
-    password2 = forms.CharField(label=_("Password confirmation"), widget=forms.PasswordInput)
-    email = forms.EmailField(label=_('Email'))
-
-    class Meta:
-        model = CustomUser
-        fields = ("username", "email")
 
 class UserChangeList(ChangeList):
     def get_ordering(self, request, queryset):
@@ -55,14 +43,46 @@ class UserChangeList(ChangeList):
         # Username is a unique key so the sort will be fast and deterministic.
         return ['username']
 
+class CustomUserForm(forms.ModelForm):
+    password1 = forms.CharField(label=_("Password"), required=False,
+                                widget=forms.PasswordInput)
+    password2 = forms.CharField(label=_("Password confirmation"),
+                                required=False, widget=forms.PasswordInput)
+
+    def clean(self):
+        data = super(CustomUserForm, self).clean()
+        if ((data.get('password1') or data.get('password2')) and
+            data.get('password1') != data.get('password2')):
+            raise ValidationError("Passwords don't match")
+        return data
+
+    def save(self, commit=True):
+        user = super(CustomUserForm, self).save(commit=False)
+        if self.cleaned_data.get('password1'):
+            user.set_password(self.cleaned_data.get('password1'))
+        if commit:
+            user.save()
+        return user
+
+
+    class Meta:
+        model = CustomUser
+        fields = [
+            'username', 'password1', 'password2', 'first_name', 'last_name',
+            'email', 'is_active', 'is_staff', 'is_superuser', 'groups',
+            'user_permissions',
+            'last_login', 'date_joined', 'is_partner', 'created_by',
+        ]
+
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff',
                     'is_superuser', 'last_ip', 'partner')
     search_fields = ('username', 'first_name', 'last_name', 'email', 'id')
     raw_id_fields = ('created_by',)
+    form = CustomUserForm
 
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
+        (None, {'fields': ('username', 'password1', 'password2')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
@@ -71,20 +91,6 @@ class CustomUserAdmin(admin.ModelAdmin):
     )
 
     actions = ['remove_staff_access']
-
-    def get_form(self, request, obj=None, **kwargs):
-        """
-        Use special form during user creation
-        """
-        defaults = {}
-        if obj is None:
-            defaults.update({
-                'form': CustomUserCreationForm,
-                'fields': admin.util.flatten_fieldsets(self.add_fieldsets),
-            })
-        defaults.update(kwargs)
-        return super(CustomUserAdmin, self).get_form(request, obj, **defaults)
-
 
     def get_changelist(self, request, **kwargs):
         return UserChangeList
