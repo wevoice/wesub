@@ -554,6 +554,9 @@ var angular = angular || null;
 	    var isDel = function(key) {
 		return ((key === 46) || (key === 8));
 	    };
+	    var isAltPressed = function(evt) {
+		return (evt.altKey || evt.metaKey);
+	    };
             $scope.minutesIdle = 0;
             $scope.$root.$emit("user-action");
             if (evt.keyCode == 9 && !evt.shiftKey) {
@@ -567,17 +570,17 @@ var angular = angular || null;
             } else if (evt.keyCode === 190 && evt.shiftKey && evt.ctrlKey) {
                 // Control+Shift+Period, go forward 4 seconds
                 VideoPlayer.seek(VideoPlayer.currentTime() + 4000);
-            } else if (evt.keyCode === 73 && evt.altKey && evt.shiftKey) {
+            } else if (evt.keyCode === 73 && isAltPressed(evt) && evt.shiftKey) {
                 // Alt+Shift+i, insert subtitle below
 		if($scope.currentEdit.storedSubtitle())
 		    $scope.workingSubtitles.subtitleList.insertSubtitleBefore(
 			$scope.workingSubtitles.subtitleList.nextSubtitle($scope.currentEdit.storedSubtitle()));
-            } else if (evt.keyCode === 73 && evt.altKey) {
+            } else if (evt.keyCode === 73 && isAltPressed(evt)) {
                 // Alt+i, insert subtitle above
 		if($scope.currentEdit.storedSubtitle())
 		    $scope.workingSubtitles.subtitleList.insertSubtitleBefore(
 			$scope.currentEdit.storedSubtitle());
-            } else if (isDel(evt.keyCode) && evt.altKey) {
+            } else if (isDel(evt.keyCode) && isAltPressed(evt)) {
                 // Alt+del, remove current subtitle
 		if($scope.currentEdit.storedSubtitle())
 		    $scope.workingSubtitles.subtitleList.removeSubtitle($scope.currentEdit.storedSubtitle());
