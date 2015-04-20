@@ -84,7 +84,7 @@ from utils.rpc import RpcRouter
 from utils.text import fmt
 from utils.translation import get_user_languages_from_request
 
-from teams.permissions import can_edit_video, can_add_version, can_rollback_language
+from teams.permissions import can_edit_video, can_add_version, can_rollback_language, can_resync
 from . import video_size
 
 rpc_router = RpcRouter('videos:rpc_router', {
@@ -671,7 +671,7 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
     elif tab == 'comments':
         ContextClass = LanguagePageContextComments
     elif tab == 'sync-history':
-        if not request.user.is_staff:
+        if not permissions.can_user_resync(video, request.user):
             return redirect_to_login(request.build_absolute_uri())
         ContextClass = LanguagePageContextSyncHistory
     else:
