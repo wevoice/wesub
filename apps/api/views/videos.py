@@ -485,7 +485,8 @@ class VideoViewSet(AmaraPaginationMixin,
         else:
             qs = self.get_videos_for_team(query_params)
         if 'video_url' in query_params:
-            qs = qs.filter(videourl__url=query_params['video_url'])
+            vt = video_type_registrar.video_type_for_url(query_params['video_url'])
+            qs = qs.filter(videourl__url=vt.convert_to_video_url())
         return qs
 
     def get_videos_for_user(self):
