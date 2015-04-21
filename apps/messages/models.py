@@ -110,7 +110,13 @@ class Message(models.Model):
         content = []
 
         if self.content:
-            content.append(urlize(self.content).replace('\n', '<br />'))
+            try:
+                my_content_with_links = urlize(self.content)
+            except ValueError:
+                # urlize() throws a value error on some input.  In that case,
+                # just skip the call.  See #2162
+                my_content_with_links = self.content
+            content.append(my_content_with_links.replace('\n', '<br />'))
             content.append('\n')
 
         if self.object and hasattr(self.object, 'render_message'):
