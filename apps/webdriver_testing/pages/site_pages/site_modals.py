@@ -29,7 +29,7 @@ class SiteModals(UnisubsPage):
         """
         self.select_option_by_text(self._LANGUAGE, language)
         if audio:
-            self.click_by_css(self._PRIMARY_AUDIO)
+            #self.click_by_css(self._PRIMARY_AUDIO)
             self.select_option_by_text(self._PRIMARY_AUDIO, audio)
         self.click_continue() 
 

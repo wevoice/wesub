@@ -252,6 +252,7 @@ from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from api.pagination import AmaraPaginationMixin
 from api.views.videos import VideoMetadataSerializer
@@ -601,6 +602,7 @@ class SubtitlesView(generics.CreateAPIView):
     renderer_classes = views.APIView.renderer_classes + [
         DFXPRenderer, SBVRenderer, SSARenderer, SRTRenderer, VTTRenderer
     ]
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_video(self):
         if not hasattr(self, '_video'):

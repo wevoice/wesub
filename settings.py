@@ -135,6 +135,7 @@ MIDDLEWARE_CLASSES = (
     'middleware.P3PHeaderMiddleware',
     'middleware.UserUUIDMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'api.middleware.CORSMiddleware',
 )
 
 ROOT_URLCONF = 'urls'

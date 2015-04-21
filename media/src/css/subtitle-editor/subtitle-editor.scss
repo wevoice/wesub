@@ -1390,6 +1390,9 @@ div.workflow {
 
         &.error {
             color: $reddish-pink;
+	    a {
+                color: inherit;
+	    }
         }
     }
 

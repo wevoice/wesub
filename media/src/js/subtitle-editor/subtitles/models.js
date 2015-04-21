@@ -317,6 +317,15 @@ var angular = angular || null;
         return false;
     }
 
+    SubtitleList.prototype.getSubtitleById = function(id) {
+        for(var i=0; i < this.length(); i++) {
+            if(this.subtitles[i].id == id) {
+                return this.subtitles[i];
+            }
+        }
+        return undefined;
+    }
+
     SubtitleList.prototype.needsAnySynced = function() {
         return this.syncedCount < this.length();
     }
@@ -325,6 +334,29 @@ var angular = angular || null;
         return (this.length() > 0 &&
                 !this.needsAnyTranscribed() &&
                 !this.needsAnySynced());
+    }
+
+    SubtitleList.prototype.firstInvalidTiming = function() {
+        for(var i=0; i < this.length(); i++) {
+            if((this.subtitles[i].startTime < 0) ||
+	       (this.subtitles[i].endTime < 0)) {
+                return this.subtitles[i];
+            }
+        }
+        for(var i=0; i < this.length(); i++) {
+            if(this.subtitles[i].startTime >= this.subtitles[i].endTime) {
+                return this.subtitles[i];
+            }
+        }
+	var startTimes = {};
+        for(var i=0; i < this.length(); i++) {
+            if(startTimes[this.subtitles[i].startTime]) {
+                return this.subtitles[i];
+            } else {
+		startTimes[this.subtitles[i].startTime] = true;
+	    }
+        }
+	return undefined;
     }
 
     SubtitleList.prototype.toXMLString = function() {

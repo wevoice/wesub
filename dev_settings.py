@@ -97,8 +97,8 @@ CACHE_TIMEOUT = 0
 
 COMPRESS_MEDIA = not DEBUG
 
-# show more log entries than by default
-LOGGING['root']['level'] = 'DEBUG'
+# Log more more things to the console
+LOGGING['root']['level'] = 'INFO'
 # disable sentry logging
 LOGGING['handlers']['sentry']['class'] = 'logging.NullHandler'
 

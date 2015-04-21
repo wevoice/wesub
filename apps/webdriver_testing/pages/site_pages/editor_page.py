@@ -43,7 +43,6 @@ class EditorPage(UnisubsPage):
     _EMBEDDED_VIDEO = "div#video"
     _VIDEO_SUBTITLE = 'div.subtitle-overlay div'
     _WORKING_LANGUAGE = 'div.work div.subtitles-language'
-    _ADD_SUBTITLE = 'button.insert-subtitle'
     _SYNC_HELP = 'div.sync-help'
     _INFO_TRAY = 'div.info-tray'
     _INFO_DETAILS = 'div.info-tray tr'
@@ -52,15 +51,18 @@ class EditorPage(UnisubsPage):
     _WORKING_METADATA_EXPANDER = 'div.working div.metadata a'
     _TOOLS_MENU = 'div.toolbox-inside a'
     _PARAGRAPH_MARKER = '.new-paragraph'
-    _REMOVE_SUBTITLE = '.remove-subtitle'
+    _REMOVE_SUBTITLE = '.remove'
+    _ADD_SUB_BELOW = '.insert-down'
+    _ADD_SUB_ABOVE = '.insert-top'
+    _TIMED_NOTE = '.note-time'
 
     #SUBTITLES
     _REFERENCE_LIST = 'div.reference ul.subtitle-list'
     _WORKING_LIST = 'ul#working-subtitle-set'
-    _SUBTITLE_ITEM = 'li'
+    _SUBTITLE_ITEM = 'li.sub'
     _SUB_TIME = 'span.timing'
     _SUB_TEXT = 'span.subtitle-text'
-
+    _SUB_TOOLS = '.sub-toolbox-inside a'
     #METADATA
     _SPEAKER_FIELD = 'textarea[placeholder="Enter Speaker Name"]' 
 
@@ -72,6 +74,8 @@ class EditorPage(UnisubsPage):
     _COLLAB_ENDORSE = 'button'
     _COLLAB_SENDBACK = 'div.actions button.send-back'
     _COLLAB_BUTTON = 'div.actions button'
+    _INVALID_TIME_WARNING = 'a.invalid-subtitle-link'
+
     # COLLAB PANEL
     _COLLAB_PANEL = 'div.workflow'
     _SEND_BACK = 'button.send-back'
@@ -89,9 +93,9 @@ class EditorPage(UnisubsPage):
         active_modal = self.wait_for_element_present(self._ACTIVE_MODAL)
         buttons = active_modal.find_elements_by_css_selector(self._MODAL_BUTTONS)
         if restore:
-            button[-1].click() 
+            buttons[-1].click() 
         else:
-            button[0].click()
+            buttons[0].click()
 
     def open_ed_with_base(self, video_id, lang, base_lang='en'):
         url = self._URL + '?base-language={2}'
@@ -248,6 +252,7 @@ class EditorPage(UnisubsPage):
 
     def click_working_sub_line(self, line):
         """Click in a subline of the working text. """
+        self.wait_for_element_present(self._WORKING_LIST)
         if line == 0:
             self.click_by_css(self._ADD_SUB_TO_END)
             position = 0
@@ -265,16 +270,50 @@ class EditorPage(UnisubsPage):
         subline.click()
         return sub_text, els[position]
 
-    def remove_active_subtitle(self, position):
+    def remove_active_subtitle(self, position, shortcut=False):
         """Click on a subtitle and delete it. """
 
         removed_text, el = self.click_working_sub_line(position)
         try:
+            menu = el.find_element_by_css_selector(self._SUB_TOOLS)
             rem = el.find_element_by_css_selector(self._REMOVE_SUBTITLE)
         except:
             self.record_error('remove button not found')
-        rem.click()
+        if shortcut:
+            el.send_keys(getattr(Keys, "ALT") + getattr(Keys, "DELETE"))
+        else:
+            self.hover_by_css(menu)
+            rem.click()
         return removed_text
+
+    def insert_sub_above(self, position, shortcut=False):
+        """Click on a subtitle and delete it. """
+
+        _, el = self.click_working_sub_line(position)
+        menu = el.find_element_by_css_selector(self._SUB_TOOLS)
+        button = el.find_element_by_css_selector(self._ADD_SUB_ABOVE)
+        if shortcut:
+            el.send_keys(getattr(Keys, "ALT") + getattr(Keys, "i"))
+        else:
+            self.browser.execute_script("document.getElementsByClassName('insert-top')[%s].click()" % str(position-1))
+
+    def insert_sub_below(self, position, shortcut=False):
+        """Click on a subtitle and delete it. """
+
+        _, el = self.click_working_sub_line(position)
+        menu = el.find_element_by_css_selector(self._SUB_TOOLS)
+        button = el.find_element_by_css_selector(self._ADD_SUB_BELOW)
+        if shortcut:
+            el.send_keys(getattr(Keys, "ALT") + getattr(Keys, "SHIFT"), getattr(Keys, "i"))
+        else:
+            self.browser.execute_script("document.getElementsByClassName('insert-down')[%s].click()" % str(position-1))
+
+    def insert_sub_note(self, position, note):
+        """add a note with subtitle start time """
+        self.browser.execute_script("document.getElementsByClassName('note-time')[%s].click()" % str(position-1))
+        self.type_by_css(self._NEW_NOTE, note)
+        self.click_by_css(self._SAVE_NOTE)
+        return self.current_notes()
 
     def hover_tools_menu(self):
         self.wait_for_element_visible(self._TOOLS_MENU)
@@ -293,6 +332,7 @@ class EditorPage(UnisubsPage):
                      'display': el.get_attribute("class"),
                  } 
             menu_list[menu_item] = item_properties          
+        self.logger.info(menu_list) 
         return menu_list
 
     def copy_timings(self):
@@ -542,3 +582,11 @@ class EditorPage(UnisubsPage):
 
     def sync_help_displayed(self):
         return self.is_element_visible(self._SYNC_HELP)
+
+    def invalid_times(self):
+        el = self.is_element_present(self._INVALID_TIME_WARNING)
+        try:
+            el.click()
+            return el.get_attribute("data-target")
+        except:
+            return None

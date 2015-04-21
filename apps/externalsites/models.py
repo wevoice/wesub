@@ -25,7 +25,6 @@ from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import query, Q
 from django.utils.translation import ugettext_lazy as _
-from gdata.client import RequestError
 import babelsubs
 # because of our insane circular imports we need to import haystack right here
 # or else things blow up
@@ -480,20 +479,8 @@ class YouTubeAccount(ExternalAccount):
         Subclasses must implement this method.
         """
         access_token = google.get_new_access_token(self.oauth_refresh_token)
-        try:
-            syncing.youtube.update_subtitles(video_url.videoid, access_token,
-                                             version)
-        except RequestError, e:
-            # If the exception was for a quota error, we want to try to resync
-            # later.  The documentation around these errors isn't great, hence
-            # the paranoid try.. except block here
-            try:
-                if 'too_many_recent_calls' in e.body:
-                    raise RetryableSyncingError(e, 'Youtube Quota Error')
-            except:
-                pass
-            # should re-raise the error so that the SyncHistory gets updated
-            raise
+        syncing.youtube.update_subtitles(video_url.videoid, access_token,
+                                         version)
 
     def do_delete_subtitles(self, video_url, language):
         access_token = google.get_new_access_token(self.oauth_refresh_token)
