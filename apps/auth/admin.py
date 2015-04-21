@@ -44,6 +44,12 @@ class UserChangeList(ChangeList):
         return ['username']
 
 class CustomUserForm(forms.ModelForm):
+    password = forms.CharField(
+        label=_("Raw Password"), required=False,
+        widget=forms.TextInput(attrs={
+            'readonly': True,
+            'style': 'width: 500px',
+        }))
     password1 = forms.CharField(label=_("Password"), required=False,
                                 widget=forms.PasswordInput)
     password2 = forms.CharField(label=_("Password confirmation"),
@@ -68,10 +74,10 @@ class CustomUserForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = [
-            'username', 'password1', 'password2', 'first_name', 'last_name',
-            'email', 'is_active', 'is_staff', 'is_superuser', 'groups',
-            'user_permissions',
-            'last_login', 'date_joined', 'is_partner', 'created_by',
+            'username', 'password', 'password1', 'password2', 'first_name',
+            'last_name', 'email', 'is_active', 'is_staff', 'is_superuser',
+            'groups', 'user_permissions', 'last_login', 'date_joined',
+            'is_partner', 'created_by',
         ]
 
 class CustomUserAdmin(admin.ModelAdmin):
@@ -82,7 +88,7 @@ class CustomUserAdmin(admin.ModelAdmin):
     form = CustomUserForm
 
     fieldsets = (
-        (None, {'fields': ('username', 'password1', 'password2')}),
+        (None, {'fields': ('username', 'password', 'password1', 'password2')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
