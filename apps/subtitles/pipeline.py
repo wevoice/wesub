@@ -544,10 +544,10 @@ def add_subtitles(video, language_code, subtitles,
                                  description, author, visibility,
                                  visibility_override, parents, None, committer,
                                  created, note, origin, metadata, action)
-    if action:
-        action.perform(author, video, version.subtitle_language, version)
     video.cache.invalidate()
     api_subtitles_edited.send(version)
+    if action:
+        action.perform(author, video, version.subtitle_language, version)
     return version
 
 def _calc_action_for_add_subtitles(video, language_code, author, complete,
