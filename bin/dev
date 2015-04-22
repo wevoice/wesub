@@ -119,7 +119,7 @@ class Bash(Command):
     """Run a bash script inside the app container."""
 
     def run_inner(self, args, options):
-        subprocess.call(["fig", "run", "--rm", "bash", "/bin/bash"])
+        subprocess.call(["docker-compose", "run", "--rm", "bash", "/bin/bash"])
 
 class Build(Command):
     """Build the app container."""
@@ -179,13 +179,13 @@ class RunServer(Command):
     """Run the django test server."""
 
     def run_inner(self, args, options):
-        subprocess.call(["fig", "up", "app"])
+        subprocess.call(["docker-compose", "up", "app"])
 
 class RunSSLServer(Command):
     """Run the django test server (HTTPS mode)."""
 
     def run_inner(self, args, options):
-        subprocess.call(["fig", "up", "sslapp"])
+        subprocess.call(["docker-compose", "up", "sslapp"])
 
 class DBReset(Command):
     """Reset the database."""
@@ -198,15 +198,15 @@ class DBReset(Command):
 class Start(Command):
     """Start background docker containers (db, search, worker, etc)."""
     def run_inner(self, args, options):
-        subprocess.call(['fig', 'up', '-d', 'db', 'queue', 'search', 'cache', 'worker'])
+        subprocess.call(['docker-compose', 'up', '-d', 'db', 'queue', 'search', 'cache', 'worker'])
 
 class Stop(Command):
     """Stop all docker containers."""
     def run_inner(self, args, options):
-        subprocess.call(['fig', 'stop'])
+        subprocess.call(['docker-compose', 'stop'])
 
 def run_manage(args):
-    subprocess.call(['fig', 'run', '--rm', 'app', 'python', 'manage.py'] + args)
+    subprocess.call(['docker-compose', 'run', '--rm', 'app', 'python', 'manage.py'] + args)
 
 def usage():
     print "Usage %s [command]" % progname()
