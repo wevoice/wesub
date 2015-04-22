@@ -31,7 +31,6 @@ from teams.permissions import (
     can_publish_edits_immediately, can_review, can_approve, can_add_version,
 )
 from teams.signals import (
-    api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
     api_language_new, api_language_edited, api_video_edited
 )
 from utils import send_templated_email
@@ -765,7 +764,6 @@ class Rpc(BaseRpc):
 
         if new_version:
             video_changed_tasks.delay(language.video.id, new_version.id)
-            api_subtitles_edited.send(new_version)
         else:
             video_changed_tasks.delay(language.video.id)
             api_video_edited.send(language.video)
@@ -1060,11 +1058,6 @@ class Rpc(BaseRpc):
                     task.complete()
 
             task.new_subtitle_version.subtitle_language.release_writelock()
-
-            if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
-                api_subtitles_approved.send(task.new_subtitle_version)
-            elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
-                api_subtitles_rejected.send(task.new_subtitle_version)
 
             video_changed_tasks.delay(task.team_video.video_id)
         else:

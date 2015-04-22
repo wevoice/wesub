@@ -19,6 +19,7 @@
 """externalsites.google -- Google API handling."""
 
 from collections import namedtuple
+from email.mime.multipart import MIMEMultipart, MIMEBase
 from lxml import etree
 import json
 import logging
@@ -53,7 +54,7 @@ OpenIDProfile = namedtuple('OpenIDProfile',
 logger = logging.getLogger('utils.youtube')
 
 def youtube_scope():
-    return "https://www.googleapis.com/auth/youtube"
+    return "https://www.googleapis.com/auth/youtube.force-ssl"
 
 def request_token_url(redirect_uri, access_type, state, extra_scopes=()):
     """Get the URL to for the request token
@@ -167,44 +168,79 @@ def revoke_auth_token(refresh_token):
     requests.get('https://accounts.google.com/o/oauth2/revoke',
                  params={'token': refresh_token})
 
-def _make_api_request(method, access_token, url, data=None, params=None,
-                      headers=None):
+def multipart_format(parts):
+    """Make a multipart message
+
+    Args:
+        parts: list of (content_type, data) tuples
+
+    Returns:
+        (headers, data) tuple
+    """
+    multi_message = MIMEMultipart('related')
+    for content_type, data in parts:
+        msg = MIMEBase(*content_type.split('/', 1))
+        msg.set_payload(data)
+        multi_message.attach(msg)
+
+    body_lines = []
+    in_headers = True
+    last_key = None
+    headers = {}
+    for line in multi_message.as_string().splitlines(True):
+        if in_headers:
+            if line == '\n':
+                in_headers = False
+            elif line.startswith(' ') and last_key:
+                headers[last_key] += line.rstrip()
+            else:
+                key, value = line[:-1].split(':')
+                headers[key] = value.strip()
+                last_key = key
+        else:
+            body_lines.append(line)
+    return headers, ''.join(body_lines)
+
+def _make_api_request(method, access_token, url, **kwargs):
     """Make a youtube API request
 
-    :param method: HTTP method to use
-    :param access_token: access token to use, or None for APIs that don't
-    need authentication
-    :param url: URL to use
-    :param data: data to send to the server
-    :param params: params to add to the URL
-    :param headers: headers to send to the server
+    Args:
+        method: HTTP method to use
+        access_token: access token to use, or None for APIs that don't need
+            authentication
+        **kwargs: args to send to requests.request()
     """
     if access_token is not None:
-        if headers is None:
-            headers = {}
-        headers['Authorization'] = 'Bearer %s' % access_token
+        if 'headers' not in kwargs:
+            kwargs['headers'] = {}
+        kwargs['headers']['Authorization'] = 'Bearer %s' % access_token
     else:
-        headers = None
-        if params is None:
-            params = {}
-        params['key'] = settings.YOUTUBE_API_KEY
-    response = requests.request(method, url, data=data, params=params,
-                                headers=headers)
-    if response.status_code != 200:
+        if 'params' not in kwargs:
+            kwargs['params'] = {}
+        kwargs['params']['key'] = settings.YOUTUBE_API_KEY
+    response = requests.request(method, url, **kwargs)
+    if method == 'delete':
+        expected_status_code = 204
+    else:
+        expected_status_code = 200
+    if response.status_code != expected_status_code:
         try:
             errors = response.json['error']['errors']
             message = ' '.join(e['reason'] for e in errors)
         except StandardError, e:
-            logger.error("%s parsing youtube response: %s" % (
-                e, response.content))
+            logger.error("%s parsing youtube response (%s): %s" % (
+                e, response.status_code, response.content))
             message = 'Unkown error'
         raise APIError(message)
     return response
 
-def _make_youtube_api_request(method, access_token, url_path, data=None,
-                              params=None, headers=None):
+def _make_youtube_api_request(method, access_token, url_path, **kwargs):
     url = 'https://www.googleapis.com/youtube/v3/' + url_path
-    return _make_api_request(method, access_token, url, data, params, headers)
+    return _make_api_request(method, access_token, url, **kwargs)
+
+def _make_youtube_upload_api_request(method, access_token, url_path, **kwargs):
+    url = 'https://www.googleapis.com/upload/youtube/v3/' + url_path
+    return _make_api_request(method, access_token, url, **kwargs)
 
 def channel_get(access_token, part, mine='true'):
     return _make_youtube_api_request('get', access_token, 'channels', params={
@@ -217,6 +253,80 @@ def video_get(access_token, video_id, part):
         'id': video_id,
         'part': ','.join(part),
     })
+
+def captions_list(access_token, video_id):
+    """Fetch info on all captions for a video
+
+    Returns:
+        List of (caption_id, language_code, name) tuples
+    """
+    response = _make_youtube_api_request(
+        'get', access_token, 'captions', params={
+            'videoId': video_id,
+            'part': 'id,snippet',
+        })
+    return [
+        (caption['id'], caption['snippet']['language'],
+         caption['snippet']['name'])
+        for caption in response.json['items']
+    ]
+
+def captions_download(access_token, caption_id, format='ttml'):
+    """Download a caption file."""
+    response = _make_youtube_api_request('get', access_token,
+                                         'captions/{}'.format(caption_id),
+                                         params={'tfmt': format})
+    return response.content
+
+def captions_insert(access_token, video_id, language_code,
+                    sub_content_type, sub_data):
+    """Download a caption file."""
+    caption_data = json.dumps({
+        'snippet': {
+            'videoId': video_id,
+            'language': language_code,
+            'name': '',
+        }
+    })
+
+    headers, data = multipart_format([
+        ('application/json', caption_data),
+        (sub_content_type, sub_data)
+    ])
+
+    params = {
+        'uploadType': 'multipart',
+        'part': 'snippet',
+    }
+    response = _make_youtube_upload_api_request(
+        'post', access_token, 'captions', params=params,
+        headers=headers, data=data)
+    return response.content
+
+def captions_update(access_token, caption_id, sub_content_type, sub_data):
+    """Download a caption file."""
+    caption_data = json.dumps({
+        'id': caption_id,
+    })
+
+    headers, data = multipart_format([
+        ('application/json', caption_data),
+        (sub_content_type, sub_data)
+    ])
+
+    params = {
+        'uploadType': 'multipart',
+        'part': 'id',
+    }
+    response = _make_youtube_upload_api_request(
+        'put', access_token, 'captions', params=params,
+        headers=headers, data=data)
+    return response.content
+
+def captions_delete(access_token, caption_id):
+    response = _make_youtube_api_request(
+        'delete', access_token, 'captions', params={'id': caption_id})
+    return response.content
 
 def video_put(access_token, video_id, **data):
     part = '.'.join(data.keys())
@@ -297,54 +407,3 @@ def update_video_description(video_id, access_token, description):
     # send back the snippet with the new description
     snippet['description'] = description
     video_put(access_token, video_id, snippet=snippet)
-
-def get_subtitled_languages(video_id):
-    """Lookup the languages that have subtitles saved on youtube
-
-    :returns: list of bcp-47 language codes (use unilangs to convert them to
-    our internal codes)
-    """
-    response = requests.get('http://www.youtube.com/api/timedtext',
-                            params={'type': 'list', 'v': video_id})
-    if response.status_code != 200:
-        logger.warn("Bad status code in get_subtitled_languages(): %s (%s)" %
-                    (response.status_code, response.content))
-        return []
-    try:
-        tree = etree.fromstring(response.content)
-    except StandardError, e:
-        logger.warn("Error parsing xml response in "
-                    "get_subtitled_languages() (%s)" % response.content)
-        return []
-
-    langs = []
-    for lang in tree.xpath('track'):
-        lang_code = lang.get('lang_code')
-        if lang_code:
-            langs.append(lang_code)
-
-    return langs
-
-def get_subtitles(video_id, language_code):
-    """Get subtitle data from youtube
-
-    :param video_id: youtube video id
-    :param language_code: bcp-47 language code
-
-    :returns: SRT text for the subtitles
-    """
-    response = requests.get('http://www.youtube.com/api/timedtext', params={
-        'v': video_id,
-        'lang': language_code,
-        'fmt': 'srt',
-    })
-    if response.status_code != 200:
-        logger.warn("Bad status code in get_subtitles(): %s (%s)" % (
-                    response.status_code, response.content))
-        return []
-    try:
-        return load_subtitles(language_code, response.content, 'srt')
-    except StandardError, e:
-        logger.warn("Error parsing subtitle data in get_subtitles() (%s)" % (
-                    response.content))
-        return None

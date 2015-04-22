@@ -97,6 +97,8 @@ CACHE_TIMEOUT = 0
 
 COMPRESS_MEDIA = not DEBUG
 
+# Log more more things to the console
+LOGGING['root']['level'] = 'INFO'
 # disable sentry logging
 LOGGING['handlers']['sentry']['class'] = 'logging.NullHandler'
 

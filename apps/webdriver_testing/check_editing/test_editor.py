@@ -7,7 +7,7 @@ from django.core import management
 import time
 
 from datetime import datetime as dt
-
+from subtitles import pipeline
 from videos.models import Video
 from utils.factories import *
 from webdriver_testing.webdriver_base import WebdriverTestCase
@@ -253,3 +253,36 @@ class TestCaseEditing(WebdriverTestCase):
         self.assertEqual(expected_text, sub_text)
         self.assertEqual(sub_text, self.editor_pg.sub_overlayed_text())
         self.assertEqual(expected_text, sub_text)
+
+    def test_non_incremental_times(self):
+        subs = SubtitleSetFactory(num_subs=5)
+        subs.append_subtitle(3500, 4500, "Sub with the same start and end time" )
+        subs.append_subtitle(4000, 4500, "Sub with the same start and end time" )
+        subs.append_subtitle(4000, 5900, "Subs line at 5 seconds" )
+        self.logger.info(subs.subtitle_items())
+        video = VideoFactory()
+        pipeline.add_subtitles(video, 'en', subs)
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.click_working_sub_line(1)
+        self.assertEqual('6', self.editor_pg.invalid_times())
+
+    def test_equal_times(self):
+        subs = SubtitleSetFactory(num_subs=2)
+        subs.append_subtitle(3500, 4500, "Subtitle"  )
+        subs.append_subtitle(3500, 4500, "Subtitle with same start end times" )
+        self.logger.info(subs.subtitle_items())
+        video = VideoFactory()
+        pipeline.add_subtitles(video, 'en', subs)
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.click_working_sub_line(1)
+        self.assertEqual('3', self.editor_pg.invalid_times())
+
+    def test_endtime_greater(self):
+        subs = SubtitleSetFactory(num_subs=2)
+        subs.append_subtitle(5500, 4500, "Subtitle"  )
+        self.logger.info(subs.subtitle_items())
+        video = VideoFactory()
+        pipeline.add_subtitles(video, 'en', subs)
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.click_working_sub_line(1)
+        self.assertEqual(u'2', self.editor_pg.invalid_times())

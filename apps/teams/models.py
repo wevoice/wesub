@@ -52,6 +52,7 @@ from teams.permissions_const import (
 )
 from teams import tasks
 from teams import workflows
+from teams.signals import api_subtitles_approved, api_subtitles_rejected
 from utils import DEFAULT_PROTOCOL
 from utils import translation
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
@@ -2408,6 +2409,11 @@ class Task(models.Model):
         # necessary we can "send back" to them later.
         if self.assignee:
             sv.set_approved_by(self.assignee)
+
+        if approval:
+            api_subtitles_approved.send(sv)
+        else:
+            api_subtitles_rejected.send(sv)
 
         return task
 
