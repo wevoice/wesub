@@ -38,6 +38,6 @@ def can_user_resync(video, user):
     team_video = video.get_team_video()
     if team_video:
         # for team videos, check if the user can resync the video
-        return teams_permissions.can_resync(team_video, user)
+        return teams_permissions.can_resync(team_video.team, user)
     else:
         return video.user == user
