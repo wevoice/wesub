@@ -74,13 +74,13 @@ class SubFetchTestCase(TestCase):
         en_subs.append_subtitle(100, 200, 'text')
         fr_subs = storage.SubtitleSet('fr')
         fr_subs.append_subtitle(100, 200, 'french text')
-        def captions_download(access_token, video_id, language_code):
-            if language_code == 'en':
+        def captions_download(access_token, caption_id):
+            if caption_id == 'caption-1':
                 return en_subs.to_xml()
-            elif language_code == 'fr':
+            elif caption_id == 'caption-2':
                 return fr_subs.to_xml()
             else:
-                raise ValueError(language_code)
+                raise ValueError(caption_id)
         self.mock_captions_download.side_effect = captions_download
 
         fetch_subs(self.video_url)
@@ -91,8 +91,8 @@ class SubFetchTestCase(TestCase):
         assert_equal(self.mock_captions_list.call_args,
                      mock.call('test-access-token', self.video_id))
         assert_equal(self.mock_captions_download.call_args_list, [
-            mock.call('test-access-token', self.video_id, 'en'),
-            mock.call('test-access-token', self.video_id, 'fr'),
+            mock.call('test-access-token', 'caption-1'),
+            mock.call('test-access-token', 'caption-2')
         ])
         # check that we created the correct languages
         assert_equal(set(l.language_code for l in
@@ -141,7 +141,7 @@ class SubFetchTestCase(TestCase):
         fetch_subs(self.video_url)
         assert_equal(
             self.mock_captions_download.call_args,
-            mock.call('test-access-token', self.video_url.videoid, 'pt-BR'))
+            mock.call('test-access-token', 'caption-1'))
 
         assert_equal(
             [l.language_code for l in self.video.all_subtitle_languages()],
