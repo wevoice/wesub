@@ -53,8 +53,11 @@ OpenIDProfile = namedtuple('OpenIDProfile',
 
 logger = logging.getLogger('utils.youtube')
 
-def youtube_scope():
-    return "https://www.googleapis.com/auth/youtube.force-ssl"
+def youtube_scopes():
+    return [
+        "https://www.googleapis.com/auth/youtube",
+        "https://www.googleapis.com/auth/youtube.force-ssl",
+    ]
 
 def request_token_url(redirect_uri, access_type, state, extra_scopes=()):
     """Get the URL to for the request token
