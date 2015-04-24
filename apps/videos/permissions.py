@@ -39,5 +39,6 @@ def can_user_resync(video, user):
     if team_video:
         # for team videos, check if the user can resync the video
         return teams_permissions.can_resync(team_video.team, user)
-    else:
-        return video.user == user
+    # For now this is limited to team videos
+    # as we'd need to know if a user actually own the youtube channel
+    return False
