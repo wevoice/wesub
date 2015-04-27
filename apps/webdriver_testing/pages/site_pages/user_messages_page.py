@@ -14,12 +14,14 @@ class UserMessagesPage(UnisubsPage):
     _MESSAGE_FROM = 'li.message p:nth-child(2) a'
     _NO_MESSAGES = 'p.empty'
 
+    #SENT MESSAGES
+
+
     def open_messages(self):
-        self.open_page(self._URL)
+        self.open_page(self._url)
 
     def open_sent_messages(self):
         self.open_page(self._URL+'sent/')
-
 
     def message_text(self):
         return self.get_text_by_css(self._MESSAGE)

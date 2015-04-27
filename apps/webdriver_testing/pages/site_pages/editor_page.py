@@ -74,7 +74,7 @@ class EditorPage(UnisubsPage):
     _COLLAB_ENDORSE = 'button'
     _COLLAB_SENDBACK = 'div.actions button.send-back'
     _COLLAB_BUTTON = 'div.actions button'
-    _INVALID_TIME_WARNING = 'a.invalid-subtitle-link'
+    _INVALID_SUB_WARNING = 'a.invalid-subtitle-link'
 
     # COLLAB PANEL
     _COLLAB_PANEL = 'div.workflow'
@@ -583,8 +583,8 @@ class EditorPage(UnisubsPage):
     def sync_help_displayed(self):
         return self.is_element_visible(self._SYNC_HELP)
 
-    def invalid_times(self):
-        el = self.is_element_present(self._INVALID_TIME_WARNING)
+    def invalid_subtitle(self):
+        el = self.is_element_present(self._INVALID_SUB_WARNING)
         try:
             el.click()
             return el.get_attribute("data-target")

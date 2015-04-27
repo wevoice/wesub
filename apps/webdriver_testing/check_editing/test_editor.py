@@ -264,7 +264,7 @@ class TestCaseEditing(WebdriverTestCase):
         pipeline.add_subtitles(video, 'en', subs)
         self.editor_pg.open_editor_page(video.video_id, 'en')
         self.editor_pg.click_working_sub_line(1)
-        self.assertEqual('6', self.editor_pg.invalid_times())
+        self.assertEqual('6', self.editor_pg.invalid_subtitle())
 
     def test_equal_times(self):
         subs = SubtitleSetFactory(num_subs=2)
@@ -275,7 +275,7 @@ class TestCaseEditing(WebdriverTestCase):
         pipeline.add_subtitles(video, 'en', subs)
         self.editor_pg.open_editor_page(video.video_id, 'en')
         self.editor_pg.click_working_sub_line(1)
-        self.assertEqual('3', self.editor_pg.invalid_times())
+        self.assertEqual('3', self.editor_pg.invalid_subtitle())
 
     def test_endtime_greater(self):
         subs = SubtitleSetFactory(num_subs=2)
@@ -285,4 +285,15 @@ class TestCaseEditing(WebdriverTestCase):
         pipeline.add_subtitles(video, 'en', subs)
         self.editor_pg.open_editor_page(video.video_id, 'en')
         self.editor_pg.click_working_sub_line(1)
-        self.assertEqual(u'2', self.editor_pg.invalid_times())
+        self.assertEqual(u'2', self.editor_pg.invalid_subtitle())
+
+    def test_blank_line_warnings(self):
+        """Amara warns when subtitle sets have blank lines """
+        video = VideoFactory()
+        subs = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
+                                            'blank_lines.srt')
+        video = self.data_utils.create_video()
+        self.video_pg.open_video_page(video.video_id)
+        self.video_pg.upload_subtitles('English', subs)
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.assertEqual(u'2', self.editor_pg.invalid_subtitle())

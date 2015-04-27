@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+import unittest
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages import video_page
@@ -13,7 +13,7 @@ import sys
 import time
 
 
-#@unittest.skip('slow')
+@unittest.skip('slow')
 class TestCaseTranscribing(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.
         

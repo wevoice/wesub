@@ -24,7 +24,7 @@ class TestCaseVideos(APILiveServerTestCase, WebdriverTestCase):
         super(TestCaseVideos, cls).setUpClass()
         management.call_command('flush', interactive=False)
         cls.user = UserFactory()
-        cls.client = APIClient
+        cls.client = APIClient(enforce_csrf_checks=True)
         for x in range(5):
             VideoFactory()
 
@@ -43,11 +43,11 @@ class TestCaseVideos(APILiveServerTestCase, WebdriverTestCase):
         return r
 
     def test_not_logged_in(self):
-        """non-authed users can't access"""
-        expected_error = {u'detail':
-                          u'Authentication credentials were not provided.'}
+        """non-authed users get public video information"""
         response = self.client.get('/api/videos/')
-        self.assertEqual(expected_error, response.data)
+        response.render()
+        r = (json.loads(response.content))
+        self.assertEqual(5, r['meta']['total_count'])
 
     def test_get_videos(self):
         """get all videos"""

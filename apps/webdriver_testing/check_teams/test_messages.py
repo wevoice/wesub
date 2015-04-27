@@ -3,6 +3,7 @@ from django.core import mail
 import time
 from django.core import management
 from teams import tasks
+from messages import tasks as message_tasks
 from teams.models import TeamMember
 from teams.models import Team
 
@@ -12,6 +13,7 @@ from webdriver_testing.pages.site_pages.teams import messages_tab
 from webdriver_testing.pages.site_pages.teams import members_tab
 from webdriver_testing.pages.site_pages import user_messages_page
 from webdriver_testing.pages.site_pages import new_message_page
+from webdriver_testing.pages.site_pages import site_modals
 from webdriver_testing.data_factories import *
 from webdriver_testing import data_helpers
 
@@ -195,6 +197,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
         cls.a_team_pg = ATeamPage(cls)
         cls.members_tab = members_tab.MembersTab(cls)
         cls.messages_tab = messages_tab.MessagesTab(cls)
+        cls.modal = site_modals.SiteModals(cls)
         cls.user_message_pg = user_messages_page.UserMessagesPage(cls)
         cls.non_member = UserFactory()
         cls.admin = UserFactory()
@@ -255,15 +258,22 @@ class TestCaseTeamMessages(WebdriverTestCase):
 
 
     def test_message_new_user(self):
+        team = TeamFactory(admin=self.admin,
+                           manager=self.manager,
+                           member=self.member,
+                           )
+        self.members_tab.log_in(self.admin.username, 'password')
+        self.messages_tab.open_messages_tab(team.slug)
+        self.messages_tab.edit_messages(self._TEST_MESSAGES)
         """message sent when user joins the team."""
         joiner = UserFactory()
-        langs = ['en', 'cs', 'ru', 'ar']
-        for lc in langs:
-            UserLangFactory(user=joiner, language=lc)
+        langs = ['English', 'French']
         self.a_team_pg.log_in(joiner.username, 'password')
         mail.outbox = []
-        self.a_team_pg.open_team_page(self.team.slug)
+        self.a_team_pg.open_team_page(team.slug)
         self.a_team_pg.join()
+        self.modal.select_spoken_languages(langs)
+        #message_tasks.team_member_new.apply()
         msg = str(mail.outbox[-1].message())
         self.logger.info(msg)
         self.assertIn(self._TEST_MESSAGES["NEW_MEMBER"], 
