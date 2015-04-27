@@ -1,6 +1,12 @@
 {% load i18n %}
 <p class="error">
-  <span ng-show="!workflow.subtitleList.isComplete()">{% trans "Not all lines completed" %}</span>
+  <span ng-show="workflow.subtitleList.needsAnyTranscribed()">
+    <a class="invalid-subtitle-link" data-target="[[ workflow.subtitleList.needsAnyTranscribed() && workflow.subtitleList.needsAnyTranscribed().id ]]"
+       href="#"
+       ng-click="onSubtitleLinkClicked($event)">
+      {% trans "Subtitles can not be blank" %}
+    </a>
+  </span>
   <span ng-show="!workflow.subtitleList.isComplete() && workflow.subtitleList.firstInvalidTiming()"> - </span>
   <span ng-show="workflow.subtitleList.firstInvalidTiming()">
     <a class="invalid-subtitle-link" data-target="[[ workflow.subtitleList.firstInvalidTiming() && workflow.subtitleList.firstInvalidTiming().id ]]"
