@@ -148,7 +148,7 @@ class Bump(Command):
         os.chdir(unisubs_folder)
         commit_path = os.path.join(unisubs_root(), 'optional', repo_name)
         open(commit_path, 'w').write(commit_id + "\n")
-        os.chdir(unisubs_root())
+        us.chdir(unisubs_root())
         subprocess.call(['git', 'add', commit_path])
 
 class Manage(Command):
@@ -175,18 +175,6 @@ class JSTest(Command):
                          '--volume=/home/ben/unisubs:/opt/unisubs',
                          'amara/jstest'])
 
-class RunServer(Command):
-    """Run the django test server."""
-
-    def run_inner(self, args, options):
-        subprocess.call(["docker-compose", "up", "app"])
-
-class RunSSLServer(Command):
-    """Run the django test server (HTTPS mode)."""
-
-    def run_inner(self, args, options):
-        subprocess.call(["docker-compose", "up", "sslapp"])
-
 class DBReset(Command):
     """Reset the database."""
 
@@ -195,15 +183,19 @@ class DBReset(Command):
         run_manage(['syncdb', '--all', '--noinput'])
         run_manage(['migrate', '--fake'])
 
-class Start(Command):
-    """Start background docker containers (db, search, worker, etc)."""
-    def run_inner(self, args, options):
-        subprocess.call(['docker-compose', 'up', '-d', 'db', 'queue', 'search', 'cache', 'worker'])
+class Up(Command):
+    """Start docker containers."""
+    options = [
+        optparse.make_option("-S", "--ssl", action="store_true", dest="ssl"),
+    ]
 
-class Stop(Command):
-    """Stop all docker containers."""
     def run_inner(self, args, options):
-        subprocess.call(['docker-compose', 'stop'])
+        containers = ['db', 'queue', 'search', 'cache', 'worker']
+        if options.ssl:
+            containers.append('sslapp')
+        else:
+            containers.append('app')
+        subprocess.call(['docker-compose', 'up'] + containers)
 
 def run_manage(args):
     subprocess.call(['docker-compose', 'run', '--rm', 'app', 'python', 'manage.py'] + args)

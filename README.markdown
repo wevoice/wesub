@@ -20,21 +20,17 @@ Amara uses [Docker](http://docker.io).  For ease of development, we use the dock
 
 3. Build the Amara docker image:
 
-        ./bin/dev build
+        bin/dev build
 
-4. Start Amara Services:
+4. Start Amara Containers:
 
-        docker-compose up -d db worker cache search queue
+        bin/dev up
 
 5. Configure Database:
 
-        ./bin/dev dbreset
+        bin/dev dbreset
 
-6. Start Amara:
-
-        docker-compose up app
-
-7. Add `unisubs.example.com` to your hosts file, pointing at `127.0.0.1`.  This
+6. Add `unisubs.example.com` to your hosts file, pointing at `127.0.0.1`.  This
    is necessary for Twitter and Facebook oauth to work correctly.
 
    You can access the site at <http://unisubs.example.com:8000>.
@@ -46,7 +42,7 @@ Testing
 
 To run the test suite:
 
-        ./bin/test.sh
+        bin/test.sh
 
 
 Dev Notes
@@ -54,7 +50,7 @@ Dev Notes
 
 To run a single `manage.py` command:
 
-        docker-compose run --rm app python manage.py <command>
+        bin/dev manage <command>
 
 To see running services:
 
