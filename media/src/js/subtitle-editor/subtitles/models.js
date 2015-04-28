@@ -439,6 +439,33 @@ var angular = angular || null;
 	return this.parser.startOfParagraph(subtitle.node);
     }
 
+    function computeTimingsForInsertion(firstStart, firstEnd, secondStart, secondEnd) {
+	var newSubtitleDuration = 3000;
+	var minSubtitleDuration = 1000;
+	var availableTime = secondEnd - firstStart;
+	if (secondStart - firstEnd > newSubtitleDuration) {
+	    var middle = firstStart + availableTime / 2;
+	    var newEnd = Math.min(middle + newSubtitleDuration / 2, secondStart);
+	    var newStart = newEnd - newSubtitleDuration;
+	    return [firstStart, firstEnd,
+		    newStart, newEnd,
+		    secondStart, secondEnd];
+	} else if (secondStart - firstStart > 2 * minSubtitleDuration) {
+	    var newEnd = secondStart;
+	    var newStart = Math.max(newEnd - newSubtitleDuration, firstStart + minSubtitleDuration);
+	    if (newStart < firstEnd)
+		firstEnd = newStart;
+	    return [firstStart, firstEnd,
+		    newStart, newEnd,
+		    secondStart, secondEnd];
+	} else {
+	    newDuration = availableTime / 3;
+	    return [firstStart, firstStart + newDuration,
+		    firstStart + newDuration, firstStart + 2*newDuration,
+		    firstStart + 2*newDuration, secondEnd];
+	}
+    }
+
     SubtitleList.prototype.insertSubtitleBefore = function(otherSubtitle) {
         if(otherSubtitle !== null) {
             var pos = this.getIndex(otherSubtitle);
@@ -458,14 +485,19 @@ var angular = angular || null;
             if(pos > 0) {
                 // Inserting a subtitle between two others.  Make it so each
                 // subtitle takes up 1/3 of the time available
-                var firstSubtitle = this.prevSubtitle(otherSubtitle);
+		var firstSubtitle = this.prevSubtitle(otherSubtitle);
+		var newTimings = computeTimingsForInsertion(
+		    firstSubtitle.startTime,
+		    firstSubtitle.endTime,
+		    otherSubtitle.startTime,
+		    otherSubtitle.endTime);
                 var totalTime = otherSubtitle.endTime - firstSubtitle.startTime;
                 var durationSplit = Math.floor(totalTime / 3);
-                var startTime = firstSubtitle.startTime + durationSplit;
-                var endTime = startTime + durationSplit;
-                this._updateSubtitleTime(firstSubtitle, firstSubtitle.startTime,
-                        startTime);
-                this._updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
+                var startTime = newTimings[2];
+                var endTime = newTimings[3];
+                this._updateSubtitleTime(firstSubtitle, newTimings[0],
+                        newTimings[1]);
+                this._updateSubtitleTime(otherSubtitle, newTimings[4], newTimings[5]);
             } else {
                 // Inserting a subtitle as the start of the list.  position the
                 // subtitle to start at time=0 and take up half the space
