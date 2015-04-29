@@ -7,8 +7,7 @@
       {% trans "Subtitles can not be blank" %}
     </a>
   </span>
-  <span ng-show="!workflow.subtitleList.isComplete() && workflow.subtitleList.firstInvalidTiming()"> - </span>
-  <span ng-show="workflow.subtitleList.firstInvalidTiming()">
+  <span ng-show="!workflow.subtitleList.needsAnyTranscribed() && workflow.subtitleList.firstInvalidTiming()">
     <a class="invalid-subtitle-link" data-target="[[ workflow.subtitleList.firstInvalidTiming() && workflow.subtitleList.firstInvalidTiming().id ]]"
        href="#"
        ng-click="onSubtitleLinkClicked($event)">
