@@ -21,10 +21,10 @@
               {% if sync_info.version %}
                 <td> <a href="{{ sync_info.version.get_absolute_url }}">{{ sync_info.version.version_number }}</a></td>
               {% else %}
-                <td>{% trans "no sync history" %}</td>
+                <td>{% trans "None" %}</td>
               {% endif %}
 	    {% else %}
-	      <td>{% trans "syncing not configured" %}</td>
+	      <td>{% trans "Syncing not configured" %}</td>
             {% endif %}
             <td class="last">
 	        {% if sync_info.syncable %}
