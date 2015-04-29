@@ -497,7 +497,7 @@ var angular = angular || null;
                 var endTime = newTimings[3];
                 this._updateSubtitleTime(firstSubtitle, newTimings[0],
                         newTimings[1]);
-                this._updateSubtitleTime(otherSubtitle, newTimings[4], newTimings[5]);
+                this.updateSubtitleTime(otherSubtitle, newTimings[4], newTimings[5]);
             } else {
                 // Inserting a subtitle as the start of the list.  position the
                 // subtitle to start at time=0 and take up half the space
