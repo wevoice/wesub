@@ -57,11 +57,7 @@ def team_settings_view(view_func):
             messages.error(request,
                            _(u'You do not have permission to edit this team.'))
             return HttpResponseRedirect(team.get_absolute_url())
-        if team.is_old_style():
-            old_view_func = getattr(old_views, view_func.__name__)
-            return old_view_func(request, team, *args, **kwargs)
-        else:
-            return view_func(request, team, *args, **kwargs)
+        return view_func(request, team, *args, **kwargs)
     return login_required(wrapper)
 
 @team_view
@@ -86,6 +82,9 @@ def welcome(request, team):
 
 @team_settings_view
 def settings_basic(request, team):
+    if team.is_old_style():
+        return old_views.settings_basic(request, team)
+
     if permissions.can_rename_team(team, request.user):
         FormClass = forms.RenameableSettingsForm
     else:
@@ -118,6 +117,9 @@ def settings_basic(request, team):
 
 @team_settings_view
 def settings_messages(request, team):
+    if team.is_old_style():
+        return old_views.settings_messages(request, team)
+
     initial = team.settings.all_messages()
     if request.POST:
         form = forms.GuidelinesMessagesForm(request.POST, initial=initial)
@@ -137,3 +139,6 @@ def settings_messages(request, team):
             'team': team, 'form': form,
     })
 
+@team_settings_view
+def settings_workflows(request, team):
+    return team.new_workflow.workflow_settings_view(request, team)

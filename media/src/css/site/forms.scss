@@ -19,13 +19,13 @@ legend {
     font-weight: $font-weight-bold;
 }
 
-input, textarea {
+input, textarea, select {
     @extend %body-font;
     font-size: $large-font-size;
     box-sizing: border-box;
     width: 100%;
     border: 1px solid $light-gray;
-    padding: 8px 4px;
+    padding: 4px;
     margin: 0;
 }
 

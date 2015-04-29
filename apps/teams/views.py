@@ -204,8 +204,8 @@ def create(request):
                     <li><a href="%(lang)s">Edit language preferences</a></li>
                     <li><a href="%(custom)s">Customize instructions to caption makers and translators</a></li>
                 </ul>"""),
-                edit=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
-                activate=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
+                edit=reverse("teams:settings_workflows", kwargs={"slug": team.slug}),
+                activate=reverse("teams:settings_workflows", kwargs={"slug": team.slug}),
                 create=reverse("teams:settings_projects", kwargs={"slug": team.slug}),
                 lang=reverse("teams:settings_languages", kwargs={"slug": team.slug}),
                 custom=reverse("teams:settings_messages", kwargs={"slug": team.slug}),
@@ -283,12 +283,8 @@ def settings_messages(request, team):
 
     return { 'team': team, 'form': form, }
 
-@settings_page
-def settings_permissions(request, team):
-    return team.new_workflow.workflow_settings_view(request, team)
-
-@render_to('teams/settings-permissions.html')
-def old_team_settings_permissions(request, team):
+@render_to('teams/settings-workflows.html')
+def old_team_settings_workflows(request, team):
     workflow = Workflow.get_for_target(team.id, 'team')
     moderated = team.moderates_videos()
 

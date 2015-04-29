@@ -10,8 +10,8 @@
         <a href="{% url "teams:settings_messages" slug=team.slug %}">{% trans "Messages" %}</a>
     </li>
 
-    <li {% if current_sub == "permissions" %}class="current"{% endif %}>
-        <a href="{% url "teams:settings_permissions" slug=team.slug %}">{% trans "Workflows" %}</a>
+    <li {% if current_sub == "workflows" %}class="current"{% endif %}>
+        <a href="{% url "teams:settings_workflows" slug=team.slug %}">{% trans "Workflows" %}</a>
     </li>
 
     {% for page in team.new_workflow.extra_settings_pages %}
