@@ -447,6 +447,10 @@ var angular = angular || null;
 	    var middle = firstStart + availableTime / 2;
 	    var newEnd = Math.min(middle + newSubtitleDuration / 2, secondStart);
 	    var newStart = newEnd - newSubtitleDuration;
+	    if (newStart < firstEnd) {
+		newStart = firstEnd;
+		newEnd = newStart + newSubtitleDuration;
+	    }
 	    return [firstStart, firstEnd,
 		    newStart, newEnd,
 		    secondStart, secondEnd];
