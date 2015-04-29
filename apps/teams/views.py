@@ -208,14 +208,13 @@ def create(request):
                 activate=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
                 create=reverse("teams:settings_projects", kwargs={"slug": team.slug}),
                 lang=reverse("teams:settings_languages", kwargs={"slug": team.slug}),
-                custom=reverse("teams:settings_guidelines", kwargs={"slug": team.slug}),
+                custom=reverse("teams:settings_messages", kwargs={"slug": team.slug}),
             ))
             return redirect(reverse("teams:settings_basic", kwargs={"slug":team.slug}))
     else:
         form = CreateTeamForm(request.user)
 
     return { 'form': form }
-
 
 # Settings
 def _delete_team(request, team):
@@ -266,7 +265,7 @@ def settings_basic(request, team):
 
 @render_to('teams/settings-messages.html')
 @settings_page
-def settings_guidelines(request, team):
+def settings_messages(request, team):
     initial = team.settings.all_messages()
     if request.POST:
         form = GuidelinesMessagesForm(request.POST, initial=initial)

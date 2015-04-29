@@ -491,17 +491,26 @@ class MessageTextField(forms.CharField):
             *args, **kwargs)
 
 class GuidelinesMessagesForm(forms.Form):
-    pagetext_welcome_heading = MessageTextField()
+    pagetext_welcome_heading = MessageTextField(
+        label=_('Welcome heading on your landing page for non-members'))
 
-    messages_invite = MessageTextField()
-    messages_manager = MessageTextField()
-    messages_admin = MessageTextField()
-    messages_application = MessageTextField()
-    messages_joins = MessageTextField()
+    messages_invite = MessageTextField(
+        label=_('When a member is invited to join the team'))
+    messages_manager = MessageTextField(
+        label=_('When a member applies to join the team'))
+    messages_admin = MessageTextField(
+        label=_('When a member is given the Manager role'))
+    messages_application = MessageTextField(
+        label=_('When a member is given the Admin role'))
+    messages_joins = MessageTextField(
+        label=_('When a member joins the team'))
 
-    guidelines_subtitle = MessageTextField()
-    guidelines_translate = MessageTextField()
-    guidelines_review = MessageTextField()
+    guidelines_subtitle = MessageTextField(
+        label=('When transcribing'))
+    guidelines_translate = MessageTextField(
+        label=('When translating'))
+    guidelines_review = MessageTextField(
+        label=('When reviewing'))
 
 class SettingsForm(forms.ModelForm):
     logo = forms.ImageField(

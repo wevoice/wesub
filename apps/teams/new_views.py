@@ -23,11 +23,13 @@ replace the old views.py module.
 """
 
 from __future__ import absolute_import
+import functools
 import logging
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext as _
 
 from . import views as old_views
@@ -45,6 +47,22 @@ def team_view(view_func):
             raise Http404
         return view_func(request, team, *args, **kwargs)
     return wrapper
+
+def team_settings_view(view_func):
+    """Decorator for the team settings pages."""
+    @functools.wraps(view_func)
+    def wrapper(request, slug, *args, **kwargs):
+        team = get_object_or_404(Team, slug=slug)
+        if not permissions.can_view_settings_tab(team, request.user):
+            messages.error(request,
+                           _(u'You do not have permission to edit this team.'))
+            return HttpResponseRedirect(team.get_absolute_url())
+        if team.is_old_style():
+            old_view_func = getattr(old_views, view_func.__name__)
+            return old_view_func(request, team, *args, **kwargs)
+        else:
+            return view_func(request, team, *args, **kwargs)
+    return login_required(wrapper)
 
 @team_view
 def dashboard(request, team):
@@ -66,11 +84,8 @@ def welcome(request, team):
         'videos': videos,
     })
 
-@team_view
+@team_settings_view
 def settings_basic(request, team):
-    if team.is_old_style():
-        return old_views.settings_basic(request, team)
-
     if permissions.can_rename_team(team, request.user):
         FormClass = forms.RenameableSettingsForm
     else:
@@ -100,3 +115,25 @@ def settings_basic(request, team):
     return render(request, "new-teams/settings.html", {
             'team': team, 'form': form,
     })
+
+@team_settings_view
+def settings_messages(request, team):
+    initial = team.settings.all_messages()
+    if request.POST:
+        form = forms.GuidelinesMessagesForm(request.POST, initial=initial)
+
+        if form.is_valid():
+            for key, val in form.cleaned_data.items():
+                setting, c = Setting.objects.get_or_create(team=team, key=Setting.KEY_IDS[key])
+                setting.data = val
+                setting.save()
+
+            messages.success(request, _(u'Guidelines and messages updated.'))
+            return HttpResponseRedirect(request.path)
+    else:
+        form = forms.GuidelinesMessagesForm(initial=initial)
+
+    return render(request, "new-teams/settings-messages.html", {
+            'team': team, 'form': form,
+    })
+
