@@ -18,7 +18,7 @@ class UserMessagesPage(UnisubsPage):
 
 
     def open_messages(self):
-        self.open_page(self._url)
+        self.open_page(self._URL)
 
     def open_sent_messages(self):
         self.open_page(self._URL+'sent/')
