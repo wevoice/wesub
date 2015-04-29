@@ -660,6 +660,7 @@ class LanguagePageContextSyncHistory(LanguagePageContext):
             synced_versions.append({
                 'video_url': video_url,
                 'version': version,
+                'syncable': get_sync_account(video, video_url),
             })
         self['synced_versions'] = synced_versions
 
