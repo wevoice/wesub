@@ -439,7 +439,7 @@ var angular = angular || null;
 	return this.parser.startOfParagraph(subtitle.node);
     }
 
-    function computeTimingsForInsertion(firstStart, firstEnd, secondStart, secondEnd) {
+    SubtitleList.prototype.computeTimingsForInsertion = function(firstStart, firstEnd, secondStart, secondEnd) {
 	var newSubtitleDuration = 3000;
 	var minSubtitleDuration = 1000;
 	var availableTime = secondEnd - firstStart;
@@ -483,18 +483,17 @@ var angular = angular || null;
             // If we are inserting between 2 synced subtitles, then we can set the
             // time
             if(pos > 0) {
-                // Inserting a subtitle between two others.  Make it so each
-                // subtitle takes up 1/3 of the time available
+                // Inserting a subtitle between two others.
 		var firstSubtitle = this.prevSubtitle(otherSubtitle);
-		var newTimings = computeTimingsForInsertion(
+		var newTimings = this.computeTimingsForInsertion(
 		    firstSubtitle.startTime,
 		    firstSubtitle.endTime,
 		    otherSubtitle.startTime,
 		    otherSubtitle.endTime);
-                var totalTime = otherSubtitle.endTime - firstSubtitle.startTime;
-                var durationSplit = Math.floor(totalTime / 3);
                 var startTime = newTimings[2];
                 var endTime = newTimings[3];
+		// Only second subtitle start time might change
+		// so needs to bre re-rendered
                 this._updateSubtitleTime(firstSubtitle, newTimings[0],
                         newTimings[1]);
                 this.updateSubtitleTime(otherSubtitle, newTimings[4], newTimings[5]);
