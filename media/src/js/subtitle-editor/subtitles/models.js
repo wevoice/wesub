@@ -507,7 +507,7 @@ var angular = angular || null;
                 // available to the two subtitles
                 var startTime = 0;
                 var endTime = Math.floor(otherSubtitle.endTime / 2);
-                this._updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
+                this.updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
             }
             attrs = {
                 begin: startTime,
