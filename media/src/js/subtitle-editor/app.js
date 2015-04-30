@@ -131,10 +131,13 @@ var angular = angular || null;
 	$scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
 	$scope.emptySubtitleWarningShown = function() {
             return ((!$scope.currentEdit.inProgress()) &&
-                    ($scope.workflow.stage == "typing") &&
                     ($scope.workflow.subtitleList.needsAnyTranscribed()) &&
                     ($scope.workflow.subtitleList.length() > 1));
-        };		  
+        };
+	$scope.invalidTimingWarningShown = function() {
+            return ((!$scope.currentEdit.inProgress()) &&
+                    ($scope.workflow.subtitleList.firstInvalidTiming()));
+        };
         $scope.warningsShown = true;
         $scope.timelineShown = $scope.workflow.stage != 'typing';
         $scope.toggleScrollingSynced = function() {
