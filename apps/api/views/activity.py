@@ -43,7 +43,7 @@ List activity items:
     :>jsonarr video: ID of the video
     :>jsonarr video_uri: API URI for the video
     :>jsonarr language: language for the activity
-    :>jsonarr language_uri: API URI for the video language
+    :>jsonarr language_url: API URI for the video language
     :>jsonarr resource_uri: API URI for the activity
     :>jsonarr user: username of the user user associated with the activity,
         or null
@@ -101,25 +101,26 @@ class ActivitySerializer(serializers.ModelSerializer):
         view_name='api:video-detail',
         lookup_field='video_id',
         read_only=True)
-    language_uri = serializers.SerializerMethodField()
+    language = serializers.CharField(source='new_language.language_code')
+    language_url = serializers.SerializerMethodField()
     resource_uri = serializers.HyperlinkedIdentityField(
         view_name='api:activity-detail',
         lookup_field='id',
     )
 
-    def get_language_uri(self, action):
-        if not action.language:
+    def get_language_url(self, action):
+        if not action.new_language:
             return None
-        return reverse('api:subtitle-language', kwargs={
-            'video_id': action.language.video.video_id,
-            'language_code': action.language.language_code,
+        return reverse('api:subtitle-language-detail', kwargs={
+            'video_id': action.new_language.video.video_id,
+            'language_code': action.new_language.language_code,
         }, request=self.context['request'])
 
     class Meta:
         model = Action
         fields = (
             'id', 'type', 'created', 'video', 'video_uri', 'language',
-            'language_uri', 'user', 'comment', 'new_video_title',
+            'language_url', 'user', 'comment', 'new_video_title',
             'resource_uri'
         )
 
