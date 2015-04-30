@@ -34,9 +34,10 @@
 
     <div>
     {% if team.is_open %}
-    <button>{% trans "Join the team" %} <span class="fa fa-angle-double-right"></span></button>
+
+    <a class="button" href="{% url "teams:join_team" slug=team.slug %}">{% trans "Join the team" %} <span class="fa fa-angle-double-right"></span></a>
     {% elif team.is_by_application %}
-    <button>{% trans "Apply to join the team" %} <span class="fa fa-angle-double-right"></span></button>
+    <a class="button" href="{% url "teams:join_team" slug=team.slug %}">{% trans "Apply to join the team" %} <span class="fa fa-angle-double-right"></span></a>
     {% endif %}
     </div>
   </div>
