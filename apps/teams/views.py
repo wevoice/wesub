@@ -127,7 +127,12 @@ def settings_page(view_func):
 
     @functools.wraps(view_func)
     def wrapper(request, slug, *args, **kwargs):
-        team = get_team_for_view(slug, request.user)
+        if isinstance(slug, Team):
+            # hack to handle the new view code calling this page.  In that
+            # case it passes the team directly rather than the slug
+            team = slug
+        else:
+            team = get_team_for_view(slug, request.user)
         if not can_change_team_settings(team, request.user):
             messages.error(request, _(u'You do not have permission to edit this team.'))
             return HttpResponseRedirect(team.get_absolute_url())
@@ -2040,29 +2045,23 @@ def add_project(request, slug):
     team = get_team_for_view(slug, request.user)
 
     if request.POST:
-        form = ProjectForm(request.POST)
+        form = ProjectForm(team, request.POST)
         workflow_form = WorkflowForm(request.POST)
 
         if form.is_valid() and workflow_form.is_valid():
 
-            if team.project_set.filter(slug=pan_slugify(form.cleaned_data['name'])).exists():
-                messages.error(request, _(u"There's already a project with this name"))
-            else:
-                project = form.save(commit=False)
-                project.team = team
-                project.save()
+            project = form.save()
+            if project.workflow_enabled:
+                workflow = workflow_form.save(commit=False)
+                workflow.team = team
+                workflow.project = project
+                workflow.save()
 
-                if project.workflow_enabled:
-                    workflow = workflow_form.save(commit=False)
-                    workflow.team = team
-                    workflow.project = project
-                    workflow.save()
-
-                messages.success(request, _(u'Project added.'))
-                return HttpResponseRedirect(
-                        reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
+            messages.success(request, _(u'Project added.'))
+            return HttpResponseRedirect(
+                reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
     else:
-        form = ProjectForm()
+        form = ProjectForm(team)
         workflow_form = WorkflowForm()
 
     return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
@@ -2089,7 +2088,7 @@ def edit_project(request, slug, project_slug):
             messages.success(request, _(u'Project deleted.'))
             return HttpResponseRedirect(project_list_url)
         else:
-            form = ProjectForm(request.POST, instance=project)
+            form = ProjectForm(team, request.POST, instance=project)
             workflow_form = WorkflowForm(request.POST, instance=workflow)
 
             # if the project doesn't have workflow enabled, the workflow form
@@ -2108,7 +2107,7 @@ def edit_project(request, slug, project_slug):
                 return HttpResponseRedirect(project_list_url)
 
     else:
-        form = ProjectForm(instance=project)
+        form = ProjectForm(team, instance=project)
         workflow_form = WorkflowForm(instance=workflow)
 
     return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }

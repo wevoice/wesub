@@ -419,6 +419,7 @@ MEDIA_BUNDLES = {
             'src/css/site/forms.scss',
             'src/css/site/links.scss',
             'src/css/site/lists.scss',
+            'src/css/site/tables.scss',
             'src/css/site/header.scss',
             'src/css/site/menus.scss',
             'src/css/site/modals.scss',

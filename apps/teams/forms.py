@@ -48,6 +48,7 @@ from videos.search_indexes import VideoIndex
 from videos.tasks import import_videos_from_feed
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
+from utils.panslugify import pan_slugify
 from utils.translation import get_language_choices
 from utils.text import fmt
 from utils.validators import MaxFileSizeValidator
@@ -616,6 +617,33 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ('name', 'description', 'workflow_enabled')
+
+    def __init__(self, team, *args, **kwargs):
+        super(ProjectForm, self).__init__(*args, **kwargs)
+        self.team = team
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+
+        same_name_qs = self.team.project_set.filter(slug=pan_slugify(name))
+        if self.instance.id is not None:
+            same_name_qs = same_name_qs.exclude(id=self.instance.id)
+
+
+        import logging
+        logging.warn("%s %s", same_name_qs.exists(), same_name_qs.query)
+        logging.warn("%s", [p.slug for p in self.team.project_set.all()])
+
+        if same_name_qs.exists():
+            raise forms.ValidationError(
+                _(u"There's already a project with this name"))
+        return name
+
+    def save(self):
+        project = super(ProjectForm, self).save(commit=False)
+        project.team = self.team
+        project.save()
+        return project
 
 class DeleteLanguageVerifyField(forms.CharField):
     def __init__(self):

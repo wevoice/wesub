@@ -71,9 +71,6 @@ urlpatterns = patterns('teams.views',
     url(r'^(?P<slug>[-\w]+)/feeds/$', 'video_feeds', name='video_feeds'),
     url(r'^(?P<slug>[-\w]+)/feeds/(?P<feed_id>\d+)$', 'video_feed', name='video_feed'),
     url(r'^(?P<slug>[-\w]+)/settings/languages/$', 'settings_languages', name='settings_languages'),
-    url(r'^(?P<slug>[-\w]+)/settings/projects/$', 'settings_projects', name='settings_projects'),
-    url(r'^(?P<slug>[-\w]+)/settings/projects/add/$', 'add_project', name='add_project'),
-    url(r'^(?P<slug>[-\w]+)/settings/projects/(?P<project_slug>[-\w]+)/$', 'edit_project', name='edit_project'),
     # just /p/ will bring all videos on any projects
     url(r'^(?P<slug>[-\w]+)/p/(?P<project_slug>[-\w]+)?/?$', 'detail', name='project_video_list'),
     # TODO: Review these...
@@ -86,6 +83,9 @@ urlpatterns += patterns('teams.new_views',
     url(r'^(?P<slug>[-\w]+)/$', 'dashboard', name='dashboard'),
     url(r'^(?P<slug>[-\w]+)/settings/$', 'settings_basic', name='settings_basic'),
     url(r'^(?P<slug>[-\w]+)/settings/messages/$', 'settings_messages', name='settings_messages'),
+    url(r'^(?P<slug>[-\w]+)/settings/projects/$', 'settings_projects', name='settings_projects'),
+    url(r'^(?P<slug>[-\w]+)/settings/projects/add/$', 'add_project', name='add_project'),
+    url(r'^(?P<slug>[-\w]+)/settings/projects/(?P<project_slug>[-\w]+)/edit/$', 'edit_project', name='edit_project'),
     url(r'^(?P<slug>[-\w]+)/settings/workflows/$', 'settings_workflows', name='settings_workflows'),
 )
 

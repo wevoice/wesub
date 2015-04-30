@@ -28,6 +28,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext as _
@@ -35,7 +36,7 @@ from django.utils.translation import ugettext as _
 from . import views as old_views
 from . import forms
 from . import permissions
-from .models import Team
+from .models import Team, Project
 
 logger = logging.getLogger('teams.views')
 
@@ -136,6 +137,63 @@ def settings_messages(request, team):
         form = forms.GuidelinesMessagesForm(initial=initial)
 
     return render(request, "new-teams/settings-messages.html", {
+            'team': team, 'form': form,
+    })
+
+@team_settings_view
+def settings_projects(request, team):
+    if team.is_old_style():
+        return old_views.settings_projects(request, team)
+
+    projects = team.project_set.exclude(name=Project.DEFAULT_NAME)
+
+    return render(request, "new-teams/settings-projects.html", {
+            'team': team, 'projects': projects,
+    })
+
+@team_settings_view
+def add_project(request, team):
+    if team.is_old_style():
+        return old_views.add_project(request, team)
+
+    if request.POST:
+        form = forms.ProjectForm(team, data=request.POST)
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(
+                reverse('teams:settings_projects', args=(team.slug,))
+            )
+    else:
+        form = forms.ProjectForm(team)
+
+    return render(request, "new-teams/settings-projects-add.html", {
+            'team': team, 'form': form,
+    })
+
+@team_settings_view
+def edit_project(request, team, project_slug):
+    if team.is_old_style():
+        return old_views.edit_project(request, team, project_slug)
+
+    project = get_object_or_404(Project, slug=project_slug)
+    if 'delete' in request.POST:
+        project.delete()
+        return HttpResponseRedirect(
+            reverse('teams:settings_projects', args=(team.slug,))
+        )
+    elif request.POST:
+        form = forms.ProjectForm(team, instance=project, data=request.POST)
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(
+                reverse('teams:settings_projects', args=(team.slug,))
+            )
+    else:
+        form = forms.ProjectForm(team, instance=project)
+
+    return render(request, "new-teams/settings-projects-edit.html", {
             'team': team, 'form': form,
     })
 
