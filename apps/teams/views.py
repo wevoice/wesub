@@ -117,6 +117,10 @@ ALL_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 
 def get_team_for_view(slug, user, exclude_private=True):
+    if isinstance(slug, Team):
+        # hack to handle the new view code calling this page.  In that
+        # case it passes the team directly rather than the slug
+        return slug
     try:
         return Team.objects.for_user(user, exclude_private).get(slug=slug)
     except Team.DoesNotExist:
@@ -127,12 +131,7 @@ def settings_page(view_func):
 
     @functools.wraps(view_func)
     def wrapper(request, slug, *args, **kwargs):
-        if isinstance(slug, Team):
-            # hack to handle the new view code calling this page.  In that
-            # case it passes the team directly rather than the slug
-            team = slug
-        else:
-            team = get_team_for_view(slug, request.user)
+        team = get_team_for_view(slug, request.user)
         if not can_change_team_settings(team, request.user):
             messages.error(request, _(u'You do not have permission to edit this team.'))
             return HttpResponseRedirect(team.get_absolute_url())

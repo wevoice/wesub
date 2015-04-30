@@ -846,10 +846,10 @@ class Project(models.Model):
 
     def save(self, slug=None,*args, **kwargs):
         self.modified = datetime.datetime.now()
-        if slug is None:
-            self.slug = pan_slugify(self.name)
-        else:
+        if slug is not None:
             self.slug = pan_slugify(slug)
+        elif not self.slug:
+            self.slug = pan_slugify(self.name)
         super(Project, self).save(*args, **kwargs)
 
     @property

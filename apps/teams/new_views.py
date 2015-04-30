@@ -61,8 +61,10 @@ def team_settings_view(view_func):
         return view_func(request, team, *args, **kwargs)
     return login_required(wrapper)
 
-@team_view
-def dashboard(request, team):
+def dashboard(request, slug):
+    team = get_object_or_404(
+        Team.objects.for_user(request.user, exclude_private=False),
+        slug=slug)
     if not team.is_old_style() and not team.user_is_member(request.user):
         return welcome(request, team)
     else:
