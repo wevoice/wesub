@@ -1,6 +1,6 @@
 {% load i18n %}
 <p class="error">
-  <span ng-show="workflow.subtitleList.needsAnyTranscribed()">
+  <span ng-show="emptySubtitleWarningShown()">
     <a class="invalid-subtitle-link" data-target="[[ workflow.subtitleList.needsAnyTranscribed() && workflow.subtitleList.needsAnyTranscribed().id ]]"
        href="#"
        ng-click="onSubtitleLinkClicked($event)">
