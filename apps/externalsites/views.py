@@ -74,8 +74,13 @@ def team_settings_tab(request, team):
                 id=request.POST['remove-youtube-account'])
             account.delete()
         return redirect(settings_page_redirect_url(team, formset))
+    
+    if team.is_old_style():
+        template_name = 'externalsites/team-settings-tab.html'
+    else:
+        template_name = 'externalsites/new-team-settings-tab.html'
 
-    return render(request, 'externalsites/team-settings-tab.html', {
+    return render(request, template_name, {
         'team': team,
         'forms': formset,
     })

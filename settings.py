@@ -421,6 +421,7 @@ MEDIA_BUNDLES = {
             'src/css/site/lists.scss',
             'src/css/site/header.scss',
             'src/css/site/menus.scss',
+            'src/css/site/modals.scss',
             'src/css/site/banner.scss',
             'src/css/site/footer.scss',
             'src/css/site/teams.scss',
@@ -473,6 +474,8 @@ MEDIA_BUNDLES = {
         "files": (
             'src/js/third-party/jquery-2.1.3.js',
             'src/js/site/menus.js',
+            'src/js/site/modals.js',
+            'src/js/site/team-integration-settings.js',
         ),
     },
     "api.js": {

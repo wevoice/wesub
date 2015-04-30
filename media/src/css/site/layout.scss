@@ -1,6 +1,8 @@
 $break-small: 800px;
 
 $z-index-menu: 1;
+$z-index-overlay: 100;
+$z-index-modal: 101;
 
 html, body {
     margin: 0;
@@ -13,10 +15,10 @@ html, body {
     margin: 0 auto;
 }
 
-.group:after {
-  content: "";
-  display: table;
-  clear: both;
+%clearfix, .group:after {
+    content: "";
+    display: table;
+    clear: both;
 }
 
 @mixin small-screen() {

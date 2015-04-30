@@ -29,7 +29,7 @@ input, textarea, select {
     margin: 0;
 }
 
-input[type=checkbox] {
+input[type=checkbox], input[type=radio] {
     width: auto;
     border: none;
     padding: 0;

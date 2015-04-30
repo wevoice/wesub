@@ -44,3 +44,16 @@ fieldset.assets>div {
     float: left;
     width: 50%;
 }
+
+#team-settings-integration {
+    fieldset {
+        margin-bottom: 40px;
+        border: 1px solid $light-gray;
+        padding-bottom: 10px;
+    }
+
+    fieldset.disabled .account-fields {
+        display: none;
+    }
+
+}
