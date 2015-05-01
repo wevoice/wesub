@@ -148,7 +148,7 @@ class Bump(Command):
         os.chdir(unisubs_folder)
         commit_path = os.path.join(unisubs_root(), 'optional', repo_name)
         open(commit_path, 'w').write(commit_id + "\n")
-        us.chdir(unisubs_root())
+        os.chdir(unisubs_root())
         subprocess.call(['git', 'add', commit_path])
 
 class Manage(Command):
