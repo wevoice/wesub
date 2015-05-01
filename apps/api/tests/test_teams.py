@@ -119,6 +119,10 @@ class TeamAPITest(TeamAPITestBase):
                      response.content)
         team = Team.objects.get(slug='test-team')
         self.check_team_data(response.data, team)
+        # check that we set the owner of the team to be the user who created
+        # it
+        assert_true(team.members.filter(role=TeamMember.ROLE_OWNER,
+                                        user=self.user).exists())
 
     def test_create_team_with_data(self):
         response = self.client.post(self.list_url, data={
