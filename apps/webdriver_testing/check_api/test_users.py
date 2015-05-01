@@ -54,6 +54,19 @@ class TestCaseUsers(APILiveServerTestCase, WebdriverTestCase):
         self.assertEqual(user.first_name, r['first_name'])
         self.assertEqual(user.last_name, r['last_name'])
 
+
+    def test_get_username_with_space(self):
+        """get user info"""
+        user  = UserFactory()
+        user.username='janet finn'
+        user.save()
+        url = '/api/users/%s/' % user.username
+        r = self._get(url)
+        self.logger.info(r)
+        self.assertEqual(user.username, r['username'])
+        self.assertEqual(user.first_name, r['first_name'])
+        self.assertEqual(user.last_name, r['last_name'])
+
     def test_create_username_chars(self):
         """Create a user via the api.
 

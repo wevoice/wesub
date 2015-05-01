@@ -89,6 +89,8 @@ class TestCaseEditing(WebdriverTestCase):
         self.assertEqual(u'可以来解决各种迫切的问题。', 
                          self.editor_pg.reference_text(3))
 
+    
+
 
     def test_reference_private_versions(self):
         """Language not displayed if not visible to user
@@ -158,7 +160,6 @@ class TestCaseEditing(WebdriverTestCase):
 
     def test_add_lines_to_end(self):
         """Add sub to the end of the subtitle list, enter adds new active sub."""
-        self.logger.info(Video.objects.all())
         self.editor_pg.open_editor_page(self.video.video_id, 'nl')
 
         subs = ['third to last', 'pentulitmate subtitle', 'THE END']
@@ -259,41 +260,43 @@ class TestCaseEditing(WebdriverTestCase):
         subs.append_subtitle(3500, 4500, "Sub with the same start and end time" )
         subs.append_subtitle(4000, 4500, "Sub with the same start and end time" )
         subs.append_subtitle(4000, 5900, "Subs line at 5 seconds" )
-        self.logger.info(subs.subtitle_items())
         video = VideoFactory()
         pipeline.add_subtitles(video, 'en', subs)
         self.editor_pg.open_editor_page(video.video_id, 'en')
-        self.editor_pg.click_working_sub_line(1)
         self.assertEqual('6', self.editor_pg.invalid_subtitle())
 
     def test_equal_times(self):
         subs = SubtitleSetFactory(num_subs=2)
         subs.append_subtitle(3500, 4500, "Subtitle"  )
         subs.append_subtitle(3500, 4500, "Subtitle with same start end times" )
-        self.logger.info(subs.subtitle_items())
         video = VideoFactory()
         pipeline.add_subtitles(video, 'en', subs)
         self.editor_pg.open_editor_page(video.video_id, 'en')
-        self.editor_pg.click_working_sub_line(1)
         self.assertEqual('3', self.editor_pg.invalid_subtitle())
 
     def test_endtime_greater(self):
         subs = SubtitleSetFactory(num_subs=2)
         subs.append_subtitle(5500, 4500, "Subtitle"  )
-        self.logger.info(subs.subtitle_items())
         video = VideoFactory()
         pipeline.add_subtitles(video, 'en', subs)
         self.editor_pg.open_editor_page(video.video_id, 'en')
-        self.editor_pg.click_working_sub_line(1)
         self.assertEqual(u'2', self.editor_pg.invalid_subtitle())
 
     def test_blank_line_warnings(self):
         """Amara warns when subtitle sets have blank lines """
         video = VideoFactory()
-        subs = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
-                                            'blank_lines.srt')
-        video = self.data_utils.create_video()
-        self.video_pg.open_video_page(video.video_id)
-        self.video_pg.upload_subtitles('English', subs)
+        subs = SubtitleSetFactory(num_subs=5)
+        pipeline.add_subtitles(video, 'en', subs, complete=True)
         self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.insert_sub_above(3)
+        self.editor_pg.click_by_css('div.workflow')
         self.assertEqual(u'2', self.editor_pg.invalid_subtitle())
+
+    def test_sync_warning(self):
+        subs = SubtitleSetFactory(num_subs=1)
+        subs.append_subtitle(2000, 2999, ""  )
+        subs.append_subtitle(3000, 4500, "Subtitle" )
+        video = VideoFactory()
+        pipeline.add_subtitles(video, 'en', subs, complete=False)
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.assertEqual('1', self.editor_pg.invalid_subtitle())

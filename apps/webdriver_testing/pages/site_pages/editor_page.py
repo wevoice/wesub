@@ -584,9 +584,8 @@ class EditorPage(UnisubsPage):
         return self.is_element_visible(self._SYNC_HELP)
 
     def invalid_subtitle(self):
-        el = self.is_element_present(self._INVALID_SUB_WARNING)
-        try:
-            el.click()
-            return el.get_attribute("data-target")
-        except:
-            return None
+        self.click_by_css('div.workflow')
+        els = self.get_elements_list(self._INVALID_SUB_WARNING)
+        return ([el.get_attribute("data-target") 
+                     for el in els 
+                     if "false" not in el.get_attribute("data-target")][0])
