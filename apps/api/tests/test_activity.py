@@ -86,18 +86,18 @@ class ActivityTestCase(TestCase):
         else:
             assert_equal(activity_data['video'], None)
             assert_equal(activity_data['video_uri'], None)
-        if activity.language:
+        if activity.new_language:
             assert_equal(activity_data['language'],
-                         activity.language.language_code)
-            assert_equal(activity_data['language_uri'], reverse(
+                         activity.new_language.language_code)
+            assert_equal(activity_data['language_url'], reverse(
                 'api:subtitle-language-detail', kwargs={
-                    'video_id': activity.language.video.video_id,
-                    'language_code': activity.language.language_code,
+                    'video_id': activity.new_language.video.video_id,
+                    'language_code': activity.new_language.language_code,
                 }, request=APIRequestFactory().get('/'))
             )
         else:
             assert_equal(activity_data['language'], None)
-            assert_equal(activity_data['language_uri'], None)
+            assert_equal(activity_data['language_url'], None)
         if activity.user:
             assert_equal(activity_data['user'], activity.user.username)
         else:
