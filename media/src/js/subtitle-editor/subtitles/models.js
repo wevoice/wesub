@@ -311,7 +311,7 @@ var angular = angular || null;
     SubtitleList.prototype.needsAnyTranscribed = function() {
         for(var i=0; i < this.length(); i++) {
             if(this.subtitles[i].markdown == '') {
-                return true;
+                return this.subtitles[i];
             }
         }
         return false;
