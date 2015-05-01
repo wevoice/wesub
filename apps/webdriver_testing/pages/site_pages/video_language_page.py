@@ -19,7 +19,7 @@ class VideoLanguagePage(VideoPage):
     _VIEW_NOTICE = 'p.view-notice'
     _DRAFT_NOTICE = 'p.view-notice.draft'
     _NO_SUBS = 'p.empty'   
-
+    _TABS = 'ul.tabs li a'
  
     #DELETE SUBTITLE LANGUAGE
      
@@ -47,6 +47,11 @@ class VideoLanguagePage(VideoPage):
         self.logger.info('Opening revision {0} page for video: {1}'.format(
                          sl_sv, video_id))
         self.open_page(self._REV_URL.format(video_id, lang_code, sl_sv))
+
+    def open_sync_history(self):
+        tab_els = self.get_elements_list(self._TABS)
+        [el.click() for el in tab_els if el.text == 'Sync History']
+
 
     def edit_subtitles(self):
         self.logger.info('Clicking edit subtitles')
@@ -148,3 +153,12 @@ class VideoLanguagePage(VideoPage):
         self.handle_js_alert('accept')
         return self.success_message_present('Rollback successful')
 
+    def visible_tabs(self):
+        tab_els = self.get_elements_list(self._TABS)
+        return [el.text for el in tab_els]
+
+    def has_resync(self):
+        return self.is_element_present('td.last input')
+
+    def not_linked(self):
+        return self.is_text_present('td:nth-child[2]', 'Syncing not configured')

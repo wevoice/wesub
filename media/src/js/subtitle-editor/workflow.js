@@ -107,11 +107,9 @@ var angular = angular || null;
         }
 	$scope.onSubtitleLinkClicked = function($event) {
             var node = $event.target;
-            if((node.tagName == 'A') && (node.className == "invalid-subtitle-link") && (node.dataset) && (node.dataset.target)) {
+            if((node.dataset) && (node.dataset.target)) {
 		var subtitle = $scope.workflow.subtitleList.getSubtitleById(node.dataset.target);
 		if (subtitle) {
-		    console.log("clicked " + subtitle.startTime);
-		    console.log(subtitle);
 		    $scope.$root.$emit('scroll-to-subtitle', subtitle);
 		}
             }

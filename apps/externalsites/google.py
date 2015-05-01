@@ -258,7 +258,7 @@ def video_get(access_token, video_id, part):
     })
 
 def captions_list(access_token, video_id):
-    """Fetch info on all captions for a video
+    """Fetch info on all non-ASR captions for a video
 
     Returns:
         List of (caption_id, language_code, name) tuples
@@ -272,6 +272,7 @@ def captions_list(access_token, video_id):
         (caption['id'], caption['snippet']['language'],
          caption['snippet']['name'])
         for caption in response.json['items']
+        if caption['snippet']['trackKind'] != 'ASR'
     ]
 
 def captions_download(access_token, caption_id, format='ttml'):

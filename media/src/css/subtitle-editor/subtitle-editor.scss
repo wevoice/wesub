@@ -1389,6 +1389,7 @@ div.workflow {
         margin-top: 0.5em;
 
         &.error {
+            font-size: 10px;
             color: $reddish-pink;
 	    a {
                 color: inherit;

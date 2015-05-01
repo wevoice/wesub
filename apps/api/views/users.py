@@ -223,7 +223,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
 
     queryset = User.objects.all().select_related('created_by')
     lookup_field = 'username'
-    lookup_value_regex = r'[\w\-@\.\+]+'
+    lookup_value_regex = r'[\w\-@\.\+\s]+'
 
     def get_serializer_class(self):
         if self.request.method == 'GET':

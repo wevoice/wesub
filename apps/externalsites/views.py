@@ -20,7 +20,8 @@ import logging
 
 from django.contrib import messages
 from django.contrib import auth
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.views import redirect_to_login
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
@@ -37,6 +38,7 @@ from externalsites.models import get_sync_account, YouTubeAccount
 from localeurl.utils import universal_url
 from teams.models import Team
 from teams.permissions import can_change_team_settings
+from videos import permissions
 from teams.views import settings_page
 from utils.text import fmt
 from videos.models import VideoUrl
@@ -223,10 +225,12 @@ def already_linked_message(user, other_account):
                      'to the %(team)s team.'),
                    team=other_account.team)
 
-@staff_member_required
+@login_required
 def resync(request, video_url_id, language_code):
     video_url = get_object_or_404(VideoUrl, id=video_url_id)
     video = video_url.video
+    if not permissions.can_user_resync(video, request.user):
+        return redirect_to_login(request.build_absolute_uri())
     language = video.subtitle_language(language_code)
 
     if request.method == 'POST':

@@ -30,3 +30,15 @@ def can_user_edit_video_urls(video, user):
     else:
         # for team videos, check if the user can edit the video
         return teams_permissions.can_edit_video(team_video, user)
+
+def can_user_resync(video, user):
+    """Check if a user has permission to resync the video's subtitles."""
+    if user.is_staff:
+        return True
+    team_video = video.get_team_video()
+    if team_video:
+        # for team videos, check if the user can resync the video
+        return teams_permissions.can_resync(team_video.team, user)
+    # For now this is limited to team videos
+    # as we'd need to know if a user actually own the youtube channel
+    return False
