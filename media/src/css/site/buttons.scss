@@ -28,7 +28,7 @@ button, a.button {
     color: $white;
     cursor: pointer;
 
-    @include button-color($secondary-aqua);
+    @include button-color($primary);
 
     &:hover {
         text-decoration: none;

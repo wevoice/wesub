@@ -64,6 +64,11 @@ nav {
         content: " \25b4";
     }
 
+    nav a.menu-toggle.open {
+        background: lighten($primary, 10);
+        color: $white !important;
+    }
+
     nav ul ul {
         display: none;
         position: absolute;
