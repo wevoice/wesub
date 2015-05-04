@@ -387,7 +387,9 @@ class TeamViewSet(AmaraPaginationMixin,
     def perform_create(self, serializer):
         if not team_permissions.can_create_team(self.request.user):
             raise PermissionDenied()
-        serializer.save()
+        team = serializer.save()
+        TeamMember.objects.create_first_member(team=team,
+                                               user=self.request.user)
 
     def perform_update(self, serializer):
         if not team_permissions.can_change_team_settings(serializer.instance,
