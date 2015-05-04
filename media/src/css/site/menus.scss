@@ -1,5 +1,6 @@
 nav {
     @extend .content;
+    padding-bottom: 10px;
 
     > a {
         padding-top: 10px;
@@ -21,7 +22,7 @@ nav {
 
 
         a {
-            padding: 20px 15px;
+            padding: 10px 15px;
             display: block;
         }
     }
@@ -77,6 +78,7 @@ nav {
         width: 200px;
         background: $off-white;
         box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.3);
+        border: 1px solid $light-gray;
         z-index: $z-index-menu;
 
         li {
@@ -95,6 +97,11 @@ nav {
         .count {
             float: right;
         }
+    }
+
+    nav ul.right ul {
+        left: auto;
+        right: 0;
     }
 
     #user-menu {

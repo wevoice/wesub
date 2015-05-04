@@ -3,6 +3,10 @@
     a {
         color: $darkish-gray;
 
+        img {
+            height: 25px;
+        }
+
         &:hover {
             text-decoration: none;
             background-color: lighten($primary, 10);
