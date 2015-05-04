@@ -344,6 +344,9 @@ class Team(models.Model):
             sv = sv.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=since))
         return sv.exclude(author__username="anonymous").values_list('author', 'subtitle_language')
 
+    def get_default_message(self, name):
+        return fmt(Setting.MESSAGE_DEFAULTS.get(name, ''), team=self)
+
     def get_messages(self, names):
         """Fetch messages from the settings objects
 
@@ -354,16 +357,13 @@ class Team(models.Model):
             dict mapping names to message text
         """
         messages = {
-            name: Setting.MESSAGE_DEFAULTS.get(name, '')
+            name: self.get_default_message(name)
             for name in names
         }
         for setting in self.settings.with_names(names):
             if setting.data:
                 messages[setting.key_name] = setting.data
-        return {
-            name: fmt(text, team=self)
-            for name, text in messages.items()
-        }
+        return messages
 
     def render_message(self, msg):
         """Return a string of HTML represention a team header for a notification.
@@ -2597,7 +2597,7 @@ class SettingManager(models.Manager):
         messages = {}
         for key in Setting.MESSAGE_KEYS:
             name = Setting.KEY_NAMES[key]
-            messages[name] = Setting.MESSAGE_DEFAULTS.get(name, '')
+            messages[name] = self.instance.get_default_message(name)
         messages.update({
             s.key_name: s.data
             for s in self.messages_guidelines()
