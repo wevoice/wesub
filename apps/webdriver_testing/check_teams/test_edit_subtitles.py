@@ -128,7 +128,7 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(self.member.username, 'password')
         self.video_lang_pg.page_refresh()
-        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT,
+        self.assertEqual(self.video_lang_pg.EDIT_VIA_TASK_TEXT,
                          self.video_lang_pg.edit_subtitles_active())
 
 

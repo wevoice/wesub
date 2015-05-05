@@ -14,12 +14,12 @@ from webdriver_testing.data_factories import UserFactory
 import os
 import time
 
-@unittest.skip('slow')
 class TestCaseSubmittable(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.  """
     NEW_BROWSER_PER_TEST_CASE = False
 
     @classmethod
+    @unittest.skip('slow')
     def setUpClass(cls):
         super(TestCaseSubmittable, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
@@ -125,11 +125,11 @@ class TestCaseSubmittable(WebdriverTestCase):
 
 
 
-@unittest.skip('slow')
 class TestCaseIncomplete(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.  """
     NEW_BROWSER_PER_TEST_CASE = True
 
+    @unittest.skip('slow')
     def setUp(self):
         super(TestCaseIncomplete, self).setUp()
         self.data_utils = data_helpers.DataHelpers()

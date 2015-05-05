@@ -39,3 +39,22 @@ class TestCaseSubtitles(WebdriverTestCase):
         self.data_utils.upload_subs(self.user, **data)
         self.video_pg.open_video_page(video.video_id)
         self.assertIn('English', self.video_pg.subtitle_languages())
+
+
+    def test_misordered_subs(self):
+        """Subtitles are displayed in sub lang page in order of time.
+
+        """
+        sub_file = os.path.join(self.subs_data_dir, 'misordered_subs.dfxp')
+        video = VideoFactory()
+        data = {'language_code': 'en',
+                'video': video.pk,
+                'primary_audio_language_code': 'en',
+                'draft': open(sub_file),
+                'is_complete': True,
+                }
+        self.data_utils.upload_subs(self.user, **data)
+        self.video_language_pg.open_video_lang_page(video.video_id, 'en')
+        expected_lines = [u'Line 1 \xb6', 'Line 2', 'Line 3', 'Line 4', 'Line 5', 'Line 6']
+        self.assertEqual(expected_lines, self.video_language_pg.displayed_lines())
+

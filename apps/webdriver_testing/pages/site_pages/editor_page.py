@@ -194,7 +194,6 @@ class EditorPage(UnisubsPage):
             return None
         subs = []
         if line_num:
-            self.logger.info('just getting 1 line of text') 
             return els[line_num-1].text
         else:
             for el in els:
@@ -321,31 +320,31 @@ class EditorPage(UnisubsPage):
 
     def tools_menu_items(self):
         self.hover_tools_menu()
+        time.sleep(3)
         els = self.get_elements_list("ul.toolbox-menu li")
         menu_list = {}
         for el in els:
+            display = el.get_attribute("class")
             item = el.find_element_by_css_selector("a")
             menu_item = item.get_attribute("class")
             item_properties = { 
                      'element': item,
                      'title': item.get_attribute("title"),
-                     'display': el.get_attribute("class"),
+                     'display': display,
                  } 
             menu_list[menu_item] = item_properties          
-        self.logger.info(menu_list) 
         return menu_list
 
     def copy_timings(self):
         menu_items = self.tools_menu_items()
-        if menu_items['copyover']['element'].is_displayed():
+        if 'ng-hide' in menu_items['copyover']['display']:
+           return 'Element not displayed'
+        else:
            menu_items['copyover']['element'].click()
            self.click_by_css("aside.shown footer.buttons button")
-        else:
-            return 'Element not displayed'
 
     def upload_subtitles(self, sub_file):
         menu_items = self.tools_menu_items()
-        self.logger.info(menu_items['upload-subtitles']['element'].tag_name)
         self.browser.execute_script("document.getElementsByClassName('upload-subtitles')[0].click()")
         self.wait_for_element_visible('button.upload-subtitles-submit-button-')
         self.type_by_css('input#subtitles-file-field', sub_file)
@@ -483,7 +482,6 @@ class EditorPage(UnisubsPage):
             th = el.find_element_by_css_selector('th')
             td = el.find_element_by_css_selector('td')
             fields[th.text] = td.text
-        self.logger.info(fields)
         return fields
 
     def toggle_playback(self):

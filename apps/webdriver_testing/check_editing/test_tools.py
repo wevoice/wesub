@@ -12,6 +12,8 @@ from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages import video_page
 from webdriver_testing.pages.site_pages import editor_page
 from utils.factories import * 
+from subtitles import pipeline
+
 
 class TestCaseTools(WebdriverTestCase):
 
@@ -38,13 +40,24 @@ class TestCaseTools(WebdriverTestCase):
             defaults = {
                         'video': cls.video,
                         'language_code': lc,
-                        'complete': True,
+#                        'complete': True,
                         'visibility': 'public',
                         'committer': cls.user,
                         'subtitles': ('apps/webdriver_testing/subtitle_data/'
                                      'Open Source Philosophy.%s.dfxp' % lc)
                    }
             cls.data_utils.add_subs(**defaults)
+
+        pipeline.add_subtitles(cls.video, 'hr', SubtitleSetFactory())
+        hr = {
+                    'video': cls.video,
+                    'language_code': 'hr',
+                    'visibility': 'public',
+                    'committer': cls.user,
+                    'subtitles': ('apps/webdriver_testing/subtitle_data/'
+                                  'Untimed_text.txt')
+                   }
+        cls.data_utils.add_subs(**hr)
         management.call_command('update_index', interactive=False) 
 
     def tearDown(self):
@@ -85,10 +98,11 @@ class TestCaseTools(WebdriverTestCase):
 
     def test_copy_timings_reference_unsynced(self):
         """No copy in menu if reference subs are unsynced. """
-        self.editor_pg.open_ed_with_base(self.video.video_id, 'sv', 'nl')
-        self.editor_pg.select_ref_language('Dutch')
+        self.editor_pg.open_ed_with_base(self.video.video_id, 'sv')
+        time.sleep(2)
+        self.editor_pg.select_ref_language('Croatian')
         time.sleep(3)
-        self.assertEqual("Element not displayed", self.editor_pg.copy_timings())
+        self.assertEqual('Element not displayed', self.editor_pg.copy_timings())
 
     def test_remove_active_subtitle(self):
         """Remove the selected subtitle line.

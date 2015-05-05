@@ -58,14 +58,14 @@ class TestCaseAddFeeds(WebdriverTestCase):
         """Add a youtube feed
 
         """
-        url = "http://gdata.youtube.com/feeds/api/users/amaratestuser/uploads"
+        url = "http://gdata.youtube.com/feeds/api/users/janetefinn/uploads"
         self.feed_pg.submit_feed_url(url)
         self.assertTrue(self.feed_pg.submit_successful())
 
         feed = VideoFeed.objects.get(url=url)
         feed.update()
         self.feeds_pg.open_feed_details(self.team.slug, feed.id)
-        self.assertEqual(3, self.feeds_pg.num_videos()) 
+        self.assertEqual(8, self.feeds_pg.num_videos()) 
 
 
     def test_brightcove_feed(self):
