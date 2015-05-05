@@ -36,7 +36,7 @@ from django.utils.translation import ugettext as _
 from . import views as old_views
 from . import forms
 from . import permissions
-from .models import Team, Project
+from .models import Setting, Team, Project
 
 logger = logging.getLogger('teams.views')
 
