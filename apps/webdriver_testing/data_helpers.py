@@ -25,10 +25,10 @@ class DataHelpers(object):
         self.logger.info(url_part)
         if url_part.startswith('http'):
             return url_part
-        elif url_part.startswith('/api2/partners'):
+        elif url_part.startswith('/api'):
             return (base_url + url_part[1:])
         else:
-            return (base_url + 'api2/partners/' + url_part)
+            return (base_url + 'api/' + url_part)
 
 
     def make_request(self, api_user, request_type, url_part, **kwargs):
@@ -37,7 +37,7 @@ class DataHelpers(object):
         url = self.api_url(url_part)
         headers = { 'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-apikey': api_user.get_api_key(),
+                    'X-api-key': api_user.get_api_key(),
                     'X-api-username': api_user.username,
                   }
         r = getattr(s, request_type)(url, headers=headers, data=json.dumps(kwargs))
