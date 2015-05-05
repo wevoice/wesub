@@ -13,13 +13,27 @@
         {% endwith %}
 
         <div class="tools subnav">
-            {% with 'guidelines' as current_sub %}
+            {% with 'messages' as current_sub %}
                 {% include 'teams/_subnav_settings.html' %}
             {% endwith %}
         </div>
         <form id="guidelines_messages_form" method="POST" action="" class="settings">
             {% csrf_token %}
             <input type="hidden" name="team" value="" />
+
+                {% if not team.is_old_style %}
+                <fieldset>
+                    <legend>{% trans 'Custom page text' %}</legend>
+                    <p class="notation">
+                        {% trans 'Customize text on your team pages.' %}
+                    </p>
+
+                    <label for="id_pagetext_welcome_heading">{% trans 'Welcome heading on your landing page for non-members' %}</label>
+                    {{ form.pagetext_welcome_heading.errors }}
+                    {{ form.pagetext_welcome_heading }}
+
+                </fieldset>
+                {% endif %}
 
                 <fieldset>
                     <legend>{% trans 'Custom messages' %}</legend>

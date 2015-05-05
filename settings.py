@@ -410,6 +410,25 @@ MEDIA_BUNDLES = {
             "css/bootstrap.css",
         ),
     },
+    "new-base.css": {
+        "files": (
+            'src/css/site/colors.scss',
+            'src/css/site/layout.scss',
+            'src/css/site/type.scss',
+            'src/css/site/buttons.scss',
+            'src/css/site/forms.scss',
+            'src/css/site/links.scss',
+            'src/css/site/lists.scss',
+            'src/css/site/tables.scss',
+            'src/css/site/header.scss',
+            'src/css/site/menus.scss',
+            'src/css/site/modals.scss',
+            'src/css/site/banner.scss',
+            'src/css/site/footer.scss',
+            'src/css/site/teams.scss',
+        ),
+        "include_path": 'src/css/site',
+    },
     "home.css": {
         "files": (
             "css/new_index.css",
@@ -450,6 +469,14 @@ MEDIA_BUNDLES = {
             "js/libs/jquery.cookie.js",
             "js/unisubs.site.js",
             "src/js/unisubs.variations.js",
+        ),
+    },
+    "new-site.js": {
+        "files": (
+            'src/js/third-party/jquery-2.1.3.js',
+            'src/js/site/menus.js',
+            'src/js/site/modals.js',
+            'src/js/site/team-integration-settings.js',
         ),
     },
     "api.js": {

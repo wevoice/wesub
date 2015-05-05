@@ -1,0 +1,22 @@
+table {
+    width: 100%;
+    margin-bottom: 1.5em;
+
+    th, td {
+        padding: 8px;
+        margin: 0;
+        border: none;
+    }
+    th {
+        float: none;
+        border-bottom: 2px solid #ddd;
+        font-weight: bold;
+    }
+    td {
+        border-bottom: 1px solid #ddd;
+        
+        &.actions {
+            text-align: right;
+        }
+    }
+}

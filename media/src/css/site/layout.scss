@@ -1,0 +1,45 @@
+$break-small: 800px;
+
+$z-index-menu: 1;
+$z-index-overlay: 100;
+$z-index-modal: 101;
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Implement a sticky footer using flexbox */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+#main-content {
+    flex-grow: 1;
+}
+
+.content {
+    max-width: 1200px;
+    padding: 0 15px;
+    margin: 0 auto;
+}
+
+%clearfix, .group:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+@mixin small-screen() {
+    @media only screen and (max-width: $break-small - 1) {
+        @content;
+    }
+}
+
+@mixin not-small-screen() {
+    @media only screen and (min-width: $break-small) {
+        @content;
+    }
+}

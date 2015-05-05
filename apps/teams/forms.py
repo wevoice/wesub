@@ -48,6 +48,7 @@ from videos.search_indexes import VideoIndex
 from videos.tasks import import_videos_from_feed
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
+from utils.panslugify import pan_slugify
 from utils.translation import get_language_choices
 from utils.text import fmt
 from utils.validators import MaxFileSizeValidator
@@ -484,40 +485,53 @@ class TaskDeleteForm(forms.Form):
 
         return task
 
+class MessageTextField(forms.CharField):
+    def __init__(self, *args, **kwargs):
+        super(MessageTextField, self).__init__(
+            max_length=4000, required=False, widget=forms.Textarea,
+            *args, **kwargs)
+
 class GuidelinesMessagesForm(forms.Form):
-    messages_invite = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
-    messages_manager = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
-    messages_admin = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
-    messages_application = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
-    messages_joins = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    pagetext_welcome_heading = MessageTextField(
+        label=_('Welcome heading on your landing page for non-members'))
 
-    guidelines_subtitle = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
-    guidelines_translate = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
-    guidelines_review = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    messages_invite = MessageTextField(
+        label=_('When a member is invited to join the team'))
+    messages_manager = MessageTextField(
+        label=_('When a member applies to join the team'))
+    messages_admin = MessageTextField(
+        label=_('When a member is given the Manager role'))
+    messages_application = MessageTextField(
+        label=_('When a member is given the Admin role'))
+    messages_joins = MessageTextField(
+        label=_('When a member joins the team'))
 
-class RenameableSettingsForm(forms.ModelForm):
-    logo = forms.ImageField(
-        validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)],
-        required=False)
-    square_logo = forms.ImageField(
-        validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)],
-        required=False)
-
-    class Meta:
-        model = Team
-        fields = ('name', 'description', 'logo', 'square_logo', 'is_visible')
+    guidelines_subtitle = MessageTextField(
+        label=('When transcribing'))
+    guidelines_translate = MessageTextField(
+        label=('When translating'))
+    guidelines_review = MessageTextField(
+        label=('When reviewing'))
 
 class SettingsForm(forms.ModelForm):
     logo = forms.ImageField(
         validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)],
+        help_text=_('Max 940 x 235'),
+        widget=forms.FileInput,
         required=False)
     square_logo = forms.ImageField(
         validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)],
+        help_text=_('Recommended size: 100 x 100'),
+        widget=forms.FileInput,
         required=False)
 
     class Meta:
         model = Team
         fields = ('description', 'logo', 'square_logo', 'is_visible')
+
+class RenameableSettingsForm(SettingsForm):
+    class Meta(SettingsForm.Meta):
+            fields = SettingsForm.Meta.fields + ('name',)
 
 class WorkflowForm(forms.ModelForm):
     class Meta:
@@ -603,6 +617,33 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ('name', 'description', 'workflow_enabled')
+
+    def __init__(self, team, *args, **kwargs):
+        super(ProjectForm, self).__init__(*args, **kwargs)
+        self.team = team
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+
+        same_name_qs = self.team.project_set.filter(slug=pan_slugify(name))
+        if self.instance.id is not None:
+            same_name_qs = same_name_qs.exclude(id=self.instance.id)
+
+
+        import logging
+        logging.warn("%s %s", same_name_qs.exists(), same_name_qs.query)
+        logging.warn("%s", [p.slug for p in self.team.project_set.all()])
+
+        if same_name_qs.exists():
+            raise forms.ValidationError(
+                _(u"There's already a project with this name"))
+        return name
+
+    def save(self):
+        project = super(ProjectForm, self).save(commit=False)
+        project.team = self.team
+        project.save()
+        return project
 
 class DeleteLanguageVerifyField(forms.CharField):
     def __init__(self):
