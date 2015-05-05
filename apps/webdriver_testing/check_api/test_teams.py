@@ -64,7 +64,7 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         data = {
             'name': 'API TEAM',
             'description': 'new team created via the api',
-            'slug': 'api-created-team' 
+            'slug': 'api-created-team1' 
             } 
 
         r = self._post(data=data, user=self.user)
@@ -78,7 +78,7 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         data = {
             'name': 'API TEAM',
             'description': 'new team created via the api',
-            'slug': 'api-created-team' 
+            'slug': 'api-created-team2' 
             } 
 
         r = self._post(data=data, user=self.staff)
@@ -89,17 +89,23 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         """ is_partner required to create a team via the api
 
         """
-        partner_user = UserFactory.create(username = 'team_creator', is_partner = True)
-        
         data = {
-                'name': 'API V2 TEAM',
+                'name': 'API TEAM',
                 'description': 'new team created via the api',
-                'slug': 'api-created-team' 
+                'slug': 'api-created-team3' 
                 } 
 
         r = self._post(data=data, user=self.partner)
+        self.logger.info(r)
         for k, v in data.iteritems():
             self.assertEqual(v, r[k])
+        url = '/api/teams/%s/members/' % r['slug']
+        r = self._get(url, self.partner)
+        self.logger.info(r)
+        self.assertIn(self.partner.username, r[0]['username'])
+        self.assertIn('owner', r[0]['role'])
+
+        
 
     def test_list(self):
         """User can get public teams + their private teams
