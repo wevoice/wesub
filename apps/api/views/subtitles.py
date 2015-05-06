@@ -379,8 +379,16 @@ class SubtitleLanguageSerializer(serializers.Serializer):
             if approver:
                 data['approver'] = approver.username
 
+    def validate_language_code(self, language_code):
+        if (SubtitleLanguage.objects
+            .filter(video=self.context['video'],
+                    language_code=language_code)
+            .exists()):
+            raise serializers.ValidationError("Language already exists")
+        return language_code
+
     def create(self, validated_data):
-        language = SubtitleLanguage(
+        language = SubtitleLanguage.objects.create(
             video=self.context['video'],
             language_code=validated_data['language_code'])
         return self.update(language, validated_data)
@@ -388,10 +396,10 @@ class SubtitleLanguageSerializer(serializers.Serializer):
     def update(self, language, validated_data):
         subtitles_complete = validated_data.get(
             'subtitles_complete',
-            validated_data.get('is_complete', None))
+            self.initial_data.get('is_complete', None))
         primary_audio_language = validated_data.get(
             'is_primary_audio_language',
-            validated_data.get('is_original', None))
+            self.initial_data.get('is_original', None))
 
         video = self.context['video']
         if subtitles_complete is not None:

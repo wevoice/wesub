@@ -159,6 +159,12 @@ class SubtitleLanguageSerializerTest(TestCase):
         serializer.is_valid(raise_exception=True)
         return serializer.save()
 
+    def run_update(self, language, data):
+        serializer = SubtitleLanguageSerializer(
+            instance=language, data=data, context=self.serializer_context)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
     def test_create(self):
         language = self.run_create({
             'language_code': 'es',
@@ -194,7 +200,7 @@ class SubtitleLanguageSerializerTest(TestCase):
     def test_update(self):
         language = SubtitleLanguageFactory(video=self.video,
                                            language_code='es')
-        self.serializer.update(language, {
+        self.run_update(language, {
             'is_primary_audio_language': True,
             'subtitles_complete': True,
         })
@@ -206,7 +212,7 @@ class SubtitleLanguageSerializerTest(TestCase):
     def test_cant_change_language_code(self):
         language = SubtitleLanguageFactory(video=self.video,
                                            language_code='es')
-        self.serializer.update(language, {
+        self.run_update(language, {
             'language_code': 'fr',
         })
         assert_equal(language.language_code, 'es')
@@ -214,17 +220,18 @@ class SubtitleLanguageSerializerTest(TestCase):
     def test_deprecated_aliases(self):
         language = SubtitleLanguageFactory(video=self.video,
                                            language_code='es')
-        self.serializer.update(language, {
+        self.run_update(language, {
             'is_original': True,
             'is_complete': True,
         })
+        self.video = test_utils.reload_obj(self.video)
         assert_equal(self.video.primary_audio_language_code, 'es')
-        assert_equal(language.subtitles_complete, True)
+        assert_equal(test_utils.reload_obj(language).subtitles_complete, True)
 
     def test_runs_tasks(self):
         language = self.run_create({'language_code': 'es'})
         assert_equal(test_utils.video_changed_tasks.delay.call_count, 1)
-        self.serializer.update(language, {})
+        self.run_update(language, {})
         assert_equal(test_utils.video_changed_tasks.delay.call_count, 2)
 
     def test_language_code_read_only(self):
