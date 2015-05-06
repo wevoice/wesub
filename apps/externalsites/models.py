@@ -665,7 +665,7 @@ class SyncHistoryManager(models.Manager):
     def get_query_set(self):
         return SyncHistoryQuerySet(self.model)
 
-    def get_attempt_to_resync(self):
+    def get_attempt_to_resync(self, team=None):
         """Lookup failed sync attempt that we should retry.
 
         Returns:
@@ -673,7 +673,10 @@ class SyncHistoryManager(models.Manager):
             to retry.  We will clear the retry flag before returning the
             SyncHistory object.
         """
-        qs = self.filter(retry=True)[:1]
+        qs = self.filter(retry=True)
+        if team:
+            qs = qs.filter(video_url__video__team=team)
+        qs = qs[:1]
         try:
             sh = qs.select_related('video_url', 'language').get()
         except SyncHistory.DoesNotExist:

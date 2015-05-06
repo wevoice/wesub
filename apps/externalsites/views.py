@@ -34,7 +34,7 @@ from externalsites import forms
 from externalsites import google
 from externalsites.auth_backends import OpenIDConnectInfo
 from externalsites.exceptions import YouTubeAccountExistsError
-from externalsites.models import get_sync_account, YouTubeAccount
+from externalsites.models import get_sync_account, YouTubeAccount, SyncHistory
 from localeurl.utils import universal_url
 from teams.models import Team
 from teams.permissions import can_change_team_settings
@@ -85,6 +85,30 @@ def team_settings_tab(request, team):
     return render(request, template_name, {
         'team': team,
         'forms': formset,
+    })
+
+@settings_page
+def team_settings_sync_errors_tab(request, team):
+    sh = SyncHistory.objects.get_attempt_to_resync(team=team)
+    if sh:
+        sync_items = sh.values_list('id', flat=True)
+    else:
+        sync_items = []
+    form = forms.ResyncForm(request.POST or None, sync_items=sync_items)
+    if form.is_valid():
+        for (key, val) in form.sync_items():
+            if val:
+                sync_item = SyncHistory.objects.get(pk=key)
+                account = sync_item.get_account()
+                account.update_subtitles(sync_item.video_url, sync_item.language)
+    if team.is_old_style():
+        template_name = 'externalsites/team-settings-sync-errors.html'
+    else:
+        template_name = 'externalsites/new-team-settings-sync-errors.html'
+
+    return render(request, template_name, {
+        'team': team,
+        'form': form,
     })
 
 def settings_page_redirect_url(team, formset):

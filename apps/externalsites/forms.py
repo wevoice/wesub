@@ -292,3 +292,14 @@ class AccountFormset(dict):
                 redirect_path = form.redirect_path()
                 if redirect_path is not None:
                     return redirect_path
+
+class ResyncForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        sync_items = kwargs.pop('sync_items')
+        super(ResyncForm, self).__init__(*args, **kwargs)
+        for i, sync_item in enumerate(sync_items):
+            self.fields['custom_%s' % i] = forms.BooleanField(label=sync_item)
+    def sync_items(self):
+        for name, value in self.cleaned_data.items():
+            if name.startswith('custom_'):
+                yield (self.fields[name].replace('custom_','',1), value)

@@ -1,0 +1,28 @@
+{% extends "teams/base.html" %}
+{% load i18n teams_tags paginator %}
+{% load url from future %}
+
+{% block html_attrs %}id="team_settings_externalsites"{% endblock %}
+
+{% block title %}{{ team }} {% trans 'Settings' %} | Amara{% endblock %}
+
+{% block view_content %}
+    <div class="view grid_8 omega">
+        {% with 'settings' as current %}
+            {% include 'teams/_tabs.html' %}
+        {% endwith %}
+        <div class="tools subnav">
+            {% with 'external-sites' as current_sub %}
+                {% include 'teams/_subnav_settings.html' %}
+            {% endwith %}
+        </div>
+	<form method="POST" action=".">
+	  {% csrf_token %}
+	  {{ form }}
+	  <input type=submit>
+	</form>
+	<p>Here to resync</p>
+    </div>
+</div>
+
+{% endblock %}
