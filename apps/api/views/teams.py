@@ -461,8 +461,9 @@ class TeamSubviewMixin(object):
 class TeamSubview(TeamSubviewMixin, viewsets.ModelViewSet):
     pass
 
-class TeamMemberViewSet(TeamSubview):
+class TeamMemberViewSet(TeamSubview, AmaraPaginationMixin):
     lookup_field = 'username'
+    paginate_by = 20
 
     def get_serializer_class(self):
         if 'username' in self.kwargs:
@@ -719,8 +720,9 @@ class TaskUpdateSerializer(TaskSerializer):
             task.assignee = self.context['user']
         task.complete()
 
-class TaskViewSet(TeamSubview):
+class TaskViewSet(TeamSubview, AmaraPaginationMixin):
     lookup_field = 'id'
+    paginate_by = 20
 
     def get_queryset(self):
         if not self.team.user_is_member(self.request.user):
