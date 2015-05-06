@@ -475,6 +475,10 @@ class VTTRenderer(SubtitleRenderer):
     media_type = 'text/vtt'
     format = 'vtt'
 
+class TextRenderer(SubtitleRenderer):
+    media_type = 'text/plain'
+    format = 'txt'
+
 class SubtitlesField(serializers.CharField):
     def __init__(self):
         super(SubtitlesField, self).__init__(style={
@@ -600,7 +604,8 @@ class SubtitlesSerializer(serializers.Serializer):
 class SubtitlesView(generics.CreateAPIView):
     serializer_class = SubtitlesSerializer
     renderer_classes = views.APIView.renderer_classes + [
-        DFXPRenderer, SBVRenderer, SSARenderer, SRTRenderer, VTTRenderer
+        DFXPRenderer, SBVRenderer, SSARenderer, SRTRenderer, VTTRenderer,
+        TextRenderer,
     ]
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
