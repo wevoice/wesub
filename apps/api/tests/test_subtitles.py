@@ -187,6 +187,12 @@ class SubtitleLanguageSerializerTest(TestCase):
         assert_equal(self.video.primary_audio_language_code, 'en')
         assert_equal(language.subtitles_complete, False)
 
+    def test_handle_capital_letters(self):
+        language = self.run_create({
+            'language_code': 'pt-BR',
+        })
+        assert_equal(language.language_code, 'pt-br')
+
     def test_try_recreate(self):
         language = SubtitleLanguageFactory(video=self.video,
                                            language_code='es')
