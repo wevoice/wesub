@@ -4277,7 +4277,7 @@
 
       duration: {
         get: function() {
-          return impl.duration;
+            return player ? player.getDuration() : impl.duration;
         }
       },
 
