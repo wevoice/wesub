@@ -255,6 +255,7 @@ from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from api.pagination import AmaraPaginationMixin
+from api.fields import LanguageCodeField
 from api.views.videos import VideoMetadataSerializer
 from videos.models import Video
 from subtitles import compat
@@ -313,7 +314,7 @@ class SubtitleLanguageListSerializer(serializers.ListSerializer):
 class SubtitleLanguageSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     created = serializers.DateTimeField(read_only=True)
-    language_code = serializers.CharField()
+    language_code = LanguageCodeField()
     is_primary_audio_language = serializers.BooleanField(required=False)
     is_rtl = serializers.BooleanField(read_only=True)
     is_translation = serializers.SerializerMethodField()

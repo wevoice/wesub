@@ -202,6 +202,7 @@ from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 import json
 
+from api.fields import LanguageCodeField
 from api.pagination import AmaraPaginationMixin
 from teams import permissions as team_perms
 from teams.models import Team, TeamVideo, Project
@@ -303,8 +304,8 @@ class VideoSerializer(serializers.Serializer):
     # default implementation that it makes more sense to not inherit.
     id = serializers.CharField(source='video_id', read_only=True)
     video_url = serializers.URLField(write_only=True, required=True)
-    primary_audio_language_code = serializers.CharField(required=False,
-                                                        allow_blank=True)
+    primary_audio_language_code = LanguageCodeField(required=False,
+                                                    allow_blank=True)
     original_language = serializers.CharField(source='language',
                                               read_only=True)
     title = serializers.CharField(required=False, allow_blank=True)
