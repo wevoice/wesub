@@ -56,7 +56,7 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         self.data_utils.upload_subs(user, **data)
 
     def _add_team_video(self):
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, video=video)
         return video, tv
 
@@ -278,7 +278,7 @@ class TestCaseApprovalWorkflowPostEdit(WebdriverTestCase):
 
     @classmethod
     def _add_team_video(cls):
-        video = cls.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=cls.team, added_by=cls.admin, video=video)
         return video, tv
 
@@ -454,7 +454,7 @@ class TestCaseNoReviews(WebdriverTestCase):
         self.data_utils.upload_subs(user, **data)
 
     def _add_team_video(self):
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, video=video)
         return video, tv
 
@@ -1191,7 +1191,7 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
 
     @classmethod
     def _add_team_video(cls):
-        video = cls.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=cls.team, added_by=cls.admin, video=video)
         return video, tv
 

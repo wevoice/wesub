@@ -344,7 +344,7 @@ class TestCaseDemandReports(WebdriverTestCase):
     def create_tv_with_original_subs(cls, lc, user, team, complete=True):
 
         vid_data = {'primary_audio_language_code': 'en' }
-        video = cls.data_utils.create_video(**vid_data)
+        video = VideoFactory(**vid_data)
         tv = TeamVideoFactory.create(
             team=team, 
             video=video, 

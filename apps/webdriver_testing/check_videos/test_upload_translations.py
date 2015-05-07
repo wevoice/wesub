@@ -30,7 +30,7 @@ class TestCaseUploadTranslation(WebdriverTestCase):
     def setUp(self):
         self.video_pg.open_page('videos/create/')
         self.video_pg.handle_js_alert('accept')
-        self.tv = self.data_utils.create_video()
+        self.tv = VideoFactory()
         self.data_utils.upload_subs(self.user, 
                                     video=self.tv.pk,
                                     primary_audio_language_code='en')

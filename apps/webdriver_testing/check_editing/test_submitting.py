@@ -33,7 +33,7 @@ class TestCaseSubmittable(WebdriverTestCase):
         td = {'video_url': ('http://qa.pculture.org/amara_tests/'
                      'Birds_short.mp4')
              }
-        cls.test_video = cls.data_utils.create_video(**td)
+        cls.test_video = VideoFactory(**td)
         cls.video_pg.open_video_page(cls.test_video.video_id)
         cls.video_pg.log_in(cls.user.username, 'password')
  
@@ -142,7 +142,7 @@ class TestCaseIncomplete(WebdriverTestCase):
                    'Birds_short.webmsd.webm')
              }
 
-        self.test_video = self.data_utils.create_video(**td)
+        self.test_video = VideoFactory(**td)
         self.video_pg.open_video_page(self.test_video.video_id)
         self.video_pg.log_in(self.user.username, 'password')
         self.video_pg.set_skiphowto()

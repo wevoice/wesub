@@ -98,7 +98,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
 
     @classmethod
     def _add_team_video(cls):
-        video = cls.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=cls.team, added_by=cls.owner, video=video)
         return video, tv
 
@@ -276,7 +276,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
 
     @classmethod
     def _add_team_video(cls):
-        video = cls.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=cls.team, added_by=cls.owner, video=video)
         return video, tv
 

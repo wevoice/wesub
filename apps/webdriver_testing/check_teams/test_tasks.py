@@ -126,7 +126,7 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
 
     def test_transcription_perform(self):
         """Starting a Transcription task opens the subtitling dialog."""
-        tv = self.data_utils.create_video()
+        tv = VideoFactory()
         TeamVideoFactory(team=self.team, added_by=self.admin, video=tv)
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
@@ -139,7 +139,7 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
         """Incomplete transcription task exists, is assigned to the same user.
 
         """
-        tv = self.data_utils.create_video()
+        tv = VideoFactory()
         TeamVideoFactory(team=self.team, added_by=self.admin, video=tv)
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
@@ -158,7 +158,7 @@ class TestCaseAutoTranscriptionTasks(WebdriverTestCase):
 
     def test_transcription_resume(self):
         """Saved transcription task can be resumed. """
-        tv = self.data_utils.create_video()
+        tv = VideoFactory()
         TeamVideoFactory(team=self.team, added_by=self.admin, video=tv)
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
@@ -231,7 +231,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
 
 
     def test_task_search_speaker_metadata(self):
-        tv = self.data_utils.create_video()
+        tv = VideoFactory()
         #Update the video title and description (via api)
         url_part = 'videos/%s/' % tv.video_id
         new_data = {'metadata': {'speaker-name': 'Ronaldo', 
@@ -253,7 +253,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.assertTrue(self.tasks_tab.task_present('Transcribe Subtitles', tv.title))
 
     def test_task_search_location_metadata(self):
-        tv = self.data_utils.create_video()
+        tv = VideoFactory()
         #Update the video title and description (via api)
         url_part = 'videos/%s/' % tv.video_id
         new_data = {'metadata': {'speaker-name': 'Ronaldo', 
@@ -282,7 +282,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         """
         self.team.subtitle_policy = 30
         self.team.save()
-        tv = self.data_utils.create_video()
+        tv = VideoFactory()
         TeamVideoFactory(team=self.team, video=tv)
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
@@ -502,7 +502,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
         """
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
-                         video=self.data_utils.create_video()).video
+                         video=VideoFactory()).video
         self.data_utils.upload_subs(self.member, video=tv.pk)
         self.tasks_tab.log_in(self.manager.username, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
@@ -512,7 +512,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def test_review_accept_creates_approve_task(self):
         """Approve task is created when reviewer accept transcription. """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -537,7 +537,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def test_review_accept_removes_review_task(self):
         """Review task removed after reviewer accepts transcription. """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -557,7 +557,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def test_review_accept_email(self):
         """Review task removed after reviewer accepts transcription. """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -579,7 +579,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def test_review_reject_transcription_reassigned(self):
         """Transcription task is reassigned when rejected by reviewer """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -606,7 +606,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def test_review_reject_removes_review_task(self):
         """Review task is removed when transcription rejected by reviewer """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -630,7 +630,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         """Translation tasks created, when transcription approved by approver.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -656,7 +656,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         """Approve task removed when transcription is approved by approver.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -677,7 +677,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def test_approve_accept_email_translator(self):
         """Email sent to reviewer when approver accepts transcription. """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -703,7 +703,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
     def test_approve_accept_email_reviewer(self):
         """Email sent to reviewer when approver accepts transcription. """
         self.skipTest("https://github.com/pculture/unisubs/issues/600")
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -731,7 +731,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         """Approve task removed when transcription is rejected by approver.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -756,7 +756,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         """Review task reassigned when, approver rejects transcription.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -789,7 +789,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         """
         self.skipTest('Needs https://github.com/pculture/unisubs/issues/600 '
                       ' fixed')
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -819,7 +819,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def test_review_send_back_email(self):
         """Translator emailed when review sends-back transcript. """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -852,7 +852,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
 
     def make_video_with_approved_transcript(self):
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                               video=video)
         data = {'language_code': 'en',
@@ -1043,7 +1043,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def test_a_resume_no_reset_original_lang(self):
         """Resuming task does not reset originl language. """
-        tv = self.data_utils.create_video()
+        tv = VideoFactory()
         TeamVideoFactory(team=self.team, added_by=self.admin, video=tv)
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
@@ -1114,7 +1114,7 @@ class TestCaseAutomaticTasksLegacyEditor(WebdriverTestCase):
         """Legacy subtitles save, incomplete task exists, assigned to same user.
 
         """
-        tv = self.data_utils.create_video()
+        tv = VideoFactory()
         TeamVideoFactory.create(team=self.team, added_by=self.admin, video=tv)
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
@@ -1135,7 +1135,7 @@ class TestCaseAutomaticTasksLegacyEditor(WebdriverTestCase):
 
     def test_legacy_subtitles_complete(self):
         """Legacy editor, complete subtitle task, preferred translation tasks created. """
-        tv = self.data_utils.create_video()
+        tv = VideoFactory()
         TeamVideoFactory.create(team=self.team, added_by=self.admin, video=tv)
         data = {'language_code': 'en',
                 'video': tv.pk,
@@ -1259,7 +1259,7 @@ class TestCaseModeratedTasksLegacyEditor(WebdriverTestCase):
         """Email sent when task accepted, contains notes.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -1290,7 +1290,7 @@ class TestCaseModeratedTasksLegacyEditor(WebdriverTestCase):
 
     def test_reject_transcription_reassigned(self):
         """Legacy editor transcription task is reassigned when sent back """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -1333,7 +1333,7 @@ class TestCaseModeratedTasksLegacyEditor(WebdriverTestCase):
         """Translation tasks created, when transcription approved by approver.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -1364,7 +1364,7 @@ class TestCaseModeratedTasksLegacyEditor(WebdriverTestCase):
         """Review task reassigned when, approver rejects transcription.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
         data = {'language_code': 'en',
@@ -1395,7 +1395,7 @@ class TestCaseModeratedTasksLegacyEditor(WebdriverTestCase):
                          self.manager.first_name, self.manager.last_name))
 
     def make_video_with_approved_transcript(self):
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                               video=video)
         data = {'language_code': 'en',

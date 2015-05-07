@@ -31,7 +31,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         """Subtitle contributor gets an email when new revision added.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         self.video_pg.open_video_page(video.video_id)
 
         self.video_pg.log_in(self.user.username, 'password')
@@ -60,7 +60,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         """Language follower gets an email when new revision added.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
 
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.log_in(self.user.username, 'password')
@@ -109,7 +109,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         """Video follower gets an email when new revision added.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         follower = UserFactory()
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.log_in(follower.username, 'password')
@@ -138,7 +138,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
 
         """
         self.skipTest('needs https://unisubs.sifterapp.com/issues/2220 fixed')
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         follower = UserFactory()
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.log_in(follower.username, 'password')
@@ -174,7 +174,7 @@ class TestCaseRevisionEdits(WebdriverTestCase):
                                     'subtitle_data')  
 
     def _add_video(self):
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         return video
 
     def _upload_en_draft(self, video, subs, user, complete=False):

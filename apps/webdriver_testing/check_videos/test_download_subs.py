@@ -26,7 +26,7 @@ class TestCaseDownloadSubs(WebdriverTestCase):
         """Create the test videos and add subtitles to it.
   
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         video.title = title
         video.save() 
         data = {'language_code': lang_code,

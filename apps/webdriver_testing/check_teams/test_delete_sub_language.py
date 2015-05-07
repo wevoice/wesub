@@ -108,7 +108,7 @@ class TestCaseWorkflows(WebdriverTestCase):
 
     @classmethod
     def _add_team_video(cls):
-        video = cls.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=cls.team, added_by=cls.admin, video=video)
         return video, tv
 
@@ -161,7 +161,7 @@ class TestCaseWorkflows(WebdriverTestCase):
         """Non workflow team videos have Delete Subtitle Language button.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=self.basic_team, added_by=self.admin, video=video)
 
         self._upload_subtitles(video, 'en', self.rev1, self.member)
@@ -325,7 +325,7 @@ class TestCaseDeletion(WebdriverTestCase):
 
     @classmethod
     def _add_team_video(cls):
-        video = cls.data_utils.create_video()
+        video = VideoFactory()
         tv = TeamVideoFactory(team=cls.team, added_by=cls.admin, video=video)
         return video, tv
 
