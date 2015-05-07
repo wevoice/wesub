@@ -411,7 +411,7 @@ MEDIA_BUNDLES = {
         ),
     },
     "new-base.css": {
-        "files": (
+        "files": [
             'src/css/site/colors.scss',
             'src/css/site/layout.scss',
             'src/css/site/type.scss',
@@ -426,7 +426,7 @@ MEDIA_BUNDLES = {
             'src/css/site/banner.scss',
             'src/css/site/footer.scss',
             'src/css/site/teams.scss',
-        ),
+        ],
         "include_path": 'src/css/site',
     },
     "home.css": {
@@ -472,12 +472,12 @@ MEDIA_BUNDLES = {
         ),
     },
     "new-site.js": {
-        "files": (
+        "files": [
             'src/js/third-party/jquery-2.1.3.js',
             'src/js/site/menus.js',
             'src/js/site/modals.js',
             'src/js/site/team-integration-settings.js',
-        ),
+        ],
     },
     "api.js": {
         "files": (

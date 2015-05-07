@@ -38,9 +38,17 @@ from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 
 from staticmedia import utils
+import optionalapps
 
-def static_root():
-    return settings.STATIC_ROOT
+def media_directories():
+    dirs = [
+        os.path.join(settings.PROJECT_ROOT, 'media')
+    ]
+    for repo_dir in optionalapps.get_repository_paths():
+        repo_media_dir = os.path.join(repo_dir, 'media')
+        if os.path.exists(repo_media_dir):
+            dirs.append(repo_media_dir)
+    return dirs
 
 class Bundle(object):
     """Represents a single media bundle."""
@@ -52,9 +60,15 @@ class Bundle(object):
         self.name = name
         self.config = config
 
+    def path(self, filename):
+        for media_dir in media_directories():
+            path_try = os.path.join(media_dir, filename)
+            if os.path.exists(path_try):
+                return path_try
+        raise ValueError("Can't find media path: {}".format(filename))
+
     def paths(self):
-        root_dir = static_root()
-        return [os.path.join(root_dir, p) for p in self.config['files']]
+        return [self.path(p) for p in self.config['files']]
 
     def concatinate_files(self):
         return ''.join(open(p).read() for p in self.paths())
@@ -162,17 +176,16 @@ class CSSBundle(Bundle):
     def build_contents(self):
         source_css = self.concatinate_files()
         if settings.STATIC_MEDIA_COMPRESSED:
-            return utils.run_command([
-                'sass', '-t', 'compressed', '-E', 'utf-8',
-                '--load-path', os.path.join(static_root(), 'css'),
-                '--scss', '--stdin',
-            ], stdin=source_css)
+            sass_type = 'compressed'
         else:
-            return utils.run_command([
-                'sass', '-t', 'expanded', '-E', 'utf-8',
-                '--load-path', os.path.join(static_root(), 'css'),
-                '--scss', '--stdin',
-            ], stdin=source_css)
+            sass_type = 'expanded'
+        cmdline = [
+            'sass', '-t', sass_type, '-E', 'utf-8', 
+        ]
+        for path in media_directories():
+            cmdline.extend(['--load-path', os.path.join(path, 'css')])
+        cmdline.extend(['--scss', '--stdin'])
+        return utils.run_command(cmdline, stdin=source_css)
 
 _type_to_bundle_class = {
     'js': JavascriptBundle,
