@@ -20,6 +20,9 @@ nav {
         float: left;
         position: relative;
 
+        &.user {
+            float: right;
+        }
 
         a {
             padding: 10px 15px;
