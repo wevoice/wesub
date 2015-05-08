@@ -147,14 +147,14 @@ var angular = angular || null;
         var subtitleList = $scope.workingSubtitles.subtitleList;
 
         function updateSyncHelpers() {
-            var startIndex = null, endIndex = null;
+            var startSub = null, endSub = null;
             if(willSync.start !== null) {
-                startIndex = subtitleList.getIndex(willSync.start);
+                startSub = willSync.start;
             }
             if(willSync.end !== null) {
-                endIndex = subtitleList.getIndex(willSync.end);
+                endSub = willSync.end;
             }
-            $scope.positionSyncHelpers(startIndex, endIndex);
+            $scope.positionSyncHelpers(startSub, endSub);
         }
 
         $scope.$root.$on('will-sync-changed', function(evt, newWillSync) {
