@@ -256,7 +256,7 @@ REST_FRAMEWORK = {
 #################
 
 import re
-LOCALE_INDEPENDENT_PATHS = (
+LOCALE_INDEPENDENT_PATHS = [
     re.compile('^/media/'),
     re.compile('^/widget/'),
     re.compile('^/api/'),
@@ -264,10 +264,9 @@ LOCALE_INDEPENDENT_PATHS = (
     re.compile('^/jstest/'),
     re.compile('^/sitemap.*.xml'),
     re.compile('^/externalsites/youtube-callback'),
-    re.compile('^/providers/'),
     re.compile('^/crossdomain.xml'),
     re.compile('^/embedder-widget-iframe/'),
-)
+]
 
 #Haystack configuration
 HAYSTACK_SITECONF = 'search_site'
