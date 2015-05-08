@@ -488,7 +488,8 @@ var angular = angular || null;
                 }
 
                 var shownSubtitle = subtitleList().subtitleAt(
-                        scope.currentTime);
+                    scope.currentTime);
+		scope.subtitle = shownSubtitle;
                 if(shownSubtitle === null && unsyncedSubtitle !== null &&
                         unsyncedSubtitle.startTime <= scope.currentTime) {
                     shownSubtitle = unsyncedSubtitle.storedSubtitle;
