@@ -424,6 +424,7 @@ MEDIA_BUNDLES = {
             'src/css/site/menus.scss',
             'src/css/site/modals.scss',
             'src/css/site/banner.scss',
+            'src/css/site/messages.scss',
             'src/css/site/footer.scss',
             'src/css/site/teams.scss',
         ],
