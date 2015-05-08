@@ -26,18 +26,16 @@ class TestCaseDownloadSubs(WebdriverTestCase):
         """Create the test videos and add subtitles to it.
   
         """
-        video = self.data_utils.create_video()
-        video.title = title
-        video.save() 
-        data = {'language_code': lang_code,
-                'video': video.pk,
-                'primary_audio_language_code': lang_code,
-                'draft': open(sub_file),
-                'is_complete': True,
-                'complete': 1
-                }
-
-        self.data_utils.upload_subs(self.user, **data)
+        video = VideoFactory(title=title,
+                             primary_audio_language_code='en')
+        data = { 'language_code': lang_code,
+                 'video': video,
+                 'subtitles': sub_file,
+                 'complete': complete,
+                 'author': self.user,
+                 'committer': self.user
+               }
+        self.data_utils.add_subs(data)
         return video
 
     def _download_filename(self, title, lang_code, output):

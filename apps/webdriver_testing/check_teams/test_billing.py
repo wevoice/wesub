@@ -344,33 +344,35 @@ class TestCaseDemandReports(WebdriverTestCase):
     def create_tv_with_original_subs(cls, lc, user, team, complete=True):
 
         vid_data = {'primary_audio_language_code': 'en' }
-        video = cls.data_utils.create_video(**vid_data)
+        video = VideoFactory(**vid_data)
         tv = TeamVideoFactory.create(
             team=team, 
             video=video, 
             added_by=user)
 
         data = {
-                    'primary_audio_language_code': 'en',
                     'language_code': 'en',
-                    'complete': int(complete), 
-                    'is_complete': complete,
-                    'video': video.pk,
-                    'draft': open('apps/webdriver_testing/subtitle_data/Timed_text.en.srt')
+                    'complete': complete, 
+                    'video': video,
+                    'subtitles': 'apps/webdriver_testing/subtitle_data/Timed_text.en.srt',
+                    'author': user,
+                    'committer': user,
                 }
-        cls.data_utils.upload_subs(user, **data)
+        cls.data_utils.add_subs(**data)
         return video, tv
 
     @classmethod
     def add_translation(cls, lc, video, user, complete=False):
         data = {
                 'language_code': lc,
-                'from_language_code': 'en',
-                'video': video.pk,
-                'subtitles': open('apps/webdriver_testing/subtitle_data/'
-                              'Timed_text.sv.dfxp'),
-                'complete': complete}
-        cls.data_utils.upload_subs(user, **data)
+                'video': video,
+                'subtitles': 'apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.sv.dfxp',
+                'complete': complete,
+                'author': user,
+                'committer': user
+               }
+        cls.data_utils.add_subs(**data)
 
     @classmethod
     def _bill_dict(cls, bill_file):
