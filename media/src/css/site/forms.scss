@@ -2,7 +2,12 @@ form {
     padding-top: 20px;
     padding-bottom: 40px;
 
+    button {
+        @include button-color($medium-gray);
+    }
+
     button.submit {
+        @include button-color($primary);
         float: right;
     }
 
