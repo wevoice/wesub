@@ -1,0 +1,25 @@
+{% extends "new-teams/base.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block page_content %}
+
+<h2>{% trans "Team Settings - Projects" %}</h2>
+
+{% if projects %}
+<table>
+  {% for project in projects %}
+  <tr>
+    <td><h4>{{ project.name }}</h4></td>
+    <td class="actions">
+      <a class="action-edit" href="{% url "teams:edit_project" slug=team.slug project_slug=project.slug %}">{% trans 'Edit' %}</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="empty">{% trans 'This team does not have any projects yet' %}</p>
+{% endif %}
+
+<a class="button" href="{% url "teams:add_project" slug=team.slug %}"><span class="fa fa-plus"></span> {% trans 'Add Project' %}</a>
+{% endblock %}

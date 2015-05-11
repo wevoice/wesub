@@ -43,7 +43,7 @@ class OldTeamWorkflow(TeamWorkflow):
     type_code = 'O'
     label = _('Old Style')
     dashboard_view = staticmethod(views.old_dashboard)
-    workflow_settings_view = staticmethod(views.old_team_settings_permissions)
+    workflow_settings_view = staticmethod(views.old_team_settings_workflows)
 
     def get_subtitle_workflow(self, team_video):
         """Get the SubtitleWorkflow for a video with this workflow.  """

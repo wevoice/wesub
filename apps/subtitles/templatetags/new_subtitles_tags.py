@@ -65,7 +65,6 @@ def render_subtitles(subtitle_version):
     thousands of subtitles that gets slow
     """
     subtitles = subtitle_version.get_subtitles()
-    parts = []
     timing_template = string.Template(u"""\
 <div class="timing">
     <a class="time_link" href="#" title="Play video here">
@@ -87,7 +86,18 @@ def render_subtitles(subtitle_version):
     <p class='quiet'>¶</p>
 </div>""")
 
+    synced_subs = []
+    unsynced_subs = []
+
     for item in subtitles.subtitle_items(HTMLGenerator.MAPPINGS):
+        if item.start_time is not None:
+            synced_subs.append(item)
+        else:
+            unsynced_subs.append(item)
+    synced_subs.sort(key=lambda item: item.start_time)
+
+    parts = []
+    for item in synced_subs + unsynced_subs:
         new_paragraph = item.meta.get('new_paragraph', False)
         if new_paragraph:
             parts.append(u'<li class="subtitle-item start-of-paragraph">')

@@ -26,7 +26,7 @@ from django.utils.translation import ugettext_lazy
 from auth.models import CustomUser as User
 from teams.models import Team
 from externalsites import models
-from utils.forms import SubmitButtonField
+from utils.forms import SubmitButtonField, SubmitButtonWidget
 import videos.tasks
 
 class AccountForm(forms.ModelForm):
@@ -181,8 +181,10 @@ class BrightcoveAccountForm(AccountForm):
             return None
 
 class AddYoutubeAccountForm(forms.Form):
-    add_button = SubmitButtonField(label=ugettext_lazy('Add YouTube account'),
-                                   required=False)
+    add_button = SubmitButtonField(
+        label=ugettext_lazy('Add YouTube account'),
+        required=False,
+        widget=SubmitButtonWidget(attrs={'class': 'small'}))
 
     def __init__(self, owner, data=None, **kwargs):
         super(AddYoutubeAccountForm, self).__init__(data=data, **kwargs)

@@ -26,18 +26,16 @@ class TestCaseDownloadSubs(WebdriverTestCase):
         """Create the test videos and add subtitles to it.
   
         """
-        video = self.data_utils.create_video()
-        video.title = title
-        video.save() 
-        data = {'language_code': lang_code,
-                'video': video.pk,
-                'primary_audio_language_code': lang_code,
-                'draft': open(sub_file),
-                'is_complete': True,
-                'complete': 1
-                }
-
-        self.data_utils.upload_subs(self.user, **data)
+        video = VideoFactory(title=title,
+                             primary_audio_language_code=lang_code)
+        data = { 'language_code': lang_code,
+                 'video': video,
+                 'subtitles': sub_file,
+                 'complete': True,
+                 'author': self.user,
+                 'committer': self.user
+               }
+        self.data_utils.add_subs(**data)
         return video
 
     def _download_filename(self, title, lang_code, output):
@@ -116,8 +114,8 @@ class TestCaseDownloadSubs(WebdriverTestCase):
         #and outputs the expected data and file format.
 
         dl_content = self._check_download_subtitles(test_video, lang_code, download_format)
-        self.assertIn('WEBVTT\n\r\n00:00:00.028 --> 00:00:01.061'
-                      '\r\n<i>Det h\xc3\xa4nde sig en g\xc3\xa5ng,</i>' , dl_content)
+        self.assertIn('WEBVTT\n\n00:00:00.028 --> 00:00:01.061'
+                      '\n<i>Det h\xc3\xa4nde sig en g\xc3\xa5ng,</i>' , dl_content)
 
     def test_download_sbv(self):
         """Download subs (zh-cn) as a sbv file.

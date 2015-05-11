@@ -117,6 +117,10 @@ ALL_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 
 def get_team_for_view(slug, user, exclude_private=True):
+    if isinstance(slug, Team):
+        # hack to handle the new view code calling this page.  In that
+        # case it passes the team directly rather than the slug
+        return slug
     try:
         return Team.objects.for_user(user, exclude_private).get(slug=slug)
     except Team.DoesNotExist:
@@ -204,18 +208,17 @@ def create(request):
                     <li><a href="%(lang)s">Edit language preferences</a></li>
                     <li><a href="%(custom)s">Customize instructions to caption makers and translators</a></li>
                 </ul>"""),
-                edit=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
-                activate=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
+                edit=reverse("teams:settings_workflows", kwargs={"slug": team.slug}),
+                activate=reverse("teams:settings_workflows", kwargs={"slug": team.slug}),
                 create=reverse("teams:settings_projects", kwargs={"slug": team.slug}),
                 lang=reverse("teams:settings_languages", kwargs={"slug": team.slug}),
-                custom=reverse("teams:settings_guidelines", kwargs={"slug": team.slug}),
+                custom=reverse("teams:settings_messages", kwargs={"slug": team.slug}),
             ))
             return redirect(reverse("teams:settings_basic", kwargs={"slug":team.slug}))
     else:
         form = CreateTeamForm(request.user)
 
     return { 'form': form }
-
 
 # Settings
 def _delete_team(request, team):
@@ -264,10 +267,10 @@ def settings_basic(request, team):
 
     return { 'team': team, 'form': form, }
 
-@render_to('teams/settings-guidelines.html')
+@render_to('teams/settings-messages.html')
 @settings_page
-def settings_guidelines(request, team):
-    initial = dict((s.key_name, s.data) for s in team.settings.messages_guidelines())
+def settings_messages(request, team):
+    initial = team.settings.all_messages()
     if request.POST:
         form = GuidelinesMessagesForm(request.POST, initial=initial)
 
@@ -284,12 +287,8 @@ def settings_guidelines(request, team):
 
     return { 'team': team, 'form': form, }
 
-@settings_page
-def settings_permissions(request, team):
-    return team.new_workflow.workflow_settings_view(request, team)
-
-@render_to('teams/settings-permissions.html')
-def old_team_settings_permissions(request, team):
+@render_to('teams/settings-workflows.html')
+def old_team_settings_workflows(request, team):
     workflow = Workflow.get_for_target(team.id, 'team')
     moderated = team.moderates_videos()
 
@@ -1554,10 +1553,6 @@ def _get_task_filters(request):
              'assignee': request.GET.get('assignee'),
              'q': request.GET.get('q'), }
 
-def dashboard(request, slug):
-    team = get_team_for_view(slug, request.user, exclude_private=False)
-    return team.new_workflow.dashboard_view(request, team)
-
 @render_to('teams/dashboard.html')
 def old_dashboard(request, team):
     user = request.user if request.user.is_authenticated() else None
@@ -2049,29 +2044,23 @@ def add_project(request, slug):
     team = get_team_for_view(slug, request.user)
 
     if request.POST:
-        form = ProjectForm(request.POST)
+        form = ProjectForm(team, request.POST)
         workflow_form = WorkflowForm(request.POST)
 
         if form.is_valid() and workflow_form.is_valid():
 
-            if team.project_set.filter(slug=pan_slugify(form.cleaned_data['name'])).exists():
-                messages.error(request, _(u"There's already a project with this name"))
-            else:
-                project = form.save(commit=False)
-                project.team = team
-                project.save()
+            project = form.save()
+            if project.workflow_enabled:
+                workflow = workflow_form.save(commit=False)
+                workflow.team = team
+                workflow.project = project
+                workflow.save()
 
-                if project.workflow_enabled:
-                    workflow = workflow_form.save(commit=False)
-                    workflow.team = team
-                    workflow.project = project
-                    workflow.save()
-
-                messages.success(request, _(u'Project added.'))
-                return HttpResponseRedirect(
-                        reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
+            messages.success(request, _(u'Project added.'))
+            return HttpResponseRedirect(
+                reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
     else:
-        form = ProjectForm()
+        form = ProjectForm(team)
         workflow_form = WorkflowForm()
 
     return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
@@ -2098,7 +2087,7 @@ def edit_project(request, slug, project_slug):
             messages.success(request, _(u'Project deleted.'))
             return HttpResponseRedirect(project_list_url)
         else:
-            form = ProjectForm(request.POST, instance=project)
+            form = ProjectForm(team, request.POST, instance=project)
             workflow_form = WorkflowForm(request.POST, instance=workflow)
 
             # if the project doesn't have workflow enabled, the workflow form
@@ -2117,7 +2106,7 @@ def edit_project(request, slug, project_slug):
                 return HttpResponseRedirect(project_list_url)
 
     else:
-        form = ProjectForm(instance=project)
+        form = ProjectForm(team, instance=project)
         workflow_form = WorkflowForm(instance=workflow)
 
     return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }

@@ -30,10 +30,16 @@ class TestCaseUploadTranslation(WebdriverTestCase):
     def setUp(self):
         self.video_pg.open_page('videos/create/')
         self.video_pg.handle_js_alert('accept')
-        self.tv = self.data_utils.create_video()
-        self.data_utils.upload_subs(self.user, 
-                                    video=self.tv.pk,
-                                    primary_audio_language_code='en')
+        self.tv = VideoFactory(primary_audio_language_code='en')
+        data = {'language_code': 'en',
+                 'video': self.tv,
+                 'subtitles': 'apps/webdriver_testing/subtitle_data/'
+                               'Timed_text.en.srt',
+                 'complete': True,
+                 'author': self.user,
+                 'committer': self.user 
+                }
+        self.data_utils.add_subs(**data) 
         self.video_pg.open_video_page(self.tv.video_id)
 
     def _upload_and_verify(self, tv, sub_file, language, lang_code):
@@ -95,27 +101,6 @@ class TestCaseUploadTranslation(WebdriverTestCase):
         sc = self._upload_and_verify(self.tv, sub_file, 'Swedish', 'sv')
         self.assertEqual(sc, 72) 
        
-
-    def test_sbv__more_lines(self):
-        """Can not upload dependant translation with more lines than source'.
-
-        """
-        sub_file = os.path.join(self.subs_data_dir, 'Timed_text.zh-cn.sbv')
-        message = self.video_pg.upload_subtitles('Chinese, Simplified', sub_file, 
-                                       translated_from='English')
-        self.assertEqual(message, ("Sorry, we couldn't upload your file "
-                                   "because the number of lines in your "
-                                   "translation (243) doesn't match the "
-                                   "original (72)."))
-
-    def test_ssa__less_lines(self):
-        """Can upload a dependant translation with less lines than source.
-
-        """
-        sub_file = os.path.join(self.subs_data_dir, 'less_lines.ssa')       
-        sc = self._upload_and_verify(self.tv, sub_file, 'Hungarian', 'hu')
-        self.assertEqual(sc, 7) 
-
     def test_dfxp(self):
         """Upload translation (fr) in a dfxp file.
 

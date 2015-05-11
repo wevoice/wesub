@@ -47,7 +47,7 @@ class TestCaseFollowing(WebdriverTestCase):
 
         """
         self.video_pg.log_in(self.user.username, 'password')
-        tv = self.data_utils.create_video()
+        tv = VideoFactory()
         sub_file = os.path.join(self.subs_data_dir, 'Untimed_text.dfxp')
         self.video_pg.open_video_page(tv.video_id)
         self.video_pg.upload_subtitles('English', sub_file)
@@ -60,7 +60,7 @@ class TestCaseFollowing(WebdriverTestCase):
 
         """
         self.video_pg.log_in(self.user.username, 'password')
-        tv = self.data_utils.create_video()
+        tv = VideoFactory()
         sub_file = os.path.join(self.subs_data_dir, 'Untimed_text.dfxp')
         self.video_pg.open_video_page(tv.video_id)
         self.video_pg.upload_subtitles('English', sub_file)

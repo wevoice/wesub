@@ -1,0 +1,42 @@
+#header {
+    background: $off-white;
+    a {
+        color: $darkish-gray;
+
+        img {
+            height: 25px;
+        }
+
+        &:hover {
+            text-decoration: none;
+            background-color: lighten($primary, 10);
+            color: $white;
+        }
+
+        &.home {
+            padding: 10px 0 0 0;
+            margin-right: 5px;
+
+            &:hover {
+                background-color: inherit;
+                color: $darkish-gray;
+            }
+        }
+    }
+}
+
+#announce-banner {
+    background-color: $off-white;
+    color: $darkish-gray;
+    text-align: center;
+
+    li {
+        padding: 8px 0;
+        border-bottom: 1px solid $green;
+    }
+
+    a {
+        color: $green;
+        margin-left: 10px;
+    }
+}
