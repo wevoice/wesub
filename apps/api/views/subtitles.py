@@ -626,7 +626,7 @@ class SubtitlesView(generics.CreateAPIView):
     def get_serializer_context(self):
         return {
             'video': self.get_video(),
-            'language_code': self.kwargs['language_code'],
+            'language_code': self.kwargs['language_code'].lower(),
             'user': self.request.user,
             'request': self.request,
             'sub_format': self.request.query_params.get('sub_format', 'json'),
