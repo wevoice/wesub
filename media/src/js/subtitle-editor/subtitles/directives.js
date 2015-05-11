@@ -44,8 +44,8 @@ var USER_IDLE_MINUTES = 15;
             var currentArrow = undefined;
             var wrapper = $(elem);
 
-            function getSubtitleTop(index) {
-                var li = $('li.sub', subtitleList).eq(index);
+            function getSubtitleTop(subtitle) {
+                var li = scope.getSubtitleRepeatItem(subtitle);
                 var top = li.offset().top - wrapper.offset().top;
                 if(top < 0 || top + startHelper.height() >= wrapper.height()) {
                     return null;
@@ -53,18 +53,18 @@ var USER_IDLE_MINUTES = 15;
                 return top;
             }
 
-            var lastSyncStartIndex = null;
-            var lastSyncEndIndex = null;
+            var lastSyncStart = null;
+            var lastSyncEnd = null;
 
-            scope.positionSyncHelpers = function(startIndex, endIndex) {
-                if(startIndex === undefined) {
-                    startIndex = lastSyncStartIndex;
+            scope.positionSyncHelpers = function(startSub, endSub) {
+                if(startSub === undefined) {
+                    startSub = lastSyncStart;
                 }
-                if(endIndex === undefined) {
-                    endIndex = lastSyncEndIndex;
+                if(endSub === undefined) {
+                    endSub = lastSyncEnd;
                 }
-                lastSyncStartIndex = startIndex;
-                lastSyncEndIndex = endIndex;
+                lastSyncStart = startSub;
+                lastSyncEnd = endSub;
 
                 if(!scope.timelineShown || !VideoPlayer.isPlaying()) {
                     startHelper.hide();
@@ -73,11 +73,11 @@ var USER_IDLE_MINUTES = 15;
                 }
                 var startTop = null;
                 var endTop = null;
-                if(startIndex !== null) {
-                    startTop = getSubtitleTop(startIndex);
+                if(startSub !== null) {
+                    startTop = getSubtitleTop(startSub);
                 }
-                if(endIndex !== null) {
-                    endTop = getSubtitleTop(endIndex);
+                if(endSub !== null) {
+                    endTop = getSubtitleTop(endSub);
                 }
                 if(startTop !== null) {
                     startHelper.css('top', startTop + 'px');

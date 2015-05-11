@@ -66,7 +66,7 @@ class TestCaseBulkApprove(WebdriverTestCase):
         self.tasks_tab.open_page('teams/%s/approvals/' %self.team.slug)
         lang_list = ('en', 'fr', 'de', 'it', 'hr', 'ro', 'ru', 'sv', 'es', 'pt')
         for x in range(20):
-            video = self.data_utils.create_video()
+            video = VideoFactory()
             tv = TeamVideoFactory(team=self.team, added_by=self.admin, 
                          video=video)
             for lc in lang_list:
