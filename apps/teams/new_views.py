@@ -36,6 +36,7 @@ from django.utils.translation import ugettext as _
 from . import views as old_views
 from . import forms
 from . import permissions
+from . import tasks
 from .models import Setting, Team, Project
 
 logger = logging.getLogger('teams.views')
@@ -106,8 +107,8 @@ def settings_basic(request, team):
                 raise
 
             if is_visible != form.instance.is_visible:
-                update_video_public_field.delay(team.id)
-                invalidate_video_visibility_caches.delay(team)
+                tasks.update_video_public_field.delay(team.id)
+                tasks.invalidate_video_visibility_caches.delay(team)
 
             messages.success(request, _(u'Settings saved.'))
             return HttpResponseRedirect(request.path)
