@@ -174,6 +174,7 @@ class TestCaseRevisionEdits(WebdriverTestCase):
                                     'subtitle_data')  
 
     def _add_video(self):
+#        video = VideoFactory()
         video = VideoFactory(primary_audio_language_code='en')
         return video
 

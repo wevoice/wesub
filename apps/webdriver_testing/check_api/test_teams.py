@@ -102,10 +102,8 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         url = '/api/teams/%s/members/' % r['slug']
         r = self._get(url, self.partner)
         self.logger.info(r)
-        self.assertIn(self.partner.username, r[0]['username'])
-        self.assertIn('owner', r[0]['role'])
-
-        
+        self.assertIn(self.partner.username, r['objects'][0]['username'])
+        self.assertIn('owner', r['objects'][0]['role'])
 
     def test_list(self):
         """User can get public teams + their private teams
@@ -517,7 +515,7 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         r = self._get(url=url, user=admin)
         members_url = "/api/teams/%s/members/" % team.slug
         r = self._get(url=members_url, user=admin)
-        self.assertIn(user, [member['username'] for member in r])
+        self.assertIn(user, [member['username'] for member in r['objects']])
         #Query for a specific user
         query_url = url + '?user=%s' % user
         r = self._get(url=query_url, user=admin)

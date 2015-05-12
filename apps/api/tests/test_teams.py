@@ -601,8 +601,9 @@ class TasksAPITest(TeamAPITestBase):
         task_map = dict((t.id, t) for t in correct_tasks)
         response = self.client.get(self.list_url, params)
         assert_equal(response.status_code, status.HTTP_200_OK)
-        assert_items_equal([t['id'] for t in response.data], task_map.keys())
-        for task_data in response.data:
+        response_objects = response.data['objects']
+        assert_items_equal([t['id'] for t in response_objects], task_map.keys())
+        for task_data in response_objects:
             self.check_task_data(task_data, task_map[task_data['id']])
 
     def test_list(self):
@@ -733,7 +734,7 @@ class TasksAPITest(TeamAPITestBase):
         task_qs = self.team.task_set.all().order_by(order_param)
         response = self.client.get(self.list_url, {'order_by': order_param})
         assert_equal(response.status_code, status.HTTP_200_OK)
-        assert_equal([t['id'] for t in response.data],
+        assert_equal([t['id'] for t in response.data['objects']],
                      [t.id for t in task_qs])
 
     def test_order_by_filter(self):

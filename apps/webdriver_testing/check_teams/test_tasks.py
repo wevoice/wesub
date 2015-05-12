@@ -514,7 +514,6 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.assertTrue(self.tasks_tab.task_present(
                 'Review Original English Subtitles', video.title))
 
-
     def test_review_accept_creates_approve_task(self):
         """Approve task is created when reviewer accept transcription. """
         video = self.setup_tasks()
