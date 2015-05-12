@@ -20,16 +20,12 @@ var angular = angular || null;
 
 (function() {
 
-    var API_BASE_PATH_TEAMS = '/api2/partners/teams/';
-    var API_BASE_PATH_VIDEOS = '/api2/partners/videos/';
+    var API_BASE_PATH_TEAMS = '/api/teams/';
 
     var module = angular.module('amara.SubtitleEditor.subtitles.services', []);
 
     var getTaskSaveAPIUrl = function(teamSlug, taskID) {
         return API_BASE_PATH_TEAMS + teamSlug + '/tasks/' + taskID + '/';
-    };
-    var getVideoLangAPIUrl = function(videoId) {
-        return API_BASE_PATH_VIDEOS + videoId + '/languages/';
     };
     var getSubtitlesAPIURL = function(videoId, languageCode) {
         return ('/api/videos/' + videoId +
