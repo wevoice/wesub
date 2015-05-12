@@ -174,18 +174,21 @@ class TestCaseRevisionEdits(WebdriverTestCase):
                                     'subtitle_data')  
 
     def _add_video(self):
-        video = VideoFactory()
+#        video = VideoFactory()
+        video = VideoFactory(primary_audio_language_code='en')
         return video
 
     def _upload_en_draft(self, video, subs, user, complete=False):
-        data = {'language_code': 'en',
-                     'video': video.pk,
-                     'primary_audio_language_code': 'en',
-                     'draft': open(subs),
-                     'complete': int(complete),
-                     'is_complete': complete,
-                    }
-        self.data_utils.upload_subs(user, **data)
+
+        data = { 'language_code': 'en',
+                 'video': video,
+                 'subtitles': subs,
+                 'complete': complete,
+                 'author': user,
+                 'committer': user 
+               }
+        self.data_utils.add_subs(**data)
+
 
     def _create_two_incomplete(self, video, user):
         rev1 = os.path.join(self.subs_dir, 'Timed_text.en.srt')

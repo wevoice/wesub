@@ -1,0 +1,89 @@
+{% extends "new-teams/base.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block html_attrs %}{{ block.super }} id="team-settings-integration"{% endblock %}
+
+{% block page_content %}
+
+<h2>{% trans "Team Settings - Integrations" %}</h2>
+
+<form id="external-accounts" method="POST" action="">
+  {% csrf_token %}
+
+  <fieldset class="youtube">
+    <legend>{% trans "YouTube" %}</legend>
+    {% for form in forms.youtube_forms %}
+    <div class="youtube-form">
+      <div class="remove-button">
+        {{ form.remove_button }}
+      </div>
+      <h3>{% blocktrans with account_name=form.account.get_owner_display %}
+        Linked Account: {{ account_name }}
+        {% endblocktrans %}
+      </h3>
+      {% if form.show_sync_teams %}
+      <h4>{% trans "Sync videos from these teams:" %}</h4>
+      {{ form.sync_teams }}
+      {% endif %}
+    </div>
+    {% empty %}
+    <p><em>{% trans 'No youtube accounts linked yet.' %}</em></p>
+    {% endfor %}
+    {{ forms.add_youtube.add_button }}
+  </fieldset>
+
+  <fieldset class="kaltura{% if not forms.kaltura.enabled.value %} disabled{% endif %}">
+    <legend>{% trans "Kaltura" %}</legend>
+    {% include "_checkbox_field.html" with field=forms.kaltura.enabled %}
+    {{ forms.kaltura.non_field_errors }}
+    <div class="account-fields">
+      {% include "_field.html" with field=forms.kaltura.partner_id %}
+      {% include "_field.html" with field=forms.kaltura.secret %}
+    </div>
+  </fieldset>
+
+  <fieldset class="brightcove{% if not forms.brightcove.enabled.value %} disabled{% endif %}">
+    <legend>{% trans "Brightcove" %}</legend>
+    {% include "_checkbox_field.html" with field=forms.brightcove.enabled %}
+    {{ forms.brightcove.non_field_errors }}
+    <div class="account-fields">
+      {% include "_field.html" with field=forms.brightcove.publisher_id %}
+      {% include "_field.html" with field=forms.brightcove.write_token %}
+      {% if forms.brightcove.import_feed %}
+      <a class="import-feed" href="{% url "teams:video_feed" slug=team.slug feed_id=forms.brightcove.import_feed.id %}">View feed</a>
+      {% endif %}
+      {% include "_field.html" with field=forms.brightcove.feed_enabled widget_type="checkbox" %}
+      <fieldset class="feed-fields">
+        {% include "_field.html" with field=forms.brightcove.player_id %}
+        {{ forms.brightcove.feed_tags.errors }}
+        {{ forms.brightcove.feed_type.errors }}
+        <ul class="feed-import">
+          {% for choice in forms.brightcove.feed_type %}
+          <li>
+          {{ choice.tag }} {{ choice.choice_label }}
+          {% if choice.choice_value == "T" %}
+          {{ forms.brightcove.feed_tags }}
+          <em>{% trans "separate tags with commas" %}</em>
+          {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </fieldset>
+    </div>
+  </fieldset>
+
+  <div class="actions">
+    <button class="submit">{% trans "Save Changes" %} <span class="fa fa-angle-double-right"></span></button>
+  </div>
+</form>
+
+<aside id="confirm-delete-account-modal" class="modal" role="dialog" aria-labeledby="confirm-delete-title">
+    <h3 id="confrim-delete-title">{% trans 'About to delete account settings' %}</h3>
+    <p>{% trans 'You have disabled an account that was previously enabled.  If you continue, then the settings for that account will be lost.' %}</p>
+    <footer class="buttons">
+        <button class="continue">{% trans 'Continue' %}</button>
+        <button class="close">{% trans 'Cancel' %}</button>
+    </footer>
+</aside>
+{% endblock %}

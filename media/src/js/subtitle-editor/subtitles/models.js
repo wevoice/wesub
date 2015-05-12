@@ -309,7 +309,8 @@ var angular = angular || null;
     }
 
     SubtitleList.prototype.needsAnyTranscribed = function() {
-        for(var i=0; i < this.length(); i++) {
+        var length = this.length();
+        for(var i=0; i < length; i++) {
             if(this.subtitles[i].markdown == '') {
                 return this.subtitles[i];
             }
@@ -318,7 +319,8 @@ var angular = angular || null;
     }
 
     SubtitleList.prototype.getSubtitleById = function(id) {
-        for(var i=0; i < this.length(); i++) {
+        var length = this.length();
+        for(var i=0; i < length; i++) {
             if(this.subtitles[i].id == id) {
                 return this.subtitles[i];
             }
@@ -337,19 +339,20 @@ var angular = angular || null;
     }
 
     SubtitleList.prototype.firstInvalidTiming = function() {
-        for(var i=0; i < this.length(); i++) {
+        var length = this.length();
+        for(var i=0; i < length; i++) {
             if((this.subtitles[i].startTime < 0) ||
 	       (this.subtitles[i].endTime < 0)) {
                 return this.subtitles[i];
             }
         }
-        for(var i=0; i < this.length(); i++) {
+        for(var i=0; i < length; i++) {
             if(this.subtitles[i].startTime >= this.subtitles[i].endTime) {
                 return this.subtitles[i];
             }
         }
 	var startTimes = {};
-        for(var i=0; i < this.length(); i++) {
+        for(var i=0; i < length; i++) {
             if(startTimes[this.subtitles[i].startTime]) {
                 return this.subtitles[i];
             } else {

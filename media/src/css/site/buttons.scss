@@ -1,0 +1,49 @@
+@mixin small-button {
+    font-size: 1.4rem;
+    padding: 6px 12px;
+}
+
+@mixin medium-button {
+    font-size: 1.6rem;
+    padding: 6px 18px;
+}
+
+@mixin button-color($color) {
+    background-color: $color;
+    border-color: $color;
+
+    &:hover {
+        background: lighten($color, 10);
+        border-color: lighten($color, 10);
+    }
+}
+
+button, a.button {
+    display: inline-block;
+    margin: 0;
+    padding: 13px 26px;
+    font-size: 2.0rem;
+    font-weight: $font-weight-normal;
+    border: 1px solid;
+    color: $white;
+    cursor: pointer;
+
+    @include button-color($primary);
+
+    &:hover {
+        text-decoration: none;
+    }
+
+    &.small {
+        @include small-button;
+    }
+
+    &.medium {
+        @include medium-button;
+    }
+
+    &.delete {
+        @include button-color($red);
+    }
+}
+
