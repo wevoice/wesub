@@ -28,7 +28,8 @@ from teams.models import Team
 from externalsites import models
 from utils.forms import SubmitButtonField, SubmitButtonWidget
 import videos.tasks
-
+import logging
+logger = logging.getLogger("forms")
 class AccountForm(forms.ModelForm):
     """Base class for forms on the teams or user profile tab."""
 
@@ -298,8 +299,8 @@ class ResyncForm(forms.Form):
         sync_items = kwargs.pop('sync_items')
         super(ResyncForm, self).__init__(*args, **kwargs)
         for i, sync_item in enumerate(sync_items):
-            self.fields['custom_%s' % i] = forms.BooleanField(label=sync_item)
+            self.fields['custom_%s' % sync_item['id']] = forms.BooleanField(label=sync_item, required = False)
     def sync_items(self):
         for name, value in self.cleaned_data.items():
             if name.startswith('custom_'):
-                yield (self.fields[name].replace('custom_','',1), value)
+                yield (name.replace('custom_','',1), value)
