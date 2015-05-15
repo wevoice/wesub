@@ -1,5 +1,5 @@
 {% extends "teams/base.html" %}
-{% load i18n teams_tags paginator %}
+{% load i18n sync_items_tags teams_tags paginator %}
 {% load url from future %}
 
 {% block html_attrs %}id="team_settings_externalsites"{% endblock %}
@@ -18,10 +18,24 @@
         </div>
 	<form method="POST" action=".">
 	  {% csrf_token %}
-	  {{ form }}
+	  <table>
+	    {% for fitem in form %}
+	    <tr>
+	      {% with fitem.label|get_fields as fields %}
+	      {% for key, val in fields.items %}
+	      <td>
+		{{ key }} - {{ val }}
+	      </td>
+	      {% endfor %}
+	      <td>
+		{{ fitem }}
+	      </td>
+	      {% endwith %}
+	    </tr>
+	    {% endfor %}
+	  </table>
 	  <input type=submit>
 	</form>
-	<p>Here to resync</p>
     </div>
 </div>
 

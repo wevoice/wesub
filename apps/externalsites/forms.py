@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import json
 from django import forms
 from django.core import validators
 from django.core.urlresolvers import reverse
@@ -299,7 +300,7 @@ class ResyncForm(forms.Form):
         sync_items = kwargs.pop('sync_items')
         super(ResyncForm, self).__init__(*args, **kwargs)
         for i, sync_item in enumerate(sync_items):
-            self.fields['custom_%s' % sync_item['id']] = forms.BooleanField(label=sync_item, required = False)
+            self.fields['custom_%s' % sync_item['id']] = forms.BooleanField(label=json.dumps(sync_item), required = False)
     def sync_items(self):
         for name, value in self.cleaned_data.items():
             if name.startswith('custom_'):
