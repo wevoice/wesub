@@ -458,6 +458,11 @@ class ContainerManager(object):
         log(line_fmt, 'Host', 'Name', 'Container ID')
         for container in self.containers_started:
             log(line_fmt, *container)
+        log("------------- Shell Command Line ---------------")
+        cmd_line = [
+            'run', '-it', '--rm',
+        ] + self.app_env_params() + [self.image_name, 'shell']
+        log(' '.join(cmd_line))
 
 class Deploy(object):
     """Top-level manager for the deploy."""
