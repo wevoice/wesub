@@ -285,6 +285,7 @@ class TestCaseTED(WebdriverTestCase):
         url_part = '%sapi2/ted/videos/1806/languages/sv' % self.base_url
         resp = self.data_utils.make_request(self.admin, 'get', url_part)
         r = resp.json
+        self.logger.info(r)
         self.assertEqual(r['metadata']['speaker-name'], 'Jultomten')
 
     def test_ted_api_title_published(self):
@@ -320,7 +321,7 @@ class TestCaseTED(WebdriverTestCase):
 
     def test_amara_api_published(self):
         """Amara api returns translated speaker name for published version. """
-        url_part = '/videos/%s/languages/sv' % self.speaker_video.video_id
+        url_part = '/api/videos/%s/languages/sv' % self.speaker_video.video_id
         resp = self.data_utils.make_request(self.admin, 'get', url_part)
         r = resp.json
         self.assertEqual(r['metadata']['speaker-name'], 'Jultomten')
@@ -328,15 +329,15 @@ class TestCaseTED(WebdriverTestCase):
 
     def test_amara_api_draft(self):
         """Amara api returns '' when only draft version. """
-        url_part = '/videos/%s/languages/de' % self.speaker_video.video_id
+        url_part = '/api/videos/%s/languages/de' % self.speaker_video.video_id
         r = self.data_utils.make_request(self.admin, 'get', url_part)
         response = r.json
-
+        self.logger.info(r)
         self.assertEqual(response['metadata']['speaker-name'], '')
 
     def test_amara_api_nospeaker(self):
         """Amara api returns '' when no speaker name translated. """
-        url_part = '/videos/%s/languages/ru' % self.speaker_video.video_id
+        url_part = '/api/videos/%s/languages/ru' % self.speaker_video.video_id
         r = self.data_utils.make_request(self.admin, 'get', url_part)
         response = r.json
         self.assertEqual(response['metadata']['speaker-name'], '')
