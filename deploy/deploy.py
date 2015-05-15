@@ -60,6 +60,7 @@ def log(msg, *args, **kwargs):
 
 def log_nostar(msg, *args, **kwargs):
     sys.stdout.write(msg.format(*args, **kwargs))
+    sys.stdout.write("\n")
     sys.stdout.flush()
 
 class LoggingTimer(object):
