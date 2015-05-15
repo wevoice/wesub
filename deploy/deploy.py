@@ -464,7 +464,7 @@ class ContainerManager(object):
         cmd_line = [
             'docker', 'run', '-it', '--rm',
         ] + self.app_env_params() + [self.image_name, 'shell']
-        log_time(' '.join(cmd_line))
+        log_nostar(' '.join(cmd_line))
 
 class Deploy(object):
     """Top-level manager for the deploy."""
