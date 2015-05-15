@@ -16,6 +16,9 @@
                 {% include 'teams/_subnav_settings.html' %}
             {% endwith %}
         </div>
+	<div class="remove-button">
+	  <a href="{% url "teams:settings_sync_externalsites" slug=team.slug %}">{% trans "Review failed sync" %} >> </a>
+	</div>
         <form id="external-accounts" class="settings" method="POST" action="">
             {% csrf_token %}
 
@@ -39,7 +42,6 @@
                 <p class="no-accounts">{% trans 'No youtube accounts linked yet.' %}</p>
                 {% endfor %}
                 {{ forms.add_youtube.add_button }}
-		<a href="{% url "teams:settings_sync_externalsites" slug=team.slug %}">{% trans "Review failed sync" %}</a>
             </fieldset>
 
             <fieldset class="kaltura{% if not forms.kaltura.enabled.value %} disabled{% endif %}">

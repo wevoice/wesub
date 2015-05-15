@@ -89,16 +89,25 @@ def team_settings_tab(request, team):
 
 @settings_page
 def team_settings_sync_errors_tab(request, team):
+    if request.POST:        
+        sh = SyncHistory.objects.get_attempts_to_resync(team=team)
+        if sh:
+            sync_items = sh
+        else:
+            sync_items = []
+        form = forms.ResyncForm(request.POST, sync_items=sync_items)
+        if form.is_valid():
+            for (key, val) in form.sync_items():
+                if val:
+                    SyncHistory.objects.force_retry(key, team)
+        
     sh = SyncHistory.objects.get_attempts_to_resync(team=team)
     if sh:
-        sync_items = sh.values('id', 'account_type', 'details', 'version', 'video_url')
+        sync_items = sh
     else:
         sync_items = []
-    form = forms.ResyncForm(request.POST or None, sync_items=sync_items)
-    if form.is_valid():
-        for (key, val) in form.sync_items():
-            if val:
-                sync_item = SyncHistory.objects.force_retry(key)
+        
+    form = forms.ResyncForm(sync_items=sync_items)
     if team.is_old_style():
         template_name = 'externalsites/team-settings-sync-errors.html'
     else:

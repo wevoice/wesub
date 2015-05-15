@@ -16,25 +16,31 @@
                 {% include 'teams/_subnav_settings.html' %}
             {% endwith %}
         </div>
-	<form method="POST" action=".">
+	<form class="resync" method="POST" action=".">
 	  {% csrf_token %}
-	  <table>
+	  <table class="resync_table">
+	    <tr>
+	      <th>{% trans 'Account Type' %}</th>
+	      <th>{% trans 'Error Details' %}</th>
+	      <th>{% trans 'Subtitle Language' %}</th>
+	      <th>{% trans 'Resync' %}</th>
+	    </tr>
 	    {% for fitem in form %}
 	    <tr>
 	      {% with fitem.label|get_fields as fields %}
 	      {% for key, val in fields.items %}
 	      <td>
-		{{ key }} - {{ val }}
+		{{ val }}
 	      </td>
 	      {% endfor %}
-	      <td>
+	      <td class="box">
 		{{ fitem }}
 	      </td>
 	      {% endwith %}
 	    </tr>
 	    {% endfor %}
 	  </table>
-	  <input type=submit>
+	  <input type=submit value="{% trans 'Resync selected items' %}">
 	</form>
     </div>
 </div>
