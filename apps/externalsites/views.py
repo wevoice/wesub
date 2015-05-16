@@ -37,7 +37,7 @@ from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import get_sync_account, YouTubeAccount, SyncHistory
 from localeurl.utils import universal_url
 from teams.models import Team
-from teams.permissions import can_change_team_settings
+from teams.permissions import can_change_team_settings, can_resync
 from videos import permissions
 from teams.views import settings_page
 from utils.text import fmt
@@ -88,7 +88,10 @@ def team_settings_tab(request, team):
     })
 
 @settings_page
+@login_required
 def team_settings_sync_errors_tab(request, team):
+    if not can_resync(team, request.user):
+        return redirect_to_login(request.build_absolute_uri())
     if request.POST:        
         sh = SyncHistory.objects.get_attempts_to_resync(team=team)
         if sh:

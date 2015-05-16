@@ -749,7 +749,7 @@ def can_assign_tasks(team, user, project=None, lang=None):
 
 def can_resync(team, user):
     role = get_role_for_target(user, team)
-    return role in [ROLE_ADMIN, ROLE_OWNER]
+    return user.is_staff or role in [ROLE_ADMIN, ROLE_OWNER]
 
 def can_perform_task_for(user, type, team_video, language, allow_own=False):
     """Return whether the given user can perform the given type of task."""

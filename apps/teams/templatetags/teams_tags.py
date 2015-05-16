@@ -51,6 +51,7 @@ from teams.permissions import (
     can_delete_video_in_team as _can_delete_video_in_team,
     can_approve as _can_approve,
     can_delete_language as _can_delete_language,
+    can_resync as _can_resync,
 )
 from teams.permissions import (
     can_invite, can_add_video_somewhere,
@@ -370,6 +371,10 @@ def can_view_approve_tab(team, user):
 @register.filter
 def can_rename_team(team, user):
     return _can_rename_team(team, user)
+
+@register.filter
+def can_resync(team, user):
+    return _can_resync(team, user)
 
 @register.filter
 def can_apply(team, user):
