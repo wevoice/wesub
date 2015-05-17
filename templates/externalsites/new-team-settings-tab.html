@@ -1,5 +1,5 @@
 {% extends "new-teams/base.html" %}
-{% load i18n %}
+{% load i18n teams_tags %}
 {% load url from future %}
 
 {% block html_attrs %}{{ block.super }} id="team-settings-integration"{% endblock %}
@@ -8,6 +8,11 @@
 
 <h2>{% trans "Team Settings - Integrations" %}</h2>
 
+{% if team|can_resync:user %}
+<div class="remove-button">
+  <a href="{% url "teams:settings_sync_externalsites" slug=team.slug %}">{% trans "Review failed sync" %} >> </a>
+</div>
+{% endif %}
 <form id="external-accounts" method="POST" action="">
   {% csrf_token %}
 

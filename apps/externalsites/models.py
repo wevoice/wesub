@@ -676,12 +676,12 @@ class SyncHistoryManager(models.Manager):
             qs = qs.filter(video_url__video__user=user)
         else:
             return None
-        qs = qs.filter(result=SyncHistory.RESULT_ERROR).select_related('language').order_by('-datetime')
+        qs = qs.select_related('language').order_by('-datetime')
         keep = []
         seen = set()
         for item in qs:
             if item.language not in seen:
-                if not item.retry:
+                if (item.result == SyncHistory.RESULT_ERROR) and not item.retry:
                     keep.append({'account_type': item.get_account_type_display(), 'id': item.id, 'language': item.language.title_display(), 'details': item.details})
                 seen.add(item.language)
         return keep
