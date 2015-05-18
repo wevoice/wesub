@@ -301,7 +301,7 @@ class ResyncForm(forms.Form):
         super(ResyncForm, self).__init__(*args, **kwargs)
         for i, sync_item in enumerate(sync_items):
             item_id = sync_item.pop('id')
-            self.fields['custom_%s' % item_id] = forms.BooleanField(label=json.dumps(sync_item), required = False)
+            self.fields['custom_%s' % item_id] = forms.BooleanField(label=json.dumps(sync_item), required = False, widget=forms.CheckboxInput(attrs={'class': 'bulkable'}))
     def sync_items(self):
         for name, value in self.cleaned_data.items():
             if name.startswith('custom_'):

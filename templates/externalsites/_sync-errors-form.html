@@ -1,6 +1,8 @@
 {% load i18n sync_items_tags teams_tags %}
+
 <form class="resync" method="POST" action=".">
   {% csrf_token %}
+  <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
   <table class="resync_table">
     <tr>
       <th>{% trans 'Resync' %}</th>
