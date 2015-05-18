@@ -42,3 +42,9 @@ def can_user_resync(video, user):
     # For now this is limited to team videos
     # as we'd need to know if a user actually own the youtube channel
     return False
+
+def can_user_resync_own_video(video, user):
+    """Check if a user has permission to resync the video's subtitles."""
+    if user.is_staff or (video.user == user):
+        return True
+    return False

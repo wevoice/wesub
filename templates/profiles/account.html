@@ -28,7 +28,7 @@
                 <fieldset>
                     <h3>{% trans "YouTube Sync" %}</h3>
                     <div class="callout">
-                        {% if youtube_accounts %}
+                      {% if youtube_accounts %}
                             {% for account in youtube_accounts  %}
                             <a class="button reduced" href="{% url "profiles:remove-third-party" "youtube" account.pk %}">{% trans 'Disconnect' %}</a>
                                 <p>
@@ -38,6 +38,7 @@
                                     {% endblocktrans %}
                                 </p>
                             {% endfor %}
+		      <p><a href="{% url "profiles:profile_sync_externalsites" %}">{% trans "Review failed sync" %} >> </a></p>
                         {% else %}
                             <a class="button open-modal reduced" href="#youtube-modal">
                                 <span>Connect to</span>

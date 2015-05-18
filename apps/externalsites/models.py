@@ -39,6 +39,7 @@ from subtitles.models import SubtitleLanguage, SubtitleVersion
 from teams.models import Team
 from utils.text import fmt
 from videos.models import VideoUrl, VideoFeed
+from videos.permissions import can_user_resync_own_video
 import videos.models
 import videos.tasks
 
@@ -703,14 +704,19 @@ class SyncHistoryManager(models.Manager):
         sh.save()
         return sh
 
-    def force_retry(self, pk, team):
+    def force_retry(self, pk, team=None, user=None):
         try:
             sh = self.get(pk=pk)
         except SyncHistory.DoesNotExist:
             return None
-        if sh.video_url.video.get_team_video() and sh.video_url.video.get_team_video().team  == team:
-            sh.retry = True
-            sh.save()
+        if team is not None:
+            if sh.video_url.video.get_team_video() and sh.video_url.video.get_team_video().team == team:
+                sh.retry = True
+                sh.save()
+        elif user is not None:
+            if can_user_resync_own_video(sh.video_url.video, user):
+                sh.retry = True
+                sh.save()
 
 class SyncHistory(models.Model):
     """History of all subtitle sync attempts."""

@@ -102,7 +102,7 @@ def team_settings_sync_errors_tab(request, team):
         if form.is_valid():
             for (key, val) in form.sync_items():
                 if val:
-                    SyncHistory.objects.force_retry(key, team)
+                    SyncHistory.objects.force_retry(key, team=team)
         
     sh = SyncHistory.objects.get_attempts_to_resync(team=team)
     if sh:
@@ -118,6 +118,34 @@ def team_settings_sync_errors_tab(request, team):
 
     return render(request, template_name, {
         'team': team,
+        'form': form,
+    })
+
+@login_required
+def user_profile_sync_errors_tab(request):
+    if request.POST:
+        sh = SyncHistory.objects.get_attempts_to_resync(user=request.user)
+        if sh:
+            sync_items = sh
+        else:
+            sync_items = []
+        form = forms.ResyncForm(request.POST, sync_items=sync_items)
+        if form.is_valid():
+            for (key, val) in form.sync_items():
+                if val:
+                    SyncHistory.objects.force_retry(key, user=request.user)
+
+    sh = SyncHistory.objects.get_attempts_to_resync(user=request.user)
+    if sh:
+        sync_items = sh
+    else:
+        sync_items = []
+
+    form = forms.ResyncForm(sync_items=sync_items)
+    template_name = 'externalsites/user-profile-sync-errors.html'
+
+    return render(request, template_name, {
+        'user_info': request.user,
         'form': form,
     })
 
