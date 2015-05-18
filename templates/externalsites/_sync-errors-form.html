@@ -3,7 +3,7 @@
 <form class="resync" method="POST" action=".">
   {% csrf_token %}
   <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
-  <table class="resync_table">
+  <table border="1" class="simple-list resync_table listing">
     <tr>
       <th>{% trans 'Resync' %}</th>
       <th>{% trans 'Account Type' %}</th>
