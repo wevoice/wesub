@@ -3,22 +3,23 @@
   {% csrf_token %}
   <table class="resync_table">
     <tr>
-      <th>{% trans 'Account Type' %}</th>
-      <th>{% trans 'Error Details' %}</th>
-      <th>{% trans 'Subtitle Language' %}</th>
       <th>{% trans 'Resync' %}</th>
+      <th>{% trans 'Account Type' %}</th>
+      <th>{% trans 'Video' %}</th>
+      <th>{% trans 'Language' %}</th>
+      <th>{% trans 'Error' %}</th>
     </tr>
     {% for fitem in form %}
     <tr>
-      {% with fitem.label|get_fields as fields %}
-      {% for key, val in fields.items %}
-      <td>
-	{{ val }}
-      </td>
-      {% endfor %}
       <td class="box">
 	{{ fitem }}
       </td>
+      {% with fitem.label|get_fields as fields %}
+      {% for item in fields %}
+      <td>
+	{{ item }}
+      </td>
+      {% endfor %}
       {% endwith %}
     </tr>
     {% endfor %}
