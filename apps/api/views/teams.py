@@ -461,7 +461,7 @@ class TeamSubviewMixin(object):
 class TeamSubview(TeamSubviewMixin, viewsets.ModelViewSet):
     pass
 
-class TeamMemberViewSet(TeamSubview, AmaraPaginationMixin):
+class TeamMemberViewSet(AmaraPaginationMixin, TeamSubview):
     lookup_field = 'username'
     paginate_by = 20
 
@@ -720,7 +720,7 @@ class TaskUpdateSerializer(TaskSerializer):
             task.assignee = self.context['user']
         task.complete()
 
-class TaskViewSet(TeamSubview, AmaraPaginationMixin):
+class TaskViewSet(AmaraPaginationMixin, TeamSubview):
     lookup_field = 'id'
     paginate_by = 20
 
@@ -853,8 +853,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
             instance.deny(self.context['user'], 'API')
         return instance
 
-class TeamApplicationViewSet(TeamSubviewMixin,
-                             AmaraPaginationMixin,
+class TeamApplicationViewSet(AmaraPaginationMixin,
+                             TeamSubviewMixin,
                              mixins.RetrieveModelMixin,
                              mixins.UpdateModelMixin,
                              mixins.ListModelMixin,
