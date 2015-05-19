@@ -25,5 +25,9 @@ def get_fields(dictionary):
     if language_code in ALL_LANGUAGES_DICT:
         language = ALL_LANGUAGES_DICT[language_code]
     output.append(language)
-    output.append(dict['details'])
+    details_url = "http://support.amara.org/support/solutions/articles/208290-how-to-check-why-subtitles-failed-to-sync-to-your-video"
+    output.append(mark_safe('<a target="blank" href="' +
+                            details_url
+                             +
+                            '">' + dict['details'] + '</a>'))
     return output
