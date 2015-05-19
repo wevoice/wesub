@@ -38,7 +38,7 @@ from externalsites.exceptions import (SyncingError, RetryableSyncingError,
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from teams.models import Team
 from utils.text import fmt
-from videos.models import VideoUrl, VideoFeed
+from videos.models import Video, VideoUrl, VideoFeed
 import videos.models
 import videos.tasks
 
@@ -82,6 +82,12 @@ class ExternalAccountManager(models.Manager):
     def _get_sync_account_nonteam_video(self, video, video_url):
             return self.get(type=ExternalAccount.TYPE_USER,
                           owner_id=video.user_id)
+
+    def team_accounts(self):
+        return self.filter(type=ExternalAccount.TYPE_TEAM)
+
+    def user_accounts(self):
+        return self.filter(type=ExternalAccount.TYPE_USER)
 
 class ExternalAccount(models.Model):
     account_type = NotImplemented
@@ -374,8 +380,6 @@ class YouTubeAccount(ExternalAccount):
     channel_id = models.CharField(max_length=255, unique=True)
     username = models.CharField(max_length=255)
     oauth_refresh_token = models.CharField(max_length=255)
-    import_feed = models.OneToOneField(VideoFeed, null=True,
-                                       on_delete=models.SET_NULL)
     sync_teams = models.ManyToManyField(
         Team, related_name='youtube_sync_accounts')
 
@@ -423,29 +427,6 @@ class YouTubeAccount(ExternalAccount):
         return 'https://gdata.youtube.com/feeds/api/users/%s/uploads' % (
             self.channel_id)
 
-    def create_feed(self):
-        if self.import_feed is not None:
-            raise ValueError("Feed already created")
-        try:
-            existing_feed = VideoFeed.objects.get(url=self.feed_url())
-        except VideoFeed.DoesNotExist:
-            self.import_feed = VideoFeed.objects.create(url=self.feed_url(),
-                                                        user=self.user,
-                                                        team=self.team)
-            videos.tasks.update_video_feed.delay(self.import_feed.id)
-        else:
-            if (existing_feed.user is not None and
-                existing_feed.user != self.user):
-                raise ValueError("Import feed already created by user %s" %
-                                 existing_feed.user)
-            if (existing_feed.team is not None and
-                existing_feed.team != self.team):
-                raise ValueError("Import feed already created by team %s" %
-                                 existing_feed.team)
-            self.import_feed = existing_feed
-
-        self.save()
-
     def get_owner_display(self):
         if self.username:
             return self.username
@@ -489,9 +470,12 @@ class YouTubeAccount(ExternalAccount):
 
     def delete(self):
         google.revoke_auth_token(self.oauth_refresh_token)
-        if self.import_feed is not None:
-            self.import_feed.delete()
         super(YouTubeAccount, self).delete()
+
+    def import_videos(self):
+        for video_id in google.get_uploaded_video_ids(self.channel_id):
+            video_url = 'http://youtube.com/watch?v={}'.format(video_id)
+            Video.get_or_create_for_url(video_url)
 
 account_models = [
     KalturaAccount,
