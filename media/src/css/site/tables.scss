@@ -19,4 +19,8 @@ table {
             text-align: right;
         }
     }
+    &.resync_table {
+        text-align: center;
+        th span.help-link {font-size: 0.8em;}
+    }
 }

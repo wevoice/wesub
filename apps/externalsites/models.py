@@ -39,6 +39,7 @@ from subtitles.models import SubtitleLanguage, SubtitleVersion
 from teams.models import Team
 from utils.text import fmt
 from videos.models import VideoUrl, VideoFeed
+from videos.permissions import can_user_resync_own_video
 import videos.models
 import videos.tasks
 
@@ -665,6 +666,36 @@ class SyncHistoryManager(models.Manager):
     def get_query_set(self):
         return SyncHistoryQuerySet(self.model)
 
+    def get_attempts_to_resync(self, team=None, user=None):
+        """Lookup failed sync attempt that we should retry,
+        for a user or for a team.
+        """
+        days_of_search = 183
+        qs = self
+        if team:
+            qs = qs.filter(video_url__video__team=team)
+        elif user:
+            qs = qs.filter(video_url__video__user=user)
+        else:
+            return None
+        qs = qs.filter(datetime__gt=datetime.datetime.now() - datetime.timedelta(days=days_of_search))
+        qs = qs.select_related('language', 'video_url__video').order_by('-datetime')
+        keep = []
+        seen = set()
+        for item in qs:
+            if item.language not in seen:
+                if (item.result == SyncHistory.RESULT_ERROR) and not item.retry:
+                    video_id = item.video_url.video.video_id
+                    video_url = item.video_url.video.get_video_url()
+                    keep.append({'account_type': item.get_account_type_display(),
+                                 'id': item.id,
+                                 'language_code': item.language.language_code,
+                                 'details': item.details,
+                                 'video_id': video_id,
+                                 'video_url': video_url})
+                seen.add(item.language)
+        return keep
+
     def get_attempt_to_resync(self):
         """Lookup failed sync attempt that we should retry.
 
@@ -681,6 +712,20 @@ class SyncHistoryManager(models.Manager):
         sh.retry = False
         sh.save()
         return sh
+
+    def force_retry(self, pk, team=None, user=None):
+        try:
+            sh = self.get(pk=pk)
+        except SyncHistory.DoesNotExist:
+            return None
+        if team is not None:
+            if sh.video_url.video.get_team_video() and sh.video_url.video.get_team_video().team == team:
+                sh.retry = True
+                sh.save()
+        elif user is not None:
+            if can_user_resync_own_video(sh.video_url.video, user):
+                sh.retry = True
+                sh.save()
 
 class SyncHistory(models.Model):
     """History of all subtitle sync attempts."""

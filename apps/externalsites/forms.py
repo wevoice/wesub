@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import json
 from django import forms
 from django.core import validators
 from django.core.urlresolvers import reverse
@@ -28,7 +29,8 @@ from teams.models import Team
 from externalsites import models
 from utils.forms import SubmitButtonField, SubmitButtonWidget
 import videos.tasks
-
+import logging
+logger = logging.getLogger("forms")
 class AccountForm(forms.ModelForm):
     """Base class for forms on the teams or user profile tab."""
 
@@ -292,3 +294,15 @@ class AccountFormset(dict):
                 redirect_path = form.redirect_path()
                 if redirect_path is not None:
                     return redirect_path
+
+class ResyncForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        sync_items = kwargs.pop('sync_items')
+        super(ResyncForm, self).__init__(*args, **kwargs)
+        for i, sync_item in enumerate(sync_items):
+            item_id = sync_item.pop('id')
+            self.fields['custom_%s' % item_id] = forms.BooleanField(label=json.dumps(sync_item), required = False, widget=forms.CheckboxInput(attrs={'class': 'bulkable'}))
+    def sync_items(self):
+        for name, value in self.cleaned_data.items():
+            if name.startswith('custom_'):
+                yield (name.replace('custom_','',1), value)
