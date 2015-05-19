@@ -380,6 +380,7 @@ class YouTubeAccount(ExternalAccount):
     channel_id = models.CharField(max_length=255, unique=True)
     username = models.CharField(max_length=255)
     oauth_refresh_token = models.CharField(max_length=255)
+    last_import_video_id = models.CharField(max_length=100, blank=True)
     sync_teams = models.ManyToManyField(
         Team, related_name='youtube_sync_accounts')
 
@@ -473,9 +474,16 @@ class YouTubeAccount(ExternalAccount):
         super(YouTubeAccount, self).delete()
 
     def import_videos(self):
-        for video_id in google.get_uploaded_video_ids(self.channel_id):
+        video_ids = google.get_uploaded_video_ids(self.channel_id)
+        if not video_ids:
+            return
+        for video_id in video_ids:
+            if video_id == self.last_import_video_id:
+                break
             video_url = 'http://youtube.com/watch?v={}'.format(video_id)
             Video.get_or_create_for_url(video_url)
+        self.last_import_video_id = video_ids[0]
+        self.save()
 
 account_models = [
     KalturaAccount,

@@ -57,7 +57,7 @@ youtube_get_user_info = mock.Mock(return_value=test_video_info)
 youtube_get_new_access_token = mock.Mock(return_value='test-access-token')
 youtube_revoke_auth_token = mock.Mock()
 youtube_update_video_description = mock.Mock()
-youtube_get_uploaded_video_ids = mock.Mock()
+youtube_get_uploaded_video_ids = mock.Mock(return_value=[])
 url_exists = mock.Mock(return_value=True)
 
 current_locks = set()

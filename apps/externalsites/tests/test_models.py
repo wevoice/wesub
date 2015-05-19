@@ -21,6 +21,7 @@ from __future__ import absolute_import
 from django.test import TestCase
 from django.core.exceptions import PermissionDenied
 from nose.tools import *
+import mock
 
 from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import (BrightcoveAccount, YouTubeAccount,
@@ -305,88 +306,38 @@ class YoutubeAccountTest(TestCase):
         account = YouTubeAccount.objects.all().get()
         assert_equals(account.oauth_refresh_token, 'test-refresh-token2')
 
-class YoutubeAccountFeedTest(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        self.user_account = YouTubeAccountFactory(channel_id='user-channel',
-                                                  user=self.user)
+class YouTubeVideoImportTest(TestCase):
+    @test_utils.patch_for_test("externalsites.google.get_uploaded_video_ids")
+    @test_utils.patch_for_test("videos.models.Video.get_or_create_for_url")
+    def setUp(self, mock_get_or_create_for_url, mock_get_uploaded_video_ids):
+        self.account = YouTubeAccountFactory(user=UserFactory())
+        self.mock_get_uploaded_video_ids = mock_get_uploaded_video_ids
+        self.mock_get_or_create_for_url = mock_get_or_create_for_url
+        self.mock_get_uploaded_video_ids.return_value = [
+            'video-1', 'video-2', 'video-3',
+        ]
 
-        self.team = TeamFactory()
-        self.team_account = YouTubeAccountFactory(channel_id='team-channel',
-                                                  team=self.team)
+    def test_import_videos(self):
+        self.account.import_videos()
+        assert_equals(self.mock_get_or_create_for_url.call_args_list, [
+            mock.call('http://youtube.com/watch?v=video-1'),
+            mock.call('http://youtube.com/watch?v=video-2'),
+            mock.call('http://youtube.com/watch?v=video-3'),
+        ])
 
-    def feed_url(self, account):
-        return ('https://gdata.youtube.com/'
-                'feeds/api/users/%s/uploads' % account.channel_id)
+    def test_set_last_import_video_id(self):
+        self.account.import_videos()
+        # we should set last_import_video_id to the first video in the list
+        assert_equal(test_utils.reload_obj(self.account).last_import_video_id,
+                     'video-1')
 
-    def check_create_feed(self, account):
-        account.create_feed()
-        self.assertEquals(account.import_feed.url, self.feed_url(account))
-        self.assertEquals(account.import_feed.user, account.user)
-        self.assertEquals(account.import_feed.team, account.team)
-
-    def test_create_feed_for_user(self):
-        self.check_create_feed(self.user_account)
-
-    def test_create_feed_for_team(self):
-        self.check_create_feed(self.team_account)
-
-    def test_create_feed_twice_raises_error(self):
-        self.user_account.create_feed()
-        self.assertRaises(ValueError, self.user_account.create_feed)
-
-    def test_existing_feed_for_user(self):
-        # if there already is an youtube feed created by the user, we should
-        # link it to the youtube account.
-
-        feed = VideoFeedFactory(url=self.feed_url(self.user_account),
-                                user=self.user)
-        self.user_account.create_feed()
-        self.assertEquals(self.user_account.import_feed.pk, feed.pk)
-
-    def test_existing_feed_for_other_user(self):
-        # if there already is an youtube feed created by a different user, we
-        # should raise an error
-        feed = VideoFeedFactory(url=self.feed_url(self.user_account),
-                                user=UserFactory())
-        self.assertRaises(ValueError, self.user_account.create_feed)
-
-    def test_existing_feed_for_team(self):
-        # if there already is an youtube feed created by the team, we should
-        # link it to the youtube account.
-        feed = VideoFeedFactory(url=self.feed_url(self.team_account),
-                                team=self.team)
-        self.team_account.create_feed()
-        self.assertEquals(self.team_account.import_feed.pk, feed.pk)
-
-    def test_existing_feed_for_other_team(self):
-        # if there already is an youtube feed created by a different team, we
-        # should raise an error
-        feed = VideoFeedFactory(url=self.feed_url(self.team_account),
-                                team=TeamFactory())
-        self.assertRaises(ValueError, self.team_account.create_feed)
-
-    @test_utils.patch_for_test('videos.tasks.update_video_feed')
-    def test_schedule_update_for_new_feed(self, mock_update_video_feed):
-        self.user_account.create_feed()
-        self.assertEquals(mock_update_video_feed.delay.call_count, 1)
-        mock_update_video_feed.delay.assert_called_with(
-            self.user_account.import_feed.id)
-
-    @test_utils.patch_for_test('videos.tasks.update_video_feed')
-    def test_no_update_for_existing_feeds(self, mock_update_video_feed):
-        feed = VideoFeedFactory(url=self.feed_url(self.user_account),
-                                user=self.user)
-        self.user_account.create_feed()
-        self.assertEquals(mock_update_video_feed.delay.call_count, 0)
-
-    def test_delete_feed_on_account_delete(self):
-        account = YouTubeAccountFactory(user=UserFactory(),
-                                        channel_id='test-channel-id')
-        account.create_feed()
-        self.assertEqual(VideoFeed.objects.count(), 1)
-        account.delete()
-        self.assertEqual(VideoFeed.objects.count(), 0)
+    def test_dont_reimport(self):
+        self.account.last_import_video_id = 'video-2'
+        self.account.import_videos()
+        # we should only import videos added after video-2 in the playlist
+        assert_equals(self.mock_get_or_create_for_url.call_args_list, [
+            mock.call('http://youtube.com/watch?v=video-1')
+        ])
 
 class DeleteAccountRelatedModelTest(TestCase):
     # Test that we delete our related objects when we delete our account.
