@@ -65,6 +65,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'videos.tasks.update_from_feed',
         'schedule': crontab(minute=0),
     },
+    'import_from_accounts': {
+        'task': 'externalsites.tasks.import_videos_from_accounts',
+        'schedule': crontab(minute=0),
+    },
     'gauge_videos': {
         'task': 'videos.tasks.gauge_videos',
         'schedule': timedelta(seconds=300),
