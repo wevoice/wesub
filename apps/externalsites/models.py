@@ -25,7 +25,6 @@ from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import query, Q
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
 import babelsubs
 # because of our insane circular imports we need to import haystack right here
 # or else things blow up
@@ -684,8 +683,14 @@ class SyncHistoryManager(models.Manager):
         for item in qs:
             if item.language not in seen:
                 if (item.result == SyncHistory.RESULT_ERROR) and not item.retry:
-                    video_url = reverse("videos:video", kwargs={"video_id": item.video_url.video.video_id})
-                    keep.append({'account_type': item.get_account_type_display(), 'id': item.id, 'language': item.language.language_code, 'details': item.details, 'video_url': video_url})
+                    video_id = item.video_url.video.video_id
+                    video_url = item.video_url.video.get_video_url()
+                    keep.append({'account_type': item.get_account_type_display(),
+                                 'id': item.id,
+                                 'language_code': item.language.language_code,
+                                 'details': item.details,
+                                 'video_id': video_id,
+                                 'video_url': video_url})
                 seen.add(item.language)
         return keep
 
