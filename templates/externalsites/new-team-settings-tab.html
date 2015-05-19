@@ -10,7 +10,7 @@
 
 {% if team|can_resync:user %}
 <div class="remove-button">
-  <a href="{% url "teams:settings_sync_externalsites" slug=team.slug %}">{% trans "Review failed sync" %} >> </a>
+  <a href="{% url "teams:settings_sync_externalsites" slug=team.slug %}">{% trans "Check for syncing issues" %} >> </a>
 </div>
 {% endif %}
 <form id="external-accounts" method="POST" action="">
