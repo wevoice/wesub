@@ -111,15 +111,18 @@ def team_settings_sync_errors_tab(request, team):
         sync_items = []
         
     form = forms.ResyncForm(sync_items=sync_items)
+    context = {
+        'team': team,
+        'form': form,
+    }
+
     if team.is_old_style():
         template_name = 'externalsites/team-settings-sync-errors.html'
     else:
+        context['nobulk'] = True
         template_name = 'externalsites/new-team-settings-sync-errors.html'
 
-    return render(request, template_name, {
-        'team': team,
-        'form': form,
-    })
+    return render(request, template_name, context)
 
 @login_required
 def user_profile_sync_errors_tab(request):

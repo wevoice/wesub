@@ -2,7 +2,9 @@
 
 <form class="resync" method="POST" action=".">
   {% csrf_token %}
+  {% if not nobulk %}
   <input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+  {% endif %}
   <table border="1" class="simple-list resync_table listing">
     <tr>
       <th>{% trans 'Resync' %}</th>
