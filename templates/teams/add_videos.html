@@ -14,13 +14,7 @@
         {% endwith %}
         <form method='post' action="." enctype="multipart/form-data" class="add-video">
             <h3>{% trans 'Add multiple videos' %}</h3>
-            
-            <fieldset>
-                {% include "_form_field.html" with field=form.usernames %}
-                {% include "_form_field.html" with field=form.youtube_user_url %}
-
-                {% smart_field_render form.feed_url %}
-            </fieldset>
+            {% smart_field_render form.feed_url %}
             <div class="submit">
                 <button><span>{% trans 'Save' %}</span></button>
             </div>

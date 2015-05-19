@@ -209,7 +209,6 @@ def create(request):
     context = {
         'video_form': video_form,
         'initial_url': request.GET.get('initial_url'),
-        'feed_form': AddFromFeedForm(request.user)
     }
     if video_form.is_valid():
         try:
@@ -237,22 +236,6 @@ def create(request):
                               context_instance=RequestContext(request))
 
 create.csrf_exempt = True
-
-def create_from_feed(request):
-    form = AddFromFeedForm(request.user, request.POST or None)
-    if form.is_valid():
-        form.save()
-        messages.success(request, form.success_message())
-        return redirect('videos:create')
-    context = {
-        'video_form': VideoForm(),
-        'feed_form': form,
-        'from_feed': True
-    }
-    return render_to_response('videos/create.html', context,
-                              context_instance=RequestContext(request))
-
-create_from_feed.csrf_exempt = True
 
 def shortlink(request, encoded_pk):
     pk = base62.to_decimal(encoded_pk)
