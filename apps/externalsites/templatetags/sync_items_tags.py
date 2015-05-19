@@ -10,7 +10,7 @@ ALL_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 def get_fields(dictionary):
     output = []
     dict = json.loads(dictionary)
-    output.append(mark_safe('<a href="' +
+    output.append(mark_safe('<a target="blank" href="' +
                             dict['video_url']
                              +
                             '">' + dict['account_type'] + '</a>'))
