@@ -670,6 +670,7 @@ class SyncHistoryManager(models.Manager):
         """Lookup failed sync attempt that we should retry,
         for a user or for a team.
         """
+        days_of_search = 183
         qs = self
         if team:
             qs = qs.filter(video_url__video__team=team)
@@ -677,7 +678,8 @@ class SyncHistoryManager(models.Manager):
             qs = qs.filter(video_url__video__user=user)
         else:
             return None
-        qs = qs.select_related('language').order_by('-datetime')
+        qs = qs.filter(datetime__gt=datetime.datetime.now() - datetime.timedelta(days=days_of_search))
+        qs = qs.select_related('language', 'video_url__video').order_by('-datetime')
         keep = []
         seen = set()
         for item in qs:
