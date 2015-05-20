@@ -6,7 +6,7 @@ class MessagesTab(ATeamPage):
 
     """
 
-    _URL = 'teams/%s/settings/guidelines/'  #provide the team slug
+    _URL = 'teams/%s/settings/messages/'  #provide the team slug
 
     #MESSAGES FIELDS
     _INVITATION_MESSAGE = 'textarea#id_messages_invite'
@@ -39,6 +39,7 @@ class MessagesTab(ATeamPage):
         """
         for message_field, text in messages.iteritems():
             field = getattr(self, '_'.join(['', message_field, 'MESSAGE']))
+            self.logger.info(field)
             self.type_by_css(field, text)
 
     def _stored_message_text(self):
@@ -62,6 +63,7 @@ class MessagesTab(ATeamPage):
         for guideline_field in self._GUIDELINES:
             css_field = getattr(self, 
                 '_'.join(['', guideline_field, 'GUIDELINES']))
+            self.logger.info(css_field)
             displayed_text = self.get_text_by_css(css_field)
             current_guidelines[guideline_field] = displayed_text
         return current_guidelines
