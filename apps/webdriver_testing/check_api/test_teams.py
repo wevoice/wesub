@@ -5,7 +5,6 @@ from caching.tests.utils import assert_invalidates_model_cache
 from videos.models import *
 from utils.factories import *
 from webdriver_testing.data_factories import ApplicationFactory
-from subtitles import pipeline
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from webdriver_testing.pages.site_pages.teams import members_tab
