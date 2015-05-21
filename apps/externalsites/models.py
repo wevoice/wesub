@@ -671,6 +671,7 @@ class SyncHistoryManager(models.Manager):
         for a user or for a team.
         """
         days_of_search = 183
+        items_of_search = 20000
         qs = self
         if team:
             qs = qs.filter(video_url__video__team=team)
@@ -679,7 +680,7 @@ class SyncHistoryManager(models.Manager):
         else:
             return None
         qs = qs.filter(datetime__gt=datetime.datetime.now() - datetime.timedelta(days=days_of_search))
-        qs = qs.select_related('language', 'video_url__video').order_by('-datetime')
+        qs = qs.select_related('language', 'video_url__video').order_by('-id')[:items_of_search]
         keep = []
         seen = set()
         for item in qs:
