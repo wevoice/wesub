@@ -674,11 +674,16 @@ class SyncHistoryManager(models.Manager):
         items_of_search = 20000
         qs = self
         if team:
-            qs = qs.filter(video_url__video__team=team)
+            owner = team
         elif user:
-            qs = qs.filter(video_url__video__user=user)
+            owner = user
         else:
             return None
+        accounts = []
+        for account_type in [YouTubeAccount, KalturaAccount, BrightcoveAccount]:
+            for account_id in account_type.objects.for_owner(owner).values_list('id', flat=True):
+                accounts.append(account_id)
+        qs = qs.filter(account_id__in=accounts)
         qs = qs.filter(datetime__gt=datetime.datetime.now() - datetime.timedelta(days=days_of_search))
         qs = qs.select_related('language', 'video_url__video').order_by('-id')[:items_of_search]
         keep = []
