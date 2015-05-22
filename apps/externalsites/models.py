@@ -672,6 +672,7 @@ class SyncHistoryManager(models.Manager):
         """
         days_of_search = 183
         items_of_search = 20000
+        items_to_display = 200
         qs = self
         if team:
             owner = team
@@ -692,13 +693,15 @@ class SyncHistoryManager(models.Manager):
             if item.language not in seen:
                 if (item.result == SyncHistory.RESULT_ERROR) and not item.retry:
                     video_id = item.video_url.video.video_id
-                    video_url = item.video_url.video.get_video_url()
+                    video_url = item.video_url.url
                     keep.append({'account_type': item.get_account_type_display(),
                                  'id': item.id,
                                  'language_code': item.language.language_code,
                                  'details': item.details,
                                  'video_id': video_id,
                                  'video_url': video_url})
+                    if len(keep) >= items_to_display:
+                        break
                 seen.add(item.language)
         return keep
 
