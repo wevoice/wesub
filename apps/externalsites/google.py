@@ -31,6 +31,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 import jwt
 import requests
+import pafy
 
 from utils.subtitles import load_subtitles
 from utils.text import fmt
@@ -403,6 +404,24 @@ def _get_video_info(video_id):
     except StandardError, e:
         raise APIError("get_video_info: Unexpected content: %s" % e)
 
+
+def get_direct_url(video_id):
+    """
+    It does a request to google to retrieve the URL
+    So that should be done in a backgound task
+    """
+    video = pafy.new(video_id)
+    url = None
+    size = None
+    for s in video.streams:
+        if url:
+            if s.get_filesize() < size:
+                url = s.url
+                size = s.get_filesize()
+        else:
+            url = s.url
+            size = s.get_filesize()
+    return url
 
 def update_video_description(video_id, access_token, description):
     # get the current snippet for the video

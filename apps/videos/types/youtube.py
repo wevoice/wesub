@@ -72,6 +72,11 @@ class YoutubeVideoType(VideoType):
             self._video_info = google.get_video_info(self.video_id)
         return self._video_info
 
+    def get_direct_url(self):
+        if not hasattr(self, '_direct_url'):
+            self._direct_url = google.get_direct_url(self.video_id)
+        return self._direct_url
+
     def set_values(self, video, fetch_subs_async=True):
         try:
             video_info = self.get_video_info()
