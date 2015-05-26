@@ -56,8 +56,11 @@ import urlparse
 BUILDER_DOCKER_HOST = 'unix:///docker.sock'
 
 def log(msg, *args, **kwargs):
-    msg = msg.format(*args, **kwargs)
-    sys.stdout.write("* {}\n".format(msg))
+    log_nostar("* " + msg, *args, **kwargs)
+
+def log_nostar(msg, *args, **kwargs):
+    sys.stdout.write(msg.format(*args, **kwargs))
+    sys.stdout.write("\n")
     sys.stdout.flush()
 
 class LoggingTimer(object):
@@ -458,6 +461,11 @@ class ContainerManager(object):
         log(line_fmt, 'Host', 'Name', 'Container ID')
         for container in self.containers_started:
             log(line_fmt, *container)
+        log("------------- Shell Command Line ---------------")
+        cmd_line = [
+            'docker', 'run', '-it', '--rm',
+        ] + self.app_env_params() + [self.image_name, 'shell']
+        log_nostar(' '.join(cmd_line))
 
 class Deploy(object):
     """Top-level manager for the deploy."""

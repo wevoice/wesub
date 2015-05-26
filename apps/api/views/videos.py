@@ -192,6 +192,7 @@ from __future__ import absolute_import
 
 from django import http
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from rest_framework import filters
 from rest_framework import generics
 from rest_framework import mixins
@@ -202,6 +203,7 @@ from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 import json
 
+from api.fields import LanguageCodeField
 from api.pagination import AmaraPaginationMixin
 from teams import permissions as team_perms
 from teams.models import Team, TeamVideo, Project
@@ -283,12 +285,13 @@ class VideoListSerializer(serializers.ListSerializer):
         # Do some optimizations to reduce the number of queries before passing
         # the result to the default to_representation() method
 
-        # Note: we have to use prefetch_related the teamvideo attributes,
-        # otherwise it will filter out non-team videos.  I think this is a
-        # django 1.4 bug.
-        qs = (qs.select_related('teamvideo')
-              .prefetch_related('teamvideo__team', 'teamvideo__project',
-                                'newsubtitlelanguage_set', 'videourl_set'))
+        if isinstance(qs, QuerySet):
+            # Note: we have to use prefetch_related the teamvideo attributes,
+            # otherwise it will filter out non-team videos.  I think this is a
+            # django 1.4 bug.
+            qs = (qs.select_related('teamvideo')
+                  .prefetch_related('teamvideo__team', 'teamvideo__project',
+                                    'newsubtitlelanguage_set', 'videourl_set'))
         # run bulk_has_public_version(), otherwise we have a query for each
         # language of each video
         videos = list(qs)
@@ -303,8 +306,8 @@ class VideoSerializer(serializers.Serializer):
     # default implementation that it makes more sense to not inherit.
     id = serializers.CharField(source='video_id', read_only=True)
     video_url = serializers.URLField(write_only=True, required=True)
-    primary_audio_language_code = serializers.CharField(required=False,
-                                                        allow_blank=True)
+    primary_audio_language_code = LanguageCodeField(required=False,
+                                                    allow_blank=True)
     original_language = serializers.CharField(source='language',
                                               read_only=True)
     title = serializers.CharField(required=False, allow_blank=True)

@@ -49,13 +49,7 @@ class DailymotionVideoType(VideoType):
 
     @classmethod
     def matches_video_url(cls, url):
-        video_id = cls.get_video_id(url)
-        if video_id:
-            metadata = cls.get_metadata(video_id)
-            stream_flv_mini_url = metadata.get('url', '')
-            return bool(stream_flv_mini_url)
-
-        return False
+        return bool(cls.get_video_id(url))
 
     def set_values(self, video_obj):
         metadata = self.get_metadata(self.video_id)

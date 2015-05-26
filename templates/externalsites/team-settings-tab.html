@@ -16,6 +16,11 @@
                 {% include 'teams/_subnav_settings.html' %}
             {% endwith %}
         </div>
+	{% if team|can_resync:user %}
+	<div class="remove-button">
+	  <a href="{% url "teams:settings_sync_externalsites" slug=team.slug %}">{% trans "Check for syncing issues" %} >> </a>
+	</div>
+	{% endif %}
         <form id="external-accounts" class="settings" method="POST" action="">
             {% csrf_token %}
 

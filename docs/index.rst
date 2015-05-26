@@ -10,7 +10,6 @@ Contents:
    running-amara
    bugs
    api
-   new-api
    languages
    teams-callbacks
    subtitle-formats

@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
+from utils.factories import *
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages.teams import messages_tab
 from webdriver_testing.pages.site_pages.teams import tasks_tab
-from webdriver_testing.data_factories import TeamMemberFactory
 from webdriver_testing.data_factories import TeamLangPrefFactory
-
-from webdriver_testing.data_factories import WorkflowFactory
-from webdriver_testing.data_factories import UserFactory
 from webdriver_testing import data_helpers
 import time
 
@@ -24,25 +21,25 @@ class TestCaseTeamGuidelines(WebdriverTestCase):
         super(TestCaseTeamGuidelines, cls).setUpClass()
         cls.messages_tab = messages_tab.MessagesTab(cls)
         cls.tasks_tab = tasks_tab.TasksTab(cls)
-        cls.team_owner = UserFactory.create()
+        cls.admin = UserFactory.create()
+        cls.team = TeamFactory(admin=cls.admin,
+                               workflow_enabled=True,
+                               translate_policy=20,
+                               subtitle_policy=20,
+                              )
+        cls.team_workflow = WorkflowFactory(team = cls.team,
+                                            autocreate_subtitle=True,
+                                            autocreate_translate=True,
+                                            review_allowed = 10,
+                                           )
 
-        #CREATE AN OPEN TEAM WITH WORKFLOWS and AUTOTASKS
-        cls.team = TeamMemberFactory.create(team__workflow_enabled = True,
-                                             user = cls.team_owner).team
-        #Turn on Task Autocreation
-        WorkflowFactory.create(
-            team = cls.team,
-            autocreate_subtitle = True,
-            autocreate_translate = True,
-            review_allowed = 10)
-
-    def test_guidelines__edit(self):
+    def test_guidelines_edit(self):
         """Change the default guidelines and verify they are stored.
 
         """
         self.messages_tab.open_page('teams')
 
-        self.messages_tab.log_in(self.team_owner.username, 'password')
+        self.messages_tab.log_in(self.admin.username, 'password')
         self.messages_tab.open_messages_tab(self.team.slug)
         self.messages_tab.edit_guidelines(self._TEST_GUIDELINES)
 

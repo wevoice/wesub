@@ -89,7 +89,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
         data = {
                 'language_code': lc,
                 'video': video,
-                'subtitles': subs
+                'subtitles': subs,
                 'complete': complete,
                 'author': user,
                 'committer': user
@@ -251,7 +251,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
         data = {
                 'language_code': lc,
                 'video': video,
-                'subtitles': subs
+                'subtitles': subs,
                 'complete': complete,
                 'author': user,
                 'committer': user
