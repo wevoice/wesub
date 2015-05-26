@@ -591,7 +591,7 @@ class Cleanup(object):
                     self.remove_image(host, tag)
                 if self.docker.image_exists(host, image):
                     log("removing unused image: {}", image)
-                    self.remove_image(host, tag)
+                    self.remove_image(host, image)
                 else:
                     log("image removed from untagging: {}", image)
 
