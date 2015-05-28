@@ -192,6 +192,7 @@ from __future__ import absolute_import
 
 from django import http
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from rest_framework import filters
 from rest_framework import generics
 from rest_framework import mixins
@@ -284,12 +285,13 @@ class VideoListSerializer(serializers.ListSerializer):
         # Do some optimizations to reduce the number of queries before passing
         # the result to the default to_representation() method
 
-        # Note: we have to use prefetch_related the teamvideo attributes,
-        # otherwise it will filter out non-team videos.  I think this is a
-        # django 1.4 bug.
-        qs = (qs.select_related('teamvideo')
-              .prefetch_related('teamvideo__team', 'teamvideo__project',
-                                'newsubtitlelanguage_set', 'videourl_set'))
+        if isinstance(qs, QuerySet):
+            # Note: we have to use prefetch_related the teamvideo attributes,
+            # otherwise it will filter out non-team videos.  I think this is a
+            # django 1.4 bug.
+            qs = (qs.select_related('teamvideo')
+                  .prefetch_related('teamvideo__team', 'teamvideo__project',
+                                    'newsubtitlelanguage_set', 'videourl_set'))
         # run bulk_has_public_version(), otherwise we have a query for each
         # language of each video
         videos = list(qs)
@@ -496,7 +498,8 @@ class VideoViewSet(AmaraPaginationMixin,
     def get_videos_for_user(self):
         visibility = Q(is_visible=True)
         if self.request.user.is_authenticated():
-            visibility = visibility | Q(members__user=self.request.user)
+            members = self.request.user.team_members.all()
+            visibility = visibility | Q(id__in=members.values_list('team_id'))
         user_visible_teams = Team.objects.filter(visibility)
         return Video.objects.filter(
             Q(teamvideo__isnull=True) |

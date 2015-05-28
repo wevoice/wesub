@@ -2529,8 +2529,8 @@ a.truncated-expand {
 
     .youtube-form {
         border: 1px solid $light-grey;
-
         padding: 0.5em;
+        min-height: 33px;
 
         .remove-button {
             float: right;
@@ -3237,5 +3237,22 @@ a.truncated-expand {
         height: 4em;
         padding: 0.5em;
         box-sizing: border-box;
+    }
+}
+.v1 table.resync_table {
+    th {
+        text-align: center;
+        font-size: 1.3em;
+        span.help-link {font-size: 0.8em;}
+    }
+    th, td {
+        padding: 8px;
+	&.box {text-align: center;}
+    }
+}
+
+.v1 form.resync {
+    input {
+        margin: 10px;
     }
 }

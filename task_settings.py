@@ -83,7 +83,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'retry_failed_sync': {
         'task': 'externalsites.tasks.retry_failed_sync',
-        'schedule': timedelta(seconds=300),
+        'schedule': timedelta(seconds=10),
     },
 }
 

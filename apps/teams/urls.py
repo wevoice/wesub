@@ -97,4 +97,5 @@ urlpatterns += patterns('',
 # settings views that are handled by other apps
 urlpatterns += patterns('',
     url(r'^(?P<slug>[-\w]+)/settings/accounts/$', 'externalsites.views.team_settings_tab', name='settings_externalsites'),
+    url(r'^(?P<slug>[-\w]+)/settings/sync/$', 'externalsites.views.team_settings_sync_errors_tab', name='settings_sync_externalsites'),
 )

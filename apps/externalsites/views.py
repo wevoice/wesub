@@ -34,10 +34,10 @@ from externalsites import forms
 from externalsites import google
 from externalsites.auth_backends import OpenIDConnectInfo
 from externalsites.exceptions import YouTubeAccountExistsError
-from externalsites.models import get_sync_account, YouTubeAccount
+from externalsites.models import get_sync_account, YouTubeAccount, SyncHistory
 from localeurl.utils import universal_url
 from teams.models import Team
-from teams.permissions import can_change_team_settings
+from teams.permissions import can_change_team_settings, can_resync
 from videos import permissions
 from teams.views import settings_page
 from utils.text import fmt
@@ -85,6 +85,71 @@ def team_settings_tab(request, team):
     return render(request, template_name, {
         'team': team,
         'forms': formset,
+    })
+
+@settings_page
+@login_required
+def team_settings_sync_errors_tab(request, team):
+    if not can_resync(team, request.user):
+        return redirect_to_login(request.build_absolute_uri())
+    if request.POST:        
+        sh = SyncHistory.objects.get_attempts_to_resync(team=team)
+        if sh:
+            sync_items = sh
+        else:
+            sync_items = []
+        form = forms.ResyncForm(request.POST, sync_items=sync_items)
+        if form.is_valid():
+            for (key, val) in form.sync_items():
+                if val:
+                    SyncHistory.objects.force_retry(key, team=team)
+        
+    sh = SyncHistory.objects.get_attempts_to_resync(team=team)
+    if sh:
+        sync_items = sh
+    else:
+        sync_items = []
+        
+    form = forms.ResyncForm(sync_items=sync_items)
+    context = {
+        'team': team,
+        'form': form,
+    }
+
+    if team.is_old_style():
+        template_name = 'externalsites/team-settings-sync-errors.html'
+    else:
+        context['nobulk'] = True
+        template_name = 'externalsites/new-team-settings-sync-errors.html'
+
+    return render(request, template_name, context)
+
+@login_required
+def user_profile_sync_errors_tab(request):
+    if request.POST:
+        sh = SyncHistory.objects.get_attempts_to_resync(user=request.user)
+        if sh:
+            sync_items = sh
+        else:
+            sync_items = []
+        form = forms.ResyncForm(request.POST, sync_items=sync_items)
+        if form.is_valid():
+            for (key, val) in form.sync_items():
+                if val:
+                    SyncHistory.objects.force_retry(key, user=request.user)
+
+    sh = SyncHistory.objects.get_attempts_to_resync(user=request.user)
+    if sh:
+        sync_items = sh
+    else:
+        sync_items = []
+
+    form = forms.ResyncForm(sync_items=sync_items)
+    template_name = 'externalsites/user-profile-sync-errors.html'
+
+    return render(request, template_name, {
+        'user_info': request.user,
+        'form': form,
     })
 
 def settings_page_redirect_url(team, formset):

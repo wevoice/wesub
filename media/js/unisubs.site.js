@@ -726,6 +726,12 @@ var Site = function(Site) {
             that.Utils.truncateTextBlocks($('div.application-note'), 50);
             that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
         },
+        review_sync_errors: function() {
+            that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
+        },
+        user_review_sync_errors: function() {
+            that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
+        },
         team_members_list: function() {
             that.Utils.resetLangFilter();
             that.Utils.chosenify();
