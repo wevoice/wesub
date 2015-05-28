@@ -53,6 +53,11 @@ List activity items:
     :>jsonarr id: object id **(deprecated use resource_uri if you need to get
         details on a particular activity)**
 
+.. note::
+
+    If both team and video are given as GET params, then team will be used and
+    video will be ignored.
+
 Activity types:
 
 1.  Add video
