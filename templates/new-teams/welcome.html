@@ -8,9 +8,10 @@
 
 {% block html_attrs %}id="team-welcome"{% endblock %}
 
-{% block content %}
+{% block header %}
+{{ block.super }}
 <div class="banner">
-  <div class="content">
+  <div class="content group">
     <h1>{{ messages.pagetext_welcome_heading }}</h1>
     {% if team.description %}<p>{{ team.description }}</p>{% endif %}
 
@@ -42,6 +43,9 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block content %}
 {% if videos %}
   <div class="content group">
     {% for video in videos %}

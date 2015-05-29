@@ -24,3 +24,25 @@ table {
         th span.help-link {font-size: 0.8em;}
     }
 }
+
+table.key-value {
+    border-spacing: 0 0;
+    table-layout: fixed;
+
+    th, td {
+        border: none;
+        padding: 0;
+        vertical-align: top;
+
+        &:first-of-type {
+            width: 200px;
+            &:after {
+                content: ":";
+            }
+        }
+
+        &.breakup {
+            word-wrap: break-word;
+        }
+    }
+}
