@@ -146,7 +146,7 @@ def retry_failed_sync():
 
 @task()
 def import_videos_from_accounts():
-    for account in YouTubeAccount.objects.user_accounts():
+    for account in YouTubeAccount.objects.accounts_to_import():
         import_video_from_youtube_account.apply_async(
             args=(account.id,), queue='feeds')
 

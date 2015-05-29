@@ -306,39 +306,6 @@ class YoutubeAccountTest(TestCase):
         account = YouTubeAccount.objects.all().get()
         assert_equals(account.oauth_refresh_token, 'test-refresh-token2')
 
-class YouTubeVideoImportTest(TestCase):
-    @test_utils.patch_for_test("externalsites.google.get_uploaded_video_ids")
-    @test_utils.patch_for_test("videos.models.Video.get_or_create_for_url")
-    def setUp(self, mock_get_or_create_for_url, mock_get_uploaded_video_ids):
-        self.account = YouTubeAccountFactory(user=UserFactory())
-        self.mock_get_uploaded_video_ids = mock_get_uploaded_video_ids
-        self.mock_get_or_create_for_url = mock_get_or_create_for_url
-        self.mock_get_uploaded_video_ids.return_value = [
-            'video-1', 'video-2', 'video-3',
-        ]
-
-    def test_import_videos(self):
-        self.account.import_videos()
-        assert_equals(self.mock_get_or_create_for_url.call_args_list, [
-            mock.call('http://youtube.com/watch?v=video-1'),
-            mock.call('http://youtube.com/watch?v=video-2'),
-            mock.call('http://youtube.com/watch?v=video-3'),
-        ])
-
-    def test_set_last_import_video_id(self):
-        self.account.import_videos()
-        # we should set last_import_video_id to the first video in the list
-        assert_equal(test_utils.reload_obj(self.account).last_import_video_id,
-                     'video-1')
-
-    def test_dont_reimport(self):
-        self.account.last_import_video_id = 'video-2'
-        self.account.import_videos()
-        # we should only import videos added after video-2 in the playlist
-        assert_equals(self.mock_get_or_create_for_url.call_args_list, [
-            mock.call('http://youtube.com/watch?v=video-1')
-        ])
-
 class DeleteAccountRelatedModelTest(TestCase):
     # Test that we delete our related objects when we delete our account.
     # This test is important because we don't use an actual foreign key in the

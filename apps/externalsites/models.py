@@ -36,7 +36,7 @@ from externalsites import syncing
 from externalsites.exceptions import (SyncingError, RetryableSyncingError,
                                       YouTubeAccountExistsError)
 from subtitles.models import SubtitleLanguage, SubtitleVersion
-from teams.models import Team
+from teams.models import Team, TeamVideo
 from utils.text import fmt
 from videos.models import Video, VideoUrl, VideoFeed
 from videos.permissions import can_user_resync_own_video
@@ -353,6 +353,10 @@ class YouTubeAccountManager(ExternalAccountManager):
             type=ExternalAccount.TYPE_USER,
             channel_id=video_url.owner_username)
 
+    def accounts_to_import(self):
+        return self.filter(Q(type=ExternalAccount.TYPE_USER)|
+                           Q(import_team__isnull=False))
+
     def create_or_update(self, channel_id, oauth_refresh_token, **data):
         """Create a new YouTubeAccount, if none exists for the channel_id
 
@@ -381,7 +385,9 @@ class YouTubeAccount(ExternalAccount):
     channel_id = models.CharField(max_length=255, unique=True)
     username = models.CharField(max_length=255)
     oauth_refresh_token = models.CharField(max_length=255)
-    last_import_video_id = models.CharField(max_length=100, blank=True)
+    last_import_video_id = models.CharField(max_length=100, blank=True,
+                                            default='')
+    import_team = models.ForeignKey(Team, null=True)
     sync_teams = models.ManyToManyField(
         Team, related_name='youtube_sync_accounts')
 
@@ -474,7 +480,13 @@ class YouTubeAccount(ExternalAccount):
         google.revoke_auth_token(self.oauth_refresh_token)
         super(YouTubeAccount, self).delete()
 
+    def should_import_videos(self):
+        return (self.type == ExternalAccount.TYPE_USER or
+                (self.type == ExternalAccount.TYPE_TEAM and self.import_team))
+
     def import_videos(self):
+        if not self.should_import_videos():
+            return
         video_ids = google.get_uploaded_video_ids(self.channel_id)
         if not video_ids:
             return
@@ -482,7 +494,12 @@ class YouTubeAccount(ExternalAccount):
             if video_id == self.last_import_video_id:
                 break
             video_url = 'http://youtube.com/watch?v={}'.format(video_id)
-            Video.get_or_create_for_url(video_url)
+            if self.type == ExternalAccount.TYPE_USER:
+                Video.get_or_create_for_url(video_url, user=self.user)
+            elif self.import_team:
+                video = Video.get_or_create_for_url(video_url)
+                TeamVideo.objects.create(video=video, team=self.import_team)
+
         self.last_import_video_id = video_ids[0]
         self.save()
 
