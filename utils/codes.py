@@ -15,8 +15,16 @@ from random import SystemRandom
 
 random = SystemRandom()
 
-ALPHABET = string.uppercase + string.lowercase + string.digits + '-_'
+class CodeGenerator(object):
+    def __init__(self, alphabet):
+        self.alphabet = alphabet
 
+    def __call__(self, length):
+        return ''.join(random.sample(self.alphabet, length))
+
+_make_code_generator = CodeGenerator(
+    string.uppercase + string.lowercase + string.digits + '-_'
+)
 def make_code(bits_needed=64):
     """Make a new code
 
@@ -26,4 +34,4 @@ def make_code(bits_needed=64):
     """
     # 64 letter alphabet means each char is 6 bits.
     length = int(math.ceil(bits_needed / 6.0))
-    return ''.join(random.sample(ALPHABET, length))
+    return _make_code_generator(length)

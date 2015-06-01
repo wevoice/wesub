@@ -391,7 +391,7 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
         report.process()
         bill = 'user-data/%s' % report.csv_file
         entries = self._bill_dict(bill)
-        self.assertEqual(9, len(entries))
+        self.assertEqual(18, len(entries))
 
     def test_professional_svcs_report(self):
         """Professional svcs report only contains approved videos."""
@@ -405,7 +405,7 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
         report.process()
         bill = 'user-data/%s' % report.csv_file
         entries = self._bill_dict(bill)
-        self.assertEqual(3, len(entries))
+        self.assertEqual(6, len(entries))
 
 
     def test_translator_report_values(self):

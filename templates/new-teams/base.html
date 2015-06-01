@@ -73,10 +73,7 @@
     <li class="user">{% include "new-user-menu.html" %}</li>
   </ul>
 </nav>
-{% endblock %}
-
-
-{% block content %}
+{% block banner %}
 <div class="banner">
   <div class="content group">
     {% if team.logo %}
@@ -86,8 +83,5 @@
     {% endif %}
   </div>
 </div>
-
-<div class="content">
-  {% block page_content %}{% endblock %}
-</div>
+{% endblock %}
 {% endblock %}
