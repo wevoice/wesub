@@ -33,5 +33,4 @@ class FailedSyncPage(UnisubsPage):
         els = self.get_elements_list(self._RESYNC_BOX)
         for el in els:
             el.click()
-        self.browser.get_screenshot_as_file("BOX.png")
         self.click_by_css(self._SUBMIT)

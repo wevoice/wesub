@@ -443,17 +443,19 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         member = UserFactory()
         team = TeamFactory(admin=admin,
                            member=member)
-        project = ProjectFactory.create(team=team, 
+        project1 = ProjectFactory(team=team, 
                        description='initial team project',
                        guidelines='these are guidelines')
-        url = '/api/teams/{0}/projects/{1}/'.format(team.slug, project.slug)
+        url = '/api/teams/{0}/projects/{1}/'.format(team.slug, project1.slug)
         data = {
             'description': 'updated description' 
             } 
         r = self._put(url=url, data=data, user=admin)
+        self.logger.info(r)
         self.team_pg.open_page('/')
         self.team_pg.log_in(admin.username, 'password')
-        self.team_pg.open_page("/teams/{0}/settings/projects/{1}".format(team.slug, project.slug))
+        self.team_pg.open_page("/teams/{0}/settings/projects/{1}/edit/".format(team.slug, project1.slug))
+        
         self.assertTrue(self.team_pg.is_text_present("textarea", data['description']))
 
     def test_project_delete(self):
