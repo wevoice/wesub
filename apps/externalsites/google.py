@@ -405,23 +405,12 @@ def _get_video_info(video_id):
         raise APIError("get_video_info: Unexpected content: %s" % e)
 
 
-def get_direct_url(video_id):
+def get_direct_url_to_audio(video_id):
     """
     It does a request to google to retrieve the URL
     So that should be done in a backgound task
     """
-    video = pafy.new(video_id)
-    url = None
-    size = None
-    for s in video.streams:
-        if url:
-            if s.get_filesize() < size:
-                url = s.url
-                size = s.get_filesize()
-        else:
-            url = s.url
-            size = s.get_filesize()
-    return url
+    return pafy.new(video_id).getbestaudio().url
 
 def update_video_description(video_id, access_token, description):
     # get the current snippet for the video

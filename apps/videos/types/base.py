@@ -37,6 +37,15 @@ class VideoType(object):
     @classmethod 
     def video_url(cls, obj):
         return obj.url
+
+    def get_audio_file(self):
+        """
+        Should return path to a mono audio track
+        of the video. this should be a local file.
+        Takes time to complete as file must be
+        downloaded, encoded, etc.
+        """
+        raise Exception('Not implemented')
     
     def convert_to_video_url(self):
         return self.format_url(self.url)
