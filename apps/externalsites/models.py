@@ -497,7 +497,7 @@ class YouTubeAccount(ExternalAccount):
             if self.type == ExternalAccount.TYPE_USER:
                 Video.get_or_create_for_url(video_url, user=self.user)
             elif self.import_team:
-                video = Video.get_or_create_for_url(video_url)
+                video, created = Video.get_or_create_for_url(video_url)
                 TeamVideo.objects.create(video=video, team=self.import_team)
 
         self.last_import_video_id = video_ids[0]

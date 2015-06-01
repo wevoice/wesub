@@ -45,7 +45,7 @@ class YoutubeImportTest(TestCase):
         def make_video(url, *args, **kwargs):
             video = VideoFactory()
             VideoURLFactory(video=video, url=url, primary=True)
-            return video
+            return video, True
         self.mock_get_or_create_for_url.side_effect = make_video
 
     def test_accounts_to_import(self):
