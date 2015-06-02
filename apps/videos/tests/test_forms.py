@@ -84,69 +84,19 @@ class AddFromFeedFormTestCase(TestCase):
     def make_feed(self, url):
         return VideoFeed.objects.create(user=self.user, url=url)
 
-    def youtube_url(self, username):
-        return 'https://gdata.youtube.com/feeds/api/users/%s/uploads' % (
-            username,)
-
-    def youtube_user_url(self, username):
-        return 'http://www.youtube.com/user/%s' % (username,)
-
-    def check_feed_urls(self, *feed_urls):
-        self.assertEquals(set(f.url for f in VideoFeed.objects.all()),
-                          set(feed_urls))
-
     def test_success(self):
-        form = self.make_form(
-            feed_url='http://example.com/feed.rss',
-            usernames='testuser, testuser2',
-            youtube_user_url=self.youtube_user_url('testuser3'))
+        form = self.make_form(feed_url='http://example.com/feed.rss')
         self.assertEquals(form.errors, {})
         form.save()
-        self.check_feed_urls(
-            'http://example.com/feed.rss',
-            self.youtube_url('testuser'),
-            self.youtube_url('testuser2'),
-            self.youtube_url('testuser3'),
-        )
+        self.assertEquals(set(f.url for f in VideoFeed.objects.all()),
+                          set(['http://example.com/feed.rss']))
+
 
     def test_duplicate_feeds(self):
         # test trying to add feed that already exists
         url = 'http://example.com/feed.rss'
         self.make_feed(url)
         form = self.make_form(feed_url=url)
-        self.assertNotEquals(form.errors, {})
-
-    def test_duplicate_feeds_with_youtube_users(self):
-        # test trying to add a youtube user when the feed for that user
-        # already exists
-        self.make_feed(self.youtube_url('testuser'))
-        form = self.make_form(usernames='testuser')
-        self.assertNotEquals(form.errors, {})
-
-    def test_duplicate_feeds_with_youtube_urls(self):
-        # test trying to add a youtube url when the feed for that user already
-        # exists
-        self.make_feed(self.youtube_url('testuser'))
-        form = self.make_form(
-            youtube_user_url=self.youtube_user_url('testuser'))
-        self.assertNotEquals(form.errors, {})
-
-    def test_duplicate_feeds_in_form(self):
-        # test having duplicate feeds in 1 form, for example when the feed url
-        # is the same as the URL for a youtube user.
-        form = self.make_form(
-            feed_url=self.youtube_url('testuser'),
-            youtube_user_url=self.youtube_user_url('testuser'))
-        self.assertNotEquals(form.errors, {})
-
-        form = self.make_form(
-            usernames='testuser',
-            youtube_user_url=self.youtube_user_url('testuser'))
-        self.assertNotEquals(form.errors, {})
-
-        form = self.make_form(
-            feed_url=self.youtube_url('testuser'),
-            usernames='testuser')
         self.assertNotEquals(form.errors, {})
 
 class CreateSubtitlesFormTestBase(TestCase):
