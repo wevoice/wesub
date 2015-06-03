@@ -53,6 +53,11 @@ List activity items:
     :>jsonarr id: object id **(deprecated use resource_uri if you need to get
         details on a particular activity)**
 
+.. note::
+
+    If both team and video are given as GET params, then team will be used and
+    video will be ignored.
+
 Activity types:
 
 1.  Add video
@@ -88,6 +93,7 @@ from rest_framework import viewsets
 from rest_framework.reverse import reverse
 
 from api.pagination import AmaraPaginationMixin
+from subtitles.models import SubtitleLanguage
 from teams.models import Team
 from videos.models import Action, Video
 
@@ -130,6 +136,7 @@ class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
     paginate_by = 20
 
     def get_queryset(self):
+        self.applied_language_filter = False
         params = self.request.query_params
         if 'team' in params:
             try:
@@ -140,6 +147,15 @@ class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
                 raise PermissionDenied()
             if 'team-activity' in params:
                 qs = Action.objects.filter(team=team)
+            elif 'language' in params:
+                language_qs = (
+                    SubtitleLanguage.objects
+                    .filter(language_code=params['language'],
+                            video__teamvideo__team_id=team.id)
+                    .values_list('id')
+                )
+                qs = Action.objects.filter(new_language_id__in=language_qs)
+                self.applied_language_filter = True
             else:
                 qs = team.fetch_video_actions()
         elif 'video' in params:
@@ -161,9 +177,10 @@ class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
         params = self.request.query_params
         if 'type' in params:
             queryset = queryset.filter(action_type=params['type'])
-        if 'language' in params:
+        if 'language' in params and not self.applied_language_filter:
             queryset = queryset.filter(
                 new_language__language_code=params['language'])
+            self.applied_language_filter = True
         if 'before' in params:
             queryset = queryset.filter(
                 created__lt=datetime.fromtimestamp(int(params['before'])))

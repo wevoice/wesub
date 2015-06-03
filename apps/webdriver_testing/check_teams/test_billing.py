@@ -308,9 +308,9 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
             video = TeamVideoFactory(team=cls.team,
                                      video__primary_audio_language_code='en').video
             #Add subtitles and approve tasks
-            cls.add_subtitles(lc, video, cls.member, complete=True)
-            cls._post(cls.manager, video, lc) #post approve to actions endpoint
-            cls._post(cls.admin, video, lc)   #post approve to actions endpoint
+            cls.add_subtitles('en', video, cls.member, complete=True)
+            cls._post(cls.manager, video, 'en') #post approve to actions endpoint
+            cls._post(cls.admin, video, 'en')   #post approve to actions endpoint
             cls.add_subtitles(lc, video, cls.member, complete=True)
             cls._post(cls.manager, video, lc) #post approve to actions endpoint
             cls._post(cls.admin, video, lc)   #post approve to actions endpoint
@@ -335,14 +335,16 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
         for language in lang_list:
             TeamLangPrefFactory.create(team=team, language_code=language,
                                        preferred=True)
-        member = TeamMemberFactory(team=team,
-                                       user__first_name='Jerry', 
-                                       user__last_name='Garcia',
-                                       user__pay_rate_code='L2').user
+        member = UserFactory(
+                            first_name='Jerry', 
+                            last_name='Garcia',
+                            pay_rate_code='L2')
 
-        member2 = TeamMemberFactory(team=team,
-                user__first_name='Gabriel José de la Concordia'.decode("utf8"), 
-                user__last_name='García Márquez'.decode("utf8")).user
+        member2 = UserFactory(
+                first_name='Gabriel José de la Concordia'.decode("utf8"), 
+                last_name='García Márquez'.decode("utf8"))
+        TeamContributorMemberFactory(user=member, team=team)
+        TeamContributorMemberFactory(user=member2, team=team)
         return team, member, member2
 
     @classmethod
@@ -351,6 +353,7 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
                                     'subtitle_data', 'Timed_text.en.srt')
         cls.editor_pg.log_in(user.username, 'password')
         cls.editor_pg.open_editor_page(video.video_id, lc)
+        time.sleep(3) 
         cls.editor_pg.upload_subtitles(subs_file)
         
         if not complete:
@@ -376,8 +379,6 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
         data = {"action": action }
         response = client.post(url, data)
 
-
-
     def test_translators_report(self):
         """Translator reports have rev and trnsltr entries for approved vids"""
         report = BillingFactory(type=4, 
@@ -390,7 +391,7 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
         report.process()
         bill = 'user-data/%s' % report.csv_file
         entries = self._bill_dict(bill)
-        self.assertEqual(9, len(entries))
+        self.assertEqual(18, len(entries))
 
     def test_professional_svcs_report(self):
         """Professional svcs report only contains approved videos."""
@@ -404,7 +405,7 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
         report.process()
         bill = 'user-data/%s' % report.csv_file
         entries = self._bill_dict(bill)
-        self.assertEqual(3, len(entries))
+        self.assertEqual(6, len(entries))
 
 
     def test_translator_report_values(self):
@@ -420,11 +421,11 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
         """
 
         team, member, member2 = self.create_workflow_team()
-        vid = TeamVideoFactory(team=self.team,
+        vid = TeamVideoFactory(team=team,
                                      video__primary_audio_language_code='en').video
         tv = vid.get_team_video()
         self.add_subtitles('en', vid, member)
-        self.data_utils.complete_review_task(tv, 20, member)
+        self.data_utils.complete_review_task(tv, 20, member2)
         self.data_utils.complete_approve_task(tv, 20, self.admin)
         self.add_subtitles('de', vid, member2, complete=True)
         self.data_utils.complete_review_task(tv, 20, member, 
@@ -483,7 +484,7 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
         """
 
         team, member, member2 = self.create_workflow_team()
-        vid = TeamVideoFactory(team=self.team,
+        vid = TeamVideoFactory(team=team,
                                video__primary_audio_language_code='en').video
         tv = vid.get_team_video()
         self.add_subtitles('en', vid, member)
@@ -533,7 +534,7 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
         wf.review_allowed = 0
         wf.save()
         
-        vid = TeamVideoFactory(team=self.team,
+        vid = TeamVideoFactory(team=team,
                                video__primary_audio_language_code='en').video
         tv = vid.get_team_video()
         self.add_subtitles('en', vid, member)
@@ -562,7 +563,7 @@ class TestCaseDemandReports(APILiveServerTestCase, WebdriverTestCase):
         wf.review_allowed = 0
         wf.save()
         
-        vid = TeamVideoFactory(team=self.team,
+        vid = TeamVideoFactory(team=team,
                                video__primary_audio_language_code='en').video
         tv = vid.get_team_video()
         self.add_subtitles('en', vid, member)
