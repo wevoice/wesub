@@ -20,12 +20,14 @@ import json
 
 from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
 from nose.tools import *
 
 from utils import test_utils
 from utils.subtitles import load_subtitles
 from externalsites import google
 
+@override_settings(YOUTUBE_API_KEY='test-youtube-api-key')
 class YouTubeTestCase(TestCase):
     def test_get_user_info(self):
         mocker = test_utils.RequestsMocker()
