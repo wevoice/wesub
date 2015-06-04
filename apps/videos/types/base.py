@@ -19,6 +19,10 @@
 from urlparse import urlparse
 
 from django.core.exceptions import ValidationError
+import subprocess, sys, uuid
+
+import logging
+logger = logging.getLogger("Base video type")
 
 class VideoType(object):
 
@@ -45,6 +49,24 @@ class VideoType(object):
         Takes time to complete as file must be
         downloaded, encoded, etc.
         """
+        # File is read from its URL, then converted to mono, in was
+        # so that we do not lose quality with another encoding
+        # will raise an exception if there is no diretc URL for
+        # type
+        url = self.get_direct_url()
+        output = "/tmp/" + str(uuid.uuid4()) + ".wav"
+        cmd = """avconv -i "{}" -ar 16000 -ac 1 {}""".format(url, output)
+        try:
+            subprocess.check_call(cmd, shell=True)
+        except subprocess.CalledProcessError as e:
+            logger.error("CalledProcessError error({}) when running command {}".format(e.returncode, cmd))
+            return None
+        except:
+            logger.error("Unexpected error({}) when running command {}".format(sys.exc_info()[0], cmd))
+            return None
+        return output
+
+    def get_direct_url(self):
         raise Exception('Not implemented')
     
     def convert_to_video_url(self):

@@ -20,9 +20,6 @@ from urlparse import urlparse
 
 from base import VideoType
 from externalsites import google
-import subprocess, sys, uuid
-import logging
-logger = logging.getLogger("Youtube video type")
 
 class YoutubeVideoType(VideoType):
 
@@ -70,21 +67,8 @@ class YoutubeVideoType(VideoType):
         return (hostname in YoutubeVideoType.HOSTNAMES and
                 any(pattern.search(url) for pattern in cls._url_patterns))
 
-    def get_audio_file(self):
-        url = google.get_direct_url_to_audio(self.video_id)
-        # File is read from its URL, then converted to mono, in was
-        # so that we do not lose quality with another encoding
-        output = "/tmp/" + str(uuid.uuid4()) + ".wav"
-        cmd = """avconv -i "{}" -ar 16000 -ac 1 {}""".format(url, output)
-        try:
-            subprocess.check_call(cmd, shell=True)
-        except subprocess.CalledProcessError as e:
-            logger.error("CalledProcessError error({}) when running command {}".format(e.returncode, cmd))
-            return None
-        except:
-            logger.error("Unexpected error({}) when running command {}".format(sys.exc_info()[0], cmd))
-            return None
-        return output
+    def get_direct_url(self):
+        return google.get_direct_url_to_audio(self.video_id)
 
     def get_video_info(self):
         if not hasattr(self, '_video_info'):

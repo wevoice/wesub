@@ -17,9 +17,6 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from videos.types.base import VideoType
-import subprocess, sys, uuid
-import logging
-logger = logging.getLogger("HTML5 type")
 
 class HtmlFiveVideoType(VideoType):
     abbreviation = 'H'
@@ -34,18 +31,5 @@ class HtmlFiveVideoType(VideoType):
     def matches_video_url(cls, url):
         return cls.url_extension(url) in cls.valid_extensions
 
-    def get_audio_file(self):
-        # File is read from its URL, then converted to mono, in was
-        # so that we do not lose quality with another encoding
-        # TODO: find some way to protect ourselves from huge files
-        output = "/tmp/" + str(uuid.uuid4()) + ".wav"
-        cmd = """avconv -i "{}" -ar 16000 -ac 1 {}""".format(self.url, output)
-        try:
-            subprocess.check_call(cmd, shell=True)
-        except subprocess.CalledProcessError as e:
-            logger.error("CalledProcessError error({}) when running command {}".format(e.returncode, cmd))
-            return None
-        except:
-            logger.error("Unexpected error({}) when running command {}".format(sys.exc_info()[0], cmd))
-            return None
-        return output
+    def get_direct_url(self):
+        return self.url
