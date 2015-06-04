@@ -245,17 +245,41 @@ def _make_youtube_upload_api_request(method, access_token, url_path, **kwargs):
     url = 'https://www.googleapis.com/upload/youtube/v3/' + url_path
     return _make_api_request(method, access_token, url, **kwargs)
 
-def channel_get(access_token, part, mine='true'):
-    return _make_youtube_api_request('get', access_token, 'channels', params={
-        'part': ','.join(part),
-        'mine': mine,
-    })
+def channel_get(access_token, part, channel_id=None):
+    params = { 'part': ','.join(part) }
+    if channel_id is None:
+        params['mine'] = 'true'
+    else:
+        params['id'] = channel_id
+    return _make_youtube_api_request('get', access_token, 'channels',
+                                     params=params)
 
 def video_get(access_token, video_id, part):
     return _make_youtube_api_request('get', access_token, 'videos', params={
         'id': video_id,
         'part': ','.join(part),
     })
+
+def get_uploads_playlist_id(channel_id):
+    response = channel_get(None, ['contentDetails'], channel_id)
+    content_details = response.json['items'][0]['contentDetails']
+    return content_details['relatedPlaylists']['uploads']
+
+def get_uploaded_video_ids(channel_id):
+    playlist_id = get_uploads_playlist_id(channel_id)
+
+    params = {
+        'part': 'snippet',
+        'playlistId': playlist_id
+    }
+    response = _make_youtube_api_request('get', None, 'playlistItems',
+                                         params=params)
+    rv = []
+    for item in response.json['items']:
+        resource_id = item['snippet']['resourceId']
+        if resource_id['kind'] == 'youtube#video':
+            rv.append(resource_id['videoId'])
+    return rv
 
 def captions_list(access_token, video_id):
     """Fetch info on all non-ASR captions for a video

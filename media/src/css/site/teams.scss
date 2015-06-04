@@ -56,4 +56,17 @@ fieldset.assets>div {
         display: none;
     }
 
+    .youtube-form {
+        padding-bottom: 10px;
+
+        .remove-button {
+            float: right;
+
+            button {
+                @include medium-button;
+                @include button-color($red);
+            }
+        }
+    }
+
 }

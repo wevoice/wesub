@@ -243,9 +243,6 @@ def handle_add_account_callback(request, auth_info):
     except YouTubeAccountExistsError, e:
         messages.error(request,
                        already_linked_message(request.user, e.other_account))
-    else:
-        if 'username' in auth_info.state:
-            account.create_feed()
 
     return HttpResponseRedirect(redirect_url)
 
