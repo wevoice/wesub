@@ -62,7 +62,7 @@ url_exists = mock.Mock(return_value=True)
 
 current_locks = set()
 acquire_lock = mock.Mock(
-    side_effect=lambda c, name: current_locks.add(name))
+    side_effect=lambda c, name, timeout=None: current_locks.add(name))
 release_lock = mock.Mock(
     side_effect=lambda c, name: current_locks.remove(name))
 invalidate_widget_video_cache = mock.Mock()
