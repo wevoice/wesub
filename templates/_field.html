@@ -1,7 +1,14 @@
-{{ field.errors }}
+{% load form_helpers %}
 <label>
-  {{ field.label }}
+  {% if field|is_checkbox %}
   {{ field }}
+  <span class="label">{{ field.label }}</span>
+  {% include "_field_errors.html" %}
+  {% else %}
+  <span class="label">{{ field.label }}</span>
+  {% include "_field_errors.html" %}
+  {{ field }}
+  {% endif %}
 </label>
 {% if field.help_text %}
 <p class="help">{{ field.help_text }}</p>
