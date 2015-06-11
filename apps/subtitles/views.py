@@ -370,7 +370,8 @@ def _user_for_download_permissions(request):
     if request.user.is_authenticated():
         return request.user
     username = request.META.get('HTTP_X_API_USERNAME', None)
-    api_key = request.META.get( 'HTTP_X_APIKEY', None)
+    api_key = request.META.get('HTTP_X_API_KEY',
+                               request.META.get('HTTP_X_APIKEY', None))
     if not username or not api_key:
         return request.user
     try:
