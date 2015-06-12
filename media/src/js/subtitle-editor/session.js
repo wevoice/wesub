@@ -98,6 +98,11 @@ var angular = angular || null;
                     });
                 }
             },
+            allowSaveDraft: function() {
+                return _.any(EditorData.actions, function(action) {
+                    return action.name == 'save-draft';
+                });
+            },
             saveDraft: function() {
                 var msg = $sce.trustAsHtml('Saving&hellip;');
                 $scope.dialogManager.showFreezeBox(msg);
