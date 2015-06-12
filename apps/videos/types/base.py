@@ -60,7 +60,6 @@ class VideoType(object):
         url = self.get_direct_url()
         download_file = "/tmp/" + str(uuid.uuid4())
         download_command = """curl "{}" -o {}""".format(url, download_file)
-        logger.error("download CMD " + download_command)
         try:
             subprocess.check_call(download_command, shell=True)
         except subprocess.CalledProcessError as e:
