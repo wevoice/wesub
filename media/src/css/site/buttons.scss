@@ -1,10 +1,12 @@
 @mixin small-button {
     font-size: 1.4rem;
+    line-height: 1.4rem;
     padding: 6px 12px;
 }
 
 @mixin medium-button {
     font-size: 1.6rem;
+    line-height: 1.6rem;
     padding: 6px 18px;
 }
 
@@ -18,7 +20,7 @@
     }
 }
 
-button, a.button {
+@mixin button {
     display: inline-block;
     margin: 0;
     padding: 13px 26px;
@@ -33,6 +35,11 @@ button, a.button {
     &:hover {
         text-decoration: none;
     }
+}
+
+
+button, a.button {
+    @include button;
 
     &.small {
         @include small-button;
@@ -44,6 +51,10 @@ button, a.button {
 
     &.delete {
         @include button-color($red);
+    }
+
+    &.cancel {
+        @include button-color($light-gray);
     }
 }
 
