@@ -688,6 +688,8 @@ LOGGING = {
     },
 }
 
+TMP_FOLDER = "/tmp/"
+
 from task_settings import *
 
 if DEBUG:

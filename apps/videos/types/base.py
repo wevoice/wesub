@@ -20,6 +20,7 @@ from urlparse import urlparse
 
 from django.core.exceptions import ValidationError
 import subprocess, sys, uuid, os
+from django.conf import settings
 import logging
 logger = logging.getLogger("Base video type")
 
@@ -58,7 +59,7 @@ class VideoType(object):
             except:
                 logger.error(file_name + " does not exist")
         url = self.get_direct_url()
-        download_file = "/tmp/" + str(uuid.uuid4())
+        download_file = os.path.join(settings.TMP_FOLDER, str(uuid.uuid4()))
         download_command = """curl "{}" -o {}""".format(url, download_file)
         try:
             subprocess.check_call(download_command, shell=True)
@@ -70,7 +71,7 @@ class VideoType(object):
             logger.error("Unexpected error({}) when running command {}".format(sys.exc_info()[0], download_command))
             clean(download_file)
             return None
-        output = "/tmp/" + str(uuid.uuid4()) + ".wav"
+        output = os.path.join(settings.TMP_FOLDER, str(uuid.uuid4()) + ".wav")
         cmd = """avconv -i "{}" -ar 16000 -ac 1 {}""".format(download_file, output)
         logger.error("CMD " + cmd)
         try:
