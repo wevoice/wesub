@@ -16,7 +16,7 @@ div.message {
         border-color: darken($warning, 20);
     }
     &.error {
-        background: $error;
-        border-color: darken($error, 20);
+        background: $error-bg;
+        border-color: darken($error-bg, 20);
     }
 }

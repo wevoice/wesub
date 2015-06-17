@@ -6,7 +6,7 @@
     font-family: "Merriweather", "Helvetica Neue", "Roboto", Helvetica, Arial, "Liberation Sans", sans-serif;
 }
 
-$line-height: 2.4rem;
+$line-height: 2.2rem;
 $default-font-size: 1.4rem;
 $large-font-size: 1.6rem;
 $font-weight-normal: 400;
@@ -17,7 +17,7 @@ html {
     font-size: 62.5%;
 }
 
-body {
+body, input, textarea, select {
     @extend %body-font;
     font-size: $default-font-size;
     line-height: $line-height;

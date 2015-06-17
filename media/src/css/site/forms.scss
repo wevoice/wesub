@@ -28,7 +28,6 @@ legend {
 }
 
 input, textarea, select {
-    @extend %body-font;
     font-size: $large-font-size;
     box-sizing: border-box;
     width: 100%;
@@ -36,6 +35,11 @@ input, textarea, select {
     padding: 4px;
     margin: 0;
     background: $lightest-gray;
+
+    &:disabled {
+        color: $lighter-gray;
+        border-color: $lighter-gray;
+    }
 }
 
 input[type=checkbox], input[type=radio] {
@@ -46,6 +50,24 @@ input[type=checkbox], input[type=radio] {
 
 input[type=file] {
     border: none;
+}
+
+.compact {
+    label {
+        @extend %clearfix;
+        width: 100%;
+    }
+    span.label {
+        display: inline-block;
+        // We need this to make the label line up with the input which has
+        // 4px padding and 1px border
+        padding-top: 5px;
+    }
+    input {
+        float: right;
+        width: 60%;
+        margin-left: 10px;
+    }
 }
 
 label {
@@ -62,9 +84,12 @@ p.help {
 }
 
 ul.errorlist {
-    float: right;
+    display: inline-block;
     color: $error;
-    font-style: italic;
+
+    li {
+        margin-left: 5px;
+    }
 }
 
 
