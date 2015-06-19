@@ -530,23 +530,17 @@ class Team(models.Model):
             return False
         return self.is_member(user)
 
-    def fetch_video_actions(self, video_language=None,
-                            subtitle_language=None):
+    def fetch_video_actions(self, video_language=None):
         """Fetch the Action objects for this team's videos
 
         Args:
             video_language: only actions for videos with this
                             primary_audio_language_code
-            subtitle_language: only actions that have subtitles in these
-                               languages
         """
         video_q = TeamVideo.objects.filter(team=self).values_list('video_id')
         if video_language is not None:
             video_q = video_q.filter(
                 video__primary_audio_language_code=video_language)
-        if subtitle_language is not None:
-            video_q = video_q.filter(
-                video__newsubtitlelanguage_set__language_code=subtitle_language)
         return Action.objects.filter(video_id__in=video_q)
 
     # moderation

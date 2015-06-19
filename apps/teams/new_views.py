@@ -77,13 +77,14 @@ def fetch_actions_for_activity_page(team, tab, page, params):
         action_qs = Action.objects.filter(team=team)
     else:
         video_language = params.get('video_language')
+        subtitles_language = params.get('subtitles_language', 'any')
         if video_language == 'any':
             video_language = None
-        subtitles_language = params.get('subtitles_language')
-        if subtitles_language == 'any':
-            subtitles_language = None
-        action_qs = team.fetch_video_actions(video_language,
-                                             subtitles_language)
+        action_qs = team.fetch_video_actions(video_language)
+        if subtitles_language != 'any':
+            action_qs = action_qs.filter(
+                new_language__language_code=subtitles_language)
+
     end = page * ACTIONS_ON_PAGE
     start = end - ACTIONS_ON_PAGE
 

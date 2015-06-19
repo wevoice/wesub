@@ -129,7 +129,7 @@ class FixedTaskMonitor(TaskMonitor):
 
 
 class ActionAdmin(admin.ModelAdmin):
-    list_display = ('video', 'language', 'user', 'team', 'action_type',
+    list_display = ('video', 'new_language', 'user', 'team', 'action_type',
         'created')
 
     class Meta:
