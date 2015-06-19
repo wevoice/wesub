@@ -57,7 +57,12 @@
     {% require_email_dialog %}
 
 <div id="header">{% block header %}{% include "new-header.html" %}{% endblock %}</div>
-<div id="main-content">{% block content %}{% endblock %}</div>
+<div id="main-content"><div class="content">
+    {% for message in messages %}
+    <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+</div></div>
 <div id="footer">{% block footer %}{% include 'new-footer.html' %}{% endblock %}</div>
 
 {% block bottom_scripts %}{% endblock %}

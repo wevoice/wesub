@@ -1,6 +1,5 @@
 nav {
     @extend .content;
-    padding-bottom: 10px;
 
     > a {
         padding-top: 10px;
@@ -9,6 +8,9 @@ nav {
     }
 
     @include not-small-screen {
+        ul {
+            float: left;
+        }
         ul.right {
             float: right;
         }
@@ -19,7 +21,6 @@ nav {
         display: block;
         float: left;
         position: relative;
-
 
         a {
             padding: 10px 15px;

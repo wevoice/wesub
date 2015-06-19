@@ -2070,7 +2070,7 @@ def add_project(request, slug):
 def edit_project(request, slug, project_slug):
     team = get_team_for_view(slug, request.user)
     project = Project.objects.get(slug=project_slug, team=team)
-    project_list_url = reverse('teams:settings_projects', args=[], kwargs={'slug': slug})
+    project_list_url = reverse('teams:settings_projects', args=[], kwargs={'slug': team.slug})
 
     if project.is_default_project:
         messages.error(request, _(u'You cannot edit that project.'))

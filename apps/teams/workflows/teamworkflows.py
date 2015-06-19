@@ -117,8 +117,14 @@ class TeamWorkflow(object):
 
     @classmethod
     def get_choices(cls):
-        return [(type_code, cls.label)
-                 for (type_code, cls) in cls._type_code_map.items()]
+        choices = [(type_code, cls.label)
+                   for (type_code, cls) in cls._type_code_map.items()]
+        # sort choices so that:
+        #   - unisubs choices are first, then extensions (unisubs choices are
+        #     1-char)
+        #   - after that it's sorted alphabeticaly by code
+        choices.sort(key=lambda (code, _): (len(code), code))
+        return choices
 
     @classmethod
     def register(cls):

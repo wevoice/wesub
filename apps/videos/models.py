@@ -501,6 +501,10 @@ class Video(models.Model):
         vurl = self.get_primary_videourl_obj()
         return vurl.effective_url if vurl else None
 
+    def get_video_url_type_display(self):
+        vurl = self.get_primary_videourl_obj()
+        return vurl.get_type_display() if vurl else _("No Video URL")
+
     def get_video_urls(self):
         """Return the video URLs for this video."""
         return self.videourl_set.all()

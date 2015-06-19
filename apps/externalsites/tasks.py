@@ -24,7 +24,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from externalsites import credit
 from externalsites import google
 from externalsites import subfetch
-from externalsites.models import get_account, get_sync_account, SyncHistory
+from externalsites.models import (get_account, get_sync_account, SyncHistory,
+                                  YouTubeAccount)
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from videos.models import VideoUrl
 
@@ -142,3 +143,18 @@ def retry_failed_sync():
     logging.info("retry_failed_sync: resyncing %s", sh)
     account = sh.get_account()
     account.update_subtitles(sh.video_url, sh.language)
+
+@task()
+def import_videos_from_accounts():
+    for account in YouTubeAccount.objects.accounts_to_import():
+        import_video_from_youtube_account.apply_async(
+            args=(account.id,), queue='feeds')
+
+@task
+def import_video_from_youtube_account(account_id):
+    try:
+        account = YouTubeAccount.objects.get(id=account_id)
+        account.import_videos()
+    except YouTubeAccount.DoesNotExist:
+        logging.warn("import_video_from_youtube_account: "
+                     "YouTubeAccount.DoesNotExist ({})".format(account_id))

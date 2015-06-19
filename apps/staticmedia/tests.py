@@ -61,12 +61,12 @@ class TestGetBundle(TestCase):
 
 class TestBuildBundle(TestCase):
     @test_utils.patch_for_test('staticmedia.utils.run_command')
-    @test_utils.patch_for_test('staticmedia.bundles.static_root')
-    def setUp(self, mock_media_root, mock_run_command):
+    @test_utils.patch_for_test('staticmedia.bundles.media_directories')
+    def setUp(self, mock_media_directories, mock_run_command):
         self.mock_run_command = mock_run_command
         self.mock_run_command.return_value = 'test-compressed-output'
         self.static_root = os.path.join(os.path.dirname(__file__), 'testdata')
-        mock_media_root.return_value = self.static_root
+        mock_media_directories.return_value = [self.static_root]
 
     def read_and_combine_files(self, relative_paths):
         return ''.join([
@@ -141,12 +141,14 @@ class TestCaching(TestCase):
             'files': ('foo.js', 'bar.js')
         })
 
+    @test_utils.patch_for_test('staticmedia.bundles.Bundle.path')
     @test_utils.patch_for_test('os.path.getmtime')
-    def test_modified_since(self, mock_getmtime):
+    def test_modified_since(self, mock_getmtime, mock_path):
+        mock_path.side_effect = lambda filename: filename
         def getmtime(path):
-            if path == os.path.join(bundles.static_root(), 'foo.js'):
+            if path == 'foo.js':
                 return 200
-            elif path == os.path.join(bundles.static_root(), 'bar.js'):
+            elif path == 'bar.js':
                 return 100
             else:
                 raise ValueError("unexpected path: %s" % path)

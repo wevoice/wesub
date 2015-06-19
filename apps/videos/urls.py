@@ -33,7 +33,6 @@ urlpatterns = patterns(
     url(r'^feedback/error/$', 'feedback', {'hide_captcha': True}, 'feedback_error'),
     url(r'^upload_subtitles/$', 'upload_subtitles', name='upload_subtitles'),
     url(r'^create/$', 'create', name='create'),
-    url(r'^create/feed/$', 'create_from_feed', name='create_from_feed'),
     url(r'^email_friend/$', 'email_friend', name='email_friend'),
     url(r'^activities/(?P<video_id>(\w|-)+)/$', 'actions_list', name='actions_list'),
     url(r'^stop_notification/(?P<video_id>(\w|-)+)/$', 'stop_notification', name='stop_notification'),

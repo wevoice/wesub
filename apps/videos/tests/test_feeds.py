@@ -52,48 +52,6 @@ class FeedImportTest(TestCase):
     def opened_url(self):
         return self.open_resource_mock.call_args[0][0]
 
-class TestFeedsSubmit(FeedImportTest):
-    def setUp(self):
-        FeedImportTest.setUp(self)
-        UserFactory(username='admin', password='admin', is_staff=True)
-        self.client.login(username='admin', password='admin')
-
-    def submit_feed_url(self, feed_url):
-        data = { 'feed_url': feed_url, }
-        response = self.client.post(reverse('videos:create_from_feed'), data)
-        self.assertRedirects(response, reverse('videos:create'))
-        self.assertEquals(self.opened_url(), feed_url)
-
-    def test_video_feed_submit(self):
-        self.submit_feed_url(u'http://example.com/feed')
-        test_utils.import_videos_from_feed.run_original()
-        self.assertEqual(Video.objects.count(), 2)
-
-    def test_video_youtube_username_submit(self):
-        data = {
-            'usernames': u'amaratestuser'
-        }
-        response = self.client.post(reverse('videos:create_from_feed'), data)
-        self.assertRedirects(response, reverse('videos:create'))
-        test_utils.import_videos_from_feed.run_original()
-        self.assertEqual(Video.objects.count(), 2)
-        feed_url = ('https://gdata.youtube.com'
-                    '/feeds/api/users/amaratestuser/uploads')
-        self.assertEquals(self.opened_url(), feed_url)
-
-    def test_empty_feed_submit(self):
-        self.set_feed_data(EMPTY_FEED_XML)
-        data = {
-            'feed_url': u'http://example.com/feed',
-            'save_feed': True
-        }
-        response = self.client.post(reverse('videos:create_from_feed'), data)
-        self.assertRedirects(response, reverse('videos:create'))
-        self.assertEqual(Video.objects.count(), 0)
-
-        vf = VideoFeed.objects.get()
-        self.assertEqual(vf.url,  u'http://example.com/feed')
-
 class TestFeedParser(FeedImportTest):
     # TODO: add test for MediaFeedEntryParser. I just can't find RSS link for it
     # RSS should look like this http://www.dailymotion.com/rss/ru/featured/channel/tech/1
