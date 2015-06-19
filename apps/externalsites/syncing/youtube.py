@@ -46,7 +46,7 @@ CAPTION_TRACK_LINK_REL = ('http://gdata.youtube.com'
                           '/schemas/2007#video.captionTracks')
 
 def _format_subs_for_youtube(subtitle_set):
-    return babelsubs.to(subtitle_set, 'sbv').encode('utf-8')
+    return babelsubs.to(subtitle_set, 'dfxp').encode('utf-8')
 
 def get_youtube_language_code(language_code):
     """Convert the language for a SubtitleVersion to a youtube code
@@ -78,10 +78,10 @@ def update_subtitles(video_id, access_token, subtitle_version):
     caption_id = find_existing_caption_id(access_token, video_id,
                                           language_code)
     if caption_id:
-        google.captions_update(access_token, caption_id, 'text/sbv', content)
+        google.captions_update(access_token, caption_id, 'text/xml', content)
     else:
         google.captions_insert(access_token, video_id, language_code,
-                               'text/sbv', content)
+                               'text/xml', content)
 
 def delete_subtitles(video_id, access_token, language_code):
     """Delete the subtitles for a language on YouTube """
