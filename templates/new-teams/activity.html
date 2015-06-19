@@ -11,8 +11,8 @@
 {% elif tab == "team" %}
 <h1>{% blocktrans %}Team Activity for {{ team }}{% endblocktrans %}</h1>
 {% endif %}
-<div class="filtered">
-  <div class="filters">
+<div class="split-view">
+  <div class="filters sidebar">
     <h5>{% trans "Filter and Sort" %}</h5>
     <form method="GET" action="">
       {% if action_types %}
@@ -80,7 +80,7 @@
       </div>
     </form>
   </div>
-  <div class="filtered-content" id="activity-list">
+  <div class="main">
     {% include "new-teams/_activity-list.html" %}
   </div>
 </div>

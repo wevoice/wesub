@@ -1,36 +1,24 @@
-div.filtered {
-    display: flex;
-    margin-bottom: 40px;
+.filters {
+    font-size: $small-font-size;
 
-    .filters {
-        font-size: $small-font-size;
-        border-right: 1px solid $lighter-gray;
-        padding-right: 20px;
-        margin-right: 20px;
-
-        form {
-            padding: 0;
-        }
-
-        .filter {
-            margin-bottom: 10px;
-        }
-
-        select {
-            width: 100%;
-            padding: 0 4px;
-            font-size: inherit;
-        }
-
-        .actions {
-            padding-top: 10px;
-            button, a.button {
-                @include small-button;
-            }
-        }
+    form {
+        padding: 0;
     }
 
-    .filtered-content {
-        flex-grow: 1;
+    .filter {
+        margin-bottom: 10px;
+    }
+
+    select {
+        width: 100%;
+        padding: 0 4px;
+        font-size: inherit;
+    }
+
+    .actions {
+        padding-top: 10px;
+        button, a.button {
+            @include small-button;
+        }
     }
 }
