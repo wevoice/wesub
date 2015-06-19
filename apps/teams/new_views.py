@@ -186,7 +186,7 @@ def welcome(request, team):
         videos = None
     return render(request, 'new-teams/welcome.html', {
         'team': team,
-        'messages': team.get_messages([
+        'team_messages': team.get_messages([
             'pagetext_welcome_heading',
         ]),
         'videos': videos,
