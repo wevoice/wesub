@@ -155,7 +155,7 @@ Examples:
 Creating new subtitles
 ++++++++++++++++++++++
 
-.. http:get:: /api/videos/[video-id]/languages/[language-code]/subtitles/
+.. http:post:: /api/videos/[video-id]/languages/[language-code]/subtitles/
 
     :param video-id: Amara Video ID
     :param language-code: BCP-47 language code.  **deprecated:** you can also
