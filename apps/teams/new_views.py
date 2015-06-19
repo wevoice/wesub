@@ -42,6 +42,7 @@ from . import tasks
 from .models import Setting, Team, Project, TeamLanguagePreference
 from .statistics import compute_statistics
 from django.contrib.auth.views import redirect_to_login
+from utils.breadcrumbs import BreadCrumb
 from utils.translation import get_language_choices
 from videos.models import Action
 
@@ -134,7 +135,11 @@ def activity(request, team, tab):
         'next_page': page + 1,
         'next_page_query': next_page_query.urlencode(),
         'tab': tab,
-        'has_more': has_more
+        'has_more': has_more,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Activity')),
+        ],
     }
     if team.is_old_style():
         template_dir = 'teams/'
@@ -164,6 +169,10 @@ def statistics(request, team, tab):
         cache.set(cache_key, pickle.dumps(context), 60*60*24)
     context['tab'] = tab
     context['team'] = team
+    context['breadcrumbs'] = [
+        BreadCrumb(team, 'teams:dashboard', team.slug),
+        BreadCrumb(_('Activity')),
+    ]
     if team.is_old_style():
         return render(request, 'teams/statistics.html', context)
     else:
@@ -224,7 +233,12 @@ def settings_basic(request, team):
         form = FormClass(instance=team)
 
     return render(request, "new-teams/settings.html", {
-            'team': team, 'form': form,
+        'team': team,
+        'form': form,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Settings')),
+        ],
     })
 
 @team_settings_view
@@ -248,7 +262,13 @@ def settings_messages(request, team):
         form = forms.GuidelinesMessagesForm(initial=initial)
 
     return render(request, "new-teams/settings-messages.html", {
-            'team': team, 'form': form,
+        'team': team,
+        'form': form,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
+            BreadCrumb(_('Messages')),
+        ],
     })
 
 @team_settings_view
@@ -259,7 +279,13 @@ def settings_projects(request, team):
     projects = team.project_set.exclude(name=Project.DEFAULT_NAME)
 
     return render(request, "new-teams/settings-projects.html", {
-            'team': team, 'projects': projects,
+        'team': team,
+        'projects': projects,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
+            BreadCrumb(_('Projects')),
+        ],
     })
 
 @team_settings_view
@@ -279,7 +305,14 @@ def add_project(request, team):
         form = forms.ProjectForm(team)
 
     return render(request, "new-teams/settings-projects-add.html", {
-            'team': team, 'form': form,
+        'team': team,
+        'form': form,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
+            BreadCrumb(_('Projects'), 'teams:settings_projects', team.slug),
+            BreadCrumb(_('Add Project')),
+        ],
     })
 
 @team_settings_view
@@ -305,7 +338,14 @@ def edit_project(request, team, project_slug):
         form = forms.ProjectForm(team, instance=project)
 
     return render(request, "new-teams/settings-projects-edit.html", {
-            'team': team, 'form': form,
+        'team': team,
+        'form': form,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
+            BreadCrumb(_('Projects'), 'teams:settings_projects', team.slug),
+            BreadCrumb(project.name),
+        ],
     })
 
 @team_settings_view
