@@ -56,8 +56,8 @@ class VideoType(object):
         def clean(file_name):
             try:
                 os.remove(file_name)
-            except:
-                logger.error(file_name + " does not exist")
+            except Exception, e:
+                logger.error(repr(e))
         url = self.get_direct_url()
         download_file = os.path.join(settings.TMP_FOLDER, str(uuid.uuid4()))
         download_command = """curl "{}" -o {}""".format(url, download_file)
