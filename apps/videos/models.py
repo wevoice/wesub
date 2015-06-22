@@ -1852,7 +1852,7 @@ class VideoUrl(models.Model):
     # type should be 2 chars long with the first char being unique for the
     # app.
     type = models.CharField(max_length=2)
-    url = models.URLField(max_length=255)
+    url = models.URLField(max_length=512)
     videoid = models.CharField(max_length=50, blank=True)
     primary = models.BooleanField(default=False)
     original = models.BooleanField(default=False)
@@ -1864,9 +1864,18 @@ class VideoUrl(models.Model):
 
     class Meta:
         ordering = ("video", "-primary",)
-        unique_together = (
-            ('url', 'type'),
-        )
+
+    def validate_unique(self, *args, **kwargs):
+        super(VideoUrl, self).validate_unique(*args, **kwargs)
+        if not self.id:
+            if self.__class__.objects.filter(url=self.url, type=self.type).exists():
+                raise ValidationError(
+                    {
+                        NON_FIELD_ERRORS: [
+                            _('Video already exist on Amara'),
+                        ],
+                    }
+                )
 
     def __unicode__(self):
         return self.url
