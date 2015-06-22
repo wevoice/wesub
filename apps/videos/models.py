@@ -38,6 +38,8 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
+from django.forms.forms import NON_FIELD_ERRORS
 
 from auth.models import CustomUser as User, Awards
 from caching import ModelCacheManager
@@ -1867,15 +1869,16 @@ class VideoUrl(models.Model):
 
     def validate_unique(self, *args, **kwargs):
         super(VideoUrl, self).validate_unique(*args, **kwargs)
-        if not self.id:
-            if self.__class__.objects.filter(url=self.url, type=self.type).exists():
-                raise ValidationError(
-                    {
-                        NON_FIELD_ERRORS: [
-                            _('Video already exist on Amara'),
-                        ],
-                    }
-                )
+        qs = self.__class__.objects.filter(url=self.url, type=self.type)
+        if ((not self.id and qs.exists()) or
+        ((len(qs) == 1) and (qs.get().id != self.id))):
+            raise ValidationError(
+                {
+                    NON_FIELD_ERRORS: [
+                        _('Video already exist on Amara'),
+                    ],
+                }
+            )
 
     def __unicode__(self):
         return self.url
