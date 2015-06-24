@@ -285,8 +285,8 @@ class ContainerManager(object):
     def building_preview(self):
         return self.env.BRANCH not in ('staging', 'production')
 
-    def app_env_params(self):
-        """Get docker params to set env variables for the app.
+    def app_params(self):
+        """Get docker params to used for both app containers and workers
         """
         params = [
             # AWS Auth info
@@ -296,6 +296,8 @@ class ContainerManager(object):
             # this is actually somewhat redundant since we already copy the
             # files into the docker image
             '-e', 'REVISION=' + self.env.BRANCH,
+            # mount the workspace volume inside our container
+            '-v', '/var/workspace:/var/workspace',
         ]
         if self.building_preview():
             # SETTINGS_REVISION controls how to download the
@@ -350,7 +352,7 @@ class ContainerManager(object):
                 copy of .docker/entry.sh
         """
         cmd_line = [ 'run', '-t', '--rm', ]
-        cmd_line += self.app_env_params()
+        cmd_line += self.app_params()
         cmd_line += [self.image_name, command]
         self.docker.run(self.env.DOCKER_HOST_1, *cmd_line)
 
@@ -373,7 +375,7 @@ class ContainerManager(object):
             '-h', host_name,
             '--name', name,
             '--restart=always',
-        ] + self.app_env_params() + [self.image_name, command]
+        ] + self.app_params() + [self.image_name, command]
         cid = self.docker.run_and_return_output(host, *cmd_line).strip()
         log("container id: {}", cid)
         self.containers_started.append(ContainerInfo(host, name, cid))
@@ -393,7 +395,7 @@ class ContainerManager(object):
             '-h', self.app_hostname(),
             '--name', name,
             '--restart=always',
-        ] + self.app_env_params() + self.interlock_params() + [self.image_name]
+        ] + self.app_params() + self.interlock_params() + [self.image_name]
         cid = self.docker.run_and_return_output(host, *cmd_line).strip()
         log("container id: {}", cid)
         self.containers_started.append(ContainerInfo(host, name, cid))
@@ -464,7 +466,7 @@ class ContainerManager(object):
         log("------------- Shell Command Line ---------------")
         cmd_line = [
             'docker', 'run', '-it', '--rm',
-        ] + self.app_env_params() + [self.image_name, 'shell']
+        ] + self.app_params() + [self.image_name, 'shell']
         log_nostar(' '.join(cmd_line))
 
 class Deploy(object):

@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 # 
-# Copyright (C) 2013 Participatory Culture Foundation
+# Copyright (C) 2013-2015 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -24,6 +24,12 @@ class HtmlFiveVideoType(VideoType):
 
     valid_extensions = set(['ogv', 'ogg', 'mp4', 'm4v', 'webm'])
 
+    def __init__(self, url):
+        self.url = url
+
     @classmethod
     def matches_video_url(cls, url):
         return cls.url_extension(url) in cls.valid_extensions
+
+    def get_direct_url(self):
+        return self.url

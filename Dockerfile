@@ -6,7 +6,7 @@ RUN (echo "deb http://archive.ubuntu.com/ubuntu trusty-updates main universe mul
 RUN (echo "deb-src http://archive.ubuntu.com/ubuntu trusty-updates main universe multiverse" >> /etc/apt/sources.list)
 RUN apt-get update
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -y --force-yes install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext build-essential gcc dialog mysql-client firefox flashplugin-installer xvfb node-uglify ruby-sass
+RUN apt-get -y --force-yes install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext build-essential gcc dialog mysql-client firefox flashplugin-installer xvfb node-uglify ruby-sass libav-tools curl
 ADD . /opt/apps/unisubs
 RUN mkdir -p /opt/extras/pictures
 RUN mkdir -p /opt/extras/videos

@@ -11,19 +11,32 @@ table {
     }
     th {
         float: none;
-        border-bottom: 2px solid #ddd;
+        border-bottom: 2px solid $lighter-gray;
         font-weight: bold;
     }
     td {
-        border-bottom: 1px solid #ddd;
-        
+        border-bottom: 1px solid $lighter-gray;
+
         &.actions {
             text-align: right;
         }
     }
+    tr:last-of-type td {
+        border-bottom: 0;
+    }
     &.resync_table {
         text-align: center;
         th span.help-link {font-size: 0.8em;}
+    }
+    &.full-borders {
+        border: 1px solid $lighter-gray;
+        td, th {
+            border-left: 1px solid $lighter-gray;
+
+            &:first-of-type {
+                border-left: 0;
+            }
+        }
     }
 }
 

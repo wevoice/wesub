@@ -30,3 +30,7 @@ def smart_field_render(field):
         "field": field,
         "widget_type": widget_type
     }
+
+@register.filter
+def is_checkbox(field):
+    return isinstance(field.field.widget, CheckboxInput)
