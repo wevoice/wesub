@@ -581,7 +581,7 @@ class SubtitlesViewTest(TestCase):
         response = self.client.get(url)
         assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_invalid_language_coed(self):
+    def test_invalid_language_code(self):
         url = reverse('api:subtitles', kwargs={
             'video_id': self.video.video_id,
             'language_code': 'invalidlanguage',
