@@ -30,7 +30,7 @@
 {% if summary_table %}
 <table class="team-stats">
   {% for raw in summary_table %}
-  <tr>
+  <tr {% if not forloop.first %} class="secondary"{% endif %}>
     {% for cell in raw %}
     {% if cell.header %}
     <th>{{ cell }}</th>
