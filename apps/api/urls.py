@@ -35,11 +35,11 @@ router.register(r'teams/(?P<team_slug>[\w\d\-]+)/members',
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/safe-members',
                 views.teams.SafeTeamMemberViewSet, base_name='safe-team-members')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/projects',
-                views.teams.ProjectViewSet, base_name='projects')
+                views.teams.ProjectViewSetSwitcher, base_name='projects')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/tasks',
-                views.teams.TaskViewSet, base_name='tasks')
+                views.teams.TaskViewSetSwitcher, base_name='tasks')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/applications',
-                views.teams.TeamApplicationViewSet,
+                views.teams.TeamApplicationViewSetSwitcher,
                 base_name='team-application')
 router.register(r'users', views.users.UserViewSet, base_name='users')
 router.register(r'activity', views.activity.ActivityViewSetSwitcher,

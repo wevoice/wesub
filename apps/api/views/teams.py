@@ -302,6 +302,8 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.reverse import reverse
 
+from .apiswitcher import APISwitcherMixin
+from api.fields import TimezoneAwareDateTimeField
 from api.pagination import AmaraPaginationMixin
 from auth.models import CustomUser as User
 from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
@@ -553,6 +555,8 @@ class SafeTeamMemberViewSet(TeamMemberViewSet):
 
 class ProjectSerializer(serializers.ModelSerializer):
     resource_uri = serializers.SerializerMethodField()
+    created = TimezoneAwareDateTimeField(read_only=True)
+    modified = TimezoneAwareDateTimeField(read_only=True)
 
     class Meta:
         model = Project
@@ -584,6 +588,8 @@ class ProjectUpdateSerializer(ProjectSerializer):
 
 class ProjectViewSet(TeamSubview):
     lookup_field = 'slug'
+    serializer_class = ProjectSerializer
+    update_serializer_class = ProjectUpdateSerializer
 
     def get_queryset(self):
         if not self.team.user_is_member(self.request.user):
@@ -592,9 +598,9 @@ class ProjectViewSet(TeamSubview):
 
     def get_serializer_class(self):
         if 'slug' in self.kwargs:
-            return ProjectUpdateSerializer
+            return self.update_serializer_class
         else:
-            return ProjectSerializer
+            return self.serializer_class
 
     def get_object(self):
         if not self.team.user_is_member(self.request.user):
@@ -657,6 +663,7 @@ class TaskSerializer(serializers.ModelSerializer):
     video_id = TeamVideoField(source='team_video')
     assignee = TeamMemberField(required=False)
     type = MappedChoiceField(Task.TYPE_CHOICES)
+    completed = TimezoneAwareDateTimeField(read_only=True)
     approved = MappedChoiceField(
         Task.APPROVED_CHOICES, required=False,
         default=Task._meta.get_field('approved').get_default(),
@@ -816,6 +823,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
         Application.STATUSES,
         default=Application._meta.get_field('status').get_default())
     resource_uri = serializers.SerializerMethodField()
+    created = TimezoneAwareDateTimeField(read_only=True)
+    modified = TimezoneAwareDateTimeField(read_only=True)
 
     default_error_messages = {
         'invalid-status-choice': "Unknown status: {status}",
@@ -892,3 +901,30 @@ class TeamApplicationViewSet(AmaraPaginationMixin,
         if 'before' in params:
             qs = qs.filter(created__lt=timestamp_to_datetime(params['before']))
         return qs
+
+class ProjectViewSetSwitcher(APISwitcherMixin, ProjectViewSet):
+    switchover_date = 20150716
+
+    class Deprecated(ProjectViewSet):
+        class serializer_class(ProjectSerializer):
+            created = serializers.DateTimeField(read_only=True)
+            modified = serializers.DateTimeField(read_only=True)
+
+        class update_serializer_class(ProjectUpdateSerializer):
+            created = serializers.DateTimeField(read_only=True)
+            modified = serializers.DateTimeField(read_only=True)
+
+class TeamApplicationViewSetSwitcher(APISwitcherMixin, TeamApplicationViewSet):
+    switchover_date = 20150716
+
+    class Deprecated(TeamApplicationViewSet):
+        class serializer_class(ApplicationSerializer):
+            created = serializers.DateTimeField(read_only=True)
+            modified = serializers.DateTimeField(read_only=True)
+
+class TaskViewSetSwitcher(APISwitcherMixin, TaskViewSet):
+    switchover_date = 20150716
+
+    class Deprecated(TaskViewSet):
+        class serializer_class(TaskSerializer):
+            completed = serializers.DateTimeField(read_only=True)
