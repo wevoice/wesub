@@ -1867,19 +1867,6 @@ class VideoUrl(models.Model):
     class Meta:
         ordering = ("video", "-primary",)
 
-    def validate_unique(self, *args, **kwargs):
-        super(VideoUrl, self).validate_unique(*args, **kwargs)
-        qs = self.__class__.objects.filter(url=self.url, type=self.type)
-        if ((not self.id and qs.exists()) or
-        ((len(qs) == 1) and (qs.get().id != self.id))):
-            raise ValidationError(
-                {
-                    NON_FIELD_ERRORS: [
-                        _('Video already exist on Amara'),
-                    ],
-                }
-            )
-
     def __unicode__(self):
         return self.url
 
