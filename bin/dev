@@ -182,6 +182,7 @@ class DBReset(Command):
         run_manage(['drop_all_tables'])
         run_manage(['syncdb', '--all', '--noinput'])
         run_manage(['migrate', '--fake'])
+        run_manage(['setup_indexes'])
 
 class Up(Command):
     """Start docker containers."""
