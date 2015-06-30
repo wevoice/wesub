@@ -31,6 +31,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext as _
@@ -117,7 +118,22 @@ def members(request, team):
 
 @public_team_view
 def admin_list(request, team):
-    return old_views.detail_members(request, team, role=TeamMember.ROLE_ADMIN)
+    if team.is_old_style():
+        return old_views.detail_members(request, team,
+                                        role=TeamMember.ROLE_ADMIN)
+
+    # The only real reason to view this page is if you want to ask an admin to
+    # invite you, so let's limit the access a bit
+    if (not team.is_by_invitation() and not
+        team.user_is_member(request.user)):
+        return HttpResponseForbidden()
+    return render(request, 'new-teams/admin-list.html', {
+        'team': team,
+        'admins': (team.members
+                   .filter(Q(role=TeamMember.ROLE_ADMIN)|
+                           Q(role=TeamMember.ROLE_OWNER))
+                   .select_related('user'))
+    })
 
 @team_view
 def activity(request, team, tab):
