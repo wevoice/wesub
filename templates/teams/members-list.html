@@ -47,7 +47,7 @@
                 <div class="filter-chunk">
                     <span class="inner">{% trans 'Showing' %}</span>
                     <select name="role-filter" id="role-filter">
-                        <option value="{% url "teams:detail_members" team.slug %}{% query_string request.GET %}">{% trans 'all members' %}</option>
+                        <option value="{% url "teams:members" team.slug %}{% query_string request.GET %}">{% trans 'all members' %}</option>
                         <option value="{% url "teams:detail_members_role" slug=team.slug role='admin' %}{% query_string request.GET %}"{% if role == 'admin' %} selected="selected"{% endif %}>{% trans 'admins' %}</option>
                         <option value="{% url "teams:detail_members_role" slug=team.slug role='manager' %}{% query_string request.GET %}"{% if role == 'manager' %} selected="selected"{% endif %}>{% trans 'managers' %}</option>
                         <option value="{% url "teams:detail_members_role" slug=team.slug role='contributor' %}{% query_string request.GET %}"{% if role == 'contributors' %} selected="selected"{% endif %}>{% trans 'contributor' %}</option>
@@ -75,7 +75,7 @@
                 </div>
             </p>
             {% if filtered %}
-                <a href="{% url "teams:detail_members" team.slug %}" class="clear-filters">{% trans 'Clear' %}</a>
+                <a href="{% url "teams:members" team.slug %}" class="clear-filters">{% trans 'Clear' %}</a>
             {% endif %}
         </div>
 

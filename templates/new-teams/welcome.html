@@ -35,10 +35,11 @@
 
     <div>
     {% if team.is_open %}
-
     <a class="button" href="{% url "teams:join_team" slug=team.slug %}">{% trans "Join the team" %} <span class="fa fa-angle-double-right"></span></a>
     {% elif team.is_by_application %}
     <a class="button" href="{% url "teams:join_team" slug=team.slug %}">{% trans "Apply to join the team" %} <span class="fa fa-angle-double-right"></span></a>
+    {% elif team.is_by_invitation %}
+    <p>This team is invitation only. If you're interested in helping out, <a href="{% url "teams:admin-list" slug=team.slug %}">contact a team admin</a>.</p>
     {% endif %}
     </div>
   </div>

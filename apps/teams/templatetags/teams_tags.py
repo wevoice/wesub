@@ -192,7 +192,7 @@ def team_metrics(team, member, projects):
         TeamMetric(reverse('teams:detail', args=(team.slug,)),
                    ngettext('Video', 'Videos', team.videos_count),
                    team.videos_count),
-        TeamMetric(reverse('teams:detail_members', args=(team.slug,)),
+        TeamMetric(reverse('teams:members', args=(team.slug,)),
                    ngettext('Member', 'Members', team.members_count),
                    team.members_count),
     ]

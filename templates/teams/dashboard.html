@@ -92,7 +92,7 @@
             <div class="get-started">
                 <h3>{% trans "Welcome!" %}</h3>
                 {% if not team.is_open and not team.is_by_application %} {# team is by invite only #}
-                    <p>This team is invitation only. If you're interested in helping out, <a href="{% url "teams:detail_members" slug=team.slug %}admin/">contact a team admin</a>.</p>
+                    <p>This team is invitation only. If you're interested in helping out, <a href="{% url "teams:admin-list" slug=team.slug %}">contact a team admin</a>.</p>
                 {% else %}
                     <p>
                         {% blocktrans %}

@@ -1008,7 +1008,7 @@ def remove_member(request, slug, user_pk):
 
     member = get_object_or_404(TeamMember, team=team, user__pk=user_pk)
 
-    return_path = reverse('teams:detail_members', args=[], kwargs={'slug': slug})
+    return_path = reverse('teams:members', args=[], kwargs={'slug': team.slug})
 
     if can_assign_role(team, request.user, member.role, member.user):
         user = member.user
@@ -1200,7 +1200,7 @@ def invite_members(request, slug):
             # sending invites twice for the same user, and that borks
             # the naive signal for only created invitations
             form.save()
-            return HttpResponseRedirect(reverse('teams:detail_members',
+            return HttpResponseRedirect(reverse('teams:members',
                                                 args=[], kwargs={'slug': team.slug}))
     else:
         form = InviteForm(team, request.user)
@@ -1342,7 +1342,7 @@ def search_members(request, slug):
 
 def role_saved(request, slug):
     messages.success(request, _(u'Member saved.'))
-    return_path = reverse('teams:detail_members', args=[], kwargs={'slug': slug})
+    return_path = reverse('teams:members', args=[], kwargs={'slug': slug})
     return HttpResponseRedirect(return_path)
 
 

@@ -39,7 +39,7 @@ from . import views as old_views
 from . import forms
 from . import permissions
 from . import tasks
-from .models import Setting, Team, Project, TeamLanguagePreference
+from .models import Setting, Team, Project, TeamLanguagePreference, TeamMember
 from .statistics import compute_statistics
 from django.contrib.auth.views import redirect_to_login
 from utils.breadcrumbs import BreadCrumb
@@ -56,6 +56,15 @@ def team_view(view_func):
             return redirect_to_login(request.path)
         try:
             team = Team.objects.get(slug=slug, members__user=request.user)
+        except Team.DoesNotExist:
+            raise Http404
+        return view_func(request, team, *args, **kwargs)
+    return wrapper
+
+def public_team_view(view_func):
+    def wrapper(request, slug, *args, **kwargs):
+        try:
+            team = Team.objects.get(slug=slug)
         except Team.DoesNotExist:
             raise Http404
         return view_func(request, team, *args, **kwargs)
@@ -101,6 +110,14 @@ def fetch_actions_for_activity_page(team, tab, page, params):
         'user', 'new_language__video'
     )
     return list(action_qs)
+
+@team_view
+def members(request, team):
+    return old_views.detail_members(request, team)
+
+@public_team_view
+def admin_list(request, team):
+    return old_views.detail_members(request, team, role=TeamMember.ROLE_ADMIN)
 
 @team_view
 def activity(request, team, tab):

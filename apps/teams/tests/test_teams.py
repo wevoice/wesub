@@ -669,11 +669,11 @@ class TeamsTest(TestCase):
 
         #------------ detail members -------------
 
-        url = reverse("teams:detail_members", kwargs={"slug": team.slug})
+        url = reverse("teams:members", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
 
-        url = reverse("teams:detail_members", kwargs={"slug": team.slug})
+        url = reverse("teams:members", kwargs={"slug": team.slug})
         response = self.client.get(url, {'q': 'test'})
         self.failUnlessEqual(response.status_code, 200)
 

@@ -384,11 +384,19 @@ class Team(models.Model):
 
     def is_open(self):
         """Return whether this team's membership is open to the public."""
-        return self.membership_policy == self.OPEN
+        return self.membership_policy == Team.OPEN
 
     def is_by_application(self):
         """Return whether this team's membership is by application only."""
-        return self.membership_policy == self.APPLICATION
+        return self.membership_policy == Team.APPLICATION
+
+    def is_by_invitation(self):
+        """Return whether this team's membership is by application only."""
+        return self.membership_policy in (
+            Team.INVITATION_BY_MANAGER,
+            Team.INVITATION_BY_ALL,
+            Team.INVITATION_BY_ADMIN,
+        )
 
     def get_workflow(self):
         """Return the workflow for the given team.
