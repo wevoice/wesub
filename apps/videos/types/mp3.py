@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2013 Participatory Culture Foundation
+# Copyright (C) 2013-2015 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -22,6 +22,12 @@ class Mp3VideoType(VideoType):
 
     abbreviation = 'M'
     name = 'MP3'
+
+    def __init__(self, url):
+        self.url = url
+
+    def get_direct_url(self):
+        return self.url
 
     @classmethod
     def matches_video_url(cls, url):

@@ -439,6 +439,15 @@ class SubtitlesSerializerTest(TestCase):
                 'subtitles': 'bad-dfxp-data',
             })
 
+    def test_subtitles_wrong_type(self):
+        with assert_raises(ValidationError):
+            self.run_create({
+                'sub_format': 'dfxp',
+                'subtitles': 123,
+                'title': 'test-title',
+                'description': 'test-description',
+            })
+
 class SubtitlesViewTest(TestCase):
     def setUp(self):
         self.video = VideoFactory()
@@ -563,3 +572,19 @@ class SubtitlesViewTest(TestCase):
         })
         assert_equal(test_utils.video_changed_tasks.delay.call_args,
                      mock.call(self.video.pk))
+
+    def test_invalid_video_id(self):
+        url = reverse('api:subtitles', kwargs={
+            'video_id': 'invalidvideoid',
+            'language_code': 'en',
+        })
+        response = self.client.get(url)
+        assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_invalid_language_code(self):
+        url = reverse('api:subtitles', kwargs={
+            'video_id': self.video.video_id,
+            'language_code': 'invalidlanguage',
+        })
+        response = self.client.get(url)
+        assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)
