@@ -8,6 +8,7 @@
 
 $line-height: 2.2rem;
 $default-font-size: 1.4rem;
+$small-font-size: 1.2rem;
 $large-font-size: 1.6rem;
 $font-weight-normal: 400;
 $font-weight-bold: 700;
@@ -47,32 +48,41 @@ h3, h4, h5, h6 {
 
 h1 {
     font-size: 4rem;
-    line-height: 5rem;
+    line-height: 4.5rem;
 }
 
 h2 {
     font-size: 2.4rem;
-    line-height: 3.0rem;
+    line-height: 2.8rem;
 }
 
 h3 {
     font-size: 2.0rem;
-    line-height: 3.0rem;
+    line-height: 2.4rem;
 }
 
 h4 {
     font-size: 2.0rem;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 h5 {
     font-size: 1.6rem;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 h6 {
     font-size: 1.4rem;
-    font-weight: normal;
+    font-weight: bold;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    p {
+        @extend %body-font;
+        font-size: $default-font-size;
+        line-height: $line-height;
+        font-weight: $font-weight-normal;
+    }
 }
 
 .empty {
