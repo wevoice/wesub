@@ -40,6 +40,7 @@ from teams.models import Team
 from teams.permissions import can_change_team_settings, can_resync
 from videos import permissions
 from teams.views import settings_page
+from utils.breadcrumbs import BreadCrumb
 from utils.text import fmt
 from videos.models import VideoUrl
 
@@ -85,6 +86,11 @@ def team_settings_tab(request, team):
     return render(request, template_name, {
         'team': team,
         'forms': formset,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
+            BreadCrumb(_('Integrations')),
+        ],
     })
 
 @settings_page
