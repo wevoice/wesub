@@ -78,3 +78,16 @@ table.team-stats {
         border-bottom-width: 1px;
     }
 }
+
+ul.member-list {
+    li {
+        @extend %clearfix;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    a.thumb {
+        float: left;
+        display: block;
+        margin-right: 10px;
+    }
+}

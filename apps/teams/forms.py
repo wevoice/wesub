@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+
 import datetime
+import logging
 import re
 
 from auth.models import CustomUser as User
@@ -23,6 +25,7 @@ from django import forms
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -38,9 +41,8 @@ from teams.permissions import (
 )
 from teams.permissions_const import ROLE_NAMES
 from teams.workflows import TeamWorkflow
-from videos.forms import (AddFromFeedForm, language_choices_with_empty,
-                               CreateSubtitlesForm,
-                               MultiVideoCreateSubtitlesForm)
+from videos.forms import (AddFromFeedForm, CreateSubtitlesForm,
+                          MultiVideoCreateSubtitlesForm)
 from videos.models import (
         VideoMetadata, VIDEO_META_TYPE_IDS, Video, VideoFeed,
 )
@@ -52,6 +54,8 @@ from utils.panslugify import pan_slugify
 from utils.translation import get_language_choices
 from utils.text import fmt
 from utils.validators import MaxFileSizeValidator
+
+logger = logging.getLogger(__name__)
 
 class EditTeamVideoForm(forms.ModelForm):
     author = forms.CharField(max_length=255, required=False)
@@ -827,3 +831,65 @@ class MoveVideosForm(forms.Form):
     def __init__(self, user,  *args, **kwargs):
         super(MoveVideosForm, self).__init__(*args, **kwargs)
         self.fields['team'].queryset = user.managed_teams(include_manager=False)
+
+class MemberFiltersForm(forms.Form):
+    LANGUAGE_CHOICES = [
+        ('any', _('Any language')),
+    ] + get_language_choices()
+
+    q = forms.CharField(label=_('Search'), required=False)
+
+    role = forms.ChoiceField(choices=[
+        ('any', _('All roles')),
+        (TeamMember.ROLE_ADMIN, _('Admins')),
+        (TeamMember.ROLE_MANAGER, _('Managers')),
+        (TeamMember.ROLE_CONTRIBUTOR, _('Contributors')),
+    ], initial='any', required=False)
+    language = forms.ChoiceField(choices=LANGUAGE_CHOICES,
+                                 label=_('Language spoken'),
+                                 initial='any', required=False)
+    sort = forms.ChoiceField(choices=[
+        ('recent', _('Date joined, most recent')),
+        ('oldest', _('Date joined, oldest')),
+    ], initial='recent', required=False)
+
+    def __init__(self, request):
+        super(MemberFiltersForm, self).__init__(
+            data=request.GET if request.GET else None,
+        )
+
+    def update_qs(self, qs):
+        if not self.is_bound:
+            data = {}
+        elif not self.is_valid():
+            # we should never get here
+            logger.warn("Invalid member filters: %s", self.data)
+            data = {}
+        else:
+            data = self.cleaned_data
+
+        q = data.get('q', '')
+        role = data.get('role', 'any')
+        language = data.get('language', 'any')
+        sort = data.get('sort', 'recent')
+
+        for term in [term.strip() for term in q.split()]:
+            if term:
+                qs = qs.filter(Q(user__first_name__icontains=term)
+                               | Q(user__last_name__icontains=term)
+                               | Q(user__email__icontains=term)
+                               | Q(user__username__icontains=term)
+                               | Q(user__biography__icontains=term))
+        if role != 'any':
+            if role != TeamMember.ROLE_ADMIN:
+                qs = qs.filter(role=role)
+            else:
+                qs = qs.filter(Q(role=TeamMember.ROLE_ADMIN)|
+                               Q(role=TeamMember.ROLE_OWNER))
+        if language != 'any':
+            qs = qs.filter(user__userlanguage__language=language)
+        if sort == 'oldest':
+            qs = qs.order_by('created')
+        else:
+            qs = qs.order_by('-created')
+        return qs

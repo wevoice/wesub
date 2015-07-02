@@ -114,7 +114,21 @@ def fetch_actions_for_activity_page(team, tab, page, params):
 
 @team_view
 def members(request, team):
-    return old_views.detail_members(request, team)
+    if team.is_old_style():
+        return old_views.detail_members(request, team)
+
+    filters_form = forms.MemberFiltersForm(request)
+
+    members = filters_form.update_qs(
+        team.members.select_related('user')
+        .prefetch_related('user__userlanguage_set'))
+
+
+    return render(request, 'new-teams/members.html', {
+        'team': team,
+        'members': members,
+        'filters_form': filters_form,
+    })
 
 @public_team_view
 def admin_list(request, team):

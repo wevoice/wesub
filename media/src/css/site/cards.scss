@@ -1,0 +1,54 @@
+ul.card-list {
+    > li {
+        @extend %clearfix;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid $light-gray;
+        width: 100%;
+
+        @include not-small-screen {
+            // Our layout depends on using absolutely positioning the actions
+            // div. Reserve space for it here
+            box-sizing: border-box;
+            position: relative;
+            padding-right: 220px;
+        }
+    }
+
+    .thumb {
+        float: left;
+        margin-right: 10px;
+    }
+
+    img.thumb, .thumb img {
+        height: $line-height * 3;
+    }
+
+    @include not-small-screen {
+        .actions {
+            position: absolute;
+            top: 3.2rem; // Start just below the header
+            right: 0;
+            width: 200px;
+            padding: 0;
+            margin: 0;
+        }
+    }
+    ul.actions {
+        font-size: $small-font-size;
+        text-align: right;
+    }
+    form {
+        margin: 0;
+        padding: 0;
+        button {
+            width: 100%;
+            float: none;
+        }
+    }
+    table {
+        margin-bottom: 0;
+        width: auto;
+    }
+}
+

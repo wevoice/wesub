@@ -55,6 +55,10 @@ body {
         border-right: 1px solid $lighter-gray;
         padding-right: 20px;
         margin-right: 20px;
+
+        > .section {
+            margin-bottom: 60px;
+        }
     }
 
     > .main {

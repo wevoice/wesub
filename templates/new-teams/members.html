@@ -1,0 +1,68 @@
+{% extends "new-teams/base.html" %}
+
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+
+<h2>{% blocktrans %}Members for {{ team }}{% endblocktrans %}</h2>
+<div class="split-view">
+  <div class="filters sidebar">
+    <div class="section">
+      <h5>{% trans "Filter and Sort" %}</h5>
+      <form method="GET" action="">
+        {% include "_field.html" with field=filters_form.q %}
+        {% include "_field.html" with field=filters_form.role %}
+        {% include "_field.html" with field=filters_form.language %}
+        {% include "_field.html" with field=filters_form.sort %}
+
+        <div class="actions">
+          <button class="submit">Filter</button>
+          {% if filters_form.is_bound %}
+          <a href="{% url "teams:members" team.slug %}" class="button cancel">Clear</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+    <div class="section">
+      <a class="button secondary full">{% trans "Invite Member" %}</a>
+    </div>
+  </div>
+  <div class="main">
+    {% if members %}
+    <ul class="card-list">
+    {% for member in members %}
+      <li>
+        <h4>{{ member.user.username }}</h4>
+        <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{% blocktrans with user=member.user %}{{ user }} avatar{% endblocktrans %}"></a>
+        <table class="key-value">
+          <tr>
+            <td>{% trans "Role" %}</td>
+            <td>{{ member.get_role_display }}</td>
+          </tr>
+          <tr>
+            <td>{% trans "Languages" %}</td>
+            <td>
+              {% if member.user.get_languages %}
+              {% for lang in member.user.get_language_names %}
+              {{ lang }}{% if not forloop.last %},{% endif %}
+              {% endfor %}
+              {% else %}
+              <p class="empty">{% trans "None set" %}</p>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+        <ul class="actions">
+          <li><a class="medium" href="#">{% trans "Edit membership" %}</a></li>
+          <li><a class="medium" href="#">{% trans "Send message" %}</a></li>
+        </ul>
+      </li>
+    {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty">{% trans "No members found" %}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
