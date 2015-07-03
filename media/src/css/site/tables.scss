@@ -43,6 +43,7 @@ table {
 table.key-value {
     border-spacing: 0 0;
     table-layout: fixed;
+    width: auto;
 
     th, td {
         border: none;
@@ -50,7 +51,7 @@ table.key-value {
         vertical-align: top;
 
         &:first-of-type {
-            width: 200px;
+            padding-right: 20px;
             &:after {
                 content: ":";
             }
