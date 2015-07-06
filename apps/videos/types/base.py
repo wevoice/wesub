@@ -20,6 +20,7 @@ from urlparse import urlparse
 
 from django.core.exceptions import ValidationError
 import subprocess, sys, uuid, os
+import requests
 from django.conf import settings
 import logging
 logger = logging.getLogger("Base video type")
@@ -64,12 +65,14 @@ class VideoType(object):
         download_file = os.path.join(settings.TMP_FOLDER, str(uuid.uuid4()))
         with open(download_file, 'wb') as handle:
             try:
-                response = requests.get(url, stream=True, timeout=5)
-            except ConnectionError as e:
+                # prefetch=False must be changed to stream=True
+                # once we upgrade the requests package
+                response = requests.get(url, prefetch=False, timeout=5)
+            except requests.ConnectionError as e:
                 logger.error("""Request to download raw audio/video file was not successful, raised ConnectionError error {}""".format(repr(e)))
                 clean(download_file, handle)
                 return None
-            except Timeout as e:
+            except requests.Timeout as e:
                 logger.error("""Request to download raw audio/video file was not successful, raised Timeout error {}""".format(repr(e)))
                 clean(download_file, handle)
                 return None
