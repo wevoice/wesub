@@ -20,6 +20,7 @@ from urlparse import urlparse
 
 from django.core.exceptions import ValidationError
 import subprocess, sys, uuid, os
+import requests
 from django.conf import settings
 import logging
 logger = logging.getLogger("Base video type")
@@ -53,24 +54,38 @@ class VideoType(object):
         # so that we do not lose quality with another encoding
         # will raise an exception if there is no diretc URL for
         # type
-        def clean(file_name):
+        def clean(file_name, file_handle=None):
+            if file_handle:
+                file_handle.close()
             try:
                 os.remove(file_name)
             except Exception, e:
                 logger.error(repr(e))
         url = self.get_direct_url()
         download_file = os.path.join(settings.TMP_FOLDER, str(uuid.uuid4()))
-        download_command = """curl "{}" -o {}""".format(url, download_file)
-        try:
-            subprocess.check_call(download_command, shell=True)
-        except subprocess.CalledProcessError as e:
-            logger.error("CalledProcessError error({}) when running command {}".format(e.returncode, download_command))
-            clean(download_file)
-            return None
-        except:
-            logger.error("Unexpected error({}) when running command {}".format(sys.exc_info()[0], download_command))
-            clean(download_file)
-            return None
+        with open(download_file, 'wb') as handle:
+            try:
+                # prefetch=False must be changed to stream=True
+                # once we upgrade the requests package
+                response = requests.get(url, prefetch=False, timeout=5)
+            except requests.ConnectionError as e:
+                logger.error("""Request to download raw audio/video file was not successful, raised ConnectionError error {}""".format(repr(e)))
+                clean(download_file, handle)
+                return None
+            except requests.Timeout as e:
+                logger.error("""Request to download raw audio/video file was not successful, raised Timeout error {}""".format(repr(e)))
+                clean(download_file, handle)
+                return None
+            except Exception as e:
+                logger.error("""Request to download raw audio/video file was not successful, raised exception {}""".format(repr(e)))
+                clean(download_file, handle)
+                return None
+            if not response.ok:
+                logger.error("""Request to download raw audio/video file was not successful, returned error {}""".format(r.status_code))
+                clean(download_file, handle)
+                return None
+            for block in response.iter_content(1024):
+                handle.write(block)
         output = os.path.join(settings.TMP_FOLDER, str(uuid.uuid4()) + ".wav")
         cmd = """avconv -i "{}" -ar 16000 -ac 1 {}""".format(download_file, output)
         logger.error("CMD " + cmd)
