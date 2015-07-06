@@ -16,7 +16,10 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from collections import namedtuple
+
 from django.utils.translation import ugettext as _
+
 from teams.models import Team, MembershipNarrowing, Workflow, TeamMember, Task
 from teams.permissions_const import (
     ROLES_ORDER, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_ADMIN, ROLE_MANAGER,
@@ -138,6 +141,28 @@ def roles_user_can_assign(team, user, to_user=None):
         return ROLES_ORDER[2:]
     else:
         return []
+
+EDIT_MEMBER_NOT_PERMITTED = 1
+EDIT_MEMBER_CANT_EDIT_ADMIN = 2
+EDIT_MEMBER_ALL_PERMITTED = 3
+
+def get_edit_member_permissions(member):
+    """Figure out what how one team member can edit another user's membership
+
+    Here are the rules:
+        - Owners can edit any TeamMember, except promote users to owners.
+        - Admins can edit any non-admin TeamMember, except they cannot promote
+          them to admin/ower.
+        - Other roles can't edit TeamMembers
+
+    Returns: one of the EDIT_MEMBER_* values
+    """
+    if member.role == ROLE_OWNER:
+        return EDIT_MEMBER_ALL_PERMITTED
+    elif member.role == ROLE_ADMIN:
+        return EDIT_MEMBER_CANT_EDIT_ADMIN
+    else:
+        return EDIT_MEMBER_NOT_PERMITTED
 
 def roles_user_can_invite(team, user):
     """Return a list of the roles the given user can invite for the given team.

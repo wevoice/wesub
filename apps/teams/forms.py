@@ -26,14 +26,17 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.db import transaction
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from subtitles.forms import SubtitlesUploadForm
 from teams.models import (
-    Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite, BillingReport
+    Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite,
+    BillingReport, MembershipNarrowing
 )
+from teams import permissions
 from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
     can_assign_task, can_delete_language, can_remove_video,
@@ -893,3 +896,52 @@ class MemberFiltersForm(forms.Form):
         else:
             qs = qs.order_by('-created')
         return qs
+
+class EditMembershipForm(forms.Form):
+    member = forms.ChoiceField()
+    remove = forms.BooleanField(required=False)
+    role = forms.ChoiceField(choices=[
+        (TeamMember.ROLE_CONTRIBUTOR, _('Contributor')),
+        (TeamMember.ROLE_MANAGER, _('Manager')),
+        (TeamMember.ROLE_ADMIN, _('Admin')),
+    ], initial=TeamMember.ROLE_CONTRIBUTOR)
+    language_narrowings = forms.MultipleChoiceField(required=False)
+    project_narrowings = forms.MultipleChoiceField(required=False)
+
+    def __init__(self, member, *args, **kwargs):
+        super(EditMembershipForm, self).__init__(*args, **kwargs)
+        edit_perms = permissions.get_edit_member_permissions(member)
+        self.enabled = True
+        member_qs = (TeamMember.objects
+                     .filter(team_id=member.team_id)
+                     .exclude(id=member.id))
+
+        if edit_perms == permissions.EDIT_MEMBER_NOT_PERMITTED:
+            self.enabled = False
+            self.fields['role'].choices = []
+            member_qs = TeamMember.objects.none()
+            del self.fields['remove']
+        elif edit_perms == permissions.EDIT_MEMBER_CANT_EDIT_ADMIN:
+            del self.fields['role'].choices[-1]
+            member_qs = member_qs.exclude(role__in=[
+                TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER,
+            ])
+
+        self.editable_member_ids = set(m.id for m in member_qs)
+        # no need for a fancy label, since we set the choices with JS anyway
+        self.fields['member'].choices = [
+            (mid, mid) for mid in self.editable_member_ids
+        ]
+
+    def show_remove_button(self):
+        return 'remove' in self.fields
+
+    def save(self):
+        member_to_edit = TeamMember.objects.get(
+            id=self.cleaned_data['member']
+        )
+        if self.cleaned_data.get('remove'):
+            member_to_edit.delete()
+        else:
+            member_to_edit.role = self.cleaned_data['role']
+            member_to_edit.save()
