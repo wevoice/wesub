@@ -45,16 +45,25 @@ class APISwitcherMixin(object):
                 response['HTTP_X_API_DEPRECATED'] = str(cls.switchover_date)
                 return response
 
-        # This is copyied from the django-rest framework code.  I assume they
-        # do the right with with updated and assigned
-        update_wrapper(view, cls, updated=())
-        update_wrapper(view, cls.dispatch, assigned=())
+        update_wrapper(view, new_view)
 
         # Give the deprecated class the same name as the new one, so that it
         # appears correct in the API view
         cls.Deprecated.__name__ = cls.__name__
 
         return view
+
+    def get_view_name(self):
+        func = self.settings.VIEW_NAME_FUNCTION
+        return func(self.find_view_name_class(), getattr(self, 'suffix', None))
+
+    @classmethod
+    def find_view_name_class(cls):
+        # find the class we should use for get_view_name().  This is the 
+        # parent class other than the APISwitcherMixin.
+        for klass in cls.__bases__:
+            if not issubclass(klass, APISwitcherMixin):
+                return klass
 
     @classmethod
     def should_use_new_api(cls, request):
