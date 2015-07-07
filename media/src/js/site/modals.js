@@ -29,7 +29,12 @@ $.fn.openModal = function() {
         $('body').append('<div class="modal-overlay"></div>');
         closeButton.bind('click.modal', onClose);
         $document.bind('click.modal', function(evt) {
-            if($(evt.target).closest('aside.modal').length == 0) {
+            var clickedModal = $(evt.target).closest('aside.modal');
+            if(clickedModal.length == 0) {
+                // click outside the modal
+                onClose(evt);
+            } else if($(evt.target).closest('button.close', clickedModal).length > 0) {
+                // click on the close button
                 onClose(evt);
             }
         });

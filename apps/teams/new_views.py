@@ -117,17 +117,32 @@ def members(request, team):
     if team.is_old_style():
         return old_views.detail_members(request, team)
 
+    member = team.get_member(request.user)
+
     filters_form = forms.MemberFiltersForm(request)
+
+    if request.method == 'POST':
+        edit_form = forms.EditMembershipForm(member, request.POST)
+        if edit_form.is_valid():
+            edit_form.save()
+            return HttpResponseRedirect(request.path)
+        else:
+            logger.warning("Error updating team memership: %s (%s)",
+                           edit_form.errors.as_text(),
+                           request.POST)
+            messages.warning(request, _(u'Error updating membership'))
+    else:
+        edit_form = forms.EditMembershipForm(member)
 
     members = filters_form.update_qs(
         team.members.select_related('user')
         .prefetch_related('user__userlanguage_set'))
 
-
     return render(request, 'new-teams/members.html', {
         'team': team,
         'members': members,
         'filters_form': filters_form,
+        'edit_form': edit_form,
     })
 
 @public_team_view

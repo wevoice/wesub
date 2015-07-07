@@ -30,7 +30,7 @@
   </div>
   <div class="main">
     {% if members %}
-    <ul class="card-list">
+    <ul class="card-list team-members">
     {% for member in members %}
       <li>
         <h4>{{ member.user.username }}</h4>
@@ -54,8 +54,10 @@
           </tr>
         </table>
         <ul class="actions">
-          <li><a class="medium" href="#">{% trans "Edit membership" %}</a></li>
           <li><a class="medium" href="#">{% trans "Send message" %}</a></li>
+          {% if member.id in edit_form.editable_member_ids %}
+          <li><a class="medium edit" data-member-id="{{ member.id }}" data-member-role="{{ member.role }}" data-heading="{% blocktrans with username=member.user.username %}Edit Membership for {{ username }}{% endblocktrans %}" href="#">{% trans "Edit membership" %}</a></li>
+          {% endif %}
         </ul>
       </li>
     {% endfor %}
@@ -65,4 +67,21 @@
     {% endif %}
   </div>
 </div>
+{% if edit_form.editable_member_ids %}
+<aside class="modal" id="edit-form">
+  <h3></h3>
+  <form action="" method="POST">
+    {% csrf_token %}
+    <button class="close"></button>
+    <input id="member-id-field" type="hidden" name="member">
+    {{ edit_form.role }}
+    <footer class="buttons">
+      <button>{% trans "Update" %}</button>
+      {% if edit_form.show_remove_button %}
+      <button class="delete" name="remove" value="1">{% trans "Remove member" %}</button>
+      {% endif %}
+    </footer>
+  </form>
+</aside>
+{% endif %}
 {% endblock %}
