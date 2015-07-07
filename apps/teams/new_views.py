@@ -56,7 +56,8 @@ def team_view(view_func):
         if not request.user.is_authenticated():
             return redirect_to_login(request.path)
         try:
-            team = Team.objects.get(slug=slug, members__user=request.user)
+            team = Team.objects.get(slug=slug,
+                                    members__user_id=request.user.id)
         except Team.DoesNotExist:
             raise Http404
         return view_func(request, team, *args, **kwargs)
