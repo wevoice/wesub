@@ -56,7 +56,20 @@
     {% endif %}
     {% require_email_dialog %}
 
-<div id="header">{% block header %}{% include "new-header.html" %}{% endblock %}</div>
+<div id="header">
+  {% block header %}{% include "new-header.html" %}{% endblock %}
+  {% if breadcrumbs %}
+  <ul class="breadcrumbs">
+    {% for breadcrumb in breadcrumbs %}
+    {% if breadcrumb.url %}
+    <li><a href="{{ breadcrumb.url }}">{{ breadcrumb.label }}</a></li>
+    {% else %}
+    <li>{{ breadcrumb.label }}</li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
 <div id="main-content"><div class="content">
     {% for message in messages %}
     <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">{{ message|safe }}</div>

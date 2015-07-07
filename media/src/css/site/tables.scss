@@ -1,12 +1,13 @@
 table {
     width: 100%;
     margin-bottom: 1.5em;
-    border-spacing: 0;
+    border-spacing: 0 0;
 
     th, td {
         padding: 8px;
         margin: 0;
         border: none;
+        text-align: left;
     }
     th {
         float: none;
@@ -19,9 +20,6 @@ table {
         &.actions {
             text-align: right;
         }
-    }
-    tr:last-of-type td {
-        border-bottom: 0;
     }
     &.resync_table {
         text-align: center;
@@ -36,12 +34,16 @@ table {
                 border-left: 0;
             }
         }
+        tr:last-of-type td {
+            border-bottom: 0;
+        }
     }
 }
 
 table.key-value {
     border-spacing: 0 0;
     table-layout: fixed;
+    width: auto;
 
     th, td {
         border: none;
@@ -49,7 +51,7 @@ table.key-value {
         vertical-align: top;
 
         &:first-of-type {
-            width: 200px;
+            padding-right: 20px;
             &:after {
                 content: ":";
             }

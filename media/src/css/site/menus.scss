@@ -28,6 +28,11 @@ nav {
         }
     }
 
+
+    > ul > li:first-of-type > a {
+        margin-left: -10px;
+    }
+
     @include small-screen {
         ul {
             display: none;

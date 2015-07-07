@@ -509,6 +509,8 @@ class SubtitlesField(serializers.CharField):
             return value
 
     def to_internal_value(self, value):
+        if not isinstance(value, basestring):
+            raise serializers.ValidationError("Invalid subtitle data")
         try:
             return load_subtitles(
                 self.context['language_code'], value,
@@ -621,7 +623,11 @@ class SubtitlesView(generics.CreateAPIView):
 
     def get_video(self):
         if not hasattr(self, '_video'):
-            self._video = Video.objects.get(video_id=self.kwargs['video_id'])
+            try:
+                self._video = Video.objects.get(
+                    video_id=self.kwargs['video_id'])
+            except Video.DoesNotExist:
+                raise Http404
         return self._video
 
     def get_serializer_context(self):
