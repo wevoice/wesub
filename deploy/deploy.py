@@ -129,6 +129,7 @@ class Environment(object):
         'DONT_MIGRATE',
         'MIGRATE_WHILE_RUNNING_OLD_CODE',
         'STOP_SERVERS_TO_MIGRATE'
+        'STRIP_PRODUCTION_DATA'
     ]
 
     def __init__(self):
@@ -524,6 +525,10 @@ class Deploy(object):
         elif self.env.MIGRATIONS == 'STOP_SERVERS_TO_MIGRATE':
             self.container_manager.shutdown_old_containers(old_containers)
             self.container_manager.run_app_command('migrate')
+            self.container_manager.start_new_containers()
+        elif self.env.MIGRATIONS == 'STRIP_PRODUCTION_DATA':
+            self.container_manager.shutdown_old_containers(old_containers)
+            self.container_manager.run_app_command('strip_production_data')
             self.container_manager.start_new_containers()
         else:
             raise ValueError("Unknown MIGRATIONS value: {}".format(
