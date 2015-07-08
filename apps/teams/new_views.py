@@ -150,6 +150,10 @@ def members(request, team):
         'filters_form': filters_form,
         'edit_form': edit_form,
         'show_invite_link': permissions.can_invite(team, request.user),
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Members')),
+        ],
     })
 
 @team_view
@@ -177,6 +181,11 @@ def invite(request, team):
     return render(request, template_name,  {
         'team': team,
         'form': form,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Members'), 'teams:members', team.slug),
+            BreadCrumb(_('Invite')),
+        ],
     })
 
 @team_view
