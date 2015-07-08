@@ -6,9 +6,13 @@
 {% block content %}
 
 <h2>{% trans "Invite members" %}</h2>
-<form method="post" action="">
+<form method="post" action="" class="team-invite">
   {% csrf_token %}
-  {% include "_field.html" with field=form.username %}
+  <div class="autocomplete-wrapper">
+    {% include "_field.html" with field=form.username %}
+    <ul class="autocomplete">
+    </ul>
+  </div>
   {% include "_field.html" with field=form.message %}
   {% include "_field.html" with field=form.role %}
 

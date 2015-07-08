@@ -1582,8 +1582,11 @@ class InviteExpiredException(Exception):
     pass
 
 class InviteManager(models.Manager):
-    def pending_for(self, team, user):
-        return self.filter(team=team, user=user, approved=None)
+    def pending_for(self, team, user=None):
+        if user is not None:
+            return self.filter(team=team, user=user, approved=None)
+        else:
+            return self.filter(team=team, approved=None)
 
     def acted_on(self, team, user):
         return self.filter(team=team, user=user, approved__notnull=True)

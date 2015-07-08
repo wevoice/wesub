@@ -588,6 +588,11 @@ class InviteForm(forms.Form):
         self.user = user
         self.fields['role'].choices = [(r, ROLE_NAMES[r])
                                        for r in roles_user_can_invite(team, user)]
+        self.fields['username'].widget.attrs.update({
+            'data-search-url': reverse('teams:invite-user-search',
+                                       args=(team.slug,)),
+            'autocomplete': 'off',
+        })
 
     def clean_username(self):
         username = self.cleaned_data['username']

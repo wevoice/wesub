@@ -24,15 +24,18 @@ replace the old views.py module.
 
 from __future__ import absolute_import
 import functools
+import json
 import logging
 import pickle
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext as _
 
@@ -40,10 +43,12 @@ from . import views as old_views
 from . import forms
 from . import permissions
 from . import tasks
-from .models import Setting, Team, Project, TeamLanguagePreference, TeamMember
+from .models import (Invite, Setting, Team, Project,
+                     TeamLanguagePreference, TeamMember)
 from .statistics import compute_statistics
-from django.contrib.auth.views import redirect_to_login
+from auth.models import CustomUser as User
 from utils.breadcrumbs import BreadCrumb
+from utils.text import fmt
 from utils.translation import get_language_choices
 from videos.models import Action
 
@@ -173,6 +178,31 @@ def invite(request, team):
         'team': team,
         'form': form,
     })
+
+@team_view
+def invite_user_search(request, team):
+    query = request.GET.get('query')
+    if query:
+        users = (User.objects
+                 .filter(username__icontains=query, is_active=True)
+                 .exclude(id__in=team.members.values_list('user_id'))
+                 .exclude(id__in=Invite.objects.pending_for(team).values_list('user_id')))
+    else:
+        users = User.objects.none()
+
+    data = [
+        {
+            'id': user.id,
+            'username': user.username,
+            'full_name': unicode(user),
+            'display': fmt(_('%(username)s (%(full_name)s)'),
+                           username=user.username,
+                           full_name=unicode(user))
+        }
+        for user in users
+    ]
+
+    return HttpResponse(json.dumps(data), mimetype='application/json')
 
 @public_team_view
 def admin_list(request, team):
