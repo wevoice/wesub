@@ -755,7 +755,7 @@ class TeamsTest(TestCase):
             "role": TeamMember.ROLE_CONTRIBUTOR,
         }
         user_mail_box_count = Message.objects.unread().filter(user=user2).count()
-        invite_url = reverse("teams:invite_members", args=(), kwargs={'slug': team.slug})
+        invite_url = reverse("teams:invite", args=(), kwargs={'slug': team.slug})
         response = self.client.post(invite_url, data, follow=True)
         self.failUnlessEqual(response.status_code, 200)
 

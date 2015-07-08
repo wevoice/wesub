@@ -1185,31 +1185,6 @@ def deny_application(request, slug, application_pk):
         messages.error(request, _(u'Application already processed.'))
     return redirect('teams:applications', team.slug)
 
-@render_to('teams/invite_members.html')
-@login_required
-def invite_members(request, slug):
-    team = get_team_for_view(slug, request.user)
-
-    if not can_invite(team, request.user):
-        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
-    if request.POST:
-        form = InviteForm(team, request.user, request.POST)
-        if form.is_valid():
-            # the form will fire the notifications for invitees
-            # this cannot be done on model signal, since you might be
-            # sending invites twice for the same user, and that borks
-            # the naive signal for only created invitations
-            form.save()
-            return HttpResponseRedirect(reverse('teams:members',
-                                                args=[], kwargs={'slug': team.slug}))
-    else:
-        form = InviteForm(team, request.user)
-
-    return {
-        'team': team,
-        'form': form,
-    }
-
 @login_required
 def accept_invite(request, invite_pk, accept=True):
     invite = get_object_or_404(Invite, pk=invite_pk, user=request.user)

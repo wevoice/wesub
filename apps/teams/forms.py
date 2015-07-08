@@ -574,9 +574,13 @@ class LanguagesForm(forms.Form):
         return self.cleaned_data
 
 class InviteForm(forms.Form):
-    user_id = forms.CharField(required=False, widget=forms.Select)
-    message = forms.CharField(required=False, widget=forms.Textarea)
-    role = forms.ChoiceField(choices=TeamMember.ROLES[1:][::-1], initial='contributor')
+    username = forms.CharField(required=False)
+    message = forms.CharField(required=False,
+                              widget=forms.Textarea(attrs={'rows': 4}),
+                              label=_("Message to user"))
+    role = forms.ChoiceField(choices=TeamMember.ROLES[1:][::-1],
+                             initial='contributor',
+                             label=_("Assign a role"))
 
     def __init__(self, team, user, *args, **kwargs):
         super(InviteForm, self).__init__(*args, **kwargs)
@@ -585,40 +589,37 @@ class InviteForm(forms.Form):
         self.fields['role'].choices = [(r, ROLE_NAMES[r])
                                        for r in roles_user_can_invite(team, user)]
 
-    def clean_user_id(self):
-        user_id = self.cleaned_data['user_id']
+    def clean_username(self):
+        username = self.cleaned_data['username']
 
         try:
-            invited_user = User.objects.get(id=user_id)
+            invited_user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise forms.ValidationError(_(u'User does not exist!'))
         except ValueError:
             raise forms.ValidationError(_(u'User does not exist!'))
 
         try:
-            self.team.members.get(user__id=user_id)
+            self.team.members.get(user=invited_user)
         except TeamMember.DoesNotExist:
             pass
         else:
             raise forms.ValidationError(_(u'User is already a member of this team!'))
 
-        self.user_id = user_id
         # check if there is already an invite pending for this user:
         if Invite.objects.pending_for(team=self.team, user=invited_user).exists():
-                raise forms.ValidationError(_(u'User has already been invited and has not replied yet.'))
-        return user_id
+            raise forms.ValidationError(_(u'User has already been invited and has not replied yet.'))
+        self.invited_user = invited_user
+        return username
 
     def save(self):
         from messages import tasks as notifier
-        user = User.objects.get(id=self.user_id)
         invite = Invite.objects.create(
-            team=self.team, user=user, author=self.user,
-            role= self.cleaned_data['role'],
-            note = self.cleaned_data['message'])
+            team=self.team, user=self.invited_user, author=self.user,
+            role=self.cleaned_data['role'], note=self.cleaned_data['message'])
         invite.save()
         notifier.team_invitation_sent.delay(invite.pk)
         return invite
-
 
 class ProjectForm(forms.ModelForm):
     class Meta:

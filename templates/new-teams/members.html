@@ -24,9 +24,11 @@
         </div>
       </form>
     </div>
+    {% if show_invite_link %}
     <div class="section">
-      <a class="button secondary full">{% trans "Invite Member" %}</a>
+      <a href="{% url "teams:invite" team.slug %}" class="button secondary full">{% trans "Invite Member" %}</a>
     </div>
+    {% endif %}
   </div>
   <div class="main">
     {% if members %}

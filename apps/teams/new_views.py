@@ -144,6 +144,34 @@ def members(request, team):
         'members': members,
         'filters_form': filters_form,
         'edit_form': edit_form,
+        'show_invite_link': permissions.can_invite(team, request.user),
+    })
+
+@team_view
+def invite(request, team):
+    if not permissions.can_invite(team, request.user):
+        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
+    if request.POST:
+        form = forms.InviteForm(team, request.user, request.POST)
+        if form.is_valid():
+            # the form will fire the notifications for invitees
+            # this cannot be done on model signal, since you might be
+            # sending invites twice for the same user, and that borks
+            # the naive signal for only created invitations
+            form.save()
+            return HttpResponseRedirect(reverse('teams:members',
+                                                args=[team.slug]))
+    else:
+        form = forms.InviteForm(team, request.user)
+
+    if team.is_old_style():
+        template_name = 'teams/invite_members.html'
+    else:
+        template_name = 'new-teams/invite.html'
+
+    return render(request, template_name,  {
+        'team': team,
+        'form': form,
     })
 
 @public_team_view
