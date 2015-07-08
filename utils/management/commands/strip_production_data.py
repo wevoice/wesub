@@ -16,10 +16,14 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django import dispatch
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
 from externalsites.models import account_models
+from teams.models import TeamNotificationSetting
+
+signal = dispatch.Signal(providing_args=['stdout'])
 
 class Command(BaseCommand):
     help = u'Setup the domain for the default site.'
@@ -30,4 +34,9 @@ class Command(BaseCommand):
         self.stdout.write("removing external accounts...\n")
         for AccountModel in account_models:
             AccountModel.objects.all().delete()
+        self.stdout.write("removing team notification settings...\n")
+        TeamNotificationSetting.objects.all().delete()
+
+        signal.send(self, stdout=self.stdout)
+
         self.stdout.write("done\n")
