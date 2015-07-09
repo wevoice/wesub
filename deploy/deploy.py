@@ -129,7 +129,6 @@ class Environment(object):
         'DONT_MIGRATE',
         'MIGRATE_WHILE_RUNNING_OLD_CODE',
         'STOP_SERVERS_TO_MIGRATE'
-        'STRIP_PRODUCTION_DATA'
     ]
 
     def __init__(self):
@@ -480,6 +479,12 @@ class Deploy(object):
         self.start_and_stop_containers()
         self.container_manager.print_report()
 
+    def build(self):
+        self.setup()
+        self.image_builder.setup_images()
+        self.container_manager.run_app_command("build_media")
+        self.container_manager.print_report()
+
     def stop_old_containers(self):
         self.setup()
         old_containers = self.container_manager.find_old_containers()
@@ -525,10 +530,6 @@ class Deploy(object):
         elif self.env.MIGRATIONS == 'STOP_SERVERS_TO_MIGRATE':
             self.container_manager.shutdown_old_containers(old_containers)
             self.container_manager.run_app_command('migrate')
-            self.container_manager.start_new_containers()
-        elif self.env.MIGRATIONS == 'STRIP_PRODUCTION_DATA':
-            self.container_manager.shutdown_old_containers(old_containers)
-            self.container_manager.run_app_command('strip_production_data')
             self.container_manager.start_new_containers()
         else:
             raise ValueError("Unknown MIGRATIONS value: {}".format(
@@ -619,6 +620,8 @@ def main(argv):
             Deploy().run()
         elif command == 'stop-deploy':
             Deploy().stop_old_containers()
+        elif command == 'build':
+            Deploy().build()
         elif command == 'cleanup':
             Cleanup().run()
         else:
