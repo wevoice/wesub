@@ -146,7 +146,7 @@ class Environment(object):
                 log("    {}", name)
             sys.exit(1)
         if (self.MIGRATIONS not in self.valid_migrate_values and
-            not needs_migrations):
+            needs_migrations):
             log("Invalid MIGRATIONS value: {}", self.MIGRATIONS)
             sys.exit(1)
 
