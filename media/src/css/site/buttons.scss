@@ -2,14 +2,12 @@
     font-size: 1.4rem;
     line-height: 1.4rem;
     padding: 6px 12px;
-    border-radius: 2px;
 }
 
 @mixin medium-button {
     font-size: 1.6rem;
     line-height: 1.6rem;
     padding: 6px 18px;
-    border-radius: 3px;
 }
 
 @mixin button-color($color) {
@@ -42,7 +40,6 @@
 
 button, a.button {
     @include button;
-    border-radius: 5px;
 
     &.small {
         @include small-button;
