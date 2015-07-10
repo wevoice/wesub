@@ -26,7 +26,6 @@ from django.utils import translation
 import babelsubs
 import unilangs
 
-from utils.metrics import Meter, Occurrence
 from .. import google
 
 # NOTE

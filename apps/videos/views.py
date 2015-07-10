@@ -78,7 +78,6 @@ from externalsites.models import can_sync_videourl, get_sync_account
 from utils import send_templated_email
 from utils.basexconverter import base62
 from utils.decorators import never_in_prod
-from utils.metrics import Meter
 from utils.objectlist import object_list
 from utils.rpc import RpcRouter
 from utils.text import fmt
@@ -848,7 +847,6 @@ def video_url_create(request):
                 'domain': Site.objects.get_current().domain,
                 'hash': user.hash_for_video(video.video_id)
             }
-            Meter('templated-emails-sent-by-type.videos.video-url-added').inc()
             send_templated_email(user, subject,
                                  'videos/email_video_url_add.html',
                                  context, fail_silently=not settings.DEBUG)
