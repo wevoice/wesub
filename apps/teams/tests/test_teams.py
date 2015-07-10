@@ -750,7 +750,7 @@ class TeamsTest(TestCase):
         member.save()
 
         data = {
-            "user_id": user2.id,
+            "username": user2.username,
             "message": u"test message",
             "role": TeamMember.ROLE_CONTRIBUTOR,
         }
@@ -1158,7 +1158,7 @@ class TestInvites(TestCase):
 
     def test_invite_invalid_after_accept(self):
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role':'contributor',
         })
@@ -1184,7 +1184,7 @@ class TestInvites(TestCase):
 
     def test_invite_invalid_after_deny(self):
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role':'contributor',
         })
@@ -1208,7 +1208,7 @@ class TestInvites(TestCase):
 
     def test_invite_after_removal(self):
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role': TeamMember.ROLE_MANAGER,
         })
@@ -1230,7 +1230,7 @@ class TestInvites(TestCase):
         self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
         # re-invite
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role': TeamMember.ROLE_CONTRIBUTOR,
         })
@@ -1246,7 +1246,7 @@ class TestInvites(TestCase):
     def test_invite_after_leaving(self):
         # user is invited
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role': TeamMember.ROLE_MANAGER,
         })
@@ -1285,7 +1285,7 @@ class TestInvites(TestCase):
 
 
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role': TeamMember.ROLE_MANAGER,
         })
