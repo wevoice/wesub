@@ -20,7 +20,7 @@
     </li>
     {% endfor %}
     <li>
-        <a href="{% url "teams:detail" team.slug %}">{% trans "Videos" %}</a>
+        <a href="{% url "teams:videos" team.slug %}">{% trans "Videos" %}</a>
     </li>
     <li>
         <a href="{% url "teams:members" team.slug %}">{% trans "Members" %}</a>
@@ -34,7 +34,7 @@
       <ul id="projects-menu">
         {% for project in projects %}
         <li>
-        <a href="{% url "teams:detail" team.slug %}?project={{ project.slug }}">{{ project }} <span class="count">{{ project.videos_count }}</span></a>
+        <a href="{% url "teams:videos" team.slug %}?project={{ project.slug }}">{{ project }} <span class="count">{{ project.videos_count }}</span></a>
         </li>
         {% endfor %}
       </ul>

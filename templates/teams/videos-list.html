@@ -63,7 +63,7 @@
             <input type="hidden" name="q" value="{{ query }}" />
             <button class="reduced" id="update">Update</button>
             {% if filtered %}
-            <a href="{% url "teams:detail" team.slug %}{% if query %}?q={{ query }}{% endif %}" class="button cancel">Clear</a>
+            <a href="{% url "teams:videos" team.slug %}{% if query %}?q={{ query }}{% endif %}" class="button cancel">Clear</a>
             {% endif %}
             <div class="group">
                 <div class="filter-chunk">

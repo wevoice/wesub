@@ -211,7 +211,7 @@
                         <a href="#" data-modal="language_modal" id="lang_select_btn">{% trans "Select the languages you can caption or translate" %}</a>
                     </li>
                     <li>
-                        <a href="{% url "teams:detail" team.slug %}">Browse all videos</a>
+                        <a href="{% url "teams:videos" team.slug %}">Browse all videos</a>
                     </li>
                     {% if can_add_video %}
                         <li><a href="{% url "teams:add_video" team.slug %}">{% trans "Add videos to the team" %}</a></li>

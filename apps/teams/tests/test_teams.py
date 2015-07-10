@@ -375,12 +375,12 @@ class TeamsTest(TestCase):
 
     def _tv_search_record_list(self, team):
         test_utils.update_team_video.run_original()
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
         return response.context['team_video_md_list']
 
     def _complete_search_record_list(self, team):
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
         return response.context['team_video_md_list']
 
@@ -525,7 +525,7 @@ class TeamsTest(TestCase):
 
         reset_solr()
 
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
 
         # The video should be in the list.
@@ -565,7 +565,7 @@ class TeamsTest(TestCase):
         team, new_team_video = self._create_new_team_video()
         reset_solr()
         self._set_my_languages('ko')
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.assertEqual(1, len(response.context['team_video_md_list']))
 
@@ -583,7 +583,7 @@ class TeamsTest(TestCase):
 
         reset_solr()
 
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.assertEqual(1, len(response.context['team_video_md_list']))
 
@@ -655,15 +655,15 @@ class TeamsTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
 
         #------------ detail ---------------------
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
 
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url, {'q': 'Lions'})
         self.failUnlessEqual(response.status_code, 200)
 
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url, {'q': 'empty result'})
         self.failUnlessEqual(response.status_code, 200)
 
@@ -802,7 +802,7 @@ class TeamsTest(TestCase):
         self.assertTrue(team.is_member(self.user))
 
     def test_fixes(self):
-        url = reverse("teams:detail", kwargs={"slug": 'slug-does-not-exist'})
+        url = reverse("teams:videos", kwargs={"slug": 'slug-does-not-exist'})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 404)
 
@@ -849,7 +849,7 @@ class TeamsTest(TestCase):
         team_video, _ = TeamVideo.objects.get_or_create(video=video, team=team,
                                                         added_by=self.user)
         test_utils.update_team_video.run_original()
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url + u"?q=" + title)
         videos = response.context['team_video_md_list']
 

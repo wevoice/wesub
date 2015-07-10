@@ -26,7 +26,7 @@
                             {% if '/tasks/' in request.path %}
                                 <a href="{% url "teams:team_tasks" team.slug %}{% query_string request.GET project=project.slug %}">
                             {% else %}
-                                <a href="{% url "teams:detail" team.slug %}{% query_string request.GET project=project.slug %}">
+                                <a href="{% url "teams:videos" team.slug %}{% query_string request.GET project=project.slug %}">
                             {% endif %}
                                 {{ project }}
                                 <span class="count">

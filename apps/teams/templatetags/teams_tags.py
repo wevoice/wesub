@@ -189,7 +189,7 @@ TeamMetric = namedtuple('TeamMetric', 'url label count')
 @register.inclusion_tag('teams/_metrics.html')
 def team_metrics(team, member, projects):
     metrics = [
-        TeamMetric(reverse('teams:detail', args=(team.slug,)),
+        TeamMetric(reverse('teams:videos', args=(team.slug,)),
                    ngettext('Video', 'Videos', team.videos_count),
                    team.videos_count),
         TeamMetric(reverse('teams:members', args=(team.slug,)),
@@ -203,7 +203,7 @@ def team_metrics(team, member, projects):
             team.get_tasks_count_display()))
     if projects:
         metrics.append(TeamMetric(
-            reverse('teams:detail', args=(team.slug,)),
+            reverse('teams:videos', args=(team.slug,)),
             ngettext('Project', 'Projects', len(projects)),
             len(projects)))
 

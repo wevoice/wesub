@@ -13,7 +13,7 @@
     </li>
     {% endfor %}
     <li{% if current == "videos" %} class="current" {% endif %}>
-        <a href="{% url "teams:detail" team.slug %}">
+        <a href="{% url "teams:videos" team.slug %}">
             {% trans "Videos" %}
         </a>
     </li>
