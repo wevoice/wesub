@@ -131,19 +131,22 @@ class Environment(object):
         'STOP_SERVERS_TO_MIGRATE'
     ]
 
-    def __init__(self):
+    def __init__(self, needs_migrations=True):
         for name in self.env_var_names + self.optional_env_var_names:
             setattr(self, name, os.environ.get(name, ''))
         missing = [
             name for name in self.env_var_names
             if not getattr(self, name)
         ]
+        if not needs_migrations and 'MIGRATIONS' in missing:
+            missing.remove('MIGRATIONS')
         if missing:
             log("ENV variable(s) missing:")
             for name in missing:
                 log("    {}", name)
             sys.exit(1)
-        if self.MIGRATIONS not in self.valid_migrate_values:
+        if (self.MIGRATIONS not in self.valid_migrate_values and
+            needs_migrations):
             log("Invalid MIGRATIONS value: {}", self.MIGRATIONS)
             sys.exit(1)
 
@@ -479,14 +482,20 @@ class Deploy(object):
         self.start_and_stop_containers()
         self.container_manager.print_report()
 
+    def build(self):
+        self.setup(needs_migrations=False)
+        self.image_builder.setup_images()
+        self.container_manager.run_app_command("build_media")
+        self.container_manager.print_report()
+
     def stop_old_containers(self):
         self.setup()
         old_containers = self.container_manager.find_old_containers()
         self.container_manager.shutdown_old_containers(old_containers)
 
-    def setup(self):
+    def setup(self, needs_migrations=True):
         self.cd_to_project_root()
-        self.env = Environment()
+        self.env = Environment(needs_migrations)
         commit_id = self.get_commit_id()
         self.image_builder = ImageBuilder(self.env, commit_id)
         self.container_manager = ContainerManager(
@@ -614,6 +623,8 @@ def main(argv):
             Deploy().run()
         elif command == 'stop-deploy':
             Deploy().stop_old_containers()
+        elif command == 'build':
+            Deploy().build()
         elif command == 'cleanup':
             Cleanup().run()
         else:

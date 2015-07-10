@@ -1,6 +1,6 @@
 app:
   image: amara-app
-  entrypoint: /usr/bin/env
+  entrypoint: ["/usr/bin/env"]
   command: /usr/bin/python manage.py runserver 0.0.0.0:8000
   environment:
       DJANGO_SETTINGS_MODULE: dev_settings
@@ -23,7 +23,7 @@ app:
 
 initdb:
   image: amara-app
-  entrypoint: /bin/bash
+  entrypoint: ["/bin/bash"]
   command: ./bin/dev_syncdb.sh
   environment:
       DJANGO_SETTINGS_MODULE: dev_settings
@@ -36,7 +36,7 @@ bash:
   # This is a bit weird because our dockerfile uses both entrypoint and
   # command, so we need to override them both.  Using /usr/bin/env as the
   # entrypoint works.
-  entrypoint: /usr/bin/env
+  entrypoint: ["/usr/bin/env"]
   command: /bin/bash
   environment:
       DJANGO_SETTINGS_MODULE: dev_settings
@@ -57,7 +57,7 @@ bash:
 
 sslapp:
   image: amara-app
-  entrypoint: /usr/bin/env
+  entrypoint: ["/usr/bin/env"]
   command: /usr/bin/python manage.py runsslserver 0.0.0.0:8000
   environment:
       DJANGO_SETTINGS_MODULE: dev_settings
@@ -74,7 +74,7 @@ sslapp:
 
 worker:
   image: amara-app
-  entrypoint: /usr/bin/env
+  entrypoint: ["/usr/bin/env"]
   command: /usr/bin/python manage.py celery worker -Q celery,feeds --scheduler=djcelery.schedulers.DatabaseScheduler --loglevel=DEBUG -B -E --settings=dev_settings
   volumes:
     - .:/opt/apps/unisubs
