@@ -186,14 +186,12 @@ class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
             self.applied_language_filter = True
         if 'before' in params:
             queryset = queryset.filter(
-                created__lt=self.parse_timestamp(params['before']))
+                created__lt=datetime.fromtimestamp(int(params['before'])))
         if 'after' in params:
             queryset = queryset.filter(
-                created__gte=self.parse_timestamp(params['after']))
+                created__gte=datetime.fromtimestamp(int(params['after'])))
         return queryset
 
-    def parse_timestamp(self, value):
-        return datetime.utcfromtimestamp(int(value))
 
 class ActivityViewSetSwitcher(APISwitcherMixin, ActivityViewSet):
     switchover_date = 20150716
@@ -201,6 +199,3 @@ class ActivityViewSetSwitcher(APISwitcherMixin, ActivityViewSet):
     class Deprecated(ActivityViewSet):
         class serializer_class(ActivitySerializer):
             created = serializers.DateTimeField(read_only=True)
-
-        def parse_timestamp(self, value):
-            return datetime.fromtimestamp(int(value))
