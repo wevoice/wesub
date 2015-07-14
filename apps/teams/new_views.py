@@ -52,7 +52,7 @@ from utils.breadcrumbs import BreadCrumb
 from utils.pagination import AmaraPaginator
 from utils.text import fmt
 from utils.translation import get_language_choices
-from videos.models import Action
+from videos.models import Action, Video
 
 logger = logging.getLogger('teams.views')
 
@@ -126,13 +126,31 @@ def videos(request, team):
     if team.is_old_style():
         return old_views.detail(request, team)
 
-    videos = team.videos.all()
+    filters_form = forms.VideoFiltersForm(team, request)
+    if filters_form.is_bound and filters_form.is_valid():
+        videos = filters_form.get_queryset()
+    else:
+        videos = team.videos.all()
+
     paginator = AmaraPaginator(videos, VIDEOS_PER_PAGE)
-    filters_form = forms.VideoFiltersForm(team)
+    page = paginator.get_page(request)
+
+    if filters_form.is_bound:
+        # Hack to convert the search index results to regular Video objects.
+        # We will probably be able to drop this when we implement #838
+        video_order = {
+            result.video_pk: i
+            for i, result in enumerate(page)
+        }
+        videos = list(Video.objects.filter(id__in=video_order.keys()))
+        videos.sort(key=lambda v: video_order[v.id])
+    else:
+        videos = list(page)
 
     return render(request, 'new-teams/videos.html', {
         'team': team,
-        'page': paginator.get_page(request),
+        'videos': videos,
+        'page': page,
         'filters_form': filters_form,
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),

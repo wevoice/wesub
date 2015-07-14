@@ -34,7 +34,7 @@
   <div class="main">
     {% if page %}
     <ul class="video-card-list">
-    {% for video in page %}
+    {% for video in videos %}
     <li>
         <a class="wrapper" href="{% url "videos:video" video_id=video.video_id %}">
           <h5 class="title">{{ video.title_display }}</h5>

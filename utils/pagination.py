@@ -24,8 +24,23 @@ class AmaraPaginator(Paginator):
     def get_page(self, request):
         page = request.GET.get('page')
         try:
-            return self.page(page)
+            page = self.page(page)
         except PageNotAnInteger:
-            return self.page(1)
+            page = self.page(1)
         except EmptyPage:
-            return self.page(self.num_pages)
+            page = self.page(self.num_pages)
+        self.add_links_to_page(page, request)
+        return page
+
+    def add_links_to_page(self, page, request):
+        query = request.GET.copy()
+        page.first_page_link = self.make_page_link(1, query)
+        page.prev_page_link = self.make_page_link(page.previous_page_number(),
+                                                  query)
+        page.next_page_link = self.make_page_link(page.next_page_number(),
+                                                  query)
+        page.last_page_link = self.make_page_link(self.num_pages, query)
+
+    def make_page_link(self, page_number, query):
+        query['page'] = page_number
+        return '?' + query.urlencode()

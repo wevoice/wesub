@@ -54,6 +54,7 @@ from videos.tasks import import_videos_from_feed
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.panslugify import pan_slugify
+from utils.searching import get_terms
 from utils.translation import get_language_choices
 from utils.text import fmt
 from utils.validators import MaxFileSizeValidator
@@ -858,10 +859,19 @@ class VideoFiltersForm(forms.Form):
         ('-subs', _('Least complete languages')),
     ], initial='recent', required=False)
 
-    def __init__(self, team, *args, **kwargs):
-        super(VideoFiltersForm, self).__init__(*args, **kwargs)
+    def __init__(self, team, request):
+        super(VideoFiltersForm, self).__init__(data=self.calc_data(request))
         self.team = team
         self.setup_project_field()
+
+    def calc_data(self, request):
+        valid_names = set(['q', 'project', 'sort'])
+        data = {
+            name: value
+            for name, value in request.GET.items()
+            if name in valid_names
+        }
+        return data if data else None
 
     def setup_project_field(self):
         projects = Project.objects.for_team(self.team)
@@ -869,13 +879,44 @@ class VideoFiltersForm(forms.Form):
             choices = [
                 ('any', _('Any Project')),
             ] + [
-                (p.id, p.name) for p in projects
+                (p.slug, p.name) for p in projects
             ]
             self.fields['project'].choices = choices
             self.show_project = True
         else:
             del self.fields['project']
             self.show_project = False
+
+    def get_queryset(self):
+        # This code is a bit ugly, since it reflects the ugly state of our
+        # search indexes.  See #838 for our plan to improve things
+        from haystack.query import SearchQuerySet
+
+        project = self.cleaned_data.get('project', 'any')
+        q = self.cleaned_data['q']
+        sort = self.cleaned_data['sort']
+
+        qs = SearchQuerySet().models(TeamVideo).filter(team_id=self.team.id)
+        if q:
+            for term in get_terms(q):
+                qs = qs.auto_query(qs.query.clean(term).decode('utf-8'))
+        if project != 'any':
+            try:
+                project_pk = self.team.project_set.get(slug=project).id
+            except Project.DoesNotExist:
+                project_pk = -1
+            qs = qs.filter(project_pk=project_pk)
+
+        qs = qs.order_by({
+             'name':  'video_title_exact',
+            '-name': '-video_title_exact',
+             'subs':  'num_completed_langs',
+            '-subs': '-num_completed_langs',
+             'time':  'team_video_create_date',
+            '-time': '-team_video_create_date',
+        }.get(sort or '-time'))
+
+        return qs
 
 class MemberFiltersForm(forms.Form):
     LANGUAGE_CHOICES = [
