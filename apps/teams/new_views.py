@@ -33,6 +33,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -48,13 +49,15 @@ from .models import (Invite, Setting, Team, Project,
 from .statistics import compute_statistics
 from auth.models import CustomUser as User
 from utils.breadcrumbs import BreadCrumb
+from utils.pagination import AmaraPaginator
 from utils.text import fmt
 from utils.translation import get_language_choices
 from videos.models import Action
 
 logger = logging.getLogger('teams.views')
 
-ACTIONS_ON_PAGE = 20
+ACTIONS_PER_PAGE = 20
+VIDEOS_PER_PAGE = 8
 
 def team_view(view_func):
     def wrapper(request, slug, *args, **kwargs):
@@ -102,8 +105,8 @@ def fetch_actions_for_activity_page(team, tab, page, params):
             action_qs = action_qs.filter(
                 new_language__language_code=subtitles_language)
 
-    end = page * ACTIONS_ON_PAGE
-    start = end - ACTIONS_ON_PAGE
+    end = page * ACTIONS_PER_PAGE
+    start = end - ACTIONS_PER_PAGE
 
     if params.get('action_type', 'any') != 'any':
         action_qs = action_qs.filter(action_type=params.get('action_type'))
@@ -117,6 +120,25 @@ def fetch_actions_for_activity_page(team, tab, page, params):
         'user', 'new_language__video'
     )
     return list(action_qs)
+
+@team_view
+def videos(request, team):
+    if team.is_old_style():
+        return old_views.detail(request, team)
+
+    videos = team.videos.all()
+    paginator = AmaraPaginator(videos, VIDEOS_PER_PAGE)
+    filters_form = forms.VideoFiltersForm(team)
+
+    return render(request, 'new-teams/videos.html', {
+        'team': team,
+        'page': paginator.get_page(request),
+        'filters_form': filters_form,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Videos')),
+        ],
+    })
 
 @team_view
 def members(request, team):
@@ -247,7 +269,7 @@ def activity(request, team, tab):
                             if code in readable_langs]
     action_types = Action.TYPES_CATEGORIES[tab]
 
-    has_more = len(activity_list) >= ACTIONS_ON_PAGE
+    has_more = len(activity_list) >= ACTIONS_PER_PAGE
 
     filtered = bool(set(request.GET.keys()).intersection([
         'action_type', 'language', 'sort']))

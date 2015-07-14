@@ -841,6 +841,42 @@ class MoveVideosForm(forms.Form):
         super(MoveVideosForm, self).__init__(*args, **kwargs)
         self.fields['team'].queryset = user.managed_teams(include_manager=False)
 
+class VideoFiltersForm(forms.Form):
+    LANGUAGE_CHOICES = [
+        ('any', _('Any language')),
+    ] + get_language_choices()
+
+    q = forms.CharField(label=_('Search'), required=False)
+    project = forms.ChoiceField(label=_('Project'), required=False,
+                                choices=[])
+    sort = forms.ChoiceField(choices=[
+        ('name', _('Name, a-z')),
+        ('-name', _('Name, z-a')),
+        ('time', _('Time, newest')),
+        ('-time', _('Time, oldest')),
+        ('subs', _('Most completed languages')),
+        ('-subs', _('Least complete languages')),
+    ], initial='recent', required=False)
+
+    def __init__(self, team, *args, **kwargs):
+        super(VideoFiltersForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.setup_project_field()
+
+    def setup_project_field(self):
+        projects = Project.objects.for_team(self.team)
+        if projects:
+            choices = [
+                ('any', _('Any Project')),
+            ] + [
+                (p.id, p.name) for p in projects
+            ]
+            self.fields['project'].choices = choices
+            self.show_project = True
+        else:
+            del self.fields['project']
+            self.show_project = False
+
 class MemberFiltersForm(forms.Form):
     LANGUAGE_CHOICES = [
         ('any', _('Any language')),

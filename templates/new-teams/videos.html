@@ -1,0 +1,56 @@
+{% extends "new-teams/base.html" %}
+
+{% load i18n videos_tags %}
+{% load url from future %}
+
+{% block content %}
+
+<h2>{% blocktrans %}Members for {{ team }}{% endblocktrans %}</h2>
+<div class="split-view">
+  <div class="filters sidebar">
+    <div class="section">
+      <h5>{% trans "Filter and Sort" %}</h5>
+      <form method="GET" action="">
+        {% include "_field.html" with field=filters_form.q %}
+        {% if filters_form.show_project %}
+          {% include "_field.html" with field=filters_form.project %}
+        {% endif %}
+        {% include "_field.html" with field=filters_form.sort %}
+
+        <div class="actions">
+          <button class="submit">Filter</button>
+          {% if filters_form.is_bound %}
+          <a href="{% url "teams:videos" team.slug %}" class="button cancel">Clear</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+    {% if show_add_link %}
+    <div class="section">
+      <a href="{% url "teams:add_video" team.slug %}" class="button secondary full">{% trans "Add Video" %}</a>
+    </div>
+    {% endif %}
+  </div>
+  <div class="main">
+    {% if page %}
+    <ul class="video-card-list">
+    {% for video in page %}
+    <li>
+        <a class="wrapper" href="{% url "videos:video" video_id=video.video_id %}">
+          <h5 class="title">{{ video.title_display }}</h5>
+          <img src="{{ video.get_wide_thumbnail }}" alt="{{ video.title_display }}">
+        </a>
+        <ul class="actions">
+          <li><a href="#">{% trans "edit" %}</a></li>
+          <li><a href="#">{% trans "remove" %}</a></li>
+        </ul>
+      </li>
+    {% endfor %}
+    </ul>
+    {% include "_new_paginator.html" %}
+    {% else %}
+    <p class="empty">{% trans "No Videos found" %}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -28,7 +28,7 @@ body {
     margin: 0 auto;
 }
 
-%clearfix, .group:after {
+%clearfix:after, .group:after {
     content: "";
     display: table;
     clear: both;
@@ -52,6 +52,7 @@ body {
 
     > .sidebar {
         width: 300px;
+        min-width: 300px;
         border-right: 1px solid $lighter-gray;
         padding-right: 20px;
         margin-right: 20px;
