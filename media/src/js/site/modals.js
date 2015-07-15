@@ -61,10 +61,18 @@ $document.ready(function() {
         var link = $(this);
         var modal = $('#' + link.data('modal'));
 
-        $link.bind('click', function(e) {
+        link.bind('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             modal.openModal();
+            if(link.data('heading')) {
+                $('h3', modal).text(link.data('heading'));
+            }
+            if(link.data('setFormValues')) {
+                $.each(link.data('setFormValues'), function(name, value) {
+                    $('*[name=' + name + ']').val(value);
+                });
+            }
         });
     });
 });

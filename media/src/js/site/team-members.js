@@ -19,26 +19,8 @@
 (function() {
 
 $(document).ready(function() {
-    $('ul.team-members').each(handleMemberList);
     $('form.team-invite').each(handleInviteForm);
 });
-
-function handleMemberList(memberList) {
-    $('a.edit', memberList).click(openEditForm);
-}
-
-function openEditForm(evt) {
-    var link = $(this);
-    var form = $('#edit-form');
-
-    $('h3', form).text(link.data('heading'));
-    $('#member-id-field', form).val(link.data('member-id'));
-    $('#id_role', form).val(link.data('member-role'));
-
-    form.openModal();
-    evt.preventDefault();
-    evt.stopPropagation();
-}
 
 function handleInviteForm(form) {
     var usernameField = $('input[name=username]', form);
@@ -49,47 +31,5 @@ function handleInviteForm(form) {
         }
     });
 }
-
-/*
-function handleInviteForm(form) {
-    var usernameField = $('input[name=username]', form);
-    var url = usernameField.data('search-url');
-    var autocompleteList = $('ul.autocomplete', form);
-    var lastQuery = null;
-
-    usernameField.on("keyup paste", function() {
-        query = usernameField.val();
-        if(query == lastQuery) {
-            return;
-        }
-        $.get(url, {query: query}, function(data) {
-            updateAutocomplete(data);
-        });
-        lastQuery = query;
-    }).on("focusout", function() {
-        // use setTimeout to ensure if the user clicked on the autocomplete
-        // list, we don't hide it before the click event.
-        setTimeout(autocompleteList.hide, 0);
-    }).on("focusin", function() {
-        if(autocompleteList.has('li')) {
-            autocompleteList.show();
-        }
-    });
-
-    function updateAutocomplete(data) {
-        autocompleteList.show();
-        $('li', autocompleteList).remove();
-        $.each(data, function(i, userData) {
-            var link = $('<a href="#">');
-            link.text(userData.display);
-            link.click(function() {
-                usernameField.val(userData.username);
-                autocompleteList.hide();
-            });
-            autocompleteList.append($('<li>').append(link));
-        });
-    }
-}
-*/
 
 })();
