@@ -102,14 +102,14 @@ class TestCaseTasks(APILiveServerTestCase, WebdriverTestCase):
         tv = TeamVideoFactory(team=self.team, video=video)
         url = '/api/teams/%s/tasks/?type=Subtitle' % self.team.slug
         r = self._get(url=url, user=self.member)
-        self.assertEqual(2, len(r))
+        self.assertEqual(2, len(r['objects']))
 
     def test_completed_transcribe(self):
         """List off the existing completed tasks filtered by type. 
         """
         url = '/api/teams/%s/tasks/?completed&type=Subtitle' % self.team.slug
         r = self._get(url=url, user=self.member)
-        self.assertEqual(1, len(r))
+        self.assertEqual(1, len(r['objects']))
 
     def test_list_open_translate(self):
         """List off the existing open tasks of a type. 
@@ -118,7 +118,7 @@ class TestCaseTasks(APILiveServerTestCase, WebdriverTestCase):
         """
         url = '/api/teams/%s/tasks/?open&type=Translate' % self.team.slug
         r = self._get(url=url, user=self.member)
-        self.assertEqual(3, len(r))
+        self.assertEqual(3, len(r['objects']))
 
 
     def test_query_video_id(self):
@@ -129,7 +129,7 @@ class TestCaseTasks(APILiveServerTestCase, WebdriverTestCase):
         url = '/api/teams/{0}/tasks/?video_id={1}'.format(
             self.team.slug, self.video.video_id)
         r = self._get(url=url, user=self.member)
-        self.assertEqual(12, len(r))
+        self.assertEqual(12, len(r['objects']))
 
     def test_query_video_id_type(self):
         """Query for tasks of a video_id and type. 
@@ -137,7 +137,7 @@ class TestCaseTasks(APILiveServerTestCase, WebdriverTestCase):
         url = '/api/teams/{0}/tasks/?video_id={1}&type=Approve'.format(
             self.team.slug, self.video.video_id)
         r = self._get(url=url, user=self.member)
-        self.assertEqual(3, len(r))
+        self.assertEqual(3, len(r['objects']))
 
 
     def test_query_video_id_lang(self):
@@ -148,7 +148,7 @@ class TestCaseTasks(APILiveServerTestCase, WebdriverTestCase):
 
         r = self._get(url=url, user=self.member)
         self.logger.info(r)
-        self.assertEqual(3, len(r))
+        self.assertEqual(3, len(r['objects']))
 
     def test_query_completed_videoid_lang(self):
         """Query for tasks of a video_id. 
@@ -157,7 +157,7 @@ class TestCaseTasks(APILiveServerTestCase, WebdriverTestCase):
             self.team.slug, self.video.video_id)
         r = self._get(url=url, user=self.member)
         self.logger.info(r)
-        self.assertEqual(2, len(r))
+        self.assertEqual(2, len(r['objects']))
 
 
     def test_query_assignee(self):
@@ -167,7 +167,7 @@ class TestCaseTasks(APILiveServerTestCase, WebdriverTestCase):
         url = '/api/teams/%s/tasks/?assignee=%s' % (
                 self.team.slug, self.member.username)
         r = self._get(url=url, user=self.member)
-        self.assertEqual(3, len(r))
+        self.assertEqual(3, len(r['objects']))
 
  
     def test_task_detail(self):

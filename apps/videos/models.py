@@ -38,6 +38,8 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
+from django.forms.forms import NON_FIELD_ERRORS
 
 from auth.models import CustomUser as User, Awards
 from caching import ModelCacheManager
@@ -500,6 +502,10 @@ class Video(models.Model):
         """
         vurl = self.get_primary_videourl_obj()
         return vurl.effective_url if vurl else None
+
+    def get_video_url_type_display(self):
+        vurl = self.get_primary_videourl_obj()
+        return vurl.get_type_display() if vurl else _("No Video URL")
 
     def get_video_urls(self):
         """Return the video URLs for this video."""
@@ -1848,7 +1854,7 @@ class VideoUrl(models.Model):
     # type should be 2 chars long with the first char being unique for the
     # app.
     type = models.CharField(max_length=2)
-    url = models.URLField(max_length=255)
+    url = models.URLField(max_length=512)
     videoid = models.CharField(max_length=50, blank=True)
     primary = models.BooleanField(default=False)
     original = models.BooleanField(default=False)
@@ -1860,9 +1866,19 @@ class VideoUrl(models.Model):
 
     class Meta:
         ordering = ("video", "-primary",)
-        unique_together = (
-            ('url', 'type'),
-        )
+
+    def validate_unique(self, *args, **kwargs):
+        super(VideoUrl, self).validate_unique(*args, **kwargs)
+        qs = self.__class__.objects.filter(url=self.url, type=self.type)
+        if ((not self.id and qs.exists()) or
+        ((len(qs) == 1) and (qs.get().id != self.id))):
+            raise ValidationError(
+                {
+                    NON_FIELD_ERRORS: [
+                        _('Video already exist on Amara'),
+                    ],
+                }
+            )
 
     def __unicode__(self):
         return self.url

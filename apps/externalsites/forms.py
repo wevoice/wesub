@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import json
 from django import forms
 from django.core import validators
 from django.core.urlresolvers import reverse
@@ -26,9 +27,11 @@ from django.utils.translation import ugettext_lazy
 from auth.models import CustomUser as User
 from teams.models import Team
 from externalsites import models
-from utils.forms import SubmitButtonField
+from utils.forms import SubmitButtonField, SubmitButtonWidget
+from utils.text import fmt
 import videos.tasks
-
+import logging
+logger = logging.getLogger("forms")
 class AccountForm(forms.ModelForm):
     """Base class for forms on the teams or user profile tab."""
 
@@ -181,8 +184,10 @@ class BrightcoveAccountForm(AccountForm):
             return None
 
 class AddYoutubeAccountForm(forms.Form):
-    add_button = SubmitButtonField(label=ugettext_lazy('Add YouTube account'),
-                                   required=False)
+    add_button = SubmitButtonField(
+        label=ugettext_lazy('Add YouTube account'),
+        required=False,
+        widget=SubmitButtonWidget(attrs={'class': 'small'}))
 
     def __init__(self, owner, data=None, **kwargs):
         super(AddYoutubeAccountForm, self).__init__(data=data, **kwargs)
@@ -209,14 +214,16 @@ class YoutubeAccountForm(forms.Form):
     sync_teams = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         required=False)
+    import_team = forms.ChoiceField(label='', required=False)
 
     def __init__(self, admin_user, account, data=None, **kwargs):
         super(YoutubeAccountForm, self).__init__(data=data, **kwargs)
         self.account = account
         self.admin_user = admin_user
-        self.setup_sync_teams()
+        self.setup_sync_team()
+        self.setup_import_team()
 
-    def setup_sync_teams(self):
+    def setup_sync_team(self):
         choices = []
         initial = []
         # allow the admin to uncheck any of the current sync teams
@@ -235,6 +242,30 @@ class YoutubeAccountForm(forms.Form):
         self['sync_teams'].field.choices = choices
         self['sync_teams'].field.initial = initial
 
+    def setup_import_team(self):
+        # Setup the import team field.  The choices are:
+        #   - None to disable import
+        #   - Any valid sync team
+        #   - The account team it self
+        #   - The current import_team
+        label_template = _('Import Videos into %(team)s')
+
+        choices = [('', _("Disable Video Import"))]
+        choices.append((self.account.team.id,
+                        fmt(label_template, team=self.account.team.name)))
+        choices.extend(
+            (team_id, fmt(label_template, team=team_name))
+            for team_id, team_name in self.fields['sync_teams'].choices
+        )
+        if (self.account.import_team_id and
+            self.account.import_team_id not in [c[0] for c in choices]):
+            choices.append((self.account.import_team_id,
+                            fmt(label_template,
+                                team=self.account.import_team.name)))
+
+        self.fields['import_team'].choices = choices
+        self.fields['import_team'].initial = self.account.import_team_id
+
     def save(self):
         if not self.is_valid():
             raise ValueError("Form not valid")
@@ -244,6 +275,11 @@ class YoutubeAccountForm(forms.Form):
             self.account.sync_teams = Team.objects.filter(
                 id__in=self.cleaned_data['sync_teams']
             )
+            if self.cleaned_data['import_team'] == '':
+                self.account.import_team = None
+            else:
+                self.account.import_team_id = self.cleaned_data['import_team']
+            self.account.save()
 
     def show_sync_teams(self):
         return len(self['sync_teams'].field.choices) > 0
@@ -290,3 +326,15 @@ class AccountFormset(dict):
                 redirect_path = form.redirect_path()
                 if redirect_path is not None:
                     return redirect_path
+
+class ResyncForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        sync_items = kwargs.pop('sync_items')
+        super(ResyncForm, self).__init__(*args, **kwargs)
+        for i, sync_item in enumerate(sync_items):
+            item_id = sync_item.pop('id')
+            self.fields['custom_%s' % item_id] = forms.BooleanField(label=json.dumps(sync_item), required = False, widget=forms.CheckboxInput(attrs={'class': 'bulkable'}))
+    def sync_items(self):
+        for name, value in self.cleaned_data.items():
+            if name.startswith('custom_'):
+                yield (name.replace('custom_','',1), value)

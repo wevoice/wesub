@@ -1,0 +1,18 @@
+ol, ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.activity {
+    li {
+        padding: 10px 0;
+        border-bottom: 1px solid $lighter-gray;
+    }
+
+    .timestamp {
+        float: right;
+        margin-left: 5px;
+    }
+
+}

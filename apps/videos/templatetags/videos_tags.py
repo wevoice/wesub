@@ -51,6 +51,10 @@ def is_follower(obj, user):
 def can_user_edit_video_urls(video, user):
     return permissions.can_user_edit_video_urls(video, user)
 
+@register.filter
+def can_user_resync(video, user):
+    return permissions.can_user_resync(video, user)
+
 @register.simple_tag
 def write_video_type_js(video):
     if not video or not bool(video.get_video_url()):

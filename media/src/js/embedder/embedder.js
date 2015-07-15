@@ -200,15 +200,13 @@
             initialize: function() {
 
                 var video = this;
-                var apiURL = '//' + _amaraConf.baseURL + '/api2/partners/videos/?&video_url=';
-
+                var apiURL = '//' + _amaraConf.baseURL + '/api/videos/?video_url=';
                 this.subtitles = new that.Subtitles();
 
                 // Make a call to the Amara API to get attributes like available languages,
                 // internal ID, description, etc.
                 _$.ajax({
                     url: apiURL + encodeURIComponent(this.get('url')),
-                    dataType: 'jsonp',
                     success: function(resp) {
                         if (resp.objects.length) {
                             // The video exists on Amara.
@@ -442,15 +440,6 @@
             },
             loadPopcorn: function() {
                 var url = this.model.get('url');
-                // Hack for apparent Chrome issue with HTML5 videos
-                // if same video is open twice in the same browser instance
-                if (window.chrome && /\.(mp4|mv4|ogg|ogv|webm)(\?.*)?$/i.test(url)) {
-                    if(url.indexOf('?') == -1) {
-                        url += '?amaranoise=' + Date.now();
-                    } else {
-                        url += '&amaranoise=' + Date.now();
-                    }
-                }
                 // For youtube, we need to alter the URL to enable controls.
                 if(url.indexOf('youtube.com') != -1) {
                     if(url.indexOf('?') == -1) {
@@ -723,7 +712,7 @@
                 var that = this;
 
                 var apiURL = ''+
-                    '//' + _amaraConf.baseURL + '/api2/partners/videos/' +
+                    '//' + _amaraConf.baseURL + '/api/videos/' +
                     this.model.get('id') + '/languages/' + language + '/subtitles/';
 
                 // Make a call to the Amara API to retrieve subtitles for this language.
@@ -731,7 +720,6 @@
                 // TODO: If we already have subtitles in this language, don't do anything.
                 _$.ajax({
                     url: apiURL,
-                    dataType: 'jsonp',
                     success: function(resp) {
                         // Save these subtitles to the video's 'subtitles' collection.
                         // TODO: Placeholder until we have the API return the language code.

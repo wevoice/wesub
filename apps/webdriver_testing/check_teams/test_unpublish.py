@@ -86,19 +86,19 @@ class TestCaseUnpublishLast(WebdriverTestCase):
 
     @classmethod
     def _upload_lang(cls, video, subs, lc, user, complete=False):
-        data = {'language_code': lc,
-                     'video': video.pk,
-                     'draft': open(subs),
-                     'complete': int(complete),
-                     'is_complete': complete,
-                    }
-        if lc == 'en':
-            data['primary_audio_language_code'] = 'en'
-        cls.data_utils.upload_subs(user, **data)
+        data = {
+                'language_code': lc,
+                'video': video,
+                'subtitles': subs,
+                'complete': complete,
+                'author': user,
+                'committer': user
+               }
+        cls.data_utils.add_subs(**data)
 
     @classmethod
     def _add_team_video(cls):
-        video = cls.data_utils.create_video()
+        video = VideoFactory(primary_audio_language_code='en')
         tv = TeamVideoFactory(team=cls.team, added_by=cls.owner, video=video)
         return video, tv
 
@@ -161,21 +161,6 @@ class TestCaseUnpublishLast(WebdriverTestCase):
                                  % self.team.slug)
         self.assertFalse(self.tasks_tab.task_present(
                         'Approve German Subtitles', self.video.title))
-
-
-    def test_unpublish_edit_forked_translation(self):
-        """In-progress translations editable after last source deleted.
-
-        """
-        self.tasks_tab.log_in(self.contributor.username, 'password')
-        self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
-                                 '&assignee=anyone&lang=sv'.format(
-                                 self.team.slug, self.tv.pk))
-
-        task_text = 'Translate Subtitles into Swedish'
-        self.tasks_tab.perform_task(task_text, self.video.title)
-        self.assertEqual(u'Editing Swedish\u2026', self.editor_pg.working_language())
-        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
 
     def test_unpublish_revision_not_searchable(self):
         """Unpublished (deleted) revision text doesn't show in search results.
@@ -255,8 +240,6 @@ class TestCaseDeleteLast(WebdriverTestCase):
         cls.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % cls.team.slug)
  
-
-
     def tearDown(self):
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert('accept')
@@ -264,19 +247,20 @@ class TestCaseDeleteLast(WebdriverTestCase):
 
     @classmethod
     def _upload_lang(cls, video, subs, lc, user, complete=False):
-        data = {'language_code': lc,
-                     'video': video.pk,
-                     'draft': open(subs),
-                     'complete': int(complete),
-                     'is_complete': complete,
-                    }
-        if lc == 'en':
-            data['primary_audio_language_code'] = 'en'
-        cls.data_utils.upload_subs(user, **data)
+
+        data = {
+                'language_code': lc,
+                'video': video,
+                'subtitles': subs,
+                'complete': complete,
+                'author': user,
+                'committer': user
+               }
+        cls.data_utils.add_subs(**data)
 
     @classmethod
     def _add_team_video(cls):
-        video = cls.data_utils.create_video()
+        video = VideoFactory(primary_audio_language_code='en')
         tv = TeamVideoFactory(team=cls.team, added_by=cls.owner, video=video)
         return video, tv
 
@@ -350,23 +334,6 @@ class TestCaseDeleteLast(WebdriverTestCase):
         available_langs = self.video_pg.subtitle_languages()
         self.logger.info(available_langs)
         self.assertIn('English', available_langs)
-
-
-
-    def test_delete_edit_forked_translation(self):
-        """In-progress translations editable after last source deleted.
-
-        """
-        self.tasks_tab.log_in(self.contributor.username, 'password')
-        self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
-                                 '&assignee=anyone&lang=sv'.format(
-                                 self.team.slug, self.tv.pk))
-
-        task_text = 'Translate Subtitles into Swedish'
-        self.tasks_tab.perform_task(task_text, self.video.title)
-        self.assertEqual(u'Editing Swedish\u2026', self.editor_pg.working_language())
-        self.assertEqual('English (original)', self.editor_pg.selected_ref_language())
-
 
     def test_delete_revision_not_searchable(self):
         """Unpublished (deleted) revision text doesn't show in search results.

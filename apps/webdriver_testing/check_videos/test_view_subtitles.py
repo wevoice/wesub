@@ -21,44 +21,38 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
-        cls.video = VideoFactory()
+        cls.video = VideoFactory(primary_audio_language_code='de')
         #Upload original language de
-        complete = True
         data = {'language_code': 'de',
-                'video': cls.video.pk,
-                'primary_audio_language_code': 'de',
-                'draft': open(os.path.join(cls.subs_dir, 'Timed_text.en.srt')), 
-                'complete': int(complete)
+                 'video': cls.video,
+                 'subtitles': 'apps/webdriver_testing/subtitle_data/'
+                               'Timed_text.en.srt',
+                 'complete': True,
+                 'author': cls.user,
+                 'committer': cls.user 
                 }
-        cls.data_utils.upload_subs(cls.user, **data)
+        cls.data_utils.add_subs(**data)
        
         #Upload sv, translated from de, complete
         data = {'language_code': 'sv',
-                'video': cls.video.pk,
-                'translated_from': 'de',
-                'draft': open(os.path.join(cls.subs_dir, 'Timed_text.sv.dfxp')),
-                'is_complete': complete,
-                'complete': int(complete)
+                 'video': cls.video,
+                 'subtitles': 'apps/webdriver_testing/subtitle_data/'
+                               'Timed_text.sv.dfxp',
+                 'complete': True,
+                 'author': cls.user,
+                 'committer': cls.user 
                 }
-        cls.data_utils.upload_subs(cls.user, **data)
-        complete = False
-        #Upload ar, translated from de, incomplete
-        data = {'language_code': 'ar',
-                'video': cls.video.pk,
-                'draft': open(os.path.join(cls.subs_dir, 'Timed_text.ar.xml')),
-                'is_complete': complete,
-                'complete': int(complete)
-                }
-        cls.data_utils.upload_subs(cls.user, **data)
+        cls.data_utils.add_subs(**data)
         #Upload hu, translated from sv, incomplete
         data = {'language_code': 'hu',
-                'video': cls.video.pk,
-                'translated_from': 'sv',
-                'draft': open(os.path.join(cls.subs_dir, 'Timed_text.hu.ssa')),
-                'is_complete': complete,
-                'complete': int(complete)
+                 'video': cls.video,
+                 'subtitles': 'apps/webdriver_testing/subtitle_data/'
+                               'Timed_text.hu.ssa',
+                 'complete': False,
+                 'author': cls.user,
+                 'committer': cls.user 
                 }
-        cls.data_utils.upload_subs(cls.user, **data)
+        cls.data_utils.add_subs(**data)
         cls.video_pg.open_video_page(cls.video.video_id)
         
 
@@ -73,28 +67,21 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         de_tag, _ = self.video_pg.language_status('German')
         self.assertEqual('original', de_tag)
 
-    def test_labeled_incomplete__translation(self):
+    def test_labeled_incomplete_translation(self):
         """"Translation, with incomplete subtitles displays incomplete tag.
 
         """
         hu_tag, _ = self.video_pg.language_status('Hungarian')
         self.assertEqual('incomplete', hu_tag)
 
-    def test_labeled_incomplete__forked(self):
-        """Forked, incomplete subtitles display incomplete tag.
-
-        """
-        ar_tag, _ = self.video_pg.language_status('Arabic')
-        self.assertEqual('incomplete', ar_tag)
-
-    def test_status_img__original_complete(self):
+    def test_status_img_original_complete(self):
         """Orignal lang complete, shows complete status button.
 
         """
         _, de_status = self.video_pg.language_status('German')
         self.assertIn('status-complete', de_status)
 
-    def test_status_img__translation_complete(self):
+    def test_status_img_translation_complete(self):
         """Translation lang complete, shows complete status button.
 
         """
@@ -102,41 +89,21 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         self.assertIn('status-complete', sv_status)
 
 
-    def test_status_img__forked_incomplete(self):
-        """Forked, incomplete subs display incomplete status button.
-
-        """
-        _, ar_status = self.video_pg.language_status('Arabic')
-        self.assertIn('status-incomplete', ar_status)
-
-
     def test_no_primary_audio_lang(self):
         """Language list displays when no subs for primary audio lang exists.
 
         """
-        vid = VideoFactory()
+        video = VideoFactory(primary_audio_language_code='de')
 
-        #Upload en, primary audio = de
-        complete = True
         data = {'language_code': 'en',
-                'video': vid.pk,
-                'primary_audio_language_code': 'de',
-                'draft': open(os.path.join(self.subs_dir, 'Timed_text.en.srt')), 
-                'is_complete': complete,
-                'complete': int(complete)
+                 'video': video,
+                 'subtitles': 'apps/webdriver_testing/subtitle_data/'
+                               'Timed_text.en.srt',
+                 'complete': True,
+                 'author': self.user,
+                 'committer': self.user 
                 }
-        self.data_utils.upload_subs(self.user, **data)
-        #Upload sv, forked
-        data = {'language_code': 'sv',
-                'video': vid.pk,
-                'draft': open(os.path.join(self.subs_dir, 'Timed_text.sv.dfxp')),
-                'is_complete': complete,
-                'complete': int(complete)
-                }
-        self.data_utils.upload_subs(self.user, **data)
-        self.video_pg.open_video_page(vid.video_id)
+        self.data_utils.add_subs(**data)
+        self.video_pg.open_video_page(video.video_id)
         _, en_status = self.video_pg.language_status('English')
-        self.assertIn('status-complete', en_status, 
-            'ref: https://unisubs.sifterapp.com/issues/2350')
-
-
+        self.assertIn('status-complete', en_status)

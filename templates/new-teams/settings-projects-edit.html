@@ -1,0 +1,20 @@
+{% extends "new-teams/base.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+
+<h2>{% trans "Team Settings - Edit Project" %}</h2>
+<form method="POST" action="">
+  {% csrf_token %}
+
+  {% include "_field.html" with field=form.name %}
+  {% include "_field.html" with field=form.description %}
+
+  <div class="actions">
+    <button class="delete" name="delete" value="1"><span class="fa fa-trash-o"></span> {% trans "Delete" %}</button>
+    <button class="submit">{% trans "Update" %} <span class="fa fa-angle-double-right"></span></button>
+  </div>
+</form>
+{% endblock %}
+

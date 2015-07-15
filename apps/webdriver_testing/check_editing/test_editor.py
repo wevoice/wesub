@@ -7,7 +7,7 @@ from django.core import management
 import time
 
 from datetime import datetime as dt
-
+from subtitles import pipeline
 from videos.models import Video
 from utils.factories import *
 from webdriver_testing.webdriver_base import WebdriverTestCase
@@ -89,6 +89,8 @@ class TestCaseEditing(WebdriverTestCase):
         self.assertEqual(u'可以来解决各种迫切的问题。', 
                          self.editor_pg.reference_text(3))
 
+    
+
 
     def test_reference_private_versions(self):
         """Language not displayed if not visible to user
@@ -109,21 +111,6 @@ class TestCaseEditing(WebdriverTestCase):
         sub_text, _ = self.editor_pg.click_working_sub_line(3)
         self.assertEqual(sub_text, self.editor_pg.sub_overlayed_text())
 
-
-    def test_remove_active_subtitle(self):
-        """Remove the selected subtitle line.
- 
-        from i2441
-        """
-        self.editor_pg.open_editor_page(self.video.video_id, 'en')
-        subtext = self.editor_pg.working_text()
-        removed_text = self.editor_pg.remove_active_subtitle(3)
-        self.assertEqual(subtext[2], removed_text)
-        subtext = self.editor_pg.working_text()
-        self.assertNotEqual(subtext[2], removed_text)
-
-        
-
     def test_working_language(self):
         self.editor_pg.open_editor_page(self.video.video_id, 'en')
         self.assertEqual(u'Editing English\u2026', self.editor_pg.working_language())
@@ -135,8 +122,6 @@ class TestCaseEditing(WebdriverTestCase):
         self.editor_pg.open_editor_page(self.video.video_id, 'en')
         self.assertEqual('Open Source Philosophy',
                          self.editor_pg.video_title())
-
-
 
     def test_info_tray(self):
         """Info tray displays start, stop, char count, chars/second."""
@@ -165,7 +150,6 @@ class TestCaseEditing(WebdriverTestCase):
         self.assertEqual('72', sub_info['Characters'], 
                          'character count is not expected value')
 
-
     def test_info_tray_char_updates(self):
         """Info tray character counts updates dynamically"""
         self.editor_pg.open_editor_page(self.video.video_id, 'en')
@@ -174,11 +158,8 @@ class TestCaseEditing(WebdriverTestCase):
         self.assertEqual('11', sub_info['Characters'], 
                          'character count is not expected value')
 
-
-
     def test_add_lines_to_end(self):
         """Add sub to the end of the subtitle list, enter adds new active sub."""
-        self.logger.info(Video.objects.all())
         self.editor_pg.open_editor_page(self.video.video_id, 'nl')
 
         subs = ['third to last', 'pentulitmate subtitle', 'THE END']
@@ -261,8 +242,6 @@ class TestCaseEditing(WebdriverTestCase):
         self.browser.execute_script("window.location.hash='add-sub-at-end'")
         self.assertFalse(self.editor_pg.sync_help_displayed())
 
-
-
     def test_rtl(self):
         self.video_pg.open_video_page(self.video.video_id)
         self.editor_pg.open_editor_page(self.video.video_id, 'ar')
@@ -275,3 +254,49 @@ class TestCaseEditing(WebdriverTestCase):
         self.assertEqual(expected_text, sub_text)
         self.assertEqual(sub_text, self.editor_pg.sub_overlayed_text())
         self.assertEqual(expected_text, sub_text)
+
+    def test_non_incremental_times(self):
+        subs = SubtitleSetFactory(num_subs=5)
+        subs.append_subtitle(3500, 4500, "Sub with the same start and end time" )
+        subs.append_subtitle(4000, 4500, "Sub with the same start and end time" )
+        subs.append_subtitle(4000, 5900, "Subs line at 5 seconds" )
+        video = VideoFactory()
+        pipeline.add_subtitles(video, 'en', subs)
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.assertEqual('6', self.editor_pg.invalid_subtitle())
+
+    def test_equal_times(self):
+        subs = SubtitleSetFactory(num_subs=2)
+        subs.append_subtitle(3500, 4500, "Subtitle"  )
+        subs.append_subtitle(3500, 4500, "Subtitle with same start end times" )
+        video = VideoFactory()
+        pipeline.add_subtitles(video, 'en', subs)
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.assertEqual('3', self.editor_pg.invalid_subtitle())
+
+    def test_endtime_greater(self):
+        subs = SubtitleSetFactory(num_subs=2)
+        subs.append_subtitle(5500, 4500, "Subtitle"  )
+        video = VideoFactory()
+        pipeline.add_subtitles(video, 'en', subs)
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.assertEqual(u'2', self.editor_pg.invalid_subtitle())
+
+    def test_blank_line_warnings(self):
+        """Amara warns when subtitle sets have blank lines """
+        video = VideoFactory()
+        subs = SubtitleSetFactory(num_subs=5)
+        pipeline.add_subtitles(video, 'en', subs, complete=True)
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.insert_sub_above(3)
+        self.editor_pg.click_by_css('div.workflow')
+        self.assertEqual(u'2', self.editor_pg.invalid_subtitle())
+
+    def test_sync_warning(self):
+        subs = SubtitleSetFactory(num_subs=1)
+        subs.append_subtitle(2000, 2999, ""  )
+        subs.append_subtitle(3000, 4500, "Subtitle" )
+        video = VideoFactory()
+        pipeline.add_subtitles(video, 'en', subs, complete=False)
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.assertEqual('1', self.editor_pg.invalid_subtitle())

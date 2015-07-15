@@ -4,7 +4,7 @@ html5lib==0.95
 # this will be removed after the rollout of amqp
 vendor/amqplib-1.0.2-patched.tar.gz
 amqp==1.0.8
-Django==1.4.20
+Django==1.4.21
 Fabric==1.4.0
 PyRSS2Gen==1.0.0
 PyYAML==3.10
@@ -55,7 +55,6 @@ vendor/django-tastypie-0.9.11.tar.gz
 #vendor/oboe-0.4.1.0.tar.gz
 requests==0.13.1
 rauth==0.4.12
-bernhard==0.0.2
 -e git+https://github.com/jsocol/bleach.git@105b4cfc2f00cc1954bcab3b39b16fbfaf8863e0#egg=bleach
 markdown2==2.0.0
 -e git+https://github.com/pculture/babelsubs.git#egg=babelsubs
@@ -68,7 +67,7 @@ sphinxcontrib-httpdomain==1.3.0
 sphinxcontrib-napoleon
 sphinx_rtd_theme
 # Testing
-coverage==3.2b3
+coverage==3.4
 nose==1.3.3
 nose-exclude==0.2.0
 unittest2==0.5.1
@@ -80,3 +79,4 @@ mock==1.0.1
 selenium
 xvfbwrapper==0.2.4
 factory_boy==2.4.1
+pafy

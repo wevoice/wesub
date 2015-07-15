@@ -144,8 +144,7 @@ class ViewsTests(TestCase):
         # creating a duplicated project results in error
         response = self.client.post(url, data)
         self.failUnlessEqual(response.status_code, 200)
-        messages = [m.message for m in list(response.context['messages'])]
-        self.assertIn(u"There's already a project with this name", messages)
+        self.assertFalse(response.context['form'].is_valid())
 
     def test_remove_video(self):
         team = TeamFactory(slug="new-team",

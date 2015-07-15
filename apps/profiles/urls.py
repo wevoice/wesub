@@ -36,3 +36,8 @@ urlpatterns = patterns('profiles.views',
     url(r'^remove-third-party/(?P<account_type>\w+)/(?P<account_id>[0-9]+)/$', 'remove_third_party',
         name='remove-third-party'),
 )
+
+# settings views that are handled by other apps
+urlpatterns += patterns('',
+    url(r'^sync/$', 'externalsites.views.user_profile_sync_errors_tab', name='profile_sync_externalsites'),
+)

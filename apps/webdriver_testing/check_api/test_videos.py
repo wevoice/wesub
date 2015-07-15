@@ -14,6 +14,8 @@ from videos.models import *
 from utils.factories import *
 from subtitles import pipeline
 from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import video_page
+
 
 class TestCaseVideos(APILiveServerTestCase, WebdriverTestCase):
     """TestSuite for site video searches.  """
@@ -23,8 +25,9 @@ class TestCaseVideos(APILiveServerTestCase, WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseVideos, cls).setUpClass()
         management.call_command('flush', interactive=False)
+        cls.video_pg = video_page.VideoPage(cls)
         cls.user = UserFactory()
-        cls.client = APIClient
+        cls.client = APIClient(enforce_csrf_checks=True)
         for x in range(5):
             VideoFactory()
 
@@ -35,6 +38,14 @@ class TestCaseVideos(APILiveServerTestCase, WebdriverTestCase):
         r = (json.loads(response.content))
         return r
 
+    def _put(self, url='/api/videos/', data=None):
+        self.client.force_authenticate(self.user)
+        response = self.client.put(url, data)
+        response.render()
+        r = (json.loads(response.content))
+        self.logger.info(r)
+        return r
+
     def _post(self, url='/api/videos/', data=None):
         self.client.force_authenticate(self.user)
         response = self.client.post(url, data)
@@ -43,11 +54,11 @@ class TestCaseVideos(APILiveServerTestCase, WebdriverTestCase):
         return r
 
     def test_not_logged_in(self):
-        """non-authed users can't access"""
-        expected_error = {u'detail':
-                          u'Authentication credentials were not provided.'}
+        """non-authed users get public video information"""
         response = self.client.get('/api/videos/')
-        self.assertEqual(expected_error, response.data)
+        response.render()
+        r = (json.loads(response.content))
+        self.assertEqual(5, r['meta']['total_count'])
 
     def test_get_videos(self):
         """get all videos"""
@@ -131,6 +142,19 @@ class TestCaseVideos(APILiveServerTestCase, WebdriverTestCase):
         self.assertEqual(data['title'], video.title)
         self.assertEqual(data['description'], video.description)
         self.assertEqual(data['duration'], video.duration)
+
+    def test_update_metadata(self):
+        video = VideoFactory()
+        data = {
+                "title": "updated video title",
+               }
+        
+        url = "/api/videos/%s/" % video.video_id
+        self._put(url=url, data=data)
+        self.video_pg.open_video_page(video.video_id)
+        #Check video title displays on the site
+        self.assertEqual(data['title'],
+            self.video_pg.video_title())
 
 
     def test_get_urls(self):

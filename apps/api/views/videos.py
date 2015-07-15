@@ -192,6 +192,7 @@ from __future__ import absolute_import
 
 from django import http
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from rest_framework import filters
 from rest_framework import generics
 from rest_framework import mixins
@@ -199,8 +200,11 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.reverse import reverse
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 import json
 
+from .apiswitcher import APISwitcherMixin
+from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
 from api.pagination import AmaraPaginationMixin
 from teams import permissions as team_perms
 from teams.models import Team, TeamVideo, Project
@@ -282,12 +286,13 @@ class VideoListSerializer(serializers.ListSerializer):
         # Do some optimizations to reduce the number of queries before passing
         # the result to the default to_representation() method
 
-        # Note: we have to use prefetch_related the teamvideo attributes,
-        # otherwise it will filter out non-team videos.  I think this is a
-        # django 1.4 bug.
-        qs = (qs.select_related('teamvideo')
-              .prefetch_related('teamvideo__team', 'teamvideo__project',
-                                'newsubtitlelanguage_set', 'videourl_set'))
+        if isinstance(qs, QuerySet):
+            # Note: we have to use prefetch_related the teamvideo attributes,
+            # otherwise it will filter out non-team videos.  I think this is a
+            # django 1.4 bug.
+            qs = (qs.select_related('teamvideo')
+                  .prefetch_related('teamvideo__team', 'teamvideo__project',
+                                    'newsubtitlelanguage_set', 'videourl_set'))
         # run bulk_has_public_version(), otherwise we have a query for each
         # language of each video
         videos = list(qs)
@@ -302,15 +307,15 @@ class VideoSerializer(serializers.Serializer):
     # default implementation that it makes more sense to not inherit.
     id = serializers.CharField(source='video_id', read_only=True)
     video_url = serializers.URLField(write_only=True, required=True)
-    primary_audio_language_code = serializers.CharField(required=False,
-                                                        allow_blank=True)
+    primary_audio_language_code = LanguageCodeField(required=False,
+                                                    allow_blank=True)
     original_language = serializers.CharField(source='language',
                                               read_only=True)
     title = serializers.CharField(required=False, allow_blank=True)
     description = serializers.CharField(required=False, allow_blank=True)
     duration = serializers.IntegerField(required=False)
     thumbnail = serializers.URLField(required=False, allow_blank=True)
-    created = serializers.DateTimeField(read_only=True)
+    created = TimezoneAwareDateTimeField(read_only=True)
     team = TeamSerializer(required=False, allow_null=True)
     project = ProjectSerializer(required=False, allow_null=True)
     all_urls = serializers.SerializerMethodField()
@@ -467,7 +472,7 @@ class VideoViewSet(AmaraPaginationMixin,
 
     lookup_field = 'video_id'
     lookup_value_regex = r'(\w|-)+'
-
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = ('title', 'created')
 
@@ -483,14 +488,20 @@ class VideoViewSet(AmaraPaginationMixin,
             qs = self.get_videos_for_user()
         else:
             qs = self.get_videos_for_team(query_params)
-
         if 'video_url' in query_params:
-            qs = qs.filter(videourl__url=query_params['video_url'])
+            vt = video_type_registrar.video_type_for_url(query_params['video_url'])
+            if vt:
+                qs = qs.filter(videourl__url=vt.convert_to_video_url())
+            else:
+                qs = qs.filter(videourl__url=query_params['video_url'])
         return qs
 
     def get_videos_for_user(self):
-        user_visible_teams = Team.objects.filter(
-            Q(is_visible=True) | Q(members__user=self.request.user))
+        visibility = Q(is_visible=True)
+        if self.request.user.is_authenticated():
+            members = self.request.user.team_members.all()
+            visibility = visibility | Q(id__in=members.values_list('team_id'))
+        user_visible_teams = Team.objects.filter(visibility)
         return Video.objects.filter(
             Q(teamvideo__isnull=True) |
             Q(teamvideo__team__in=user_visible_teams))
@@ -555,7 +566,7 @@ class VideoViewSet(AmaraPaginationMixin,
         return video
 
 class VideoURLSerializer(serializers.Serializer):
-    created = serializers.DateTimeField(read_only=True)
+    created = TimezoneAwareDateTimeField(read_only=True)
     url = serializers.CharField()
     primary = serializers.BooleanField(required=False)
     original = serializers.BooleanField(required=False)
@@ -596,12 +607,14 @@ class VideoURLUpdateSerializer(VideoURLSerializer):
     url = serializers.CharField(read_only=True)
 
 class VideoURLViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
+    serializer_class = VideoURLSerializer
+    update_serializer_class = VideoURLUpdateSerializer
 
     def get_serializer_class(self):
         if 'pk' in self.kwargs:
-            return VideoURLUpdateSerializer
+            return self.update_serializer_class
         else:
-            return VideoURLSerializer
+            return self.serializer_class
 
     @property
     def video(self):
@@ -624,3 +637,19 @@ class VideoURLViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
             'request': self.request,
         }
 
+class VideoViewSetSwitcher(APISwitcherMixin, VideoViewSet):
+    switchover_date = 20150716
+
+    class Deprecated(VideoViewSet):
+        class serializer_class(VideoSerializer):
+            created = serializers.DateTimeField(read_only=True)
+
+class VideoURLViewSetSwitcher(APISwitcherMixin, VideoURLViewSet):
+    switchover_date = 20150716
+
+    class Deprecated(VideoURLViewSet):
+        class serializer_class(VideoURLSerializer):
+            created = serializers.DateTimeField(read_only=True)
+
+        class update_serializer_class(VideoURLUpdateSerializer):
+            created = serializers.DateTimeField()

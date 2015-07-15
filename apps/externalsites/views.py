@@ -20,7 +20,8 @@ import logging
 
 from django.contrib import messages
 from django.contrib import auth
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.views import redirect_to_login
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
@@ -33,11 +34,13 @@ from externalsites import forms
 from externalsites import google
 from externalsites.auth_backends import OpenIDConnectInfo
 from externalsites.exceptions import YouTubeAccountExistsError
-from externalsites.models import get_sync_account, YouTubeAccount
+from externalsites.models import get_sync_account, YouTubeAccount, SyncHistory
 from localeurl.utils import universal_url
 from teams.models import Team
-from teams.permissions import can_change_team_settings
+from teams.permissions import can_change_team_settings, can_resync
+from videos import permissions
 from teams.views import settings_page
+from utils.breadcrumbs import BreadCrumb
 from utils.text import fmt
 from videos.models import VideoUrl
 
@@ -74,10 +77,85 @@ def team_settings_tab(request, team):
                 id=request.POST['remove-youtube-account'])
             account.delete()
         return redirect(settings_page_redirect_url(team, formset))
+    
+    if team.is_old_style():
+        template_name = 'externalsites/team-settings-tab.html'
+    else:
+        template_name = 'externalsites/new-team-settings-tab.html'
 
-    return render(request, 'externalsites/team-settings-tab.html', {
+    return render(request, template_name, {
         'team': team,
         'forms': formset,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
+            BreadCrumb(_('Integrations')),
+        ],
+    })
+
+@settings_page
+@login_required
+def team_settings_sync_errors_tab(request, team):
+    if not can_resync(team, request.user):
+        return redirect_to_login(request.build_absolute_uri())
+    if request.POST:        
+        sh = SyncHistory.objects.get_attempts_to_resync(team=team)
+        if sh:
+            sync_items = sh
+        else:
+            sync_items = []
+        form = forms.ResyncForm(request.POST, sync_items=sync_items)
+        if form.is_valid():
+            for (key, val) in form.sync_items():
+                if val:
+                    SyncHistory.objects.force_retry(key, team=team)
+        
+    sh = SyncHistory.objects.get_attempts_to_resync(team=team)
+    if sh:
+        sync_items = sh
+    else:
+        sync_items = []
+        
+    form = forms.ResyncForm(sync_items=sync_items)
+    context = {
+        'team': team,
+        'form': form,
+    }
+
+    if team.is_old_style():
+        template_name = 'externalsites/team-settings-sync-errors.html'
+    else:
+        context['nobulk'] = True
+        template_name = 'externalsites/new-team-settings-sync-errors.html'
+
+    return render(request, template_name, context)
+
+@login_required
+def user_profile_sync_errors_tab(request):
+    if request.POST:
+        sh = SyncHistory.objects.get_attempts_to_resync(user=request.user)
+        if sh:
+            sync_items = sh
+        else:
+            sync_items = []
+        form = forms.ResyncForm(request.POST, sync_items=sync_items)
+        if form.is_valid():
+            for (key, val) in form.sync_items():
+                if val:
+                    SyncHistory.objects.force_retry(key, user=request.user)
+
+    sh = SyncHistory.objects.get_attempts_to_resync(user=request.user)
+    if sh:
+        sync_items = sh
+    else:
+        sync_items = []
+
+    form = forms.ResyncForm(sync_items=sync_items)
+    template_name = 'externalsites/user-profile-sync-errors.html'
+
+    return render(request, template_name, {
+        'user_info': request.user,
+        'form': form,
     })
 
 def settings_page_redirect_url(team, formset):
@@ -133,7 +211,7 @@ def youtube_add_account(request):
     state['type'] = 'add-account'
     return redirect(google.request_token_url(
         google_callback_url(), 'offline', state,
-        ['https://www.googleapis.com/auth/youtube']))
+        google.youtube_scopes()))
 
 def handle_add_account_callback(request, auth_info):
     try:
@@ -171,9 +249,6 @@ def handle_add_account_callback(request, auth_info):
     except YouTubeAccountExistsError, e:
         messages.error(request,
                        already_linked_message(request.user, e.other_account))
-    else:
-        if 'username' in auth_info.state:
-            account.create_feed()
 
     return HttpResponseRedirect(redirect_url)
 
@@ -218,10 +293,12 @@ def already_linked_message(user, other_account):
                      'to the %(team)s team.'),
                    team=other_account.team)
 
-@staff_member_required
+@login_required
 def resync(request, video_url_id, language_code):
     video_url = get_object_or_404(VideoUrl, id=video_url_id)
     video = video_url.video
+    if not permissions.can_user_resync(video, request.user):
+        return redirect_to_login(request.build_absolute_uri())
     language = video.subtitle_language(language_code)
 
     if request.method == 'POST':

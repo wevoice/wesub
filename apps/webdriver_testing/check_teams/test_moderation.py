@@ -127,7 +127,7 @@ class TestCaseDraftVideos(WebdriverTestCase):
         cls.logger.info('Setup: Add video to team with draft subs.')
         cls.draft = TeamVideoFactory.create(
                 team=cls.team, 
-                video=cls.data_utils.create_video(),
+                video=VideoFactory(),
                 added_by=cls.user).video
         data = { 'visibility': 'private', 
                  'video': cls.draft,

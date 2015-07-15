@@ -163,34 +163,6 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.video_pg.open_video_page(video.video_id)
         self.assertEqual(new_title, self.video_pg.video_title())
 
-
-    def test_review_edit_title_reject(self):
-        """Edit title in review, video title updated after publish """
-        video = VideoFactory(title = 'test title',
-                             primary_audio_language_code='en'
-                            )
-        TeamVideoFactory(team=self.team, video=video)
-        self._create_subs(video, 'en', self.member, complete=True)
-        orig_title = 'test title'
-        new_title = 'this is a new title'
-        self.tasks_tab.log_in(self.manager.username, 'password')
-        self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.perform_task("Review Original", video, title=new_title, edit='type')
-        self.editor_pg.collab_action("Send Back")
-        self.assertEqual(orig_title, self.video_pg.video_title())
-        self.tasks_tab.log_in(self.member.username, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&/'
-                                 % self.team.slug)
-        self.perform_task("Transcribe", video, edit='upload', title=None)
-        self.editor_pg.collab_action("Complete")
-        self.assertEqual(orig_title, self.video_pg.video_title())
-        self.data_utils.complete_review_task(video.get_team_video(), 20, self.manager)
-        self.data_utils.complete_approve_task(video.get_team_video(), 20, self.admin)
-        self.video_pg.open_video_page(video.video_id)
-        self.assertEqual(new_title, self.video_pg.video_title())
-
-
-
     def test_transcribe_edit_title_save_draft(self):
         """Edit title in transcribe, and save a draft """
         video = TeamVideoFactory(team=self.team,
@@ -229,7 +201,7 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.perform_task("Transcribe", video, title=new_title, edit='upload')
         self.editor_pg.collab_action("Complete")
-        self.assertEqual(video.title, self.video_pg.video_title())
+        self.assertEqual('test title', self.video_pg.video_title())
         self.data_utils.complete_review_task(video.get_team_video(), 20, self.manager)
         self.tasks_tab.log_in(self.admin.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
@@ -243,18 +215,17 @@ class TestCaseModeratedVideoTitles(WebdriverTestCase):
                              title = 'test title'
                              )
         TeamVideoFactory(video=video, team=self.team)
-        orig_title = 'test title' 
         new_title = "edited"
         self.tasks_tab.log_in(self.member.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.perform_task("Transcribe", video, title=new_title, edit='upload')
         self.editor_pg.collab_action("Complete")
-        self.assertEqual(orig_title, self.video_pg.video_title())
+        self.assertEqual('test title', self.video_pg.video_title())
         self.tasks_tab.log_in(self.manager.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.perform_task("Review Original", video, title=None, edit='upload')
+        self.perform_task("Review Original", video, title=None, edit='type')
         self.editor_pg.collab_action("Approve")
-        self.assertEqual(orig_title, self.video_pg.video_title())
+        self.assertEqual('test title', self.video_pg.video_title())
         self.tasks_tab.log_in(self.admin.username, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.perform_task("Approve Original", video, title=None)

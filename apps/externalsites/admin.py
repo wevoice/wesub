@@ -90,7 +90,6 @@ class YoutubeAccountForm(forms.ModelForm):
     class Meta:
         model = models.YouTubeAccount
 
-
 class YouTubeAccountAdmin(admin.ModelAdmin):
     form = YoutubeAccountForm
     fields = (
@@ -100,6 +99,7 @@ class YouTubeAccountAdmin(admin.ModelAdmin):
         'username',
         'oauth_refresh_token',
         'sync_teams',
+        'import_team',
         'resync_subtitles',
     )
 

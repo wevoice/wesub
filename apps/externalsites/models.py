@@ -25,7 +25,6 @@ from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import query, Q
 from django.utils.translation import ugettext_lazy as _
-from gdata.client import RequestError
 import babelsubs
 # because of our insane circular imports we need to import haystack right here
 # or else things blow up
@@ -37,9 +36,10 @@ from externalsites import syncing
 from externalsites.exceptions import (SyncingError, RetryableSyncingError,
                                       YouTubeAccountExistsError)
 from subtitles.models import SubtitleLanguage, SubtitleVersion
-from teams.models import Team
+from teams.models import Team, TeamVideo
 from utils.text import fmt
-from videos.models import VideoUrl, VideoFeed
+from videos.models import Video, VideoUrl, VideoFeed
+from videos.permissions import can_user_resync_own_video
 import videos.models
 import videos.tasks
 
@@ -83,6 +83,12 @@ class ExternalAccountManager(models.Manager):
     def _get_sync_account_nonteam_video(self, video, video_url):
             return self.get(type=ExternalAccount.TYPE_USER,
                           owner_id=video.user_id)
+
+    def team_accounts(self):
+        return self.filter(type=ExternalAccount.TYPE_TEAM)
+
+    def user_accounts(self):
+        return self.filter(type=ExternalAccount.TYPE_USER)
 
 class ExternalAccount(models.Model):
     account_type = NotImplemented
@@ -347,6 +353,10 @@ class YouTubeAccountManager(ExternalAccountManager):
             type=ExternalAccount.TYPE_USER,
             channel_id=video_url.owner_username)
 
+    def accounts_to_import(self):
+        return self.filter(Q(type=ExternalAccount.TYPE_USER)|
+                           Q(import_team__isnull=False))
+
     def create_or_update(self, channel_id, oauth_refresh_token, **data):
         """Create a new YouTubeAccount, if none exists for the channel_id
 
@@ -375,8 +385,9 @@ class YouTubeAccount(ExternalAccount):
     channel_id = models.CharField(max_length=255, unique=True)
     username = models.CharField(max_length=255)
     oauth_refresh_token = models.CharField(max_length=255)
-    import_feed = models.OneToOneField(VideoFeed, null=True,
-                                       on_delete=models.SET_NULL)
+    last_import_video_id = models.CharField(max_length=100, blank=True,
+                                            default='')
+    import_team = models.ForeignKey(Team, null=True)
     sync_teams = models.ManyToManyField(
         Team, related_name='youtube_sync_accounts')
 
@@ -424,29 +435,6 @@ class YouTubeAccount(ExternalAccount):
         return 'https://gdata.youtube.com/feeds/api/users/%s/uploads' % (
             self.channel_id)
 
-    def create_feed(self):
-        if self.import_feed is not None:
-            raise ValueError("Feed already created")
-        try:
-            existing_feed = VideoFeed.objects.get(url=self.feed_url())
-        except VideoFeed.DoesNotExist:
-            self.import_feed = VideoFeed.objects.create(url=self.feed_url(),
-                                                        user=self.user,
-                                                        team=self.team)
-            videos.tasks.update_video_feed.delay(self.import_feed.id)
-        else:
-            if (existing_feed.user is not None and
-                existing_feed.user != self.user):
-                raise ValueError("Import feed already created by user %s" %
-                                 existing_feed.user)
-            if (existing_feed.team is not None and
-                existing_feed.team != self.team):
-                raise ValueError("Import feed already created by team %s" %
-                                 existing_feed.team)
-            self.import_feed = existing_feed
-
-        self.save()
-
     def get_owner_display(self):
         if self.username:
             return self.username
@@ -480,20 +468,8 @@ class YouTubeAccount(ExternalAccount):
         Subclasses must implement this method.
         """
         access_token = google.get_new_access_token(self.oauth_refresh_token)
-        try:
-            syncing.youtube.update_subtitles(video_url.videoid, access_token,
-                                             version)
-        except RequestError, e:
-            # If the exception was for a quota error, we want to try to resync
-            # later.  The documentation around these errors isn't great, hence
-            # the paranoid try.. except block here
-            try:
-                if 'too_many_recent_calls' in e.body:
-                    raise RetryableSyncingError(e, 'Youtube Quota Error')
-            except:
-                pass
-            # should re-raise the error so that the SyncHistory gets updated
-            raise
+        syncing.youtube.update_subtitles(video_url.videoid, access_token,
+                                         version)
 
     def do_delete_subtitles(self, video_url, language):
         access_token = google.get_new_access_token(self.oauth_refresh_token)
@@ -502,9 +478,30 @@ class YouTubeAccount(ExternalAccount):
 
     def delete(self):
         google.revoke_auth_token(self.oauth_refresh_token)
-        if self.import_feed is not None:
-            self.import_feed.delete()
         super(YouTubeAccount, self).delete()
+
+    def should_import_videos(self):
+        return (self.type == ExternalAccount.TYPE_USER or
+                (self.type == ExternalAccount.TYPE_TEAM and self.import_team))
+
+    def import_videos(self):
+        if not self.should_import_videos():
+            return
+        video_ids = google.get_uploaded_video_ids(self.channel_id)
+        if not video_ids:
+            return
+        for video_id in video_ids:
+            if video_id == self.last_import_video_id:
+                break
+            video_url = 'http://youtube.com/watch?v={}'.format(video_id)
+            if self.type == ExternalAccount.TYPE_USER:
+                Video.get_or_create_for_url(video_url, user=self.user)
+            elif self.import_team:
+                video, created = Video.get_or_create_for_url(video_url)
+                TeamVideo.objects.create(video=video, team=self.import_team)
+
+        self.last_import_video_id = video_ids[0]
+        self.save()
 
 account_models = [
     KalturaAccount,
@@ -678,6 +675,45 @@ class SyncHistoryManager(models.Manager):
     def get_query_set(self):
         return SyncHistoryQuerySet(self.model)
 
+    def get_attempts_to_resync(self, team=None, user=None):
+        """Lookup failed sync attempt that we should retry,
+        for a user or for a team.
+        """
+        days_of_search = 183
+        items_of_search = 20000
+        items_to_display = 200
+        qs = self
+        if team:
+            owner = team
+        elif user:
+            owner = user
+        else:
+            return None
+        accounts = []
+        for account_type in [YouTubeAccount, KalturaAccount, BrightcoveAccount]:
+            for account_id in account_type.objects.for_owner(owner).values_list('id', flat=True):
+                accounts.append(account_id)
+        qs = qs.filter(account_id__in=accounts)
+        qs = qs.filter(datetime__gt=datetime.datetime.now() - datetime.timedelta(days=days_of_search))
+        qs = qs.select_related('language', 'video_url__video').order_by('-id')[:items_of_search]
+        keep = []
+        seen = set()
+        for item in qs:
+            if item.language not in seen:
+                if (item.result == SyncHistory.RESULT_ERROR) and not item.retry:
+                    video_id = item.video_url.video.video_id
+                    video_url = item.video_url.url
+                    keep.append({'account_type': item.get_account_type_display(),
+                                 'id': item.id,
+                                 'language_code': item.language.language_code,
+                                 'details': item.details,
+                                 'video_id': video_id,
+                                 'video_url': video_url})
+                    if len(keep) >= items_to_display:
+                        break
+                seen.add(item.language)
+        return keep
+
     def get_attempt_to_resync(self):
         """Lookup failed sync attempt that we should retry.
 
@@ -694,6 +730,20 @@ class SyncHistoryManager(models.Manager):
         sh.retry = False
         sh.save()
         return sh
+
+    def force_retry(self, pk, team=None, user=None):
+        try:
+            sh = self.get(pk=pk)
+        except SyncHistory.DoesNotExist:
+            return None
+        if team is not None:
+            if sh.video_url.video.get_team_video() and sh.video_url.video.get_team_video().team == team:
+                sh.retry = True
+                sh.save()
+        elif user is not None:
+            if can_user_resync_own_video(sh.video_url.video, user):
+                sh.retry = True
+                sh.save()
 
 class SyncHistory(models.Model):
     """History of all subtitle sync attempts."""

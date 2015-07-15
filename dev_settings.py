@@ -33,7 +33,7 @@ BROKER_HOST = os.environ.get('QUEUE_1_PORT_5672_TCP_ADDR')
 BROKER_USER = 'guest'
 BROKER_PASSWORD = 'guest'
 BROKER_PORT = os.environ.get('QUEUE_1_PORT_5672_TCP_PORT')
-EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 JS_USE_COMPILED = True
 RUN_LOCALLY = True
@@ -97,6 +97,8 @@ CACHE_TIMEOUT = 0
 
 COMPRESS_MEDIA = not DEBUG
 
+# Log more more things to the console
+LOGGING['root']['level'] = 'INFO'
 # disable sentry logging
 LOGGING['handlers']['sentry']['class'] = 'logging.NullHandler'
 

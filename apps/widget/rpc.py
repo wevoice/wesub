@@ -31,12 +31,10 @@ from teams.permissions import (
     can_publish_edits_immediately, can_review, can_approve, can_add_version,
 )
 from teams.signals import (
-    api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
     api_language_new, api_language_edited, api_video_edited
 )
 from utils import send_templated_email
 from utils.forms import flatten_errorlists
-from utils.metrics import Meter
 from utils.subtitles import create_new_subtitles
 from utils.translation import get_user_languages_from_request
 from videos import models
@@ -78,7 +76,6 @@ def add_general_settings(request, dict):
 class Rpc(BaseRpc):
     # Logging
     def log_session(self, request,  log):
-        Meter('templated-emails-sent-by-type.subtitle-save-failure').inc()
         send_templated_email(
             settings.WIDGET_LOG_EMAIL,
             'Subtitle save failure',
@@ -765,7 +762,6 @@ class Rpc(BaseRpc):
 
         if new_version:
             video_changed_tasks.delay(language.video.id, new_version.id)
-            api_subtitles_edited.send(new_version)
         else:
             video_changed_tasks.delay(language.video.id)
             api_video_edited.send(language.video)
@@ -1060,11 +1056,6 @@ class Rpc(BaseRpc):
                     task.complete()
 
             task.new_subtitle_version.subtitle_language.release_writelock()
-
-            if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
-                api_subtitles_approved.send(task.new_subtitle_version)
-            elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
-                api_subtitles_rejected.send(task.new_subtitle_version)
 
             video_changed_tasks.delay(task.team_video.video_id)
         else:

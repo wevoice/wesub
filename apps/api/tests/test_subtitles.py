@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
 import json
 
 from django.http import Http404
@@ -27,6 +28,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 import babelsubs
 import mock
 
+from api.tests.utils import format_datetime_field
 from api.views.subtitles import (SubtitleLanguageSerializer,
                                  SubtitleLanguageViewSet,
                                  SubtitlesSerializer,
@@ -59,7 +61,7 @@ class SubtitleLanguageSerializerTest(TestCase):
         serializer_data = self.get_serializer_data()
         assert_equal(serializer_data['id'], self.language.id)
         assert_equal(serializer_data['created'],
-                     self.language.created.isoformat())
+                     format_datetime_field(self.language.created))
         assert_equal(serializer_data['is_original'], True)
         assert_equal(serializer_data['is_primary_audio_language'], True)
         assert_equal(serializer_data['is_rtl'], self.language.is_rtl())
@@ -159,6 +161,12 @@ class SubtitleLanguageSerializerTest(TestCase):
         serializer.is_valid(raise_exception=True)
         return serializer.save()
 
+    def run_update(self, language, data):
+        serializer = SubtitleLanguageSerializer(
+            instance=language, data=data, context=self.serializer_context)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
     def test_create(self):
         language = self.run_create({
             'language_code': 'es',
@@ -181,6 +189,12 @@ class SubtitleLanguageSerializerTest(TestCase):
         assert_equal(self.video.primary_audio_language_code, 'en')
         assert_equal(language.subtitles_complete, False)
 
+    def test_handle_capital_letters(self):
+        language = self.run_create({
+            'language_code': 'pt-BR',
+        })
+        assert_equal(language.language_code, 'pt-br')
+
     def test_try_recreate(self):
         language = SubtitleLanguageFactory(video=self.video,
                                            language_code='es')
@@ -194,7 +208,7 @@ class SubtitleLanguageSerializerTest(TestCase):
     def test_update(self):
         language = SubtitleLanguageFactory(video=self.video,
                                            language_code='es')
-        self.serializer.update(language, {
+        self.run_update(language, {
             'is_primary_audio_language': True,
             'subtitles_complete': True,
         })
@@ -206,7 +220,7 @@ class SubtitleLanguageSerializerTest(TestCase):
     def test_cant_change_language_code(self):
         language = SubtitleLanguageFactory(video=self.video,
                                            language_code='es')
-        self.serializer.update(language, {
+        self.run_update(language, {
             'language_code': 'fr',
         })
         assert_equal(language.language_code, 'es')
@@ -214,17 +228,18 @@ class SubtitleLanguageSerializerTest(TestCase):
     def test_deprecated_aliases(self):
         language = SubtitleLanguageFactory(video=self.video,
                                            language_code='es')
-        self.serializer.update(language, {
+        self.run_update(language, {
             'is_original': True,
             'is_complete': True,
         })
+        self.video = test_utils.reload_obj(self.video)
         assert_equal(self.video.primary_audio_language_code, 'es')
-        assert_equal(language.subtitles_complete, True)
+        assert_equal(test_utils.reload_obj(language).subtitles_complete, True)
 
     def test_runs_tasks(self):
         language = self.run_create({'language_code': 'es'})
         assert_equal(test_utils.video_changed_tasks.delay.call_count, 1)
-        self.serializer.update(language, {})
+        self.run_update(language, {})
         assert_equal(test_utils.video_changed_tasks.delay.call_count, 2)
 
     def test_language_code_read_only(self):
@@ -426,6 +441,15 @@ class SubtitlesSerializerTest(TestCase):
                 'subtitles': 'bad-dfxp-data',
             })
 
+    def test_subtitles_wrong_type(self):
+        with assert_raises(ValidationError):
+            self.run_create({
+                'sub_format': 'dfxp',
+                'subtitles': 123,
+                'title': 'test-title',
+                'description': 'test-description',
+            })
+
 class SubtitlesViewTest(TestCase):
     def setUp(self):
         self.video = VideoFactory()
@@ -550,3 +574,19 @@ class SubtitlesViewTest(TestCase):
         })
         assert_equal(test_utils.video_changed_tasks.delay.call_args,
                      mock.call(self.video.pk))
+
+    def test_invalid_video_id(self):
+        url = reverse('api:subtitles', kwargs={
+            'video_id': 'invalidvideoid',
+            'language_code': 'en',
+        })
+        response = self.client.get(url)
+        assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_invalid_language_code(self):
+        url = reverse('api:subtitles', kwargs={
+            'video_id': self.video.video_id,
+            'language_code': 'invalidlanguage',
+        })
+        response = self.client.get(url)
+        assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)

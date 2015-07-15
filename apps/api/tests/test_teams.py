@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
 from datetime import datetime, timedelta
 import time
 
@@ -26,6 +27,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 import factory
 import mock
 
+from api.tests.utils import format_datetime_field
 from auth.models import CustomUser as User
 from subtitles import pipeline
 from teams.models import Team, TeamMember, Task, Application
@@ -119,6 +121,10 @@ class TeamAPITest(TeamAPITestBase):
                      response.content)
         team = Team.objects.get(slug='test-team')
         self.check_team_data(response.data, team)
+        # check that we set the owner of the team to be the user who created
+        # it
+        assert_true(team.members.filter(role=TeamMember.ROLE_OWNER,
+                                        user=self.user).exists())
 
     def test_create_team_with_data(self):
         response = self.client.post(self.list_url, data={
@@ -408,8 +414,9 @@ class ProjectAPITest(TeamAPITestBase):
         assert_equal(data['slug'], project.slug)
         assert_equal(data['description'], project.description)
         assert_equal(data['guidelines'], project.guidelines)
-        assert_equal(data['created'], project.created.isoformat())
-        assert_equal(data['modified'], project.modified.isoformat())
+        assert_equal(data['created'], format_datetime_field(project.created))
+        assert_equal(data['modified'],
+                     format_datetime_field(project.modified))
         assert_equal(data['workflow_enabled'], project.workflow_enabled)
         assert_equal(data['resource_uri'],
                      reverse('api:projects-detail', kwargs={
@@ -570,7 +577,8 @@ class TasksAPITest(TeamAPITestBase):
             assert_equal(data['assignee'], None)
         assert_equal(data['priority'], task.priority)
         if task.completed:
-            assert_equal(data['completed'], task.completed.isoformat())
+            assert_equal(data['completed'],
+                         format_datetime_field(task.completed))
         else:
             assert_equal(data['completed'], None)
         assert_equal(data['approved'], task.get_approved_display())
@@ -597,8 +605,9 @@ class TasksAPITest(TeamAPITestBase):
         task_map = dict((t.id, t) for t in correct_tasks)
         response = self.client.get(self.list_url, params)
         assert_equal(response.status_code, status.HTTP_200_OK)
-        assert_items_equal([t['id'] for t in response.data], task_map.keys())
-        for task_data in response.data:
+        response_objects = response.data['objects']
+        assert_items_equal([t['id'] for t in response_objects], task_map.keys())
+        for task_data in response_objects:
             self.check_task_data(task_data, task_map[task_data['id']])
 
     def test_list(self):
@@ -729,7 +738,7 @@ class TasksAPITest(TeamAPITestBase):
         task_qs = self.team.task_set.all().order_by(order_param)
         response = self.client.get(self.list_url, {'order_by': order_param})
         assert_equal(response.status_code, status.HTTP_200_OK)
-        assert_equal([t['id'] for t in response.data],
+        assert_equal([t['id'] for t in response.data['objects']],
                      [t.id for t in task_qs])
 
     def test_order_by_filter(self):
@@ -996,9 +1005,11 @@ class TeamApplicationAPITest(TeamAPITestBase):
         assert_equal(data['note'], application.note)
         assert_equal(data['status'], application.get_status_display())
         assert_equal(data['id'], application.id)
-        assert_equal(data['created'], application.created.isoformat())
+        assert_equal(data['created'],
+                     format_datetime_field(application.created))
         if application.modified:
-            assert_equal(data['modified'], application.modified.isoformat())
+            assert_equal(data['modified'],
+                         format_datetime_field(application.modified))
         else:
             assert_equal(data['modified'], None)
         assert_equal(data['resource_uri'], self.detail_url(application))

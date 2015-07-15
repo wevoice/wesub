@@ -20,6 +20,7 @@
 """
 import os
 
+from django.dispatch import Signal
 from django.conf import settings
 from django.core.cache import cache
 from nose.plugins import Plugin
@@ -27,6 +28,9 @@ from nose.plugins import Plugin
 from utils.test_utils import monkeypatch
 from utils.test_utils import xvfb
 import optionalapps
+
+test_case_will_start = Signal()
+test_case_complete = Signal()
 
 class UnisubsTestPlugin(Plugin):
     name = 'Amara Test Plugin'
@@ -54,6 +58,7 @@ class UnisubsTestPlugin(Plugin):
 
     def begin(self):
         self.patcher.patch_functions()
+        test_case_will_start.send(self)
 
     def finalize(self, result):
         self.patcher.unpatch_functions()
@@ -62,6 +67,7 @@ class UnisubsTestPlugin(Plugin):
     def afterTest(self, test):
         self.patcher.reset_mocks()
         cache.clear()
+        test_case_complete.send(self)
 
     def wantDirectory(self, dirname):
         if dirname in self.directories_to_skip:
@@ -76,4 +82,3 @@ class UnisubsTestPlugin(Plugin):
             # same thing for optional app repos
             return True
         return None
-

@@ -17,19 +17,17 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from datetime import datetime
-from utils.metrics import Timer
 
 def update_metadata(video_pk):
     from videos.models import Video
-    with Timer('metadata-update-time'):
-        video = Video.objects.get(pk=video_pk)
-        video.edited = datetime.now()
-        video.save()
-        _update_is_public(video)
-        _update_is_was_subtitled(video)
-        _update_languages_count(video)
-        _update_complete_date(video)
-        _invalidate_cache(video)
+    video = Video.objects.get(pk=video_pk)
+    video.edited = datetime.now()
+    video.save()
+    _update_is_public(video)
+    _update_is_was_subtitled(video)
+    _update_languages_count(video)
+    _update_complete_date(video)
+    _invalidate_cache(video)
 
 def _update_is_was_subtitled(video):
     from subtitles.models import SubtitleLanguage

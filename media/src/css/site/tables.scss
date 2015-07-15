@@ -1,0 +1,64 @@
+table {
+    width: 100%;
+    margin-bottom: 1.5em;
+    border-spacing: 0 0;
+
+    th, td {
+        padding: 8px;
+        margin: 0;
+        border: none;
+        text-align: left;
+    }
+    th {
+        float: none;
+        border-bottom: 2px solid $lighter-gray;
+        font-weight: bold;
+    }
+    td {
+        border-bottom: 1px solid $lighter-gray;
+
+        &.actions {
+            text-align: right;
+        }
+    }
+    &.resync_table {
+        text-align: center;
+        th span.help-link {font-size: 0.8em;}
+    }
+    &.full-borders {
+        border: 1px solid $lighter-gray;
+        td, th {
+            border-left: 1px solid $lighter-gray;
+
+            &:first-of-type {
+                border-left: 0;
+            }
+        }
+        tr:last-of-type td {
+            border-bottom: 0;
+        }
+    }
+}
+
+table.key-value {
+    border-spacing: 0 0;
+    table-layout: fixed;
+    width: auto;
+
+    th, td {
+        border: none;
+        padding: 0;
+        vertical-align: top;
+
+        &:first-of-type {
+            padding-right: 20px;
+            &:after {
+                content: ":";
+            }
+        }
+
+        &.breakup {
+            word-wrap: break-word;
+        }
+    }
+}

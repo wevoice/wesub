@@ -5,8 +5,7 @@
     <p>{% trans "Watch the video and verify that the subtitles are correct. Click Approve when done, or Save Draft to finish later" %}<br>
     <a class="edit-metadata" href="#" ng-click="onEditTitleClicked($event)">{% trans "Edit title and description." %}</a>
     </p>
-    <p class="error" ng-show="!workflow.subtitleList.isComplete()">{% trans "Not all lines completed" %}</p>
-
+    {% include "editor/workflow-errors-review.html" %}
     <div class="actions">
         <button ng-repeat="action in actions" ng-disabled="!action.canPerform()" ng-class="action.class" ng-click="action.perform()">
             [[ action.label ]]

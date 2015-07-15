@@ -102,6 +102,13 @@ class TestCaseActivity(APILiveServerTestCase, WebdriverTestCase):
         r = self._get(user=self.user)
         self.assertEqual(10, r['meta']['total_count'])
 
+    def test_sub_language(self):
+        url = '/api/activity/?type=4'
+        r = self._get(url=url, user=self.user)
+        self.assertEqual('pt-br', r['objects'][1]['language'])
+        self.assertIn('pt-br', r['objects'][1]['language_url'])
+
+
     def test_video_query(self):
         """Query user activity for a video 
 
@@ -120,6 +127,7 @@ class TestCaseActivity(APILiveServerTestCase, WebdriverTestCase):
         self.logger.info(r)
         self.assertEqual(10, r['meta']['total_count'])
 
+
     def test_lang_query(self):
         """query activity by language
 
@@ -129,6 +137,20 @@ class TestCaseActivity(APILiveServerTestCase, WebdriverTestCase):
         self.logger.info(r)
         self.assertEqual(6, r['meta']['total_count'])
 
+
+    def test_team_lang_query(self):
+        """query activity by language
+
+        """
+        url = '/api/activity/?language=en&team=%s' % self.team.slug
+        r = self._get(url=url, user=self.member)
+        self.logger.info(r)
+        self.assertEqual(7, r['meta']['total_count'])
+
+        url = '/api/activity/?language=pt-br&team=%s' % self.team.slug
+        r = self._get(url=url, user=self.member)
+        self.logger.info(r)
+        self.assertEqual(3, r['meta']['total_count'])
     
     def test_rejected_query(self):
         """query team task reject version

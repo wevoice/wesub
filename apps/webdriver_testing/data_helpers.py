@@ -25,7 +25,7 @@ class DataHelpers(object):
         self.logger.info(url_part)
         if url_part.startswith('http'):
             return url_part
-        elif url_part.startswith('/api2/partners'):
+        elif url_part.startswith('/api'):
             return (base_url + url_part[1:])
         else:
             return (base_url + 'api2/partners/' + url_part)
@@ -40,36 +40,27 @@ class DataHelpers(object):
                     'X-apikey': api_user.get_api_key(),
                     'X-api-username': api_user.username,
                   }
+        if request_type == 'get':
+            del headers['Accept']
+        self.logger.info(headers)
+        r = getattr(s, request_type)(url, headers=headers, data=json.dumps(kwargs))
+        return r
+
+
+    def subs_request(self, api_user, request_type, url_part, **kwargs):
+        s = requests.session()
+        s.config['keep_alive'] = False
+        url = self.api_url(url_part)
+        headers = {
+                    'X-api-key': api_user.get_api_key(),
+                    'X-api-username': api_user.username,
+                  }
         r = getattr(s, request_type)(url, headers=headers, data=json.dumps(kwargs))
         return r
 
     def create_video(self, **kwargs):
         return VideoFactory(**kwargs)
            
-
-    def super_user(self):
-        superuser = UserFactory(is_partner=True, 
-                                is_staff=True, 
-                                is_superuser=True) 
-        auth = dict(username=superuser.username, password='password')
-        return auth
-
-
-    def upload_subs(self, user, **kwargs):
-        defaults = {'language_code': 'en',
-                    'draft': open('apps/webdriver_testing/subtitle_data/'
-                            'Timed_text.en.srt'),
-                    'complete': 1
-                    }
-        defaults.update(kwargs)
-        c = Client()
-        try:
-            c.login(username=user.username, password='password')
-        except:
-            c.login(**self.super_user())
-        response = c.post(reverse('videos:upload_subtitles'), defaults)
-        time.sleep(1)
-
     def add_subs(self, **kwargs):
         defaults = {
                     'language_code': 'en',

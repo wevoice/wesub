@@ -15,41 +15,46 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
+
 from django.conf.urls import patterns, url, include
 from rest_framework import routers
 
-from api import views
+from . import views
 
 router = routers.SimpleRouter()
-router.register(r'videos', views.VideoViewSet)
+router.register(r'videos', views.videos.VideoViewSetSwitcher)
 router.register(r'videos/(?P<video_id>[\w\d]+)/languages',
-                views.SubtitleLanguageViewSet, base_name='subtitle-language')
+                views.subtitles.SubtitleLanguageViewSetSwitcher,
+                base_name='subtitle-language')
 router.register(r'videos/(?P<video_id>[\w\d]+)/urls',
-                views.VideoURLViewSet, base_name='video-url')
-router.register(r'teams', views.TeamViewSet, base_name='teams')
+                views.videos.VideoURLViewSetSwitcher, base_name='video-url')
+router.register(r'teams', views.teams.TeamViewSet, base_name='teams')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/members',
-                views.TeamMemberViewSet, base_name='team-members')
+                views.teams.TeamMemberViewSet, base_name='team-members')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/safe-members',
-                views.SafeTeamMemberViewSet, base_name='safe-team-members')
+                views.teams.SafeTeamMemberViewSet, base_name='safe-team-members')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/projects',
-                views.ProjectViewSet, base_name='projects')
+                views.teams.ProjectViewSetSwitcher, base_name='projects')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/tasks',
-                views.TaskViewSet, base_name='tasks')
+                views.teams.TaskViewSetSwitcher, base_name='tasks')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/applications',
-                views.TeamApplicationViewSet, base_name='team-application')
-router.register(r'users', views.UserViewSet, base_name='users')
-router.register(r'activity', views.ActivityViewSet, base_name='activity')
+                views.teams.TeamApplicationViewSetSwitcher,
+                base_name='team-application')
+router.register(r'users', views.users.UserViewSet, base_name='users')
+router.register(r'activity', views.activity.ActivityViewSetSwitcher,
+                base_name='activity')
 
 urlpatterns = router.urls + patterns('',
     url(r'^videos/(?P<video_id>[\w\d]+)'
         '/languages/(?P<language_code>[\w-]+)/subtitles/$',
-        views.SubtitlesView.as_view(), name='subtitles'),
+        views.subtitles.SubtitlesView.as_view(), name='subtitles'),
     url(r'^videos/(?P<video_id>[\w\d]+)'
         '/languages/(?P<language_code>[\w-]+)/subtitles/actions/$',
-        views.Actions.as_view(), name='subtitle-actions'),
+        views.subtitles.Actions.as_view(), name='subtitle-actions'),
     url(r'^videos/(?P<video_id>[\w\d]+)'
         '/languages/(?P<language_code>[\w-]+)/subtitles/notes/$',
-        views.NotesList.as_view()),
-    url(r'^languages/$', views.languages, name='languages'),
-    url(r'^message/$', views.Messages.as_view(), name='messages'),
+        views.subtitles.NotesListSwitcher.as_view()),
+    url(r'^languages/$', views.languages.languages, name='languages'),
+    url(r'^message/$', views.messages.Messages.as_view(), name='messages'),
 )

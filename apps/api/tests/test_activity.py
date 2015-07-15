@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
 from datetime import datetime
 import time
 
@@ -24,6 +25,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient, APIRequestFactory
 
+from api.tests.utils import format_datetime_field
 from comments.models import Comment
 from subtitles import pipeline
 from utils.factories import *
@@ -65,7 +67,8 @@ class ActivityTestCase(TestCase):
 
     def check_activity_data(self, activity_data, activity):
         assert_equal(activity_data['type'], activity.action_type)
-        assert_equal(activity_data['created'], activity.created.isoformat())
+        assert_equal(activity_data['created'],
+                     format_datetime_field(activity.created))
         assert_equal(activity_data['new_video_title'],
                      activity.new_video_title)
         assert_equal(activity_data['id'], activity.id)
@@ -86,18 +89,18 @@ class ActivityTestCase(TestCase):
         else:
             assert_equal(activity_data['video'], None)
             assert_equal(activity_data['video_uri'], None)
-        if activity.language:
+        if activity.new_language:
             assert_equal(activity_data['language'],
-                         activity.language.language_code)
-            assert_equal(activity_data['language_uri'], reverse(
+                         activity.new_language.language_code)
+            assert_equal(activity_data['language_url'], reverse(
                 'api:subtitle-language-detail', kwargs={
-                    'video_id': activity.language.video.video_id,
-                    'language_code': activity.language.language_code,
+                    'video_id': activity.new_language.video.video_id,
+                    'language_code': activity.new_language.language_code,
                 }, request=APIRequestFactory().get('/'))
             )
         else:
             assert_equal(activity_data['language'], None)
-            assert_equal(activity_data['language_uri'], None)
+            assert_equal(activity_data['language_url'], None)
         if activity.user:
             assert_equal(activity_data['user'], activity.user.username)
         else:

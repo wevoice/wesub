@@ -20,12 +20,14 @@ import json
 
 from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
 from nose.tools import *
 
 from utils import test_utils
 from utils.subtitles import load_subtitles
 from externalsites import google
 
+@override_settings(YOUTUBE_API_KEY='test-youtube-api-key')
 class YouTubeTestCase(TestCase):
     def test_get_user_info(self):
         mocker = test_utils.RequestsMocker()
@@ -50,6 +52,63 @@ class YouTubeTestCase(TestCase):
         with mocker:
             user_info = google.get_youtube_user_info('test-access-token')
         self.assertEqual(user_info, ('test-channel-id', 'test-username'))
+
+    def test_get_uploaded_video_ids(self):
+        mocker = test_utils.RequestsMocker()
+        mocker.expect_request(
+            'get', 'https://www.googleapis.com/youtube/v3/channels', params={
+                'part': 'contentDetails',
+                'id': 'test-channel-id',
+                'key': 'test-youtube-api-key',
+            }, body=json.dumps({
+                'items': [
+                    {
+                        'contentDetails': {
+                            'relatedPlaylists': {
+                                'uploads': 'test-playlist-id',
+                            },
+                        },
+                    },
+                ]
+            })
+        )
+        mocker.expect_request(
+            'get', 'https://www.googleapis.com/youtube/v3/playlistItems', params={
+                'part': 'snippet',
+                'playlistId': 'test-playlist-id',
+                'key': 'test-youtube-api-key',
+            }, body=json.dumps({
+                'items': [
+                    {
+                        'snippet': {
+                            'resourceId': {
+                                'kind': u'youtube#video',
+                                'videoId': 'test-video-id1',
+                            }
+                        }
+                    },
+                    {
+                        'snippet': {
+                            'resourceId': {
+                                'kind': u'youtube#video',
+                                'videoId': 'test-video-id2',
+                            }
+                        }
+                    },
+                    {
+                        'snippet': {
+                            'resourceId': {
+                                'kind': u'youtube#something-else',
+                            }
+                        }
+                    },
+                ]
+            })
+        )
+        google.get_uploaded_video_ids.run_original_for_test()
+        with mocker:
+            video_ids = google.get_uploaded_video_ids('test-channel-id')
+        assert_equal(video_ids, [ 'test-video-id1', 'test-video-id2' ])
 
     def test_get_video_info(self):
         mocker = test_utils.RequestsMocker()
@@ -177,44 +236,3 @@ class TestTimeParsing(TestCase):
 
     def test_invalid(self):
         self.assertEqual(google._parse_8601_duration('foo'), None)
-
-class FetchSubtitleTest(TestCase):
-    def test_get_subtitled_languages(self):
-        mocker = test_utils.RequestsMocker()
-        mocker.expect_request(
-            'get',
-            'http://www.youtube.com/api/timedtext',
-            {'type': 'list', 'v': 'test-video-id' },
-            body="""\
-<?xml version="1.0" encoding="utf-8" ?>
-<transcript_list docid="-265835944167687750">
-    <track id="0" name="" lang_code="en" lang_original="English" lang_translated="English" lang_default="true"/>
-    <track id="1" name="" lang_code="fr" lang_original="French" lang_translated="French" lang_default="false"/>
-    <track id="2" name="" lang_code="ak" lang_original="Akana" lang_translated="Akana" lang_default="false"/>
-</transcript_list>"""
-        )
-        with mocker:
-            langs = google.get_subtitled_languages('test-video-id')
-        # check the return value.  Note that the bcp47 language code "ak"
-        # should not be converted to our internal representation
-        self.assertEqual(set(langs), set(['en', 'fr', 'ak']))
-
-    def test_get_subititles(self):
-        srt_data = """\
-1
-00:00:02,220 --> 00:00:06,220
-Line 1
-
-2
-00:00:50,000 --> 00:00:53,000
-Line 2
-"""
-        mocker = test_utils.RequestsMocker()
-        mocker.expect_request(
-            'get', 'http://www.youtube.com/api/timedtext',
-            { 'v': 'test-video-id', 'lang': 'en', 'fmt': 'srt' },
-            body=srt_data)
-        with mocker:
-            subs = google.get_subtitles('test-video-id', 'en')
-        self.assertEquals(subs.to_xml(),
-                          load_subtitles('en', srt_data, 'srt').to_xml())

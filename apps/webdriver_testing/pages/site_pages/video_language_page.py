@@ -19,7 +19,7 @@ class VideoLanguagePage(VideoPage):
     _VIEW_NOTICE = 'p.view-notice'
     _DRAFT_NOTICE = 'p.view-notice.draft'
     _NO_SUBS = 'p.empty'   
-
+    _TABS = 'ul.tabs li a'
  
     #DELETE SUBTITLE LANGUAGE
      
@@ -47,6 +47,11 @@ class VideoLanguagePage(VideoPage):
         self.logger.info('Opening revision {0} page for video: {1}'.format(
                          sl_sv, video_id))
         self.open_page(self._REV_URL.format(video_id, lang_code, sl_sv))
+
+    def open_sync_history(self):
+        tab_els = self.get_elements_list(self._TABS)
+        [el.click() for el in tab_els if el.text == 'Sync History']
+
 
     def edit_subtitles(self):
         self.logger.info('Clicking edit subtitles')
@@ -101,31 +106,15 @@ class VideoLanguagePage(VideoPage):
     def view_notice(self):
         return self.get_text_by_css(self._VIEW_NOTICE)
 
-
     def delete_subtitles_language_exists(self):
         return self.is_element_present(self._DELETE_SUBTITLE_LANGUAGE)
 
-    def dependent_langs(self):
-        lang_list = []
-        lang_els = self.get_elements_list(self._DEPENDENTS)
-        for el in lang_els:
-            lang_list.append(el.text)
-        return lang_list, lang_els
-
-
-    def delete_subtitle_language(self, languages=None):
+    def delete_subtitle_language(self):
         """Completely delete a subtitle language, and optional dependents.
 
         """
         self.click_by_css(self._DELETE_SUBTITLE_LANGUAGE)
         #check the boxes of the dependent languages to delete
-        if languages:
-            _, els = self.dependent_langs()
-            for el in els:
-                self.logger.info(el.text)
-                if el.text in languages:
-                    el.find_element_by_css_selector('input').click()
-        #type in the are you sure text
         self.type_by_css(self._CONFIRM_TEXT, 
                          'Yes I want to delete this language')
         self.submit_by_css(self._SUBMIT_DELETE)
@@ -148,3 +137,12 @@ class VideoLanguagePage(VideoPage):
         self.handle_js_alert('accept')
         return self.success_message_present('Rollback successful')
 
+    def visible_tabs(self):
+        tab_els = self.get_elements_list(self._TABS)
+        return [el.text for el in tab_els]
+
+    def has_resync(self):
+        return self.is_element_present('td.last input')
+
+    def not_linked(self):
+        return self.is_text_present('td:nth-child[2]', 'Syncing not configured')

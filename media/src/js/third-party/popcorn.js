@@ -1,5 +1,5 @@
 /*
- * popcorn.js version 8a40e8b
+ * popcorn.js version 9ab9c47
  * http://popcornjs.org
  *
  * Copyright 2011, Mozilla Foundation
@@ -102,7 +102,7 @@
   };
 
   //  Popcorn API version, automatically inserted via build system.
-  Popcorn.version = "8a40e8b";
+  Popcorn.version = "9ab9c47";
 
   //  Boolean flag allowing a client to determine if Popcorn can be supported
   Popcorn.isSupported = true;
@@ -3885,6 +3885,11 @@
 
     function onBuffering() {
       impl.networkState = self.NETWORK_LOADING;
+      var newDuration = player.getDuration();
+      if (impl.duration !== newDuration) {
+        impl.duration = newDuration;
+        self.dispatchEvent( "durationchange" );
+      }
       self.dispatchEvent( "waiting" );
     }
 
@@ -4028,46 +4033,29 @@
       // Set wmode to transparent to show video overlays
       playerVars.wmode = playerVars.wmode || "opaque";
 
-      // For HTML5 on Firefox, at least until flash is fixed in
-      // youtube API
-      if ( playerVars.html5 !== 0 )
+      if ( playerVars.html5 !== 0 ) {
         playerVars.html5 = 1;
+      }
 
       // Get video ID out of youtube url
       aSrc = regexYouTube.exec( aSrc )[ 1 ];
 
-      var xhrURL = "https://gdata.youtube.com/feeds/api/videos/" + aSrc + "?v=2&alt=jsonc&callback=?";
-      // Get duration value.
-      Popcorn.getJSONP( xhrURL, function( resp ) {
-
-        var warning = "failed to retreive duration data, reason: ";
-        if ( resp.error ) {
-          console.warn( warning + resp.error.message );
-          return ;
-        } else if ( !resp.data ) {
-          console.warn( warning + "no response data" );
-          return;
+      player = new YT.Player( elem, {
+        width: "100%",
+        height: "100%",
+        wmode: playerVars.wmode,
+        videoId: aSrc,
+        playerVars: playerVars,
+        events: {
+          'onReady': onPlayerReady,
+          'onError': onPlayerError,
+          'onStateChange': onPlayerStateChange
         }
-        impl.duration = resp.data.duration;
-        self.dispatchEvent( "durationchange" );
-
-        player = new YT.Player( elem, {
-          width: "100%",
-          height: "100%",
-          wmode: playerVars.wmode,
-          videoId: aSrc,
-          playerVars: playerVars,
-          events: {
-            'onReady': onPlayerReady,
-            'onError': onPlayerError,
-            'onStateChange': onPlayerStateChange
-          }
-        });
+      });
 
         impl.networkState = self.NETWORK_LOADING;
         self.dispatchEvent( "loadstart" );
         self.dispatchEvent( "progress" );
-      });
     }
 
     function monitorCurrentTime() {
@@ -4277,7 +4265,7 @@
 
       duration: {
         get: function() {
-          return impl.duration;
+            return player ? player.getDuration() : impl.duration;
         }
       },
 
@@ -4368,16 +4356,9 @@
 
               //throw fake DOMException/INDEX_SIZE_ERR
               throw "INDEX_SIZE_ERR: DOM Exception 1";
-            }
+            },
+            length: 1
           };
-
-          Object.defineProperties( timeRanges, {
-            length: {
-              get: function() {
-                return 1;
-              }
-            }
-          });
 
           return timeRanges;
         },
@@ -5571,7 +5552,7 @@
         loop: false,
         poster: EMPTY_STRING,
         // SC Volume values are 0-100, we remap to 0-1 in volume getter/setter
-        volume: 100,
+        volume: 1,
         muted: 0,
         currentTime: 0,
         duration: NaN,
@@ -5685,7 +5666,7 @@
             player.unbind( SC.Widget.Events.PAUSE );
 
             // Play/Pause cycle is done, restore volume and continue loading.
-            player.setVolume( 100 );
+            player.setVolume( 1 );
             player.bind( SC.Widget.Events.SEEK, function() {
               player.unbind( SC.Widget.Events.SEEK );
               onLoaded();
@@ -6153,17 +6134,12 @@
 
       volume: {
         get: function() {
-          // Remap from HTML5's 0-1 to SoundCloud's 0-100 range
-          var volume = getVolume();
-          return volume / 100;
+          return getVolume();
         },
         set: function( aValue ) {
           if( aValue < 0 || aValue > 1 ) {
             throw "Volume value must be between 0.0 and 1.0";
           }
-
-          // Remap from HTML5's 0-1 to SoundCloud's 0-100 range
-          aValue = aValue * 100;
           setVolume( aValue );
         }
       },
@@ -6249,7 +6225,7 @@
     if ( !jwLoaded ) {
       if ( !window.jwplayer ) {
         var tag = document.createElement( "script" );
-        
+
         tag.src = "https://jwpsrv.com/library/zaIF4JI9EeK2FSIACpYGxA.js";
         var firstScriptTag = document.getElementsByTagName( "script" )[ 0 ];
         firstScriptTag.parentNode.insertBefore( tag, firstScriptTag );
@@ -6315,14 +6291,17 @@
       mediaReadyCallbacks.unshift( callback );
     }
 
-    function onReady() {
-      // JWPlayer needs a play/pause to force ready state.
-      // However, the ready state does not happen until after the play/pause callbacks.
-      // So we put this inside a setTimeout to ensure we do this afterwards,
-      // thus, actually being ready.
-      setTimeout( function() {
-        impl.duration = player.getDuration();
+    function waitForMetaData(){
+      var duration = player.getDuration();
+      //JWPlayer sets the duration only after the video has started playing
+      //Hence, we assume that when duration is available all
+      //other metadata is also ready
+      if(duration == -1){
+        setTimeout(waitForMetaData, 0);
+      } else {
+        impl.duration = duration
         self.dispatchEvent( "durationchange" );
+        playerReady = true;
         impl.readyState = self.HAVE_METADATA;
         self.dispatchEvent( "loadedmetadata" );
         self.dispatchEvent( "loadeddata" );
@@ -6340,7 +6319,12 @@
         // We can't easily determine canplaythrough, but will send anyway.
         impl.readyState = self.HAVE_ENOUGH_DATA;
         self.dispatchEvent( "canplaythrough" );
-      }, 0 );
+      }
+    }
+
+    function onReady() {
+      // JWPlayer needs a play/pause to force ready state.
+      waitForMetaData();
     }
 
     // TODO: (maybe)
@@ -6456,12 +6440,21 @@
         destroyPlayer();
       }
 
-      jwplayer( parent.id ).setup({
-        file: aSrc,
+      var params = {
         width: "100%",
         height: "100%",
         controls: impl.controls
-      });
+      };
+
+      // Source can either be a single file or multiple files that represent
+      // different quality
+      if(typeof aSrc == "string"){
+        params["file"] = aSrc;
+      } else {
+        params["sources"] = aSrc;
+      }
+
+      jwplayer( parent.id ).setup(params);
 
       player = jwplayer( parent.id );
       player.onReady( onPlayerReady );
@@ -6751,16 +6744,9 @@
 
               //throw fake DOMException/INDEX_SIZE_ERR
               throw "INDEX_SIZE_ERR: DOM Exception 1";
-            }
+            },
+            length: 1
           };
-
-          Object.defineProperties( timeRanges, {
-            length: {
-              get: function() {
-                return 1;
-              }
-            }
-          });
 
           return timeRanges;
         }
@@ -7209,16 +7195,15 @@
         options.anchor.style.display = "none";
 
         // add the widget's div to the target div.
-        // if target is <video> or <audio>, create a container and routinely 
+        // if target is <video> or <audio>, create a container and routinely
         // update its size/position to be that of the media
         if ( target ) {
           if ( [ "VIDEO", "AUDIO" ].indexOf( target.nodeName ) > -1 ) {
             options.trackedContainer = trackMediaElement( target );
             options.trackedContainer.element.appendChild( options.anchor );
+          } else {
+            target.appendChild( options.anchor );
           }
-          else {
-            target && target.appendChild( options.anchor );
-          }          
         }
 
         img.addEventListener( "load", function() {

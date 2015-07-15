@@ -18,8 +18,8 @@
 
 (function(){
 
-    var API_BASE_PATH = '/api2/partners/teams/';
-    //               /api2/partners/teams/volunteer/tasks/1/
+    var API_BASE_PATH = '/api/teams/';
+
     var module = angular.module('amara.SubtitleEditor.services', []);
 
     function getUpdateTaskAPIUrl(taskId, teamSlug){

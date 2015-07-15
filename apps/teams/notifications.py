@@ -26,7 +26,6 @@ from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
 
 from utils import send_templated_email
-from utils.metrics import Meter
 from unilangs import LanguageCode
 from videos.models import Video
 
@@ -182,16 +181,12 @@ class BaseNotification(object):
                         'data_sent':data_sent,
                     })
 
-                Meter('http-callback-notification-error').inc()
-            else:
-                Meter('http-callback-notification-success').inc()
             return success, content
         except:
             logger.exception("Failed to send http notification ")
         return None, None
 
     def send_email(self, email_to):
-        Meter('templated-emails-sent-by-type.teams.team-video-activity').inc()
         send_templated_email(email_to,
                 _("New activity on your team video"),
                 "teams/emails/new-activity.html",

@@ -13,7 +13,6 @@ from webdriver_testing.data_factories import UserFactory
 import os
 import time
 
-@unittest.skip('slow')
 class TestCasePartialSync(WebdriverTestCase):
     """Tests for the Legacy Editor Subtitle Syncing editor page.
         
@@ -21,6 +20,7 @@ class TestCasePartialSync(WebdriverTestCase):
     NEW_BROWSER_PER_TEST_CASE = False
 
     @classmethod
+    @unittest.skip('slow')
     def setUpClass(cls):
         super(TestCasePartialSync, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
@@ -33,7 +33,7 @@ class TestCasePartialSync(WebdriverTestCase):
 
         td = {'video_url': ('http://www.youtube.com/watch?v=WqJineyEszo')
              }
-        cls.test_video = cls.data_utils.create_video(**td)
+        cls.test_video = VideoFactory(**td)
         cls.video_pg.open_video_page(cls.test_video.video_id)
         cls.video_pg.log_in(cls.user.username, 'password')
         cls.video_pg.set_skiphowto()

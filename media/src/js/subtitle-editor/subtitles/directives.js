@@ -44,8 +44,8 @@ var USER_IDLE_MINUTES = 15;
             var currentArrow = undefined;
             var wrapper = $(elem);
 
-            function getSubtitleTop(index) {
-                var li = $('li', subtitleList).eq(index);
+            function getSubtitleTop(subtitle) {
+                var li = scope.getSubtitleRepeatItem(subtitle);
                 var top = li.offset().top - wrapper.offset().top;
                 if(top < 0 || top + startHelper.height() >= wrapper.height()) {
                     return null;
@@ -53,18 +53,18 @@ var USER_IDLE_MINUTES = 15;
                 return top;
             }
 
-            var lastSyncStartIndex = null;
-            var lastSyncEndIndex = null;
+            var lastSyncStart = null;
+            var lastSyncEnd = null;
 
-            scope.positionSyncHelpers = function(startIndex, endIndex) {
-                if(startIndex === undefined) {
-                    startIndex = lastSyncStartIndex;
+            scope.positionSyncHelpers = function(startSub, endSub) {
+                if(startSub === undefined) {
+                    startSub = lastSyncStart;
                 }
-                if(endIndex === undefined) {
-                    endIndex = lastSyncEndIndex;
+                if(endSub === undefined) {
+                    endSub = lastSyncEnd;
                 }
-                lastSyncStartIndex = startIndex;
-                lastSyncEndIndex = endIndex;
+                lastSyncStart = startSub;
+                lastSyncEnd = endSub;
 
                 if(!scope.timelineShown || !VideoPlayer.isPlaying()) {
                     startHelper.hide();
@@ -73,11 +73,11 @@ var USER_IDLE_MINUTES = 15;
                 }
                 var startTop = null;
                 var endTop = null;
-                if(startIndex !== null) {
-                    startTop = getSubtitleTop(startIndex);
+                if(startSub !== null) {
+                    startTop = getSubtitleTop(startSub);
                 }
-                if(endIndex !== null) {
-                    endTop = getSubtitleTop(endIndex);
+                if(endSub !== null) {
+                    endTop = getSubtitleTop(endSub);
                 }
                 if(startTop !== null) {
                     startHelper.css('top', startTop + 'px');
@@ -254,12 +254,9 @@ var USER_IDLE_MINUTES = 15;
             templateLI.append('<span class="subtitle-text" />');
             if(!readOnly) {
 		templateLI.append('<span class="warning">!</span>');
-                templateLI.append(makeImageButton('remove-subtitle',
-                    'images/editor/remove-subtitle.gif'));
-                templateLI.append(makeImageButton('insert-subtitle',
-                    'images/editor/plus.gif'));
                 templateLI.append(
-                        '<button class="new-paragraph">&para;</button>');
+                    '<button class="new-paragraph">&para;</button>');
+		templateLI.append(makeSubtitleMenu());
             } else {
                 templateLI.append('<span class="new-paragraph">&para;</span>');
             }
@@ -305,13 +302,21 @@ var USER_IDLE_MINUTES = 15;
             subtitleList.addChangeCallback(onChange);
             reloadSubtitles();
 
-            function makeImageButton(cssClass, imageURLPath) {
-                var img = $('<img />');
-                img.prop('src', EditorData.staticURL + imageURLPath);
-                var button = $('<button />');
-                button.prop('class', cssClass);
-                button.append(img);
-                return button
+            function makeSubtitleMenu() {
+		var toolbox = $('<div />').prop('class', "sub-toolbox");
+		var icon = $('<a />');
+		icon.prop('href', '#');
+		icon.append($('<img />').prop('src', EditorData.staticURL + "images/subtitle-editor/glyphicons_halflings_135_wrench_light.png"));
+		var menu = $('<ul />').prop('class', "sub-toolbox-menu");
+		[["jump-to", "Seek to subtitle"],
+		 ["insert-top", "Insert subtitle above"],
+		 ["insert-down", "Insert subtitle below"],
+		 ["remove", "Delete subtitle"],
+		 ["note-time", "Start note for current time"]].forEach(function(data) {
+		    menu.append($('<li />').append($('<a />').prop('class', data[0]).prop('title', data[1])));
+		});
+		toolbox.append($('<div />').prop('class', "sub-toolbox-inside").append(icon).append(menu));
+		return toolbox;
             }
 
             function createLIForSubtitle(subtitle) {
@@ -324,7 +329,7 @@ var USER_IDLE_MINUTES = 15;
 
             function renderSubtitle(subtitle, elt) {
                 var content = subtitle.content();
-                var classes = [];
+                var classes = ["sub"];
 
                 if($scope.timeline.shownSubtitle === subtitle) {
                     classes.push('current-subtitle');
@@ -375,7 +380,20 @@ var USER_IDLE_MINUTES = 15;
                         }
                     } else if(node.tagName == 'LI') {
                         return 'edit';
-                    }
+                    } else if(node.tagName == 'A') {
+                        switch(node.className) {
+			case 'jump-to':
+			    return 'jump-to';
+			case 'insert-top':
+			    return 'insert-top';
+			case 'insert-down':
+			    return 'insert-down';
+			case 'remove':
+			    return 'remove';
+			case 'note-time':
+			    return 'note-time';
+			}
+		    }
                     node = node.parentNode;
                 }
                 return null;
@@ -393,6 +411,22 @@ var USER_IDLE_MINUTES = 15;
                         renderSubtitle(subtitle, subtitleMap[subtitle.id]);
                         break;
                     case 'insert':
+                        if(change.before !== null) {
+                            var node = subtitleMap[change.before.id];
+                            node.before(createLIForSubtitle(subtitle));
+                        } else {
+                            elm.append(createLIForSubtitle(subtitle));
+                        }
+                        break;
+                    case 'insert-top':
+                        if(change.before !== null) {
+                            var node = subtitleMap[change.before.id];
+                            node.before(createLIForSubtitle(subtitle));
+                        } else {
+                            elm.append(createLIForSubtitle(subtitle));
+                        }
+                        break;
+                    case 'insert-down':
                         if(change.before !== null) {
                             var node = subtitleMap[change.before.id];
                             node.before(createLIForSubtitle(subtitle));

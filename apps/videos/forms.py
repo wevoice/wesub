@@ -172,15 +172,10 @@ class VideoForm(forms.Form):
         self.created = created
         return obj
 
-youtube_user_url_re = re.compile(r'^(http://)?(www.)?youtube.com/user/(?P<username>[a-zA-Z0-9]+)/?.*$')
-
 class AddFromFeedForm(forms.Form, AjaxForm):
     VIDEOS_LIMIT = 10
 
-    youtube_feed_url_pattern =  'https://gdata.youtube.com/feeds/api/users/%s/uploads'
     usernames = UsernameListField(required=False, label=_(u'Youtube usernames'), help_text=_(u'Enter usernames separated by comma.'))
-    youtube_user_url = StripRegexField(youtube_user_url_re, required=False, label=_(u'Youtube page link.'),
-                                       help_text=_(u'For example: http://www.youtube.com/user/username'))
     feed_url = FeedURLField(required=False, help_text=_(u'We support: rss 2.0 media feeds including Youtube, Vimeo, Dailymotion, and more.'))
 
     def __init__(self, user, *args, **kwargs):
@@ -199,25 +194,6 @@ class AddFromFeedForm(forms.Form, AjaxForm):
             self.parse_feed_url(url)
 
         return url
-
-    def clean_youtube_user_url(self):
-        url = self.cleaned_data.get('youtube_user_url', '').strip()
-
-        if url:
-            username = youtube_user_url_re.match(url).groupdict()['username']
-            url = self.youtube_feed_url_pattern % str(username)
-            self.parse_feed_url(url)
-
-        return url
-
-    def clean_usernames(self):
-        usernames = self.cleaned_data.get('usernames', [])
-
-        for username in usernames:
-            url = self.youtube_feed_url_pattern % str(username)
-            self.parse_feed_url(url)
-
-        return usernames
 
     def parse_feed_url(self, url):
         feed_parser = FeedParser(url)

@@ -24,6 +24,7 @@ import logging
 from unilangs import LanguageCode
 
 from externalsites import google
+from externalsites.models import YouTubeAccount
 from subtitles.models import ORIGIN_IMPORTED
 from subtitles import pipeline
 from videos.models import VIDEO_TYPE_YOUTUBE
@@ -31,7 +32,12 @@ from videos.models import VIDEO_TYPE_YOUTUBE
 logger = logging.getLogger('externalsites.subfetch')
 
 def should_fetch_subs(video_url):
-    return video_url.type == VIDEO_TYPE_YOUTUBE
+    if video_url.type == VIDEO_TYPE_YOUTUBE:
+        return (YouTubeAccount.objects
+                .filter(channel_id=video_url.owner_username)
+                .exists())
+    else:
+        return False
 
 def fetch_subs(video_url):
     if video_url.type == VIDEO_TYPE_YOUTUBE:
@@ -41,14 +47,26 @@ def fetch_subs(video_url):
 
 def fetch_subs_youtube(video_url):
     video_id = video_url.videoid
+    channel_id = video_url.owner_username
+    if not channel_id:
+        logger.warn("fetch_subs() no username: %s", video_url.pk)
+        return
+    try:
+        account = YouTubeAccount.objects.get(channel_id=channel_id)
+    except YouTubeAccount.DoesNotExist:
+        logger.warn("fetch_subs() no youtube account for %s", channel_id)
+        return
+
     existing_langs = set(
         l.language_code for l in
         video_url.video.newsubtitlelanguage_set.having_versions()
     )
 
-    for language_code in google.get_subtitled_languages(video_id):
+    access_token = google.get_new_access_token(account.oauth_refresh_token)
+    captions_list = google.captions_list(access_token, video_id)
+    for caption_id, language_code, caption_name in captions_list:
         if language_code not in existing_langs:
-            subs = google.get_subtitles(video_id, language_code)
-            pipeline.add_subtitles(video_url.video, language_code.lower(), subs,
+            dfxp = google.captions_download(access_token, caption_id)
+            pipeline.add_subtitles(video_url.video, language_code, dfxp,
                                    note="From youtube", complete=True,
                                    origin=ORIGIN_IMPORTED)

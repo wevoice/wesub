@@ -1,0 +1,80 @@
+#team-welcome {
+    .banner {
+        padding-bottom: 20px;
+
+        ol {
+            margin: 40px 0;
+        }
+
+        li {
+            display: block;
+            float: left;
+            margin-right: 40px;
+            width: 33%;
+
+            &:last-of-type {
+                float: none;
+                width: auto;
+                margin-right: 0;
+            }
+        }
+
+        h4 {
+            text-align: center;
+        }
+
+        .icon {
+            text-align: center;
+            font-size: 80px;
+            line-height: 90px;
+        }
+    }
+
+    .video {
+        float: left;
+        margin-bottom: 20px;
+
+        &:first-of-type {
+            margin-right: 80px;
+        }
+    }
+}
+
+fieldset.assets>div {
+    float: left;
+    width: 50%;
+}
+
+#team-settings-integration {
+    fieldset {
+        margin-bottom: 40px;
+        border: 1px solid $light-gray;
+        padding: 10px;
+    }
+
+    fieldset.disabled .account-fields {
+        display: none;
+    }
+
+    .youtube-form {
+        padding-bottom: 10px;
+
+        .remove-button {
+            float: right;
+
+            button {
+                @include medium-button;
+                @include button-color($red);
+            }
+        }
+    }
+
+}
+
+table.team-stats {
+    margin-bottom: 80px;
+
+    tr.secondary th {
+        border-bottom-width: 1px;
+    }
+}

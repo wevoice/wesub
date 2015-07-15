@@ -46,17 +46,19 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
 
 
     def _upload_en_draft(self, video, subs, user, complete=False):
-        data = {'language_code': 'en',
-                     'video': video.pk,
-                     'primary_audio_language_code': 'en',
-                     'draft': open(subs),
-                     'complete': int(complete),
-                     'is_complete': complete,
-                    }
-        self.data_utils.upload_subs(user, **data)
+        data = {
+                'language_code': 'en',
+                'video': video,
+                'subtitles': subs,
+                'complete': complete,
+                'author': user,
+                'committer': user
+               }
+        self.data_utils.add_subs(**data)
+
 
     def _add_team_video(self):
-        video = self.data_utils.create_video()
+        video = VideoFactory(primary_audio_language_code='en')
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, video=video)
         return video, tv
 
@@ -128,7 +130,7 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(self.member.username, 'password')
         self.video_lang_pg.page_refresh()
-        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT,
+        self.assertEqual(self.video_lang_pg.EDIT_VIA_TASK_TEXT,
                          self.video_lang_pg.edit_subtitles_active())
 
 
@@ -265,20 +267,18 @@ class TestCaseApprovalWorkflowPostEdit(WebdriverTestCase):
 
     @classmethod
     def _upload_subs(cls, video, lc, user):
-        data = {'language_code': lc,
-                     'video': video.pk,
-                     'primary_audio_language_code': 'en',
-                     'draft': open('apps/webdriver_testing/subtitle_data/Timed_text.en.srt'),
-                     'complete': 1,
-                     'is_complete': True,
-                    }
-        if lc != 'en':
-            data['from_language_code'] = 'en'
-        cls.data_utils.upload_subs(user, **data)
+        data = {
+                'language_code': lc,
+                'video': video,
+                'complete': True,
+                'author': user,
+                'committer': user
+               }
+        cls.data_utils.add_subs(**data)
 
     @classmethod
     def _add_team_video(cls):
-        video = cls.data_utils.create_video()
+        video = VideoFactory(primary_audio_language_code='en')
         tv = TeamVideoFactory(team=cls.team, added_by=cls.admin, video=video)
         return video, tv
 
@@ -444,17 +444,18 @@ class TestCaseNoReviews(WebdriverTestCase):
 
 
     def _upload_en_draft(self, video, subs, user, complete=False):
-        data = {'language_code': 'en',
-                     'video': video.pk,
-                     'primary_audio_language_code': 'en',
-                     'draft': open(subs),
-                     'complete': int(complete),
-                     'is_complete': complete,
-                    }
-        self.data_utils.upload_subs(user, **data)
+        data = {
+                'language_code': 'en',
+                'video': video,
+                'subtitles': subs,
+                'complete': complete,
+                'author': user,
+                'committer': user
+               }
+        self.data_utils.add_subs(**data)
 
     def _add_team_video(self):
-        video = self.data_utils.create_video()
+        video = VideoFactory(primary_audio_language_code='en')
         tv = TeamVideoFactory(team=self.team, added_by=self.admin, video=video)
         return video, tv
 
@@ -562,7 +563,7 @@ class TestCaseNoReviewsPostEdit(WebdriverTestCase):
         cls.member2 = TeamMemberFactory(team=cls.team, 
                                         role=TeamMember.ROLE_CONTRIBUTOR).user
 
-        cls.video = VideoFactory()
+        cls.video = VideoFactory(primary_audio_language_code='en')
         cls.tv = TeamVideoFactory(team=cls.team, 
                                   video=cls.video)
         cls._upload_subs(cls.video, 'en', user=cls.member)
@@ -572,15 +573,14 @@ class TestCaseNoReviewsPostEdit(WebdriverTestCase):
 
     @classmethod
     def _upload_subs(cls, video, lc, user):
-        data = {'language_code': lc,
-                     'video': cls.video.pk,
-                     'primary_audio_language_code': 'en',
-                     'draft': open('apps/webdriver_testing/subtitle_data'
-                                   '/Timed_text.en.srt'),
-                     'complete': 1,
-                     'is_complete': True
-                    }
-        cls.data_utils.upload_subs(user, **data)
+        data = {
+                'language_code': lc,
+                'video': video,
+                'complete': True,
+                'author': user,
+                'committer': user
+               }
+        cls.data_utils.add_subs(**data)
 
     def test_admin_edit_permissions(self):
         """Edit Subtitles inactive for below admin permissions.
@@ -865,7 +865,7 @@ class TestCaseNoWorkflow(WebdriverTestCase):
                                translate_policy=20,
                                subtitle_policy=20,
                               )
-        cls.video = VideoFactory()
+        cls.video = VideoFactory(primary_audio_language_code='en')
         cls.tv = TeamVideoFactory(team=cls.team, 
                                   added_by=cls.admin, 
                                   video=cls.video)
@@ -876,15 +876,15 @@ class TestCaseNoWorkflow(WebdriverTestCase):
 
     @classmethod
     def _upload_subs(cls, video, lc, user):
-        data = {'language_code': lc,
-                     'video': cls.video.pk,
-                     'primary_audio_language_code': 'en',
-                     'draft': open('apps/webdriver_testing/subtitle_data'
-                                   '/Timed_text.en.srt'),
-                     'complete': 1,
-                     'is_complete': True
-                    }
-        cls.data_utils.upload_subs(user, **data)
+
+        data = {
+                'language_code': lc,
+                'video': video,
+                'complete': True,
+                'author': user,
+                'committer': user
+               }
+        cls.data_utils.add_subs(**data)
 
 
     def test_admin_edit_permissions(self):
@@ -1180,18 +1180,19 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
 
     @classmethod
     def _upload_en_draft(cls, video, subs, user, complete=False):
-        data = {'language_code': 'en',
-                     'video': video.pk,
-                     'primary_audio_language_code': 'en',
-                     'draft': open(subs),
-                     'complete': int(complete),
-                     'is_complete': complete,
-                    }
-        cls.data_utils.upload_subs(user, **data)
+        data = {
+                'language_code': 'en',
+                'video': video,
+                'subtitles': subs,
+                'complete': complete,
+                'author': user,
+                'committer': user
+               }
+        cls.data_utils.add_subs(**data)
 
     @classmethod
     def _add_team_video(cls):
-        video = cls.data_utils.create_video()
+        video = VideoFactory(primary_audio_language_code='en')
         tv = TeamVideoFactory(team=cls.team, added_by=cls.admin, video=video)
         return video, tv
 

@@ -20,8 +20,8 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 from django.core.exceptions import PermissionDenied
-from gdata.client import RequestError
 from nose.tools import *
+import mock
 
 from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import (BrightcoveAccount, YouTubeAccount,
@@ -305,143 +305,6 @@ class YoutubeAccountTest(TestCase):
         assert_equals(YouTubeAccount.objects.all().count(), 1)
         account = YouTubeAccount.objects.all().get()
         assert_equals(account.oauth_refresh_token, 'test-refresh-token2')
-
-class SyncRetryTest(TestCase):
-    @test_utils.patch_for_test('externalsites.syncing.youtube.update_subtitles')
-    def setUp(self, mock_update_subtitles):
-        self.mock_update_subtitles = mock_update_subtitles
-        self.account = YouTubeAccountFactory(user=UserFactory())
-        video = YouTubeVideoFactory()
-        self.vurl = video.get_primary_videourl_obj()
-        self.version = pipeline.add_subtitles(video, 'en', None)
-        self.language = self.version.subtitle_language
-
-    def check_retry_flag(self, error, correct_retry_value):
-        self.mock_update_subtitles.side_effect = error
-        self.account.update_subtitles(self.vurl, self.language)
-        qs = SyncHistory.objects.get_for_language(self.language)
-        last_sync_history = qs[0]
-        assert_equal(last_sync_history.retry, correct_retry_value)
-
-    def make_quota_error(self):
-        error = RequestError('Simulated Quota Error')
-        error.status = 403
-        error.body = "<?xmlversion='1.0'encoding='UTF-8'?><errors><error><domain>yt:quota</domain><code>too_many_recent_calls</code></error></errors>"
-        return error
-
-    def make_non_quota_error(self):
-        error = RequestError('Simulated Auth Error')
-        error.status = 403
-        error.body = "Authentication error"
-        return error
-
-    def test_set_retry_on_quota_error(self):
-        # If update_subtitles() results in a quota error, we should set the
-        # retry flag
-        self.check_retry_flag(self.make_quota_error(), True)
-
-    def test_dont_set_retry_on_other_error(self):
-        # If update_subtitles() results in a non-quota error, we shouldn't set
-        # retry
-        self.check_retry_flag(self.make_non_quota_error(), False)
-
-    def test_success_clears_retry(self):
-        # If update_subtitles() results in a success, we should clear any
-        # retry flags from previous history entries.
-        SyncHistory.objects.create_for_error(
-            self.make_quota_error(), account=self.account,
-            video_url=self.vurl, language=self.language,
-            version=self.version, action=SyncHistory.ACTION_UPDATE_SUBTITLES,
-            retry=True)
-        # simulate update_subtitles() running without error.  We should clear
-        # the retry flag from the prevous sync history entry
-        assert_true(SyncHistory.objects.filter(retry=True).exists())
-        self.mock_update_subtitles.side_effect = None
-        self.account.update_subtitles(self.vurl, self.language)
-        assert_false(SyncHistory.objects.filter(retry=True).exists())
-
-class YoutubeAccountFeedTest(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        self.user_account = YouTubeAccountFactory(channel_id='user-channel',
-                                                  user=self.user)
-
-        self.team = TeamFactory()
-        self.team_account = YouTubeAccountFactory(channel_id='team-channel',
-                                                  team=self.team)
-
-    def feed_url(self, account):
-        return ('https://gdata.youtube.com/'
-                'feeds/api/users/%s/uploads' % account.channel_id)
-
-    def check_create_feed(self, account):
-        account.create_feed()
-        self.assertEquals(account.import_feed.url, self.feed_url(account))
-        self.assertEquals(account.import_feed.user, account.user)
-        self.assertEquals(account.import_feed.team, account.team)
-
-    def test_create_feed_for_user(self):
-        self.check_create_feed(self.user_account)
-
-    def test_create_feed_for_team(self):
-        self.check_create_feed(self.team_account)
-
-    def test_create_feed_twice_raises_error(self):
-        self.user_account.create_feed()
-        self.assertRaises(ValueError, self.user_account.create_feed)
-
-    def test_existing_feed_for_user(self):
-        # if there already is an youtube feed created by the user, we should
-        # link it to the youtube account.
-
-        feed = VideoFeedFactory(url=self.feed_url(self.user_account),
-                                user=self.user)
-        self.user_account.create_feed()
-        self.assertEquals(self.user_account.import_feed.pk, feed.pk)
-
-    def test_existing_feed_for_other_user(self):
-        # if there already is an youtube feed created by a different user, we
-        # should raise an error
-        feed = VideoFeedFactory(url=self.feed_url(self.user_account),
-                                user=UserFactory())
-        self.assertRaises(ValueError, self.user_account.create_feed)
-
-    def test_existing_feed_for_team(self):
-        # if there already is an youtube feed created by the team, we should
-        # link it to the youtube account.
-        feed = VideoFeedFactory(url=self.feed_url(self.team_account),
-                                team=self.team)
-        self.team_account.create_feed()
-        self.assertEquals(self.team_account.import_feed.pk, feed.pk)
-
-    def test_existing_feed_for_other_team(self):
-        # if there already is an youtube feed created by a different team, we
-        # should raise an error
-        feed = VideoFeedFactory(url=self.feed_url(self.team_account),
-                                team=TeamFactory())
-        self.assertRaises(ValueError, self.team_account.create_feed)
-
-    @test_utils.patch_for_test('videos.tasks.update_video_feed')
-    def test_schedule_update_for_new_feed(self, mock_update_video_feed):
-        self.user_account.create_feed()
-        self.assertEquals(mock_update_video_feed.delay.call_count, 1)
-        mock_update_video_feed.delay.assert_called_with(
-            self.user_account.import_feed.id)
-
-    @test_utils.patch_for_test('videos.tasks.update_video_feed')
-    def test_no_update_for_existing_feeds(self, mock_update_video_feed):
-        feed = VideoFeedFactory(url=self.feed_url(self.user_account),
-                                user=self.user)
-        self.user_account.create_feed()
-        self.assertEquals(mock_update_video_feed.delay.call_count, 0)
-
-    def test_delete_feed_on_account_delete(self):
-        account = YouTubeAccountFactory(user=UserFactory(),
-                                        channel_id='test-channel-id')
-        account.create_feed()
-        self.assertEqual(VideoFeed.objects.count(), 1)
-        account.delete()
-        self.assertEqual(VideoFeed.objects.count(), 0)
 
 class DeleteAccountRelatedModelTest(TestCase):
     # Test that we delete our related objects when we delete our account.

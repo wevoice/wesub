@@ -155,7 +155,7 @@ Examples:
 Creating new subtitles
 ++++++++++++++++++++++
 
-.. http:get:: /api/videos/[video-id]/languages/[language-code]/subtitles/
+.. http:post:: /api/videos/[video-id]/languages/[language-code]/subtitles/
 
     :param video-id: Amara Video ID
     :param language-code: BCP-47 language code.  **deprecated:** you can also
@@ -252,9 +252,12 @@ from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
+from .apiswitcher import APISwitcherMixin
+from .videos import VideoMetadataSerializer
 from api.pagination import AmaraPaginationMixin
-from api.views.videos import VideoMetadataSerializer
+from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
 from videos.models import Video
 from subtitles import compat
 from subtitles import pipeline
@@ -311,8 +314,8 @@ class SubtitleLanguageListSerializer(serializers.ListSerializer):
 
 class SubtitleLanguageSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    created = serializers.DateTimeField(read_only=True)
-    language_code = serializers.CharField()
+    created = TimezoneAwareDateTimeField(read_only=True)
+    language_code = LanguageCodeField()
     is_primary_audio_language = serializers.BooleanField(required=False)
     is_rtl = serializers.BooleanField(read_only=True)
     is_translation = serializers.SerializerMethodField()
@@ -378,8 +381,16 @@ class SubtitleLanguageSerializer(serializers.Serializer):
             if approver:
                 data['approver'] = approver.username
 
+    def validate_language_code(self, language_code):
+        if (SubtitleLanguage.objects
+            .filter(video=self.context['video'],
+                    language_code=language_code)
+            .exists()):
+            raise serializers.ValidationError("Language already exists")
+        return language_code
+
     def create(self, validated_data):
-        language = SubtitleLanguage(
+        language = SubtitleLanguage.objects.create(
             video=self.context['video'],
             language_code=validated_data['language_code'])
         return self.update(language, validated_data)
@@ -387,10 +398,10 @@ class SubtitleLanguageSerializer(serializers.Serializer):
     def update(self, language, validated_data):
         subtitles_complete = validated_data.get(
             'subtitles_complete',
-            validated_data.get('is_complete', None))
+            self.initial_data.get('is_complete', None))
         primary_audio_language = validated_data.get(
             'is_primary_audio_language',
-            validated_data.get('is_original', None))
+            self.initial_data.get('is_original', None))
 
         video = self.context['video']
         if subtitles_complete is not None:
@@ -474,6 +485,10 @@ class VTTRenderer(SubtitleRenderer):
     media_type = 'text/vtt'
     format = 'vtt'
 
+class TextRenderer(SubtitleRenderer):
+    media_type = 'text/plain'
+    format = 'txt'
+
 class SubtitlesField(serializers.CharField):
     def __init__(self):
         super(SubtitlesField, self).__init__(style={
@@ -494,6 +509,8 @@ class SubtitlesField(serializers.CharField):
             return value
 
     def to_internal_value(self, value):
+        if not isinstance(value, basestring):
+            raise serializers.ValidationError("Invalid subtitle data")
         try:
             return load_subtitles(
                 self.context['language_code'], value,
@@ -599,18 +616,24 @@ class SubtitlesSerializer(serializers.Serializer):
 class SubtitlesView(generics.CreateAPIView):
     serializer_class = SubtitlesSerializer
     renderer_classes = views.APIView.renderer_classes + [
-        DFXPRenderer, SBVRenderer, SSARenderer, SRTRenderer, VTTRenderer
+        DFXPRenderer, SBVRenderer, SSARenderer, SRTRenderer, VTTRenderer,
+        TextRenderer,
     ]
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_video(self):
         if not hasattr(self, '_video'):
-            self._video = Video.objects.get(video_id=self.kwargs['video_id'])
+            try:
+                self._video = Video.objects.get(
+                    video_id=self.kwargs['video_id'])
+            except Video.DoesNotExist:
+                raise Http404
         return self._video
 
     def get_serializer_context(self):
         return {
             'video': self.get_video(),
-            'language_code': self.kwargs['language_code'],
+            'language_code': self.kwargs['language_code'].lower(),
             'user': self.request.user,
             'request': self.request,
             'sub_format': self.request.query_params.get('sub_format', 'json'),
@@ -695,7 +718,7 @@ class Actions(views.APIView):
 
 class NotesSerializer(serializers.Serializer):
     user = serializers.CharField(source='user.username', read_only=True)
-    created = serializers.DateTimeField(read_only=True)
+    created = TimezoneAwareDateTimeField(read_only=True)
     body = serializers.CharField()
 
     def create(self, validated_data):
@@ -723,3 +746,18 @@ class NotesList(generics.ListCreateAPIView):
             'editor_notes': self.editor_notes,
             'user': self.request.user,
         }
+
+class SubtitleLanguageViewSetSwitcher(APISwitcherMixin,
+                                      SubtitleLanguageViewSet):
+    switchover_date = 20150716
+
+    class Deprecated(SubtitleLanguageViewSet):
+        class serializer_class(SubtitleLanguageSerializer):
+            created = serializers.DateTimeField(read_only=True)
+
+class NotesListSwitcher(APISwitcherMixin, NotesList):
+    switchover_date = 20150716
+
+    class Deprecated(NotesList):
+        class serializer_class(NotesSerializer):
+            created = serializers.DateTimeField(read_only=True)

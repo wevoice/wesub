@@ -57,11 +57,12 @@ youtube_get_user_info = mock.Mock(return_value=test_video_info)
 youtube_get_new_access_token = mock.Mock(return_value='test-access-token')
 youtube_revoke_auth_token = mock.Mock()
 youtube_update_video_description = mock.Mock()
+youtube_get_uploaded_video_ids = mock.Mock(return_value=[])
 url_exists = mock.Mock(return_value=True)
 
 current_locks = set()
 acquire_lock = mock.Mock(
-    side_effect=lambda c, name: current_locks.add(name))
+    side_effect=lambda c, name, timeout=None: current_locks.add(name))
 release_lock = mock.Mock(
     side_effect=lambda c, name: current_locks.remove(name))
 invalidate_widget_video_cache = mock.Mock()
@@ -86,6 +87,8 @@ class MonkeyPatcher(object):
             ('externalsites.google.get_video_info', youtube_get_video_info),
             ('externalsites.google.get_youtube_user_info',
              youtube_get_user_info),
+            ('externalsites.google.get_uploaded_video_ids',
+             youtube_get_uploaded_video_ids),
             ('externalsites.google.get_new_access_token',
              youtube_get_new_access_token),
             ('externalsites.google.revoke_auth_token',

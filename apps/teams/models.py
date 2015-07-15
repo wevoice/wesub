@@ -52,11 +52,13 @@ from teams.permissions_const import (
 )
 from teams import tasks
 from teams import workflows
+from teams.signals import api_subtitles_approved, api_subtitles_rejected
 from utils import DEFAULT_PROTOCOL
 from utils import translation
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
+from utils.text import fmt
 from videos.models import (Video, VideoUrl, SubtitleVersion, SubtitleLanguage,
                            Action)
 from videos.tasks import video_changed_tasks
@@ -342,6 +344,27 @@ class Team(models.Model):
             sv = sv.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=since))
         return sv.exclude(author__username="anonymous").values_list('author', 'subtitle_language')
 
+    def get_default_message(self, name):
+        return fmt(Setting.MESSAGE_DEFAULTS.get(name, ''), team=self)
+
+    def get_messages(self, names):
+        """Fetch messages from the settings objects
+
+        This method fetches the messages assocated with names and interpolates
+        them to replace %(team)s with the team name.
+
+        Returns:
+            dict mapping names to message text
+        """
+        messages = {
+            name: self.get_default_message(name)
+            for name in names
+        }
+        for setting in self.settings.with_names(names):
+            if setting.data:
+                messages[setting.key_name] = setting.data
+        return messages
+
     def render_message(self, msg):
         """Return a string of HTML represention a team header for a notification.
 
@@ -507,23 +530,17 @@ class Team(models.Model):
             return False
         return self.is_member(user)
 
-    def fetch_video_actions(self, video_language=None,
-                            subtitle_language=None):
+    def fetch_video_actions(self, video_language=None):
         """Fetch the Action objects for this team's videos
 
         Args:
             video_language: only actions for videos with this
                             primary_audio_language_code
-            subtitle_language: only actions that have subtitles in these
-                               languages
         """
         video_q = TeamVideo.objects.filter(team=self).values_list('video_id')
         if video_language is not None:
             video_q = video_q.filter(
                 video__primary_audio_language_code=video_language)
-        if subtitle_language is not None:
-            video_q = video_q.filter(
-                video__newsubtitlelanguage_set__language_code=subtitle_language)
         return Action.objects.filter(video_id__in=video_q)
 
     # moderation
@@ -823,8 +840,10 @@ class Project(models.Model):
 
     def save(self, slug=None,*args, **kwargs):
         self.modified = datetime.datetime.now()
-        slug = slug if slug is not None else self.slug or self.name
-        self.slug = pan_slugify(slug)
+        if slug is not None:
+            self.slug = pan_slugify(slug)
+        elif not self.slug:
+            self.slug = pan_slugify(self.name)
         super(Project, self).save(*args, **kwargs)
 
     @property
@@ -2409,6 +2428,11 @@ class Task(models.Model):
         if self.assignee:
             sv.set_approved_by(self.assignee)
 
+        if approval:
+            api_subtitles_approved.send(sv)
+        else:
+            api_subtitles_rejected.send(sv)
+
         return task
 
     def _ensure_language_complete(self, subtitle_language):
@@ -2558,9 +2582,22 @@ class SettingManager(models.Manager):
 
     def messages_guidelines(self):
         """Return a QS of settings related to team messages or guidelines."""
-        keys = [key for key, name in Setting.KEY_CHOICES
-                if name.startswith('messages_') or name.startswith('guidelines_')]
-        return self.get_query_set().filter(key__in=keys)
+        return self.get_query_set().filter(key__in=Setting.MESSAGE_KEYS)
+
+    def with_names(self, names):
+        return self.filter(key__in=[Setting.KEY_IDS[name] for name in names])
+
+    def all_messages(self):
+        messages = {}
+        for key in Setting.MESSAGE_KEYS:
+            name = Setting.KEY_NAMES[key]
+            messages[name] = self.instance.get_default_message(name)
+        messages.update({
+            s.key_name: s.data
+            for s in self.messages_guidelines()
+            if s.data
+        })
+        return messages
 
 class Setting(models.Model):
     KEY_CHOICES = (
@@ -2584,10 +2621,20 @@ class Setting(models.Model):
         (308, 'block_reviewed_and_sent_back_message'),
         (309, 'block_approved_message'),
         (310, 'block_new_video_message'),
+        # 400 is for text displayed on web pages
+        (401, 'pagetext_welcome_heading'),
     )
     KEY_NAMES = dict(KEY_CHOICES)
     KEY_IDS = dict([choice[::-1] for choice in KEY_CHOICES])
 
+    MESSAGE_KEYS = [
+        key for key, name in KEY_CHOICES
+        if name.startswith('messages_') or name.startswith('guidelines_')
+        or name.startswith('pagetext_')
+    ]
+    MESSAGE_DEFAULTS = {
+        'pagetext_welcome_heading': _("Help %(team)s reach a world audience"),
+    }
     key = models.PositiveIntegerField(choices=KEY_CHOICES)
     data = models.TextField(blank=True)
     team = models.ForeignKey(Team, related_name='settings')

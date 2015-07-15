@@ -24,6 +24,7 @@ the MySQL GET_LOCK() statement.
 """
 
 import contextlib
+import time
 
 from django.db import connection
 
@@ -33,19 +34,24 @@ class LockBusy(StandardError):
 def _lock_name(name):
     return "amara.%s" % name
 
-def acquire_lock(cursor, name):
-    cursor.execute("SELECT GET_LOCK(%s, 0)", (_lock_name(name),))
-    rv = cursor.fetchone()[0]
-    if rv == 0:
-        raise LockBusy()
+def acquire_lock(cursor, name, timeout=None):
+    start_time = time.time()
+    while True:
+        cursor.execute("SELECT GET_LOCK(%s, 0)", (_lock_name(name),))
+        rv = cursor.fetchone()[0]
+        if rv != 0:
+            break
+        if timeout is None or time.time() >= start_time + timeout:
+            raise LockBusy()
+        time.sleep(0.1)
 
 def release_lock(cursor, name):
     cursor.execute("SELECT RELEASE_LOCK(%s)", (_lock_name(name),))
 
 @contextlib.contextmanager
-def lock(name):
+def lock(name, timeout=None):
     """Context manager that manages an app-wide lock."""
     cursor = connection.cursor()
-    acquire_lock(cursor, name)
+    acquire_lock(cursor, name, timeout=timeout)
     yield
     release_lock(cursor, name)

@@ -309,12 +309,23 @@ var angular = angular || null;
     }
 
     SubtitleList.prototype.needsAnyTranscribed = function() {
-        for(var i=0; i < this.length(); i++) {
+        var length = this.length();
+        for(var i=0; i < length; i++) {
             if(this.subtitles[i].markdown == '') {
-                return true;
+                return this.subtitles[i];
             }
         }
         return false;
+    }
+
+    SubtitleList.prototype.getSubtitleById = function(id) {
+        var length = this.length();
+        for(var i=0; i < length; i++) {
+            if(this.subtitles[i].id == id) {
+                return this.subtitles[i];
+            }
+        }
+        return undefined;
     }
 
     SubtitleList.prototype.needsAnySynced = function() {
@@ -325,6 +336,30 @@ var angular = angular || null;
         return (this.length() > 0 &&
                 !this.needsAnyTranscribed() &&
                 !this.needsAnySynced());
+    }
+
+    SubtitleList.prototype.firstInvalidTiming = function() {
+        var length = this.length();
+        for(var i=0; i < length; i++) {
+            if((this.subtitles[i].startTime < 0) ||
+	       (this.subtitles[i].endTime < 0)) {
+                return this.subtitles[i];
+            }
+        }
+        for(var i=0; i < length; i++) {
+            if(this.subtitles[i].startTime >= this.subtitles[i].endTime) {
+                return this.subtitles[i];
+            }
+        }
+	var startTimes = {};
+        for(var i=0; i < length; i++) {
+            if(startTimes[this.subtitles[i].startTime]) {
+                return this.subtitles[i];
+            } else {
+		startTimes[this.subtitles[i].startTime] = true;
+	    }
+        }
+	return undefined;
     }
 
     SubtitleList.prototype.toXMLString = function() {
@@ -407,6 +442,37 @@ var angular = angular || null;
 	return this.parser.startOfParagraph(subtitle.node);
     }
 
+    SubtitleList.prototype.computeTimingsForInsertion = function(firstStart, firstEnd, secondStart, secondEnd) {
+	var newSubtitleDuration = 3000;
+	var minSubtitleDuration = 1000;
+	var availableTime = secondEnd - firstStart;
+	if (secondStart - firstEnd > newSubtitleDuration) {
+	    var middle = firstStart + availableTime / 2;
+	    var newEnd = Math.min(middle + newSubtitleDuration / 2, secondStart);
+	    var newStart = newEnd - newSubtitleDuration;
+	    if (newStart < firstEnd) {
+		newStart = firstEnd;
+		newEnd = newStart + newSubtitleDuration;
+	    }
+	    return [firstStart, firstEnd,
+		    newStart, newEnd,
+		    secondStart, secondEnd];
+	} else if (secondStart - firstStart > 2 * minSubtitleDuration) {
+	    var newEnd = secondStart;
+	    var newStart = Math.max(newEnd - newSubtitleDuration, firstStart + minSubtitleDuration);
+	    if (newStart < firstEnd)
+		firstEnd = newStart;
+	    return [firstStart, firstEnd,
+		    newStart, newEnd,
+		    secondStart, secondEnd];
+	} else {
+	    newDuration = availableTime / 3;
+	    return [firstStart, firstStart + newDuration,
+		    firstStart + newDuration, firstStart + 2*newDuration,
+		    firstStart + 2*newDuration, secondEnd];
+	}
+    }
+
     SubtitleList.prototype.insertSubtitleBefore = function(otherSubtitle) {
         if(otherSubtitle !== null) {
             var pos = this.getIndex(otherSubtitle);
@@ -424,23 +490,27 @@ var angular = angular || null;
             // If we are inserting between 2 synced subtitles, then we can set the
             // time
             if(pos > 0) {
-                // Inserting a subtitle between two others.  Make it so each
-                // subtitle takes up 1/3 of the time available
-                var firstSubtitle = this.prevSubtitle(otherSubtitle);
-                var totalTime = otherSubtitle.endTime - firstSubtitle.startTime;
-                var durationSplit = Math.floor(totalTime / 3);
-                var startTime = firstSubtitle.startTime + durationSplit;
-                var endTime = startTime + durationSplit;
-                this._updateSubtitleTime(firstSubtitle, firstSubtitle.startTime,
-                        startTime);
-                this._updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
+                // Inserting a subtitle between two others.
+		var firstSubtitle = this.prevSubtitle(otherSubtitle);
+		var newTimings = this.computeTimingsForInsertion(
+		    firstSubtitle.startTime,
+		    firstSubtitle.endTime,
+		    otherSubtitle.startTime,
+		    otherSubtitle.endTime);
+                var startTime = newTimings[2];
+                var endTime = newTimings[3];
+		// Only second subtitle start time might change
+		// so needs to bre re-rendered
+                this._updateSubtitleTime(firstSubtitle, newTimings[0],
+                        newTimings[1]);
+                this.updateSubtitleTime(otherSubtitle, newTimings[4], newTimings[5]);
             } else {
                 // Inserting a subtitle as the start of the list.  position the
                 // subtitle to start at time=0 and take up half the space
                 // available to the two subtitles
                 var startTime = 0;
                 var endTime = Math.floor(otherSubtitle.endTime / 2);
-                this._updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
+                this.updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
             }
             attrs = {
                 begin: startTime,

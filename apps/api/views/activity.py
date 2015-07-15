@@ -43,7 +43,7 @@ List activity items:
     :>jsonarr video: ID of the video
     :>jsonarr video_uri: API URI for the video
     :>jsonarr language: language for the activity
-    :>jsonarr language_uri: API URI for the video language
+    :>jsonarr language_url: API URI for the video language
     :>jsonarr resource_uri: API URI for the activity
     :>jsonarr user: username of the user user associated with the activity,
         or null
@@ -52,6 +52,11 @@ List activity items:
         for other types
     :>jsonarr id: object id **(deprecated use resource_uri if you need to get
         details on a particular activity)**
+
+.. note::
+
+    If both team and video are given as GET params, then team will be used and
+    video will be ignored.
 
 Activity types:
 
@@ -87,7 +92,10 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.reverse import reverse
 
+from .apiswitcher import APISwitcherMixin
+from api.fields import TimezoneAwareDateTimeField
 from api.pagination import AmaraPaginationMixin
+from subtitles.models import SubtitleLanguage
 from teams.models import Team
 from videos.models import Action, Video
 
@@ -95,31 +103,33 @@ class ActivitySerializer(serializers.ModelSerializer):
     type = serializers.IntegerField(source='action_type')
     user = serializers.CharField(source='user.username')
     comment = serializers.CharField(source='comment.content')
+    created = TimezoneAwareDateTimeField(read_only=True)
     video = serializers.CharField(source='video.video_id')
     video_uri = serializers.HyperlinkedRelatedField(
         source='video',
         view_name='api:video-detail',
         lookup_field='video_id',
         read_only=True)
-    language_uri = serializers.SerializerMethodField()
+    language = serializers.CharField(source='new_language.language_code')
+    language_url = serializers.SerializerMethodField()
     resource_uri = serializers.HyperlinkedIdentityField(
         view_name='api:activity-detail',
         lookup_field='id',
     )
 
-    def get_language_uri(self, action):
-        if not action.language:
+    def get_language_url(self, action):
+        if not action.new_language:
             return None
-        return reverse('api:subtitle-language', kwargs={
-            'video_id': action.language.video.video_id,
-            'language_code': action.language.language_code,
+        return reverse('api:subtitle-language-detail', kwargs={
+            'video_id': action.new_language.video.video_id,
+            'language_code': action.new_language.language_code,
         }, request=self.context['request'])
 
     class Meta:
         model = Action
         fields = (
             'id', 'type', 'created', 'video', 'video_uri', 'language',
-            'language_uri', 'user', 'comment', 'new_video_title',
+            'language_url', 'user', 'comment', 'new_video_title',
             'resource_uri'
         )
 
@@ -129,6 +139,7 @@ class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
     paginate_by = 20
 
     def get_queryset(self):
+        self.applied_language_filter = False
         params = self.request.query_params
         if 'team' in params:
             try:
@@ -139,6 +150,15 @@ class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
                 raise PermissionDenied()
             if 'team-activity' in params:
                 qs = Action.objects.filter(team=team)
+            elif 'language' in params:
+                language_qs = (
+                    SubtitleLanguage.objects
+                    .filter(language_code=params['language'],
+                            video__teamvideo__team_id=team.id)
+                    .values_list('id')
+                )
+                qs = Action.objects.filter(new_language_id__in=language_qs)
+                self.applied_language_filter = True
             else:
                 qs = team.fetch_video_actions()
         elif 'video' in params:
@@ -160,9 +180,10 @@ class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
         params = self.request.query_params
         if 'type' in params:
             queryset = queryset.filter(action_type=params['type'])
-        if 'language' in params:
+        if 'language' in params and not self.applied_language_filter:
             queryset = queryset.filter(
                 new_language__language_code=params['language'])
+            self.applied_language_filter = True
         if 'before' in params:
             queryset = queryset.filter(
                 created__lt=datetime.fromtimestamp(int(params['before'])))
@@ -170,3 +191,11 @@ class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(
                 created__gte=datetime.fromtimestamp(int(params['after'])))
         return queryset
+
+
+class ActivityViewSetSwitcher(APISwitcherMixin, ActivityViewSet):
+    switchover_date = 20150728
+
+    class Deprecated(ActivityViewSet):
+        class serializer_class(ActivitySerializer):
+            created = serializers.DateTimeField(read_only=True)

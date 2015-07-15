@@ -20,18 +20,12 @@ from datetime import timedelta
 from settings import *
 from server_local_settings import *
 
-
 DEBUG = False
 
 ADMINS = (
-    ('Craig Zheng', 'craig@pculture.org'),
-    ('universalsubtitles-errors', 'universalsubtitles-errors@pculture.org')
 )
 
 if INSTALLATION == DEV:
-    ADMINS = (
-        ('Evan', 'ehazlett@pculture.org'),
-    )
     SITE_ID = 16
     SITE_NAME = 'unisubsdev'
     REDIS_DB = "3"
@@ -53,9 +47,6 @@ elif INSTALLATION == PRODUCTION:
     SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
     EMAIL_SUBJECT_PREFIX = '[usubs-production]'
     COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-    ADMINS = (
-      ('universalsubtitles-errors', 'universalsubtitles-errors@pculture.org'),
-    )
     # only send actual email on the production server
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 elif INSTALLATION == DEMO:
@@ -65,15 +56,14 @@ elif INSTALLATION == DEMO:
 elif INSTALLATION == LOCAL:
     SITE_ID = 14
     SITE_NAME = 'unisubsstaging'
-    ADMINS = (
-        ('Evan', 'ehazlett@pculture.org'),
-    )
 
 if INSTALLATION == STAGING or INSTALLATION == PRODUCTION or INSTALLATION == LOCAL:
     DATABASE_ROUTERS = ['routers.UnisubsRouter']
     AWS_STORAGE_BUCKET_NAME = DEFAULT_BUCKET
     COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
     SOLR_ROOT = '/usr/share/'
+
+TEMPLATE_DEBUG = DEBUG
 
 CELERYD_LOG_LEVEL = 'INFO'
 CELERY_REDIRECT_STDOUTS = True

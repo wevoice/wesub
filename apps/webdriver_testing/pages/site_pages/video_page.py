@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import time
+
 from webdriver_testing.pages.site_pages import UnisubsPage
 from urlparse import urlsplit
 
@@ -184,6 +186,7 @@ class VideoPage(UnisubsPage):
             self.click_by_css(self._SUBTITLES_OK)
         else:
             self.click_by_css(self._UNFOLLOW_ALL)
+        time.sleep(2)
 
     def subtitle_languages(self):
         langs = []

@@ -1,0 +1,121 @@
+nav {
+    @extend .content;
+
+    > a {
+        padding-top: 10px;
+        display: block;
+        float: left;
+    }
+
+    @include not-small-screen {
+        ul {
+            float: left;
+        }
+        ul.right {
+            float: right;
+        }
+    }
+
+
+    li {
+        display: block;
+        float: left;
+        position: relative;
+
+        a {
+            padding: 10px 15px;
+            display: block;
+        }
+    }
+
+
+    > ul > li:first-of-type > a {
+        margin-left: -10px;
+    }
+
+    @include small-screen {
+        ul {
+            display: none;
+        }
+        li {
+            float: none;
+
+            a {
+                padding: 10px 0;
+            }
+        }
+    }
+
+    button.menu-toggle-all {
+        background: $off-white;
+        border-color: $light-gray;
+        color: $medium-gray;
+        border-radius: 5px;
+        margin: 10px 0;
+        z-index: $z-index-menu;
+    }
+    .burger {
+        text-align: right;
+        @include not-small-screen {
+            display: none;
+        }
+    }
+}
+
+/* Submenus */
+@include not-small-screen {
+    nav a.menu-toggle:after {
+        content: " \25be";
+    }
+    nav a.menu-toggle.open:after {
+        content: " \25b4";
+    }
+
+    nav a.menu-toggle.open {
+        background: lighten($primary, 10);
+        color: $white !important;
+    }
+
+    nav ul ul {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 200px;
+        background: $off-white;
+        box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.3);
+        border: 1px solid $light-gray;
+        z-index: $z-index-menu;
+
+        li {
+            float: none;
+
+            a {
+                display: block;
+                padding: 6px 20px;
+            }
+
+            &.separator {
+                border-top: 1px solid $light-gray;
+            }
+        }
+
+        .count {
+            float: right;
+        }
+    }
+
+    nav ul.right ul {
+        left: auto;
+        right: 0;
+    }
+
+    #user-menu {
+        right: 0;
+    }
+}
+@include small-screen {
+    .menu-toggle {
+        display: none;
+    }
+}

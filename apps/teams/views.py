@@ -78,7 +78,6 @@ from teams.tasks import (
 from videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
-from utils.metrics import time as timefn
 from utils.objectlist import object_list
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
@@ -117,6 +116,10 @@ ALL_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 
 def get_team_for_view(slug, user, exclude_private=True):
+    if isinstance(slug, Team):
+        # hack to handle the new view code calling this page.  In that
+        # case it passes the team directly rather than the slug
+        return slug
     try:
         return Team.objects.for_user(user, exclude_private).get(slug=slug)
     except Team.DoesNotExist:
@@ -204,18 +207,17 @@ def create(request):
                     <li><a href="%(lang)s">Edit language preferences</a></li>
                     <li><a href="%(custom)s">Customize instructions to caption makers and translators</a></li>
                 </ul>"""),
-                edit=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
-                activate=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
+                edit=reverse("teams:settings_workflows", kwargs={"slug": team.slug}),
+                activate=reverse("teams:settings_workflows", kwargs={"slug": team.slug}),
                 create=reverse("teams:settings_projects", kwargs={"slug": team.slug}),
                 lang=reverse("teams:settings_languages", kwargs={"slug": team.slug}),
-                custom=reverse("teams:settings_guidelines", kwargs={"slug": team.slug}),
+                custom=reverse("teams:settings_messages", kwargs={"slug": team.slug}),
             ))
             return redirect(reverse("teams:settings_basic", kwargs={"slug":team.slug}))
     else:
         form = CreateTeamForm(request.user)
 
     return { 'form': form }
-
 
 # Settings
 def _delete_team(request, team):
@@ -264,10 +266,10 @@ def settings_basic(request, team):
 
     return { 'team': team, 'form': form, }
 
-@render_to('teams/settings-guidelines.html')
+@render_to('teams/settings-messages.html')
 @settings_page
-def settings_guidelines(request, team):
-    initial = dict((s.key_name, s.data) for s in team.settings.messages_guidelines())
+def settings_messages(request, team):
+    initial = team.settings.all_messages()
     if request.POST:
         form = GuidelinesMessagesForm(request.POST, initial=initial)
 
@@ -284,12 +286,8 @@ def settings_guidelines(request, team):
 
     return { 'team': team, 'form': form, }
 
-@settings_page
-def settings_permissions(request, team):
-    return team.new_workflow.workflow_settings_view(request, team)
-
-@render_to('teams/settings-permissions.html')
-def old_team_settings_permissions(request, team):
+@render_to('teams/settings-workflows.html')
+def old_team_settings_workflows(request, team):
     workflow = Workflow.get_for_target(team.id, 'team')
     moderated = team.moderates_videos()
 
@@ -439,7 +437,6 @@ def _get_videos_for_detail_page(team, user, query, project, language_code,
     return team.get_videos_for_languages_haystack(**kwargs)
 
 # Videos
-@timefn
 @render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
     team = get_team_for_view(slug, request.user)
@@ -559,7 +556,6 @@ def detail(request, slug, project_slug=None, languages=None):
                     record._team_video.completed_langs = record.video_completed_langs
     return extra_context
 
-@timefn
 @render_to('teams/move_videos.html')
 def move_videos(request, slug, project_slug=None, languages=None):
     team = get_team_for_view(slug, request.user)
@@ -921,111 +917,7 @@ class TableCell():
     def __repr__(self):
         return str(self.content)
 
-@login_required
-def statistics(request, slug, tab='teamstats'):
-    """For the team activity, statistics tabs
-    """
-    team = get_team_for_view(slug, request.user)
-    if tab == 'teamstats' and not can_view_stats_tab(team, request.user):
-        return HttpResponseForbidden("Not allowed")
-    cache_key = 'stats-' + slug + '-' + tab
-    cached_context = cache.get(cache_key)
-    if cached_context:
-        context = pickle.loads(cached_context)
-    else:
-        context = compute_statistics(team, stats_type=tab)
-        cache.set(cache_key, pickle.dumps(context), 60*60*24)
-    context['activity_tab'] = tab
-    context['team'] = team
-    return render(request, 'teams/statistics.html', context)
-
-def activity(request, slug, tab='videos'):
-    team = get_team_for_view(slug, request.user)
-
-    try:
-        page = int(request.GET['page'])
-    except (ValueError, KeyError):
-        page = 1
-
-    user = request.user if request.user.is_authenticated() else None
-    try:
-        member = team.members.get(user=user)
-    except TeamMember.DoesNotExist:
-        member = None
-
-    # This section is here to work around MySQL's poor decisions.
-    #
-    # Much like the Tasks page, this query performs extremely poorly when run
-    # normally.  So we split it into two parts here so that each will run fast.
-    if tab == 'team':
-        action_qs = Action.objects.filter(team=team)
-    else:
-        video_language = request.GET.get('video_language')
-        if video_language == 'any':
-            video_language = None
-        subtitles_language = request.GET.get('subtitles_language')
-        if subtitles_language == 'any':
-            subtitles_language = None
-        action_qs = team.fetch_video_actions(video_language,
-                                             subtitles_language)
-    end = page * ACTIONS_ON_PAGE
-    start = end - ACTIONS_ON_PAGE
-
-    if request.GET.get('action_type') and request.GET.get('action_type') != 'any':
-        action_qs = action_qs.filter(action_type = int(request.GET.get('action_type')))
-
-    action_qs = action_qs.select_related('new_language', 'video')
-
-    sort = request.GET.get('sort', '-created')
-    action_qs = action_qs.order_by(sort)
-
-    action_qs = action_qs[start:end].select_related(
-        'user', 'new_language__video'
-    )
-
-    activity_list = list(action_qs)
-    language_choices = None
-    if tab == 'videos':
-        readable_langs = TeamLanguagePreference.objects.get_readable(team)
-        language_choices = [(code, name) for code, name in get_language_choices()
-                            if code in readable_langs]
-    action_types = Action.TYPES_CATEGORIES[tab]
-
-    has_more = len(activity_list) >= ACTIONS_ON_PAGE
-
-    query = request.GET.get('q', '')
-
-    filtered = bool(set(request.GET.keys()).intersection([
-        'action_type', 'language', 'sort']))
-
-    context = {
-        'activity_list': activity_list,
-        'query': query,
-        'filtered': filtered,
-        'action_types': action_types,
-        'language_choices': language_choices,
-        'team': team,
-        'member': member,
-        'activity_tab': tab,
-        'next_page': page + 1,
-        'has_more': has_more
-    }
-    if not request.is_ajax():
-        return render(request, 'teams/activity.html', context)
-    else:
-        # for ajax requests we only want to return the activity list, since
-        # that's all that the JS code needs.
-        return render(request, 'teams/_activity-list.html', context)
-
-def team_activity(request, slug):
-    return activity(request, slug, tab='team')
-def teamstatistics_activity(request, slug):
-    return statistics(request, slug, tab='teamstats')
-def videosstatistics_activity(request, slug):
-    return statistics(request, slug, tab='videosstats')
-
 # Members
-@timefn
 @render_to('teams/members-list.html')
 def detail_members(request, slug, role=None):
     q = request.REQUEST.get('q')
@@ -1554,10 +1446,6 @@ def _get_task_filters(request):
              'assignee': request.GET.get('assignee'),
              'q': request.GET.get('q'), }
 
-def dashboard(request, slug):
-    team = get_team_for_view(slug, request.user, exclude_private=False)
-    return team.new_workflow.dashboard_view(request, team)
-
 @render_to('teams/dashboard.html')
 def old_dashboard(request, team):
     user = request.user if request.user.is_authenticated() else None
@@ -1666,7 +1554,6 @@ def old_dashboard(request, team):
 
     return context
 
-@timefn
 @render_to('teams/tasks.html')
 def team_tasks(request, slug, project_slug=None):
     team = get_team_for_view(slug, request.user)
@@ -2049,29 +1936,23 @@ def add_project(request, slug):
     team = get_team_for_view(slug, request.user)
 
     if request.POST:
-        form = ProjectForm(request.POST)
+        form = ProjectForm(team, request.POST)
         workflow_form = WorkflowForm(request.POST)
 
         if form.is_valid() and workflow_form.is_valid():
 
-            if team.project_set.filter(slug=pan_slugify(form.cleaned_data['name'])).exists():
-                messages.error(request, _(u"There's already a project with this name"))
-            else:
-                project = form.save(commit=False)
-                project.team = team
-                project.save()
+            project = form.save()
+            if project.workflow_enabled:
+                workflow = workflow_form.save(commit=False)
+                workflow.team = team
+                workflow.project = project
+                workflow.save()
 
-                if project.workflow_enabled:
-                    workflow = workflow_form.save(commit=False)
-                    workflow.team = team
-                    workflow.project = project
-                    workflow.save()
-
-                messages.success(request, _(u'Project added.'))
-                return HttpResponseRedirect(
-                        reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
+            messages.success(request, _(u'Project added.'))
+            return HttpResponseRedirect(
+                reverse('teams:settings_projects', args=(team.slug,)))
     else:
-        form = ProjectForm()
+        form = ProjectForm(team)
         workflow_form = WorkflowForm()
 
     return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
@@ -2081,7 +1962,7 @@ def add_project(request, slug):
 def edit_project(request, slug, project_slug):
     team = get_team_for_view(slug, request.user)
     project = Project.objects.get(slug=project_slug, team=team)
-    project_list_url = reverse('teams:settings_projects', args=[], kwargs={'slug': slug})
+    project_list_url = reverse('teams:settings_projects', args=[], kwargs={'slug': team.slug})
 
     if project.is_default_project:
         messages.error(request, _(u'You cannot edit that project.'))
@@ -2098,7 +1979,7 @@ def edit_project(request, slug, project_slug):
             messages.success(request, _(u'Project deleted.'))
             return HttpResponseRedirect(project_list_url)
         else:
-            form = ProjectForm(request.POST, instance=project)
+            form = ProjectForm(team, request.POST, instance=project)
             workflow_form = WorkflowForm(request.POST, instance=workflow)
 
             # if the project doesn't have workflow enabled, the workflow form
@@ -2117,7 +1998,7 @@ def edit_project(request, slug, project_slug):
                 return HttpResponseRedirect(project_list_url)
 
     else:
-        form = ProjectForm(instance=project)
+        form = ProjectForm(team, instance=project)
         workflow_form = WorkflowForm(instance=workflow)
 
     return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }

@@ -70,7 +70,7 @@ class TestCaseEdit(WebdriverTestCase):
         self.videos_tab.add_video(dup_url)
         self.assertEqual(self.videos_tab.error_message(), 
                          'This video already belongs to the %s team.' 
-                         % self.team.slug)
+                         % self.team.name)
 
 
     def test_add_private_team_duplicate(self):
@@ -107,7 +107,7 @@ class TestCaseEdit(WebdriverTestCase):
         self.videos_tab.add_video(dup_url)
         self.assertEqual(self.videos_tab.error_message(), 
                          'This video already belongs to the %s team.' 
-                         % self.team.slug)
+                         % self.team.name)
 
     def test_remove_site(self):
         """Remove video from team and site, total destruction!

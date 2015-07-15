@@ -78,13 +78,12 @@ from externalsites.models import can_sync_videourl, get_sync_account
 from utils import send_templated_email
 from utils.basexconverter import base62
 from utils.decorators import never_in_prod
-from utils.metrics import Meter
 from utils.objectlist import object_list
 from utils.rpc import RpcRouter
 from utils.text import fmt
 from utils.translation import get_user_languages_from_request
 
-from teams.permissions import can_edit_video, can_add_version, can_rollback_language
+from teams.permissions import can_edit_video, can_add_version, can_rollback_language, can_resync
 from . import video_size
 
 rpc_router = RpcRouter('videos:rpc_router', {
@@ -209,7 +208,6 @@ def create(request):
     context = {
         'video_form': video_form,
         'initial_url': request.GET.get('initial_url'),
-        'feed_form': AddFromFeedForm(request.user)
     }
     if video_form.is_valid():
         try:
@@ -237,22 +235,6 @@ def create(request):
                               context_instance=RequestContext(request))
 
 create.csrf_exempt = True
-
-def create_from_feed(request):
-    form = AddFromFeedForm(request.user, request.POST or None)
-    if form.is_valid():
-        form.save()
-        messages.success(request, form.success_message())
-        return redirect('videos:create')
-    context = {
-        'video_form': VideoForm(),
-        'feed_form': form,
-        'from_feed': True
-    }
-    return render_to_response('videos/create.html', context,
-                              context_instance=RequestContext(request))
-
-create_from_feed.csrf_exempt = True
 
 def shortlink(request, encoded_pk):
     pk = base62.to_decimal(encoded_pk)
@@ -660,6 +642,7 @@ class LanguagePageContextSyncHistory(LanguagePageContext):
             synced_versions.append({
                 'video_url': video_url,
                 'version': version,
+                'syncable': get_sync_account(video, video_url),
             })
         self['synced_versions'] = synced_versions
 
@@ -671,7 +654,7 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
     elif tab == 'comments':
         ContextClass = LanguagePageContextComments
     elif tab == 'sync-history':
-        if not request.user.is_staff:
+        if not permissions.can_user_resync(video, request.user):
             return redirect_to_login(request.build_absolute_uri())
         ContextClass = LanguagePageContextSyncHistory
     else:
@@ -864,7 +847,6 @@ def video_url_create(request):
                 'domain': Site.objects.get_current().domain,
                 'hash': user.hash_for_video(video.video_id)
             }
-            Meter('templated-emails-sent-by-type.videos.video-url-added').inc()
             send_templated_email(user, subject,
                                  'videos/email_video_url_add.html',
                                  context, fail_silently=not settings.DEBUG)

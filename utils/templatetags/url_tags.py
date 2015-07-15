@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2013 Participatory Culture Foundation
+# Copyright (C) 2015 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,14 +15,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-from datetime import timedelta
 
-from celery.decorators import task
 
-from comments.models import Comment
-from utils.metrics import Gauge
+from urlparse import urlparse
+from django import template
 
-@task
-def gauge_comments():
-    Gauge('comments.Comment').report(Comment.objects.count())
+register = template.Library()
 
+@register.filter
+def url_host(url):
+    try:
+        parsed = urlparse(url)
+    except StandardError:
+        return url
+    else:
+        return parsed.netloc

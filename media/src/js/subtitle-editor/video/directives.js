@@ -119,6 +119,27 @@ var angular = angular || null;
             $scope.$watch('videoState.currentTime', drawBar);
             $scope.$watch('videoState.duration', drawBar);
 
+            $scope.$root.$on('jump-to-subtitle', function(evt, subtitle) {
+		if(subtitle.isSynced())
+                    VideoPlayer.seek(subtitle.startTime);
+	    });
+
+            $scope.$root.$on('jump-to-time', function(evt, displayTime) {
+		var time = 0;
+		var cents = displayTime.split('.');
+		if (cents.length == 2) {
+		    time += parseInt(cents[1]);
+		    var seconds = cents[0].split(':');
+		    if (seconds.length > 1) {
+			var s = 0;
+			for (var i = 0 ; i < seconds.length ; i++)
+			    s += parseInt(seconds[i]) * Math.pow(60, seconds.length -1 - i);
+			time += 100*s;
+			VideoPlayer.seek(time * 10);
+		    }
+		}
+	    });
+
             function setProgressFromPageX(pageX) {
                 if($scope.videoState.duration === null) {
                     return;

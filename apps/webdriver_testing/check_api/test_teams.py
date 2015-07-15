@@ -5,7 +5,6 @@ from caching.tests.utils import assert_invalidates_model_cache
 from videos.models import *
 from utils.factories import *
 from webdriver_testing.data_factories import ApplicationFactory
-from subtitles import pipeline
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from webdriver_testing.pages.site_pages.teams import members_tab
@@ -64,7 +63,7 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         data = {
             'name': 'API TEAM',
             'description': 'new team created via the api',
-            'slug': 'api-created-team' 
+            'slug': 'api-created-team1' 
             } 
 
         r = self._post(data=data, user=self.user)
@@ -78,7 +77,7 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         data = {
             'name': 'API TEAM',
             'description': 'new team created via the api',
-            'slug': 'api-created-team' 
+            'slug': 'api-created-team2' 
             } 
 
         r = self._post(data=data, user=self.staff)
@@ -89,17 +88,21 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         """ is_partner required to create a team via the api
 
         """
-        partner_user = UserFactory.create(username = 'team_creator', is_partner = True)
-        
         data = {
-                'name': 'API V2 TEAM',
+                'name': 'API TEAM',
                 'description': 'new team created via the api',
-                'slug': 'api-created-team' 
+                'slug': 'api-created-team3' 
                 } 
 
         r = self._post(data=data, user=self.partner)
+        self.logger.info(r)
         for k, v in data.iteritems():
             self.assertEqual(v, r[k])
+        url = '/api/teams/%s/members/' % r['slug']
+        r = self._get(url, self.partner)
+        self.logger.info(r)
+        self.assertIn(self.partner.username, r['objects'][0]['username'])
+        self.assertIn('owner', r['objects'][0]['role'])
 
     def test_list(self):
         """User can get public teams + their private teams
@@ -440,17 +443,19 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         member = UserFactory()
         team = TeamFactory(admin=admin,
                            member=member)
-        project = ProjectFactory.create(team=team, 
+        project1 = ProjectFactory(team=team, 
                        description='initial team project',
                        guidelines='these are guidelines')
-        url = '/api/teams/{0}/projects/{1}/'.format(team.slug, project.slug)
+        url = '/api/teams/{0}/projects/{1}/'.format(team.slug, project1.slug)
         data = {
             'description': 'updated description' 
             } 
         r = self._put(url=url, data=data, user=admin)
+        self.logger.info(r)
         self.team_pg.open_page('/')
         self.team_pg.log_in(admin.username, 'password')
-        self.team_pg.open_page("/teams/{0}/settings/projects/{1}".format(team.slug, project.slug))
+        self.team_pg.open_page("/teams/{0}/settings/projects/{1}/edit/".format(team.slug, project1.slug))
+        
         self.assertTrue(self.team_pg.is_text_present("textarea", data['description']))
 
     def test_project_delete(self):
@@ -511,7 +516,7 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         r = self._get(url=url, user=admin)
         members_url = "/api/teams/%s/members/" % team.slug
         r = self._get(url=members_url, user=admin)
-        self.assertIn(user, [member['username'] for member in r])
+        self.assertIn(user, [member['username'] for member in r['objects']])
         #Query for a specific user
         query_url = url + '?user=%s' % user
         r = self._get(url=query_url, user=admin)

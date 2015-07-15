@@ -43,7 +43,8 @@ var angular = angular || null;
                 return true;
             },
             subtitlesComplete: function() {
-                return $scope.workingSubtitles.subtitleList.isComplete();
+                return ($scope.workingSubtitles.subtitleList.isComplete() &&
+			($scope.workingSubtitles.subtitleList.firstInvalidTiming() == undefined));
             },
         };
     }]);
@@ -96,6 +97,11 @@ var angular = angular || null;
                         'discardChangesAndOpenLegacyEditor': $scope.exitToLegacyEditor
                     });
                 }
+            },
+            allowSaveDraft: function() {
+                return _.any(EditorData.actions, function(action) {
+                    return action.name == 'save-draft';
+                });
             },
             saveDraft: function() {
                 var msg = $sce.trustAsHtml('Saving&hellip;');

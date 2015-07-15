@@ -30,22 +30,13 @@
             {% endif %}
             joined Amara on {{ user_info.date_joined|date:"DATE_FORMAT" }}
         </p>
-        {% with user_info.get_languages as langs %}
+        {% with user_info.get_language_names as langs %}
             <h3>{% trans "Languages" %}</h3>
             {% if langs %}
                 <ul class="user-languages">
                     {% for l in langs %}
                         <li>
-                            <span class="language">{{ l.get_language_display }}</span>
-                            {% comment %}
-                                No way to set this anymore and it's not used at all.
-
-                                {% if l.language == user_info.preferred_language and langs.count > 1 %}
-                                    <span class="preferred">
-                                        <span>Preferred</span>
-                                    </span>
-                                {% endif %}
-                            {% endcomment %}
+                            <span class="language">{{ l }}</span>
                         </li>
                     {% endfor %}
                 </ul>

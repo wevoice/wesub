@@ -1093,14 +1093,15 @@ class TestCaseRollbackRevision(WebdriverTestCase):
 
 
     def _upload_en_draft(self, video, subs, user, complete=False):
-        data = {'language_code': 'en',
-                     'video': video.pk,
-                     'primary_audio_language_code': 'en',
-                     'draft': open(subs),
-                     'complete': int(complete),
-                     'is_complete': complete,
+        data = {
+                'language_code': 'en',
+                'video': video,
+                'subtitles': subs,
+                'complete': complete,
+                'author': user,
+                'committer': user
                     }
-        self.data_utils.upload_subs(user, **data)
+        self.data_utils.add_subs(**data)
 
 
     def tearDown(self):

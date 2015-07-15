@@ -1,0 +1,90 @@
+%body-font {
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
+}
+
+%header-font {
+    font-family: "Merriweather", "Helvetica Neue", "Roboto", Helvetica, Arial, "Liberation Sans", sans-serif;
+}
+
+$line-height: 2.2rem;
+$default-font-size: 1.4rem;
+$small-font-size: 1.2rem;
+$large-font-size: 1.6rem;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+
+html {
+    // Make the root font size 10px by default, for easy sizing with rems
+    font-size: 62.5%;
+}
+
+body, input, textarea, select {
+    @extend %body-font;
+    font-size: $default-font-size;
+    line-height: $line-height;
+    font-weight: $font-weight-normal;
+    color: $dark-gray;
+}
+
+p {
+    margin: 0;
+    padding: 0 0 $line-height/2 0;
+}
+
+strong {
+    font-weight: $font-weight-bold;
+}
+
+h1, h2, {
+    @extend %header-font;
+    padding: 0 0 0.5em 0;
+    margin: 0;
+}
+
+h3, h4, h5, h6 {
+    padding: 0 0 0.5em 0;
+    margin: 0;
+}
+
+h1 {
+    font-size: 4rem;
+    line-height: 4.5rem;
+}
+
+h2 {
+    font-size: 2.4rem;
+    line-height: 2.8rem;
+}
+
+h3 {
+    font-size: 2.0rem;
+    line-height: 2.4rem;
+}
+
+h4 {
+    font-size: 2.0rem;
+    font-weight: bold;
+}
+
+h5 {
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+h6 {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    p {
+        @extend %body-font;
+        font-size: $default-font-size;
+        line-height: $line-height;
+        font-weight: $font-weight-normal;
+    }
+}
+
+.empty {
+    font-style: italic;
+}

@@ -37,8 +37,11 @@ in multiple places.
 3e) The notification class fires the notification
 """
 
+import logging
+
 from django import dispatch
 
+logger = logging.getLogger(__name__)
 
 def _teams_to_notify(video):
     """
@@ -56,6 +59,7 @@ def _execute_video_task(video, event_name):
     from teams import tasks as team_tasks
     from teams.models import  TeamVideo
     from django.db.models import Q
+    logger.info("notification: %s (video: %s)", event_name, video)
     tvs =  list(TeamVideo.objects.filter(
         Q(team__notification_settings__isnull=False) |
         Q(team__partner__notification_settings__isnull=False),
@@ -68,6 +72,7 @@ def _execute_video_task(video, event_name):
     
 def _execute_language_task(language, event_name):
     from teams import tasks as team_tasks
+    logger.info("notification: %s (language: %s)", event_name, language)
     video = language.video
     teams = _teams_to_notify(video)
     for team in teams:
@@ -78,6 +83,7 @@ def _execute_language_task(language, event_name):
  
 def _execute_version_task(version, event_name):
     from teams import tasks as team_tasks
+    logger.info("notification: %s (version: %s)", event_name, version)
     video = version.video
     teams = _teams_to_notify(video)
     for team in teams:

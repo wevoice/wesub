@@ -54,6 +54,19 @@ class TestCaseUsers(APILiveServerTestCase, WebdriverTestCase):
         self.assertEqual(user.first_name, r['first_name'])
         self.assertEqual(user.last_name, r['last_name'])
 
+
+    def test_get_username_with_space(self):
+        """get user info"""
+        user  = UserFactory()
+        user.username='janet finn'
+        user.save()
+        url = '/api/users/%s/' % user.username
+        r = self._get(url)
+        self.logger.info(r)
+        self.assertEqual(user.username, r['username'])
+        self.assertEqual(user.first_name, r['first_name'])
+        self.assertEqual(user.last_name, r['last_name'])
+
     def test_create_username_chars(self):
         """Create a user via the api.
 
@@ -153,5 +166,17 @@ class TestCaseUsers(APILiveServerTestCase, WebdriverTestCase):
         r = self._post(data=data)
         self.assertEqual([u'Username not unique: imaunique@user.com'], r)
 
+
+    def test_unique_user_24chars(self):
+        """Create unique user length limited to 24 chars
+
+        """
+        data = {'username':'newuserwith30chars@example.com',
+                'email': 'newuserwith30chars@example.com',
+                'password': 'password',
+                'find_unique_username': True
+                    }
+        r = self._post(data=data)
+        self.assertEqual(r, {u'non_field_errors': [u'Username too long: newuserwith30chars@example.com']})
 
 

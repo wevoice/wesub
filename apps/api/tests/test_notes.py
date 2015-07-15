@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
 import json
 
 from django.test import TestCase
@@ -22,6 +23,7 @@ from nose.tools import *
 from rest_framework.test import APIClient
 import mock
 
+from api.tests.utils import format_datetime_field
 from subtitles import workflows
 from subtitles.models import SubtitleNote
 from utils import test_utils
@@ -54,7 +56,7 @@ class TestActionsAPI(TestCase):
             {
                 'user': self.user.username,
                 'body': 'test note',
-                'created': note.created.isoformat(),
+                'created': format_datetime_field(note.created),
             }
         ])
 

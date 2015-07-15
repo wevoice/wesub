@@ -20,6 +20,7 @@ import json
 
 import babelsubs
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, Http404
@@ -60,6 +61,7 @@ def _version_data(version):
         'description': version.description,
     }
 
+@require_POST
 def regain_lock(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
     language = video.subtitle_language(language_code)
@@ -70,7 +72,6 @@ def regain_lock(request, video_id, language_code):
     language.writelock(request.user, request.browser_id, save=True)
     return HttpResponse(json.dumps({'ok': True}))
 
-@login_required
 @require_POST
 def release_lock(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
@@ -97,17 +98,34 @@ def old_editor(request, video_id, language_code):
     return redirect("http://%s%s" % (request.get_host(), url_path))
 
 class SubtitleEditorBase(View):
-    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
+        self.handle_special_user(request)
+        if not request.user.is_authenticated():
+            return redirect_to_login(request.build_absolute_uri())
         return super(SubtitleEditorBase, self).dispatch(
             request, *args, **kwargs)
+
+    def handle_special_user(self, request):
+        if 'special_user' not in request.GET:
+            return
+        try:
+            special_user = User.objects.get(id=request.session['editor-user-id'])
+        except (KeyError, User.DoesNotExist):
+            raise PermissionDenied()
+        # We use the editor user for this requests, but still don't log them
+        # in.  Note that this will also control the auth headers that get sent
+        # to the editor, so the API calls will also use this user.
+        request.user = special_user
 
     def get_video_urls(self):
         """Get video URLs to send to the editor."""
         return self.workflow.editor_video_urls(self.language_code)
 
     def get_redirect_url(self):
-        return self.video.get_absolute_url()
+        if 'return_url' in self.request.GET:
+            return self.request.GET['return_url']
+        else:
+            return self.video.get_absolute_url()
 
     def get_custom_css(self):
         return ""
@@ -352,7 +370,8 @@ def _user_for_download_permissions(request):
     if request.user.is_authenticated():
         return request.user
     username = request.META.get('HTTP_X_API_USERNAME', None)
-    api_key = request.META.get( 'HTTP_X_APIKEY', None)
+    api_key = request.META.get('HTTP_X_API_KEY',
+                               request.META.get('HTTP_X_APIKEY', None))
     if not username or not api_key:
         return request.user
     try:

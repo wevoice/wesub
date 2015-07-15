@@ -56,8 +56,11 @@ import urlparse
 BUILDER_DOCKER_HOST = 'unix:///docker.sock'
 
 def log(msg, *args, **kwargs):
-    msg = msg.format(*args, **kwargs)
-    sys.stdout.write("* {}\n".format(msg))
+    log_nostar("* " + msg, *args, **kwargs)
+
+def log_nostar(msg, *args, **kwargs):
+    sys.stdout.write(msg.format(*args, **kwargs))
+    sys.stdout.write("\n")
     sys.stdout.flush()
 
 class LoggingTimer(object):
@@ -128,19 +131,22 @@ class Environment(object):
         'STOP_SERVERS_TO_MIGRATE'
     ]
 
-    def __init__(self):
+    def __init__(self, needs_migrations=True):
         for name in self.env_var_names + self.optional_env_var_names:
             setattr(self, name, os.environ.get(name, ''))
         missing = [
             name for name in self.env_var_names
             if not getattr(self, name)
         ]
+        if not needs_migrations and 'MIGRATIONS' in missing:
+            missing.remove('MIGRATIONS')
         if missing:
             log("ENV variable(s) missing:")
             for name in missing:
                 log("    {}", name)
             sys.exit(1)
-        if self.MIGRATIONS not in self.valid_migrate_values:
+        if (self.MIGRATIONS not in self.valid_migrate_values and
+            needs_migrations):
             log("Invalid MIGRATIONS value: {}", self.MIGRATIONS)
             sys.exit(1)
 
@@ -282,8 +288,8 @@ class ContainerManager(object):
     def building_preview(self):
         return self.env.BRANCH not in ('staging', 'production')
 
-    def app_env_params(self):
-        """Get docker params to set env variables for the app.
+    def app_params(self):
+        """Get docker params to used for both app containers and workers
         """
         params = [
             # AWS Auth info
@@ -293,6 +299,8 @@ class ContainerManager(object):
             # this is actually somewhat redundant since we already copy the
             # files into the docker image
             '-e', 'REVISION=' + self.env.BRANCH,
+            # mount the workspace volume inside our container
+            '-v', '/var/workspace:/var/workspace',
         ]
         if self.building_preview():
             # SETTINGS_REVISION controls how to download the
@@ -347,7 +355,7 @@ class ContainerManager(object):
                 copy of .docker/entry.sh
         """
         cmd_line = [ 'run', '-t', '--rm', ]
-        cmd_line += self.app_env_params()
+        cmd_line += self.app_params()
         cmd_line += [self.image_name, command]
         self.docker.run(self.env.DOCKER_HOST_1, *cmd_line)
 
@@ -370,7 +378,7 @@ class ContainerManager(object):
             '-h', host_name,
             '--name', name,
             '--restart=always',
-        ] + self.app_env_params() + [self.image_name, command]
+        ] + self.app_params() + [self.image_name, command]
         cid = self.docker.run_and_return_output(host, *cmd_line).strip()
         log("container id: {}", cid)
         self.containers_started.append(ContainerInfo(host, name, cid))
@@ -390,7 +398,7 @@ class ContainerManager(object):
             '-h', self.app_hostname(),
             '--name', name,
             '--restart=always',
-        ] + self.app_env_params() + self.interlock_params() + [self.image_name]
+        ] + self.app_params() + self.interlock_params() + [self.image_name]
         cid = self.docker.run_and_return_output(host, *cmd_line).strip()
         log("container id: {}", cid)
         self.containers_started.append(ContainerInfo(host, name, cid))
@@ -458,6 +466,11 @@ class ContainerManager(object):
         log(line_fmt, 'Host', 'Name', 'Container ID')
         for container in self.containers_started:
             log(line_fmt, *container)
+        log("------------- Shell Command Line ---------------")
+        cmd_line = [
+            'docker', 'run', '-it', '--rm',
+        ] + self.app_params() + [self.image_name, 'shell']
+        log_nostar(' '.join(cmd_line))
 
 class Deploy(object):
     """Top-level manager for the deploy."""
@@ -469,14 +482,20 @@ class Deploy(object):
         self.start_and_stop_containers()
         self.container_manager.print_report()
 
+    def build(self):
+        self.setup(needs_migrations=False)
+        self.image_builder.setup_images()
+        self.container_manager.run_app_command("build_media")
+        self.container_manager.print_report()
+
     def stop_old_containers(self):
         self.setup()
         old_containers = self.container_manager.find_old_containers()
         self.container_manager.shutdown_old_containers(old_containers)
 
-    def setup(self):
+    def setup(self, needs_migrations=True):
         self.cd_to_project_root()
-        self.env = Environment()
+        self.env = Environment(needs_migrations)
         commit_id = self.get_commit_id()
         self.image_builder = ImageBuilder(self.env, commit_id)
         self.container_manager = ContainerManager(
@@ -583,7 +602,7 @@ class Cleanup(object):
                     self.remove_image(host, tag)
                 if self.docker.image_exists(host, image):
                     log("removing unused image: {}", image)
-                    self.remove_image(host, tag)
+                    self.remove_image(host, image)
                 else:
                     log("image removed from untagging: {}", image)
 
@@ -604,6 +623,8 @@ def main(argv):
             Deploy().run()
         elif command == 'stop-deploy':
             Deploy().stop_old_containers()
+        elif command == 'build':
+            Deploy().build()
         elif command == 'cleanup':
             Cleanup().run()
         else:

@@ -31,7 +31,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         """Subtitle contributor gets an email when new revision added.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         self.video_pg.open_video_page(video.video_id)
 
         self.video_pg.log_in(self.user.username, 'password')
@@ -60,7 +60,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         """Language follower gets an email when new revision added.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
 
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.log_in(self.user.username, 'password')
@@ -109,7 +109,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         """Video follower gets an email when new revision added.
 
         """
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         follower = UserFactory()
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.log_in(follower.username, 'password')
@@ -138,7 +138,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
 
         """
         self.skipTest('needs https://unisubs.sifterapp.com/issues/2220 fixed')
-        video = self.data_utils.create_video()
+        video = VideoFactory()
         follower = UserFactory()
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.log_in(follower.username, 'password')
@@ -174,18 +174,21 @@ class TestCaseRevisionEdits(WebdriverTestCase):
                                     'subtitle_data')  
 
     def _add_video(self):
-        video = self.data_utils.create_video()
+#        video = VideoFactory()
+        video = VideoFactory(primary_audio_language_code='en')
         return video
 
     def _upload_en_draft(self, video, subs, user, complete=False):
-        data = {'language_code': 'en',
-                     'video': video.pk,
-                     'primary_audio_language_code': 'en',
-                     'draft': open(subs),
-                     'complete': int(complete),
-                     'is_complete': complete,
-                    }
-        self.data_utils.upload_subs(user, **data)
+
+        data = { 'language_code': 'en',
+                 'video': video,
+                 'subtitles': subs,
+                 'complete': complete,
+                 'author': user,
+                 'committer': user 
+               }
+        self.data_utils.add_subs(**data)
+
 
     def _create_two_incomplete(self, video, user):
         rev1 = os.path.join(self.subs_dir, 'Timed_text.en.srt')

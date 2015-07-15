@@ -135,6 +135,7 @@ MIDDLEWARE_CLASSES = (
     'middleware.P3PHeaderMiddleware',
     'middleware.UserUUIDMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'api.middleware.CORSMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -255,7 +256,7 @@ REST_FRAMEWORK = {
 #################
 
 import re
-LOCALE_INDEPENDENT_PATHS = (
+LOCALE_INDEPENDENT_PATHS = [
     re.compile('^/media/'),
     re.compile('^/widget/'),
     re.compile('^/api/'),
@@ -263,10 +264,9 @@ LOCALE_INDEPENDENT_PATHS = (
     re.compile('^/jstest/'),
     re.compile('^/sitemap.*.xml'),
     re.compile('^/externalsites/youtube-callback'),
-    re.compile('^/providers/'),
     re.compile('^/crossdomain.xml'),
     re.compile('^/embedder-widget-iframe/'),
-)
+]
 
 #Haystack configuration
 HAYSTACK_SITECONF = 'search_site'
@@ -409,6 +409,30 @@ MEDIA_BUNDLES = {
             "css/bootstrap.css",
         ),
     },
+    "new-base.css": {
+        "files": [
+            'src/css/site/colors.scss',
+            'src/css/site/layout.scss',
+            'src/css/site/type.scss',
+            'src/css/site/buttons.scss',
+            'src/css/site/forms.scss',
+            'src/css/site/links.scss',
+            'src/css/site/lists.scss',
+            'src/css/site/tables.scss',
+            'src/css/site/graphs.scss',
+            'src/css/site/header.scss',
+            'src/css/site/tabs.scss',
+            'src/css/site/pagination.scss',
+            'src/css/site/filters.scss',
+            'src/css/site/menus.scss',
+            'src/css/site/modals.scss',
+            'src/css/site/banner.scss',
+            'src/css/site/messages.scss',
+            'src/css/site/footer.scss',
+            'src/css/site/teams.scss',
+        ],
+        "include_path": 'src/css/site',
+    },
     "home.css": {
         "files": (
             "css/new_index.css",
@@ -450,6 +474,15 @@ MEDIA_BUNDLES = {
             "js/unisubs.site.js",
             "src/js/unisubs.variations.js",
         ),
+    },
+    "new-site.js": {
+        "files": [
+            'src/js/third-party/jquery-2.1.3.js',
+            'src/js/site/menus.js',
+            'src/js/site/modals.js',
+            'src/js/site/pagination.js',
+            'src/js/site/team-integration-settings.js',
+        ],
     },
     "api.js": {
         "files": (
@@ -659,6 +692,8 @@ LOGGING = {
         },
     },
 }
+
+TMP_FOLDER = "/tmp/"
 
 from task_settings import *
 

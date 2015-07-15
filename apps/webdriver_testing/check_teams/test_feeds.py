@@ -29,19 +29,6 @@ class TestCaseAddFeeds(WebdriverTestCase):
     def setUp(self):
         self.feed_pg.open_feed_page(self.team.slug)
 
-    def test_duplicate_youtube_user(self):
-        """Add a youtube user feed
-
-        """
-        youtube_user = 'latestvideoss'
-        self.feed_pg.submit_youtube_users_videos(youtube_user)
-        self.assertTrue(self.feed_pg.submit_successful())
-        self.feed_pg.open_feed_page(self.team.slug)
-        self.feed_pg.submit_youtube_users_videos(youtube_user)
-        expected_error = ('Feed for https://gdata.youtube.com/feeds/api/users'
-                          '/latestvideoss/uploads already exists')
-        self.assertEqual(expected_error, self.feed_pg.submit_error())
-
     def test_vimeo(self):
         """Add a vimeo feed
 
@@ -53,20 +40,6 @@ class TestCaseAddFeeds(WebdriverTestCase):
         feed.update()
         self.feeds_pg.open_feed_details(self.team.slug, feed.id)
         self.assertEqual(1, self.feeds_pg.num_videos()) 
-
-    def test_youtube_feed(self):
-        """Add a youtube feed
-
-        """
-        url = "http://gdata.youtube.com/feeds/api/users/amaratestuser/uploads"
-        self.feed_pg.submit_feed_url(url)
-        self.assertTrue(self.feed_pg.submit_successful())
-
-        feed = VideoFeed.objects.get(url=url)
-        feed.update()
-        self.feeds_pg.open_feed_details(self.team.slug, feed.id)
-        self.assertEqual(3, self.feeds_pg.num_videos()) 
-
 
     def test_brightcove_feed(self):
         """Add a brightcove new videos feed
@@ -85,22 +58,11 @@ class TestCaseAddFeeds(WebdriverTestCase):
         """Add a kaltura yahoo feed
 
         """
-        url = "http://qa.pculture.org/feeds_test/kaltura_yahoo_feed.rss"
+        url = ("http://www.kaltura.com/api_v3/getFeed.php"
+              "?partnerId=1492321&feedId=0_sp2qln1h")
         self.feed_pg.submit_feed_url(url)
         self.assertTrue(self.feed_pg.submit_successful())
         feed = VideoFeed.objects.get(url=url)
         feed.update()
         self.feeds_pg.open_feed_details(self.team.slug, feed.id)
-        self.assertEqual(3, self.feeds_pg.num_videos()) 
-
-    def test_kaltura_itunes_feed(self):
-        """Add a kaltura itunes feed
-
-        """
-        url = "http://qa.pculture.org/feeds_test/kaltura_itunes_feed.rss"
-        self.feed_pg.submit_feed_url(url)
-        self.assertTrue(self.feed_pg.submit_successful())
-        feed = VideoFeed.objects.get(url=url)
-        feed.update()
-        self.feeds_pg.open_feed_details(self.team.slug, feed.id)
-        self.assertEqual(3, self.feeds_pg.num_videos()) 
+        self.assertEqual(8, self.feeds_pg.num_videos()) 

@@ -62,6 +62,11 @@ Creating Users
         include a url that when visited will login the created user.  Use this
         to allow users to login without explicitly setting their passwords.
         This URL expires in 2 hours
+    :<json find_unique_username: *optional*, if username is taken, we will
+        find a similar, unused, username for the new user.  If passed, make
+        sure you check the username returned since it might not be the same
+        one that you passed in.  If set, usernames can only be a maximum of 24
+        characters to make room for potential extra characters.
     :>json username: username
     :>json first_name: First name
     :>json last_name: Last name
@@ -88,8 +93,8 @@ Updating Your Account
 .. http:put:: /api/users/[username]
 
 Use PUT to update your user account.  ``username`` must match the username of
-the auth credentials sent.  PUT inputs the same fields as POST, with the
-exception of username.
+the auth credentials sent.  PUT inputs the same fields as POST, except
+username, create_login_token, and find_unique_username.
 """
 
 from __future__ import absolute_import
@@ -97,6 +102,7 @@ import re
 
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError
 from rest_framework import mixins
 from rest_framework import serializers
 from rest_framework import viewsets
@@ -123,19 +129,9 @@ class UserSerializer(serializers.ModelSerializer):
             'created_by',
         )
 
-class UserWriteSerializer(UserSerializer):
-    api_key = serializers.CharField(source='api_key.key', read_only=True)
-    create_login_token = serializers.BooleanField(write_only=True,
-                                                  required=False)
-
     default_error_messages = {
         'invalid-username': 'Invalid Username: {username}',
     }
-
-    def __init__(self, *args, **kwargs):
-        super(UserSerializer, self).__init__(*args, **kwargs)
-        if self.instance is not None:
-            self.fields['username'].read_only = True
 
     valid_username_re = re.compile(r'[\w\-@\.\+]+$')
     def validate_username(self, username):
@@ -144,44 +140,81 @@ class UserWriteSerializer(UserSerializer):
                       username=username.encode('ascii', 'replace'))
         return username
 
-    def create(self, validated_data):
-        user = User(created_by=self.context['request'].user)
-        user = self._update(user, validated_data)
-        user.ensure_api_key_created()
-        return user
-
-    def update(self, user, validated_data):
-        if user != self.context['request'].user:
-            raise PermissionDenied()
-        return self._update(user, validated_data)
-
-    def _update(self, user, validated_data):
-        for key, value in validated_data.items():
-            if key == 'password':
-                user.set_password(value)
-            else:
-                setattr(user, key, value)
-        user.save()
-        if 'create_login_token' in validated_data:
-            self.login_token = LoginToken.objects.for_user(user)
-        return user
-
     def to_representation(self, user):
-        data = super(UserWriteSerializer, self).to_representation(user)
+        data = super(UserSerializer, self).to_representation(user)
         if hasattr(self, 'login_token'):
             data['auto_login_url'] = reverse(
                 "auth:token-login", args=(self.login_token.token,),
                 request=self.context['request'])
         return data
 
+class PasswordField(serializers.CharField):
+    def to_internal_value(self, password):
+        return make_password(password)
+
+class UserCreateSerializer(UserSerializer):
+    username = serializers.CharField(max_length=30)
+    password = PasswordField(required=False, write_only=True)
+    api_key = serializers.CharField(source='api_key.key', read_only=True)
+    create_login_token = serializers.BooleanField(write_only=True,
+                                                  required=False)
+    find_unique_username = serializers.BooleanField(write_only=True,
+                                                    required=False)
+
+    default_error_messages = {
+        'username-not-unique': 'Username not unique: {username}',
+        'username-too-long': 'Username too long: {username}',
+    }
+
+    def validate(self, data):
+        if data.get('find_unique_username'):
+            # if we need to find a unique username, then we should stricter
+            # limit on the username length
+            if len(data['username']) > 24:
+                self.fail('username-too-long', username=data['username'])
+        return data
+
+    def create(self, validated_data):
+        find_unique_username = validated_data.pop('find_unique_username',
+                                                  False)
+        create_login_token = validated_data.pop('create_login_token', False)
+        try:
+            if find_unique_username:
+                user = User.objects.create_with_unique_username(
+                    created_by=self.context['request'].user, **validated_data)
+            else:
+                user = User.objects.create(
+                    created_by=self.context['request'].user, **validated_data)
+        except IntegrityError, e:
+            self.fail('username-not-unique',
+                      username=validated_data['username'])
+        user.ensure_api_key_created()
+        if create_login_token:
+            self.login_token = LoginToken.objects.for_user(user)
+        return user
+
     class Meta:
         model = User
         fields = UserSerializer.Meta.fields + (
             'email', 'api_key', 'password', 'create_login_token',
+            'find_unique_username',
         )
-        extra_kwargs = {
-            'password': { 'required': False, 'write_only':True },
-        }
+
+class UserUpdateSerializer(UserSerializer):
+    username = serializers.CharField(read_only=True)
+    password = PasswordField(required=False, write_only=True)
+    api_key = serializers.CharField(source='api_key.key', read_only=True)
+
+    def update(self, user, validated_data):
+        if user != self.context['request'].user:
+            raise PermissionDenied()
+        return super(UserSerializer, self).update(user, validated_data)
+
+    class Meta:
+        model = User
+        fields = UserSerializer.Meta.fields + (
+            'email', 'api_key', 'password',
+        )
 
 class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.CreateModelMixin,
@@ -190,13 +223,15 @@ class UserViewSet(mixins.RetrieveModelMixin,
 
     queryset = User.objects.all().select_related('created_by')
     lookup_field = 'username'
-    lookup_value_regex = r'[\w\-@\.\+]+'
+    lookup_value_regex = r'[\w\-@\.\+\s]+'
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return UserSerializer
-        elif self.request.method in ('POST', 'PUT', 'PATCH'):
-            return UserWriteSerializer
+        elif self.request.method == 'POST':
+            return UserCreateSerializer
+        elif self.request.method in ('PUT', 'PATCH'):
+            return UserUpdateSerializer
         else:
             raise ValueError("Invalid request method: {}".format(
                 self.request.method))
