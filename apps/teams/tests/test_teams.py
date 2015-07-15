@@ -803,6 +803,7 @@ class TeamsTest(TestCase):
 
     def test_fixes(self):
         url = reverse("teams:videos", kwargs={"slug": 'slug-does-not-exist'})
+        self.client.login(**self.auth)
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 404)
 
@@ -850,6 +851,7 @@ class TeamsTest(TestCase):
                                                         added_by=self.user)
         test_utils.update_team_video.run_original()
         url = reverse("teams:videos", kwargs={"slug": team.slug})
+        self.client.login(**self.auth)
         response = self.client.get(url + u"?q=" + title)
         videos = response.context['team_video_md_list']
 
