@@ -47,12 +47,6 @@ CAPTION_TRACK_LINK_REL = ('http://gdata.youtube.com'
 def _format_subs_for_youtube(subtitle_set):
     return babelsubs.to(subtitle_set, 'vtt').encode('utf-8')
 
-def get_youtube_language_code(language_code):
-    """Convert the language for a SubtitleVersion to a youtube code
-    """
-    lc = unilangs.LanguageCode(language_code.lower(), "unisubs")
-    return lc.encode("youtube")
-
 def find_existing_caption_id(access_token, video_id, language_code):
     for caption_info in google.captions_list(access_token, video_id):
         if language_code == caption_info[1] and caption_info[2] == '':
@@ -62,12 +56,7 @@ def find_existing_caption_id(access_token, video_id, language_code):
 def update_subtitles(video_id, access_token, subtitle_version):
     """Push the subtitles for a language to YouTube """
 
-    try:
-        language_code = get_youtube_language_code(
-            subtitle_version.subtitle_language.language_code)
-    except KeyError:
-        logger.error("Couldn't encode LC %s to youtube" % language_code)
-        return
+    language_code = subtitle_version.subtitle_language.language_code
 
     subs = subtitle_version.get_subtitles()
     if should_add_credit_to_subtitles(subtitle_version, subs):
