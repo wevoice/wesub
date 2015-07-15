@@ -49,7 +49,8 @@ def _format_subs_for_youtube(subtitle_set):
 
 def find_existing_caption_id(access_token, video_id, language_code):
     for caption_info in google.captions_list(access_token, video_id):
-        if language_code == caption_info[1] and caption_info[2] == '':
+        if (language_code.lower() == caption_info[1] and
+            caption_info[2] == ''):
             return caption_info[0]
     return None
 
