@@ -44,7 +44,6 @@ from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
 
 from messages.models import Message
 from utils import send_templated_email
-from utils.metrics import Meter
 from utils.text import fmt
 from utils.translation import get_language_label
 
@@ -86,7 +85,6 @@ def send_new_message_notification(message_id):
         "domain":  Site.objects.get_current().domain,
         "STATIC_URL": settings.STATIC_URL,
     }
-    Meter('templated-emails-sent-by-type.message-received').inc()
     send_templated_email(user, subject, "messages/email/message_received.html", context)
 
 @task()
@@ -134,7 +132,6 @@ def team_invitation_sent(invite_pk):
         msg.content = body
         msg.save()
     template_name = 'messages/email/team-you-have-been-invited.html'
-    Meter('templated-emails-sent-by-type.teams.invitation').inc()
     return send_templated_email(invite.user, title, template_name, context)
 
 @task()
@@ -171,7 +168,6 @@ def application_sent(application_pk):
             msg.object = application.team
             msg.author = application.user
             msg.save()
-        Meter('templated-emails-sent-by-type.teams.application-sent').inc()
         send_templated_email(m.user, subject, "messages/email/application-sent-email.html", context)
     return True
 
@@ -204,7 +200,6 @@ def team_application_denied(application_pk):
         msg.user = application.user
         msg.object = application.team
         msg.save()
-    Meter('templated-emails-sent-by-type.teams.application-declined').inc()
     send_templated_email(application.user, subject, template_name, context)
 
 @task()
@@ -245,7 +240,6 @@ def team_member_new(member_pk):
             msg.object = m.team
             msg.save()
         template_name = "messages/email/team-new-member.html"
-        Meter('templated-emails-sent-by-type.teams.new-member').inc()
         send_templated_email(m.user, subject, template_name, context)
 
     # does this team have a custom message for this?
@@ -276,7 +270,6 @@ def team_member_new(member_pk):
     msg.object = member.team
     msg.save()
     template_name = "messages/email/team-welcome.html"
-    Meter('templated-emails-sent-by-type.teams.welcome').inc()
     send_templated_email(msg.user, msg.subject, template_name, context)
 
 @task()
@@ -315,7 +308,6 @@ def team_member_leave(team_pk, user_pk):
             msg.user = m.user
             msg.object = team
             msg.save()
-        Meter('templated-emails-sent-by-type.teams.someone-left').inc()
         send_templated_email(m.user, subject, "messages/email/team-member-left.html", context)
 
 
@@ -334,7 +326,6 @@ def team_member_leave(team_pk, user_pk):
         msg.object = team
         msg.save()
     template_name = "messages/email/team-member-you-have-left.html"
-    Meter('templated-emails-sent-by-type.teams.you-left').inc()
     send_templated_email(user, subject, template_name, context)
 
 @task()
@@ -352,7 +343,6 @@ def email_confirmed(user_pk):
         )
         message.save()
     template_name = "messages/email/email-confirmed.html"
-    Meter('templated-emails-sent-by-type.email-confirmed').inc()
     send_templated_email(user, subject, template_name, context )
     return True
 
@@ -376,7 +366,6 @@ def videos_imported_message(user_pk, imported_videos):
         )
         message.save()
     template_name = "messages/email/videos-imported.html"
-    Meter('templated-emails-sent-by-type.videos-imported').inc()
     send_templated_email(user, subject, template_name, context)
 
 @task()
@@ -414,7 +403,6 @@ def team_task_assigned(task_pk):
         msg.save()
 
     template_name = "messages/email/team-task-assigned.html"
-    Meter('templated-emails-sent-by-type.teams.task-assigned').inc()
     email_res = send_templated_email(user, subject, template_name, context)
     return msg, email_res
 
@@ -496,7 +484,6 @@ def _reviewed_notification(task_pk, status):
         msg.save()
 
     template_name = "messages/email/team-task-reviewed.html"
-    Meter('templated-emails-sent-by-type.teams.task-reviewed').inc()
     email_res =  send_templated_email(user, subject, template_name, context)
 
     if status == REVIEWED_AND_SENT_BACK:
@@ -598,7 +585,6 @@ def approved_notification(task_pk, published=False):
         msg.save()
 
     template_name = template_html
-    Meter('templated-emails-sent-by-type.teams.approval-result').inc()
     email_res =  send_templated_email(user, subject, template_name, context)
     Action.create_approved_video_handler(version, reviewer)
     return msg, email_res
@@ -658,7 +644,6 @@ def send_reject_notification(task_pk, sent_back):
         msg.save()
 
     template_name = "messages/email/team-task-rejected.html"
-    Meter('templated-emails-sent-by-type.teams.task-rejected').inc()
     email_res =  send_templated_email(user, subject, template_name, context)
     Action.create_rejected_video_handler(version, reviewer)
     return msg, email_res
@@ -731,7 +716,6 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     followers = set(video.notification_list(comment.user))
 
     for user in followers:
-        Meter('templated-emails-sent-by-type.new-comment-notification').inc()
         send_templated_email(
             user,
             subject,

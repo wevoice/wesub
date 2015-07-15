@@ -78,7 +78,6 @@ from teams.tasks import (
 from videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
-from utils.metrics import time as timefn
 from utils.objectlist import object_list
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
@@ -438,7 +437,6 @@ def _get_videos_for_detail_page(team, user, query, project, language_code,
     return team.get_videos_for_languages_haystack(**kwargs)
 
 # Videos
-@timefn
 @render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
     team = get_team_for_view(slug, request.user)
@@ -558,7 +556,6 @@ def detail(request, slug, project_slug=None, languages=None):
                     record._team_video.completed_langs = record.video_completed_langs
     return extra_context
 
-@timefn
 @render_to('teams/move_videos.html')
 def move_videos(request, slug, project_slug=None, languages=None):
     team = get_team_for_view(slug, request.user)
@@ -921,7 +918,6 @@ class TableCell():
         return str(self.content)
 
 # Members
-@timefn
 @render_to('teams/members-list.html')
 def detail_members(request, slug, role=None):
     q = request.REQUEST.get('q')
@@ -1558,7 +1554,6 @@ def old_dashboard(request, team):
 
     return context
 
-@timefn
 @render_to('teams/tasks.html')
 def team_tasks(request, slug, project_slug=None):
     team = get_team_for_view(slug, request.user)
