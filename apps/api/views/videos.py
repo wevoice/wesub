@@ -203,7 +203,8 @@ from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 import json
 
-from api.fields import LanguageCodeField
+from .apiswitcher import APISwitcherMixin
+from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
 from api.pagination import AmaraPaginationMixin
 from teams import permissions as team_perms
 from teams.models import Team, TeamVideo, Project
@@ -314,7 +315,7 @@ class VideoSerializer(serializers.Serializer):
     description = serializers.CharField(required=False, allow_blank=True)
     duration = serializers.IntegerField(required=False)
     thumbnail = serializers.URLField(required=False, allow_blank=True)
-    created = serializers.DateTimeField(read_only=True)
+    created = TimezoneAwareDateTimeField(read_only=True)
     team = TeamSerializer(required=False, allow_null=True)
     project = ProjectSerializer(required=False, allow_null=True)
     all_urls = serializers.SerializerMethodField()
@@ -565,7 +566,7 @@ class VideoViewSet(AmaraPaginationMixin,
         return video
 
 class VideoURLSerializer(serializers.Serializer):
-    created = serializers.DateTimeField(read_only=True)
+    created = TimezoneAwareDateTimeField(read_only=True)
     url = serializers.CharField()
     primary = serializers.BooleanField(required=False)
     original = serializers.BooleanField(required=False)
@@ -606,12 +607,14 @@ class VideoURLUpdateSerializer(VideoURLSerializer):
     url = serializers.CharField(read_only=True)
 
 class VideoURLViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
+    serializer_class = VideoURLSerializer
+    update_serializer_class = VideoURLUpdateSerializer
 
     def get_serializer_class(self):
         if 'pk' in self.kwargs:
-            return VideoURLUpdateSerializer
+            return self.update_serializer_class
         else:
-            return VideoURLSerializer
+            return self.serializer_class
 
     @property
     def video(self):
@@ -634,3 +637,19 @@ class VideoURLViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
             'request': self.request,
         }
 
+class VideoViewSetSwitcher(APISwitcherMixin, VideoViewSet):
+    switchover_date = 20150716
+
+    class Deprecated(VideoViewSet):
+        class serializer_class(VideoSerializer):
+            created = serializers.DateTimeField(read_only=True)
+
+class VideoURLViewSetSwitcher(APISwitcherMixin, VideoURLViewSet):
+    switchover_date = 20150716
+
+    class Deprecated(VideoURLViewSet):
+        class serializer_class(VideoURLSerializer):
+            created = serializers.DateTimeField(read_only=True)
+
+        class update_serializer_class(VideoURLUpdateSerializer):
+            created = serializers.DateTimeField()

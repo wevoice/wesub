@@ -43,6 +43,8 @@ YOUTUBE_CLIENT_ID = 'test-youtube-id'
 YOUTUBE_CLIENT_SECRET = 'test-youtube-secret'
 YOUTUBE_API_KEY = 'test-youtube-api-key'
 
+API_ALWAYS_USE_FUTURE = True
+
 # Use MD5 password hashing, other algorithms are purposefully slow to increase
 # security.  Also include the SHA1 hasher since some of the tests use it.
 PASSWORD_HASHERS = (

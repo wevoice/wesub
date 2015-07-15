@@ -25,6 +25,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient, APIRequestFactory
 import mock
 
+from api.tests.utils import format_datetime_field
 from api.views.videos import VideoSerializer, VideoViewSet
 from subtitles import pipeline
 from utils.factories import *
@@ -69,7 +70,8 @@ class VideoSerializerTest(TestCase):
         assert_equal(data['title'], self.video.title)
         assert_equal(data['description'], self.video.description)
         assert_equal(data['duration'], self.video.duration)
-        assert_equal(data['created'], self.video.created.isoformat())
+        assert_equal(data['created'],
+                     format_datetime_field(self.video.created))
         assert_equal(data['thumbnail'], self.video.thumbnail)
         assert_equal(data['resource_uri'],
                      'http://testserver/api/videos/{0}/'.format(
@@ -643,7 +645,7 @@ class VideoURLTestCase(TestCase):
 
     def correct_data(self, video_url):
         return {
-            'created': video_url.created.isoformat(),
+            'created': format_datetime_field(video_url.created),
             'url': video_url.url,
             'primary': video_url.primary,
             'original': video_url.original,
