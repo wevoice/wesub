@@ -58,6 +58,10 @@
         </li>
         {% endfor %}
         <li>
+          <a href="{% url "teams:settings_feeds" slug=team.slug %}">{% trans "Video Feeds" %}</a>
+        </li>
+        <li>
+        <li>
           <a href="{% url "teams:settings_projects" slug=team.slug %}">{% trans "Projects" %}</a>
         </li>
         <li>

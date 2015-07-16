@@ -19,6 +19,12 @@ table {
 
         &.actions {
             text-align: right;
+
+            form {
+                display: inline;
+                margin: 0;
+                padding: 0;
+            }
         }
     }
     &.resync_table {

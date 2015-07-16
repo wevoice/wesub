@@ -64,6 +64,10 @@ button, a.button {
         }
     }
 
+    &.primary {
+        @include button-color($primary);
+    }
+
     &.delete {
         @include button-color($red);
     }

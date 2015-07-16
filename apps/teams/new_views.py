@@ -479,6 +479,44 @@ def settings_messages(request, team):
     })
 
 @team_settings_view
+def settings_feeds(request, team):
+    if team.is_old_style():
+        return old_views.video_feeds(request, team)
+
+    action = request.POST.get('action')
+    if request.method == 'POST' and action == 'import':
+        feed = get_object_or_404(team.videofeed_set, id=request.POST['feed'])
+        feed.update()
+        messages.success(request, _(u'Importing videos now'))
+        return HttpResponseRedirect(request.build_absolute_uri())
+    if request.method == 'POST' and action == 'delete':
+        feed = get_object_or_404(team.videofeed_set, id=request.POST['feed'])
+        feed.delete()
+        messages.success(request, _(u'Feed deleted'))
+        return HttpResponseRedirect(request.build_absolute_uri())
+
+    if request.method == 'POST' and action == 'add':
+        add_form = forms.AddTeamVideosFromFeedForm(team, request.user,
+                                                   data=request.POST)
+        if add_form.is_valid():
+            add_form.save()
+            messages.success(request, _(u'Video Feed Added'))
+            return HttpResponseRedirect(request.build_absolute_uri())
+    else:
+        add_form = forms.AddTeamVideosFromFeedForm(team, request.user)
+
+    return render(request, "new-teams/settings-feeds.html", {
+        'team': team,
+        'add_form': add_form,
+        'feeds': team.videofeed_set.all(),
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
+            BreadCrumb(_('Video Feeds')),
+        ],
+    })
+
+@team_settings_view
 def settings_projects(request, team):
     if team.is_old_style():
         return old_views.settings_projects(request, team)

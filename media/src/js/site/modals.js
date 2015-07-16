@@ -69,6 +69,9 @@ $document.ready(function() {
             if(link.data('heading')) {
                 $('h3', modal).text(link.data('heading'));
             }
+            if(link.data('text')) {
+                $('.text', modal).text(link.data('text'));
+            }
             if(link.data('setFormValues')) {
                 $.each(link.data('setFormValues'), function(name, value) {
                     $('*[name=' + name + ']').val(value);

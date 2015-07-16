@@ -278,8 +278,6 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         return obj
 
 class AddTeamVideosFromFeedForm(AddFromFeedForm):
-    VIDEOS_LIMIT = None
-
     def __init__(self, team, user, *args, **kwargs):
         if not can_add_video(team, user):
             raise ValueError("%s can't add videos to %s" % (user, team))
