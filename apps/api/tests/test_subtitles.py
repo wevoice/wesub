@@ -28,6 +28,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 import babelsubs
 import mock
 
+from api.tests.utils import format_datetime_field
 from api.views.subtitles import (SubtitleLanguageSerializer,
                                  SubtitleLanguageViewSet,
                                  SubtitlesSerializer,
@@ -60,7 +61,7 @@ class SubtitleLanguageSerializerTest(TestCase):
         serializer_data = self.get_serializer_data()
         assert_equal(serializer_data['id'], self.language.id)
         assert_equal(serializer_data['created'],
-                     self.language.created.isoformat())
+                     format_datetime_field(self.language.created))
         assert_equal(serializer_data['is_original'], True)
         assert_equal(serializer_data['is_primary_audio_language'], True)
         assert_equal(serializer_data['is_rtl'], self.language.is_rtl())

@@ -14,21 +14,10 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
-
 from django.utils import timezone
-from rest_framework.fields import CharField
-from rest_framework import serializers
 import pytz
 
-class LanguageCodeField(CharField):
-    def to_internal_value(self, language_code):
-        return language_code.lower()
-
-class TimezoneAwareDateTimeField(serializers.DateTimeField):
-    def __init__(self, *args, **kwargs):
-        super(TimezoneAwareDateTimeField, self).__init__(*args, **kwargs)
-        self.tz = timezone.get_default_timezone()
-
-    def to_representation(self, value):
-        return super(TimezoneAwareDateTimeField, self).to_representation(
-            self.tz.localize(value).astimezone(pytz.utc))
+def format_datetime_field(datetime):
+    tz = timezone.get_default_timezone()
+    isoformat = tz.localize(datetime).astimezone(pytz.utc).isoformat()
+    return isoformat.replace('+00:00', 'Z')
