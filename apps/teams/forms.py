@@ -642,11 +642,6 @@ class ProjectForm(forms.ModelForm):
         if self.instance.id is not None:
             same_name_qs = same_name_qs.exclude(id=self.instance.id)
 
-
-        import logging
-        logging.warn("%s %s", same_name_qs.exists(), same_name_qs.query)
-        logging.warn("%s", [p.slug for p in self.team.project_set.all()])
-
         if same_name_qs.exists():
             raise forms.ValidationError(
                 _(u"There's already a project with this name"))
@@ -655,6 +650,45 @@ class ProjectForm(forms.ModelForm):
     def save(self):
         project = super(ProjectForm, self).save(commit=False)
         project.team = self.team
+        project.save()
+        return project
+
+class EditProjectForm(forms.Form):
+    project = forms.ChoiceField(choices=[])
+    name = forms.CharField(required=True)
+    description = forms.CharField(widget=forms.Textarea, required=False)
+
+    def __init__(self, team, *args, **kwargs):
+        super(EditProjectForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.fields['project'].choices = [
+            (p.id, p.id) for p in team.project_set.all()
+        ]
+
+    def clean(self):
+        if self.cleaned_data.get('name') and self.cleaned_data.get('project'):
+            self.check_duplicate_name()
+        return self.cleaned_data
+
+    def check_duplicate_name(self):
+        name = self.cleaned_data['name']
+
+        same_name_qs = (
+            self.team.project_set
+            .filter(slug=pan_slugify(name))
+            .exclude(id=self.cleaned_data['project'])
+        )
+
+        if same_name_qs.exists():
+            self._errors['name'] = self.error_class([
+                _(u"There's already a project with this name")
+            ])
+            del self.cleaned_data['name']
+
+    def save(self):
+        project = self.team.project_set.get(id=self.cleaned_data['project'])
+        project.name = self.cleaned_data['name']
+        project.description = self.cleaned_data['description']
         project.save()
         return project
 

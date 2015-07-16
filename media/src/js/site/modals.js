@@ -62,10 +62,12 @@ $document.ready(function() {
         var modal = $('#' + link.data('modal'));
 
         link.bind('click', function(e) {
-            debugger;
             e.preventDefault();
             e.stopPropagation();
             modal.openModal();
+            if(link.data('clear-errors')) {
+                $('ul.errorlist', modal).remove();
+            }
             if(link.data('heading')) {
                 $('h3', modal).text(link.data('heading'));
             }
@@ -74,11 +76,13 @@ $document.ready(function() {
             }
             if(link.data('setFormValues')) {
                 $.each(link.data('setFormValues'), function(name, value) {
-                    $('*[name=' + name + ']').val(value);
+                    $('*[name=' + name + ']', modal).val(value);
                 });
             }
         });
     });
+
+    $('aside.modal.start-open').openModal();
 });
 
 })();

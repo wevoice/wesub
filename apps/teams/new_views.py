@@ -523,40 +523,53 @@ def settings_projects(request, team):
 
     projects = team.project_set.exclude(name=Project.DEFAULT_NAME)
 
-    return render(request, "new-teams/settings-projects.html", {
-        'team': team,
-        'projects': projects,
-        'breadcrumbs': [
-            BreadCrumb(team, 'teams:dashboard', team.slug),
-            BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
-            BreadCrumb(_('Projects')),
-        ],
-    })
+    form = request.POST.get('form')
 
-@team_settings_view
-def add_project(request, team):
-    if team.is_old_style():
-        return old_views.add_project(request, team)
+    if request.method == 'POST' and form == 'add':
+        add_form = forms.ProjectForm(team, data=request.POST)
 
-    if request.POST:
-        form = forms.ProjectForm(team, data=request.POST)
-
-        if form.is_valid():
-            form.save()
+        if add_form.is_valid():
+            add_form.save()
+            messages.success(request, _('Project added.'))
             return HttpResponseRedirect(
                 reverse('teams:settings_projects', args=(team.slug,))
             )
     else:
-        form = forms.ProjectForm(team)
+        add_form = forms.ProjectForm(team)
 
-    return render(request, "new-teams/settings-projects-add.html", {
+    if request.method == 'POST' and form == 'edit':
+        edit_form = forms.EditProjectForm(team, data=request.POST)
+
+        if edit_form.is_valid():
+            edit_form.save()
+            messages.success(request, _('Project updated.'))
+            return HttpResponseRedirect(
+                reverse('teams:settings_projects', args=(team.slug,))
+            )
+    else:
+        edit_form = forms.EditProjectForm(team)
+
+    if request.method == 'POST' and form == 'delete':
+        try:
+            project = projects.get(id=request.POST['project'])
+        except Project.DoesNotExist:
+            pass
+        else:
+            project.delete()
+            messages.success(request, _('Project deleted.'))
+            return HttpResponseRedirect(
+                reverse('teams:settings_projects', args=(team.slug,))
+            )
+
+    return render(request, "new-teams/settings-projects.html", {
         'team': team,
-        'form': form,
+        'projects': projects,
+        'add_form': add_form,
+        'edit_form': edit_form,
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
-            BreadCrumb(_('Projects'), 'teams:settings_projects', team.slug),
-            BreadCrumb(_('Add Project')),
+            BreadCrumb(_('Projects')),
         ],
     })
 
