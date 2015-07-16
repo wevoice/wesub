@@ -9,12 +9,8 @@ from debug_toolbar.middleware import DebugToolbarMiddleware
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv4_address
-from django.db.backends.mysql.base import CursorWrapper as _CursorWrapper
 from django.utils.cache import patch_vary_headers
 from django.utils.http import cookie_date
-
-from utils.metrics import ManualTimer, Meter, Timer
-
 
 SECTIONS = {
     'widget': 'widget',
@@ -69,53 +65,6 @@ class UserUUIDMiddleware(object):
         # Content varies with the CSRF cookie, so set the Vary header.
         patch_vary_headers(response, ('Cookie',))
         return response
-
-
-# I'm so sorry about this.
-class MetricsCursorWrapper(_CursorWrapper):
-    def _query_type(self, query):
-        if not query:
-            return 'UNKNOWN'
-        elif query.startswith('SELECT COUNT(*) '):
-            return 'COUNT'
-        elif query.startswith('SELECT '):
-            return 'SELECT'
-        elif query.startswith('DELETE '):
-            return 'DELETE'
-        elif query.startswith('INSERT '):
-            return 'INSERT'
-        elif query.startswith('UPDATE '):
-            return 'UPDATE'
-        else:
-            return 'OTHER'
-
-    def execute(self, query, params=None):
-        op = self._query_type(query)
-
-        with Timer('db-query-time'):
-            with Timer('db-query-time.%s' % op):
-                return super(MetricsCursorWrapper, self).execute(query, params)
-
-    def executemany(self, query, params_list):
-        op = self._query_type(query)
-        start = time.time()
-
-        try:
-            return super(MetricsCursorWrapper, self).executemany(query, params_list)
-        finally:
-            end = time.time()
-            delta = end - start
-            ms = delta * 1000
-
-            # This is an ugly hack to get at least a rough measurement of query
-            # times for executemany() queries.
-            ms_per_query = ms / len(params_list)
-
-            for _ in xrange(len(params_list)):
-                ManualTimer('db-query-time').record(ms_per_query)
-                ManualTimer('db-query-time.%s' % op).record(ms_per_query)
-
-django.db.backends.mysql.base.CursorWrapper = MetricsCursorWrapper
 
 
 # http://www.randallmorey.com/blog/2010/feb/17/django-cache-sessions-and-google-analytics/
