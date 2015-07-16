@@ -27,6 +27,7 @@ from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.db import transaction
+from django.forms.util import ErrorDict
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -44,7 +45,7 @@ from teams.permissions import (
 )
 from teams.permissions_const import ROLE_NAMES
 from teams.workflows import TeamWorkflow
-from videos.forms import (AddFromFeedForm, CreateSubtitlesForm,
+from videos.forms import (AddFromFeedForm, VideoForm, CreateSubtitlesForm,
                           MultiVideoCreateSubtitlesForm)
 from videos.models import (
         VideoMetadata, VIDEO_META_TYPE_IDS, Video, VideoFeed,
@@ -843,6 +844,11 @@ class MoveVideosForm(forms.Form):
         self.fields['team'].queryset = user.managed_teams(include_manager=False)
 
 class VideoFiltersForm(forms.Form):
+    """Form to handle the filters on the team videos page
+
+    Note that this form is a bit weird because it uses the GET params, rather
+    than POST data.
+    """
     LANGUAGE_CHOICES = [
         ('any', _('Any language')),
     ] + get_language_choices()
@@ -857,7 +863,7 @@ class VideoFiltersForm(forms.Form):
         ('-time', _('Time, oldest')),
         ('subs', _('Most completed languages')),
         ('-subs', _('Least complete languages')),
-    ], initial='recent', required=False)
+    ], initial='time', required=False)
 
     def __init__(self, team, request):
         super(VideoFiltersForm, self).__init__(data=self.calc_data(request))
@@ -1028,3 +1034,157 @@ class EditMembershipForm(forms.Form):
         else:
             member_to_edit.role = self.cleaned_data['role']
             member_to_edit.save()
+
+class NewMoveTeamVideoForm(forms.Form):
+    team_video = forms.ChoiceField(choices=[])
+    new_team = forms.ChoiceField(label=_('New Team'), choices=[])
+
+    def __init__(self, team, user, *args, **kwargs):
+        super(NewMoveTeamVideoForm, self).__init__(*args, **kwargs)
+        dest_teams = permissions.can_move_videos_to(
+            team, user,
+        )
+        self.fields['new_team'].choices = [
+            (t.id, t.name) for t in dest_teams
+        ]
+        if dest_teams:
+            self.enabled = True
+            self.fields['team_video'].choices = [
+                (tv.id, tv.id) for tv in team.teamvideo_set.all()
+            ]
+        else:
+            self.enabled = False
+
+    def save(self):
+        team_video = TeamVideo.objects.get(id=self.cleaned_data['team_video'])
+        dest_team = Team.objects.get(id=self.cleaned_data['new_team'])
+        team_video.move_to(dest_team)
+        self.dest_team = dest_team
+        return team_video
+
+    def message(self):
+        return fmt(_('Video moved to %(team)s.'), team=self.dest_team)
+
+    def error_message(self):
+        return _('Error moving video.')
+
+class NewAddTeamVideoForm(VideoForm):
+    project = forms.ChoiceField(label=_('Project'), choices=[])
+    thumbnail = forms.ImageField(required=False)
+
+    def __init__(self, team, user, *args, **kwargs):
+        super(NewAddTeamVideoForm, self).__init__(user, *args, **kwargs)
+        self.team = team
+        if not permissions.can_add_video(team, user):
+            self.enabled = False
+        else:
+            self.enabled = True
+            self.fields['project'].choices = [
+                (p.id, p.name) for p in Project.objects.for_team(team)
+            ]
+        if not self.fields['project'].choices:
+            del self.fields['project']
+
+    def full_clean(self):
+        if not self.enabled:
+            self._errors = ErrorDict()
+            self._errors['__all__'] = _("You don't have permission to "
+                                        "add videos to this team")
+            return {}
+        return super(NewAddTeamVideoForm, self).full_clean()
+
+    def clean(self):
+        if not self._errors:
+            video, created = Video.get_or_create_for_url(
+                self.cleaned_data['video_url'], self._video_type, self.user,
+            )
+            if not created and video.get_team_video() is not None:
+                raise forms.ValidationError(
+                    _(u'Video is already part of a team')
+                )
+            self.video = video
+            self.created = created
+        return self.cleaned_data
+
+    def save(self):
+        if 'project' in self.fields:
+            project_id = self.cleaned_data['project']
+        else:
+            project_id = None
+        team_video = TeamVideo.objects.create(
+            video=self.video, team=self.team, project_id=project_id,
+        )
+        if self.cleaned_data['thumbnail']:
+            thumb = self.cleaned_data['thumbnail']
+            self.video.s3_thumbnail.save(thumb.name, thumb)
+        return team_video
+
+    def message(self):
+        if self.created:
+            return _('Video added to team.')
+        else:
+            return _('Existing video added to team.')
+
+    def error_message(self):
+        return _('Error adding video.')
+
+class NewEditTeamVideoForm(forms.Form):
+    team_video = forms.ChoiceField(choices=[])
+    project = forms.ChoiceField(label=_('Project'), choices=[])
+    thumbnail = forms.ImageField(label=_('Change thumbnail'), required=False)
+
+    def __init__(self, team, user, *args, **kwargs):
+        super(NewEditTeamVideoForm, self).__init__(*args, **kwargs)
+        if not permissions.can_edit_videos(team, user):
+            self.enabled = False
+        else:
+            self.enabled = True
+            self.fields['team_video'].choices = [
+                (tv.id, tv.id) for tv in team.teamvideo_set.all()
+            ]
+            self.fields['project'].choices = [
+                (p.id, p.name) for p in Project.objects.for_team(team)
+            ]
+        if not self.fields['project'].choices:
+            del self.fields['project']
+
+    def save(self):
+        team_video = (TeamVideo.objects
+                      .select_related('video')
+                      .get(id=self.cleaned_data['team_video']))
+        if ('project' in self.fields and
+            self.cleaned_data['project'] != team_video.project_id):
+            team_video.project_id = self.cleaned_data['project']
+            team_video.save()
+        if self.cleaned_data['thumbnail']:
+            thumb = self.cleaned_data['thumbnail']
+            team_video.video.s3_thumbnail.save(thumb.name, thumb)
+        return team_video
+
+    def message(self):
+        return _('Video updated.')
+
+    def error_message(self):
+        return _('Error updating video.')
+
+class RemoveTeamVideoForm(forms.Form):
+    team_video = forms.ChoiceField(choices=[])
+
+    def __init__(self, team, user, *args, **kwargs):
+        super(RemoveTeamVideoForm, self).__init__(*args, **kwargs)
+        if not permissions.can_remove_videos(team, user):
+            self.enabled = False
+        else:
+            self.enabled = True
+            self.fields['team_video'].choices = [
+                (tv.id, tv.id) for tv in team.teamvideo_set.all()
+            ]
+
+    def save(self):
+        TeamVideo.objects.filter(id=self.cleaned_data['team_video']).delete()
+
+    def message(self):
+        return _("Video removed from team.")
+
+    def error_message(self):
+        return _('Error removing video.')

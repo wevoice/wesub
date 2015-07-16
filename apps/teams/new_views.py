@@ -44,7 +44,7 @@ from . import views as old_views
 from . import forms
 from . import permissions
 from . import tasks
-from .models import (Invite, Setting, Team, Project,
+from .models import (Invite, Setting, Team, Project, TeamVideo,
                      TeamLanguagePreference, TeamMember)
 from .statistics import compute_statistics
 from auth.models import CustomUser as User
@@ -126,32 +126,69 @@ def videos(request, team):
     if team.is_old_style():
         return old_views.detail(request, team)
 
+    # We embed several modal forms on the page, but luckily we can use the
+    # same code to handle them all
+    form_classes = {
+        'add': forms.NewAddTeamVideoForm,
+        'edit': forms.NewEditTeamVideoForm,
+        'remove': forms.RemoveTeamVideoForm,
+        'move': forms.NewMoveTeamVideoForm,
+    }
+    page_forms = {}
+    for name, klass in form_classes.items():
+        if request.method == 'POST' and request.POST.get('form') == name:
+            form = klass(team, request.user, data=request.POST,
+                         files=request.FILES)
+            if form.is_valid():
+                form.save()
+                messages.success(request, form.message())
+                return HttpResponseRedirect(request.build_absolute_uri())
+            else:
+                messages.error(request, "{}<br>{}".format(
+                    unicode(form.error_message()),
+                    _('Please retry and contact an Amara admin the '
+                      'issue continues')))
+                # We don't want to display the error on the form since we
+                # re-use it for each video.  So unbind the data.
+                form = klass(team, request.user)
+                logging.error(form.errors.as_text())
+        else:
+            form = klass(team, request.user)
+        page_forms[name] = form
+
     filters_form = forms.VideoFiltersForm(team, request)
     if filters_form.is_bound and filters_form.is_valid():
-        videos = filters_form.get_queryset()
+        team_videos = filters_form.get_queryset()
     else:
-        videos = team.videos.all()
+        team_videos = (team.teamvideo_set.all()
+                       .order_by('-video__created')
+                       .select_related('video'))
 
-    paginator = AmaraPaginator(videos, VIDEOS_PER_PAGE)
+    paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
     page = paginator.get_page(request)
 
-    if filters_form.is_bound:
+    if filters_form.is_bound and filters_form.is_valid():
         # Hack to convert the search index results to regular Video objects.
         # We will probably be able to drop this when we implement #838
-        video_order = {
-            result.video_pk: i
+        team_video_order = {
+            result.team_video_pk: i
             for i, result in enumerate(page)
         }
-        videos = list(Video.objects.filter(id__in=video_order.keys()))
-        videos.sort(key=lambda v: video_order[v.id])
+        team_videos = list(
+            TeamVideo.objects
+            .filter(id__in=team_video_order.keys())
+            .select_related('video')
+        )
+        team_videos.sort(key=lambda tv: team_video_order[tv.id])
     else:
-        videos = list(page)
+        team_videos = list(page)
 
     return render(request, 'new-teams/videos.html', {
         'team': team,
-        'videos': videos,
+        'team_videos': team_videos,
         'page': page,
         'filters_form': filters_form,
+        'forms': page_forms,
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Videos')),

@@ -380,6 +380,15 @@ def can_move_videos(team, user):
     role = get_role_for_target(user, team, None, None)
     return role in [ROLE_ADMIN, ROLE_OWNER]
 
+def can_move_videos_to(current_team, user):
+    if not can_move_videos(current_team, user):
+        return []
+    qs = (TeamMember.objects.admins()
+          .filter(user=user)
+          .exclude(team=current_team)
+          .select_related('team'))
+    return [m.team for m in qs]
+
 def can_sort_by_primary_language(team, user):
     return team.slug != "ted"
 
@@ -412,6 +421,19 @@ def can_remove_video(team_video, user):
         2: ROLE_MANAGER,
         3: ROLE_ADMIN,
     }[team_video.team.video_policy]
+
+    return role in _perms_equal_or_greater(role_required)
+
+def can_remove_videos(team, user):
+    """Return whether the given user can remove the given team video."""
+
+    role = get_role_for_target(user, team)
+
+    role_required = {
+        1: ROLE_CONTRIBUTOR,
+        2: ROLE_MANAGER,
+        3: ROLE_ADMIN,
+    }[team.video_policy]
 
     return role in _perms_equal_or_greater(role_required)
 
@@ -449,6 +471,18 @@ def can_edit_video(team_video, user):
 
     return role in _perms_equal_or_greater(role_required)
 
+def can_edit_videos(team, user):
+    """Return whether the given user can edit the given video."""
+
+    role = get_role_for_target(user, team)
+
+    role_required = {
+        1: ROLE_CONTRIBUTOR,
+        2: ROLE_MANAGER,
+        3: ROLE_ADMIN,
+    }[team.video_policy]
+
+    return role in _perms_equal_or_greater(role_required)
 
 def can_view_settings_tab(team, user):
     """Return whether the given user can view (and therefore edit) the team's settings.
