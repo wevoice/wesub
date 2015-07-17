@@ -50,11 +50,7 @@
     {% announcement %}
     {% if user.is_authenticated %}
         {% messages %}
-        {% block email_confirmation_block %}
-            {% email_confirmation_notification %}
-        {% endblock %}
     {% endif %}
-    {% require_email_dialog %}
 
 <div id="header">
   {% block header %}{% include "new-header.html" %}{% endblock %}

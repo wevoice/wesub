@@ -49,13 +49,18 @@ nav {
     button.menu-toggle-all {
         background: $off-white;
         border-color: $light-gray;
-        color: $medium-gray;
+        color: $medium-gray !important;
         border-radius: 5px;
         margin: 10px 0;
         z-index: $z-index-menu;
     }
     .burger {
+        position: absolute;
+        right: 10px;
+        top: 0;
         text-align: right;
+        z-index: $z-index-menu;
+
         @include not-small-screen {
             display: none;
         }
