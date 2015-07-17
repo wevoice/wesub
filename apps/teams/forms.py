@@ -1095,7 +1095,11 @@ class NewMoveTeamVideoForm(forms.Form):
         return team_video
 
     def message(self):
-        return fmt(_('Video moved to %(team)s.'), team=self.dest_team)
+        return fmt(_('Video moved to <a href="%(url)s">%(team)s</a>.'),
+                   url=reverse(
+                       'teams:dashboard', args=(self.dest_team.slug,),
+                   ),
+                   team=self.dest_team)
 
     def error_message(self):
         return _('Error moving video.')
