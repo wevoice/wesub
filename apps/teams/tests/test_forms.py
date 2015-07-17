@@ -254,6 +254,7 @@ class EditTeamVideoFormTest(TestCase):
         thumb_file = test_thumbnail_file()
         form = self.make_form({
             'team_video': self.team_video.id,
+            'primary_audio_language': 'en',
             'project': self.project2.id,
         }, {
             'thumbnail': thumb_file,
@@ -262,6 +263,7 @@ class EditTeamVideoFormTest(TestCase):
         form.save()
         team_video = reload_obj(self.team_video)
         assert_equal(team_video.project, self.project2)
+        assert_equal(team_video.video.primary_audio_language_code, 'en')
         assert_equal(mock_save.call_args,
                      mock.call(thumb_file.name, thumb_file))
 
