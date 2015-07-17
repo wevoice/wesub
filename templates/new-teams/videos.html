@@ -43,7 +43,7 @@
         </a>
         <ul class="actions">
           {% if forms.edit.enabled %}
-          <li><a class="open-modal" data-modal="edit-form" data-heading="{% blocktrans with title=video.title_display %}Edit Team Video: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}, "project": "{{team_video.project_id }}" }' href="#">{% trans "edit" %}</a></li>
+          <li><a class="open-modal" data-modal="edit-form" data-heading="{% blocktrans with title=video.title_display %}Edit Team Video: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}, "primary_audio_language": "{{ video.primary_audio_language_code }}", "project": "{{team_video.project_id }}" }' href="#">{% trans "edit" %}</a></li>
           {% endif %}
           {% if forms.move.enabled %}
           <li><a class="open-modal" data-modal="move-form" data-heading="{% blocktrans with title=video.title_display %}Move Team Video: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}}' href="#">{% trans "move" %}</a></li>
@@ -88,6 +88,7 @@
     <button class="close"></button>
     <input type="hidden" name="form" value="edit">
     <input type="hidden" name="team_video">
+    {% include "_field.html" with field=forms.edit.primary_audio_language %}
     {% include "_field.html" with field=forms.edit.project %}
     {% include "_field.html" with field=forms.edit.thumbnail %}
     <footer class="buttons">

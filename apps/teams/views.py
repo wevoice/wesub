@@ -823,7 +823,7 @@ def add_videos(request, slug):
     if form.is_valid():
         form.save()
         messages.success(request, form.success_message())
-        return redirect(reverse('teams:video_feeds', kwargs={
+        return redirect(reverse('teams:settings_feeds', kwargs={
             'slug': team.slug,
         }))
 
@@ -2385,7 +2385,7 @@ def video_feed(request, team, feed_id):
             feed.update()
         elif action == 'delete':
             feed.delete()
-            return redirect(reverse('teams:video_feeds', kwargs={
+            return redirect(reverse('teams:settings_feeds', kwargs={
                 'slug': team.slug,
             }))
         return redirect(reverse('teams:video_feed', kwargs={

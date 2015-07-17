@@ -1162,6 +1162,7 @@ class NewAddTeamVideoForm(VideoForm):
 
 class NewEditTeamVideoForm(forms.Form):
     team_video = forms.ChoiceField(choices=[])
+    primary_audio_language = forms.ChoiceField(required=False, choices=[])
     project = forms.ChoiceField(label=_('Project'), choices=[])
     thumbnail = forms.ImageField(label=_('Change thumbnail'), required=False)
 
@@ -1177,6 +1178,8 @@ class NewEditTeamVideoForm(forms.Form):
             self.fields['project'].choices = [
                 (p.id, p.name) for p in Project.objects.for_team(team)
             ]
+            self.fields['primary_audio_language'].choices = \
+                    get_language_choices(with_empty=True)
         if not self.fields['project'].choices:
             del self.fields['project']
 
@@ -1184,13 +1187,20 @@ class NewEditTeamVideoForm(forms.Form):
         team_video = (TeamVideo.objects
                       .select_related('video')
                       .get(id=self.cleaned_data['team_video']))
-        if ('project' in self.fields and
-            self.cleaned_data['project'] != team_video.project_id):
+        video = team_video.video
+
+        project = self.cleaned_data.get('project')
+        primary_audio_language = self.cleaned_data['primary_audio_language']
+        thumbnail = self.cleaned_data['thumbnail']
+
+        if 'project' in self.fields and project != team_video.project_id:
             team_video.project_id = self.cleaned_data['project']
             team_video.save()
-        if self.cleaned_data['thumbnail']:
-            thumb = self.cleaned_data['thumbnail']
-            team_video.video.s3_thumbnail.save(thumb.name, thumb)
+        if primary_audio_language != video.primary_audio_language_code:
+            video.primary_audio_language_code = primary_audio_language
+            video.save()
+        if thumbnail:
+            team_video.video.s3_thumbnail.save(thumbnail.name, thumbnail)
         return team_video
 
     def message(self):
