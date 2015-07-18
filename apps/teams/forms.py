@@ -1104,6 +1104,80 @@ class NewMoveTeamVideoForm(forms.Form):
     def error_message(self):
         return _('Error moving video.')
 
+class MoveTeamVideosForm(forms.Form):
+    team_videos = forms.MultipleChoiceField(choices=[])
+    new_team = forms.ChoiceField(label=_('New Team'), choices=[])
+    project = forms.ChoiceField(label=_('Project'), choices=[],
+                                required=False)
+
+    def __init__(self, team, user, *args, **kwargs):
+        super(MoveTeamVideosForm, self).__init__(*args, **kwargs)
+        dest_teams = [team] + permissions.can_move_videos_to(
+            team, user,
+        )
+        self.fields['new_team'].choices = [
+            (dest.id, dest.name) for dest in dest_teams
+        ]
+        if dest_teams:
+            self.enabled = True
+            self.fields['team_videos'].choices = [
+                (tv.id, tv.id) for tv in team.teamvideo_set.all()
+            ]
+            self.setup_projects(dest_teams)
+        else:
+            self.enabled = False
+
+    def setup_projects(self, dest_teams):
+        # choices regular django choices object.  project_options is a list of
+        # (id, name, team_id) tuples.  We need to store team_id in the
+        # <option> tag to make our javascript work
+        choices = [ ('', _('None')) ]
+        self.project_options = [
+            ('', _('None'), 0),
+        ]
+
+        qs = (Project.objects
+              .filter(team__in=dest_teams)
+              .exclude(name=Project.DEFAULT_NAME))
+        for project in qs:
+            choices.append((project.id, project.name))
+            self.project_options.append(
+                (project.id, project.name, project.team_id)
+            )
+        self.fields['project'].choices = choices
+
+    def clean_project(self):
+        project_id = self.cleaned_data.get('project', '')
+        if project_id == '':
+            return None
+        if self.data.get('new_team') is None:
+            # No team given, so we can't validate the project.
+            return None
+
+        project = Project.objects.get(id=project_id)
+        if str(project.team_id) != self.data['new_team']:
+            raise forms.ValidationError(_("Project is not part of team"))
+        return project
+
+    def clean_new_team(self):
+        if not self.cleaned_data.get('new_team'):
+            return None
+        return Team.objects.get(id=self.cleaned_data['new_team'])
+
+    def save(self):
+        qs = TeamVideo.objects.filter(id__in=self.cleaned_data['team_videos'])
+        for team_video in qs:
+            team_video.move_to(self.cleaned_data['new_team'],
+                               self.cleaned_data['project'])
+
+    def message(self):
+        new_team = self.cleaned_data['new_team']
+        return fmt(_('Videos moved to <a href="%(url)s">%(team)s</a>.'),
+                   url=reverse(
+                       'teams:dashboard', args=(new_team.slug,),
+                   ),
+                   team=new_team)
+
 class NewAddTeamVideoForm(VideoForm):
     project = forms.ChoiceField(label=_('Project'), choices=[])
     thumbnail = forms.ImageField(required=False)

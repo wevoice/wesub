@@ -484,6 +484,7 @@ MEDIA_BUNDLES = {
             'src/js/site/pagination.js',
             'src/js/site/autocomplete.js',
             'src/js/site/team-members.js',
+            'src/js/site/team-bulk-move.js',
             'src/js/site/team-integration-settings.js',
         ],
     },

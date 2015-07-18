@@ -43,11 +43,15 @@ button, a.button {
 
     &.small {
         @include small-button;
+        margin-bottom: 2px;
     }
 
     &.medium {
         @include medium-button;
+        margin-bottom: 4px;
     }
+
+    margin-bottom: 8px;
 
     &.full {
         width: 100%;

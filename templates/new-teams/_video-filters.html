@@ -1,0 +1,19 @@
+{% load url from future %}
+{% load i18n %}
+<div class="section">
+  <h5>{% trans "Filter and Sort" %}</h5>
+  <form method="GET" action="">
+    {% include "_field.html" with field=filters_form.q %}
+    {% if filters_form.show_project %}
+    {% include "_field.html" with field=filters_form.project %}
+    {% endif %}
+    {% include "_field.html" with field=filters_form.sort %}
+
+    <div class="actions">
+      <button class="submit">Filter</button>
+      {% if filters_form.is_bound %}
+      <a href="{{ request.path }}" class="button cancel">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+</div>

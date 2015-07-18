@@ -196,6 +196,68 @@ def videos(request, team):
     })
 
 @team_view
+def move_videos(request, team):
+    if team.is_old_style():
+        return old_views.move_videos(request, team)
+
+    if not permissions.can_move_videos(team, request.user):
+        return HttpResponseRedirect(reverse('teams:videos',
+                                            args=(team.slug,)))
+
+    if request.method == 'POST':
+        form = forms.MoveTeamVideosForm(team, request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, form.message())
+            return HttpResponseRedirect(reverse('teams:videos',
+                                                args=(team.slug,)))
+    else:
+        form = forms.MoveTeamVideosForm(team, request.user)
+
+    filters_form = forms.VideoFiltersForm(team, request)
+    if filters_form.is_bound and filters_form.is_valid():
+        team_videos = filters_form.get_queryset()
+    else:
+        team_videos = (team.teamvideo_set.all()
+                       .order_by('-video__created')
+                       .select_related('video'))
+
+    paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
+    page = paginator.get_page(request)
+
+    if filters_form.is_bound and filters_form.is_valid():
+        # Hack to convert the search index results to regular Video objects.
+        # We will probably be able to drop this when we implement #838
+        team_video_order = {
+            result.team_video_pk: i
+            for i, result in enumerate(page)
+        }
+        team_videos = list(
+            TeamVideo.objects
+            .filter(id__in=team_video_order.keys())
+            .select_related('video')
+        )
+        team_videos.sort(key=lambda tv: team_video_order[tv.id])
+    else:
+        team_videos = list(page)
+
+    if request.method == 'POST':
+        messages.info(request, unicode(request.POST.getlist('videos')))
+
+    return render(request, 'new-teams/move-videos.html', {
+        'team': team,
+        'team_videos': team_videos,
+        'form': form,
+        'page': page,
+        'filters_form': filters_form,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Videos'), 'teams:videos', team.slug),
+            BreadCrumb(_('Bulk Move Videos')),
+        ],
+    })
+
+@team_view
 def members(request, team):
     if team.is_old_style():
         return old_views.detail_members(request, team)

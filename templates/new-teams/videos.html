@@ -5,29 +5,18 @@
 
 {% block content %}
 
-<h2>{% blocktrans %}Members for {{ team }}{% endblocktrans %}</h2>
+<h2>{% blocktrans %}Videos for {{ team }}{% endblocktrans %}</h2>
 <div class="split-view">
   <div class="filters sidebar">
+    {% include "new-teams/_video-filters.html" %}
+    {% if forms.add.enabled or forms.move.enabled %}
     <div class="section">
-      <h5>{% trans "Filter and Sort" %}</h5>
-      <form method="GET" action="">
-        {% include "_field.html" with field=filters_form.q %}
-        {% if filters_form.show_project %}
-          {% include "_field.html" with field=filters_form.project %}
-        {% endif %}
-        {% include "_field.html" with field=filters_form.sort %}
-
-        <div class="actions">
-          <button class="submit">Filter</button>
-          {% if filters_form.is_bound %}
-          <a href="{% url "teams:videos" team.slug %}" class="button cancel">Clear</a>
-          {% endif %}
-        </div>
-      </form>
-    </div>
-    {% if forms.add.enabled %}
-    <div class="section">
+      {% if forms.add.enabled %}
       <a class="button secondary full open-modal" data-modal="add-form">{% trans "Add Video" %}</a>
+      {% endif %}
+      {% if forms.move.enabled %}
+      <a href="{% url "teams:move_videos" team.slug %}{% if request.META.QUERY_STRING %}?{{ request.META.QUERY_STRING }}{% endif %}" class="button secondary full">{% trans "Bulk Move Videos" %}</a>
+      {% endif %}
     </div>
     {% endif %}
   </div>

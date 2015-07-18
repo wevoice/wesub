@@ -1,0 +1,60 @@
+{% extends "new-teams/base.html" %}
+
+{% load i18n videos_tags %}
+{% load url from future %}
+
+{% block content %}
+<h2>{% blocktrans %}Bulk Move Videos for {{ team }}{% endblocktrans %}</h2>
+<div class="split-view">
+  <div class="filters sidebar">
+    {% include "new-teams/_video-filters.html" %}
+  </div>
+  <div class="main">
+    {% if page %}
+    <form action="" method="POST" class="team-bulk-move">
+      {% csrf_token %}
+
+      <fieldset>
+        <legend>{% trans "Select Videos" %}</legend>
+
+        <ul class="video-card-list">
+          {% for team_video in team_videos %}
+          {% with video=team_video.video %}
+          <li>
+          <div class="wrapper">
+            <input type="hidden" name="team_videos" value="{{team_video.id}}" disabled>
+            <h5 class="title">{{ video.title_display }}</h5>
+            <img src="{{ video.get_wide_thumbnail }}" alt="{{ video.title_display }}">
+          </div>
+          </li>
+          {% endwith %}
+          {% endfor %}
+        </ul>
+
+      </fieldset>
+
+      <fieldset>
+        <legend>{% trans "Move Videos To" %}</legend>
+        {% include "_field.html" with field=form.new_team %}
+        <label>
+          <span class="label">{{ form.project.label }}</span>
+          {% include "_field_errors.html" with field=form.project%}
+          <select name="project">
+            {% for project_id, project_name, team_id in form.project_options %}
+            <option value="{{ project_id }}" data-team="{{ team_id }}">{{ project_name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </fieldset>
+
+    <div class="actions">
+        <button class="submit">{% trans "Move" %}</button>
+    </div>
+    </form>
+    {% include "_new_paginator.html" %}
+    {% else %}
+    <p class="empty">{% trans "No Videos found" %}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

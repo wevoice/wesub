@@ -91,3 +91,17 @@ ul.member-list {
         margin-right: 10px;
     }
 }
+
+.team-bulk-move {
+    ul {
+        margin-top: 10px;
+    }
+    li {
+        cursor: pointer;
+
+        &.selected .wrapper {
+            border: 8px solid $primary;
+            margin: -8px;
+        }
+    }
+}
