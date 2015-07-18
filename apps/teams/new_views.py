@@ -161,7 +161,7 @@ def videos(request, team):
         team_videos = filters_form.get_queryset()
     else:
         team_videos = (team.teamvideo_set.all()
-                       .order_by('-video__created')
+                       .order_by('-created')
                        .select_related('video'))
 
     paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
@@ -219,7 +219,7 @@ def move_videos(request, team):
         team_videos = filters_form.get_queryset()
     else:
         team_videos = (team.teamvideo_set.all()
-                       .order_by('-video__created')
+                       .order_by('-created')
                        .select_related('video'))
 
     paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)

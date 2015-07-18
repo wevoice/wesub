@@ -891,11 +891,11 @@ class VideoFiltersForm(forms.Form):
     sort = forms.ChoiceField(choices=[
         ('name', _('Name, a-z')),
         ('-name', _('Name, z-a')),
-        ('time', _('Time, newest')),
-        ('-time', _('Time, oldest')),
+        ('time', _('Time, oldest')),
+        ('-time', _('Time, newest')),
         ('subs', _('Most completed languages')),
         ('-subs', _('Least complete languages')),
-    ], initial='time', required=False)
+    ], initial='-time', required=False)
 
     def __init__(self, team, request):
         super(VideoFiltersForm, self).__init__(data=self.calc_data(request))
