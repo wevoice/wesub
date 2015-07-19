@@ -915,7 +915,8 @@ class VideoFiltersForm(forms.Form):
         projects = Project.objects.for_team(self.team)
         if projects:
             choices = [
-                ('any', _('Any Project')),
+                ('any', _('Any')),
+                ('none', _('No Project')),
             ] + [
                 (p.slug, p.name) for p in projects
             ]
@@ -939,6 +940,8 @@ class VideoFiltersForm(forms.Form):
             for term in get_terms(q):
                 qs = qs.auto_query(qs.query.clean(term).decode('utf-8'))
         if project != 'any':
+            if project == 'none':
+                project = Project.DEFAULT_NAME
             try:
                 project_pk = self.team.project_set.get(slug=project).id
             except Project.DoesNotExist:
@@ -1123,11 +1126,11 @@ class MoveTeamVideosForm(forms.Form):
             self.fields['team_videos'].choices = [
                 (tv.id, tv.id) for tv in team.teamvideo_set.all()
             ]
-            self.setup_projects(dest_teams)
+            self.setup_project_field(dest_teams)
         else:
             self.enabled = False
 
-    def setup_projects(self, dest_teams):
+    def setup_project_field(self, dest_teams):
         # choices regular django choices object.  project_options is a list of
         # (id, name, team_id) tuples.  We need to store team_id in the
         # <option> tag to make our javascript work
@@ -1147,15 +1150,23 @@ class MoveTeamVideosForm(forms.Form):
         self.fields['project'].choices = choices
 
     def clean_project(self):
-        project_id = self.cleaned_data.get('project', '')
-        if project_id == '':
-            return None
-        if self.data.get('new_team') is None:
-            # No team given, so we can't validate the project.
+        try:
+            team = self.cleaned_data['new_team']
+        except KeyError:
+            # No valid team, so we can't validate the project.
             return None
 
-        project = Project.objects.get(id=project_id)
-        if str(project.team_id) != self.data['new_team']:
+        project_id = self.cleaned_data.get('project', '')
+
+        if project_id == '':
+            return team.default_project
+
+        try:
+            project = Project.objects.get(id=project_id)
+        except Project.DoesNotExist:
+            raise forms.ValidationError(_("Invalid project"))
+
+        if project.team_id != team.id:
             raise forms.ValidationError(_("Project is not part of team"))
         return project
 
@@ -1241,11 +1252,13 @@ class NewAddTeamVideoForm(VideoForm):
 class NewEditTeamVideoForm(forms.Form):
     team_video = forms.ChoiceField(choices=[])
     primary_audio_language = forms.ChoiceField(required=False, choices=[])
-    project = forms.ChoiceField(label=_('Project'), choices=[])
+    project = forms.ChoiceField(label=_('Project'), choices=[],
+                                required=False)
     thumbnail = forms.ImageField(label=_('Change thumbnail'), required=False)
 
     def __init__(self, team, user, *args, **kwargs):
         super(NewEditTeamVideoForm, self).__init__(*args, **kwargs)
+        self.team = team
         if not permissions.can_edit_videos(team, user):
             self.enabled = False
         else:
@@ -1253,12 +1266,21 @@ class NewEditTeamVideoForm(forms.Form):
             self.fields['team_video'].choices = [
                 (tv.id, tv.id) for tv in team.teamvideo_set.all()
             ]
-            self.fields['project'].choices = [
-                (p.id, p.name) for p in Project.objects.for_team(team)
-            ]
+            self.setup_project_field()
             self.fields['primary_audio_language'].choices = \
                     get_language_choices(with_empty=True)
-        if not self.fields['project'].choices:
+
+    def setup_project_field(self):
+        projects = Project.objects.for_team(self.team)
+        if projects:
+            self.fields['project'].choices = [
+                ('', _('None')),
+            ] + [
+                (p.id, p.name) for p in projects
+            ]
+        else:
+            # only the default project has been created, don't present a
+            # selectbox with that as the only choice
             del self.fields['project']
 
     def save(self):
@@ -1271,9 +1293,12 @@ class NewEditTeamVideoForm(forms.Form):
         primary_audio_language = self.cleaned_data['primary_audio_language']
         thumbnail = self.cleaned_data['thumbnail']
 
-        if 'project' in self.fields and project != team_video.project_id:
-            team_video.project_id = self.cleaned_data['project']
-            team_video.save()
+        if 'project' in self.fields:
+            if project == '':
+                project = self.team.default_project.id
+            if project != team_video.project_id:
+                team_video.project_id = project
+                team_video.save()
         if primary_audio_language != video.primary_audio_language_code:
             video.primary_audio_language_code = primary_audio_language
             video.save()

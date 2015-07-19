@@ -241,9 +241,6 @@ def move_videos(request, team):
     else:
         team_videos = list(page)
 
-    if request.method == 'POST':
-        messages.info(request, unicode(request.POST.getlist('videos')))
-
     return render(request, 'new-teams/move-videos.html', {
         'team': team,
         'team_videos': team_videos,
