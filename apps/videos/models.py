@@ -2057,7 +2057,12 @@ class ImportedVideo(models.Model):
 
 class VideoTypeUrlPatternManager(models.Manager):
     def patterns_for_type(self, type):
-        return self.filter(type=type)
+        cache_key = 'videotypepattern:{0}'.format(type)
+        patterns = cache.get(cache_key)
+        if patterns is None:
+            patterns = self.filter(type=type)
+            cache.set(cache_key, patterns)
+        return patterns
 
 class VideoTypeUrlPattern(models.Model):
     type = models.CharField(max_length=2)

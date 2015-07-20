@@ -427,7 +427,8 @@ class TestTypeUrlPatterns(TestCase):
         pattern.type = self.type
         pattern.save()
     def get_patterns_for_type(self):
-        patterns = VideoTypeUrlPattern.objects.patterns_for_type("AB")
+        patterns = VideoTypeUrlPattern.objects.patterns_for_type("YT")
+        self.assertEquals(len(patterns), 1)
         for p in patterns:
             self.assertEquals(p.type, self.type)
             self.assertEquals(p.url_pattern, self.url)
