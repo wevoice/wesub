@@ -421,10 +421,13 @@ class TestGetMergedDFXP(TestCase):
 class TestTypeUrlPatterns(TestCase):
     def setUp(self):
         pattern = VideoTypeUrlPattern()
-        pattern.url = "toto"
-        pattern.type="TT"
+        self.url = "http://example.com/"
+        self.type = "YT"
+        pattern.url_pattern = self.url
+        pattern.type = self.type
         pattern.save()
     def get_patterns_for_type(self):
         patterns = VideoTypeUrlPattern.objects.patterns_for_type("AB")
-        for pattern in patterns:
-            self.assertEquals(pattern.type, "AB")
+        for p in patterns:
+            self.assertEquals(p.type, self.type)
+            self.assertEquals(p.url_pattern, self.url)
