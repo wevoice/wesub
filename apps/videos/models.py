@@ -2055,6 +2055,11 @@ class ImportedVideo(models.Model):
     class Meta:
         ordering = ('-id',)
 
+class VideoTypeUrlPatternManager(models.Manager):
+    def patterns_for_type(self, type):
+        return self.filter(type=type)
+
 class VideoTypeUrlPattern(models.Model):
     type = models.CharField(max_length=2)
     url_pattern = models.URLField(max_length=255, unique=True)
+    objects = VideoTypeUrlPatternManager()
