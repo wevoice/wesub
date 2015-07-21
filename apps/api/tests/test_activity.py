@@ -25,6 +25,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient, APIRequestFactory
 
+from api.tests.utils import format_datetime_field
 from comments.models import Comment
 from subtitles import pipeline
 from utils.factories import *
@@ -66,7 +67,8 @@ class ActivityTestCase(TestCase):
 
     def check_activity_data(self, activity_data, activity):
         assert_equal(activity_data['type'], activity.action_type)
-        assert_equal(activity_data['created'], activity.created.isoformat())
+        assert_equal(activity_data['created'],
+                     format_datetime_field(activity.created))
         assert_equal(activity_data['new_video_title'],
                      activity.new_video_title)
         assert_equal(activity_data['id'], activity.id)

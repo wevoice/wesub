@@ -41,7 +41,6 @@ from tastypie.models import ApiKey
 from caching import CacheGroup, ModelCacheManager
 from utils.amazon import S3EnabledImageField
 from utils import translation
-from utils.metrics import Meter
 from utils.tasks import send_templated_email_async
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
@@ -557,7 +556,6 @@ class EmailConfirmationManager(models.Manager):
             "confirmation_key": confirmation_key,
         }
         subject = u'Please confirm your email address for %s' % current_site.name
-        Meter('templated-emails-sent-by-type.email-address-confirmation').inc()
         send_templated_email_async(user, subject, "messages/email/email-confirmation.html", context)
         return self.create(
             user=user,
