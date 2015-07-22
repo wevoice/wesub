@@ -1108,8 +1108,11 @@ class NewMoveTeamVideoForm(forms.Form):
         return _('Error moving video.')
 
 class MoveTeamVideosForm(forms.Form):
-    team_videos = forms.MultipleChoiceField(choices=[])
+    team_videos = forms.MultipleChoiceField(choices=[], required=False)
     new_team = forms.ChoiceField(label=_('New Team'), choices=[])
+    include_all = forms.BooleanField(
+        label=_('Move all videos, including those on other pages'),
+        required=False)
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
 
@@ -1175,8 +1178,9 @@ class MoveTeamVideosForm(forms.Form):
             return None
         return Team.objects.get(id=self.cleaned_data['new_team'])
 
-    def save(self):
-        qs = TeamVideo.objects.filter(id__in=self.cleaned_data['team_videos'])
+    def save(self, qs):
+        if not self.cleaned_data['include_all']:
+            qs = qs.filter(id__in=self.cleaned_data['team_videos'])
         for team_video in qs:
             team_video.move_to(self.cleaned_data['new_team'],
                                self.cleaned_data['project'])

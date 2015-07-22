@@ -201,18 +201,8 @@ def move_videos(request, team):
         return old_views.move_videos(request, team)
 
     if not permissions.can_move_videos(team, request.user):
-        return HttpResponseRedirect(reverse('teams:videos',
+        return HttpResponseRedirect(reverse('teams:move_videos',
                                             args=(team.slug,)))
-
-    if request.method == 'POST':
-        form = forms.MoveTeamVideosForm(team, request.user, data=request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, form.message())
-            return HttpResponseRedirect(reverse('teams:videos',
-                                                args=(team.slug,)))
-    else:
-        form = forms.MoveTeamVideosForm(team, request.user)
 
     filters_form = forms.VideoFiltersForm(team, request)
     if filters_form.is_bound and filters_form.is_valid():
@@ -221,6 +211,16 @@ def move_videos(request, team):
         team_videos = (team.teamvideo_set.all()
                        .order_by('-created')
                        .select_related('video'))
+
+    if request.method == 'POST':
+        form = forms.MoveTeamVideosForm(team, request.user, data=request.POST)
+        if form.is_valid():
+            form.save(team_videos)
+            messages.success(request, form.message())
+            return HttpResponseRedirect(reverse('teams:videos',
+                                                args=(team.slug,)))
+    else:
+        form = forms.MoveTeamVideosForm(team, request.user)
 
     paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
     page = paginator.get_page(request)

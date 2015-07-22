@@ -104,4 +104,14 @@ ul.member-list {
             margin: -8px;
         }
     }
+
+    fieldset {
+        position: relative;
+    }
+
+    #select-all {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
 }

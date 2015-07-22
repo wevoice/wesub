@@ -28,8 +28,11 @@ function handleTeamBulkMove() {
     var projectField = $('select[name=project]', form);
     var teamField = $('select[name=new_team]', form);
     var projectChoices = $('option', projectField).clone();
+    var selectAll = $('#select-all input', form);
+
     teamField.change(updateProjectChoices);
     updateProjectChoices();
+    selectAll.change(onSelectAllChanged);
     $('.wrapper', form).click(onVideoClick);
 
     function updateProjectChoices() {
@@ -53,6 +56,21 @@ function handleTeamBulkMove() {
         } else {
             input.prop('disabled', true);
             li.removeClass('selected');
+        }
+        if($('.video-card-list li').is(':not(.selected)')) {
+            selectAll.prop('checked', false);
+        } else {
+            selectAll.prop('checked', true);
+        }
+    }
+
+    function onSelectAllChanged() {
+        if(selectAll.prop('checked')) {
+            $('.video-card-list li', form).addClass('selected');
+            $('input[name=team_videos]', form).prop('disabled', false);
+        } else {
+            $('.video-card-list li', form).removeClass('selected');
+            $('input[name=team_videos]', form).prop('disabled', true);
         }
     }
 }
