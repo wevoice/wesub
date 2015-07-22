@@ -13,7 +13,7 @@
 <div class="banner">
   <div class="content group">
     <h1>{{ team_messages.pagetext_welcome_heading }}</h1>
-    {% if team.description %}<p>{{ team.description }}</p>{% endif %}
+    {% if team.description %}{{ team.description|urlize|linebreaks }}{% endif %}
 
     <ol class="group">
       <li>
