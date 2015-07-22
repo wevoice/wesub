@@ -191,7 +191,10 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
             else:
                 # get_task_for_editor should only return approve/review tasks
                 raise ValueError("Wrong task type: %s" % task)
-            return subtitles.workflows.ReviewWorkMode(heading)
+            help_text = _('Watch the video and verify that the subtitles '
+                          'are correct. Click Approve when done, or Save '
+                          'Draft to finish later')
+            return subtitles.workflows.ReviewWorkMode(heading, help_text)
         else:
             return subtitles.workflows.NormalWorkMode()
 
