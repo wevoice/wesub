@@ -504,14 +504,14 @@ class GuidelinesMessagesForm(forms.Form):
 
     messages_invite = MessageTextField(
         label=_('When a member is invited to join the team'))
-    messages_manager = MessageTextField(
-        label=_('When a member applies to join the team'))
-    messages_admin = MessageTextField(
-        label=_('When a member is given the Manager role'))
     messages_application = MessageTextField(
-        label=_('When a member is given the Admin role'))
+        label=_('When a member applies to join the team'))
     messages_joins = MessageTextField(
         label=_('When a member joins the team'))
+    messages_manager = MessageTextField(
+        label=_('When a member is given the Manager role'))
+    messages_admin = MessageTextField(
+        label=_('When a member is given the Admin role'))
 
     guidelines_subtitle = MessageTextField(
         label=('When transcribing'))
