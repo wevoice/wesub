@@ -580,7 +580,7 @@ def settings_projects(request, team):
     if team.is_old_style():
         return old_views.settings_projects(request, team)
 
-    projects = team.project_set.exclude(name=Project.DEFAULT_NAME)
+    projects = Project.objects.for_team(team)
 
     form = request.POST.get('form')
 
