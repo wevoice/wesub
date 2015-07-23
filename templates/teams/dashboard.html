@@ -29,7 +29,7 @@
 
     {% block select_language_dialog %}
         {% if not team|is_team_member:user %}
-            {% url "teams:join_team" slug=team.slug as redirect_url %}
+            {% url "teams:join" slug=team.slug as redirect_url %}
             {% select_language_dialog hide_link="True" redirect=redirect_url %}
         {% else %}
             {% select_language_dialog hide_link="True" %}

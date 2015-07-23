@@ -389,8 +389,8 @@ class TeamsTest(TestCase):
         manager = UserFactory()
         TeamMemberFactory(team=team, user=manager)
 
-        join_url = reverse('teams:join_team', args=[team.slug])
-        leave_url = reverse('teams:leave_team', args=[team.slug])
+        join_url = reverse('teams:join', args=[team.slug])
+        leave_url = reverse('teams:leave', args=[team.slug])
 
         self.client.login(**self.auth)
 
@@ -796,7 +796,7 @@ class TeamsTest(TestCase):
         self.client.login()
         TeamMember.objects.filter(user=self.user, team=team).delete()
         self.assertFalse(team.is_member(self.user))
-        url = reverse("teams:join_team", kwargs={"slug": team.slug})
+        url = reverse("teams:join", kwargs={"slug": team.slug})
         response = self.client.post(url)
         self.failUnlessEqual(response.status_code, 302)
         self.assertTrue(team.is_member(self.user))
@@ -1272,7 +1272,7 @@ class TestInvites(TestCase):
         self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
 
         # user leaves team
-        url = reverse("teams:leave_team", args=(self.team.slug,))
+        url = reverse("teams:leave", args=(self.team.slug,))
         response  = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
@@ -1363,7 +1363,7 @@ class TestApplication(TestCase):
 
 
     def _leave_team(self, user):
-        url = reverse("teams:leave_team", args=(self.team.slug,))
+        url = reverse("teams:leave", args=(self.team.slug,))
         self.client.post(url)
 
     def _remove_member(self, user):
