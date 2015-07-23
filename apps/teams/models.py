@@ -52,6 +52,7 @@ from teams.permissions_const import (
 )
 from teams import tasks
 from teams import workflows
+from teams.exceptions import ApplicationInvalidException
 from teams.signals import api_subtitles_approved, api_subtitles_rejected
 from utils import DEFAULT_PROTOCOL
 from utils import translation
@@ -469,6 +470,34 @@ class Team(models.Model):
             member = None
         self._member_cache[user.id] = member
         return member
+
+    def get_join_mode(self, user):
+        """Figure out how the user can join the team.
+
+        Returns:
+            - "open" -- user can join the team without any approval
+            - "application" -- user can apply to join the team
+            - "pending-application" -- user has a pending application to join
+              the team
+            - "invitation" -- user must be invited to join
+            - "already-joined" -- user has already joined the team
+            - None -- user can't join the team
+        """
+        if self.user_is_member(user):
+            return 'already-joined'
+        elif self.is_open():
+            return 'open'
+        elif self.is_by_invitation():
+            return 'invitation'
+        elif self.is_by_application():
+            try:
+                application = self.applications.get(user=user)
+            except Application.DoesNotExist:
+                return 'application'
+            else:
+                if application.status == Application.STATUS_PENDING:
+                    return 'pending-application'
+        return None
 
     def user_is_member(self, user):
         members = self.cache.get('members')
@@ -1443,9 +1472,6 @@ class MembershipNarrowing(models.Model):
 class TeamSubtitleNote(SubtitleNoteBase):
     team = models.ForeignKey(Team, related_name='+')
 
-class ApplicationInvalidException(Exception):
-    pass
-
 class ApplicationManager(models.Manager):
 
     def can_apply(self, team, user):
@@ -1500,6 +1526,26 @@ class Application(models.Model):
     class Meta:
         unique_together = (('team', 'user', 'status'),)
 
+    def check_can_submit(self):
+        """Check if a user can submit this application
+
+        Raises: ApplicationInvalidException if the user can't apply.  The
+        message will be set explaining why.
+        """
+        if self.status == Application.STATUS_PENDING and self.pk is not None:
+            raise ApplicationInvalidException(
+                fmt(_(u'You already have a pending application to %(team)s.'),
+                team=self.team)
+            )
+        elif self.status == Application.STATUS_DENIED:
+            raise ApplicationInvalidException(
+                _(u'Your application has been denied.')
+            )
+        elif self.status == Application.STATUS_MEMBER_REMOVED:
+            raise ApplicationInvalidException(
+                fmt(_(u'You have been removed from %(team)s.'),
+                    team=self.team)
+            )
 
     def approve(self, author, interface):
         """Approve the application.

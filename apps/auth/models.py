@@ -33,6 +33,7 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.db import models
+from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _, ugettext
@@ -266,6 +267,15 @@ class CustomUser(BaseUser):
 
     def calc_languages(self):
         return list(self.userlanguage_set.values_list('language', flat=True))
+
+    def set_languages(self, language_codes):
+        with transaction.commit_on_success():
+            self.userlanguage_set.all().delete()
+            self.userlanguage_set = [
+                UserLanguage(language=lc)
+                for lc in language_codes
+            ]
+        self.cache.invalidate()
 
     def get_language_names(self):
         """Get a list of language names that the user speaks."""

@@ -31,13 +31,15 @@ from django.forms.util import ErrorDict
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext
 
 from subtitles.forms import SubtitlesUploadForm
 from teams.models import (
     Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite,
-    BillingReport, MembershipNarrowing
+    BillingReport, MembershipNarrowing, Application,
 )
 from teams import permissions
+from teams.exceptions import ApplicationInvalidException
 from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
     can_assign_task, can_delete_language, can_remove_video,
@@ -1337,3 +1339,49 @@ class RemoveTeamVideoForm(forms.Form):
 
     def error_message(self):
         return _('Error removing video.')
+
+class ApplicationForm(forms.Form):
+    about_you = forms.CharField(widget=forms.Textarea, label="")
+    language1 = forms.ChoiceField(
+        choices=get_language_choices(with_empty=True))
+    language2 = forms.ChoiceField(
+        choices=get_language_choices(with_empty=True), required=False)
+    language3 = forms.ChoiceField(
+        choices=get_language_choices(with_empty=True), required=False)
+    language4 = forms.ChoiceField(
+        choices=get_language_choices(with_empty=True), required=False)
+    language5 = forms.ChoiceField(
+        choices=get_language_choices(with_empty=True), required=False)
+    language6 = forms.ChoiceField(
+        choices=get_language_choices(with_empty=True), required=False)
+
+    def __init__(self, application, *args, **kwargs):
+        super(ApplicationForm, self).__init__(*args, **kwargs)
+        self.application = application
+        self.fields['about_you'].help_text = fmt(
+            ugettext('Tell us a little bit about yourself and why '
+                     'you\'re interested in translating with '
+                     '%(team)s.  This should be 3-5 sentences, no '
+                     'longer!'),
+            team=application.team)
+
+        for i, language in enumerate(application.user.get_languages()):
+            field = self.fields['language{}'.format(i+1)]
+            field.initial = language
+
+    def clean(self):
+        try:
+            self.application.check_can_submit()
+        except ApplicationInvalidException, e:
+            raise forms.ValidationError(e.message)
+        return self.cleaned_data
+
+    def save(self):
+        self.application.note = self.cleaned_data['about_you']
+        self.application.save()
+        languages = []
+        for i in xrange(1, 7):
+            value = self.cleaned_data['language{}'.format(i)]
+            if value:
+                languages.append(value)
+        self.application.user.set_languages(languages)

@@ -37,15 +37,16 @@ from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext as _
 
 from . import views as old_views
 from . import forms
 from . import permissions
 from . import tasks
+from .exceptions import ApplicationInvalidException
 from .models import (Invite, Setting, Team, Project, TeamVideo,
-                     TeamLanguagePreference, TeamMember)
+                     TeamLanguagePreference, TeamMember, Application)
 from .statistics import compute_statistics
 from auth.models import CustomUser as User
 from utils.breadcrumbs import BreadCrumb
@@ -350,6 +351,52 @@ def invite_user_search(request, team):
     return HttpResponse(json.dumps(data), mimetype='application/json')
 
 @public_team_view
+@login_required
+def join(request, team):
+    user = request.user
+
+    if team.user_is_member(request.user):
+        messages.info(request,
+                      fmt(_(u'You are already a member of %(team)s.'),
+                          team=team))
+    elif team.is_open():
+        member = TeamMember.objects.create(team=team, user=request.user,
+                                           role=TeamMember.ROLE_CONTRIBUTOR)
+        messages.success(request,
+                         fmt(_(u'You are now a member of %(team)s.'),
+                             team=team))
+        tasks.team_member_new.delay(member.pk)
+    elif team.is_by_application():
+        return application_form(request, team)
+    else:
+        messages.error(request,
+                       fmt(_(u'You cannot join %(team)s.'), team=team))
+    return redirect(team)
+
+def application_form(request, team):
+    try:
+        application = team.applications.get(user=request.user)
+    except Application.DoesNotExist:
+        application = Application(team=team, user=request.user)
+    try:
+        application.check_can_submit()
+    except ApplicationInvalidException, e:
+        messages.error(request, e.message)
+        return redirect(team)
+
+    if request.method == 'POST':
+        form = forms.ApplicationForm(application, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(team)
+    else:
+        form = forms.ApplicationForm(application)
+    return render(request, "new-teams/application.html", {
+        'team': team,
+        'form': form,
+    })
+
+@public_team_view
 def admin_list(request, team):
     if team.is_old_style():
         return old_views.detail_members(request, team,
@@ -459,8 +506,16 @@ def welcome(request, team):
         videos = team.videos.order_by('-id')[:2]
     else:
         videos = None
+
+    if Application.objects.open(team, request.user):
+        messages.info(request,
+                      _(u"Your application has been submitted. "
+                        u"You will be notified of the team "
+                        "administrator's response"))
+
     return render(request, 'new-teams/welcome.html', {
         'team': team,
+        'join_mode': team.get_join_mode(request.user),
         'team_messages': team.get_messages([
             'pagetext_welcome_heading',
         ]),

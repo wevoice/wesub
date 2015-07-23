@@ -1196,20 +1196,6 @@ def accept_invite(request, invite_pk, accept=True):
             "error_msg": _("This invite is no longer valid"),
         }, RequestContext(request)))
 
-@login_required
-def join_team(request, slug):
-    team = get_object_or_404(Team, slug=slug)
-    user = request.user
-
-    if not can_join_team(team, user):
-        messages.error(request, _(u'You cannot join this team.'))
-    else:
-        member = TeamMember(team=team, user=user, role=TeamMember.ROLE_CONTRIBUTOR)
-        member.save()
-        messages.success(request, _(u'You are now a member of this team.'))
-        notifier.team_member_new.delay(member.pk)
-    return redirect(team)
-
 def _check_can_leave(team, user):
     """Return an error message if the member cannot leave the team, otherwise None."""
 
