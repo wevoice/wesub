@@ -3868,9 +3868,12 @@
         setTimeout( onFirstPlay, 0 );
         return;
       }
-      addYouTubeEvent( "pause", onFirstPause );
+      // On Chrome the pause event is not fired
+      // so we hack with a timeout
+      //addYouTubeEvent( "pause", onFirstPause );
       player.seekTo( 0 );
       player.pauseVideo();
+      setTimeout(onFirstPause, 200 );
     }
 
     function addYouTubeEvent( event, listener ) {
