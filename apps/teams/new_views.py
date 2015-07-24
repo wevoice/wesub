@@ -49,6 +49,7 @@ from .models import (Invite, Setting, Team, Project, TeamVideo,
                      TeamLanguagePreference, TeamMember, Application)
 from .statistics import compute_statistics
 from auth.models import CustomUser as User
+from messages import tasks as messages_tasks
 from utils.breadcrumbs import BreadCrumb
 from utils.pagination import AmaraPaginator
 from utils.text import fmt
@@ -365,7 +366,7 @@ def join(request, team):
         messages.success(request,
                          fmt(_(u'You are now a member of %(team)s.'),
                              team=team))
-        tasks.team_member_new.delay(member.pk)
+        messages_tasks.team_member_new.delay(member.pk)
     elif team.is_by_application():
         return application_form(request, team)
     else:
