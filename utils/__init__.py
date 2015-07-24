@@ -28,7 +28,6 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.contrib.sites.models import Site
-from utils.metrics import Meter
 
 DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https')
 
@@ -116,8 +115,6 @@ def send_templated_email(to, subject, body_template, body_dict,
             oboe.Context.log('email', 'info', backtrace=False,**{"template":body_template})
         except Exception, e:
             print >> sys.stderr, "Oboe error: %s" % e
-
-    Meter('templated-emails-sent').inc()
 
     return email.send(fail_silently)
 

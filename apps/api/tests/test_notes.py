@@ -23,6 +23,7 @@ from nose.tools import *
 from rest_framework.test import APIClient
 import mock
 
+from api.tests.utils import format_datetime_field
 from subtitles import workflows
 from subtitles.models import SubtitleNote
 from utils import test_utils
@@ -55,7 +56,7 @@ class TestActionsAPI(TestCase):
             {
                 'user': self.user.username,
                 'body': 'test note',
-                'created': note.created.isoformat(),
+                'created': format_datetime_field(note.created),
             }
         ])
 

@@ -25,8 +25,8 @@ DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https')
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
 
+from localeurl.utils import universal_url
 from utils import send_templated_email
-from utils.metrics import Meter
 from unilangs import LanguageCode
 from videos.models import Video
 
@@ -112,22 +112,28 @@ class BaseNotification(object):
         query for the latest data. This is team dependent if the team
         has a custom base url.
         """
-        from apiv2.api import (
-            VideoLanguageResource, VideoResource, ApplicationResource
-        )
         from teams.models import Application
-        if self.video:
-            video_klass = getattr(self.__class__, "video_resource_class", VideoResource)
-            if self.language:
-                lang_klass = getattr(self.__class__, "language_resource_class", VideoLanguageResource)
-                url =  lang_klass(self.api_name).get_resource_uri(self.language)
-                if self.version_pk:
-                   url += "subtitles/?version_no=%s"  % self.version.version_number
-                return url
-            else:
-                return video_klass(self.api_name).get_resource_uri(self.video)
+
+        if self.language:
+            url = universal_url('api:subtitles', kwargs={
+                'video_id': self.language.video.video_id,
+                'language_code': self.language.language_code
+            })
+            if self.version:
+                url += '?version_no={}'.format(self.version.version_number)
+            return url
+        elif self.video:
+            return universal_url('api:video-detail', kwargs={
+                'video_id': self.video.video_id,
+            })
         elif self.application_pk:
-            return ApplicationResource("partners").get_resource_uri(Application.objects.get(pk=self.application_pk))
+            application = Application.objects.get(pk=self.application_pk)
+            return universal_url('api:team-application-detail', kwargs={
+                'team_slug': application.team.slug,
+                'id': application.id,
+            })
+        else:
+            return None
 
     @property
     def video_id(self):
@@ -182,16 +188,12 @@ class BaseNotification(object):
                         'data_sent':data_sent,
                     })
 
-                Meter('http-callback-notification-error').inc()
-            else:
-                Meter('http-callback-notification-success').inc()
             return success, content
         except:
             logger.exception("Failed to send http notification ")
         return None, None
 
     def send_email(self, email_to):
-        Meter('templated-emails-sent-by-type.teams.team-video-activity').inc()
         send_templated_email(email_to,
                 _("New activity on your team video"),
                 "teams/emails/new-activity.html",
