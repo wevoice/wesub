@@ -194,7 +194,7 @@ class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
 
 
 class ActivityViewSetSwitcher(APISwitcherMixin, ActivityViewSet):
-    switchover_date = 20150728
+    switchover_date = 20150824
 
     class Deprecated(ActivityViewSet):
         class serializer_class(ActivitySerializer):

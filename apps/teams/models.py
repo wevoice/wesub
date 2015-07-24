@@ -53,6 +53,7 @@ from teams.permissions_const import (
 from teams import tasks
 from teams import workflows
 from teams.exceptions import ApplicationInvalidException
+from teams.notifications import BaseNotification
 from teams.signals import api_subtitles_approved, api_subtitles_rejected
 from utils import DEFAULT_PROTOCOL
 from utils import translation
@@ -2924,13 +2925,22 @@ class TeamNotificationSetting(models.Model):
 
     objects = TeamNotificationSettingManager()
 
-    def get_notification_class(self):
-        try:
-            from ted.notificationclasses import NOTIFICATION_CLASS_MAP
+    NOTIFICATION_CLASS_MAP = {
+        1: BaseNotification,
+    }
 
-            return NOTIFICATION_CLASS_MAP[self.notification_class]
-        except ImportError:
-            logger.exception("Apparently unisubs-integration is not installed")
+    @classmethod
+    def register_notification_class(cls, index, notification_class):
+        """Register a new notification class.
+
+        This is used to allow other apps to extend the notification system.
+        """
+        if index in cls.NOTIFICATION_CLASS_MAP:
+            raise ValueError("%s already registered", index)
+        cls.NOTIFICATION_CLASS_MAP[index] = notification_class
+
+    def get_notification_class(self):
+        return self.NOTIFICATION_CLASS_MAP.get(self.notification_class)
 
     def notify(self, event_name,  **kwargs):
         """Resolve the notification class for this setting and fires notfications."""
@@ -2939,6 +2949,12 @@ class TeamNotificationSetting(models.Model):
         if not notification_class:
             logger.error("Could not find notification class %s" % self.notification_class)
             return
+
+        logger.info(
+            "Sending %s %s (team: %s) (partner: %s) (data: %s)",
+            notification_class.__name__, event_name, self.team, self.partner,
+            kwargs,
+        )
 
         notification = notification_class(self.team, self.partner,
                 event_name,  **kwargs)
