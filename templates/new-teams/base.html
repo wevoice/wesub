@@ -14,7 +14,7 @@
     <li>
         <a href="{% url "teams:dashboard" team.slug %}">{% trans "Dashboard" %}</a>
     </li>
-    {% for page in team.new_workflow.extra_pages %}
+    {% for page in team|extra_pages:request.user %}
     <li>
         <a href="{{ page.url }}">{{ page.title }}</a>
     </li>
@@ -52,7 +52,7 @@
         <li>
           <a href="{% url "teams:settings_workflows" slug=team.slug %}">{% trans "Workflows" %}</a>
         </li>
-        {% for page in team.new_workflow.extra_settings_pages %}
+      {% for page in team|extra_settings_pages:request.user %}
         <li>
           <a href="{{ page.url }}">{{ page.title }}</a>
         </li>

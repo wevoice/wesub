@@ -76,22 +76,28 @@ class TeamWorkflow(object):
         """Get the SubtitleWorkflow for a video with this workflow.  """
         raise NotImplementedError()
 
-    def extra_pages(self):
+    def extra_pages(self, user):
         """Get extra team pages to handle this workflow.
 
         These pages will be listed as tabs in the team section.  Workflows
         will typically use this for things like dashboard pages.
+
+        Args:
+            user -- user viewing the page
 
         Returns:
             list of :class:`TeamPage` objects
         """
         return []
 
-    def extra_settings_pages(self):
+    def extra_settings_pages(self, user):
         """Get extra team settings pages to handle this workflow.
 
         This works just like extra_pages(), but the pages will show up as
         tabs under the settings section.
+
+        Args:
+            user -- user viewing the page
 
         Returns:
             list of :class:`TeamPage` objects

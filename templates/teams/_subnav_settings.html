@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n teams_tags %}
 {% load url from future %}
 
 <ul>
@@ -14,7 +14,7 @@
         <a href="{% url "teams:settings_workflows" slug=team.slug %}">{% trans "Workflows" %}</a>
     </li>
 
-    {% for page in team.new_workflow.extra_settings_pages %}
+    {% for page in team|extra_settings_pages:request.user %}
     <li{% if current_sub == page.name %} class="current" {% endif %}>
         <a href="{{ page.url }}">{{ page.title }}</a>
     </li>

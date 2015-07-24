@@ -570,3 +570,11 @@ def get_upload_form(task, user):
 
     """
     return TaskUploadForm(user=user, video=task.team_video.video)
+
+@register.filter
+def extra_pages(team, user):
+    return team.new_workflow.extra_pages(user)
+
+@register.filter
+def extra_settings_pages(team, user):
+    return team.new_workflow.extra_settings_pages(user)

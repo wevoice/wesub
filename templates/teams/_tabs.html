@@ -7,7 +7,7 @@
             {% trans "Dashboard" %}
         </a>
     </li>
-    {% for page in team.new_workflow.extra_pages %}
+    {% for page in team|extra_pages:request.user %}
     <li{% if current == page.name %} class="current" {% endif %}>
         <a href="{{ page.url }}">{{ page.title }}</a>
     </li>
