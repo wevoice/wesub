@@ -23,7 +23,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseServerError
 from django.db.models import Count
 from django.conf import settings
 from django.contrib import messages
