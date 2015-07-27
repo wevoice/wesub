@@ -1181,11 +1181,28 @@ class MoveTeamVideosForm(forms.Form):
         return Team.objects.get(id=self.cleaned_data['new_team'])
 
     def save(self, qs):
-        if not self.cleaned_data['include_all']:
-            qs = qs.filter(id__in=self.cleaned_data['team_videos'])
-        for team_video in qs:
+
+        for team_video in self.find_team_videos_to_update(qs):
             team_video.move_to(self.cleaned_data['new_team'],
                                self.cleaned_data['project'])
+
+    def find_team_videos_to_update(self, qs):
+        from haystack.query import SearchQuerySet
+        include_all = self.cleaned_data['include_all']
+        if isinstance(qs, SearchQuerySet):
+            # hack to make this work if we get a SearchQuerySet.  Fixing
+            # pculture/unisubs#838 would be really nice
+            if not include_all:
+                qs = qs.filter(
+                    team_video_pk__in=self.cleaned_data['team_videos']
+                )
+                qs = TeamVideo.objects.filter(
+                    id__in=qs.values_list('team_video_pk', flat=True)
+                )
+        else:
+            if not include_all:
+                qs = qs.filter(id__in=self.cleaned_data['team_videos'])
+        return qs
 
     def message(self):
         new_team = self.cleaned_data['new_team']
