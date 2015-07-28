@@ -14,5 +14,69 @@ ul.activity {
         float: right;
         margin-left: 5px;
     }
+}
 
+@mixin thumb-list-height($height) {
+    // Sizes the thumbnails for a thumb-list.  Height should be the height the
+    // content.  We'll set the thumbnail width so that it's a 16:9 ratio.
+    .thumb {
+        width: $height * 16 / 9;
+        height: $height;
+        line-height: $height;
+    }
+}
+
+ul.thumb-list {
+    // By default, size the thumb enough to fit 4 lines of text + 1 line of
+    // buttons.
+    @include thumb-list-height($line-height * 4 + 2.8rem);
+    li {
+        margin-bottom: 30px;
+    }
+
+    .thumb {
+        display: block;
+        float: left;
+        position: relative;
+        margin-right: 10px;
+        background: $black;
+        text-align: center;
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            vertical-align: middle;
+        }
+
+        .badge {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0 5px;
+            line-height: $line-height;
+            color: $lighter-gray;
+            font-size: $small-font-size;
+            font-weight: bold;
+        }
+    }
+
+    .extra-info {
+        float: right;
+        font-style: italic;
+        margin-left: 10px;
+    }
+
+    button, a.button {
+        @include medium-button;
+        margin: 0;
+    }
+
+    .secondary-actions {
+        float: right;
+        button {
+            @include button-color-light($white);
+            padding: 0 5px;
+        }
+    }
 }

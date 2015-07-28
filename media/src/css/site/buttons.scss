@@ -1,22 +1,36 @@
 @mixin small-button {
     font-size: 1.4rem;
-    line-height: 1.4rem;
-    padding: 6px 12px;
+    line-height: 2.8rem;
+    padding: 0 12px;
 }
 
 @mixin medium-button {
     font-size: 1.6rem;
-    line-height: 1.6rem;
-    padding: 6px 18px;
+    line-height: 2.8rem;
+    padding: 0 18px;
 }
 
 @mixin button-color($color) {
     background-color: $color;
-    border-color: $color;
 
     &:hover {
         background: lighten($color, 10);
-        border-color: lighten($color, 10);
+    }
+    &:active {
+        background: lighten($color, 20);
+    }
+}
+
+@mixin button-color-light($color) {
+    background-color: $color;
+    color: $dark-gray !important;
+
+    &:hover {
+        background: darken($color, 10);
+    }
+
+    &:active {
+        background: darken($color, 20);
     }
 }
 
@@ -26,7 +40,7 @@
     padding: 13px 26px;
     font-size: 2.0rem;
     font-weight: $font-weight-normal;
-    border: 1px solid;
+    border: 0;
     color: $white !important;
     cursor: pointer;
 
@@ -43,30 +57,13 @@ button, a.button {
 
     &.small {
         @include small-button;
-        margin-bottom: 2px;
     }
 
     &.medium {
         @include medium-button;
-        margin-bottom: 4px;
     }
 
-    margin-bottom: 8px;
-
-    &.full {
-        width: 100%;
-        box-sizing: border-box;
-        text-align: center;
-    }
-
-    &.secondary {
-        background-color: $white;
-        border-color: $light-gray;
-        color: $dark-gray !important;
-        &:hover {
-            background: darken($white, 10);
-        }
-    }
+    margin-bottom: 0;
 
     &.primary {
         @include button-color($primary);
@@ -78,6 +75,27 @@ button, a.button {
 
     &.cancel {
         @include button-color($light-gray);
+    }
+
+    &.flat {
+        @include button-color-light($white);
+    }
+}
+
+
+.sidebar .tools {
+    button, a.button {
+        border: 1px solid $light-gray;
+        background-color: $white;
+        box-sizing: border-box;
+        color: $dark-gray !important;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 8px;
+
+        &:hover {
+            background: darken($white, 10);
+        }
     }
 }
 

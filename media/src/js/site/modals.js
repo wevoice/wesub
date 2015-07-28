@@ -57,7 +57,7 @@ $.fn.openModal = function() {
 }
 
 $document.ready(function() {
-    $('a.open-modal').each(function() {
+    $('.open-modal').each(function() {
         var link = $(this);
         var modal = $('#' + link.data('modal'));
 

@@ -7,40 +7,47 @@
 
 <h2>{% blocktrans %}Videos for {{ team }}{% endblocktrans %}</h2>
 <div class="split-view">
-  <div class="filters sidebar">
-    {% include "new-teams/_video-filters.html" %}
+  <div class="sidebar">
+    <div class="section filters">
+      {% include "new-teams/_video-filters.html" %}
+    </div>
     {% if forms.add.enabled or forms.move.enabled %}
-    <div class="section">
+    <div class="section tools">
       {% if forms.add.enabled %}
-      <a class="button secondary full open-modal" data-modal="add-form">{% trans "Add Video" %}</a>
+      <a class="button open-modal" data-modal="add-form">{% trans "Add Video" %}</a>
       {% endif %}
       {% if forms.move.enabled %}
-      <a href="{% url "teams:move_videos" team.slug %}{% if request.META.QUERY_STRING %}?{{ request.META.QUERY_STRING }}{% endif %}" class="button secondary full">{% trans "Bulk Move Videos" %}</a>
+      <a href="{% url "teams:move_videos" team.slug %}{% if request.META.QUERY_STRING %}?{{ request.META.QUERY_STRING }}{% endif %}" class="button">{% trans "Bulk Move Videos" %}</a>
       {% endif %}
     </div>
     {% endif %}
   </div>
   <div class="main">
     {% if page %}
-    <ul class="video-card-list team-videos">
+    <ul class="thumb-list team-videos">
       {% for team_video in team_videos %}
       {% with video=team_video.video %}
       <li>
-        <a class="wrapper" href="{% url "videos:video" video_id=video.video_id %}">
-          <h5 class="title">{{ video.title_display }}</h5>
+        <a class="thumb" href="{% url "videos:video" video_id=video.video_id %}">
           <img src="{{ video.get_wide_thumbnail }}" alt="{{ video.title_display }}">
+          {% if video.duration %}<div class="badge">{{ video.duration|format_duration }}</div>{% endif %}
         </a>
-        <ul class="actions">
-          {% if forms.edit.enabled %}
-          <li><a class="open-modal" data-modal="edit-form" data-heading="{% blocktrans with title=video.title_display %}Edit Team Video: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}, "primary_audio_language": "{{ video.primary_audio_language_code }}", "project": "{{team_video.project_id }}" }' href="#">{% trans "edit" %}</a></li>
-          {% endif %}
+        <div class="extra-info">{{ video.get_primary_audio_language_code_display }}</div>
+        <h6 class="one-line">
+          <a href="{% url "videos:video" video_id=video.video_id %}">{{ video.title_display }}</a>
+        </h6>
+        <div class="three-lines">{{ video.description|urlize|linebreaks }}</div>
+        <div class="secondary-actions">
           {% if forms.move.enabled %}
-          <li><a class="open-modal" data-modal="move-form" data-heading="{% blocktrans with title=video.title_display %}Move Team Video: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}}' href="#">{% trans "move" %}</a></li>
+          <button class="open-modal" title="{% trans "move video" %}" data-modal="move-form" data-heading="{% blocktrans with title=video.title_display %}Move Team Video: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}}' href="#"><span class="fa fa-arrow-right"></span></button>
           {% endif %}
           {% if forms.remove.enabled %}
-          <li><a class="open-modal" data-modal="remove-form" data-heading="{% blocktrans with title=video.title_display %}Remove Video from Team: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}}' href="#">{% trans "remove" %}</a></li>
+          <button class="open-modal" title="{% trans "remove video" %}" data-modal="remove-form" data-heading="{% blocktrans with title=video.title_display %}Remove Video from Team: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}}' href="#"><span class="fa fa-remove"></span></button>
           {% endif %}
-        </ul>
+        </div>
+        {% if forms.edit.enabled %}
+        <button class="open-modal" data-modal="edit-form" data-heading="{% blocktrans with title=video.title_display %}Edit Team Video: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}, "primary_audio_language": "{{ video.primary_audio_language_code }}", "project": "{{team_video.project_id }}" }'>{% trans "edit" %}</button>
+        {% endif %}
       </li>
       {% endwith %}
       {% endfor %}

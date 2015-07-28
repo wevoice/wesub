@@ -28,7 +28,7 @@ body, input, textarea, select {
 
 p {
     margin: 0;
-    padding: 0 0 $line-height/2 0;
+    padding: 0 0 $line-height 0;
 }
 
 strong {
@@ -41,8 +41,13 @@ h1, h2, {
     margin: 0;
 }
 
-h3, h4, h5, h6 {
+h3, h4 {
     padding: 0 0 0.5em 0;
+    margin: 0;
+}
+
+h5, h6 {
+    padding: 0;
     margin: 0;
 }
 
@@ -83,6 +88,10 @@ h1, h2, h3, h4, h5, h6 {
         line-height: $line-height;
         font-weight: $font-weight-normal;
     }
+
+    a {
+        color: inherit;
+    }
 }
 
 .empty {
@@ -91,4 +100,24 @@ h1, h2, h3, h4, h5, h6 {
 
 .confirmation {
     font-style: italic;
+}
+
+.one-line {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.two-lines {
+    height: $line-height * 2;
+    overflow: hidden;
+}
+
+.three-lines {
+    height: $line-height * 3;
+    overflow: hidden;
+}
+
+.four-lines {
+    height: $line-height * 4;
+    overflow: hidden;
 }
