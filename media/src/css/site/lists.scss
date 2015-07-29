@@ -67,6 +67,14 @@ ul.thumb-list {
         margin-left: 10px;
     }
 
+    input[type=checkbox] {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 17px;
+        height: 17px;
+    }
+
     button, a.button {
         @include medium-button;
         margin: 0;
@@ -79,4 +87,13 @@ ul.thumb-list {
             padding: 0 5px;
         }
     }
+}
+
+.select-all-thumbs {
+    text-align: right;
+    margin-bottom: 0;
+}
+
+.needs-one-selected, .needs-all-selected {
+    display: none;
 }

@@ -4,33 +4,43 @@
 {% load url from future %}
 
 {% block content %}
-
 <h2>{% blocktrans %}Videos for {{ team }}{% endblocktrans %}</h2>
 <div class="split-view">
   <div class="sidebar">
     <div class="section filters">
       {% include "new-teams/_video-filters.html" %}
     </div>
-    {% if forms.add.enabled or forms.move.enabled %}
+
+    {% if forms.add.enabled or forms.bulk_move.enabled %}
     <div class="section tools">
       {% if forms.add.enabled %}
-      <a class="button open-modal" data-modal="add-form">{% trans "Add Video" %}</a>
+      <button class="open-modal" data-modal="add-form">{% trans "Add Video" %}</button>
       {% endif %}
-      {% if forms.move.enabled %}
-      <a href="{% url "teams:move_videos" team.slug %}{% if request.META.QUERY_STRING %}?{{ request.META.QUERY_STRING }}{% endif %}" class="button">{% trans "Bulk Move Videos" %}</a>
+      {% if forms.bulk_move.enabled %}
+      <button class="open-modal needs-one-selected" data-modal="bulk-move-form">{% trans "Move Selected Videos" %}</button>
       {% endif %}
     </div>
     {% endif %}
   </div>
   <div class="main">
     {% if page %}
-    <ul class="thumb-list team-videos">
+    {% if forms.bulk_move.enabled %}
+    {# Wrap the form around the list so that it contains the checkboxes #}
+    <form action="" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="form" value="bulk_move">
+      <label class="select-all-thumbs"><input type="checkbox"> {% trans "Select all" %}</label>
+    {% endif %}
+    <ul class="thumb-list bulk-mode">
       {% for team_video in team_videos %}
       {% with video=team_video.video %}
       <li>
         <a class="thumb" href="{% url "videos:video" video_id=video.video_id %}">
           <img src="{{ video.get_wide_thumbnail }}" alt="{{ video.title_display }}">
           {% if video.duration %}<div class="badge">{{ video.duration|format_duration }}</div>{% endif %}
+          {% if forms.bulk_move.enabled %}
+          <input class="selection" type="checkbox" name="team_videos" value="{{ team_video.id }}">
+          {% endif %}
         </a>
         <div class="extra-info">{{ video.get_primary_audio_language_code_display }}</div>
         <h6 class="one-line">
@@ -53,6 +63,31 @@
       {% endfor %}
     </ul>
     {% include "_new_paginator.html" %}
+
+    {% if forms.bulk_move.enabled %}
+    <aside class="modal" id="bulk-move-form">
+      <h3>{% trans "Bulk Move Videos" %}</h3>
+      <button class="close"></button>
+      {% include "_field.html" with field=forms.bulk_move.new_team %}
+      <label>
+        <span class="label">{{ forms.bulk_move.project.label }}</span>
+        {% include "_field_errors.html" with field=forms.bulk_move.project%}
+        <select name="project">
+          {% for project_id, project_name, team_id in forms.bulk_move.project_options %}
+          <option value="{{ project_id }}" data-team="{{ team_id }}">{{ project_name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="needs-all-selected">
+        {% include "_field.html" with field=forms.bulk_move.include_all %}
+      </div>
+      <footer class="buttons">
+        <button>{% trans "Move Videos" %}</button>
+      </footer>
+    </aside>
+    </form>
+    {% endif %}
+
     {% else %}
     <p class="empty">{% trans "No Videos found" %}</p>
     {% endif %}
@@ -62,9 +97,9 @@
 {% if forms.add.enabled %}
 <aside class="modal" id="add-form">
   <h3>{% trans "Add Video" %}</h3>
+  <button class="close"></button>
   <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    <button class="close"></button>
     <input type="hidden" name="form" value="add">
     {% include "_field.html" with field=forms.add.video_url %}
     {% include "_field.html" with field=forms.add.project %}
@@ -79,9 +114,9 @@
 {% if forms.edit.enabled %}
 <aside class="modal" id="edit-form">
   <h3></h3>
+  <button class="close"></button>
   <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    <button class="close"></button>
     <input type="hidden" name="form" value="edit">
     <input type="hidden" name="team_video">
     {% include "_field.html" with field=forms.edit.primary_audio_language %}
@@ -97,9 +132,9 @@
 {% if forms.move.enabled %}
 <aside class="modal" id="move-form">
   <h3></h3>
+  <button class="close"></button>
   <form action="" method="POST">
     {% csrf_token %}
-    <button class="close"></button>
     <input type="hidden" name="form" value="move">
     <input type="hidden" name="team_video">
     {% include "_field.html" with field=forms.move.new_team %}
@@ -113,9 +148,9 @@
 {% if forms.remove.enabled %}
 <aside class="modal" id="remove-form">
   <h3></h3>
+  <button class="close"></button>
   <form action="" method="POST">
     {% csrf_token %}
-    <button class="close"></button>
     <input type="hidden" name="form" value="remove">
     <input type="hidden" name="team_video">
     <p class="confirmation">{% trans "Are you sure you want to remove this video from your team?" %}</p>

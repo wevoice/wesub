@@ -1113,7 +1113,7 @@ class MoveTeamVideosForm(forms.Form):
     team_videos = forms.MultipleChoiceField(choices=[], required=False)
     new_team = forms.ChoiceField(label=_('New Team'), choices=[])
     include_all = forms.BooleanField(
-        label=_('Move all videos, including those on other pages'),
+        label=_('Include videos on other pages'),
         required=False)
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
@@ -1188,21 +1188,18 @@ class MoveTeamVideosForm(forms.Form):
 
     def find_team_videos_to_update(self, qs):
         from haystack.query import SearchQuerySet
-        include_all = self.cleaned_data['include_all']
-        if isinstance(qs, SearchQuerySet):
+        if not self.cleaned_data['include_all']:
+            return TeamVideo.objects.filter(
+                id__in=self.cleaned_data['team_videos']
+            )
+        elif isinstance(qs, SearchQuerySet):
             # hack to make this work if we get a SearchQuerySet.  Fixing
             # pculture/unisubs#838 would be really nice
-            if not include_all:
-                qs = qs.filter(
-                    team_video_pk__in=self.cleaned_data['team_videos']
-                )
-                qs = TeamVideo.objects.filter(
-                    id__in=qs.values_list('team_video_pk', flat=True)
-                )
+            return TeamVideo.objects.filter(
+                id__in=qs.values_list('team_video_pk', flat=True)
+            )
         else:
-            if not include_all:
-                qs = qs.filter(id__in=self.cleaned_data['team_videos'])
-        return qs
+            return qs
 
     def message(self):
         new_team = self.cleaned_data['new_team']
@@ -1211,6 +1208,9 @@ class MoveTeamVideosForm(forms.Form):
                        'teams:dashboard', args=(new_team.slug,),
                    ),
                    team=new_team)
+
+    def error_message(self):
+        return _('Error moving videos.')
 
 class NewAddTeamVideoForm(VideoForm):
     project = forms.ChoiceField(label=_('Project'), choices=[])

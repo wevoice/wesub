@@ -1094,9 +1094,6 @@ class TeamVideo(models.Model):
                                               to_team=new_team,
                                               to_project=self.project)
 
-            # Update search data and other things
-            video_changed_tasks.delay(video.pk)
-
             # Create any necessary tasks.
             autocreate_tasks(self)
 
@@ -1104,6 +1101,8 @@ class TeamVideo(models.Model):
             api_teamvideo_new.send(self)
             video_moved_from_team_to_team.send(sender=self,
                                                destination_team=new_team, video=self.video)
+        # Update search data and other things
+        video_changed_tasks.delay(self.video_id)
 
     def get_task_for_editor(self, language_code):
         if not hasattr(self, '_editor_task'):
