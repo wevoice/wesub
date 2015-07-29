@@ -30,25 +30,12 @@ function handleThumbListSelection() {
     thumbnails.click(onThumbClicked);
     selectAll.change(onSelectAllChange);
 
-    function anyChecked() {
-        return checkboxes.is(':checked');
-    }
-
-    function allChecked() {
-        return !checkboxes.is(':not(:checked)');
-    }
-
     function onThumbClicked(evt) {
         var checkbox = $('input.selection', this);
         if(checkbox.length > 0) {
             checkbox.prop('checked', !checkbox.prop('checked'));
             evt.preventDefault();
             evt.stopPropagation();
-            if(!checkbox.prop('checked')) {
-                selectAll.prop('checked', false);
-            } else if(allChecked()) {
-                selectAll.prop('checked', true);
-            }
             updateSelectionSenstiveElts();
         }
     }
@@ -68,8 +55,28 @@ function handleThumbListSelection() {
     }
 
     function updateSelectionSenstiveElts() {
-        setComponentsEnabled($('.needs-one-selected'), anyChecked());
-        setComponentsEnabled($('.needs-all-selected'), allChecked());
+        var checkCount = checkboxes.filter(':checked').length;
+        setComponentsEnabled($('.needs-one-selected'), checkCount > 0);
+        setComponentsEnabled($('.needs-multiple-selected'), checkCount > 1);
+        setComponentsEnabled($('.needs-all-selected'),
+                checkCount == checkboxes.length);
+        selectAll.prop('checked', checkCount == checkboxes.length);
+        updateButtomSheet(checkCount);
+    }
+
+    function updateButtomSheet(checkCount) {
+        if(checkCount > 0) {
+            $('.bottom-sheet').addClass('shown');
+            // FIXME: This code should use ngettext, but we don't have it set
+            // up in javascript
+            if(checkCount > 1) {
+                $('.bottom-sheet h3').text(checkCount + ' videos selected');
+            } else {
+                $('.bottom-sheet h3').text('1 video selected');
+            }
+        } else {
+            $('.bottom-sheet').removeClass('shown');
+        }
     }
 }
 

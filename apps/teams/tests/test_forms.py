@@ -21,7 +21,10 @@ import os
 
 from django.test import TestCase
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.core.files.uploadedfile import SimpleUploadedFile
+from haystack import site
+from haystack.query import SearchQuerySet
 from nose.tools import *
 import mock
 
@@ -303,35 +306,69 @@ class EditTeamVideoFormTest(TestCase):
         assert_equal(form.fields['team_video'].choices, [])
         assert_false(form.enabled)
 
-class RemoveTeamVideoFormTest(TestCase):
-    @patch_for_test('teams.permissions.can_remove_videos')
-    def setUp(self, mock_can_remove_videos):
-        self.mock_can_remove_videos = mock_can_remove_videos
-        self.mock_can_remove_videos.return_value = True
+class BulkTeamVideoFormTest(TestCase):
+    def setUp(self):
+        self.check_permissions = mock.Mock(return_value=True)
+        self.perform_save = mock.Mock()
+        self.user = UserFactory()
+        self.team = TeamFactory(admin=self.user)
+        self.team_videos = [
+            TeamVideoFactory(team=self.team)
+            for i in range(10)
+        ]
 
-        self.team = TeamFactory()
-        self.team_video = TeamVideoFactory(team=self.team)
-        self.user = TeamMemberFactory(team=self.team).user
+    def make_form(self, *args, **kwargs):
+        class FormClass(forms.BulkTeamVideoForm):
+            check_permissions = self.check_permissions
+            perform_save = self.perform_save
+        return FormClass(self.team, self.user, *args, **kwargs)
 
-    def make_form(self, data=None):
-        return forms.RemoveTeamVideoForm(self.team, self.user, data=data)
+    def test_permission_check_pass(self):
+        assert_true(self.make_form().enabled)
 
-    def test_remove_video(self):
-        form = self.make_form({
-            'team_video': self.team_video.id,
+    def test_permission_check_fail(self):
+        self.check_permissions.return_value = False
+        assert_false(self.make_form().enabled)
+
+    def test_permission_check_fail_prevents_save(self):
+        self.check_permissions.return_value = False
+        bound_form = self.make_form(data={
+            'team_videos': [self.team_videos[0].id],
         })
-        assert_true(form.is_valid(), form.errors.as_text())
-        form.save()
-        assert_false(TeamVideo.objects.filter(id=self.team_video.id).exists())
-        # The video should still be around, but not in any team
-        vid = self.team_video.video_id
-        assert_true(Video.objects.filter(id=vid).exists())
-        assert_false(TeamVideo.objects.filter(video_id=vid).exists())
+        with assert_raises(PermissionDenied):
+            bound_form.save(self.team.teamvideo_set.all())
 
-    def test_can_remove_videos_permissions_check(self):
-        self.mock_can_remove_videos.return_value = False
-        form = self.make_form()
-        assert_false(form.enabled)
-        assert_equal(self.mock_can_remove_videos.call_args,
-                     mock.call(self.team, self.user))
-        assert_equal(form.fields['team_video'].choices, [])
+    def check_save(self, form, correct_videos):
+        assert_true(form.is_valid(), form.errors.as_text())
+        form.save(qs=self.team.teamvideo_set.all())
+        assert_items_equal(
+            form.perform_save.call_args[0][0],
+            correct_videos,
+        )
+
+    def test_save_no_include_all(self):
+        selected_videos = self.team_videos[:2]
+
+        form = self.make_form(data={
+            'team_videos': [tv.id for tv in selected_videos],
+        })
+        self.check_save(form, selected_videos)
+
+    def test_save_with_include_all(self):
+        form = self.make_form(data={
+            'team_videos': [self.team_videos[0].id],
+            'include_all': 1,
+        })
+        self.check_save(form, self.team_videos)
+
+    def test_save_with_include_all_and_search_qs(self):
+        search_index = site.get_index(TeamVideo)
+        for tv in self.team_videos:
+            search_index.update_object(tv)
+        search_qs = (SearchQuerySet().models(TeamVideo)
+                     .filter(team_id=self.team.id))
+        form = self.make_form(data={
+            'team_videos': [self.team_videos[0].id],
+            'include_all': 1,
+        })
+        self.check_save(form, self.team_videos)

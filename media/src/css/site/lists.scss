@@ -91,7 +91,11 @@ ul.thumb-list {
 
 .select-all-thumbs {
     text-align: right;
-    margin-bottom: 0;
+
+    label {
+        display: inline;
+        margin-bottom: 0;
+    }
 }
 
 .needs-one-selected, .needs-all-selected {

@@ -79,6 +79,21 @@ $document.ready(function() {
                     $('*[name=' + name + ']', modal).val(value);
                 });
             }
+            if(link.data('copyInput')) {
+                var inputName = link.data('copyInput');
+                var form = $('form', modal);
+                // Delete any inputs added before
+                $('input[name=' + inputName + '].copied', form).remove();
+                // Copy any inputs outside of forms into the modal
+                $('input[name=' + inputName + ']')
+                    .not(':checkbox:not(:checked)').each(function() { 
+                    var input = $(this);
+                    if(input.closest("form").length > 0) {
+                        return;
+                    }
+                    input.clone().attr('type', 'hidden').addClass('copied').appendTo(form);
+                });
+            }
         });
     });
 

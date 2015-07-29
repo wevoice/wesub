@@ -82,3 +82,26 @@ body {
         flex-grow: 1;
     }
 }
+
+.bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+    box-sizing: border-box;
+    padding: 0 20px;
+    background: rgba(0, 0, 0, 0.7);
+    transition: ease height 0.5s, ease padding 0.5s;
+    color: $off-white;
+    text-align: center;
+
+    &.shown {
+        height: 120px;
+        padding: 20px;
+    }
+
+    button {
+        margin-right: 20px;
+    }
+}

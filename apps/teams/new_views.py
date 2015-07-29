@@ -141,9 +141,9 @@ def videos(request, team):
     form_classes = {
         'add': forms.NewAddTeamVideoForm,
         'edit': forms.NewEditTeamVideoForm,
-        'remove': forms.RemoveTeamVideoForm,
-        'move': forms.NewMoveTeamVideoForm,
-        'bulk_move': forms.MoveTeamVideosForm,
+        'bulk_edit': forms.BulkEditTeamVideosForm,
+        'move': forms.MoveTeamVideosForm,
+        'remove': forms.RemoveTeamVideosForm,
     }
     page_forms = {}
     for name, klass in form_classes.items():
@@ -151,7 +151,7 @@ def videos(request, team):
             form = klass(team, request.user, data=request.POST,
                          files=request.FILES)
             if form.is_valid():
-                if isinstance(form, forms.MoveTeamVideosForm):
+                if isinstance(form, forms.BulkTeamVideoForm):
                     form.save(qs=team_videos)
                 else:
                     form.save()
@@ -189,9 +189,6 @@ def videos(request, team):
     else:
         team_videos = list(page)
 
-    if not team_videos:
-        # don't enable bulk move if there's nothing to select
-        page_forms['bulk_move'].enabled = False
 
     return render(request, 'new-teams/videos.html', {
         'team': team,
@@ -199,6 +196,11 @@ def videos(request, team):
         'page': page,
         'filters_form': filters_form,
         'forms': page_forms,
+        'bulk_mode_enabled': team_videos and (
+            page_forms['move'].enabled or
+            page_forms['remove'].enabled or
+            page_forms['bulk_edit'].enabled
+        ),
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Videos')),

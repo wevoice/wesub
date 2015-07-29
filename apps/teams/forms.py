@@ -23,6 +23,7 @@ import re
 from auth.models import CustomUser as User
 from django import forms
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -32,6 +33,7 @@ from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
+from django.utils.translation import ungettext
 
 from subtitles.forms import SubtitlesUploadForm
 from teams.models import (
@@ -1072,68 +1074,85 @@ class EditMembershipForm(forms.Form):
             member_to_edit.role = self.cleaned_data['role']
             member_to_edit.save()
 
-class NewMoveTeamVideoForm(forms.Form):
-    team_video = forms.ChoiceField(choices=[])
-    new_team = forms.ChoiceField(label=_('New Team'), choices=[])
-
-    def __init__(self, team, user, *args, **kwargs):
-        super(NewMoveTeamVideoForm, self).__init__(*args, **kwargs)
-        dest_teams = permissions.can_move_videos_to(
-            team, user,
-        )
-        self.fields['new_team'].choices = [
-            (t.id, t.name) for t in dest_teams
-        ]
-        if dest_teams:
-            self.enabled = True
-            self.fields['team_video'].choices = [
-                (tv.id, tv.id) for tv in team.teamvideo_set.all()
-            ]
-        else:
-            self.enabled = False
-
-    def save(self):
-        team_video = TeamVideo.objects.get(id=self.cleaned_data['team_video'])
-        dest_team = Team.objects.get(id=self.cleaned_data['new_team'])
-        team_video.move_to(dest_team)
-        self.dest_team = dest_team
-        return team_video
-
-    def message(self):
-        return fmt(_('Video moved to <a href="%(url)s">%(team)s</a>.'),
-                   url=reverse(
-                       'teams:dashboard', args=(self.dest_team.slug,),
-                   ),
-                   team=self.dest_team)
-
-    def error_message(self):
-        return _('Error moving video.')
-
-class MoveTeamVideosForm(forms.Form):
+class BulkTeamVideoForm(forms.Form):
+    """Base class for forms that operate on multiple team videos at once."""
     team_videos = forms.MultipleChoiceField(choices=[], required=False)
-    new_team = forms.ChoiceField(label=_('New Team'), choices=[])
     include_all = forms.BooleanField(
         label=_('Include videos on other pages'),
         required=False)
+
+    def __init__(self, team, user, *args, **kwargs):
+        super(BulkTeamVideoForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.user = user
+        self.enabled = self.check_permissions()
+        self.fields['team_videos'].choices = [
+            (tv.id, tv.id) for tv in team.teamvideo_set.all()
+        ]
+        self.setup_fields()
+
+    def is_valid(self):
+        if not self.enabled:
+            return False
+        else:
+            return super(BulkTeamVideoForm, self).is_valid()
+
+    def save(self, qs):
+        if not self.enabled:
+            raise PermissionDenied("Form not enabled")
+        self.perform_save(self.find_team_videos_to_update(qs))
+
+    def find_team_videos_to_update(self, qs):
+        from haystack.query import SearchQuerySet
+        if not self.cleaned_data['include_all']:
+            qs = TeamVideo.objects.filter(
+                id__in=self.cleaned_data['team_videos']
+            )
+        elif isinstance(qs, SearchQuerySet):
+            # hack to make this work if we get a SearchQuerySet.  Fixing
+            # pculture/unisubs#838 would be really nice
+            qs = TeamVideo.objects.filter(
+                id__in=qs.values_list('team_video_pk', flat=True)
+            )
+        self.count = qs.count()
+        return qs
+
+    def check_permissions(self, team, user):
+        """Check if a user has permission to use this form.
+
+        Returns: True/False
+        """
+        raise NotImplementedError()
+
+    def setup_fields(self):
+        """Override this if you need to dynamically setup the form fields."""
+        pass
+
+    def perform_save(self, qs):
+        """Does the work for the save() method.
+
+        Args:
+            qs -- queryset of TeamVideos that should be operated on.
+        """
+        raise NotImplementedError()
+
+class MoveTeamVideosForm(BulkTeamVideoForm):
+    new_team = forms.ChoiceField(label=_('New Team'), choices=[])
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
 
-    def __init__(self, team, user, *args, **kwargs):
-        super(MoveTeamVideosForm, self).__init__(*args, **kwargs)
-        dest_teams = [team] + permissions.can_move_videos_to(
-            team, user,
-        )
+    def setup_fields(self):
+        dest_teams = [self.team] + self.can_move_videos_to
         self.fields['new_team'].choices = [
             (dest.id, dest.name) for dest in dest_teams
         ]
-        if dest_teams:
-            self.enabled = True
-            self.fields['team_videos'].choices = [
-                (tv.id, tv.id) for tv in team.teamvideo_set.all()
-            ]
-            self.setup_project_field(dest_teams)
-        else:
-            self.enabled = False
+        self.setup_project_field(dest_teams)
+
+    def check_permissions(self):
+        self.can_move_videos_to = permissions.can_move_videos_to(
+            self.team, self.user,
+        )
+        return bool(self.can_move_videos_to)
 
     def setup_project_field(self, dest_teams):
         # choices regular django choices object.  project_options is a list of
@@ -1180,37 +1199,117 @@ class MoveTeamVideosForm(forms.Form):
             return None
         return Team.objects.get(id=self.cleaned_data['new_team'])
 
-    def save(self, qs):
-
-        for team_video in self.find_team_videos_to_update(qs):
+    def perform_save(self, qs):
+        for team_video in qs:
             team_video.move_to(self.cleaned_data['new_team'],
                                self.cleaned_data['project'])
 
-    def find_team_videos_to_update(self, qs):
-        from haystack.query import SearchQuerySet
-        if not self.cleaned_data['include_all']:
-            return TeamVideo.objects.filter(
-                id__in=self.cleaned_data['team_videos']
-            )
-        elif isinstance(qs, SearchQuerySet):
-            # hack to make this work if we get a SearchQuerySet.  Fixing
-            # pculture/unisubs#838 would be really nice
-            return TeamVideo.objects.filter(
-                id__in=qs.values_list('team_video_pk', flat=True)
-            )
-        else:
-            return qs
-
     def message(self):
         new_team = self.cleaned_data['new_team']
-        return fmt(_('Videos moved to <a href="%(url)s">%(team)s</a>.'),
-                   url=reverse(
-                       'teams:dashboard', args=(new_team.slug,),
-                   ),
-                   team=new_team)
+        project = self.cleaned_data['project']
+        if new_team == self.team:
+            if project.is_default_project:
+                msg = ungettext(
+                    'Video removed from project',
+                    '%(count)s videos removed from projects',
+                    self.count)
+            else:
+                msg = ungettext(
+                    'Video moved to Project: %(project)s',
+                    '%(count)s moved to Project: %(project)s',
+                    self.count)
+        else:
+            if project.is_default_project:
+                msg = ungettext(
+                    'Video moved to %(team_link)s',
+                    '%(count)s moved to %(team_link)s',
+                    self.count)
+            else:
+                msg = ungettext(
+                    'Video moved to %(team_link)s (Project: %(project)s)',
+                    '%(count)s moved to %(team_link)s (Project: %(project)s)',
+                    self.count)
+        team_link = '<a href="{}">{}</a>.'.format(
+            reverse('teams:dashboard', args=(new_team.slug,)),
+            new_team)
+        return fmt(msg, team_link=team_link, project=project.name,
+                   count=self.count)
 
     def error_message(self):
         return _('Error moving videos.')
+
+class RemoveTeamVideosForm(BulkTeamVideoForm):
+    def check_permissions(self):
+        return permissions.can_remove_videos(self.team, self.user)
+
+    def perform_save(self, qs):
+        qs.delete()
+
+    def message(self):
+        msg = ungettext('Video removed from project',
+                        '%(count)s videos removed from projects',
+                        self.count)
+        return fmt(msg, count=self.count)
+
+    def error_message(self):
+        return _('Error removing video.')
+
+class BulkEditTeamVideosForm(BulkTeamVideoForm):
+    primary_audio_language = forms.ChoiceField(required=False, choices=[])
+    project = forms.ChoiceField(label=_('Project'), choices=[],
+                                required=False)
+    thumbnail = forms.ImageField(label=_('Change thumbnail'), required=False)
+
+    def check_permissions(self):
+        return permissions.can_edit_videos(self.team, self.user)
+
+    def setup_fields(self):
+        self.fields['primary_audio_language'].choices = \
+                get_language_choices(with_empty=True)
+        projects = self.team.project_set.all()
+        if len(projects) > 1:
+            self.fields['project'].choices = [
+                ('', '---------'),
+            ]
+            for p in projects:
+                if p.is_default_project:
+                    choice = (p.id, _('No Project'))
+                else:
+                    choice = (p.id, p.name)
+                self.fields['project'].choices.append(choice)
+
+        else:
+            # only the default project has been created, don't present a
+            # selectbox with that as the only choice
+            del self.fields['project']
+
+    def perform_save(self, qs):
+        qs = qs.select_related('video')
+        project = self.cleaned_data.get('project')
+        primary_audio_language = self.cleaned_data['primary_audio_language']
+        thumbnail = self.cleaned_data['thumbnail']
+
+        for team_video in qs:
+            video = team_video.video
+
+            if project and project != team_video.project_id:
+                team_video.project_id = project
+                team_video.save()
+            if (primary_audio_language and
+                primary_audio_language != video.primary_audio_language_code):
+                video.primary_audio_language_code = primary_audio_language
+                video.save()
+            if thumbnail:
+                team_video.video.s3_thumbnail.save(thumbnail.name, thumbnail)
+
+    def message(self):
+        msg = ungettext('Video updated',
+                        '%(count)s videos updated',
+                        self.count)
+        return fmt(msg, count=self.count)
+
+    def error_message(self):
+        return _('Error updating video.')
 
 class NewAddTeamVideoForm(VideoForm):
     project = forms.ChoiceField(label=_('Project'), choices=[])
@@ -1334,28 +1433,6 @@ class NewEditTeamVideoForm(forms.Form):
 
     def error_message(self):
         return _('Error updating video.')
-
-class RemoveTeamVideoForm(forms.Form):
-    team_video = forms.ChoiceField(choices=[])
-
-    def __init__(self, team, user, *args, **kwargs):
-        super(RemoveTeamVideoForm, self).__init__(*args, **kwargs)
-        if not permissions.can_remove_videos(team, user):
-            self.enabled = False
-        else:
-            self.enabled = True
-            self.fields['team_video'].choices = [
-                (tv.id, tv.id) for tv in team.teamvideo_set.all()
-            ]
-
-    def save(self):
-        TeamVideo.objects.filter(id=self.cleaned_data['team_video']).delete()
-
-    def message(self):
-        return _("Video removed from team.")
-
-    def error_message(self):
-        return _('Error removing video.')
 
 class ApplicationForm(forms.Form):
     about_you = forms.CharField(widget=forms.Textarea, label="")
