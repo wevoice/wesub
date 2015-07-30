@@ -26,9 +26,11 @@ function handleThumbListSelection() {
     var thumbnails = $('ul.thumb-list .thumb');
     var checkboxes = $('.selection', thumbnails);
     var selectAll = $('.select-all-thumbs input').eq(0);
+    var deselectAll = $('button.deselect-all');
     updateSelectionSenstiveElts();
     thumbnails.click(onThumbClicked);
     selectAll.change(onSelectAllChange);
+    deselectAll.click(onDeselectAll);
 
     function onThumbClicked(evt) {
         var checkbox = $('input.selection', this);
@@ -45,11 +47,16 @@ function handleThumbListSelection() {
         updateSelectionSenstiveElts();
     }
 
+    function onDeselectAll(evt) {
+        checkboxes.prop('checked', false);
+        updateSelectionSenstiveElts();
+    }
+
     function setComponentsEnabled(selector, enabled) {
         if(enabled) {
-            selector.show();
+            selector.removeClass('hidden');
         } else {
-            selector.hide();
+            selector.addClass('hidden');
         }
         $('input', selector).prop('disabled', !enabled);
     }
@@ -66,16 +73,18 @@ function handleThumbListSelection() {
 
     function updateButtomSheet(checkCount) {
         if(checkCount > 0) {
-            $('.bottom-sheet').addClass('shown');
+            bottomSheet.show();
             // FIXME: This code should use ngettext, but we don't have it set
             // up in javascript
-            if(checkCount > 1) {
-                $('.bottom-sheet h3').text(checkCount + ' videos selected');
+            if(checkCount == 1) {
+                var title = $('.bottom-sheet').data('titleSingular');
             } else {
-                $('.bottom-sheet h3').text('1 video selected');
+                var title = $('.bottom-sheet').data('titlePlural')
+                    .replace('COUNT_PLACEHOLDER', checkCount);
             }
+            bottomSheet.setHeading(title);
         } else {
-            $('.bottom-sheet').removeClass('shown');
+            bottomSheet.hide();
         }
     }
 }

@@ -56,8 +56,7 @@
 </div>
 
 {% if bulk_mode_enabled %}
-<div class="bottom-sheet">
-  <h3></h3>
+<div class="bottom-sheet" data-title-singular="{% trans "1 videos selected" %}" data-title-plural="{% blocktrans with count="COUNT_PLACEHOLDER" %}{{ count }} videos selected{% endblocktrans %}">
   {% if forms.bulk_edit.enabled %}
   <button class="needs-multiple-selected open-modal" data-modal="bulk-edit-form" data-copy-input="team_videos">{% trans "Bulk Edit" %}</button>
   {% endif %}
@@ -67,6 +66,7 @@
   {% if forms.remove.enabled %}
   <button class="open-modal" data-modal="remove-form" data-copy-input="team_videos">{% trans "Remove" %}</button>
   {% endif %}
+  <button class="dismiss deselect-all">{% trans "deselect all" %}</button>
 </div>
 {% endif %}
 
