@@ -39,10 +39,14 @@
         <h6 class="one-line">
           <a href="{% url "videos:video" video_id=video.video_id %}">{{ video.title_display }}</a>
         </h6>
-        <div class="three-lines">{{ video.description|urlize|linebreaks }}</div>
+        {% with description=video.description|urlize|linebreaks %}
         {% if forms.edit.enabled %}
+        <div class="three-lines">{{ description }}</div>
         <button class="open-modal" data-modal="edit-form" data-heading="{% blocktrans with title=video.title_display %}Edit Team Video: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}, "primary_audio_language": "{{ video.primary_audio_language_code }}", "project": "{{team_video.project_id }}" }'>{% trans "edit" %}</button>
+        {% else %}
+        <div class="four-lines">{{ description }}</div>
         {% endif %}
+        {% endwith %}
       </li>
       {% endwith %}
       {% endfor %}

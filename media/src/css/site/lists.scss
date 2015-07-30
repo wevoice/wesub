@@ -31,6 +31,7 @@ ul.thumb-list {
     // buttons.
     @include thumb-list-height($line-height * 4 + 28px);
     li {
+        @extend %clearfix;
         margin-bottom: 30px;
     }
 

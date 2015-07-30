@@ -189,7 +189,6 @@ def videos(request, team):
     else:
         team_videos = list(page)
 
-
     return render(request, 'new-teams/videos.html', {
         'team': team,
         'team_videos': team_videos,
