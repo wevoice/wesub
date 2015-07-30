@@ -147,9 +147,10 @@ def videos(request, team):
     }
     page_forms = {}
     for name, klass in form_classes.items():
+        auto_id = '{}_id-%s'.format(name)
         if request.method == 'POST' and request.POST.get('form') == name:
-            form = klass(team, request.user, data=request.POST,
-                         files=request.FILES)
+            form = klass(team, request.user, auto_id=auto_id,
+                         data=request.POST, files=request.FILES)
             if form.is_valid():
                 if isinstance(form, forms.BulkTeamVideoForm):
                     form.save(qs=team_videos)
@@ -165,9 +166,9 @@ def videos(request, team):
                 logger.error(form.errors.as_text())
                 # We don't want to display the error on the form since we
                 # re-use it for each video.  So unbind the data.
-                form = klass(team, request.user)
+                form = klass(team, request.user, auto_id=auto_id)
         else:
-            form = klass(team, request.user)
+            form = klass(team, request.user, auto_id=auto_id)
         page_forms[name] = form
 
     paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)

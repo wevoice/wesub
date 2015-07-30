@@ -1396,7 +1396,7 @@ class NewEditTeamVideoForm(forms.Form):
         projects = Project.objects.for_team(self.team)
         if projects:
             self.fields['project'].choices = [
-                ('', _('None')),
+                (self.team.default_project.id, _('None')),
             ] + [
                 (p.id, p.name) for p in projects
             ]
