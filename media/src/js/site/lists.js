@@ -35,9 +35,11 @@ function handleThumbListSelection() {
     function onThumbClicked(evt) {
         var checkbox = $('input.selection', this);
         if(checkbox.length > 0) {
-            checkbox.prop('checked', !checkbox.prop('checked'));
-            evt.preventDefault();
-            evt.stopPropagation();
+            if(evt.target != checkbox[0]) {
+                checkbox.prop('checked', !checkbox.prop('checked'));
+                evt.preventDefault();
+                evt.stopPropagation();
+            }
             updateSelectionSenstiveElts();
         }
     }
