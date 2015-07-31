@@ -3845,9 +3845,7 @@
       impl.readyState = self.HAVE_ENOUGH_DATA;
       self.dispatchEvent( "canplaythrough" );
     }
-
     function onFirstPause() {
-      removeYouTubeEvent( "pause", onFirstPause );
       if ( player.getCurrentTime() > 0 ) {
         setTimeout( onFirstPause, 0 );
         return;
@@ -3868,9 +3866,9 @@
         setTimeout( onFirstPlay, 0 );
         return;
       }
-      addYouTubeEvent( "pause", onFirstPause );
       player.seekTo( 0 );
       player.pauseVideo();
+      onFirstPause();
     }
 
     function addYouTubeEvent( event, listener ) {

@@ -312,8 +312,7 @@ class ContainerManager(object):
         if self.env.BRANCH == 'production':
             return [
                 '-e', ('INTERLOCK_DATA={"alias_domains": '
-                       '["www.amara.org", "universalsubtitles.org", '
-                       '"www.universalsubtitles.org"]}'),
+                       '["www.amara.org"]}'),
                 '-e', 'NEW_RELIC_APP_NAME=AmaraVPC',
                 '-e', ('NEW_RELIC_LICENSE_KEY=' +
                        self.env.NEW_RELIC_LICENSE_KEY)
