@@ -34,6 +34,7 @@ Get info for a specific video
     :>json team: Slug of the Video's team (or null)
     :>json metadata: Dict mapping metadata names to values
     :>json languages: List of languages that have subtitles started (see below)
+    :>json video_type: Video type identifier
     :>json all_urls: List of URLs for the video (the first one is the primary
      video URL)
     :>json resource_uri: API uri for the video
@@ -307,6 +308,7 @@ class VideoSerializer(serializers.Serializer):
     # default implementation that it makes more sense to not inherit.
     id = serializers.CharField(source='video_id', read_only=True)
     video_url = serializers.URLField(write_only=True, required=True)
+    video_type = serializers.SerializerMethodField()
     primary_audio_language_code = LanguageCodeField(required=False,
                                                     allow_blank=True)
     original_language = serializers.CharField(source='language',
@@ -353,6 +355,14 @@ class VideoSerializer(serializers.Serializer):
         video_urls = list(video.get_video_urls())
         video_urls.sort(key=lambda vurl: vurl.primary, reverse=True)
         return [vurl.url for vurl in video_urls]
+
+    def get_video_type(self, video):
+        types = set()
+        for url in video.get_video_urls():
+            types.add(video_type_registrar.video_type_for_url(url.url))
+        if len(types) == 1:
+            return types.pop().abbreviation
+        return ""
 
     def will_add_video_to_team(self):
         if not self.team_video:
