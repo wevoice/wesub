@@ -58,7 +58,9 @@
     {% endif %}
   </div>
 </div>
+{% endblock %}
 
+{% block bottom %}
 {% if bulk_mode_enabled %}
 <div class="bottom-sheet" data-title-singular="{% trans "1 videos selected" %}" data-title-plural="{% blocktrans with count="COUNT_PLACEHOLDER" %}{{ count }} videos selected{% endblocktrans %}">
   {% if forms.bulk_edit.enabled %}
@@ -73,9 +75,7 @@
   <button class="dismiss deselect-all">{% trans "deselect all" %}</button>
 </div>
 {% endif %}
-{% endblock %}
 
-{% block bottom %}
 {% if forms.add.enabled %}
 <aside class="modal" id="add-form">
   <h3>{% trans "Add Video" %}</h3>

@@ -20,9 +20,12 @@
 
 var $document = $(document);
 
-$.fn.openModal = function() {
+$.fn.openModal = function(setupData) {
     this.each(function() {
         var modal = $(this);
+        if(setupData) {
+            setupModal(modal, setupData);
+        }
         var closeButton = $('button.close', modal);
 
         modal.addClass('shown');
@@ -54,6 +57,38 @@ $.fn.openModal = function() {
             $document.unbind('keydown.modal');
         }
     });
+
+    function setupModal(modal, setupData) {
+        if(setupData['clear-errors']) {
+            $('ul.errorlist', modal).remove();
+        }
+        if(setupData['heading']) {
+            $('h3', modal).text(setupData['heading']);
+        }
+        if(setupData['text']) {
+            $('.text', modal).text(setupData['text']);
+        }
+        if(setupData['setFormValues']) {
+            $.each(setupData['setFormValues'], function(name, value) {
+                $('*[name=' + name + ']', modal).val(value);
+            });
+        }
+        if(setupData['copyInput']) {
+            var inputName = setupData['copyInput'];
+            var form = $('form', modal);
+            // Delete any inputs added before
+            $('input[name=' + inputName + '].copied', form).remove();
+            // Copy any inputs outside of forms into the modal
+            $('input[name=' + inputName + ']')
+                .not(':checkbox:not(:checked)').each(function() {
+                    var input = $(this);
+                    if(input.closest("form").length > 0) {
+                        return;
+                    }
+                    input.clone().attr('type', 'hidden').addClass('copied').appendTo(form);
+                });
+        }
+    }
 }
 
 $document.ready(function() {
@@ -64,36 +99,7 @@ $document.ready(function() {
         link.bind('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            modal.openModal();
-            if(link.data('clear-errors')) {
-                $('ul.errorlist', modal).remove();
-            }
-            if(link.data('heading')) {
-                $('h3', modal).text(link.data('heading'));
-            }
-            if(link.data('text')) {
-                $('.text', modal).text(link.data('text'));
-            }
-            if(link.data('setFormValues')) {
-                $.each(link.data('setFormValues'), function(name, value) {
-                    $('*[name=' + name + ']', modal).val(value);
-                });
-            }
-            if(link.data('copyInput')) {
-                var inputName = link.data('copyInput');
-                var form = $('form', modal);
-                // Delete any inputs added before
-                $('input[name=' + inputName + '].copied', form).remove();
-                // Copy any inputs outside of forms into the modal
-                $('input[name=' + inputName + ']')
-                    .not(':checkbox:not(:checked)').each(function() { 
-                    var input = $(this);
-                    if(input.closest("form").length > 0) {
-                        return;
-                    }
-                    input.clone().attr('type', 'hidden').addClass('copied').appendTo(form);
-                });
-            }
+            modal.openModal(link.data());
         });
     });
 

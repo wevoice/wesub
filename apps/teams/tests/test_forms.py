@@ -114,51 +114,6 @@ class EditMemberFormTest(TestCase):
             TeamMember.objects.filter(id=self.contributor.id).exists()
         )
 
-class MoveTeamVideoFormTest(TestCase):
-    @patch_for_test('teams.permissions.can_move_videos_to')
-    def setUp(self, mock_can_move_videos_to):
-        self.mock_can_move_videos_to = mock_can_move_videos_to
-
-        self.team = TeamFactory()
-        self.team_video = TeamVideoFactory(team=self.team)
-        self.user = TeamMemberFactory(team=self.team).user
-        self.team2 = TeamFactory()
-        self.team3 = TeamFactory()
-
-        mock_can_move_videos_to.return_value = [ self.team2, self.team3, ]
-
-    def make_form(self, data=None):
-        return forms.NewMoveTeamVideoForm(self.team, self.user, data=data)
-
-    def test_move_video(self):
-        form = self.make_form({
-            'team_video': self.team_video.id,
-            'new_team': self.team2.id,
-        })
-        assert_true(form.is_valid(), form.errors.as_text())
-        form.save()
-        team_video = reload_obj(self.team_video)
-        assert_equal(team_video.team, self.team2)
-        assert_equal(team_video.project, self.team2.default_project)
-
-    def test_team_choices(self):
-        self.mock_can_move_videos_to.return_value = [ self.team2 ]
-        form = self.make_form()
-        assert_equal(form.fields['new_team'].choices, [
-            (self.team2.id, self.team2.name)
-        ])
-
-    def test_no_valid_choice(self):
-        self.mock_can_move_videos_to.return_value = [ ]
-        form = self.make_form()
-        assert_equal(form.fields['new_team'].choices, [])
-        assert_false(form.enabled)
-
-    def test_permission_check(self):
-        form = self.make_form()
-        assert_equal(self.mock_can_move_videos_to.call_args,
-                     mock.call(self.team, self.user))
-
 def test_thumbnail_file():
     p = os.path.join(settings.PROJECT_ROOT,
                      'media/images/video-no-thumbnail-wide.png')
