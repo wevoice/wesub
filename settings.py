@@ -737,4 +737,4 @@ if DEBUG:
             'TAG': 'div',
         }
 
-optionalapps.add_extra_settings(globals(), locals())
+optionalapps.exec_repository_scripts('settings_extra.py', globals(), locals())
