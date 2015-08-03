@@ -86,8 +86,6 @@ DATABASES = {
         }
     }
 
-DATABASES.update(uslogging_db)
-
 USE_AMAZON_S3 = AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and DEFAULT_BUCKET
 
 try:
