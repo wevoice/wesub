@@ -28,6 +28,9 @@ elif [ "$ACTION" = "worker" ]; then
 elif [ "$ACTION" = "update_translations" ]; then
     echo "Updating translations..."
     /usr/local/bin/update_translations $2
+elif [ "$ACTION" = "reset_db" ]; then
+    echo "Reseting database"
+    /usr/local/bin/reset-db
 elif [ "$ACTION" = "shell" ]; then
     echo "Running shell..."
     echo "source /usr/local/bin/config_env" >> ~/.bash_profile

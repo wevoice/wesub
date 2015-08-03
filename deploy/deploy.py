@@ -123,6 +123,8 @@ class Environment(object):
 
     optional_env_var_names = [
         'ROLLBACK_ID',
+        'DB_NAME',
+        'RESET_DB',
     ]
 
     valid_migrate_values = [
@@ -302,6 +304,11 @@ class ContainerManager(object):
             # mount the workspace volume inside our container
             '-v', '/var/workspace:/var/workspace',
         ]
+        if self.env.DB_NAME:
+            params.extend([
+                '-e', 'DB_NAME=' + self.env.DB_NAME,
+            ])
+
         if self.building_preview():
             # SETTINGS_REVISION controls how to download the
             # server_local_settings.py file (see .docker/config_env.sh)
@@ -478,6 +485,12 @@ class Deploy(object):
         if not self.env.ROLLBACK_ID:
             self.image_builder.setup_images()
             self.container_manager.run_app_command("build_media")
+        if self.env.RESET_DB == 'true':
+            if self.container_manager.building_preview():
+                self.container_manager.run_app_command("reset_db")
+            else:
+                log("Not calling reset_db since we are not "
+                    "building a preview.")
         self.start_and_stop_containers()
         self.container_manager.print_report()
 
