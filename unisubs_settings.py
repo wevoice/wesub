@@ -58,7 +58,6 @@ elif INSTALLATION == LOCAL:
     SITE_NAME = 'unisubsstaging'
 
 if INSTALLATION == STAGING or INSTALLATION == PRODUCTION or INSTALLATION == LOCAL:
-    DATABASE_ROUTERS = ['routers.UnisubsRouter']
     AWS_STORAGE_BUCKET_NAME = DEFAULT_BUCKET
     COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
     SOLR_ROOT = '/usr/share/'
