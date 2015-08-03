@@ -484,13 +484,14 @@ class Deploy(object):
         self.setup()
         if not self.env.ROLLBACK_ID:
             self.image_builder.setup_images()
-            self.container_manager.run_app_command("build_media")
         if self.env.RESET_DB == 'true':
             if self.container_manager.building_preview():
                 self.container_manager.run_app_command("reset_db")
             else:
                 log("Not calling reset_db since we are not "
                     "building a preview.")
+        if not self.env.ROLLBACK_ID:
+            self.container_manager.run_app_command("build_media")
         self.start_and_stop_containers()
         self.container_manager.print_report()
 
