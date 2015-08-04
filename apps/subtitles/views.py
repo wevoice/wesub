@@ -48,6 +48,7 @@ from teams.models import Task
 from teams.permissions import can_assign_task
 from utils.text import fmt
 from videos.models import Video
+from videos.types import video_type_registrar
 
 def _version_data(version):
     '''
@@ -184,6 +185,7 @@ class SubtitleEditorBase(View):
                 'title': self.video.title,
                 'description': self.video.description,
                 'primaryVideoURL': self.video.get_video_url(),
+                'primaryVideoURLType': video_type_registrar.video_type_for_url(self.video.get_video_url()).abbreviation,
                 'videoURLs': self.get_video_urls(),
                 'metadata': self.video.get_metadata(),
             },
