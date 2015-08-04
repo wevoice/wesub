@@ -184,6 +184,33 @@ class DBReset(Command):
         run_manage(['migrate', '--fake'])
         run_manage(['setup_indexes'])
 
+class DBDump(Command):
+    """Dump the database to a flie."""
+
+    def run_inner(self, args, options):
+        try:
+            path = args[0]
+        except IndexError:
+            print 'need to specify a file'
+            return
+        with open(path, 'w') as f:
+            subprocess.call(['docker-compose', 'run', '--rm', 'app',
+                             '/opt/apps/unisubs/bin/mysqldump_docker.sh'],
+                            stdout=f)
+
+class DBLoad(Command):
+    """Load the database from a file."""
+
+    def run_inner(self, args, options):
+        try:
+            path = args[0]
+        except IndexError:
+            print 'need to specify a file'
+            return
+        with open(path, 'r') as f:
+            run_manage(['dbshell'], stdin=f)
+
+
 class Up(Command):
     """Start docker containers."""
     options = [
@@ -196,8 +223,9 @@ class Up(Command):
         else:
             subprocess.call(['docker-compose', 'up', 'app', 'worker'])
 
-def run_manage(args):
-    subprocess.call(['docker-compose', 'run', '--rm', 'app', 'python', 'manage.py'] + args)
+def run_manage(args, **kwargs):
+    subprocess.call(['docker-compose', 'run', '--rm', 'app', 'python',
+                     'manage.py'] + args, **kwargs)
 
 def usage():
     print "Usage %s [command]" % progname()
