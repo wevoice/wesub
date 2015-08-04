@@ -21,17 +21,18 @@
 var $document = $(document);
 
 $.fn.autocompleteTextbox = function(options) {
-    var settings = $.extend({
-        // default options
-        queryParamName: 'query',
-    }, options);
-
     this.each(function() {
         var field = $(this);
         var autocompleteList = $('<ul class="autocomplete">');
         var lastValue = null;
+        var settings = $.extend({
+            // default options
+            queryParamName: 'query',
+            url: field.data('autocompleteUrl')
+        }, options);
 
-        autocompleteList.insertAfter(field.closest('label'));
+        autocompleteList.appendTo(field.closest('label'));
+        autocompleteList.hide();
 
         field.on("keyup paste", function() {
             value = field.val();
@@ -44,25 +45,26 @@ $.fn.autocompleteTextbox = function(options) {
                 updateAutocomplete(responseData);
             });
             lastValue = value;
-        }).on("focusout", function() {
-            // use setTimeout to ensure if the user clicked on the
-            // autocomplete list, we don't hide it before the click event.
-            setTimeout(autocompleteList.hide, 0);
+        }).on("focusout", function(evt) {
+            autocompleteList.hide();
         }).on("focusin", function() {
-            if(autocompleteList.has('li')) {
+            if($('li', autocompleteList).length > 0) {
                 autocompleteList.show();
             }
         });
 
         function updateAutocomplete(responseData) {
+            if(responseData.length == 0) {
+                autocompleteList.hide();
+                return;
+            }
             autocompleteList.show();
             $('li', autocompleteList).remove();
             $.each(responseData, function(i, item) {
-                var autocompleteData = settings.callback(item);
                 var link = $('<a href="#">');
-                link.text(autocompleteData[1]);
-                link.click(function() {
-                    field.val(autocompleteData[0]);
+                link.text(item.label);
+                link.mousedown(function() {
+                    field.val(item.value);
                     autocompleteList.hide();
                 });
                 autocompleteList.append($('<li>').append(link));
@@ -70,5 +72,9 @@ $.fn.autocompleteTextbox = function(options) {
         }
     });
 }
+
+$document.ready(function() {
+    $('.autocomplete-textbox').autocompleteTextbox();
+});
 
 })();

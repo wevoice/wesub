@@ -57,6 +57,7 @@ from videos.models import (
 from videos.search_indexes import VideoIndex
 from videos.tasks import import_videos_from_feed
 from utils.forms import ErrorableModelForm
+from utils.forms.autocomplete import AutocompleteTextInput
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
@@ -578,7 +579,7 @@ class LanguagesForm(forms.Form):
         return self.cleaned_data
 
 class InviteForm(forms.Form):
-    username = forms.CharField(required=False)
+    username = forms.CharField(required=False, widget=AutocompleteTextInput)
     message = forms.CharField(required=False,
                               widget=forms.Textarea(attrs={'rows': 4}),
                               label=_("Message to user"))
@@ -592,11 +593,9 @@ class InviteForm(forms.Form):
         self.user = user
         self.fields['role'].choices = [(r, ROLE_NAMES[r])
                                        for r in roles_user_can_invite(team, user)]
-        self.fields['username'].widget.attrs.update({
-            'data-search-url': reverse('teams:invite-user-search',
-                                       args=(team.slug,)),
-            'autocomplete': 'off',
-        })
+        self.fields['username'].widget.set_autocomplete_url(
+            reverse('teams:invite-user-search', args=(team.slug,))
+        )
 
     def clean_username(self):
         username = self.cleaned_data['username']

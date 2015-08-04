@@ -290,12 +290,10 @@ def invite_user_search(request, team):
 
     data = [
         {
-            'id': user.id,
-            'username': user.username,
-            'full_name': unicode(user),
-            'display': fmt(_('%(username)s (%(full_name)s)'),
-                           username=user.username,
-                           full_name=unicode(user))
+            'value': user.username,
+            'label': fmt(_('%(username)s (%(full_name)s)'),
+                         username=user.username,
+                         full_name=unicode(user)),
         }
         for user in users
     ]

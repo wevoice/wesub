@@ -66,6 +66,7 @@ input[type=file] {
 }
 
 label {
+    position: relative;
     display: block;
     padding: 0;
     margin: 0 0 $line-height/2 0;
@@ -86,22 +87,20 @@ ul.errorlist {
         margin-left: 5px;
     }
 }
-.autocomplete-wrapper {
-    position: relative;
 
-    .autocomplete {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        padding: 0 4px;
-        margin-top: -1px;
-        border: 1px solid $light-gray;
-        background: $white;
+.autocomplete {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: 0 4px;
+    margin-top: -1px;
+    border: 1px solid $light-gray;
+    background: $white;
+    z-index: $z-index-menu;
 
-        li {
-            padding: 3px 0;
-        }
+    li {
+        padding: 3px 0;
     }
 }
