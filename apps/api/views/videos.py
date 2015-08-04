@@ -359,7 +359,9 @@ class VideoSerializer(serializers.Serializer):
     def get_video_type(self, video):
         types = set()
         for url in video.get_video_urls():
-            types.add(video_type_registrar.video_type_for_url(url.url))
+            video_type = video_type_registrar.video_type_for_url(url.url)
+            if video_type is not None:
+                types.add(video_type)
         if len(types) == 1:
             return types.pop().abbreviation
         return ""
