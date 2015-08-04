@@ -31,6 +31,8 @@ $.fn.openModal = function(setupData) {
         modal.addClass('shown');
         $('body').append('<div class="modal-overlay"></div>');
         closeButton.bind('click.modal', onClose);
+        modal.trigger('open');
+
         $document.bind('click.modal', function(evt) {
             var clickedModal = $(evt.target).closest('aside.modal');
             if(clickedModal.length == 0) {
@@ -55,6 +57,7 @@ $.fn.openModal = function(setupData) {
             closeButton.unbind('click.modal');
             $document.unbind('click.modal');
             $document.unbind('keydown.modal');
+            modal.trigger('close');
         }
     });
 

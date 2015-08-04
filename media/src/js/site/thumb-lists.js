@@ -23,11 +23,12 @@ $(document).ready(function() {
 });
 
 function handleThumbListSelection() {
-    var thumbnails = $('ul.thumb-list .thumb');
+    var thumbList = $(this);
+    var thumbnails = $('.thumb', thumbList);
     var checkboxes = $('.selection', thumbnails);
     var selectAll = $('.select-all-thumbs input').eq(0);
     var deselectAll = $('button.deselect-all');
-    updateSelectionSenstiveElts();
+    onSelectionChanged();
     thumbnails.click(onThumbClicked);
     selectAll.change(onSelectAllChange);
     deselectAll.click(onDeselectAll);
@@ -40,18 +41,18 @@ function handleThumbListSelection() {
                 evt.preventDefault();
                 evt.stopPropagation();
             }
-            updateSelectionSenstiveElts();
+            onSelectionChanged();
         }
     }
 
     function onSelectAllChange(evt) {
         checkboxes.prop('checked', selectAll.prop('checked'));
-        updateSelectionSenstiveElts();
+        onSelectionChanged();
     }
 
     function onDeselectAll(evt) {
         checkboxes.prop('checked', false);
-        updateSelectionSenstiveElts();
+        onSelectionChanged();
     }
 
     function setComponentsEnabled(selector, enabled) {
@@ -63,14 +64,16 @@ function handleThumbListSelection() {
         $('input', selector).prop('disabled', !enabled);
     }
 
-    function updateSelectionSenstiveElts() {
-        var checkCount = checkboxes.filter(':checked').length;
+    function onSelectionChanged() {
+        var selection = checkboxes.filter(':checked').closest('li');
+        var checkCount = selection.length;
         setComponentsEnabled($('.needs-one-selected'), checkCount > 0);
         setComponentsEnabled($('.needs-multiple-selected'), checkCount > 1);
         setComponentsEnabled($('.needs-all-selected'),
                 checkCount == checkboxes.length);
         selectAll.prop('checked', checkCount == checkboxes.length);
         updateButtomSheet(checkCount);
+        thumbList.trigger('selectionChange', [selection]);
     }
 
     function updateButtomSheet(checkCount) {
