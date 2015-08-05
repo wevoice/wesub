@@ -62,6 +62,7 @@ ACTIONS_PER_PAGE = 20
 VIDEOS_PER_PAGE = 8
 
 def team_view(view_func):
+    @functools.wraps(view_func)
     def wrapper(request, slug, *args, **kwargs):
         if not request.user.is_authenticated():
             return redirect_to_login(request.path)
@@ -71,6 +72,18 @@ def team_view(view_func):
         except Team.DoesNotExist:
             raise Http404
         return view_func(request, team, *args, **kwargs)
+    return wrapper
+
+def admin_only_view(view_func):
+    @functools.wraps(view_func)
+    @team_view
+    def wrapper(request, team, *args, **kwargs):
+        member = team.get_member(request.user)
+        if not member.is_admin():
+            messages.error(request,
+                           _("You are not authorized to see this page"))
+            return redirect(team)
+        return view_func(request, team, member, *args, **kwargs)
     return wrapper
 
 def public_team_view(view_func):
