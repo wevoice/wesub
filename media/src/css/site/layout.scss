@@ -1,6 +1,7 @@
 $break-small: 800px;
 $break-medium: 900px;
 $content-max-width: 1200px;
+$content-max-width-narrow: 900px;
 
 $z-index-menu: 1;
 $z-index-overlay: 100;
@@ -28,6 +29,11 @@ body {
     padding: 0 15px;
     margin: 0 auto;
 }
+
+.not-so-wide {
+    max-width: $content-max-width-narrow;
+}
+
 
 %clearfix:after, .group:after {
     content: "";
