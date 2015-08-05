@@ -40,6 +40,7 @@
       </ul>
     </li>
     {% endif %}
+    {% if team|can_view_settings_tab:user %}
     <li>
       <a href="#" class="menu-toggle" data-menu="settings-menu">{% trans "Settings" %}</a>
       <ul id="settings-menu">
@@ -69,6 +70,7 @@
         </li>
       </ul>
     </li>
+    {% endif %}
   </ul>
   <ul class="right">
     <li>
