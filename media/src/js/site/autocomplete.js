@@ -28,7 +28,8 @@ $.fn.autocompleteTextbox = function(options) {
         var settings = $.extend({
             // default options
             queryParamName: 'query',
-            url: field.data('autocompleteUrl')
+            url: field.data('autocompleteUrl'),
+            extraFields: field.data('autocompleteExtraFields')
         }, options);
 
         autocompleteList.appendTo(field.closest('label'));
@@ -41,6 +42,12 @@ $.fn.autocompleteTextbox = function(options) {
             }
             data = {};
             data[settings.queryParamName] = value;
+            if(settings.extraFields) {
+                var form = field.closest('form');
+                $.each(settings.extraFields.split(':'), function(i, name) {
+                    data[name] = $('[name=' + name + ']', form).val();
+                });
+            }
             $.get(settings.url, data, function(responseData) {
                 updateAutocomplete(responseData);
             });

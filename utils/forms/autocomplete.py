@@ -20,9 +20,12 @@ from django import forms
 
 class AutocompleteTextInput(forms.TextInput):
     def __init__(self, *args, **kwargs):
+        extra_fields = kwargs.pop('extra_fields', None)
         super(AutocompleteTextInput, self).__init__(*args, **kwargs)
         self.attrs['autocomplete'] = 'off'
         self.attrs['class'] = 'autocomplete-textbox'
+        if extra_fields:
+            self.attrs['data-autocomplete-extra-fields'] = extra_fields
 
     def set_autocomplete_url(self, url):
         self.attrs['data-autocomplete-url'] = url
