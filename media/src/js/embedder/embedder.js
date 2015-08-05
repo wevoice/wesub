@@ -27,7 +27,13 @@
                 analytics('embedder', 'init-origin', e.origin);
 		hostPage.source.postMessage({initDone: true, index: hostPage.index}, hostPage.origin);
 		window.removeEventListener('message', initReceiver, false);
+		window.addEventListener('message', resizeInside, false);
 	    }
+	}
+    }
+    function resizeInside(e) {
+	if (e && e.data && e.data.resize) {
+	    window._amara.amaraInstances[0].resize_(e.data.width, e.data.height);
 	}
     }
     // Should be triggered whenever the size of the content of the widget changes
@@ -317,6 +323,16 @@
 	    },
 	    hideThumbnail: function() {
 		this.$thumbnailContainer.hide();
+	    },
+	    resize_: function(width, height) {
+                this.$popContainer.width(width);
+                this.$popContainer.height(height);
+                this.$thumbnailContainer.width(width);
+                this.$thumbnailContainer.height(height);
+                this.$videoDivContainer.width(width);
+                this.$videoDivContainer.height(height);
+                this.model.set('height', height);
+                this.model.set('width', width);
 	    },
             render: function() {
 

@@ -13,6 +13,12 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	var resize = function(index, width, height) {
             if (iframes[index].style.visibility == "visible")
                 iframes[index].parentNode.style.height = "";
+	    var w = width;
+	    if (iframes[index].parentNode && iframes[index].parentNode.parentNode && (iframes[index].parentNode.parentNode.clientWidth < width)) {
+		width =  iframes[index].parentNode.parentNode.clientWidth;
+		height = parseInt((height - 37) * width / w) + 37;
+		iframes[index].contentWindow.postMessage({resize: true, width: width, height: (height - 37)}, iframeDomain);
+	    }
 	    iframes[index].width = 0;
 	    iframes[index].width = width;
 	    iframes[index].height = height;
