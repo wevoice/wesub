@@ -904,6 +904,7 @@ class VideoFiltersForm(forms.Form):
         super(VideoFiltersForm, self).__init__(data=self.calc_data(request))
         self.team = team
         self.setup_project_field()
+        self.selected_project = None
 
     def calc_data(self, request):
         valid_names = set(['q', 'project', 'sort'])
@@ -946,7 +947,9 @@ class VideoFiltersForm(forms.Form):
             if project == 'none':
                 project = Project.DEFAULT_NAME
             try:
-                project_pk = self.team.project_set.get(slug=project).id
+                self.selected_project = self.team.project_set.get(
+                    slug=project)
+                project_pk = self.selected_project.pk
             except Project.DoesNotExist:
                 project_pk = -1
             qs = qs.filter(project_pk=project_pk)

@@ -184,6 +184,12 @@ def videos(request, team):
             form = klass(team, request.user, auto_id=auto_id)
         page_forms[name] = form
 
+    if filters_form.selected_project:
+        # use the selected project by default on the add video form
+        page_forms['add'].initial = {
+            'project': filters_form.selected_project.id,
+        }
+
     paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
     page = paginator.get_page(request)
 
