@@ -132,7 +132,7 @@
 <aside class="modal" id="move-form">
   <h3>{% trans "Move Videos" %}</h3>
   <button class="close"></button>
-  <form action="" method="POST">
+  <form class="team-bulk-move" action="" method="POST">
     {% csrf_token %}
     <input type="hidden" name="form" value="move">
     {% include "_field.html" with field=forms.move.new_team %}
