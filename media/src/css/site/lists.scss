@@ -4,6 +4,11 @@ ol, ul {
     padding: 0;
 }
 
+ul.bullet {
+    list-style-type: disc;
+    list-style-position: inside;
+}
+
 ul.activity {
     li {
         padding: 10px 0;
