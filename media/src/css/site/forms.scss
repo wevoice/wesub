@@ -72,6 +72,12 @@ label {
     margin: 0 0 $line-height/2 0;
 }
 
+label label {
+    // This covers the nested labels inside a radio select
+    margin: $line-height / 4 10px;
+    font-size: $large-font-size;
+}
+
 p.help {
     margin-top: -$line-height/2;
     margin-bottom: $line-height/2;

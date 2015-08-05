@@ -30,7 +30,7 @@ ul.thumb-list {
     // By default, size the thumb enough to fit 4 lines of text + 1 line of
     // buttons.
     @include thumb-list-height($line-height * 4 + 28px);
-    li {
+    > li {
         @extend %clearfix;
         margin-bottom: 30px;
     }
