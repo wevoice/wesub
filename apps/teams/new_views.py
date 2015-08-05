@@ -174,8 +174,9 @@ def videos(request, team):
             else:
                 messages.error(request, "{}<br>{}".format(
                     unicode(form.error_message()),
-                    _('Please retry and contact an Amara admin the '
-                      'issue continues')))
+                    _('Please retry. If the issue continues, please contact '
+                      'your team admin or Amara support at '
+                      'support@amara.org')))
                 logger.error(form.errors.as_text())
                 # We don't want to display the error on the form since we
                 # re-use it for each video.  So unbind the data.
