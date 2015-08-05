@@ -116,3 +116,10 @@ h1, h2, h3, h4, h5, h6 {
     height: $line-height * 4;
     overflow: hidden;
 }
+
+.extra-info {
+    float: right;
+    font-style: italic;
+    margin-left: 10px;
+}
+
