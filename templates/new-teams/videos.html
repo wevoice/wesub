@@ -100,7 +100,7 @@
   <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="hidden" name="form" value="edit">
-    {{ forms.edit.selection.as_hidden }}
+    {{ forms.edit.team_video.as_hidden }}
     {% include "_field.html" with field=forms.edit.primary_audio_language %}
     {% include "_field.html" with field=forms.edit.project %}
     {% include "_field.html" with field=forms.edit.thumbnail %}
