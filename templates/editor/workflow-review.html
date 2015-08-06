@@ -2,7 +2,8 @@
 <div ng-switch-when="review">
     <h2>[[ workMode.heading ]]</h2>
 
-    <p>[[ workMode.helpText ]]</h2>
+    <h3>[[ workMode.helpText ]]</h3>
+    <p>
     <a class="edit-metadata" href="#" ng-click="onEditTitleClicked($event)">{% trans "Edit title and description." %}</a>
     </p>
     {% include "editor/workflow-errors-review.html" %}
