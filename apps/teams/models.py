@@ -52,6 +52,7 @@ from teams.permissions_const import (
 )
 from teams import tasks
 from teams import workflows
+from teams.exceptions import ApplicationInvalidException
 from teams.notifications import BaseNotification
 from teams.signals import api_subtitles_approved, api_subtitles_rejected
 from utils import DEFAULT_PROTOCOL
@@ -385,11 +386,19 @@ class Team(models.Model):
 
     def is_open(self):
         """Return whether this team's membership is open to the public."""
-        return self.membership_policy == self.OPEN
+        return self.membership_policy == Team.OPEN
 
     def is_by_application(self):
         """Return whether this team's membership is by application only."""
-        return self.membership_policy == self.APPLICATION
+        return self.membership_policy == Team.APPLICATION
+
+    def is_by_invitation(self):
+        """Return whether this team's membership is by application only."""
+        return self.membership_policy in (
+            Team.INVITATION_BY_MANAGER,
+            Team.INVITATION_BY_ALL,
+            Team.INVITATION_BY_ADMIN,
+        )
 
     def get_workflow(self):
         """Return the workflow for the given team.
@@ -457,11 +466,39 @@ class Team(models.Model):
         if user.id in self._member_cache:
             return self._member_cache[user.id]
         try:
-            member = self.members.get(user=user)
+            member = self.members.get(user_id=user.id)
         except TeamMember.DoesNotExist:
             member = None
         self._member_cache[user.id] = member
         return member
+
+    def get_join_mode(self, user):
+        """Figure out how the user can join the team.
+
+        Returns:
+            - "open" -- user can join the team without any approval
+            - "application" -- user can apply to join the team
+            - "pending-application" -- user has a pending application to join
+              the team
+            - "invitation" -- user must be invited to join
+            - "already-joined" -- user has already joined the team
+            - None -- user can't join the team
+        """
+        if self.user_is_member(user):
+            return 'already-joined'
+        elif self.is_open():
+            return 'open'
+        elif self.is_by_invitation():
+            return 'invitation'
+        elif self.is_by_application():
+            try:
+                application = self.applications.get(user=user)
+            except Application.DoesNotExist:
+                return 'application'
+            else:
+                if application.status == Application.STATUS_PENDING:
+                    return 'pending-application'
+        return None
 
     def user_is_member(self, user):
         members = self.cache.get('members')
@@ -1057,9 +1094,6 @@ class TeamVideo(models.Model):
                                               to_team=new_team,
                                               to_project=self.project)
 
-            # Update search data and other things
-            video_changed_tasks.delay(video.pk)
-
             # Create any necessary tasks.
             autocreate_tasks(self)
 
@@ -1067,6 +1101,8 @@ class TeamVideo(models.Model):
             api_teamvideo_new.send(self)
             video_moved_from_team_to_team.send(sender=self,
                                                destination_team=new_team, video=self.video)
+        # Update search data and other things
+        video_changed_tasks.delay(self.video_id)
 
     def get_task_for_editor(self, language_code):
         if not hasattr(self, '_editor_task'):
@@ -1436,9 +1472,6 @@ class MembershipNarrowing(models.Model):
 class TeamSubtitleNote(SubtitleNoteBase):
     team = models.ForeignKey(Team, related_name='+')
 
-class ApplicationInvalidException(Exception):
-    pass
-
 class ApplicationManager(models.Manager):
 
     def can_apply(self, team, user):
@@ -1493,6 +1526,26 @@ class Application(models.Model):
     class Meta:
         unique_together = (('team', 'user', 'status'),)
 
+    def check_can_submit(self):
+        """Check if a user can submit this application
+
+        Raises: ApplicationInvalidException if the user can't apply.  The
+        message will be set explaining why.
+        """
+        if self.status == Application.STATUS_PENDING and self.pk is not None:
+            raise ApplicationInvalidException(
+                fmt(_(u'You already have a pending application to %(team)s.'),
+                team=self.team)
+            )
+        elif self.status == Application.STATUS_DENIED:
+            raise ApplicationInvalidException(
+                _(u'Your application has been denied.')
+            )
+        elif self.status == Application.STATUS_MEMBER_REMOVED:
+            raise ApplicationInvalidException(
+                fmt(_(u'You have been removed from %(team)s.'),
+                    team=self.team)
+            )
 
     def approve(self, author, interface):
         """Approve the application.
@@ -1575,8 +1628,11 @@ class InviteExpiredException(Exception):
     pass
 
 class InviteManager(models.Manager):
-    def pending_for(self, team, user):
-        return self.filter(team=team, user=user, approved=None)
+    def pending_for(self, team, user=None):
+        if user is not None:
+            return self.filter(team=team, user=user, approved=None)
+        else:
+            return self.filter(team=team, approved=None)
 
     def acted_on(self, team, user):
         return self.filter(team=team, user=user, approved__notnull=True)

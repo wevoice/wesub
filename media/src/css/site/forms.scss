@@ -1,10 +1,5 @@
 form {
-    padding-top: 20px;
     padding-bottom: 40px;
-
-    button {
-        @include button-color($medium-gray);
-    }
 
     button.submit {
         @include button-color($primary);
@@ -71,9 +66,16 @@ input[type=file] {
 }
 
 label {
+    position: relative;
     display: block;
     padding: 0;
     margin: 0 0 $line-height/2 0;
+}
+
+label label {
+    // This covers the nested labels inside a radio select
+    margin: $line-height / 4 10px;
+    font-size: $large-font-size;
 }
 
 p.help {
@@ -92,5 +94,19 @@ ul.errorlist {
     }
 }
 
+.autocomplete {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: 0 4px;
+    margin-top: -1px;
+    border: 1px solid $light-gray;
+    background: $white;
+    z-index: $z-index-menu;
 
-
+    li {
+        padding: 3px 0;
+    }
+}

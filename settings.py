@@ -418,10 +418,13 @@ MEDIA_BUNDLES = {
             'src/css/site/forms.scss',
             'src/css/site/links.scss',
             'src/css/site/lists.scss',
+            'src/css/site/cards.scss',
             'src/css/site/tables.scss',
             'src/css/site/graphs.scss',
             'src/css/site/header.scss',
             'src/css/site/tabs.scss',
+            'src/css/site/split-view.scss',
+            'src/css/site/bottom-sheet.scss',
             'src/css/site/pagination.scss',
             'src/css/site/filters.scss',
             'src/css/site/menus.scss',
@@ -481,6 +484,10 @@ MEDIA_BUNDLES = {
             'src/js/site/menus.js',
             'src/js/site/modals.js',
             'src/js/site/pagination.js',
+            'src/js/site/autocomplete.js',
+            'src/js/site/thumb-lists.js',
+            'src/js/site/bottom-sheet.js',
+            'src/js/site/team-bulk-move.js',
             'src/js/site/team-integration-settings.js',
         ],
     },
@@ -729,4 +736,4 @@ if DEBUG:
             'TAG': 'div',
         }
 
-optionalapps.add_extra_settings(globals(), locals())
+optionalapps.exec_repository_scripts('settings_extra.py', globals(), locals())

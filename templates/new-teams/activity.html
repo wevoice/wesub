@@ -7,9 +7,9 @@
 
 {% include "new-teams/_activity-tabs.html" %}
 {% if tab == "videos" %}
-<h1>{% blocktrans %}Video Activity for {{ team }}{% endblocktrans %}</h1>
+<h2>{% blocktrans %}Video Activity for {{ team }}{% endblocktrans %}</h2>
 {% elif tab == "team" %}
-<h1>{% blocktrans %}Team Activity for {{ team }}{% endblocktrans %}</h1>
+<h2>{% blocktrans %}Team Activity for {{ team }}{% endblocktrans %}</h2>
 {% endif %}
 <div class="split-view">
   <div class="filters sidebar">

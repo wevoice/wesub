@@ -1,22 +1,34 @@
 @mixin small-button {
-    font-size: 1.4rem;
-    line-height: 1.4rem;
-    padding: 6px 12px;
+    font-size: 14px;
+    padding: 2px 12px;
 }
 
 @mixin medium-button {
-    font-size: 1.6rem;
-    line-height: 1.6rem;
-    padding: 6px 18px;
+    font-size: 16px;
+    padding: 3px 18px;
 }
 
 @mixin button-color($color) {
     background-color: $color;
-    border-color: $color;
 
     &:hover {
         background: lighten($color, 10);
-        border-color: lighten($color, 10);
+    }
+    &:active {
+        background: lighten($color, 20);
+    }
+}
+
+@mixin button-color-light($color) {
+    background-color: $color;
+    color: $dark-gray;
+
+    &:hover {
+        background: darken($color, 10);
+    }
+
+    &:active {
+        background: darken($color, 20);
     }
 }
 
@@ -24,10 +36,10 @@
     display: inline-block;
     margin: 0;
     padding: 13px 26px;
-    font-size: 2.0rem;
+    font-size: 20px;
     font-weight: $font-weight-normal;
-    border: 1px solid;
-    color: $white !important;
+    border: 0;
+    color: $white;
     cursor: pointer;
 
     @include button-color($primary);
@@ -49,12 +61,39 @@ button, a.button {
         @include medium-button;
     }
 
+    margin-bottom: 0;
+
+    &.primary {
+        @include button-color($primary);
+    }
+
     &.delete {
         @include button-color($red);
     }
 
     &.cancel {
         @include button-color($light-gray);
+    }
+
+    &.flat {
+        @include button-color-light($white);
+    }
+}
+
+
+.sidebar .tools {
+    button, a.button {
+        border: 1px solid $light-gray;
+        background-color: $white;
+        box-sizing: border-box;
+        color: $dark-gray;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 8px;
+
+        &:hover {
+            background: darken($white, 10);
+        }
     }
 }
 

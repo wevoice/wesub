@@ -7,3 +7,11 @@
         display: none;
     }
 }
+
+ul.paginator {
+    text-align: center;
+    li {
+        display: inline;
+        padding: 5px 10px;
+    }
+}

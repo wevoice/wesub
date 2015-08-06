@@ -173,10 +173,7 @@ class VideoForm(forms.Form):
         return obj
 
 class AddFromFeedForm(forms.Form, AjaxForm):
-    VIDEOS_LIMIT = 10
-
-    usernames = UsernameListField(required=False, label=_(u'Youtube usernames'), help_text=_(u'Enter usernames separated by comma.'))
-    feed_url = FeedURLField(required=False, help_text=_(u'We support: rss 2.0 media feeds including Youtube, Vimeo, Dailymotion, and more.'))
+    feed_url = FeedURLField(required=False, help_text=_(u'We support: rss 2.0 media feeds including Vimeo, Dailymotion, and more.'))
 
     def __init__(self, user, *args, **kwargs):
         if not user.is_authenticated():

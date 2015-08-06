@@ -24,38 +24,72 @@ replace the old views.py module.
 
 from __future__ import absolute_import
 import functools
+import json
 import logging
 import pickle
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext as _
 
 from . import views as old_views
 from . import forms
 from . import permissions
 from . import tasks
-from .models import Setting, Team, Project, TeamLanguagePreference
+from .exceptions import ApplicationInvalidException
+from .models import (Invite, Setting, Team, Project, TeamVideo,
+                     TeamLanguagePreference, TeamMember, Application)
 from .statistics import compute_statistics
-from django.contrib.auth.views import redirect_to_login
+from auth.models import CustomUser as User
+from messages import tasks as messages_tasks
 from utils.breadcrumbs import BreadCrumb
+from utils.pagination import AmaraPaginator
+from utils.text import fmt
 from utils.translation import get_language_choices
-from videos.models import Action
+from videos.models import Action, Video
 
 logger = logging.getLogger('teams.views')
 
-ACTIONS_ON_PAGE = 20
+ACTIONS_PER_PAGE = 20
+VIDEOS_PER_PAGE = 8
 
 def team_view(view_func):
+    @functools.wraps(view_func)
     def wrapper(request, slug, *args, **kwargs):
         if not request.user.is_authenticated():
             return redirect_to_login(request.path)
         try:
-            team = Team.objects.get(slug=slug, members__user=request.user)
+            team = Team.objects.get(slug=slug,
+                                    members__user_id=request.user.id)
+        except Team.DoesNotExist:
+            raise Http404
+        return view_func(request, team, *args, **kwargs)
+    return wrapper
+
+def admin_only_view(view_func):
+    @functools.wraps(view_func)
+    @team_view
+    def wrapper(request, team, *args, **kwargs):
+        member = team.get_member(request.user)
+        if not member.is_admin():
+            messages.error(request,
+                           _("You are not authorized to see this page"))
+            return redirect(team)
+        return view_func(request, team, member, *args, **kwargs)
+    return wrapper
+
+def public_team_view(view_func):
+    def wrapper(request, slug, *args, **kwargs):
+        try:
+            team = Team.objects.get(slug=slug)
         except Team.DoesNotExist:
             raise Http404
         return view_func(request, team, *args, **kwargs)
@@ -86,8 +120,8 @@ def fetch_actions_for_activity_page(team, tab, page, params):
             action_qs = action_qs.filter(
                 new_language__language_code=subtitles_language)
 
-    end = page * ACTIONS_ON_PAGE
-    start = end - ACTIONS_ON_PAGE
+    end = page * ACTIONS_PER_PAGE
+    start = end - ACTIONS_PER_PAGE
 
     if params.get('action_type', 'any') != 'any':
         action_qs = action_qs.filter(action_type=params.get('action_type'))
@@ -101,6 +135,255 @@ def fetch_actions_for_activity_page(team, tab, page, params):
         'user', 'new_language__video'
     )
     return list(action_qs)
+
+@team_view
+def videos(request, team):
+    if team.is_old_style():
+        return old_views.detail(request, team)
+
+    filters_form = forms.VideoFiltersForm(team, request)
+    if filters_form.is_bound and filters_form.is_valid():
+        team_videos = filters_form.get_queryset()
+    else:
+        team_videos = (team.teamvideo_set.all()
+                       .order_by('-created')
+                       .select_related('video'))
+
+    # We embed several modal forms on the page, but luckily we can use the
+    # same code to handle them all
+    form_classes = {
+        'add': forms.NewAddTeamVideoForm,
+        'edit': forms.NewEditTeamVideoForm,
+        'bulk_edit': forms.BulkEditTeamVideosForm,
+        'move': forms.MoveTeamVideosForm,
+        'remove': forms.RemoveTeamVideosForm,
+    }
+    page_forms = {}
+    for name, klass in form_classes.items():
+        auto_id = '{}_id-%s'.format(name)
+        if request.method == 'POST' and request.POST.get('form') == name:
+            form = klass(team, request.user, auto_id=auto_id,
+                         data=request.POST, files=request.FILES)
+            if form.is_valid():
+                if isinstance(form, forms.BulkTeamVideoForm):
+                    form.save(qs=team_videos)
+                else:
+                    form.save()
+                messages.success(request, form.message())
+                return HttpResponseRedirect(request.build_absolute_uri())
+            else:
+                messages.error(request, "{}<br>{}".format(
+                    unicode(form.error_message()),
+                    _('Please retry. If the issue continues, please contact '
+                      'your team admin or Amara support at '
+                      'support@amara.org')))
+                logger.error(form.errors.as_text())
+                # We don't want to display the error on the form since we
+                # re-use it for each video.  So unbind the data.
+                form = klass(team, request.user, auto_id=auto_id)
+        else:
+            form = klass(team, request.user, auto_id=auto_id)
+        page_forms[name] = form
+
+    if filters_form.selected_project:
+        # use the selected project by default on the add video form
+        page_forms['add'].initial = {
+            'project': filters_form.selected_project.id,
+        }
+
+    paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
+    page = paginator.get_page(request)
+
+    if filters_form.is_bound and filters_form.is_valid():
+        # Hack to convert the search index results to regular Video objects.
+        # We will probably be able to drop this when we implement #838
+        team_video_order = {
+            result.team_video_pk: i
+            for i, result in enumerate(page)
+        }
+        team_videos = list(
+            TeamVideo.objects
+            .filter(id__in=team_video_order.keys())
+            .select_related('video')
+        )
+        team_videos.sort(key=lambda tv: team_video_order[tv.id])
+    else:
+        team_videos = list(page)
+
+    return render(request, 'new-teams/videos.html', {
+        'team': team,
+        'team_videos': team_videos,
+        'page': page,
+        'filters_form': filters_form,
+        'forms': page_forms,
+        'bulk_mode_enabled': team_videos and (
+            page_forms['move'].enabled or
+            page_forms['remove'].enabled or
+            page_forms['bulk_edit'].enabled
+        ),
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Videos')),
+        ],
+    })
+
+@team_view
+def members(request, team):
+    if team.is_old_style():
+        return old_views.detail_members(request, team)
+
+    member = team.get_member(request.user)
+
+    filters_form = forms.MemberFiltersForm(request)
+
+    if request.method == 'POST':
+        edit_form = forms.EditMembershipForm(member, request.POST)
+        if edit_form.is_valid():
+            edit_form.save()
+            return HttpResponseRedirect(request.path)
+        else:
+            logger.warning("Error updating team memership: %s (%s)",
+                           edit_form.errors.as_text(),
+                           request.POST)
+            messages.warning(request, _(u'Error updating membership'))
+    else:
+        edit_form = forms.EditMembershipForm(member)
+
+    members = filters_form.update_qs(
+        team.members.select_related('user')
+        .prefetch_related('user__userlanguage_set'))
+
+    return render(request, 'new-teams/members.html', {
+        'team': team,
+        'members': members,
+        'filters_form': filters_form,
+        'edit_form': edit_form,
+        'show_invite_link': permissions.can_invite(team, request.user),
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Members')),
+        ],
+    })
+
+@team_view
+def invite(request, team):
+    if not permissions.can_invite(team, request.user):
+        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
+    if request.POST:
+        form = forms.InviteForm(team, request.user, request.POST)
+        if form.is_valid():
+            # the form will fire the notifications for invitees
+            # this cannot be done on model signal, since you might be
+            # sending invites twice for the same user, and that borks
+            # the naive signal for only created invitations
+            form.save()
+            return HttpResponseRedirect(reverse('teams:members',
+                                                args=[team.slug]))
+    else:
+        form = forms.InviteForm(team, request.user)
+
+    if team.is_old_style():
+        template_name = 'teams/invite_members.html'
+    else:
+        template_name = 'new-teams/invite.html'
+
+    return render(request, template_name,  {
+        'team': team,
+        'form': form,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Members'), 'teams:members', team.slug),
+            BreadCrumb(_('Invite')),
+        ],
+    })
+
+@team_view
+def invite_user_search(request, team):
+    query = request.GET.get('query')
+    if query:
+        users = (User.objects
+                 .filter(username__icontains=query, is_active=True)
+                 .exclude(id__in=team.members.values_list('user_id'))
+                 .exclude(id__in=Invite.objects.pending_for(team).values_list('user_id')))
+    else:
+        users = User.objects.none()
+
+    data = [
+        {
+            'value': user.username,
+            'label': fmt(_('%(username)s (%(full_name)s)'),
+                         username=user.username,
+                         full_name=unicode(user)),
+        }
+        for user in users
+    ]
+
+    return HttpResponse(json.dumps(data), mimetype='application/json')
+
+@public_team_view
+@login_required
+def join(request, team):
+    user = request.user
+
+    if team.user_is_member(request.user):
+        messages.info(request,
+                      fmt(_(u'You are already a member of %(team)s.'),
+                          team=team))
+    elif team.is_open():
+        member = TeamMember.objects.create(team=team, user=request.user,
+                                           role=TeamMember.ROLE_CONTRIBUTOR)
+        messages.success(request,
+                         fmt(_(u'You are now a member of %(team)s.'),
+                             team=team))
+        messages_tasks.team_member_new.delay(member.pk)
+    elif team.is_by_application():
+        return application_form(request, team)
+    else:
+        messages.error(request,
+                       fmt(_(u'You cannot join %(team)s.'), team=team))
+    return redirect(team)
+
+def application_form(request, team):
+    try:
+        application = team.applications.get(user=request.user)
+    except Application.DoesNotExist:
+        application = Application(team=team, user=request.user)
+    try:
+        application.check_can_submit()
+    except ApplicationInvalidException, e:
+        messages.error(request, e.message)
+        return redirect(team)
+
+    if request.method == 'POST':
+        form = forms.ApplicationForm(application, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(team)
+    else:
+        form = forms.ApplicationForm(application)
+    return render(request, "new-teams/application.html", {
+        'team': team,
+        'form': form,
+    })
+
+@public_team_view
+def admin_list(request, team):
+    if team.is_old_style():
+        return old_views.detail_members(request, team,
+                                        role=TeamMember.ROLE_ADMIN)
+
+    # The only real reason to view this page is if you want to ask an admin to
+    # invite you, so let's limit the access a bit
+    if (not team.is_by_invitation() and not
+        team.user_is_member(request.user)):
+        return HttpResponseForbidden()
+    return render(request, 'new-teams/admin-list.html', {
+        'team': team,
+        'admins': (team.members
+                   .filter(Q(role=TeamMember.ROLE_ADMIN)|
+                           Q(role=TeamMember.ROLE_OWNER))
+                   .select_related('user'))
+    })
 
 @team_view
 def activity(request, team, tab):
@@ -117,7 +400,7 @@ def activity(request, team, tab):
                             if code in readable_langs]
     action_types = Action.TYPES_CATEGORIES[tab]
 
-    has_more = len(activity_list) >= ACTIONS_ON_PAGE
+    has_more = len(activity_list) >= ACTIONS_PER_PAGE
 
     filtered = bool(set(request.GET.keys()).intersection([
         'action_type', 'language', 'sort']))
@@ -193,8 +476,16 @@ def welcome(request, team):
         videos = team.videos.order_by('-id')[:2]
     else:
         videos = None
+
+    if Application.objects.open(team, request.user):
+        messages.info(request,
+                      _(u"Your application has been submitted. "
+                        u"You will be notified of the team "
+                        "administrator's response"))
+
     return render(request, 'new-teams/welcome.html', {
         'team': team,
+        'join_mode': team.get_join_mode(request.user),
         'team_messages': team.get_messages([
             'pagetext_welcome_heading',
         ]),
@@ -272,46 +563,97 @@ def settings_messages(request, team):
     })
 
 @team_settings_view
-def settings_projects(request, team):
+def settings_feeds(request, team):
     if team.is_old_style():
-        return old_views.settings_projects(request, team)
+        return old_views.video_feeds(request, team)
 
-    projects = team.project_set.exclude(name=Project.DEFAULT_NAME)
+    action = request.POST.get('action')
+    if request.method == 'POST' and action == 'import':
+        feed = get_object_or_404(team.videofeed_set, id=request.POST['feed'])
+        feed.update()
+        messages.success(request, _(u'Importing videos now'))
+        return HttpResponseRedirect(request.build_absolute_uri())
+    if request.method == 'POST' and action == 'delete':
+        feed = get_object_or_404(team.videofeed_set, id=request.POST['feed'])
+        feed.delete()
+        messages.success(request, _(u'Feed deleted'))
+        return HttpResponseRedirect(request.build_absolute_uri())
 
-    return render(request, "new-teams/settings-projects.html", {
+    if request.method == 'POST' and action == 'add':
+        add_form = forms.AddTeamVideosFromFeedForm(team, request.user,
+                                                   data=request.POST)
+        if add_form.is_valid():
+            add_form.save()
+            messages.success(request, _(u'Video Feed Added'))
+            return HttpResponseRedirect(request.build_absolute_uri())
+    else:
+        add_form = forms.AddTeamVideosFromFeedForm(team, request.user)
+
+    return render(request, "new-teams/settings-feeds.html", {
         'team': team,
-        'projects': projects,
+        'add_form': add_form,
+        'feeds': team.videofeed_set.all(),
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
-            BreadCrumb(_('Projects')),
+            BreadCrumb(_('Video Feeds')),
         ],
     })
 
 @team_settings_view
-def add_project(request, team):
+def settings_projects(request, team):
     if team.is_old_style():
-        return old_views.add_project(request, team)
+        return old_views.settings_projects(request, team)
 
-    if request.POST:
-        form = forms.ProjectForm(team, data=request.POST)
+    projects = Project.objects.for_team(team)
 
-        if form.is_valid():
-            form.save()
+    form = request.POST.get('form')
+
+    if request.method == 'POST' and form == 'add':
+        add_form = forms.ProjectForm(team, data=request.POST)
+
+        if add_form.is_valid():
+            add_form.save()
+            messages.success(request, _('Project added.'))
             return HttpResponseRedirect(
                 reverse('teams:settings_projects', args=(team.slug,))
             )
     else:
-        form = forms.ProjectForm(team)
+        add_form = forms.ProjectForm(team)
 
-    return render(request, "new-teams/settings-projects-add.html", {
+    if request.method == 'POST' and form == 'edit':
+        edit_form = forms.EditProjectForm(team, data=request.POST)
+
+        if edit_form.is_valid():
+            edit_form.save()
+            messages.success(request, _('Project updated.'))
+            return HttpResponseRedirect(
+                reverse('teams:settings_projects', args=(team.slug,))
+            )
+    else:
+        edit_form = forms.EditProjectForm(team)
+
+    if request.method == 'POST' and form == 'delete':
+        try:
+            project = projects.get(id=request.POST['project'])
+        except Project.DoesNotExist:
+            pass
+        else:
+            project.delete()
+            messages.success(request, _('Project deleted.'))
+            return HttpResponseRedirect(
+                reverse('teams:settings_projects', args=(team.slug,))
+            )
+
+    return render(request, "new-teams/settings-projects.html", {
         'team': team,
-        'form': form,
+        'projects': projects,
+        'add_form': add_form,
+        'edit_form': edit_form,
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
-            BreadCrumb(_('Projects'), 'teams:settings_projects', team.slug),
-            BreadCrumb(_('Add Project')),
+            BreadCrumb(_('Projects')),
         ],
     })
 

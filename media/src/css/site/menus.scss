@@ -1,6 +1,32 @@
 nav {
     @extend .content;
 
+    // styles for all links
+    a {
+        color: $darkish-gray;
+
+        img {
+            height: 25px;
+        }
+
+        &:hover {
+            text-decoration: none;
+            background-color: lighten($primary, 10);
+            color: $white;
+        }
+
+        &.home {
+            padding: 10px 0 0 0;
+            margin-right: 5px;
+
+            &:hover {
+                background-color: inherit;
+                color: $darkish-gray;
+            }
+        }
+    }
+
+    // styles for top-level links
     > a {
         padding-top: 10px;
         display: block;
@@ -55,7 +81,12 @@ nav {
         z-index: $z-index-menu;
     }
     .burger {
+        position: absolute;
+        right: 10px;
+        top: 0;
         text-align: right;
+        z-index: $z-index-menu;
+
         @include not-small-screen {
             display: none;
         }
@@ -73,7 +104,7 @@ nav {
 
     nav a.menu-toggle.open {
         background: lighten($primary, 10);
-        color: $white !important;
+        color: $white;
     }
 
     nav ul ul {

@@ -1,5 +1,7 @@
 $break-small: 800px;
+$break-medium: 900px;
 $content-max-width: 1200px;
+$content-max-width-narrow: 900px;
 
 $z-index-menu: 1;
 $z-index-overlay: 100;
@@ -28,7 +30,12 @@ body {
     margin: 0 auto;
 }
 
-%clearfix, .group:after {
+.not-so-wide {
+    max-width: $content-max-width-narrow;
+}
+
+
+%clearfix:after, .group:after {
     content: "";
     display: table;
     clear: both;
@@ -46,18 +53,12 @@ body {
     }
 }
 
-.split-view {
-    display: flex;
-    margin-bottom: 40px;
-
-    > .sidebar {
-        width: 300px;
-        border-right: 1px solid $lighter-gray;
-        padding-right: 20px;
-        margin-right: 20px;
+@mixin medium-screen() {
+    @media only screen and (min-width: $break-small) and (max-width: $break-medium - 1) {
+        @content;
     }
+}
 
-    > .main {
-        flex-grow: 1;
-    }
+.hidden {
+    display: none !important;
 }

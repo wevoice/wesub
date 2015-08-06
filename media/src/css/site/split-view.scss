@@ -1,0 +1,35 @@
+/*
+ * Split-view splits the content into a sidebar and main area, for example
+ * on the videos page
+ */
+
+.split-view {
+    display: flex;
+    margin-bottom: 40px;
+
+    > .sidebar {
+        width: 300px;
+        min-width: 300px;
+        border-right: 1px solid $lighter-gray;
+        padding-right: 20px;
+        margin-right: 20px;
+
+        @include medium-screen {
+            width: 200px;
+            min-width: 200px;
+        }
+
+        @include small-screen {
+            display: none;
+        }
+
+        > .section {
+            margin-bottom: 60px;
+        }
+    }
+
+    > .main {
+        flex-grow: 1;
+    }
+}
+

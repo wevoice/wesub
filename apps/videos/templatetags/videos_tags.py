@@ -107,6 +107,9 @@ def format_duration(value):
     Usage: {{ VALUE|format_duration }}
     """
 
+    if value is None:
+        return ''
+
     # Place seconds in to integer
     secs = int(value)
 
