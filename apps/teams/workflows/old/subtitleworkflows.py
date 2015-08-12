@@ -32,6 +32,7 @@ from subtitles.signals import subtitles_published
 from teams.models import Task
 from teams.permissions import can_add_version, can_assign_task
 from teams.workflows.notes import TeamEditorNotes
+from teams.workflows.subtitleworkflows import TeamSubtitlesWorkflow
 from utils import send_templated_email
 from utils import translation
 from utils.text import fmt
@@ -160,25 +161,6 @@ class TaskTeamEditorNotes(TeamEditorNotes):
             Message.objects.create(
                 user=user, subject=subject,
                 content=render_to_string(message_template, data))
-
-class TeamSubtitlesWorkflow(subtitles.workflows.DefaultWorkflow):
-    def __init__(self, team_video):
-        subtitles.workflows.DefaultWorkflow.__init__(self, team_video.video)
-        self.team_video = team_video
-        self.team = team_video.team
-
-    def get_editor_notes(self, language_code):
-        return TeamEditorNotes(self.team_video.team, self.team_video.video,
-                               language_code)
-
-    def user_can_view_video(self, user):
-        return self.team.is_visible or self.team.is_member(user)
-
-    def user_can_view_private_subtitles(self, user, language_code):
-        return self.team_video.team.is_member(user)
-
-    def user_can_edit_subtitles(self, user, language_code):
-        return can_add_version(user, self.video, language_code)
 
 class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
     def get_work_mode(self, user, language_code):
