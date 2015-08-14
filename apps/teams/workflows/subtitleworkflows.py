@@ -46,3 +46,9 @@ class TeamSubtitlesWorkflow(subtitles.workflows.DefaultWorkflow):
 class SimpleTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
     def user_can_edit_subtitles(self, user, language_code):
         return self.team_video.team.is_member(user)
+
+    def get_add_language_mode(self, user):
+        if self.team_video.team.is_member(user):
+            return '<standard>'
+        else:
+            return None
