@@ -147,39 +147,6 @@ class SubtitlesUploadForm(forms.Form):
                 u"Sorry, we can't upload your subtitles because a draft for "
                 u"this language is already in moderation."))
 
-    def _verify_team_policies(self, team_video, language_code,
-                              from_language_code):
-        # if this is being saved as part of a task, than permissions mean
-        # something else. For example a team might require admins to transcribe
-        # but if it allows managers to review, then saves done as part of a review
-        # task can be done by a manager (nice huh?)
-        possible_task_languages = [language_code, '']
-        try:
-            # If a task exist, we should let permissions be checked by _verify_no_blocking_review...
-            # so don't bother with assignment
-            team_video.task_set.incomplete_review_or_approve().filter(language__in=possible_task_languages).exists()
-            return
-        except Task.DoesNotExist:
-            pass
-
-        is_transcription = (not from_language_code)
-        if is_transcription:
-            allowed = can_create_and_edit_subtitles(self.user, team_video,
-                                                    language_code)
-            if not allowed:
-                raise forms.ValidationError(_(
-                    u"Sorry, we can't upload your subtitles because this "
-                    u"language is moderated and you don't have permission to "
-                    u"transcribe subtitles."))
-        else:
-            allowed = can_create_and_edit_translations(self.user, team_video,
-                                                       language_code)
-            if not allowed:
-                raise forms.ValidationError(_(
-                    u"Sorry, we can't upload your subtitles because this "
-                    u"language is moderated and you don't have permission to "
-                    u"translate subtitles."))
-
     def _verify_translation_subtitle_counts(self, from_language_code):
         if from_language_code and hasattr(self, '_parsed_subtitles'):
             from_count = len(self.from_sv.get_subtitles())
@@ -286,6 +253,13 @@ class SubtitlesUploadForm(forms.Form):
         # subtitles matches the source.
         self._verify_translation_subtitle_counts(from_language_code)
 
+        workflow = self.video.get_workflow()
+
+        if not workflow.user_can_edit_subtitles(self.user, language_code):
+            raise forms.ValidationError(_(
+                u"Sorry, we can't upload your subtitles because this "
+                u"language is moderated."))
+
         # Videos that are part of a team have a few more restrictions.
         team_video = self.video.get_team_video()
         if team_video:
@@ -300,10 +274,6 @@ class SubtitlesUploadForm(forms.Form):
             self._verify_no_blocking_review_approve_tasks(team_video,
                                                           language_code)
 
-            # Finally ensure that the teams "who can translate/transcribe"
-            # settings don't prevent this upload.
-            self._verify_team_policies(team_video, language_code,
-                                       from_language_code)
 
         return self.cleaned_data
 
