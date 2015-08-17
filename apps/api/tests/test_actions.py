@@ -29,7 +29,7 @@ from utils import test_utils
 from utils.factories import *
 
 class TestActionsAPI(TestCase):
-    @test_utils.patch_for_test('subtitles.workflows.DefaultWorkflow.get_actions')
+    @test_utils.patch_for_test('subtitles.workflows.DefaultLanguageWorkflow.get_actions')
     def setUp(self, mock_get_actions):
         self.mock_get_actions = mock_get_actions
         self.setup_actions()

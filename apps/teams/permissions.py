@@ -645,6 +645,10 @@ def can_delete_language(team, user):
 def can_add_version(user, video, language_code):
     """Check if a user can add a new version to a SubtitleLanguage
 
+    Deprecated:
+        This method works with old-style teams, but not others.  For newer
+        teams you should call video.get_workflow().user_can_edit_subtitles().
+
     Returns a TeamsPermissionsCheck object
     """
     team_video = video.get_team_video()
