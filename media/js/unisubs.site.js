@@ -1041,7 +1041,23 @@ var Site = function(Site) {
                 $('a[href="#youtube-modal"]').click();
             }
         },
-
+        bulk_deletable_messages: function() {
+            $('.delete-selected').bind('click', function(event) {
+                    if (confirm(window.DELETE_MESSAGES_CONFIRM)) {
+			var $this = $(this);
+			MessagesApi.remove(
+			    $('input.bulkable:checked', '.v1 .messages.listing').map(function() {
+				return $(this).attr('value');}).get(), function(response) {
+                            if (response.error) {
+				$.jGrowl.error(response.error);
+                            } else {
+			    window.location.reload();
+                            }
+			});
+                    }
+                    return false;
+            });
+        },
         // Messages
         messages_list: function() {
             var reply_msg_data;
@@ -1090,20 +1106,24 @@ var Site = function(Site) {
                 set_message_data(data, $('#msg_modal'));
                 return false;
             });
-            $('.mark-all-read').bind('click', function(event) {
-                MessagesApi.mark_all_read(function(response) {
-                    if (response.error) {
-                        $.jGrowl.error(response.error);
-                    } else {
-                        window.location.reload();
-                    }
-                });
-                return false;
+            $('.mark-as-read').bind('click', function(event) {
+		MessagesApi.mark_as_read($('input.bulkable:checked', '.v1 .messages.listing').map(function() {
+		    return $(this).attr('value');}).get(), function(response) {
+			if (response.error) {
+                            $.jGrowl.error(response.error);
+			} else {
+			    window.location.reload();
+			}
+                    });
+		return false;
             });
-
+            this.bulk_deletable_messages();
+            that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
             that.Utils.messagesDeleteAndSend();
         },
         messages_sent: function() {
+            this.bulk_deletable_messages();
+            that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
             that.Utils.messagesDeleteAndSend();
         },
         messages_new: function() {

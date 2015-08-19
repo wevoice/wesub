@@ -297,7 +297,9 @@ div.fix-chosen div.chzn-container {
     position: relative;
     text-align: right;
     @include linear-gradient( bottom, hsla(0, 0%, 98%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
-
+    .bulk-actions {
+        float: left;
+    }
     .button, button {
         background: transparent;
         border: 1px solid transparent;
@@ -471,6 +473,10 @@ div.fix-chosen div.chzn-container {
         }
         p {
             margin: .5em 0;
+        }
+        .bulkable {
+            position: absolute;
+            top: 3em; left: 44px;
         }
         .thumb {
             position: absolute;
