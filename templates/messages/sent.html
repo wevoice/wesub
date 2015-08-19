@@ -15,13 +15,17 @@
     <script type="text/javascript">
         window.STATIC_URL = '{{ STATIC_URL }}';
         window.DELETE_MESSAGE_CONFIRM = '{% trans 'Do you really wish to delete this message?' %}';
+        window.DELETE_MESSAGES_CONFIRM = '{% trans 'Do you really wish to delete these messages?' %}';
     </script>
 {% endblock %}
 
 {% block view_content %}
-    {% comment %}<div class="tools">
-        <a href="#" class="button" id="mark-read">Mark all read</a>
-    </div>{% endcomment %}
+    <div class="tools">
+      <span class="bulk-actions">
+	<input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+      </span>
+      <a href="#" class="button delete-selected" id="delete-selected">{% trans "Delete selected" %}</a>
+    </div>
     {% if message_list %}
         {% if is_paginated %}{% paginator %}{% endif %}
         <ul class="listing messages">
@@ -33,6 +37,7 @@
                     <a href="{{ msg.user.get_absolute_url }}">{{ msg.user }}</a>
                 </p>
                 <p>{{ msg.get_content|safe }}</p>
+                <input class="bulkable" type="checkbox" value="{{msg.id}}">
                 <a class="thumb"href="{{ msg.user.get_absolute_url }}">
                     {% with msg.user.small_avatar as user_avatar_url %}
                         {% if user_avatar_url %}
