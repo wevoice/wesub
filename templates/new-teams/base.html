@@ -34,7 +34,7 @@
       <ul id="projects-menu">
         {% for project in projects %}
         <li>
-        <a href="{% url "teams:videos" team.slug %}?project={{ project.slug }}">{{ project }} <span class="count">{{ project.videos_count }}</span></a>
+        <a href="{{ project.get_absolute_url }}">{{ project }} <span class="count">{{ project.videos_count }}</span></a>
         </li>
         {% endfor %}
       </ul>

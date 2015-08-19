@@ -894,10 +894,15 @@ class Project(models.Model):
         """Return the full, absolute URL for this project, including http:// and the domain."""
         return '%s://%s%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, self.get_absolute_url())
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('teams:project_video_list', [self.team.slug, self.slug])
-
+        if self.team.is_old_style():
+            return reverse('teams:project_video_list',
+                           args=(self.team.slug, self.slug))
+        else:
+            # TODO implement project landing page for new-style teams
+            return '{}?project={}'.format(
+                reverse('teams:videos', args=(self.team.slug,)),
+                self.slug)
 
     @property
     def videos_count(self):
