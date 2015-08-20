@@ -1148,17 +1148,15 @@ var Site = function(Site) {
                 dataType: 'json'
             }, function (data) {
                 var terms = {};
-
                 $.each(data.results, function (i, val) {
                     var name;
                     if (data.results[i][2] !== '') {
-                        name = ' (' + data.results[i][2] + ')';
+                        name = ' - ' + data.results[i][2];
                     } else {
                         name = '';
                     }
                     terms[data.results[i][0]] = data.results[i][1] + name;
                 });
-
                 return terms;
             });
         },
