@@ -84,6 +84,10 @@ class Message(models.Model):
             self.deleted_for_user = True
             self.save()
         elif self.author == user:
+            self.delete_for_author(user)
+
+    def delete_for_author(self, author):
+        if self.author == author:
             self.deleted_for_author = True
             self.save()
 
