@@ -114,11 +114,12 @@ var Site = function(Site) {
                 }
             });
         },
-        messagesDeleteAndSend: function() {
+        messagesDeleteAndSend: function(from_sentbox) {
             $('.messages .delete').click(function(){
                 if (confirm(window.DELETE_MESSAGE_CONFIRM)){
                     var $this = $(this);
-                    MessagesApi.remove($this.attr('message_id'), function(response){
+                    var message_id = $this.attr('message_id');
+                    var callback = function(response) {
                         if (response.error){
                             $.jGrowl.error(response.error);
                         } else {
@@ -126,7 +127,11 @@ var Site = function(Site) {
                                 $(this).remove();
                             });
                         }
-                    });
+                    };
+                    if (from_sentbox)
+                        MessagesApi.remove_sent(message_id, callback);
+                    else
+                        MessagesApi.remove(message_id, callback);
                 }
                 return false;
             });
@@ -1127,12 +1132,12 @@ var Site = function(Site) {
             });
             this.bulk_deletable_messages(false);
             that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
-            that.Utils.messagesDeleteAndSend();
+            that.Utils.messagesDeleteAndSend(false);
         },
         messages_sent: function() {
             this.bulk_deletable_messages(true);
             that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
-            that.Utils.messagesDeleteAndSend();
+            that.Utils.messagesDeleteAndSend(true);
         },
         messages_new: function() {
             that.Utils.chosenify();
