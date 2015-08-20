@@ -39,6 +39,20 @@ class MessagesApiClass(object):
             msg.delete_for_user(user)
 
         return {}
+    def remove_sent(self, message_ids, user):
+        if not user.is_authenticated():
+            return {'error': _('You should be authenticated.')}
+        if not isinstance(message_ids, list):
+            message_ids = [message_ids]
+        for message_id in message_ids:
+            try:
+                msg = Message.objects.for_author(user).get(pk=message_id)
+            except Message.DoesNotExist:
+                return {'error': _('Message does not exist.')}
+
+            msg.delete_for_author(user)
+
+        return {}
 
     def mark_as_read(self, message_ids, user):
         if not user.is_authenticated():
