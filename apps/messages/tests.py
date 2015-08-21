@@ -49,7 +49,8 @@ class MessageTest(TestCase):
         self.message = Message(user=to_user,
                            author=self.author,
                            subject=self.subject,
-                          content=self.body)
+                           message_type='M',
+                           content=self.body)
         self.message.save()
 
     def _send_email(self, to_user):

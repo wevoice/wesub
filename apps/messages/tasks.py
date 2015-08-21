@@ -125,6 +125,7 @@ def team_invitation_sent(invite_pk):
     if invite.user.notify_by_message:
         body = render_to_string("messages/team-you-have-been-invited.txt", context)
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = title
         msg.user = invite.user
         msg.object = invite
@@ -162,6 +163,7 @@ def application_sent(application_pk):
             user=application.user, team=application.team.name)
         if m.user.notify_by_message:
             msg = Message()
+            msg.message_type = 'S'
             msg.subject = subject
             msg.content = body
             msg.user = m.user
@@ -195,6 +197,7 @@ def team_application_denied(application_pk):
         team=application.team.name)
     if application.user.notify_by_message:
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string("messages/team-application-denied.txt", context)
         msg.user = application.user
@@ -234,6 +237,7 @@ def team_member_new(member_pk):
             team=member.team)
         if m.user.notify_by_message:
             msg = Message()
+            msg.message_type = 'S'
             msg.subject = subject
             msg.content = body
             msg.user = m.user
@@ -262,6 +266,7 @@ def team_member_new(member_pk):
     body = render_to_string(template_name,context)
 
     msg = Message()
+    msg.message_type = 'S'
     msg.subject = fmt(
         ugettext("You've joined the %(team)s team!"),
         team=member.team)
@@ -303,6 +308,7 @@ def team_member_leave(team_pk, user_pk):
         body = render_to_string("messages/team-member-left.txt",context)
         if m.user.notify_by_message:
             msg = Message()
+            msg.message_type = 'S'
             msg.subject = subject
             msg.content = body
             msg.user = m.user
@@ -320,6 +326,7 @@ def team_member_leave(team_pk, user_pk):
     if user.notify_by_message:
         template_name = "messages/team-member-you-have-left.txt"
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string(template_name,context)
         msg.user = user
@@ -338,6 +345,7 @@ def email_confirmed(user_pk):
         body = render_to_string("messages/email-confirmed.txt", context)
         message  = Message(
             user=user,
+            message_type='S',
             subject=subject,
             content=body
         )
@@ -360,6 +368,7 @@ def videos_imported_message(user_pk, imported_videos):
     if user.notify_by_message:
         body = render_to_string("messages/videos-imported.txt", context)
         message  = Message(
+            message_type='S',
             user=user,
             subject=subject,
             content=body
@@ -396,6 +405,7 @@ def team_task_assigned(task_pk):
     if user.notify_by_message:
         template_name = "messages/team-task-assigned.txt"
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string(template_name,context)
         msg.user = user
@@ -477,6 +487,7 @@ def _reviewed_notification(task_pk, status):
     if user.notify_by_message:
         template_name = "messages/team-task-reviewed.txt"
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string(template_name,context)
         msg.user = user
@@ -578,6 +589,7 @@ def approved_notification(task_pk, published=False):
     if user.notify_by_message:
         template_name = template_txt
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string(template_name,context)
         msg.user = user
@@ -637,6 +649,7 @@ def send_reject_notification(task_pk, sent_back):
     if user.notify_by_message:
         template_name = "messages/team-task-rejected.txt"
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string(template_name,context)
         msg.user = user

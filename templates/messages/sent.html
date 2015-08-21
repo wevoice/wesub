@@ -47,7 +47,7 @@
                         {% endif %}
                     {% endwith %}
                 </a>
-                <span class="timestamp">{{ msg.created|timesince }} {% trans 'ago' %}</span>
+                <span class="timestamp">{{ msg.created|timesince }} {% trans 'ago' %}<br>{{ msg.message_type }}</span>
             </li>
         {% endfor %}
         </ul>

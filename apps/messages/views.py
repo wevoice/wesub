@@ -109,6 +109,7 @@ def new(request):
         if form.is_valid():
             if form.cleaned_data['user']:
                 m = Message(user=form.cleaned_data['user'], author=request.user,
+                        message_type='M',
                         content=form.cleaned_data['content'],
                         subject=form.cleaned_data['subject'])
                 m.save()
@@ -128,6 +129,7 @@ def new(request):
                     members = map(lambda member: member.user, UserLanguage.objects.filter(user__in=form.cleaned_data['team'].members.values('user')).filter(language__exact=language).exclude(user__exact=request.user).select_related('user'))
                 for member in members:
                     message_list.append(Message(user=member, author=request.user,
+                                                message_type='M',
                                                 content=form.cleaned_data['content'],
                                                 subject=form.cleaned_data['subject']))
                 Message.objects.bulk_create(message_list, batch_size=500);
