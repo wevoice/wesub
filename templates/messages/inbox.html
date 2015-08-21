@@ -74,9 +74,6 @@
                                 <a class="reply open-modal" href="#msg_modal" data-modal="msg_modal" data="{{ msg.json_data }}">{% trans "Reply" %}</a>
                             </li>
                         {% endif %}
-                        <li>
-                            <a href="#" class="delete" message_id="{{ msg.pk }}">{% trans "Delete" %}</a>
-                        </li>
                     </ul>
                 </li>
             {% endfor %}
