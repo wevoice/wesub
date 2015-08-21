@@ -62,7 +62,7 @@
                             {% endwith %}
                         </a>
                     {% endif %}
-                    <span class="timestamp">{% if not msg.read %}<span class="unread">Unread</span>{% endif %}{{ msg.created|timesince }} {% trans 'ago' %}</span>
+			<span class="timestamp">{% if not msg.read %}<span class="unread">Unread</span>{% endif %}{{ msg.created|timesince }} {% trans 'ago' %}<br>{{ msg.message_type }}</span>
                     <ul class="admin-controls">
                         {% if not msg.read %}
                         <li>

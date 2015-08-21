@@ -20,6 +20,7 @@ import json
 
 from django.db import models
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
@@ -29,7 +30,6 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape, urlize
 
 from auth.models import CustomUser as User
-
 MESSAGE_MAX_LENGTH = getattr(settings,'MESSAGE_MAX_LENGTH', 1000)
 
 class MessageManager(models.Manager):
@@ -68,6 +68,21 @@ class Message(models.Model):
 
     hide_cookie_name = 'hide_new_messages'
 
+    SYSTEM_NOTIFICATION = 'S'
+    MESSAGE = 'M'
+    OLD_MESSAGE = 'O'
+    MESSAGE_TYPES = (SYSTEM_NOTIFICATION, MESSAGE, OLD_MESSAGE)
+    MESSAGE_TYPE_CHOICES = (
+        (SYSTEM_NOTIFICATION, 'System Notification'),
+        (MESSAGE, 'Regular Message'),
+        (OLD_MESSAGE, 'Old Type Message'),
+    )
+    def validate_message_type(value):
+        if value not in MESSAGE_TYPES:
+            raise ValidationError('%s is not a valid message type' % value)
+    message_type = models.CharField(max_length=1,
+                                    choices=MESSAGE_TYPE_CHOICES,
+                                    validators=[validate_message_type])
     class Meta:
         ordering = ['-created']
 
