@@ -45,16 +45,22 @@ class MessageTest(TestCase):
         self.user = UserFactory()
         mail.outbox = []
 
-    def _create_message(self, to_user):
+    def _create_message(self, to_user, message_type='M'):
         self.message = Message(user=to_user,
                            author=self.author,
                            subject=self.subject,
-                           message_type='M',
+                           message_type=message_type,
                            content=self.body)
         self.message.save()
 
     def _send_email(self, to_user):
         send_templated_email(to_user, "test email", "messages/email/email-confirmed.html", {})
+
+    def test_message_cleanup(self):
+        self._create_message(self.user)
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 1)
+        Message.objects.cleanup(0)
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 0)
 
     def test_send_email_to_allowed_user(self):
         self.user.notify_by_email = True
