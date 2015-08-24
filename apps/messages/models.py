@@ -16,7 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import json
+import json, datetime
 
 from django.db import models
 from django.core.cache import cache
@@ -48,6 +48,12 @@ class MessageManager(models.Manager):
         super(MessageManager, self).bulk_create(object_list, **kwargs)
         for user_id in set(m.user_id for m in object_list):
             User.cache.invalidate_by_pk(user_id)
+
+    def cleanup(self, days, message_type=None):
+        messages_to_clean = self.get_query_set().filter(created__lte=datetime.datetime.now() - datetime.timedelta(days=days))
+        if message_type:
+            messages_to_clean = messages_to_clean.filter(message_type=message_type)
+        messages_to_clean.delete()
 
 class Message(models.Model):
     user = models.ForeignKey(User)
