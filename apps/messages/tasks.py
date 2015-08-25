@@ -56,8 +56,10 @@ def _team_sends_notification(team, notification_setting_name):
 
 @task()
 def cleanup():
-    Message.objects.cleanup(364, message_type='S')
-    Message.objects.cleanup(2*365, message_type='M')
+    # These numbers have to be chosen. Do not cleanup for now
+    # Message.objects.cleanup(364, message_type='S')
+    # Message.objects.cleanup(2*365, message_type='M')
+    return
 
 @task()
 def send_new_messages_notifications(message_ids):
