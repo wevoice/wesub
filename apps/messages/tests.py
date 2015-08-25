@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import datetime
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -61,6 +62,16 @@ class MessageTest(TestCase):
         self.assertEquals(Message.objects.filter(user=self.user).count(), 1)
         Message.objects.cleanup(0)
         self.assertEquals(Message.objects.filter(user=self.user).count(), 0)
+        self._create_message(self.user)
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 1)
+        Message.objects.filter(user=self.user).update(created=datetime.datetime.now() - datetime.timedelta(days=5))
+        Message.objects.cleanup(6)
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 1)
+        Message.objects.cleanup(4, message_type='S')
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 1)
+        Message.objects.cleanup(4, message_type='M')
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 0)
+
 
     def test_send_email_to_allowed_user(self):
         self.user.notify_by_email = True
