@@ -22,29 +22,68 @@ var activeMenu = null;
 var toggleAllActive = false;
 
 function openMenu(linkElt) {
-    var menuId = linkElt.data('menu');
-    $('#' + menuId).show();
-    linkElt.addClass('open');
+    var menu = linkElt.siblings('.dropdown');
+    if(linkElt.is('.caret')) {
+        linkElt.html('&#9650;');
+    }
+    if(menu.length == 0) return;
+    menu.show();
     activeMenu = linkElt;
+    positionMenu();
+    linkElt.addClass('open');
+    $(document).bind('click.dropdown', onClickWithOpenDropDown);
 }
+
 function closeMenu() {
-    var menuId = activeMenu.data('menu');
-    $('#' + menuId).hide();
+    var menu = activeMenu.siblings('.dropdown');
+    if(activeMenu.is('.caret')) {
+        activeMenu.html('&#9660;');
+    }
+    if(menu.length == 0) return;
+    menu.hide();
     activeMenu.removeClass('open');
     activeMenu = null;
+    $(document).unbind('click.dropdown');
+}
+
+function positionMenu() {
+    var menu = activeMenu.siblings('.dropdown');
+    var parentElt = activeMenu.parent();
+    var maxLeft = $(window).width() - menu.width() - 10;
+    // Position the menu at the bottom of the parent element
+    menu.css('top', parentElt.offset().top + parentElt.height());
+    // Position the menu at the left of the dropdown button (but make sure
+    // it's not past the edge of the window)
+    menu.css('left', Math.min(activeMenu.offset().left, maxLeft));
+}
+
+function onClickWithOpenDropDown(evt) {
+    if($(evt.target).closest('ul.dropdown').length == 0) {
+        // click outside the dropdown
+        closeMenu();
+    }
+}
+
+function onMenuToggleClick(evt) {
+    var linkElt = $(this);
+    if(activeMenu === null) {
+        openMenu(linkElt);
+    } else if (activeMenu[0] == linkElt[0]) {
+        closeMenu();
+    } else {
+        closeMenu();
+        openMenu(linkElt);
+    }
+    evt.preventDefault();
+    evt.stopPropagation();
 }
 
 $(document).ready(function() {
-    $('a.menu-toggle').click(function() {
-        var linkElt = $(this);
-        if(activeMenu === null) {
-            openMenu(linkElt);
-        } else if (activeMenu[0] == linkElt[0]) {
-            closeMenu();
-        } else {
-            closeMenu();
-            openMenu(linkElt);
-        }
+    $('a.menu-toggle').click(onMenuToggleClick);
+    $('.split-button').each(function() {
+        var caret = $('<button class="caret">&#9660;</button>');
+        $('button, a.button', this).not('.dropdown button').after(caret);
+        $('button.caret', this).click(onMenuToggleClick);
     });
 
     $('button.menu-toggle-all').click(function() {
@@ -57,4 +96,11 @@ $(document).ready(function() {
         }
     });
 });
+
+$(window).resize(function() {
+    if(activeMenu) {
+        positionMenu();
+    }
+});
+
 }(this));

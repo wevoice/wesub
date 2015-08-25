@@ -47,6 +47,20 @@
     &:hover {
         text-decoration: none;
     }
+
+    .split-button & {
+        padding-right: 13px;
+    }
+
+    .split-button &.caret {
+        padding-left: 9px;
+        padding-right: 9px;
+        border-left: 1px solid $white;
+    }
+}
+
+.split-button {
+    display: inline-block;
 }
 
 
@@ -79,7 +93,6 @@ button, a.button {
         @include button-color-light($white);
     }
 }
-
 
 .sidebar .tools {
     button, a.button {
