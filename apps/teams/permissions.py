@@ -619,10 +619,6 @@ def can_publish_edits_immediately(team_video, user, lang):
 
     return True
 
-def can_rollback_language(user, language):
-    """Can the user rollback a language to a previous version."""
-    return can_add_version(user, language.video, language.language_code)
-
 def can_post_edit_subtitles(team_video, user, lang=None):
     """ Returns wheter the user has permission to post edit an original language """
     if user.is_staff:
