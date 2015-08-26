@@ -25,6 +25,7 @@ import subtitles.workflows
 from teams.models import Team
 from teams.workflows import TeamWorkflow
 from teams.workflows.old import OldTeamWorkflow
+from teams.workflows.simple import SimpleTeamWorkflow
 
 @subtitles.workflows.get_workflow.override
 def get_workflow_override(video):
@@ -43,3 +44,4 @@ def get_workflow_override(video):
 
 # register default team workflows
 OldTeamWorkflow.register()
+SimpleTeamWorkflow.register()

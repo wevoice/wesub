@@ -28,7 +28,6 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
-from vidscraper.sites import blip
 
 from auth.models import CustomUser as User
 from subtitles import pipeline
@@ -208,15 +207,6 @@ class TestViews(WebUseTest):
         self.video.save()
         response = self.client.get(self.video.get_absolute_url(), follow=True)
         self.assertEqual(response.status_code, 200)
-
-    def test_bliptv_twice(self):
-        VIDEO_FILE = 'http://blip.tv/file/get/Kipkay-AirDusterOfficeWeaponry223.m4v'
-        old_video_file_url = blip.video_file_url
-        blip.video_file_url = lambda x: VIDEO_FILE
-        Video.get_or_create_for_url('http://blip.tv/file/4395490')
-        blip.video_file_url = old_video_file_url
-        # this test passes if the following line executes without throwing an error.
-        Video.get_or_create_for_url(VIDEO_FILE)
 
     def test_legacy_history(self):
         # TODO: write tests
