@@ -86,14 +86,15 @@ Creating Videos
         extra information about the video.  Right now the type keys supported
         are "speaker-name" and "location".  Values can be any string.
     :<json team: team slug for the video or null to remove it from its team.
-       The string "null" is a synonym for the null object **(deprecated)**
     :<json project: project slug for the video or null to put it in the
-        default project.  The string "null" is a synonym for the null object
-        **(deprecated)**
+        default project.
 
 .. note::
     **Deprecated:** For all fields, if you pass an empty string, we will treat
     it as if the field was not present in the input.
+
+    **Deprecated:** For slug and project, You can use the string "null" as a
+    synonym for the null object.
 
 When submitting URLs of external providers (i.e. youtube, vimeo), the metadata
 (title, description, duration) can be fetched from them. If you're submitting

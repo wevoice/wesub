@@ -582,17 +582,17 @@ class LanguagePageContext(dict):
 class LanguagePageContextSubtitles(LanguagePageContext):
     def setup_tab(self, request, video, language, version):
         team_video = video.get_team_video()
-        user_can_add_version = can_add_version(request.user, video,
-                                               language.language_code)
+        user_can_edit = user_can_edit_subtitles(request.user, video,
+                                                language.language_code)
         public_langs = (video.newsubtitlelanguage_set
                         .having_public_versions().count())
 
         self['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
-        self['edit_disabled'] = not user_can_add_version
+        self['edit_disabled'] = not user_can_edit
         self['show_download_all'] = public_langs > 1
         # If there are tasks for this language, the user has to go through the
         # tasks panel to edit things instead of doing it directly from here.
-        if user_can_add_version and video.get_team_video():
+        if user_can_edit and video.get_team_video():
             has_open_task = (Task.objects.incomplete()
                              .filter(team_video=video.get_team_video(),
                                      language=language.language_code)
