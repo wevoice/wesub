@@ -43,12 +43,30 @@ class TeamSubtitlesWorkflow(subtitles.workflows.DefaultWorkflow):
     def user_can_edit_subtitles(self, user, language_code):
         return permissions.can_add_version(user, self.video, language_code)
 
-class SimpleTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
-    def user_can_edit_subtitles(self, user, language_code):
-        return self.team_video.team.is_member(user)
+class TeamVideoWorkflow(subtitles.workflows.DefaultVideoWorkflow):
+    def __init__(self, team_video):
+        super(TeamVideoWorkflow, self).__init__(team_video.video)
+        self.team_video = team_video
+        self.team = team_video.team
 
     def get_add_language_mode(self, user):
-        if self.team_video.team.is_member(user):
+        if self.team.is_member(user):
             return '<standard>'
         else:
             return None
+
+    def get_default_language_workflow(self, language_code):
+        return TeamLanguageWorkflow(self.team_video, language_code)
+
+class TeamLanguageWorkflow(subtitles.workflows.DefaultLanguageWorkflow):
+    def __init__(self, team_video, language_code):
+        super(TeamLanguageWorkflow, self).__init__(team_video.video,
+                                                   language_code)
+        self.team_video = team_video
+        self.team = team_video.team
+
+    def user_can_edit_subtitles(self, user):
+        return user.is_staff or self.team.is_member(user)
+
+    def user_can_view_private_subtitles(self, user):
+        return user.is_staff or self.team.is_member(user)

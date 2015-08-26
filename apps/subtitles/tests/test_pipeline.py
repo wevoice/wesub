@@ -617,7 +617,7 @@ class TestBasicAdding(TestCase):
         _add(True, [(100,200, "hey"), (None, None, "there")])
         self.assertFalse(_get_sl_completion())
 
-    @test_utils.patch_for_test('subtitles.workflows.DefaultWorkflow.get_actions')
+    @test_utils.patch_for_test('subtitles.workflows.DefaultLanguageWorkflow.get_actions')
     def test_action(self, mock_get_actions):
         user = UserFactory()
         test_action = TestAction('action')
@@ -627,7 +627,7 @@ class TestBasicAdding(TestCase):
         test_action.perform.assert_called_with(
             user, self.video, version.subtitle_language, version)
 
-    @test_utils.patch_for_test('subtitles.workflows.DefaultWorkflow.get_actions')
+    @test_utils.patch_for_test('subtitles.workflows.DefaultLanguageWorkflow.get_actions')
     def test_action_completes_subtitles(self, mock_get_actions):
         user = UserFactory()
         test_action = TestAction('action', True)
@@ -640,7 +640,7 @@ class TestBasicAdding(TestCase):
         test_action.perform.assert_called_with(
             user, self.video, version.subtitle_language, version)
 
-    @test_utils.patch_for_test('subtitles.workflows.DefaultWorkflow.get_actions')
+    @test_utils.patch_for_test('subtitles.workflows.DefaultLanguageWorkflow.get_actions')
     def test_complete_and_action_set(self, mock_get_actions):
         # test an action that has complete set to a value, but the
         # pipeline.add_subtitles call has complete set to a different value.

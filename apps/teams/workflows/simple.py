@@ -26,7 +26,7 @@ from teams import views as old_views
 from teams import forms
 from teams.workflows import TeamWorkflow
 from utils.breadcrumbs import BreadCrumb
-from .subtitleworkflows import SimpleTeamSubtitlesWorkflow
+from .subtitleworkflows import TeamVideoWorkflow
 
 class SimpleTeamWorkflow(TeamWorkflow):
     """Workflow for basic public/private teams
@@ -41,7 +41,7 @@ class SimpleTeamWorkflow(TeamWorkflow):
 
     def get_subtitle_workflow(self, team_video):
         """Get the SubtitleWorkflow for a video with this workflow.  """
-        return SimpleTeamSubtitlesWorkflow(team_video)
+        return TeamVideoWorkflow(team_video)
 
     def workflow_settings_view(self, request, team):
         if request.method == 'POST':
