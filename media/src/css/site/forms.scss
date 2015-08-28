@@ -23,8 +23,8 @@ legend {
 }
 
 input, textarea, select {
-    font-size: $large-font-size;
     width: 100%;
+    font-size: inherit;
     border: 1px solid $light-gray;
     padding: 4px;
     margin: 0;
@@ -69,13 +69,13 @@ label {
     display: block;
     padding: 0;
     margin: 0 0 $line-height/2 0;
-    font-size: $large-font-size;
+    font-size: inherit;
 }
 
 label label {
     // This covers the nested labels inside a radio select
     margin: $line-height / 4 10px;
-    font-size: $large-font-size;
+    font-size: inherit;
 }
 
 p.help {
