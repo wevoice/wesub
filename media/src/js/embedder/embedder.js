@@ -205,13 +205,15 @@
                 this.subtitles = new that.Subtitles();
                 // Make a call to the Amara API to get attributes like available languages,
                 // internal ID, description, etc.
+		console.log("URL is " + apiURL + encodeURIComponent(this.get('url')));
                 _$.ajax({
                     url: apiURL + encodeURIComponent(this.get('url')),
                     success: function(resp) {
                         if (resp.objects.length) {
                             // The video exists on Amara.
                             video.set('is_on_amara', true);
-
+			    console.log("Video is on Amara");
+			    console.log(resp);
                             // There should only be one object.
                             if (resp.objects.length === 1) {
                                 // Set all of the API attrs as attrs on the video model.
@@ -371,13 +373,15 @@
                 this.pop = this.loadPopcorn();
 
                 this.pop.on('error', function() {
+		    console.log("Popcorn Error");
+		    console.log(that.pop.error);
                     if (that.pop.error.code == window.MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) {
                             notifyVideoLoadedToHost(window.MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED);
 		    }
                 });
 
                 this.pop.on('loadedmetadata', function() {
-
+		    console.log("Loaded metadata");
                     // In case of HTML5 videos, we need to set their dimension directly to the video element
                     _$('video', that.$popContainer).width(that.$popContainer.width()).height(that.$popContainer.height());
 
@@ -447,6 +451,7 @@
                         url += '&controls=1';
                     }
                 }
+		console.log("video_type is " + this.model.get('video_type'));
 		if (this.model.get('video_type') == 'C')
                     pop = _Popcorn.brightcove(this.$popContainer.attr('id'), url, {frameAnimation: true});
 		else
