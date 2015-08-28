@@ -31,6 +31,10 @@
 
     > .main {
         flex-grow: 1;
+
+        > .section {
+            margin-bottom: 60px;
+        }
     }
 }
 

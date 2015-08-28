@@ -81,8 +81,11 @@ function onMenuToggleClick(evt) {
 $(document).ready(function() {
     $('a.menu-toggle').click(onMenuToggleClick);
     $('.split-button').each(function() {
-        var caret = $('<button class="caret">&#9660;</button>');
-        $('button, a.button', this).not('.dropdown button').after(caret);
+        var button = $('button, a.button', this).not('.dropdown button');
+        var caret = $('<button>&#9660;</button>')
+            .attr('class', button.attr('class'))
+            .addClass('caret');
+        button.after(caret);
         $('button.caret', this).click(onMenuToggleClick);
     });
 
