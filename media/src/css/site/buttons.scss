@@ -8,6 +8,12 @@
     padding: 3px 18px;
 }
 
+@mixin icon-button {
+    font-size: inherit;
+    padding: 0 5px;
+    @include button-color-light($white);
+}
+
 @mixin button-color($color) {
     background-color: $color;
 
@@ -73,6 +79,10 @@ button, a.button {
 
     &.medium {
         @include medium-button;
+    }
+
+    &.icon {
+        @include icon-button;
     }
 
     margin-bottom: 0;
