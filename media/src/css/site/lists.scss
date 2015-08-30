@@ -9,6 +9,10 @@ ul.bullet {
     list-style-position: inside;
 }
 
+li.header {
+    font-weight: $font-weight-bold;
+}
+
 ul.activity {
     li {
         padding: 10px 0;
