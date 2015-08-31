@@ -57,6 +57,11 @@ def inbox(request, message_pk=None):
         'user_info': user
     }
 
+    type_filter = request.GET.get('type')
+    if type_filter:
+        if type_filter != 'any':
+            qs = qs.filter(message_type = type_filter)
+
     reply = request.GET.get('reply')
 
     if reply:
@@ -67,6 +72,11 @@ def inbox(request, message_pk=None):
             extra_context['reply_msg'] = reply_msg
         except (Message.DoesNotExist, ValueError):
             pass
+    filtered = bool(set(request.GET.keys()).intersection([
+        'type']))
+
+    extra_context['type_filter'] = type_filter
+    extra_context['filtered'] = filtered
 
     response = object_list(request, queryset=qs,
                        paginate_by=MESSAGES_ON_PAGE,

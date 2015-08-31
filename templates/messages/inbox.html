@@ -1,6 +1,6 @@
 {% extends "messages/base.html" %}
 
-{% load paginator i18n %}
+{% load paginator i18n query_string %}
 {% load url from future %}
 
 {% block title %}
@@ -24,13 +24,36 @@
 {% endblock %}
 
 {% block view_content %}
-    <div class="tools">
+    <div class="tools group">
       <span class="bulk-actions">
 	<input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
       </span>
       <a href="#" class="button delete-selected" id="delete-selected">{% trans "Delete selected" %}</a>
       <a href="#" class="button mark-as-read" id="mark-as-read">{% trans "Mark as read" %}</a>
+
+      <a href="#filter" id="sort-filter">
+        {% trans 'Filter' %}
+        <span></span>
+      </a>
     </div>
+    <form class="filters group no-ajax{% if filtered %} active{% endif %}" action="" method="GET">
+      <input type="hidden" name="q" value="{{ query }}" />
+      <button class="reduced" id="update">Update</button>
+      {% if filtered %}
+      <a href="{% url "messages:inbox" %}{% if query %}?q={{ query }}{% endif %}" class="button cancel">Clear</a>
+      {% endif %}
+      <div class="group">
+        <div class="filter-chunk">
+          <span class="inner">{% trans 'Type:' %}</span>
+          <select name="type" id="type">
+            <option value="any"{% if type_filter == None %} selected="selected"{% endif %}>{% trans 'any' %}</option>
+            <option {% if type_filter == "M" %}selected="selected"{% endif %} value="M">{% trans 'Regular Message' %}</option>
+            <option {% if type_filter == "S" %}selected="selected"{% endif %} value="S">{% trans 'System Notification' %}</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
     {% if message_list %}
         {% if is_paginated %}{% paginator %}{% endif %}
 

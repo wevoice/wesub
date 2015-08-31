@@ -1131,6 +1131,7 @@ var Site = function(Site) {
                     });
 		return false;
             });
+            that.Utils.chosenify()
             this.bulk_deletable_messages(false);
             that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
             that.Utils.messagesDeleteAndSend(false);
