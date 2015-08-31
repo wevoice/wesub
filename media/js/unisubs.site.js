@@ -1083,6 +1083,7 @@ var Site = function(Site) {
             }
             function set_message_data(data, $modal) {
                 $('#message_form_id_user').val(data['author-id']);
+                $('#message_form_id_thread').val(data['thread']);
                 $('.author-username', $modal).html(data['author-username']);
                 $('.message-content', $modal).html(data['message-content']);
                 $('.message-subject').html(data['message-subject-display']);

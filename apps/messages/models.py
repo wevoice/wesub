@@ -126,6 +126,7 @@ class Message(models.Model):
             'author-avatar': self.author and self.author.small_avatar() or '',
             'author-username': self.author and unicode(self.author) or '',
             'author-id': self.author and self.author.pk or '',
+            'thread': self.thread or self.id or '',
             'user-avatar': self.user and self.user.small_avatar() or '',
             'user-username': self.user and unicode(self.user) or '',
             'user-id': self.user and self.user.pk or '',
