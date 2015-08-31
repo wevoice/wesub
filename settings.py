@@ -426,7 +426,6 @@ MEDIA_BUNDLES = {
             'src/css/site/split-view.scss',
             'src/css/site/bottom-sheet.scss',
             'src/css/site/pagination.scss',
-            'src/css/site/filters.scss',
             'src/css/site/menus.scss',
             'src/css/site/modals.scss',
             'src/css/site/tooltips.scss',

@@ -15,10 +15,6 @@
         margin-right: 20px;
         font-size: $small-font-size;
 
-        fieldset {
-            padding-bottom: 0;
-        }
-
         @include medium-screen {
             width: 200px;
             min-width: 200px;
@@ -42,3 +38,30 @@
     }
 }
 
+.filters {
+    /* Filters form that's typically put in the sidebar */
+
+    font-size: $small-font-size;
+
+    form, fieldset {
+        padding: 0;
+    }
+
+    .filter {
+        margin-bottom: 10px;
+    }
+
+
+    select, input {
+        width: 100%;
+        padding: 0 4px;
+        font-size: inherit;
+    }
+
+    .actions {
+        padding-top: 10px;
+        button, a.button {
+            @include small-button;
+        }
+    }
+}
