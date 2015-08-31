@@ -36,9 +36,10 @@ from django.utils.translation import ugettext
 from django.utils.translation import ungettext
 
 from subtitles.forms import SubtitlesUploadForm
+from teams.behaviors import get_main_project
 from teams.models import (
     Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite,
-    BillingReport, MembershipNarrowing, Application,
+    BillingReport, MembershipNarrowing, Application
 )
 from teams import permissions
 from teams.exceptions import ApplicationInvalidException
@@ -934,6 +935,11 @@ class VideoFiltersForm(forms.Form):
                 (p.slug, p.name) for p in projects
             ]
             self.fields['project'].choices = choices
+            main_project = get_main_project(self.team)
+            if main_project is None:
+                self.fields['project'].initial = 'any'
+            else:
+                self.fields['project'].initial = main_project.slug
             self.show_project = True
         else:
             del self.fields['project']
