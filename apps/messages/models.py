@@ -28,6 +28,7 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.core.urlresolvers import reverse
 from django.utils.html import escape, urlize
+from django.db.models import Q
 
 from auth.models import CustomUser as User
 MESSAGE_MAX_LENGTH = getattr(settings,'MESSAGE_MAX_LENGTH', 1000)
@@ -40,6 +41,13 @@ class MessageManager(models.Manager):
 
     def for_author(self, user):
         return self.get_query_set().filter(author=user).exclude(deleted_for_author=True)
+
+    def thread(self, message):
+        if message.thread:
+            thread_id = message.thread
+        else:
+            thread_id = message.id
+        return self.get_query_set().filter(Q(thread=thread_id) | Q(id=thread_id))
 
     def unread(self):
         return self.get_query_set().filter(read=False)
@@ -71,7 +79,7 @@ class Message(models.Model):
     object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
     objects = MessageManager()
-
+    thread = models.PositiveIntegerField(blank=True, null=True, db_index=True)
     hide_cookie_name = 'hide_new_messages'
 
     SYSTEM_NOTIFICATION = 'S'
