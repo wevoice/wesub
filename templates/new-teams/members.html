@@ -56,7 +56,7 @@
           </tr>
         </table>
         <ul class="actions">
-          <li><a class="medium" href="{% url "messages:new" %}?user={{ member.user.username }}">{% trans "Send message" %}</a></li>
+          <li><a class="medium" href="{{ member.user.send_message_url }}">{% trans "Send message" %}</a></li>
           {% if member.id in edit_form.editable_member_ids %}
           <li><a class="medium edit open-modal" data-modal="edit-form" data-set-form-values='{"member": {{ member.id }}, "role":"{{ member.role }}"}' data-heading="{% blocktrans with username=member.user.username %}Edit Membership for {{ username }}{% endblocktrans %}" href="#">{% trans "Edit membership" %}</a></li>
           {% endif %}

@@ -1,0 +1,91 @@
+{% extends "new-teams/base.html" %}
+
+{% load i18n videos_tags %}
+{% load url from future %}
+
+{% block content %}
+<h2>{% blocktrans %}{{ team }}: {{ project }}{% endblocktrans %}</h2>
+<div class="split-view">
+  <div class="sidebar">
+    <div class="section">
+      <h5>{% trans "Managers" %}</h5>
+      {% if managers %}
+      <ul class="team-managers">
+        {% for manager in managers %}
+        <li>
+        {% if remove_manager_form %}
+        <button class="open-modal remove" data-modal="remove-manager-form" data-heading="{% blocktrans %}Remove Project Manager: {{ manager }}{% endblocktrans %}" data-set-form-values='{"member": "{{ manager.user.username }}"}'><span class="fa fa-remove"></span></button>
+        {% endif %}
+        <a href="{{ manager.user.send_message_url }}" title="{% blocktrans with user=manager.user %}Send {{ user }} a message{% endblocktrans %}">{{ manager }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="empty">{% trans "No managers" %}</p>
+      {% endif %}
+    </div>
+    {% if add_manager_form %}
+    <div class="section tools">
+      <button class="open-modal" data-modal="add-manager-form">{% trans "Add Manager" %}</button>
+    </div>
+    {% endif %}
+  </div>
+  <div class="main team-projects">
+    {% if videos %}
+    <h5>{% trans "Latest Videos" %}</h5>
+    <ul class="thumb-list">
+      {% for video in videos %}
+      <li>
+        <div class="thumb">
+          <img src="{{ video.get_wide_thumbnail }}" alt="{{ video.title_display }}">
+          {% if video.duration %}<div class="badge">{{ video.duration|format_duration }}</div>{% endif %}
+        </div>
+        <div class="extra-info">{{ video.get_primary_audio_language_code_display }}</div>
+        <h6 class="one-line">
+          <a href="{% url "videos:video" video_id=video.video_id %}">{{ video.title_display }}</a>
+        </h6>
+        {% with description=video.description|urlize|linebreaks %}
+        <div class="three-lines">{{ description }}</div>
+        {% endwith %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty">{% trans "No Videos found" %}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom %}
+{% if add_manager_form %}
+<aside class="modal" id="add-manager-form">
+  <h3>{% trans "Add Project Manager" %}</h3>
+  <button class="close"></button>
+  <form action="" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="form" value="add">
+    {% include "_field.html" with field=add_manager_form.member %}
+    <footer class="buttons">
+      <button>{% trans "Add Manager" %}</button>
+    </footer>
+  </form>
+</aside>
+{% endif %}
+
+{% if remove_manager_form %}
+<aside class="modal" id="remove-manager-form">
+  <h3></h3>
+  <button class="close"></button>
+  <p>{% trans "Are you sure you want to remove this manager?" %}</p>
+  <form action="" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="form" value="remove">
+    <input type="hidden" name="member">
+    <footer class="buttons">
+      <button>{% trans "Remove" %}</button>
+    </footer>
+  </form>
+</aside>
+{% endif %}
+{% endblock %}

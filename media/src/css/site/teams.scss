@@ -139,3 +139,21 @@ form.team-application {
         }
     }
 }
+
+ul.team-managers {
+    li:hover {
+        background: $lightest-gray;
+
+        button.remove {
+            background: $lightest-gray;
+        }
+    }
+    button.remove {
+        @include icon-button;
+        float: right;
+    }
+}
+
+.team-projects ul.thumb-list {
+    @include thumb-list-height($line-height * 4);
+}

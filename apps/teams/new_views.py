@@ -266,6 +266,56 @@ def members(request, team):
     })
 
 @team_view
+def project(request, team, project_slug):
+    project = get_object_or_404(team.project_set, slug=project_slug)
+    if permissions.can_change_project_managers(team, request.user):
+        form = request.POST.get('form')
+        if request.method == 'POST' and form == 'add':
+            add_manager_form = forms.AddProjectManagerForm(
+                team, project, data=request.POST)
+            if add_manager_form.is_valid():
+                add_manager_form.save()
+                member = add_manager_form.cleaned_data['member']
+                msg = fmt(_(u'%(user)s added as a manager'), user=member.user)
+                messages.success(request, msg)
+                return redirect('teams:project', team.slug, project.slug)
+        else:
+            add_manager_form = forms.AddProjectManagerForm(team, project)
+
+        if request.method == 'POST' and form == 'remove':
+            remove_manager_form = forms.RemoveProjectManagerForm(
+                team, project, data=request.POST)
+            if remove_manager_form.is_valid():
+                remove_manager_form.save()
+                member = remove_manager_form.cleaned_data['member']
+                msg = fmt(_(u'%(user)s removed as a manager'),
+                          user=member.user)
+                messages.success(request, msg)
+                return redirect('teams:project', team.slug, project.slug)
+        else:
+            remove_manager_form = forms.RemoveProjectManagerForm(team, project)
+    else:
+        add_manager_form = None
+        remove_manager_form = None
+
+    videos = (team.videos
+              .filter(teamvideo__project=project)
+              .order_by('-id'))[:5]
+
+    return render(request, 'new-teams/project-page.html', {
+        'team': team,
+        'project': project,
+        'videos': videos,
+        'managers': project.managers.all(),
+        'add_manager_form': add_manager_form,
+        'remove_manager_form': remove_manager_form,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(project),
+        ],
+    })
+
+@team_view
 def invite(request, team):
     if not permissions.can_invite(team, request.user):
         return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
@@ -316,6 +366,30 @@ def invite_user_search(request, team):
                          full_name=unicode(user)),
         }
         for user in users
+    ]
+
+    return HttpResponse(json.dumps(data), mimetype='application/json')
+
+@team_view
+def add_project_manager_search(request, team, project_slug):
+    project = get_object_or_404(Project, slug=project_slug)
+    query = request.GET.get('query')
+    if query:
+        members_qs = (team.members
+                      .filter(user__username__icontains=query)
+                      .exclude(projects_managed=project)
+                      .select_related('user'))
+    else:
+        members_qs = TeamMember.objects.none()
+
+    data = [
+        {
+            'value': member.user.username,
+            'label': fmt(_('%(username)s (%(full_name)s)'),
+                         username=member.user.username,
+                         full_name=unicode(member.user)),
+        }
+        for member in members_qs
     ]
 
     return HttpResponse(json.dumps(data), mimetype='application/json')

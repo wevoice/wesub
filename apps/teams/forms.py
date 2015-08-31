@@ -43,6 +43,7 @@ from teams.models import (
 )
 from teams import permissions
 from teams.exceptions import ApplicationInvalidException
+from teams.fields import TeamMemberInput
 from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
     can_assign_task, can_delete_language, can_remove_video,
@@ -704,6 +705,51 @@ class EditProjectForm(forms.Form):
         project.description = self.cleaned_data['description']
         project.save()
         return project
+
+class AddProjectManagerForm(forms.Form):
+    member = TeamMemberInput(widget=AutocompleteTextInput)
+
+    def __init__(self, team, project, *args, **kwargs):
+        super(AddProjectManagerForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.project = project
+        self.fields['member'].set_team(team)
+        self.fields['member'].widget.set_autocomplete_url(
+            reverse('teams:add-project-manager-search',
+                    args=(team.slug, project.slug))
+        )
+
+    def clean_member(self):
+        member = self.cleaned_data['member']
+        if member.is_project_manager(self.project):
+            raise forms.ValidationError(fmt(
+                _(u'%(user)s is already a manager of that project'),
+                user=member.user))
+        return member
+
+    def save(self):
+        member = self.cleaned_data['member']
+        member.projects_managed.add(self.project)
+
+class RemoveProjectManagerForm(forms.Form):
+    member = TeamMemberInput()
+
+    def __init__(self, team, project, *args, **kwargs):
+        super(RemoveProjectManagerForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.project = project
+        self.fields['member'].set_team(team)
+
+    def clean_member(self):
+        member = self.cleaned_data['member']
+        if not member.is_project_manager(self.project):
+            raise forms.ValidationError(_(u'%(user)s is not a manager'),
+                                        user=username)
+        return member
+
+    def save(self):
+        member = self.cleaned_data['member']
+        self.project.managers.remove(member)
 
 class DeleteLanguageVerifyField(forms.CharField):
     def __init__(self):

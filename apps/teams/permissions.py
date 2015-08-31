@@ -312,6 +312,9 @@ def can_assign_role(team, user, role, to_user):
     """
     return role in roles_user_can_assign(team, user, to_user)
 
+def can_change_project_managers(team, user):
+    return team.get_member(user).is_admin()
+
 def can_join_team(team, user):
     """Return whether the given user can join a team.
 

@@ -902,9 +902,7 @@ class Project(models.Model):
                            args=(self.team.slug, self.slug))
         else:
             # TODO implement project landing page for new-style teams
-            return '{}?project={}'.format(
-                reverse('teams:videos', args=(self.team.slug,)),
-                self.slug)
+            return reverse('teams:project', args=(self.team.slug, self.slug))
 
     @property
     def videos_count(self):
@@ -1344,6 +1342,12 @@ class TeamMember(models.Model):
     created = models.DateTimeField(default=datetime.datetime.now, null=True,
             blank=True)
 
+    # A project manager is a user who manages a project.  They have slightly
+    # elavated permisions for that project and also new users can look to them
+    # for help.
+    projects_managed = models.ManyToManyField(Project,
+                                              related_name='managers')
+
     objects = TeamMemberManager()
 
     def __unicode__(self):
@@ -1412,6 +1416,12 @@ class TeamMember(models.Model):
         """Test if the user is an admin or owner."""
         return self.role in (ROLE_OWNER, ROLE_ADMIN)
 
+    def is_project_manager(self, project):
+        return self.projects_managed.filter(id=project.id).exists()
+
+    def is_language_manager(self, language_code):
+        return self.languages_managed.filter(code=language_code).exists()
+
     class Meta:
         unique_together = (('team', 'user'),)
 
@@ -1427,6 +1437,10 @@ def clear_tasks(sender, instance, *args, **kwargs):
 
 pre_delete.connect(clear_tasks, TeamMember, dispatch_uid='teams.members.clear-tasks-on-delete')
 
+class LanguageManager(models.Model):
+    member = models.ForeignKey(TeamMember, related_name='languages_managed')
+    code = models.CharField(max_length=16,
+                            choices=translation.ALL_LANGUAGE_CHOICES)
 
 # MembershipNarrowing
 class MembershipNarrowing(models.Model):
@@ -1434,6 +1448,8 @@ class MembershipNarrowing(models.Model):
 
     A single MembershipNarrowing can apply to a project or a language, but not both.
 
+    This model is deprecated and we're planning on replacing it with the
+    projects_managed and languages_managed fields
     """
     member = models.ForeignKey(TeamMember, related_name="narrowings")
     project = models.ForeignKey(Project, null=True, blank=True)
