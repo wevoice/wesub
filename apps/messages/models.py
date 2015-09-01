@@ -42,6 +42,9 @@ class MessageManager(models.Manager):
     def for_author(self, user):
         return self.get_query_set().filter(author=user).exclude(deleted_for_author=True)
 
+    def for_user_or_author(self, user):
+        return self.get_query_set().filter((Q(author=user) & Q(deleted_for_author=False)) | (Q(user=user) & Q(deleted_for_user=False)))
+
     def thread(self, message):
         if message.thread:
             thread_id = message.thread

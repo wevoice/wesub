@@ -23,7 +23,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.utils.http import cookie_date
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
@@ -44,6 +44,22 @@ rpc_router = RpcRouter('messages:rpc_router', {
 
 MAX_MEMBER_SEARCH_RESULTS = 40
 MESSAGES_ON_PAGE = getattr(settings, 'MESSAGES_ON_PAGE', 30)
+
+
+@login_required
+def message(request, message_id):
+    user = request.user
+    messages = Message.objects.for_user_or_author(user).filter(id=message_id)
+    if len(messages) != 1:
+        return HttpResponseForbidden("Not allowed")
+    messages.filter(user=user).update(read=True)
+    extra_context = {'subject': messages[0].subject}
+    response = object_list(request, queryset=messages,
+                       paginate_by=MESSAGES_ON_PAGE,
+                       template_name='messages/message.html',
+                       template_object_name='message',
+                       extra_context=extra_context)
+    return response
 
 
 @login_required
