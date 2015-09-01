@@ -751,6 +751,51 @@ class RemoveProjectManagerForm(forms.Form):
         member = self.cleaned_data['member']
         self.project.managers.remove(member)
 
+class AddLanguageManagerForm(forms.Form):
+    member = TeamMemberInput(widget=AutocompleteTextInput)
+
+    def __init__(self, team, language_code, *args, **kwargs):
+        super(AddLanguageManagerForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.language_code = language_code
+        self.fields['member'].set_team(team)
+        self.fields['member'].widget.set_autocomplete_url(
+            reverse('teams:add-language-manager-search',
+                    args=(team.slug, language_code))
+        )
+
+    def clean_member(self):
+        member = self.cleaned_data['member']
+        if member.is_language_manager(self.language_code):
+            raise forms.ValidationError(fmt(
+                _(u'%(user)s is already a manager of that language'),
+                user=member.user))
+        return member
+
+    def save(self):
+        member = self.cleaned_data['member']
+        member.languages_managed.create(code=self.language_code)
+
+class RemoveLanguageManagerForm(forms.Form):
+    member = TeamMemberInput()
+
+    def __init__(self, team, language_code, *args, **kwargs):
+        super(RemoveLanguageManagerForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.language_code = language_code
+        self.fields['member'].set_team(team)
+
+    def clean_member(self):
+        member = self.cleaned_data['member']
+        if not member.is_language_manager(self.language_code):
+            raise forms.ValidationError(_(u'%(user)s is not a manager'),
+                                        user=username)
+        return member
+
+    def save(self):
+        member = self.cleaned_data['member']
+        member.languages_managed.filter(code=self.language_code).delete()
+
 class DeleteLanguageVerifyField(forms.CharField):
     def __init__(self):
         help_text=_('Type "Yes I want to delete this language" if you are '

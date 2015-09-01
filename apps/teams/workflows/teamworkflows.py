@@ -114,13 +114,21 @@ class TeamWorkflow(object):
         url = reverse(view_name, kwargs={'slug': self.team.slug})
         return TeamPage(name, title,  url)
 
-    # these can be used to customize the content in the project page
+    # these can be used to customize the content in the project/language
+    # manager pages
     def render_project_page(self, request, team, project, page_data):
         page_data['videos'] = (team.videos
                              .filter(teamvideo__project=project)
                              .order_by('-id'))[:5]
 
         return render(request, 'new-teams/project-page.html', page_data)
+
+    def render_language_page(self, request, team, language_code, page_data):
+        qs = (self.team.videos
+              .filter(primary_audio_language_code=language_code)
+              .order_by('-id'))
+        page_data['videos']= qs[:5]
+        return render(request, 'new-teams/language-page.html', page_data)
 
     _type_code_map = {}
 

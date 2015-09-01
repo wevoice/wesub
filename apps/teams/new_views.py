@@ -54,7 +54,7 @@ from teams.workflows import TeamWorkflow
 from utils.breadcrumbs import BreadCrumb
 from utils.pagination import AmaraPaginator
 from utils.text import fmt
-from utils.translation import get_language_choices
+from utils.translation import get_language_choices, get_language_label
 from videos.models import Action, Video
 
 logger = logging.getLogger('teams.views')
@@ -310,8 +310,64 @@ def project(request, team, project_slug):
             BreadCrumb(project),
         ],
     }
-    team_workflow = TeamWorkflow.get_workflow(team)
-    return team_workflow.render_project_page(request, team, project, data)
+    return team.new_workflow.render_project_page(request, team, project, data)
+
+@team_view
+def language_page(request, team, language_code):
+    try:
+        language_label = get_language_label(language_code)
+    except KeyError:
+        raise Http404
+    if permissions.can_change_language_managers(team, request.user):
+        form = request.POST.get('form')
+        if request.method == 'POST' and form == 'add':
+            add_manager_form = forms.AddLanguageManagerForm(
+                team, language_code, data=request.POST)
+            if add_manager_form.is_valid():
+                add_manager_form.save()
+                member = add_manager_form.cleaned_data['member']
+                msg = fmt(_(u'%(user)s added as a manager'), user=member.user)
+                messages.success(request, msg)
+                return redirect('teams:language-page', team.slug,
+                                language_code)
+        else:
+            add_manager_form = forms.AddLanguageManagerForm(team,
+                                                            language_code)
+
+        if request.method == 'POST' and form == 'remove':
+            remove_manager_form = forms.RemoveLanguageManagerForm(
+                team, language_code, data=request.POST)
+            if remove_manager_form.is_valid():
+                remove_manager_form.save()
+                member = remove_manager_form.cleaned_data['member']
+                msg = fmt(_(u'%(user)s removed as a manager'),
+                          user=member.user)
+                messages.success(request, msg)
+                return redirect('teams:language-page', team.slug,
+                                language_code)
+        else:
+            remove_manager_form = forms.RemoveLanguageManagerForm(
+                team, language_code)
+    else:
+        add_manager_form = None
+        remove_manager_form = None
+
+    data = {
+        'team': team,
+        'language_code': language_code,
+        'language': language_label,
+        'managers': (team.members
+                     .filter(languages_managed__code=language_code)),
+        'add_manager_form': add_manager_form,
+        'remove_manager_form': remove_manager_form,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(language_label),
+        ],
+    }
+    return team.new_workflow.render_language_page(
+        request, team, language_code, data,
+    )
 
 @team_view
 def invite(request, team):
@@ -370,12 +426,22 @@ def invite_user_search(request, team):
 
 @team_view
 def add_project_manager_search(request, team, project_slug):
-    project = get_object_or_404(Project, slug=project_slug)
+    return member_search(
+        request, team,
+        team.members.exclude(projects_managed__slug=project_slug)
+    )
+
+@team_view
+def add_language_manager_search(request, team, language_code):
+    return member_search(
+        request, team,
+        team.members.exclude(languages_managed__code=language_code)
+    )
+
+def member_search(request, team, qs):
     query = request.GET.get('query')
     if query:
-        members_qs = (team.members
-                      .filter(user__username__icontains=query)
-                      .exclude(projects_managed=project)
+        members_qs = (qs.filter(user__username__icontains=query)
                       .select_related('user'))
     else:
         members_qs = TeamMember.objects.none()
