@@ -49,6 +49,9 @@ class TeamVideoWorkflow(subtitles.workflows.DefaultVideoWorkflow):
         self.team_video = team_video
         self.team = team_video.team
 
+    def user_can_view_video(self, user):
+        return self.team.is_visible or self.team.is_member(user)
+
     def get_add_language_mode(self, user):
         if self.team.is_member(user):
             return '<standard>'
