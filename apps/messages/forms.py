@@ -64,6 +64,7 @@ class TeamAdminPageMessageForm(forms.ModelForm):
         message_list = []
         for user in users:
             m = Message(author=author, user=user)
+            m.message_type = 'S'
             m.subject = subject
             m.content = content
             message_list.append(m)

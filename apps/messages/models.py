@@ -16,10 +16,11 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import json
+import json, datetime
 
 from django.db import models
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
@@ -29,7 +30,6 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape, urlize
 
 from auth.models import CustomUser as User
-
 MESSAGE_MAX_LENGTH = getattr(settings,'MESSAGE_MAX_LENGTH', 1000)
 
 class MessageManager(models.Manager):
@@ -48,6 +48,12 @@ class MessageManager(models.Manager):
         super(MessageManager, self).bulk_create(object_list, **kwargs)
         for user_id in set(m.user_id for m in object_list):
             User.cache.invalidate_by_pk(user_id)
+
+    def cleanup(self, days, message_type=None):
+        messages_to_clean = self.get_query_set().filter(created__lte=datetime.datetime.now() - datetime.timedelta(days=days))
+        if message_type:
+            messages_to_clean = messages_to_clean.filter(message_type=message_type)
+        messages_to_clean.delete()
 
 class Message(models.Model):
     user = models.ForeignKey(User)
@@ -68,6 +74,21 @@ class Message(models.Model):
 
     hide_cookie_name = 'hide_new_messages'
 
+    SYSTEM_NOTIFICATION = 'S'
+    MESSAGE = 'M'
+    OLD_MESSAGE = 'O'
+    MESSAGE_TYPES = (SYSTEM_NOTIFICATION, MESSAGE, OLD_MESSAGE)
+    MESSAGE_TYPE_CHOICES = (
+        (SYSTEM_NOTIFICATION, 'System Notification'),
+        (MESSAGE, 'Regular Message'),
+        (OLD_MESSAGE, 'Old Type Message'),
+    )
+    def validate_message_type(value):
+        if value not in MESSAGE_TYPES:
+            raise ValidationError('%s is not a valid message type' % value)
+    message_type = models.CharField(max_length=1,
+                                    choices=MESSAGE_TYPE_CHOICES,
+                                    validators=[validate_message_type])
     class Meta:
         ordering = ['-created']
 
@@ -84,6 +105,10 @@ class Message(models.Model):
             self.deleted_for_user = True
             self.save()
         elif self.author == user:
+            self.delete_for_author(user)
+
+    def delete_for_author(self, author):
+        if self.author == author:
             self.deleted_for_author = True
             self.save()
 

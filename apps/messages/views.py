@@ -26,6 +26,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.http import cookie_date
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 
 from auth.models import CustomUser as User
 from auth.models import UserLanguage
@@ -108,6 +109,7 @@ def new(request):
         if form.is_valid():
             if form.cleaned_data['user']:
                 m = Message(user=form.cleaned_data['user'], author=request.user,
+                        message_type='M',
                         content=form.cleaned_data['content'],
                         subject=form.cleaned_data['subject'])
                 m.save()
@@ -127,6 +129,7 @@ def new(request):
                     members = map(lambda member: member.user, UserLanguage.objects.filter(user__in=form.cleaned_data['team'].members.values('user')).filter(language__exact=language).exclude(user__exact=request.user).select_related('user'))
                 for member in members:
                     message_list.append(Message(user=member, author=request.user,
+                                                message_type='M',
                                                 content=form.cleaned_data['content'],
                                                 subject=form.cleaned_data['subject']))
                 Message.objects.bulk_create(message_list, batch_size=500);
@@ -159,11 +162,10 @@ def new(request):
 def search_users(request):
     users = User.objects.all()
     q = request.GET.get('term')
-
+    search_in_fields = Q(username__icontains=q) | Q(first_name__icontains=q) | Q(last_name__icontains=q)
     results = [[u.id, u.username, unicode(u)]
-               for u in users.filter(username__icontains=q,
+               for u in users.filter(search_in_fields,
                                             is_active=True)]
-
     results = results[:MAX_MEMBER_SEARCH_RESULTS]
 
     return { 'results': results }

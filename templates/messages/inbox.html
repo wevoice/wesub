@@ -18,13 +18,18 @@
         // TODO
         // Every single translation that goes to a JS variable needs to be |escapejs'd.
         window.DELETE_MESSAGE_CONFIRM = '{% trans 'Do you really wish to delete this message?' %}';
+        window.DELETE_MESSAGES_CONFIRM = '{% trans 'Do you really wish to delete these messages?' %}';
         window.MESSAGE_SUCCESSFULLY_SENT = '{% trans "The message has been successfully sent." %}';
     </script>
 {% endblock %}
 
 {% block view_content %}
     <div class="tools">
-        <a href="#" class="button mark-all-read" id="mark-all-read">Mark all read</a>
+      <span class="bulk-actions">
+	<input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+      </span>
+      <a href="#" class="button delete-selected" id="delete-selected">{% trans "Delete selected" %}</a>
+      <a href="#" class="button mark-as-read" id="mark-as-read">{% trans "Mark as read" %}</a>
     </div>
     {% if message_list %}
         {% if is_paginated %}{% paginator %}{% endif %}
@@ -45,6 +50,7 @@
                         </p>
                     {% endif %}
                     <p>{{ msg.get_content|safe }}</p>
+                    <input class="bulkable" type="checkbox" value="{{msg.id}}">
                     {% if msg.author %}
                         <a class="thumb" href="{{ msg.author.get_absolute_url }}" title="View {{ msg.author }}'s profile">
                             {% with msg.author.small_avatar as author_avatar_url %}
@@ -56,7 +62,7 @@
                             {% endwith %}
                         </a>
                     {% endif %}
-                    <span class="timestamp">{% if not msg.read %}<span class="unread">Unread</span>{% endif %}{{ msg.created|timesince }} {% trans 'ago' %}</span>
+			<span class="timestamp">{% if not msg.read %}<span class="unread">Unread</span>{% endif %}{{ msg.created|timesince }} {% trans 'ago' %}<br>{{ msg.message_type }}</span>
                     <ul class="admin-controls">
                         {% if not msg.read %}
                         <li>
@@ -68,9 +74,6 @@
                                 <a class="reply open-modal" href="#msg_modal" data-modal="msg_modal" data="{{ msg.json_data }}">{% trans "Reply" %}</a>
                             </li>
                         {% endif %}
-                        <li>
-                            <a href="#" class="delete" message_id="{{ msg.pk }}">{% trans "Delete" %}</a>
-                        </li>
                     </ul>
                 </li>
             {% endfor %}
