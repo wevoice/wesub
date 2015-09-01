@@ -100,3 +100,9 @@ ul.thumb-list {
         margin-bottom: 0;
     }
 }
+
+.list-subheader {
+    // Subheader that splits up a list.  We normally use <h5> for this.
+    color: $darkish-gray;
+    padding: 10px 0;
+}
