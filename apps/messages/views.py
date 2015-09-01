@@ -52,8 +52,14 @@ def message(request, message_id):
     messages = Message.objects.for_user_or_author(user).filter(id=message_id)
     if len(messages) != 1:
         return HttpResponseForbidden("Not allowed")
+    display_thread = request.GET.get('thread')
+    if display_thread:
+        messages = Message.objects.thread(messages[0], user)
+
     messages.filter(user=user).update(read=True)
-    extra_context = {'subject': messages[0].subject}
+    extra_context = {'subject': messages[0].subject,
+                     'mid': messages[0].id
+    }
     response = object_list(request, queryset=messages,
                        paginate_by=MESSAGES_ON_PAGE,
                        template_name='messages/message.html',

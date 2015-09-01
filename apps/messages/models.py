@@ -45,12 +45,12 @@ class MessageManager(models.Manager):
     def for_user_or_author(self, user):
         return self.get_query_set().filter((Q(author=user) & Q(deleted_for_author=False)) | (Q(user=user) & Q(deleted_for_user=False)))
 
-    def thread(self, message):
+    def thread(self, message, user):
         if message.thread:
             thread_id = message.thread
         else:
             thread_id = message.id
-        return self.get_query_set().filter(Q(thread=thread_id) | Q(id=thread_id))
+        return self.get_query_set().filter(Q(thread=thread_id) | Q(id=thread_id)).filter((Q(author=user) & Q(deleted_for_author=False)) | (Q(user=user) & Q(deleted_for_user=False)))
 
     def unread(self):
         return self.get_query_set().filter(read=False)

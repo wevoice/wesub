@@ -29,6 +29,7 @@
 	<input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
       </span>
       <a href="#" class="button delete-selected" id="delete-selected">{% trans "Delete selected" %}</a>
+      <a href="{% url "messages:message" mid %}?thread=1" class="button show-thread" id="delete-selected">{% trans "Show message thread" %}</a>
     </div>
 
     {% if message_list %}
