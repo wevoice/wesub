@@ -87,8 +87,8 @@ class MessageTest(TestCase):
         n = self._create_message(self.user, reply_to=n)
         self._create_message(self.user)
         self._create_message(self.user)
-        self.assertEquals(Message.objects.thread(n).count(), 6)
-        self.assertEquals(Message.objects.thread(m).count(), 6)
+        self.assertEquals(Message.objects.thread(n, self.user).count(), 6)
+        self.assertEquals(Message.objects.thread(m, self.user).count(), 6)
 
     def test_send_email_to_allowed_user(self):
         self.user.notify_by_email = True
