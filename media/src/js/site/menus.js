@@ -23,8 +23,7 @@ var dropdown = null;
 var toggleAllActive = false;
 
 function openMenu(linkElt) {
-    dropdown = linkElt.children('ul.dropdown')
-        .add(linkElt.siblings('ul.dropdown'));
+    dropdown = linkElt.siblings('ul.dropdown');
     if(linkElt.is('.caret')) {
         linkElt.html('&#9650;');
     }
@@ -89,7 +88,7 @@ $(document).ready(function() {
         button.after(caret);
         $('button.caret', this).click(onMenuToggleClick);
     });
-    $('button.dropdown').click(onMenuToggleClick);
+    $('.dropdown-button button').click(onMenuToggleClick);
 
     $('button.menu-toggle-all').click(function() {
         var menus = $('ul', $(this).closest('nav'));

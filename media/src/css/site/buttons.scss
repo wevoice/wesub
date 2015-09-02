@@ -134,12 +134,12 @@ button, a.button {
 
 }
 
-button.dropdown {
+.dropdown-button button {
     &:after {
-        content: '\25BC';
+        content: ' \25BC';
     }
 
     &.open:after {
-        content: '\25B2';
+        content: ' \25B2';
     }
 }
