@@ -1490,9 +1490,9 @@ class ApplicationForm(forms.Form):
     def save(self):
         self.application.note = self.cleaned_data['about_you']
         self.application.save()
-        languages = []
+        languages = set()
         for i in xrange(1, 7):
             value = self.cleaned_data['language{}'.format(i)]
             if value:
-                languages.append(value)
+                languages.add(value)
         self.application.user.set_languages(languages)
