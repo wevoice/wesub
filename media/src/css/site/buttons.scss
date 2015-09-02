@@ -133,3 +133,13 @@ button, a.button {
     }
 
 }
+
+button.dropdown {
+    &:after {
+        content: '\25BC';
+    }
+
+    &.open:after {
+        content: '\25B2';
+    }
+}

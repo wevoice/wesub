@@ -19,15 +19,19 @@
 (function() {
 
 var activeMenu = null;
+var dropdown = null;
 var toggleAllActive = false;
 
 function openMenu(linkElt) {
-    var menu = linkElt.siblings('.dropdown');
+    dropdown = linkElt.children('ul.dropdown')
+        .add(linkElt.siblings('ul.dropdown'));
     if(linkElt.is('.caret')) {
         linkElt.html('&#9650;');
     }
-    if(menu.length == 0) return;
-    menu.show();
+    if(dropdown.length == 0) {
+        return;
+    }
+    dropdown.show();
     activeMenu = linkElt;
     positionMenu();
     linkElt.addClass('open');
@@ -35,26 +39,23 @@ function openMenu(linkElt) {
 }
 
 function closeMenu() {
-    var menu = activeMenu.siblings('.dropdown');
     if(activeMenu.is('.caret')) {
         activeMenu.html('&#9660;');
     }
-    if(menu.length == 0) return;
-    menu.hide();
+    dropdown.hide();
     activeMenu.removeClass('open');
     activeMenu = null;
     $(document).unbind('click.dropdown');
 }
 
 function positionMenu() {
-    var menu = activeMenu.siblings('.dropdown');
     var parentElt = activeMenu.parent();
-    var maxLeft = $(window).width() - menu.width() - 10;
+    var maxLeft = $(window).width() - dropdown.width() - 10;
     // Position the menu at the bottom of the parent element
-    menu.css('top', parentElt.offset().top + parentElt.height());
+    dropdown.css('top', parentElt.offset().top + parentElt.height());
     // Position the menu at the left of the dropdown button (but make sure
     // it's not past the edge of the window)
-    menu.css('left', Math.min(activeMenu.offset().left, maxLeft));
+    dropdown.css('left', Math.min(activeMenu.offset().left, maxLeft));
 }
 
 function onClickWithOpenDropDown(evt) {
@@ -88,6 +89,7 @@ $(document).ready(function() {
         button.after(caret);
         $('button.caret', this).click(onMenuToggleClick);
     });
+    $('button.dropdown').click(onMenuToggleClick);
 
     $('button.menu-toggle-all').click(function() {
         var menus = $('ul', $(this).closest('nav'));

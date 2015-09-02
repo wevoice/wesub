@@ -1,5 +1,5 @@
 .tooltip {
-    @extend .dropdown;
+    @extend %dropdown;
     padding: 2px 5px;
 }
 
