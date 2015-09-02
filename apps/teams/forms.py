@@ -929,7 +929,7 @@ class VideoFiltersForm(forms.Form):
         projects = Project.objects.for_team(self.team)
         if projects:
             choices = [
-                ('any', _('Any')),
+                ('', _('Any')),
                 ('none', _('No Project')),
             ] + [
                 (p.slug, p.name) for p in projects
@@ -937,7 +937,7 @@ class VideoFiltersForm(forms.Form):
             self.fields['project'].choices = choices
             main_project = get_main_project(self.team)
             if main_project is None:
-                self.fields['project'].initial = 'any'
+                self.fields['project'].initial = ''
             else:
                 self.fields['project'].initial = main_project.slug
             self.show_project = True
@@ -950,7 +950,7 @@ class VideoFiltersForm(forms.Form):
         # search indexes.  See #838 for our plan to improve things
         from haystack.query import SearchQuerySet
 
-        project = self.cleaned_data.get('project', 'any')
+        project = self.cleaned_data.get('project')
         q = self.cleaned_data['q']
         sort = self.cleaned_data['sort']
 
@@ -958,7 +958,7 @@ class VideoFiltersForm(forms.Form):
         if q:
             for term in get_terms(q):
                 qs = qs.auto_query(qs.query.clean(term).decode('utf-8'))
-        if project != 'any':
+        if project:
             if project == 'none':
                 project = Project.DEFAULT_NAME
             try:
