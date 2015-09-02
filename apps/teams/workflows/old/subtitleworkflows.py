@@ -159,7 +159,7 @@ class TaskTeamEditorNotes(TeamEditorNotes):
                                  fail_silently=not settings.DEBUG)
 
             Message.objects.create(
-                user=user, subject=subject,
+                user=user, subject=subject, message_type="S",
                 content=render_to_string(message_template, data))
 
 class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):

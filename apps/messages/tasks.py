@@ -773,7 +773,7 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
 
     for user in message_followers:
         Message.objects.create(user=user, subject=subject, object_pk=object_pk,
-                content_type=content_type, object=obj,
+                               content_type=content_type, object=obj, message_type="S",
                 content=render_to_string('messages/new-comment.html', {
                     "video": video,
                     "language": language,
