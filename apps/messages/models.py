@@ -33,6 +33,16 @@ from django.db.models import Q
 from auth.models import CustomUser as User
 MESSAGE_MAX_LENGTH = getattr(settings,'MESSAGE_MAX_LENGTH', 1000)
 
+SYSTEM_NOTIFICATION = 'S'
+MESSAGE = 'M'
+OLD_MESSAGE = 'O'
+MESSAGE_TYPES = (SYSTEM_NOTIFICATION, MESSAGE, OLD_MESSAGE)
+MESSAGE_TYPE_CHOICES = (
+    (SYSTEM_NOTIFICATION, 'System Notification'),
+    (MESSAGE, 'Regular Message'),
+    (OLD_MESSAGE, 'Old Type Message'),
+)
+
 class MessageManager(models.Manager):
     use_for_related_fields = True
 
@@ -85,15 +95,6 @@ class Message(models.Model):
     thread = models.PositiveIntegerField(blank=True, null=True, db_index=True)
     hide_cookie_name = 'hide_new_messages'
 
-    SYSTEM_NOTIFICATION = 'S'
-    MESSAGE = 'M'
-    OLD_MESSAGE = 'O'
-    MESSAGE_TYPES = (SYSTEM_NOTIFICATION, MESSAGE, OLD_MESSAGE)
-    MESSAGE_TYPE_CHOICES = (
-        (SYSTEM_NOTIFICATION, 'System Notification'),
-        (MESSAGE, 'Regular Message'),
-        (OLD_MESSAGE, 'Old Type Message'),
-    )
     def validate_message_type(value):
         if value not in MESSAGE_TYPES:
             raise ValidationError('%s is not a valid message type' % value)

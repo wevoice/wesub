@@ -40,7 +40,7 @@
         </p>
         <ul class="listing messages">
             {% for msg in message_list %}
-                <li class="message {% if not msg.read %}unread{% endif %}">
+                <li class="message {% if not msg.read %}unread{% endif %} {% if msg.message_type == "S" %}notification{% endif %}">
                     <h3>
                         {{ msg }}
                     </h3>
@@ -63,7 +63,7 @@
                             {% endwith %}
                         </a>
                     {% endif %}
-			<span class="timestamp">{{ msg.created|timesince }} {% trans 'ago' %}<br>{{ msg.message_type }}</span>
+			<span class="timestamp">{{ msg.created|timesince }} {% trans 'ago' %}</span>
                     <ul class="admin-controls">
                         {% if msg.author != None and msg.author != request.user %}
                             <li>
