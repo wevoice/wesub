@@ -50,7 +50,6 @@ class MessagesSerializer(serializers.Serializer):
     team = serializers.CharField(required=False)
     subject = serializers.CharField()
     content = serializers.CharField()
-    message_type = serializers.CharField()
 
     default_error_messages = {
         'unknown-user': "Unknown user: {user}",
