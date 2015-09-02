@@ -39,7 +39,7 @@ OLD_MESSAGE = 'O'
 MESSAGE_TYPES = (SYSTEM_NOTIFICATION, MESSAGE, OLD_MESSAGE)
 MESSAGE_TYPE_CHOICES = (
     (SYSTEM_NOTIFICATION, 'System Notification'),
-    (MESSAGE, 'Regular Message'),
+    (MESSAGE, 'Personal Message'),
     (OLD_MESSAGE, 'Old Type Message'),
 )
 
