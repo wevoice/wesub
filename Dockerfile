@@ -30,6 +30,7 @@ ADD .docker/test_app.sh /usr/local/bin/test_app
 ADD .docker/update_translations.sh /usr/local/bin/update_translations
 ADD .docker/entry.sh /usr/local/bin/entry
 ADD .docker/reset-db.sh /usr/local/bin/reset-db
+ADD .docker/setup_preview_site.sh /usr/local/bin/setup_preview_site
 RUN easy_install pip
 RUN pip install uwsgi
 RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements.txt)

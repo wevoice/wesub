@@ -22,7 +22,7 @@ var angular = angular || null;
 
     var module = angular.module('amara.SubtitleEditor.video.services', []);
 
-    module.factory('VideoPlayer', ["$rootScope", "SubtitleStorage", function($rootScope, SubtitleStorage) {
+    module.factory('VideoPlayer', ["$rootScope", "SubtitleStorage", "EditorData", function($rootScope, SubtitleStorage, EditorData) {
         var videoURLs = [];
         var pop = null;
         var playing = false;
@@ -78,9 +78,14 @@ var angular = angular || null;
         return {
             init: function() {
                 videoURLs = SubtitleStorage.getVideoURLs();
-                pop = window.Popcorn.smart('#video', videoURLs, {
-                    controls: false,
-                });
+		if (EditorData.video.primaryVideoURLType == "C" && videoURLs.length == 1)
+                    pop = window.Popcorn.brightcove('#video', videoURLs[0], {
+			controls: false,
+                    });
+		else
+                    pop = window.Popcorn.smart('#video', videoURLs, {
+			controls: false,
+                    });
                 handlePopcornEvents();
             },
             play: function() {

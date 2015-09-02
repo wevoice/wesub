@@ -2069,3 +2069,17 @@ class ImportedVideo(models.Model):
 
     class Meta:
         ordering = ('-id',)
+
+class VideoTypeUrlPatternManager(models.Manager):
+    def patterns_for_type(self, type):
+        cache_key = 'videotypepattern:{0}'.format(type)
+        patterns = cache.get(cache_key)
+        if patterns is None:
+            patterns = self.filter(type=type)
+            cache.set(cache_key, patterns)
+        return patterns
+
+class VideoTypeUrlPattern(models.Model):
+    type = models.CharField(max_length=2)
+    url_pattern = models.URLField(max_length=255, unique=True)
+    objects = VideoTypeUrlPatternManager()

@@ -36,14 +36,12 @@ class SearchTest(TestCase):
     def test_simple_query(self):
         assert_search_querysets_equal(self.get_search_qs('foo'),
                                       VideoIndex.public()
-                                      .auto_query('foo')
-                                      .filter_or(title='foo'))
+                                      .auto_query('foo'))
 
     def test_clean_input(self):
         assert_search_querysets_equal(self.get_search_qs('foo?'),
                                       VideoIndex.public()
-                                      .auto_query('foo?')
-                                      .filter_or(title='foo\\?'))
+                                      .auto_query('foo?'))
 
     def test_empty_query(self):
         assert_search_querysets_equal(self.get_search_qs(''),
@@ -65,7 +63,6 @@ class SearchTest(TestCase):
         assert_search_querysets_equal(sqs,
                                       VideoIndex.public()
                                       .auto_query('foo')
-                                      .filter_or(title='foo')
                                       .filter(video_language_exact='en'))
 
     def check_choices(self, field, correct_choices):
@@ -98,8 +95,7 @@ class SearchTest(TestCase):
         # check that get_language_facet_counts() was presented with the
         # correct query
         self.check_get_language_facet_counts_query(VideoIndex.public()
-                                                   .auto_query('foo')
-                                                   .filter_or(title='foo'))
+                                                   .auto_query('foo'))
 
     def test_facet_choices_empty_query(self):
         form = SearchForm(RpcMultiValueDict(dict(q='')))
