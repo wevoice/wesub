@@ -350,7 +350,7 @@ class ContainerManager(object):
         return self.container_name_prefix_for_branch() + '{}-{}-'.format(
             self.commit_id[:6], self.env.BUILD_NUMBER)
 
-    def run_app_command(self, command):
+    def run_app_command(self, command, argument=None):
         """Run a command using the app container
 
         Use this to run a command that does something then quits like
@@ -363,6 +363,8 @@ class ContainerManager(object):
         cmd_line = [ 'run', '-t', '--rm', ]
         cmd_line += self.app_params()
         cmd_line += [self.image_name, command]
+        if argument is not None:
+            cmd_line += [argument]
         self.docker.run(self.env.DOCKER_HOST_1, *cmd_line)
 
     def start_worker_container(self, host, name, command):
@@ -493,6 +495,8 @@ class Deploy(object):
         if not self.env.ROLLBACK_ID:
             self.container_manager.run_app_command("build_media")
         self.start_and_stop_containers()
+        if self.container_manager.building_preview():
+            self.container_manager.run_app_command("setup_preview_site", argument=self.container_manager.app_hostname())
         self.container_manager.print_report()
 
     def build(self):
