@@ -2635,8 +2635,8 @@ a.truncated-expand {
         padding-left: .5em;
     }
 }
-#teams,.messages .view .tools {
-
+#teams,.messages {
+  .view .tools {
     #sort-filter {
         color: $normal;
         line-height: 1.5em;
@@ -2669,8 +2669,11 @@ a.truncated-expand {
         float: none;
         margin: 0;
     }
+  }
 }
-#teams,.messages .view .filters {
+
+#teams,.messages {
+  .view .filters {
     background: -moz-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
     background: -ms-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
     background: -o-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
@@ -2716,10 +2719,15 @@ a.truncated-expand {
         text-decoration: none;
         top: 11px;
     }
+  }
 }
-#teams,.messages .view .filters.active {
+
+#teams,.messages {
+  .view .filters.active {
     display: block;
+  }
 }
+
 #teams form.edit-video {
     fieldset {
         padding-bottom: 0;
