@@ -19,25 +19,25 @@
 (function() {
 
 var activeMenu = null;
-var dropdown = null;
 var toggleAllActive = false;
 
 function openMenu(linkElt) {
-    dropdown = linkElt.siblings('ul.dropdown');
+    var dropdown = initDropDown(linkElt);
+    if(dropdown === null) {
+        return;
+    }
     if(linkElt.is('.caret')) {
         linkElt.html('&#9650;');
     }
-    if(dropdown.length == 0) {
-        return;
-    }
     dropdown.show();
     activeMenu = linkElt;
-    positionMenu();
+    positionDropdown();
     linkElt.addClass('open');
     $(document).bind('click.dropdown', onClickWithOpenDropDown);
 }
 
 function closeMenu() {
+    var dropdown = getDropDown();
     if(activeMenu.is('.caret')) {
         activeMenu.html('&#9660;');
     }
@@ -47,7 +47,29 @@ function closeMenu() {
     $(document).unbind('click.dropdown');
 }
 
-function positionMenu() {
+function initDropDown(linkElt) {
+    if(linkElt.data('dropdown')) {
+        // Dropdown already initialized
+        return linkElt.data('dropdown');
+    }
+    var dropdown = linkElt.siblings('ul.dropdown');
+    if(dropdown.length == 0) {
+        return null;
+    }
+    // Make the dropdown element a top-level element.  This way avoids issues
+    // when it has a parent element that has position: relative.
+    dropdown.remove();
+    $(document.body).append(dropdown);
+    linkElt.data('dropdown', dropdown);
+    return dropdown;
+}
+
+function getDropDown() {
+    return activeMenu.data('dropdown');
+}
+
+function positionDropdown() {
+    var dropdown = getDropDown();
     var parentElt = activeMenu.parent();
     var maxLeft = $(window).width() - dropdown.width() - 10;
     // Position the menu at the bottom of the parent element
@@ -103,7 +125,7 @@ $(document).ready(function() {
 
 $(window).resize(function() {
     if(activeMenu) {
-        positionMenu();
+        positionDropdown();
     }
 });
 
