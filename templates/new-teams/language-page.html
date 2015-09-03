@@ -27,6 +27,7 @@
       <div class="tools"><button class="open-modal medium" data-modal="add-manager-form">{% trans "Add Manager" %}</button></div>
       {% endif %}
     </div>
+    {% block sidebar-extra %}{% endblock %}
   </div>
   {% block main %}{% include "new-teams/landing-page.html" %}{% endblock %}
 </div>
