@@ -1417,7 +1417,11 @@ class TeamMember(models.Model):
         return self.role in (ROLE_OWNER, ROLE_ADMIN)
 
     def is_project_manager(self, project):
-        return self.projects_managed.filter(id=project.id).exists()
+        if isinstance(project, Project):
+            project_id = project.id
+        else:
+            project_id = project
+        return self.projects_managed.filter(id=project_id).exists()
 
     def is_language_manager(self, language_code):
         return self.languages_managed.filter(code=language_code).exists()
