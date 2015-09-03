@@ -65,6 +65,13 @@
     }
 }
 
+@mixin full-button {
+    border: 1px solid $light-gray;
+    @include button-color-light($white);
+    width: 100%;
+    text-align: center;
+}
+
 .split-button {
     display: inline-block;
 }
@@ -102,20 +109,16 @@ button, a.button {
     &.flat {
         @include button-color-light($white);
     }
+
+    &.full {
+        @include full-button;
+    }
 }
 
 .sidebar .tools {
     button, a.button {
-        border: 1px solid $light-gray;
-        background-color: $white;
-        color: $dark-gray;
-        width: 100%;
-        text-align: center;
+        @include full-button;
         margin-bottom: 8px;
-
-        &:hover {
-            background: darken($white, 10);
-        }
     }
 }
 

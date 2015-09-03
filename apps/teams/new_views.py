@@ -50,6 +50,7 @@ from .models import (Invite, Setting, Team, Project, TeamVideo,
 from .statistics import compute_statistics
 from auth.models import CustomUser as User
 from messages import tasks as messages_tasks
+from teams.workflows import TeamWorkflow
 from utils.breadcrumbs import BreadCrumb
 from utils.pagination import AmaraPaginator
 from utils.text import fmt
@@ -298,14 +299,9 @@ def project(request, team, project_slug):
         add_manager_form = None
         remove_manager_form = None
 
-    videos = (team.videos
-              .filter(teamvideo__project=project)
-              .order_by('-id'))[:5]
-
-    return render(request, 'new-teams/project-page.html', {
+    data = {
         'team': team,
         'project': project,
-        'videos': videos,
         'managers': project.managers.all(),
         'add_manager_form': add_manager_form,
         'remove_manager_form': remove_manager_form,
@@ -313,7 +309,9 @@ def project(request, team, project_slug):
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(project),
         ],
-    })
+    }
+    team_workflow = TeamWorkflow.get_workflow(team)
+    return team_workflow.render_project_page(request, team, project, data)
 
 @team_view
 def invite(request, team):

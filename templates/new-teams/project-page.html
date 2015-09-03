@@ -23,14 +23,13 @@
       {% else %}
       <p class="empty">{% trans "No managers" %}</p>
       {% endif %}
+      {% if add_manager_form %}
+      <div class="tools"><button class="open-modal medium" data-modal="add-manager-form">{% trans "Add Manager" %}</button></div>
+      {% endif %}
     </div>
-    {% if add_manager_form %}
-    <div class="section tools">
-      <button class="open-modal" data-modal="add-manager-form">{% trans "Add Manager" %}</button>
-    </div>
-    {% endif %}
   </div>
-  <div class="main team-projects">
+  {% block main %}
+  <div class="main team-project-videos">
     {% if videos %}
     <h5>{% trans "Latest Videos" %}</h5>
     <ul class="thumb-list">
@@ -54,6 +53,7 @@
     <p class="empty">{% trans "No Videos found" %}</p>
     {% endif %}
   </div>
+  {% endblock %}
 </div>
 {% endblock %}
 

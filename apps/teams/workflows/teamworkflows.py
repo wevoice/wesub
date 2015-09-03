@@ -43,6 +43,7 @@ Team workflows are responsible for:
 from collections import namedtuple
 
 from django.core.urlresolvers import reverse
+from django.shortcuts import render
 
 class TeamWorkflow(object):
     type_code = NotImplemented
@@ -112,6 +113,14 @@ class TeamWorkflow(object):
         """
         url = reverse(view_name, kwargs={'slug': self.team.slug})
         return TeamPage(name, title,  url)
+
+    # these can be used to customize the content in the project page
+    def render_project_page(self, request, team, project, page_data):
+        page_data['videos'] = (team.videos
+                             .filter(teamvideo__project=project)
+                             .order_by('-id'))[:5]
+
+        return render(request, 'new-teams/project-page.html', page_data)
 
     _type_code_map = {}
 
