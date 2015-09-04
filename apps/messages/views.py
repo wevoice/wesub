@@ -52,8 +52,8 @@ def message(request, message_id):
     messages = Message.objects.for_user_or_author(user).filter(id=message_id)
     if len(messages) != 1:
         return HttpResponseForbidden("Not allowed")
-    display_thread = request.GET.get('thread')
-    if display_thread:
+    hide_thread = request.GET.get('hide_thread')
+    if not hide_thread:
         messages = Message.objects.thread(messages[0], user)
 
     messages.filter(user=user).update(read=True)
