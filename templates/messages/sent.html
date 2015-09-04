@@ -30,7 +30,7 @@
         {% if is_paginated %}{% paginator %}{% endif %}
         <ul class="listing messages">
         {% for msg in message_list %}
-            <li class="message {% if not msg.read %}unread{% endif %}">
+            <li class="message {% if not msg.read %}unread{% endif %} {% if msg.message_type == "S" %}notification{% endif %}">
                 <h3>{{ msg }}</h3>
                 <p>
                     To
