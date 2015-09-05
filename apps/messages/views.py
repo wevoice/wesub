@@ -53,20 +53,46 @@ def message(request, message_id):
     if len(messages) != 1:
         return HttpResponseForbidden("Not allowed")
     hide_thread = request.GET.get('hide_thread')
+    message_thread = Message.objects.thread(messages[0], user)
+    message_thread_length = message_thread.count()
     if not hide_thread:
-        messages = Message.objects.thread(messages[0], user)
+        messages = message_thread
+
+    reply = request.GET.get('reply')
+
+    if reply:
+        try:
+            reply_msg = Message.objects.get(pk=reply, user=user)
+            reply_msg.read = True
+            reply_msg.save()
+            extra_context['reply_msg'] = reply_msg
+        except (Message.DoesNotExist, ValueError):
+            pass
 
     messages.filter(user=user).update(read=True)
-    extra_context = {'subject': messages[0].subject,
-                     'mid': messages[0].id
+    
+    extra_context = {
+        'send_message_form': SendMessageForm(request.user, auto_id='message_form_id_%s'),
+        'messages_display': True,
+        'user_info': user,
+        'subject': messages[0].subject,
+        'mid': message_id,
+        'thread_length': message_thread_length
     }
+
     response = object_list(request, queryset=messages,
                        paginate_by=MESSAGES_ON_PAGE,
                        template_name='messages/message.html',
                        template_object_name='message',
                        extra_context=extra_context)
+    try:
+        last_message = messages[0]
+        max_age = 60*60*24*365
+        expires = cookie_date(time.time()+max_age)
+        response.set_cookie(Message.hide_cookie_name, last_message.pk, max_age, expires)
+    except Message.DoesNotExist:
+        pass
     return response
-
 
 @login_required
 def inbox(request, message_pk=None):
