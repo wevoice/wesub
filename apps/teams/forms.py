@@ -1329,7 +1329,8 @@ class BulkEditTeamVideosForm(BulkTeamVideoForm):
         return _('Error updating video.')
 
 class NewAddTeamVideoForm(VideoForm):
-    project = forms.ChoiceField(label=_('Project'), choices=[])
+    project = forms.ChoiceField(label=_('Project'), choices=[],
+                                required=False)
     thumbnail = forms.ImageField(required=False)
 
     def __init__(self, team, user, *args, **kwargs):
@@ -1340,6 +1341,8 @@ class NewAddTeamVideoForm(VideoForm):
         else:
             self.enabled = True
             self.fields['project'].choices = [
+                ('', _('None')),
+            ] + [
                 (p.id, p.name) for p in Project.objects.for_team(team)
             ]
         if not self.fields['project'].choices:
@@ -1369,6 +1372,8 @@ class NewAddTeamVideoForm(VideoForm):
     def save(self):
         if 'project' in self.fields:
             project_id = self.cleaned_data['project']
+            if not project_id:
+                project_id = None
         else:
             project_id = None
         team_video = TeamVideo.objects.create(
