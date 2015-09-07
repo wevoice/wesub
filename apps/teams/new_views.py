@@ -44,6 +44,7 @@ from . import views as old_views
 from . import forms
 from . import permissions
 from . import tasks
+from .behaviors import get_main_project
 from .exceptions import ApplicationInvalidException
 from .models import (Invite, Setting, Team, Project, TeamVideo,
                      TeamLanguagePreference, TeamMember, Application)
@@ -149,6 +150,10 @@ def videos(request, team):
         team_videos = (team.teamvideo_set.all()
                        .order_by('-created')
                        .select_related('video'))
+        main_project = get_main_project(team)
+        if main_project:
+            team_videos = team_videos.filter(
+                video__teamvideo__project=main_project)
 
     # We embed several modal forms on the page, but luckily we can use the
     # same code to handle them all
