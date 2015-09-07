@@ -4,7 +4,7 @@
 {% load url from future %}
 
 {% block title %}
-    {% trans 'Messages - Inbox' %} | Amara
+    {% trans 'Messages - Inbox' %} | {{ subject }}
 {% endblock %}
 
 {% block html_attrs %}id="messages_list"{% endblock %}
@@ -29,30 +29,10 @@
 	<input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
       </span>
       <a href="#" class="button delete-selected" id="delete-selected">{% trans "Delete selected" %}</a>
-      <a href="#" class="button mark-as-read" id="mark-as-read">{% trans "Mark as read" %}</a>
-
-      <a href="#filter" id="sort-filter">
-        {% trans 'Filter' %}
-        <span></span>
-      </a>
-    </div>
-    <form class="filters group no-ajax{% if filtered %} active{% endif %}" action="" method="GET">
-      <input type="hidden" name="q" value="{{ query }}" />
-      <button class="reduced" id="update">Update</button>
-      {% if filtered %}
-      <a href="{% url "messages:inbox" %}{% if query %}?q={{ query }}{% endif %}" class="button cancel">Clear</a>
+      {% if thread_length > 1 %}
+      <a href="{% url "messages:message" mid %}?hide_thread=1" class="button" id="delete-selected">{% trans "Hide message thread" %}</a>
       {% endif %}
-      <div class="group">
-        <div class="filter-chunk">
-          <span class="inner">{% trans 'Type:' %}</span>
-          <select name="type" id="type">
-            <option value="any"{% if type_filter == None %} selected="selected"{% endif %}>{% trans 'any' %}</option>
-            <option {% if type_filter == "M" %}selected="selected"{% endif %} value="M">{% trans 'Regular Message' %}</option>
-            <option {% if type_filter == "S" %}selected="selected"{% endif %} value="S">{% trans 'System Notification' %}</option>
-          </select>
-        </div>
-      </div>
-    </form>
+    </div>
 
     {% if message_list %}
         {% if is_paginated %}{% paginator %}{% endif %}
@@ -62,12 +42,11 @@
         </p>
         <ul class="listing messages">
             {% for msg in message_list %}
-            <li class="message {% if not msg.read %}unread{% endif %} {% if msg.message_type == "S" %}notification{% endif %}">
-	      <a href="{% url "messages:message" msg.id %}">
-                <h3>
-                  {{ msg }}
-                </h3>
-	      </a>
+                <li class="message {% if not msg.read %}unread{% endif %} {% if msg.message_type == "S" %}notification{% endif %}">
+                    <h3>
+                        {{ msg }}
+                    </h3>
+
                     {% if msg.author %}
                         <p>
                             From <a href="{{ msg.author.get_absolute_url }}">{{ msg.author }}</a>
@@ -86,13 +65,8 @@
                             {% endwith %}
                         </a>
                     {% endif %}
-			<span class="timestamp">{% if not msg.read %}<span class="unread">Unread</span>{% endif %}{{ msg.created|timesince }} {% trans 'ago' %}</span>
+			<span class="timestamp">{{ msg.created|timesince }} {% trans 'ago' %}</span>
                     <ul class="admin-controls">
-                        {% if not msg.read %}
-                        <li>
-                            <a href="#" data="{{ msg.json_data }}" class="mark-read">{% trans "Mark Read" %}</a>
-                        </li>
-                        {% endif %}
                         {% if msg.author != None and msg.author != request.user %}
                             <li>
                                 <a class="reply open-modal" href="#msg_modal" data-modal="msg_modal" data="{{ msg.json_data }}">{% trans "Reply" %}</a>

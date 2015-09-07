@@ -28,7 +28,7 @@ from django.conf import settings
 from messages.models import Message
 
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('user', 'subject', 'author', 'read', 'created')
+    list_display = ('user', 'subject', 'author', 'message_type', 'read', 'created')
 
 if settings.DEBUG:
     admin.site.register(Message, MessageAdmin)

@@ -114,11 +114,12 @@ var Site = function(Site) {
                 }
             });
         },
-        messagesDeleteAndSend: function() {
+        messagesDeleteAndSend: function(from_sentbox) {
             $('.messages .delete').click(function(){
                 if (confirm(window.DELETE_MESSAGE_CONFIRM)){
                     var $this = $(this);
-                    MessagesApi.remove($this.attr('message_id'), function(response){
+                    var message_id = $this.attr('message_id');
+                    var callback = function(response) {
                         if (response.error){
                             $.jGrowl.error(response.error);
                         } else {
@@ -126,7 +127,11 @@ var Site = function(Site) {
                                 $(this).remove();
                             });
                         }
-                    });
+                    };
+                    if (from_sentbox)
+                        MessagesApi.remove_sent(message_id, callback);
+                    else
+                        MessagesApi.remove(message_id, callback);
                 }
                 return false;
             });
@@ -223,6 +228,8 @@ var Site = function(Site) {
             });
         },
         bulkCheckboxes: function(bulkCheckbox, bulkableCheckboxes, bulkCheckboxAnchor) {
+	    bulkableCheckboxes.attr('checked', false);
+	    bulkCheckbox.attr("checked", false);
 	    bulkCheckbox.change(function() {
 		bulkableCheckboxes.attr('checked', $(this).attr('checked'));
 		bulkCheckbox.attr("checked", $(this).attr('checked'));
@@ -1041,7 +1048,29 @@ var Site = function(Site) {
                 $('a[href="#youtube-modal"]').click();
             }
         },
-
+        bulk_deletable_messages: function(from_sentbox) {
+            $('.delete-selected').bind('click', function(event) {
+                    if (confirm(window.DELETE_MESSAGES_CONFIRM)) {
+			var $this = $(this);
+			var messages = $('input.bulkable:checked', '.v1 .messages.listing').map(function() {
+			    return $(this).attr('value');}).get();
+			var callback = function(response) {
+                            if (response.error) {
+				$.jGrowl.error(response.error);
+                            } else {
+				var current_url = window.location.href;
+				var redirect_url = current_url.replace(/([&\?])page=\d+/, "$1page=1");
+				window.location = redirect_url;
+                            }
+			};
+			if (from_sentbox)
+                            MessagesApi.remove_sent(messages, callback);
+			else
+                            MessagesApi.remove(messages, callback);
+                    }
+                    return false;
+            });
+        },
         // Messages
         messages_list: function() {
             var reply_msg_data;
@@ -1054,6 +1083,7 @@ var Site = function(Site) {
             }
             function set_message_data(data, $modal) {
                 $('#message_form_id_user').val(data['author-id']);
+                $('#message_form_id_thread').val(data['thread']);
                 $('.author-username', $modal).html(data['author-username']);
                 $('.message-content', $modal).html(data['message-content']);
                 $('.message-subject').html(data['message-subject-display']);
@@ -1090,21 +1120,26 @@ var Site = function(Site) {
                 set_message_data(data, $('#msg_modal'));
                 return false;
             });
-            $('.mark-all-read').bind('click', function(event) {
-                MessagesApi.mark_all_read(function(response) {
-                    if (response.error) {
-                        $.jGrowl.error(response.error);
-                    } else {
-                        window.location.reload();
-                    }
-                });
-                return false;
+            $('.mark-as-read').bind('click', function(event) {
+		MessagesApi.mark_as_read($('input.bulkable:checked', '.v1 .messages.listing').map(function() {
+		    return $(this).attr('value');}).get(), function(response) {
+			if (response.error) {
+                            $.jGrowl.error(response.error);
+			} else {
+			    window.location.reload();
+			}
+                    });
+		return false;
             });
-
-            that.Utils.messagesDeleteAndSend();
+            that.Utils.chosenify()
+            this.bulk_deletable_messages(false);
+            that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
+            that.Utils.messagesDeleteAndSend(false);
         },
         messages_sent: function() {
-            that.Utils.messagesDeleteAndSend();
+            this.bulk_deletable_messages(true);
+            that.Utils.bulkCheckboxes($('input.bulk-select'), $('input.bulkable'), $('a.bulk-select'));
+            that.Utils.messagesDeleteAndSend(true);
         },
         messages_new: function() {
             that.Utils.chosenify();
@@ -1115,17 +1150,15 @@ var Site = function(Site) {
                 dataType: 'json'
             }, function (data) {
                 var terms = {};
-
                 $.each(data.results, function (i, val) {
                     var name;
                     if (data.results[i][2] !== '') {
-                        name = ' (' + data.results[i][2] + ')';
+                        name = ' - ' + data.results[i][2];
                     } else {
                         name = '';
                     }
                     terms[data.results[i][0]] = data.results[i][1] + name;
                 });
-
                 return terms;
             });
         },
