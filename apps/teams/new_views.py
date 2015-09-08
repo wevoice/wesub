@@ -333,7 +333,7 @@ def all_languages_page(request, team):
         )
         for lc in all_languages
     ]
-    languages.sort(key=lambda row: row[2], reverse=True)
+    languages.sort(key=lambda row: (-row[2], row[1]))
 
     data = {
         'team': team,
