@@ -123,6 +123,9 @@ class TeamWorkflow(object):
 
         return render(request, 'new-teams/project-page.html', page_data)
 
+    def render_all_languages_page(self, request, team, page_data):
+        return render(request, 'new-teams/all-languages-page.html', page_data)
+
     def render_language_page(self, request, team, language_code, page_data):
         qs = (self.team.videos
               .filter(primary_audio_language_code=language_code)

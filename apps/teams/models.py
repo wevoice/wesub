@@ -29,7 +29,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core.files import File
 from django.db import models
-from django.db.models import query, Q
+from django.db.models import query, Q, Count, Sum
 from django.db.models.signals import post_save, post_delete, pre_delete
 from django.http import Http404
 from django.template.loader import render_to_string
@@ -822,13 +822,27 @@ class Team(models.Model):
         else:
             return (complete_languages, incomplete_languages)
 
+    def get_video_language_counts(self):
+        """Count team videos for each langugage
 
+        Returns: list of (language_code, count) tuples
+        """
+        return list(self.videos
+                    .values_list('primary_audio_language_code')
+                    .annotate(Count("id"))
+                    .order_by())
 
-    
+    def get_completed_language_counts(self):
+        from subtitles.models import SubtitleLanguage
+        qs = (SubtitleLanguage.objects
+              .filter(video__in=self.videos.all())
+              .values_list('language_code')
+              .annotate(Sum('subtitles_complete')))
+        return [(lc, int(count)) for lc, count in qs]
+
 # This needs to be constructed after the model definition since we need a
 # reference to the class itself.
 Team._meta.permissions = TEAM_PERMISSIONS
-
 
 # Project
 class ProjectManager(models.Manager):

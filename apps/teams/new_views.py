@@ -51,6 +51,7 @@ from .models import (Invite, Setting, Team, Project, TeamVideo,
 from .statistics import compute_statistics
 from auth.models import CustomUser as User
 from messages import tasks as messages_tasks
+from subtitles.models import SubtitleLanguage
 from teams.workflows import TeamWorkflow
 from utils.breadcrumbs import BreadCrumb
 from utils.pagination import AmaraPaginator
@@ -318,6 +319,35 @@ def project(request, team, project_slug):
     return team.new_workflow.render_project_page(request, team, project, data)
 
 @team_view
+def all_languages_page(request, team):
+    video_language_counts = dict(team.get_video_language_counts())
+    completed_language_counts = dict(team.get_completed_language_counts())
+
+    all_languages = set(video_language_counts.keys() +
+                        completed_language_counts.keys())
+    languages = [
+        (lc,
+         get_language_label(lc),
+         video_language_counts.get(lc, 0),
+         completed_language_counts.get(lc, 0),
+        )
+        for lc in all_languages
+    ]
+    languages.sort(key=lambda row: row[2], reverse=True)
+
+    data = {
+        'team': team,
+        'languages': languages,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Languages')),
+        ],
+    }
+    return team.new_workflow.render_all_languages_page(
+        request, team, data,
+    )
+
+@team_view
 def language_page(request, team, language_code):
     try:
         language_label = get_language_label(language_code)
@@ -367,6 +397,7 @@ def language_page(request, team, language_code):
         'remove_manager_form': remove_manager_form,
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Languages'), 'teams:all-languages-page', team.slug),
             BreadCrumb(language_label),
         ],
     }
