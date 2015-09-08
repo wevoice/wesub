@@ -30,6 +30,8 @@
     }
 
     > .main {
+        /* Give the main section a definite size constraint to avoid overflowing content (see http://stackoverflow.com/questions/27472595/firefox-34-ignoring-max-width-for-flexbox) */
+        min-width: 0;
         flex-grow: 1;
 
         > .section {

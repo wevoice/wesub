@@ -103,8 +103,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .one-line {
     overflow: hidden;
-    white-space: nowrap;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    height: $line-height;
 }
 .two-lines {
     height: $line-height * 2;
