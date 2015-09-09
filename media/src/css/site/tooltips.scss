@@ -1,5 +1,6 @@
 .tooltip {
-    @extend %dropdown;
-    padding: 2px 5px;
+    @extend %floating;
+    padding: 4px 8px;
+    white-space: normal;
 }
 

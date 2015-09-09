@@ -1,10 +1,5 @@
-ul.dropdown, %dropdown {
-    position: absolute;
-    display: none;
-    z-index: $z-index-menu;
-    background: $white;
-    border: 1px solid $light-gray;
-    box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.3);
+ul.dropdown {
+    @extend %floating;
     color: $dark-gray;
 
     li {
