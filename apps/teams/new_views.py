@@ -259,7 +259,9 @@ def members(request, team):
 
     members = filters_form.update_qs(
         team.members.select_related('user')
-        .prefetch_related('user__userlanguage_set'))
+        .prefetch_related('user__userlanguage_set',
+                          'projects_managed',
+                          'languages_managed'))
 
     paginator = AmaraPaginator(members, MEMBERS_PER_PAGE)
     page = paginator.get_page(request)

@@ -42,6 +42,19 @@
             <td>{% trans "Role" %}</td>
             <td>{{ member.get_role_display }}</td>
           </tr>
+          {% if member.languages_managed.all or member.projects_managed.all %}
+          <tr>
+            <td>{% trans "Manager for" %}</td>
+            <td>
+              {% for language in member.languages_managed.all %}
+              {{ language.get_code_display }}
+              {% endfor %}
+              {% for project in member.projects_managed.all %}
+              {{ project }}
+              {% endfor %}
+            </td>
+          </tr>
+          {% endif %}
           <tr>
             <td>{% trans "Languages" %}</td>
             <td>

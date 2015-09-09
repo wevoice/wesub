@@ -1443,7 +1443,6 @@ class TeamMember(models.Model):
     class Meta:
         unique_together = (('team', 'user'),)
 
-
 def clear_tasks(sender, instance, *args, **kwargs):
     """Unassign all tasks assigned to a user.
 
