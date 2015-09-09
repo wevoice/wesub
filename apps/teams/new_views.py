@@ -145,7 +145,7 @@ def videos(request, team):
     if team.is_old_style():
         return old_views.detail(request, team)
 
-    filters_form = forms.VideoFiltersForm(team, request)
+    filters_form = forms.VideoFiltersForm(team, request.GET)
     if filters_form.is_bound and filters_form.is_valid():
         team_videos = filters_form.get_queryset()
     else:

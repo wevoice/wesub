@@ -985,11 +985,7 @@ class VideoFiltersForm(forms.Form):
     Note that this form is a bit weird because it uses the GET params, rather
     than POST data.
     """
-    LANGUAGE_CHOICES = [
-        ('any', _('Any language')),
-    ] + get_language_choices()
-
-    q = forms.CharField(label=_('Search'), required=False)
+    q = forms.CharField(label=_('Title/Description'), required=False)
     project = forms.ChoiceField(label=_('Project'), required=False,
                                 choices=[])
     sort = forms.ChoiceField(choices=[
@@ -1001,18 +997,20 @@ class VideoFiltersForm(forms.Form):
         ('-subs', _('Least complete languages')),
     ], initial='-time', required=False)
 
-    def __init__(self, team, request):
-        super(VideoFiltersForm, self).__init__(data=self.calc_data(request))
+    def __init__(self, team, get_data=None, **kwargs):
+        super(VideoFiltersForm, self).__init__(data=self.calc_data(get_data),
+                                               **kwargs)
         self.team = team
         self.setup_project_field()
         self.selected_project = None
 
-    def calc_data(self, request):
-        valid_names = set(['q', 'project', 'sort'])
+    def calc_data(self, get_data):
+        if get_data is None:
+            return None
         data = {
             name: value
-            for name, value in request.GET.items()
-            if name in valid_names
+            for name, value in get_data.items()
+            if name != 'page'
         }
         return data if data else None
 
