@@ -1092,10 +1092,16 @@ class MemberFiltersForm(forms.Form):
         ('oldest', _('Date joined, oldest')),
     ], initial='recent', required=False)
 
-    def __init__(self, request):
+    def __init__(self, get_data=None):
         super(MemberFiltersForm, self).__init__(
-            data=request.GET if request.GET else None,
+            self.calc_data(get_data)
         )
+
+    def calc_data(self, get_data):
+        if get_data is None:
+            return None
+        data = {k:v for k, v in get_data.items() if k != 'page'}
+        return data if data else None
 
     def update_qs(self, qs):
         if not self.is_bound:

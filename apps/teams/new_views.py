@@ -63,6 +63,7 @@ logger = logging.getLogger('teams.views')
 
 ACTIONS_PER_PAGE = 20
 VIDEOS_PER_PAGE = 8
+MEMBERS_PER_PAGE = 10
 
 def team_view(view_func):
     @functools.wraps(view_func)
@@ -241,7 +242,7 @@ def members(request, team):
 
     member = team.get_member(request.user)
 
-    filters_form = forms.MemberFiltersForm(request)
+    filters_form = forms.MemberFiltersForm(request.GET)
 
     if request.method == 'POST':
         edit_form = forms.EditMembershipForm(member, request.POST)
@@ -260,9 +261,12 @@ def members(request, team):
         team.members.select_related('user')
         .prefetch_related('user__userlanguage_set'))
 
+    paginator = AmaraPaginator(members, MEMBERS_PER_PAGE)
+    page = paginator.get_page(request)
+
     return render(request, 'new-teams/members.html', {
         'team': team,
-        'members': members,
+        'page': page,
         'filters_form': filters_form,
         'edit_form': edit_form,
         'show_invite_link': permissions.can_invite(team, request.user),
