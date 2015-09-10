@@ -35,7 +35,7 @@
     <ul class="card-list team-members">
     {% for member in page %}
       <li>
-        <h4>{{ member.user.username }}</h4>
+        <h4>{{ member.user }}</h4>
         <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{% blocktrans with user=member.user %}{{ user }} avatar{% endblocktrans %}"></a>
         <table class="key-value">
           <tr>
