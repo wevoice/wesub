@@ -729,7 +729,7 @@ class AddProjectManagerForm(forms.Form):
 
     def save(self):
         member = self.cleaned_data['member']
-        member.projects_managed.add(self.project)
+        member.make_project_manager(self.project)
 
 class RemoveProjectManagerForm(forms.Form):
     member = TeamMemberInput()
@@ -749,7 +749,7 @@ class RemoveProjectManagerForm(forms.Form):
 
     def save(self):
         member = self.cleaned_data['member']
-        self.project.managers.remove(member)
+        member.remove_project_manager(self.project)
 
 class AddLanguageManagerForm(forms.Form):
     member = TeamMemberInput(widget=AutocompleteTextInput)
@@ -774,7 +774,7 @@ class AddLanguageManagerForm(forms.Form):
 
     def save(self):
         member = self.cleaned_data['member']
-        member.languages_managed.create(code=self.language_code)
+        member.make_language_manager(self.language_code)
 
 class RemoveLanguageManagerForm(forms.Form):
     member = TeamMemberInput()
@@ -794,7 +794,7 @@ class RemoveLanguageManagerForm(forms.Form):
 
     def save(self):
         member = self.cleaned_data['member']
-        member.languages_managed.filter(code=self.language_code).delete()
+        member.remove_language_manager(self.language_code)
 
 class DeleteLanguageVerifyField(forms.CharField):
     def __init__(self):

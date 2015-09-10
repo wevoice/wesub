@@ -1430,15 +1430,38 @@ class TeamMember(models.Model):
         """Test if the user is an admin or owner."""
         return self.role in (ROLE_OWNER, ROLE_ADMIN)
 
+    def get_projects_managed(self):
+        if not hasattr(self, '_projects_managed_cache'):
+            self._projects_managed_cache = list(self.projects_managed.all())
+        return self._projects_managed_cache
+
+    def get_languages_managed(self):
+        if not hasattr(self, '_languages_managed_cache'):
+            self._languages_managed_cache = list(self.languages_managed.all())
+        return self._languages_managed_cache
+
     def is_project_manager(self, project):
         if isinstance(project, Project):
             project_id = project.id
         else:
             project_id = project
-        return self.projects_managed.filter(id=project_id).exists()
+        return project_id in (p.id for p in self.get_projects_managed())
 
     def is_language_manager(self, language_code):
-        return self.languages_managed.filter(code=language_code).exists()
+        return (language_code in
+                (l.code for l in self.get_languages_managed()))
+
+    def make_project_manager(self, project):
+        self.projects_managed.add(project)
+
+    def remove_project_manager(self, project):
+        self.projects_managed.remove(project)
+
+    def make_language_manager(self, language_code):
+        self.languages_managed.create(code=language_code)
+
+    def remove_language_manager(self, language_code):
+        self.languages_managed.filter(code=language_code).delete()
 
     class Meta:
         unique_together = (('team', 'user'),)
