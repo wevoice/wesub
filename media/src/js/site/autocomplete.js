@@ -100,7 +100,7 @@ $.fn.autocompleteTextbox = function(options) {
 
         function hideAutocompleteList() {
             if(shown) {
-                autocompleteList.remove();
+                autocompleteList.detach();
                 shown = false;
                 $(window).off('resize.autocomplete');
             }
