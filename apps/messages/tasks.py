@@ -47,6 +47,8 @@ from utils import send_templated_email
 from utils.text import fmt
 from utils.translation import get_language_label
 
+BATCH_SIZE = 1000
+
 def get_url_base():
     return "http://" + Site.objects.get_current().domain
 
@@ -59,7 +61,18 @@ def cleanup():
     # These numbers have to be chosen. Do not cleanup for now
     # Message.objects.cleanup(364, message_type='S')
     # Message.objects.cleanup(2*365, message_type='M')
-    return
+    # For now we just convert old messages, by small bulks.
+    # We have to do this way because we can not update on
+    # a sliced query
+    for i in range(10):
+        messages = []
+        for message in Message.objects.all().filter(message_type='O', author__isnull=True)[:BATCH_SIZE]:
+            messages.append(message.id)
+        Message.objects.all().filter(id__in=messages).update(message_type='S')
+        messages = []
+        for message in Message.objects.all().filter(message_type='O', author__isnull=False)[:BATCH_SIZE]:
+            messages.append(message.id)
+        Message.objects.all().filter(id__in=messages).update(message_type='M')
 
 @task()
 def send_new_messages_notifications(message_ids):
