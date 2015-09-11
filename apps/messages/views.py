@@ -23,7 +23,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.utils.http import cookie_date
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
@@ -47,15 +47,16 @@ MESSAGES_ON_PAGE = getattr(settings, 'MESSAGES_ON_PAGE', 30)
 
 
 @login_required
-def inbox(request, message_pk=None):
+def message(request, message_id):
     user = request.user
-    qs = Message.objects.for_user(user)
-
-    extra_context = {
-        'send_message_form': SendMessageForm(request.user, auto_id='message_form_id_%s'),
-        'messages_display': True,
-        'user_info': user
-    }
+    messages = Message.objects.for_user_or_author(user).filter(id=message_id)
+    if len(messages) != 1:
+        return HttpResponseForbidden("Not allowed")
+    hide_thread = request.GET.get('hide_thread')
+    message_thread = Message.objects.thread(messages[0], user)
+    message_thread_length = message_thread.count()
+    if not hide_thread:
+        messages = message_thread
 
     reply = request.GET.get('reply')
 
@@ -67,6 +68,63 @@ def inbox(request, message_pk=None):
             extra_context['reply_msg'] = reply_msg
         except (Message.DoesNotExist, ValueError):
             pass
+
+    messages.filter(user=user).update(read=True)
+    
+    extra_context = {
+        'send_message_form': SendMessageForm(request.user, auto_id='message_form_id_%s'),
+        'messages_display': True,
+        'user_info': user,
+        'subject': messages[0].subject,
+        'mid': message_id,
+        'thread_length': message_thread_length
+    }
+
+    response = object_list(request, queryset=messages,
+                       paginate_by=MESSAGES_ON_PAGE,
+                       template_name='messages/message.html',
+                       template_object_name='message',
+                       extra_context=extra_context)
+    try:
+        last_message = messages[0]
+        max_age = 60*60*24*365
+        expires = cookie_date(time.time()+max_age)
+        response.set_cookie(Message.hide_cookie_name, last_message.pk, max_age, expires)
+    except Message.DoesNotExist:
+        pass
+    return response
+
+@login_required
+def inbox(request, message_pk=None):
+    user = request.user
+    qs = Message.objects.for_user(user)
+
+    extra_context = {
+        'send_message_form': SendMessageForm(request.user, auto_id='message_form_id_%s'),
+        'messages_display': True,
+        'user_info': user
+    }
+
+    type_filter = request.GET.get('type')
+    if type_filter:
+        if type_filter != 'any':
+            qs = qs.filter(message_type = type_filter)
+
+    reply = request.GET.get('reply')
+
+    if reply:
+        try:
+            reply_msg = Message.objects.get(pk=reply, user=user)
+            reply_msg.read = True
+            reply_msg.save()
+            extra_context['reply_msg'] = reply_msg
+        except (Message.DoesNotExist, ValueError):
+            pass
+    filtered = bool(set(request.GET.keys()).intersection([
+        'type']))
+
+    extra_context['type_filter'] = type_filter
+    extra_context['filtered'] = filtered
 
     response = object_list(request, queryset=qs,
                        paginate_by=MESSAGES_ON_PAGE,

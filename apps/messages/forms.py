@@ -31,12 +31,13 @@ from utils.translation import (
 class SendMessageForm(forms.ModelForm, AjaxForm):
     class Meta:
         model = Message
-        fields = ('user', 'subject', 'content')
+        fields = ('user', 'subject', 'content', 'thread')
 
     def __init__(self, author, *args, **kwargs):
         self.author = author
         super(SendMessageForm, self).__init__(*args, **kwargs)
         self.fields['user'].widget = forms.HiddenInput()
+        self.fields['thread'].widget = forms.HiddenInput()
         self.fields['user'].queryset = User.objects.exclude(pk=author.pk)
 
     def clean(self):
@@ -47,6 +48,7 @@ class SendMessageForm(forms.ModelForm, AjaxForm):
     def save(self, commit=True):
         obj = super(SendMessageForm, self).save(False)
         obj.author = self.author
+        obj.message_type = 'M'
         commit and obj.save()
         return obj
 
@@ -88,7 +90,7 @@ class NewMessageForm(forms.Form):
         super(NewMessageForm, self).__init__(*args, **kwargs)
 
         self.author = author
-
+        self.message_type = 'M'
         self.fields['user'].queryset = User.objects.all()
 
         # This isn't the fastest way to do this, but it's the simplest, and
