@@ -47,6 +47,8 @@ from utils import send_templated_email
 from utils.text import fmt
 from utils.translation import get_language_label
 
+BATCH_SIZE = 10000
+
 def get_url_base():
     return "http://" + Site.objects.get_current().domain
 
@@ -59,7 +61,9 @@ def cleanup():
     # These numbers have to be chosen. Do not cleanup for now
     # Message.objects.cleanup(364, message_type='S')
     # Message.objects.cleanup(2*365, message_type='M')
-    return
+    "Write your forwards methods here."
+    Message.objects.all().filter(message_type='O', author__isnull=True)[:BATCH_SIZE].update(message_type='S')
+    Message.objects.all().filter(message_type='O', author__isnull=False)[:BATCH_SIZE].update(message_type='M')
 
 @task()
 def send_new_messages_notifications(message_ids):
