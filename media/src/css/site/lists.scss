@@ -101,6 +101,34 @@ ul.thumb-list {
     }
 }
 
+.current-filter-list {
+    @extend %clearfix;
+    font-size: $small-font-size;
+
+    h6, li {
+        float: left;
+    }
+
+    li {
+        margin-left: 10px;
+        padding: 0 10px;
+        background: $lighter-gray;
+        border-radius: 2px;
+    }
+
+    li.reset {
+        margin-left: 20px;
+        background: $white;
+        border: none;
+        a {
+            @include button;
+            @include button-color($light-gray);
+            font-size: $small-font-size;
+            padding: 0px 12px;
+        }
+    }
+}
+
 .list-subheader {
     // Subheader that splits up a list.  We normally use <h5> for this.
     color: $darkish-gray;

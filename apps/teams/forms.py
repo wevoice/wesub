@@ -58,7 +58,7 @@ from videos.models import (
 )
 from videos.search_indexes import VideoIndex
 from videos.tasks import import_videos_from_feed
-from utils.forms import ErrorableModelForm
+from utils.forms import ErrorableModelForm, get_label_for_value
 from utils.forms.autocomplete import AutocompleteTextInput
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.panslugify import pan_slugify
@@ -1068,6 +1068,17 @@ class VideoFiltersForm(forms.Form):
         }.get(sort or '-time'))
 
         return qs
+
+    def is_filtered(self):
+        return self.is_bound and self.is_valid()
+
+    def get_current_filters(self):
+        return [
+            u'{}: {}'.format(self[name].label,
+                             get_label_for_value(self, name))
+            for name in self.changed_data
+            if name != 'sort'
+        ]
 
 class MemberFiltersForm(forms.Form):
     LANGUAGE_CHOICES = [

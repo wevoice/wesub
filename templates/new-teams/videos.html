@@ -8,7 +8,18 @@
 <div class="split-view">
   <div class="sidebar">
     <div class="section filters">
-      {% include "new-teams/_video-filters.html" %}
+      <h5>{% trans "Filter and Sort" %}</h5>
+      <form method="GET" action="">
+        {% include "_field.html" with field=filters_form.q %}
+        {% if filters_form.show_project %}
+        {% include "_field.html" with field=filters_form.project %}
+        {% endif %}
+        {% include "_field.html" with field=filters_form.sort %}
+
+        <div class="actions">
+          <button class="submit">Filter</button>
+        </div>
+      </form>
     </div>
 
     {% if forms.add.enabled %}
@@ -21,6 +32,17 @@
   </div>
   <div class="main">
     {% if page %}
+    {% if filters_form.is_filtered %}
+    <div class="current-filter-list">
+      <h6>{% trans "Current filters:" %}</h6>
+      <ul>
+        {% for filter_label in filters_form.get_current_filters %}
+        <li>{{ filter_label }}</li>
+        {% endfor %}
+        <li class="reset"><a href="{% url "teams:videos" team.slug %}">{% trans "Clear filters" %}</a></li>
+      </ul>
+    </div>
+    {% endif %}
     {% if bulk_mode_enabled %}
     <div class="select-all-thumbs"><label><input type="checkbox"> {% trans "Select all" %}</label></div>
     {% endif %}
@@ -52,7 +74,13 @@
       {% endfor %}
     </ul>
     {% include "_new_paginator.html" %}
-
+    <div class="total-count">
+      {% if results_are_filtered %}
+      {% blocktrans with count=paginator.count %}{{ count }} matching videos{% endblocktrans %}
+      {% else %}
+      {% blocktrans with count=paginator.count %}{{ count }} total videos{% endblocktrans %}
+      {% endif %}
+    </div>
     {% else %}
     <p class="empty">{% trans "No Videos found" %}</p>
     {% endif %}

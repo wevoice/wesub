@@ -222,6 +222,7 @@ def videos(request, team):
         'team': team,
         'team_videos': team_videos,
         'page': page,
+        'paginator': paginator,
         'filters_form': filters_form,
         'forms': page_forms,
         'bulk_mode_enabled': team_videos and (
