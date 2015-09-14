@@ -57,9 +57,13 @@ function initDropDown(linkElt) {
         return null;
     }
     // Make the dropdown element a top-level element.  This way avoids issues
-    // when it has a parent element that has position: relative.
-    dropdown.detach();
-    $(document.body).append(dropdown);
+    // when it has a parent element that has position: relative.  Don't do
+    // this for the dropdowns in the nav menu though, they don't need it and
+    // we want to keep the hierarchy to keep the CSS styles correct.
+    if(dropdown.closest('#header').length == 0) {
+        dropdown.detach();
+        $(document.body).append(dropdown);
+    }
     linkElt.data('dropdown', dropdown);
     return dropdown;
 }
