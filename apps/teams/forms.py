@@ -36,9 +36,10 @@ from django.utils.translation import ugettext
 from django.utils.translation import ungettext
 
 from subtitles.forms import SubtitlesUploadForm
+from teams.behaviors import get_main_project
 from teams.models import (
     Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite,
-    BillingReport, MembershipNarrowing, Application,
+    BillingReport, MembershipNarrowing, Application
 )
 from teams import permissions
 from teams.exceptions import ApplicationInvalidException
@@ -928,12 +929,17 @@ class VideoFiltersForm(forms.Form):
         projects = Project.objects.for_team(self.team)
         if projects:
             choices = [
-                ('any', _('Any')),
+                ('', _('Any')),
                 ('none', _('No Project')),
             ] + [
                 (p.slug, p.name) for p in projects
             ]
             self.fields['project'].choices = choices
+            main_project = get_main_project(self.team)
+            if main_project is None:
+                self.fields['project'].initial = ''
+            else:
+                self.fields['project'].initial = main_project.slug
             self.show_project = True
         else:
             del self.fields['project']
@@ -944,7 +950,7 @@ class VideoFiltersForm(forms.Form):
         # search indexes.  See #838 for our plan to improve things
         from haystack.query import SearchQuerySet
 
-        project = self.cleaned_data.get('project', 'any')
+        project = self.cleaned_data.get('project')
         q = self.cleaned_data['q']
         sort = self.cleaned_data['sort']
 
@@ -952,7 +958,7 @@ class VideoFiltersForm(forms.Form):
         if q:
             for term in get_terms(q):
                 qs = qs.auto_query(qs.query.clean(term).decode('utf-8'))
-        if project != 'any':
+        if project:
             if project == 'none':
                 project = Project.DEFAULT_NAME
             try:
@@ -1323,7 +1329,8 @@ class BulkEditTeamVideosForm(BulkTeamVideoForm):
         return _('Error updating video.')
 
 class NewAddTeamVideoForm(VideoForm):
-    project = forms.ChoiceField(label=_('Project'), choices=[])
+    project = forms.ChoiceField(label=_('Project'), choices=[],
+                                required=False)
     thumbnail = forms.ImageField(required=False)
 
     def __init__(self, team, user, *args, **kwargs):
@@ -1334,6 +1341,8 @@ class NewAddTeamVideoForm(VideoForm):
         else:
             self.enabled = True
             self.fields['project'].choices = [
+                ('', _('None')),
+            ] + [
                 (p.id, p.name) for p in Project.objects.for_team(team)
             ]
         if not self.fields['project'].choices:
@@ -1363,6 +1372,8 @@ class NewAddTeamVideoForm(VideoForm):
     def save(self):
         if 'project' in self.fields:
             project_id = self.cleaned_data['project']
+            if not project_id:
+                project_id = None
         else:
             project_id = None
         team_video = TeamVideo.objects.create(
@@ -1484,9 +1495,9 @@ class ApplicationForm(forms.Form):
     def save(self):
         self.application.note = self.cleaned_data['about_you']
         self.application.save()
-        languages = []
+        languages = set()
         for i in xrange(1, 7):
             value = self.cleaned_data['language{}'.format(i)]
             if value:
-                languages.append(value)
+                languages.add(value)
         self.application.user.set_languages(languages)

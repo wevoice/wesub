@@ -12,6 +12,10 @@ html, body {
     padding: 0;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 /* Implement a sticky footer using flexbox */
 body {
     display: flex;

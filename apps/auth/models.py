@@ -282,6 +282,11 @@ class CustomUser(BaseUser):
         return [translation.get_language_label(lc)
                 for lc in self.get_languages()]
 
+    def get_language_codes_and_names(self):
+        """Get a list of language codes/names that the user speaks."""
+        return [(lc, translation.get_language_label(lc))
+                for lc in self.get_languages()]
+
     def speaks_language(self, language_code):
         return language_code in [l.language for l in self.get_languages()]
 

@@ -16,13 +16,17 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import string
+import logging
 
 from django.utils.translation import gettext as _
 
+from teams.behaviors import get_main_project
+from teams.models import Project
 from utils.behaviors import DONT_OVERRIDE
 from utils.text import fmt
 from videos.behaviors import make_video_title
+
+logger = logging.getLogger(__name__)
 
 @make_video_title.override
 def amara_make_video_title(video, title, metadata):
@@ -34,3 +38,12 @@ def amara_make_video_title(video, title, metadata):
     return fmt(_('%(speaker_name)s: %(title)s'),
                speaker_name=metadata['speaker-name'],
                title=title)
+
+@get_main_project.override
+def amara_get_main_project(team):
+    if team.slug == 'ted':
+        try:
+            return team.project_set.get(slug='tedtalks')
+        except Project.DoesNotExist:
+            pass
+    return DONT_OVERRIDE

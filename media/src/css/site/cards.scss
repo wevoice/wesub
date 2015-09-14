@@ -55,7 +55,6 @@ ul.card-list {
         @include not-small-screen {
             // Our layout depends on using absolutely positioning the actions
             // div. Reserve space for it here
-            box-sizing: border-box;
             padding-right: 220px;
         }
     }
@@ -67,7 +66,6 @@ ul.video-card-list {
     > li {
         float: left;
         width: 50%;
-        box-sizing: border-box;
         margin-bottom: 30px;
 
         &:nth-of-type(odd) {

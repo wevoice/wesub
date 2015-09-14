@@ -467,6 +467,8 @@ class Team(models.Model):
             return self._member_cache[user.id]
         try:
             member = self.members.get(user_id=user.id)
+            member.team = self
+            member.user = user
         except TeamMember.DoesNotExist:
             member = None
         self._member_cache[user.id] = member
