@@ -31,10 +31,8 @@
     {% endif %}
   </div>
   <div class="main">
-    {% if page %}
     {% if filters_form.is_filtered %}
     <div class="current-filter-list">
-      <h6>{% trans "Current filters:" %}</h6>
       <ul>
         {% for filter_label in filters_form.get_current_filters %}
         <li>{{ filter_label }}</li>
@@ -43,6 +41,7 @@
       </ul>
     </div>
     {% endif %}
+    {% if page %}
     {% if bulk_mode_enabled %}
     <div class="select-all-thumbs"><label><input type="checkbox"> {% trans "Select all" %}</label></div>
     {% endif %}

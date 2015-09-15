@@ -1077,7 +1077,6 @@ class VideoFiltersForm(forms.Form):
             u'{}: {}'.format(self[name].label,
                              get_label_for_value(self, name))
             for name in self.changed_data
-            if name != 'sort'
         ]
 
 class MemberFiltersForm(forms.Form):
