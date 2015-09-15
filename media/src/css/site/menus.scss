@@ -8,11 +8,17 @@ ul.dropdown {
         a {
             display: block;
             padding: 6px 20px;
-            color: $darkish-gray;
+            color: inherit;
+            text-decoration: none;
         }
 
         &.separator {
             border-top: 1px solid $light-gray;
+        }
+
+        &:hover {
+            background-color: lighten($primary, 10);
+            color: $white;
         }
     }
 
