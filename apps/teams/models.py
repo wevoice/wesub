@@ -1551,6 +1551,8 @@ class ApplicationManager(models.Manager):
         return  not team.is_member(user)
 
     def open(self, team=None, user=None):
+        if user and not user.is_authenticated():
+            return self.none()
         qs =  self.filter(status=Application.STATUS_PENDING)
         if team:
             qs = qs.filter(team=team)
