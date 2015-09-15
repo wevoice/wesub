@@ -94,7 +94,7 @@ $.fn.withTooltip = function(config) {
             var left = lastX - 10;
 
             if(top + tooltip.height() >= viewport_bottom) {
-                top = viewport_bottom - 10 - tooltip.height();
+                top = viewport_bottom - 20 - tooltip.height();
             }
             if(left > $(window).width() - 410) {
                 left = $(window).width() - 410;
