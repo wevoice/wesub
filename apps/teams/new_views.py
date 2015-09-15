@@ -179,16 +179,6 @@ def videos(request, team):
                     form.save()
                 messages.success(request, form.message())
                 return HttpResponseRedirect(request.build_absolute_uri())
-            else:
-                messages.error(request, "{}<br>{}".format(
-                    unicode(form.error_message()),
-                    _('Please retry. If the issue continues, please contact '
-                      'your team admin or Amara support at '
-                      'support@amara.org')))
-                logger.error(form.errors.as_text())
-                # We don't want to display the error on the form since we
-                # re-use it for each video.  So unbind the data.
-                form = klass(team, request.user, auto_id=auto_id)
         else:
             form = klass(team, request.user, auto_id=auto_id)
         page_forms[name] = form

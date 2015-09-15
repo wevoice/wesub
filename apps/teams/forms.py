@@ -1357,9 +1357,6 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
         return fmt(msg, team_link=team_link, project=project.name,
                    count=self.count)
 
-    def error_message(self):
-        return _('Error moving videos.')
-
 class RemoveTeamVideosForm(BulkTeamVideoForm):
     def check_permissions(self):
         return permissions.can_remove_videos(self.team, self.user)
@@ -1372,9 +1369,6 @@ class RemoveTeamVideosForm(BulkTeamVideoForm):
                         '%(count)s videos removed from projects',
                         self.count)
         return fmt(msg, count=self.count)
-
-    def error_message(self):
-        return _('Error removing video.')
 
 class BulkEditTeamVideosForm(BulkTeamVideoForm):
     primary_audio_language = forms.ChoiceField(required=False, choices=[])
@@ -1430,9 +1424,6 @@ class BulkEditTeamVideosForm(BulkTeamVideoForm):
                         self.count)
         return fmt(msg, count=self.count)
 
-    def error_message(self):
-        return _('Error updating video.')
-
 class NewAddTeamVideoForm(VideoForm):
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
@@ -1467,9 +1458,10 @@ class NewAddTeamVideoForm(VideoForm):
                 self.cleaned_data['video_url'], self._video_type, self.user,
             )
             if not created and video.get_team_video() is not None:
-                raise forms.ValidationError(
+                self._errors['video_url'] = self.error_class([
                     _(u'Video is already part of a team')
-                )
+                ])
+                return
             self.video = video
             self.created = created
         return self.cleaned_data
@@ -1494,9 +1486,6 @@ class NewAddTeamVideoForm(VideoForm):
             return _('Video added to team.')
         else:
             return _('Existing video added to team.')
-
-    def error_message(self):
-        return _('Error adding video.')
 
 class NewEditTeamVideoForm(forms.Form):
     team_video = forms.ChoiceField(choices=[])
@@ -1557,9 +1546,6 @@ class NewEditTeamVideoForm(forms.Form):
 
     def message(self):
         return _('Video updated.')
-
-    def error_message(self):
-        return _('Error updating video.')
 
 class ApplicationForm(forms.Form):
     about_you = forms.CharField(widget=forms.Textarea, label="")

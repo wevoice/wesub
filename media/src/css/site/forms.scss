@@ -85,12 +85,7 @@ p.help {
 }
 
 ul.errorlist {
-    display: inline-block;
     color: $error;
-
-    li {
-        margin-left: 5px;
-    }
 }
 
 .autocomplete {
