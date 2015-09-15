@@ -7,6 +7,11 @@
 <h2>{% blocktrans %}{{ team }}: {{ project }}{% endblocktrans %}</h2>
 <div class="split-view">
   <div class="sidebar">
+    {% if project.description %}
+    <div class="section">
+      {{ project.description|urlize|linebreaks }}
+    </div>
+    {% endif %}
     <div class="section">
       <h5>{% trans "Managers" %}</h5>
       {% if managers %}
