@@ -30,12 +30,10 @@
       </span>
       <a href="#" class="button delete-selected" id="delete-selected">{% trans "Delete selected" %}</a>
       <a href="#" class="button mark-as-read" id="mark-as-read">{% trans "Mark as read" %}</a>
-<!--
       <a href="#filter" id="sort-filter">
         {% trans 'Filter' %}
         <span></span>
       </a>
--->
     </div>
     <form class="filters group no-ajax{% if filtered %} active{% endif %}" action="" method="GET">
       <input type="hidden" name="q" value="{{ query }}" />
