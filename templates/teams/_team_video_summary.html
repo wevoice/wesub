@@ -2,7 +2,6 @@
 {% load url from future %}
 
 <li class="team_video_listing_{{ search_record.team_video_pk }}">
-  <input class="bulkable" type="checkbox" value="{{ search_record.team_video_pk }}" name="selected_videos[]">
     <div class="thumb">
         <a href="{% url "videos:video" video_id=search_record.video_id %}" title="{{ search_record.video_title }}">
             <img src="{{ search_record.thumbnail }}" alt="{{ search_record.title }} thumbnail">
@@ -30,6 +29,7 @@
             <a href="{% url "videos:video" video_id=search_record.video_id %}" title="{{ search_record.video_title }}">{{ search_record.title|truncatewords:9 }}</a>
         </h4>
     </div>
+    <input class="bulkable" type="checkbox" value="{{ search_record.team_video_pk }}" name="selected_videos[]">
     <ul class="admin-controls">
         {% with search_record|can_edit_video:request.user as can_edit_this_video %}
             {% if can_edit_this_video %}
