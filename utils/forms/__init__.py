@@ -3,7 +3,7 @@ import re
 from django import forms
 from django.core import validators
 from django.utils import html
-from django.utils.encoding import force_unicode
+from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
@@ -157,6 +157,6 @@ def get_label_for_value(form, name):
     field = form.fields[name]
     if isinstance(field, forms.ChoiceField):
         for choice in field.choices:
-            if choice[0] == value:
+            if smart_unicode(choice[0]) == value:
                 return unicode(choice[1])
     return value
