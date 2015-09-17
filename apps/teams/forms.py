@@ -43,6 +43,7 @@ from teams.models import (
 )
 from teams import permissions
 from teams.exceptions import ApplicationInvalidException
+from teams.fields import TeamMemberInput
 from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
     can_assign_task, can_delete_language, can_remove_video,
@@ -57,7 +58,7 @@ from videos.models import (
 )
 from videos.search_indexes import VideoIndex
 from videos.tasks import import_videos_from_feed
-from utils.forms import ErrorableModelForm
+from utils.forms import ErrorableModelForm, get_label_for_value
 from utils.forms.autocomplete import AutocompleteTextInput
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.panslugify import pan_slugify
@@ -705,6 +706,96 @@ class EditProjectForm(forms.Form):
         project.save()
         return project
 
+class AddProjectManagerForm(forms.Form):
+    member = TeamMemberInput(widget=AutocompleteTextInput)
+
+    def __init__(self, team, project, *args, **kwargs):
+        super(AddProjectManagerForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.project = project
+        self.fields['member'].set_team(team)
+        self.fields['member'].widget.set_autocomplete_url(
+            reverse('teams:add-project-manager-search',
+                    args=(team.slug, project.slug))
+        )
+
+    def clean_member(self):
+        member = self.cleaned_data['member']
+        if member.is_project_manager(self.project):
+            raise forms.ValidationError(fmt(
+                _(u'%(user)s is already a manager of that project'),
+                user=member.user))
+        return member
+
+    def save(self):
+        member = self.cleaned_data['member']
+        member.make_project_manager(self.project)
+
+class RemoveProjectManagerForm(forms.Form):
+    member = TeamMemberInput()
+
+    def __init__(self, team, project, *args, **kwargs):
+        super(RemoveProjectManagerForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.project = project
+        self.fields['member'].set_team(team)
+
+    def clean_member(self):
+        member = self.cleaned_data['member']
+        if not member.is_project_manager(self.project):
+            raise forms.ValidationError(_(u'%(user)s is not a manager'),
+                                        user=username)
+        return member
+
+    def save(self):
+        member = self.cleaned_data['member']
+        member.remove_project_manager(self.project)
+
+class AddLanguageManagerForm(forms.Form):
+    member = TeamMemberInput(widget=AutocompleteTextInput)
+
+    def __init__(self, team, language_code, *args, **kwargs):
+        super(AddLanguageManagerForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.language_code = language_code
+        self.fields['member'].set_team(team)
+        self.fields['member'].widget.set_autocomplete_url(
+            reverse('teams:add-language-manager-search',
+                    args=(team.slug, language_code))
+        )
+
+    def clean_member(self):
+        member = self.cleaned_data['member']
+        if member.is_language_manager(self.language_code):
+            raise forms.ValidationError(fmt(
+                _(u'%(user)s is already a manager of that language'),
+                user=member.user))
+        return member
+
+    def save(self):
+        member = self.cleaned_data['member']
+        member.make_language_manager(self.language_code)
+
+class RemoveLanguageManagerForm(forms.Form):
+    member = TeamMemberInput()
+
+    def __init__(self, team, language_code, *args, **kwargs):
+        super(RemoveLanguageManagerForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.language_code = language_code
+        self.fields['member'].set_team(team)
+
+    def clean_member(self):
+        member = self.cleaned_data['member']
+        if not member.is_language_manager(self.language_code):
+            raise forms.ValidationError(_(u'%(user)s is not a manager'),
+                                        user=username)
+        return member
+
+    def save(self):
+        member = self.cleaned_data['member']
+        member.remove_language_manager(self.language_code)
+
 class DeleteLanguageVerifyField(forms.CharField):
     def __init__(self):
         help_text=_('Type "Yes I want to delete this language" if you are '
@@ -894,11 +985,7 @@ class VideoFiltersForm(forms.Form):
     Note that this form is a bit weird because it uses the GET params, rather
     than POST data.
     """
-    LANGUAGE_CHOICES = [
-        ('any', _('Any language')),
-    ] + get_language_choices()
-
-    q = forms.CharField(label=_('Search'), required=False)
+    q = forms.CharField(label=_('Title/Description'), required=False)
     project = forms.ChoiceField(label=_('Project'), required=False,
                                 choices=[])
     sort = forms.ChoiceField(choices=[
@@ -910,18 +997,20 @@ class VideoFiltersForm(forms.Form):
         ('-subs', _('Least complete languages')),
     ], initial='-time', required=False)
 
-    def __init__(self, team, request):
-        super(VideoFiltersForm, self).__init__(data=self.calc_data(request))
+    def __init__(self, team, get_data=None, **kwargs):
+        super(VideoFiltersForm, self).__init__(data=self.calc_data(get_data),
+                                               **kwargs)
         self.team = team
         self.setup_project_field()
         self.selected_project = None
 
-    def calc_data(self, request):
-        valid_names = set(['q', 'project', 'sort'])
+    def calc_data(self, get_data):
+        if get_data is None:
+            return None
         data = {
             name: value
-            for name, value in request.GET.items()
-            if name in valid_names
+            for name, value in get_data.items()
+            if name != 'page'
         }
         return data if data else None
 
@@ -980,6 +1069,16 @@ class VideoFiltersForm(forms.Form):
 
         return qs
 
+    def is_filtered(self):
+        return self.is_bound and self.is_valid()
+
+    def get_current_filters(self):
+        return [
+            u'{}: {}'.format(self[name].label,
+                             get_label_for_value(self, name))
+            for name in self.changed_data
+        ]
+
 class MemberFiltersForm(forms.Form):
     LANGUAGE_CHOICES = [
         ('any', _('Any language')),
@@ -1001,10 +1100,16 @@ class MemberFiltersForm(forms.Form):
         ('oldest', _('Date joined, oldest')),
     ], initial='recent', required=False)
 
-    def __init__(self, request):
+    def __init__(self, get_data=None):
         super(MemberFiltersForm, self).__init__(
-            data=request.GET if request.GET else None,
+            self.calc_data(get_data)
         )
+
+    def calc_data(self, get_data):
+        if get_data is None:
+            return None
+        data = {k:v for k, v in get_data.items() if k != 'page'}
+        return data if data else None
 
     def update_qs(self, qs):
         if not self.is_bound:
@@ -1252,9 +1357,6 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
         return fmt(msg, team_link=team_link, project=project.name,
                    count=self.count)
 
-    def error_message(self):
-        return _('Error moving videos.')
-
 class RemoveTeamVideosForm(BulkTeamVideoForm):
     def check_permissions(self):
         return permissions.can_remove_videos(self.team, self.user)
@@ -1267,9 +1369,6 @@ class RemoveTeamVideosForm(BulkTeamVideoForm):
                         '%(count)s videos removed from projects',
                         self.count)
         return fmt(msg, count=self.count)
-
-    def error_message(self):
-        return _('Error removing video.')
 
 class BulkEditTeamVideosForm(BulkTeamVideoForm):
     primary_audio_language = forms.ChoiceField(required=False, choices=[])
@@ -1325,9 +1424,6 @@ class BulkEditTeamVideosForm(BulkTeamVideoForm):
                         self.count)
         return fmt(msg, count=self.count)
 
-    def error_message(self):
-        return _('Error updating video.')
-
 class NewAddTeamVideoForm(VideoForm):
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
@@ -1362,9 +1458,10 @@ class NewAddTeamVideoForm(VideoForm):
                 self.cleaned_data['video_url'], self._video_type, self.user,
             )
             if not created and video.get_team_video() is not None:
-                raise forms.ValidationError(
+                self._errors['video_url'] = self.error_class([
                     _(u'Video is already part of a team')
-                )
+                ])
+                return
             self.video = video
             self.created = created
         return self.cleaned_data
@@ -1389,9 +1486,6 @@ class NewAddTeamVideoForm(VideoForm):
             return _('Video added to team.')
         else:
             return _('Existing video added to team.')
-
-    def error_message(self):
-        return _('Error adding video.')
 
 class NewEditTeamVideoForm(forms.Form):
     team_video = forms.ChoiceField(choices=[])
@@ -1452,9 +1546,6 @@ class NewEditTeamVideoForm(forms.Form):
 
     def message(self):
         return _('Video updated.')
-
-    def error_message(self):
-        return _('Error updating video.')
 
 class ApplicationForm(forms.Form):
     about_you = forms.CharField(widget=forms.Textarea, label="")

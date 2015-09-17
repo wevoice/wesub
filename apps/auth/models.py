@@ -343,6 +343,10 @@ class CustomUser(BaseUser):
     def get_absolute_url(self):
         return ('profiles:profile', [urlquote(self.username)])
 
+    def send_message_url(self):
+        return '{}?user={}'.format(reverse('messages:new'),
+                                   urlquote(self.username))
+
     @property
     def language(self):
         return self.get_preferred_language_display()

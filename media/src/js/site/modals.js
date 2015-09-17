@@ -20,7 +20,7 @@
 
 var $document = $(document);
 
-$.fn.openModal = function(setupData) {
+$.fn.openModal = function(openEvent, setupData) {
     this.each(function() {
         var modal = $(this);
         if(setupData) {
@@ -34,6 +34,7 @@ $.fn.openModal = function(setupData) {
         modal.trigger('open');
 
         $document.bind('click.modal', function(evt) {
+            if(openEvent && evt.timeStamp <= openEvent.timeStamp) return;
             var clickedModal = $(evt.target).closest('aside.modal');
             if(clickedModal.length == 0) {
                 // click outside the modal
@@ -51,7 +52,6 @@ $.fn.openModal = function(setupData) {
 
         function onClose(evt) {
             evt.preventDefault();
-            evt.stopPropagation();
             modal.removeClass('shown');
             $('body div.modal-overlay').remove();
             closeButton.unbind('click.modal');
@@ -101,8 +101,7 @@ $document.ready(function() {
 
         link.bind('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
-            modal.openModal(link.data());
+            modal.openModal(e, link.data());
         });
     });
 

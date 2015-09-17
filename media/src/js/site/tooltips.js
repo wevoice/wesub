@@ -46,9 +46,13 @@ $.fn.withTooltip = function(config) {
         function getTooltip() {
             if(config.getTooltip) {
                 return config.getTooltip(container);
-            } else {
-                return $('.tooltip', container);
             }
+            var domElt = container[0];
+            var overflowTooltip = $('.tooltip.overflow', container);
+            if(overflowTooltip && container.hasOverflow()) {
+                return overflowTooltip;
+            }
+            return $('.tooltip:not(.overflow)', container);
         }
 
         function scheduleTimeout() {
@@ -62,8 +66,7 @@ $.fn.withTooltip = function(config) {
 
         function onMouseMove(evt) {
             if(shown) {
-                hideTooltip();
-                scheduleTimeout();
+                return;
             }
             lastMouseMove = $.now();
             lastX = evt.pageX;
@@ -87,17 +90,20 @@ $.fn.withTooltip = function(config) {
         function showTooltip() {
             var tooltip = getTooltip();
             var viewport_bottom = $(window).scrollTop() + $(window).height();
-            if(lastY + 10 + tooltip.height() < viewport_bottom) {
-                tooltip.css({
-                    'left': lastX + 10,
-                    'top': lastY + 10
-                });
-            } else {
-                tooltip.css({
-                    'left': lastX + 10,
-                    'top': viewport_bottom - 10 - tooltip.height()
-                });
+            var top = container.offset().top + container.height();
+            var left = lastX - 10;
+
+            if(top + tooltip.height() >= viewport_bottom) {
+                top = viewport_bottom - 20 - tooltip.height();
             }
+            if(left > $(window).width() - 410) {
+                left = $(window).width() - 410;
+            }
+            tooltip.css({
+                'left': left,
+                'top': top,
+                'max-width': $(window).width() - left - 10
+            });
             tooltip.show();
             shown = true;
         }
@@ -107,6 +113,18 @@ $.fn.withTooltip = function(config) {
             shown = false;
         }
     });
+}
+
+$.fn.hasOverflow = function() {
+    var rv = false;
+    this.each(function() {
+        if(this.scrollWidth > this.offsetWidth ||
+            this.scrollHeight > this.offsetHeight) {
+                rv = true;
+                return false;
+            }
+    });
+    return rv;
 }
 
 $(document).ready(function() {

@@ -1,10 +1,5 @@
-ul.dropdown, %dropdown {
-    position: absolute;
-    display: none;
-    z-index: $z-index-menu;
-    background: $white;
-    border: 1px solid $light-gray;
-    box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.3);
+ul.dropdown {
+    @extend %floating;
     color: $dark-gray;
 
     li {
@@ -13,16 +8,23 @@ ul.dropdown, %dropdown {
         a {
             display: block;
             padding: 6px 20px;
-            color: $darkish-gray;
+            color: inherit;
+            text-decoration: none;
         }
 
         &.separator {
             border-top: 1px solid $light-gray;
         }
+
+        &:hover {
+            background-color: lighten($primary, 10);
+            color: $white;
+        }
     }
 
     .count {
         float: right;
+        margin-left: 10px;
     }
 }
 

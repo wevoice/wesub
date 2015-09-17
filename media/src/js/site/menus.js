@@ -58,7 +58,7 @@ function initDropDown(linkElt) {
     }
     // Make the dropdown element a top-level element.  This way avoids issues
     // when it has a parent element that has position: relative.
-    dropdown.remove();
+    dropdown.detach();
     $(document.body).append(dropdown);
     linkElt.data('dropdown', dropdown);
     return dropdown;
@@ -77,11 +77,17 @@ function positionDropdown() {
     // Position the menu at the left of the dropdown button (but make sure
     // it's not past the edge of the window)
     dropdown.css('left', Math.min(activeMenu.offset().left, maxLeft));
+    if(parentElt.is('.dropdown-button')) {
+        dropdown.css('min-width', activeMenu.css('width'));
+    }
 }
 
 function onClickWithOpenDropDown(evt) {
     if($(evt.target).closest('ul.dropdown').length == 0) {
         // click outside the dropdown
+        closeMenu();
+    } else if($(evt.target).closest('button, a').length > 0) {
+        // click an one of the menu items
         closeMenu();
     }
 }

@@ -18,13 +18,12 @@
  */
 (function() {
 
-var $document = $(document);
-
 $.fn.autocompleteTextbox = function(options) {
     this.each(function() {
         var field = $(this);
         var autocompleteList = $('<ul class="autocomplete">');
         var lastValue = null;
+        var shown = false;
         var settings = $.extend({
             // default options
             queryParamName: 'query',
@@ -32,8 +31,6 @@ $.fn.autocompleteTextbox = function(options) {
             extraFields: field.data('autocompleteExtraFields')
         }, options);
 
-        autocompleteList.appendTo(field.closest('label'));
-        autocompleteList.hide();
 
         field.on("keyup paste", function() {
             value = field.val();
@@ -53,34 +50,65 @@ $.fn.autocompleteTextbox = function(options) {
             });
             lastValue = value;
         }).on("focusout", function(evt) {
-            autocompleteList.hide();
+            hideAutocompleteList();
         }).on("focusin", function() {
             if($('li', autocompleteList).length > 0) {
-                autocompleteList.show();
+                showAutocompleteList();
             }
         });
 
         function updateAutocomplete(responseData) {
             if(responseData.length == 0) {
-                autocompleteList.hide();
+                hideAutocompleteList();
                 return;
             }
-            autocompleteList.show();
+            showAutocompleteList();
             $('li', autocompleteList).remove();
             $.each(responseData, function(i, item) {
                 var link = $('<a href="#">');
                 link.text(item.label);
                 link.mousedown(function() {
                     field.val(item.value);
-                    autocompleteList.hide();
+                    hideAutocompleteList();
                 });
                 autocompleteList.append($('<li>').append(link));
             });
         }
+
+        function showAutocompleteList() {
+            if(!shown) {
+                $(document.body).append(autocompleteList);
+                shown = true;
+                positionAutocompleteList();
+                $(window).on('resize.autocomplete', positionAutocompleteList);
+            }
+        }
+
+        function positionAutocompleteList() {
+            if(field.closest('aside.modal').length) {
+                autocompleteList.css('position', 'fixed');
+            } else {
+                autocompleteList.css('position', 'absolute');
+            }
+            offset = field.offset();
+            autocompleteList.css('width', field.css('width'));
+            autocompleteList.offset({
+                left: offset.left,
+                top: offset.top + field.height() + 5
+            });
+        }
+
+        function hideAutocompleteList() {
+            if(shown) {
+                autocompleteList.detach();
+                shown = false;
+                $(window).off('resize.autocomplete');
+            }
+        }
     });
 }
 
-$document.ready(function() {
+$(document).ready(function() {
     $('.autocomplete-textbox').autocompleteTextbox();
 });
 

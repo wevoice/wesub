@@ -31,17 +31,30 @@
     {% endif %}
   </div>
   <div class="main">
-    {% if members %}
+    {% if page %}
     <ul class="card-list team-members">
-    {% for member in members %}
+    {% for member in page %}
       <li>
-        <h4>{{ member.user.username }}</h4>
+        <h4><a href="{{ member.user.get_absolute_url }}">{{ member.user }}</a></h4>
         <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{% blocktrans with user=member.user %}{{ user }} avatar{% endblocktrans %}"></a>
         <table class="key-value">
           <tr>
             <td>{% trans "Role" %}</td>
             <td>{{ member.get_role_display }}</td>
           </tr>
+          {% if member.languages_managed.all or member.projects_managed.all %}
+          <tr>
+            <td>{% trans "Manager for" %}</td>
+            <td>
+              {% for language in member.languages_managed.all %}
+              {{ language.get_code_display }}
+              {% endfor %}
+              {% for project in member.projects_managed.all %}
+              {{ project }}
+              {% endfor %}
+            </td>
+          </tr>
+          {% endif %}
           <tr>
             <td>{% trans "Languages" %}</td>
             <td>
@@ -56,7 +69,7 @@
           </tr>
         </table>
         <ul class="actions">
-          <li><a class="medium" href="{% url "messages:new" %}?user={{ member.user.username }}">{% trans "Send message" %}</a></li>
+          <li><a class="medium" href="{{ member.user.send_message_url }}">{% trans "Send message" %}</a></li>
           {% if member.id in edit_form.editable_member_ids %}
           <li><a class="medium edit open-modal" data-modal="edit-form" data-set-form-values='{"member": {{ member.id }}, "role":"{{ member.role }}"}' data-heading="{% blocktrans with username=member.user.username %}Edit Membership for {{ username }}{% endblocktrans %}" href="#">{% trans "Edit membership" %}</a></li>
           {% endif %}
@@ -64,6 +77,7 @@
       </li>
     {% endfor %}
     </ul>
+    {% include "_new_paginator.html" %}
     {% else %}
     <p class="empty">{% trans "No members found" %}</p>
     {% endif %}

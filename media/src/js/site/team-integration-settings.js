@@ -64,7 +64,7 @@ $(document).ready(function() {
     form.submit(function(evt) {
         if(accountWillBeDisabled()) {
             evt.preventDefault();
-            $('#confirm-delete-account-modal').openModal();
+            $('#confirm-delete-account-modal').openModal(evt);
             $('#confirm-delete-account-modal button.continue').click(function() {
                 accountsToBeDisabled = {};
                 form.submit();
