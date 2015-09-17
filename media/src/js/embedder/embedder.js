@@ -177,6 +177,7 @@
             is_on_amara: null,
             subtitles: [], // Backbone collection
             url: '',
+            video_type: '',
             show_logo: true,
             show_subtitle_me: true,
             show_order_subtitles: true,
@@ -208,7 +209,6 @@
                 var video = this;
                 var apiURL = '//' + _amaraConf.baseURL + '/api/videos/?video_url=';
                 this.subtitles = new that.Subtitles();
-
                 // Make a call to the Amara API to get attributes like available languages,
                 // internal ID, description, etc.
                 _$.ajax({
@@ -217,7 +217,6 @@
                         if (resp.objects.length) {
                             // The video exists on Amara.
                             video.set('is_on_amara', true);
-
                             // There should only be one object.
                             if (resp.objects.length === 1) {
                                 // Set all of the API attrs as attrs on the video model.
@@ -246,7 +245,8 @@
 
                         // Mark that the video model has been completely populated.
                         video.set('is_complete', true);
-			video.view.initThumbnail();
+                        video.view.render();
+                        video.view.initThumbnail();
                     }
                 });
             }
@@ -283,7 +283,6 @@
                 this.model.view = this;
                 this.template = __.template(this.templateHTML());
                 this.templateVideo = __.template(this.templateVideoHTML());
-                this.render();
                 // Default states.
                 this.states = {
                     autoScrolling: true,
@@ -335,7 +334,6 @@
                 this.model.set('width', width);
 	    },
             render: function() {
-
                 // TODO: Split this monster of a render() into several render()s.
                 var that = this;
                 this.subtitleLines = [];
@@ -394,7 +392,6 @@
                 });
 
                 this.pop.on('loadedmetadata', function() {
-
                     // In case of HTML5 videos, we need to set their dimension directly to the video element
                     _$('video', that.$popContainer).width(that.$popContainer.width()).height(that.$popContainer.height());
 
@@ -464,7 +461,10 @@
                         url += '&controls=1';
                     }
                 }
-                pop = _Popcorn.smart(this.$popContainer.attr('id'), url, {frameAnimation: true});
+		if (this.model.get('video_type') == 'C')
+                    pop = _Popcorn.brightcove(this.$popContainer.attr('id'), url, {frameAnimation: true});
+		else
+                    pop = _Popcorn.smart(this.$popContainer.attr('id'), url, {frameAnimation: true});
                 pop.controls(true);
                 return pop;
             },

@@ -26,7 +26,7 @@ import mock
 from auth.models import CustomUser as User
 from subtitles import pipeline
 from subtitles.models import SubtitleLanguage
-from videos.models import Action, Video
+from videos.models import Action, Video, VideoTypeUrlPattern
 from videos.tasks import video_changed_tasks
 from videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version, make_rollback_to
@@ -417,3 +417,18 @@ class TestGetMergedDFXP(TestCase):
         ]
 
         self.assertEquals(video.get_merged_dfxp(), dfxp_merge(subtitles))
+
+class TestTypeUrlPatterns(TestCase):
+    def setUp(self):
+        pattern = VideoTypeUrlPattern()
+        self.url = "http://example.com/"
+        self.type = "YT"
+        pattern.url_pattern = self.url
+        pattern.type = self.type
+        pattern.save()
+    def get_patterns_for_type(self):
+        patterns = VideoTypeUrlPattern.objects.patterns_for_type("YT")
+        self.assertEquals(len(patterns), 1)
+        for p in patterns:
+            self.assertEquals(p.type, self.type)
+            self.assertEquals(p.url_pattern, self.url)

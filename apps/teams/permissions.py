@@ -619,10 +619,6 @@ def can_publish_edits_immediately(team_video, user, lang):
 
     return True
 
-def can_rollback_language(user, language):
-    """Can the user rollback a language to a previous version."""
-    return can_add_version(user, language.video, language.language_code)
-
 def can_post_edit_subtitles(team_video, user, lang=None):
     """ Returns wheter the user has permission to post edit an original language """
     if user.is_staff:
@@ -648,6 +644,10 @@ def can_delete_language(team, user):
 
 def can_add_version(user, video, language_code):
     """Check if a user can add a new version to a SubtitleLanguage
+
+    Deprecated:
+        This method works with old-style teams, but not others.  For newer
+        teams you should call video.get_workflow().user_can_edit_subtitles().
 
     Returns a TeamsPermissionsCheck object
     """

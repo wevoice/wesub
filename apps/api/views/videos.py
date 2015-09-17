@@ -34,6 +34,7 @@ Get info for a specific video
     :>json team: Slug of the Video's team (or null)
     :>json metadata: Dict mapping metadata names to values
     :>json languages: List of languages that have subtitles started (see below)
+    :>json video_type: Video type identifier
     :>json all_urls: List of URLs for the video (the first one is the primary
      video URL)
     :>json resource_uri: API uri for the video
@@ -86,14 +87,15 @@ Creating Videos
         extra information about the video.  Right now the type keys supported
         are "speaker-name" and "location".  Values can be any string.
     :<json team: team slug for the video or null to remove it from its team.
-       The string "null" is a synonym for the null object **(deprecated)**
     :<json project: project slug for the video or null to put it in the
-        default project.  The string "null" is a synonym for the null object
-        **(deprecated)**
+        default project.
 
 .. note::
     **Deprecated:** For all fields, if you pass an empty string, we will treat
     it as if the field was not present in the input.
+
+    **Deprecated:** For slug and project, You can use the string "null" as a
+    synonym for the null object.
 
 When submitting URLs of external providers (i.e. youtube, vimeo), the metadata
 (title, description, duration) can be fetched from them. If you're submitting
@@ -307,6 +309,7 @@ class VideoSerializer(serializers.Serializer):
     # default implementation that it makes more sense to not inherit.
     id = serializers.CharField(source='video_id', read_only=True)
     video_url = serializers.URLField(write_only=True, required=True)
+    video_type = serializers.SerializerMethodField()
     primary_audio_language_code = LanguageCodeField(required=False,
                                                     allow_blank=True)
     original_language = serializers.CharField(source='language',
@@ -353,6 +356,16 @@ class VideoSerializer(serializers.Serializer):
         video_urls = list(video.get_video_urls())
         video_urls.sort(key=lambda vurl: vurl.primary, reverse=True)
         return [vurl.url for vurl in video_urls]
+
+    def get_video_type(self, video):
+        types = set()
+        for url in video.get_video_urls():
+            video_type = video_type_registrar.video_type_for_url(url.url)
+            if video_type is not None:
+                types.add(video_type)
+        if len(types) == 1:
+            return types.pop().abbreviation
+        return ""
 
     def will_add_video_to_team(self):
         if not self.team_video:

@@ -91,6 +91,7 @@ class MessagesSerializer(serializers.Serializer):
             Message(user=user,
                     content=self.validated_data['content'],
                     subject=self.validated_data['subject'],
+                    message_type='M',
                     author=self.context['user'])
             for user in self.recipients()
             if user != self.context['user']

@@ -83,7 +83,7 @@ from utils.rpc import RpcRouter
 from utils.text import fmt
 from utils.translation import get_user_languages_from_request
 
-from teams.permissions import can_edit_video, can_add_version, can_rollback_language, can_resync
+from teams.permissions import can_edit_video, can_add_version, can_resync
 from . import video_size
 
 rpc_router = RpcRouter('videos:rpc_router', {
@@ -561,12 +561,12 @@ class LanguagePageContext(dict):
             self['metadata'] = video.get_metadata().convert_for_display()
 
         self['rollback_allowed'] = self.calc_rollback_allowed(
-            request, version, language)
+            request, video, version, language)
 
-    def calc_rollback_allowed(self, request, version, language):
+    def calc_rollback_allowed(self, request, video, version, language):
         if version and version.next_version():
-            return (version.video.get_team_video() is None or
-                    can_rollback_language(request.user, language))
+            return user_can_edit_subtitles(request.user, video,
+                                           language.language_code)
         else:
             return False
 
@@ -582,17 +582,17 @@ class LanguagePageContext(dict):
 class LanguagePageContextSubtitles(LanguagePageContext):
     def setup_tab(self, request, video, language, version):
         team_video = video.get_team_video()
-        user_can_add_version = can_add_version(request.user, video,
-                                               language.language_code)
+        user_can_edit = user_can_edit_subtitles(request.user, video,
+                                                language.language_code)
         public_langs = (video.newsubtitlelanguage_set
                         .having_public_versions().count())
 
         self['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
-        self['edit_disabled'] = not user_can_add_version
+        self['edit_disabled'] = not user_can_edit
         self['show_download_all'] = public_langs > 1
         # If there are tasks for this language, the user has to go through the
         # tasks panel to edit things instead of doing it directly from here.
-        if user_can_add_version and video.get_team_video():
+        if user_can_edit and video.get_team_video():
             has_open_task = (Task.objects.incomplete()
                              .filter(team_video=video.get_team_video(),
                                      language=language.language_code)
@@ -602,7 +602,7 @@ class LanguagePageContextSubtitles(LanguagePageContext):
                 self['must_use_tasks'] = True
         if 'rollback_allowed' not in self:
             self['rollback_allowed'] = self.calc_rollback_allowed(
-                request, version, language)
+                request, video, version, language)
 
 class LanguagePageContextComments(LanguagePageContext):
     pass
@@ -692,9 +692,8 @@ def _widget_params(request, video, version_no=None, language=None, video_url=Non
 @get_video_revision
 def rollback(request, version):
     is_writelocked = version.subtitle_language.is_writelocked
-    team_video = version.video.get_team_video()
-    if team_video and not can_rollback_language(request.user,
-                                                version.subtitle_language):
+    if not user_can_edit_subtitles(request.user, version.video,
+                                   version.subtitle_language.language_code):
         messages.error(request, _(u"You don't have permission to rollback "
                                   "this language"))
     elif is_writelocked:
@@ -747,15 +746,12 @@ def diffing(request, first_version, second_pk):
         'first_version_next': first_version_next,
         'second_version_previous': second_version_previous,
         'second_version_next': second_version_next if (second_version_next != first_version) else None,
+        'rollback_allowed': user_can_edit_subtitles(request.user, video,
+                                                    language.language_code),
+        'width': video_size["small"]["width"],
+        'height': video_size["small"]["height"],
+        'video_url': video.get_video_url(),
     }
-    if team_video and not can_rollback_language(request.user, language):
-        context['rollback_allowed'] = False
-    else:
-        context['rollback_allowed'] = True
-
-    context['width'] = video_size["small"]["width"]
-    context['height'] = video_size["small"]["height"]
-    context['video_url'] = video.get_video_url()
 
     return render_to_response('videos/diffing.html', context,
                               context_instance=RequestContext(request))

@@ -74,4 +74,8 @@ class BrightcoveVideoType(VideoType):
             for r in BRIGHTCOVE_REGEXES:
                 if bool(r.match(url)):
                     return True
+            from videos.models import VideoTypeUrlPattern
+            for pattern in VideoTypeUrlPattern.objects.patterns_for_type(cls.abbreviation):
+                if url.find(pattern.url_pattern) == 0 and url.find('bctid') > 0:
+                    return True
         return False

@@ -546,6 +546,15 @@ class PermissionsForm(forms.ModelForm):
                   'translate_policy', 'task_assign_policy', 'workflow_enabled',
                   'max_tasks_per_member', 'task_expiration',)
 
+class SimplePermissionsForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ('membership_policy', 'video_policy')
+        labels = {
+            'membership_policy': _('How can users join your team?'),
+            'video_policy': _('Who can add/remove videos?'),
+        }
+
 class LanguagesForm(forms.Form):
     preferred = forms.MultipleChoiceField(required=False, choices=())
     blacklisted = forms.MultipleChoiceField(required=False, choices=())

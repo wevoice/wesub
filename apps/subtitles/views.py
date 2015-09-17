@@ -48,6 +48,7 @@ from teams.models import Task
 from teams.permissions import can_assign_task
 from utils.text import fmt
 from videos.models import Video
+from videos.types import video_type_registrar
 
 def _version_data(version):
     '''
@@ -164,8 +165,14 @@ class SubtitleEditorBase(View):
         if self.workflow.user_can_edit_subtitles(self.user,
                                                  self.language_code):
             return True
+        learn_more_link = '<a href="{}">{}</a>'.format(
+            'http://support.amara.org/solution/articles/212109-why-do-i-see-a-message-saying-that-i-am-not-permitted-to-edit-subtitles',
+            _('Learn more'))
+
         messages.error(self.request,
-                       _('Sorry, these subtitles are privately moderated.'))
+                       fmt(_('Sorry, you do not have permission to edit '
+                             'these subtitles. (%(learn_more_link)s)'),
+                           learn_more_link=learn_more_link))
         return False
 
     def get_editor_data(self):
@@ -184,6 +191,7 @@ class SubtitleEditorBase(View):
                 'title': self.video.title,
                 'description': self.video.description,
                 'primaryVideoURL': self.video.get_video_url(),
+                'primaryVideoURLType': video_type_registrar.video_type_for_url(self.video.get_video_url()).abbreviation,
                 'videoURLs': self.get_video_urls(),
                 'metadata': self.video.get_metadata(),
             },

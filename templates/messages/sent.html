@@ -15,24 +15,29 @@
     <script type="text/javascript">
         window.STATIC_URL = '{{ STATIC_URL }}';
         window.DELETE_MESSAGE_CONFIRM = '{% trans 'Do you really wish to delete this message?' %}';
+        window.DELETE_MESSAGES_CONFIRM = '{% trans 'Do you really wish to delete these messages?' %}';
     </script>
 {% endblock %}
 
 {% block view_content %}
-    {% comment %}<div class="tools">
-        <a href="#" class="button" id="mark-read">Mark all read</a>
-    </div>{% endcomment %}
+    <div class="tools">
+      <span class="bulk-actions">
+	<input type="checkbox" class="bulk-select" name="bulk"><a href="" class="bulk-select">{% trans "Select/Deselect all" %}</a>
+      </span>
+      <a href="#" class="button delete-selected" id="delete-selected">{% trans "Delete selected" %}</a>
+    </div>
     {% if message_list %}
         {% if is_paginated %}{% paginator %}{% endif %}
         <ul class="listing messages">
         {% for msg in message_list %}
-            <li class="message {% if not msg.read %}unread{% endif %}">
+            <li class="message {% if not msg.read %}unread{% endif %} {% if msg.message_type == "S" %}notification{% endif %}">
                 <h3>{{ msg }}</h3>
                 <p>
                     To
                     <a href="{{ msg.user.get_absolute_url }}">{{ msg.user }}</a>
                 </p>
                 <p>{{ msg.get_content|safe }}</p>
+                <input class="bulkable" type="checkbox" value="{{msg.id}}">
                 <a class="thumb"href="{{ msg.user.get_absolute_url }}">
                     {% with msg.user.small_avatar as user_avatar_url %}
                         {% if user_avatar_url %}
@@ -43,11 +48,6 @@
                     {% endwith %}
                 </a>
                 <span class="timestamp">{{ msg.created|timesince }} {% trans 'ago' %}</span>
-                <ul class="admin-controls">
-                    <li>
-                        <a href="#" class="delete" message_id="{{ msg.pk }}">{% trans "Delete" %}</a>
-                    </li>
-                </ul>
             </li>
         {% endfor %}
         </ul>
