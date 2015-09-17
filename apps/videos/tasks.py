@@ -329,7 +329,7 @@ def notify_for_version(version):
             if item.author.notify_by_message:
                 # TODO: Add body
                 Message.objects.create(user=item.author, subject=subject,
-                        content='')
+                                       content='', message_type='S')
             followers.discard(item.author)
 
     for user in followers:

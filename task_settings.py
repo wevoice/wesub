@@ -47,7 +47,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'cleanup_messages': {
         'task': 'messages.tasks.cleanup',
-        'schedule': crontab(hour=4, minute=30),
+        'schedule': crontab(minute=30),
     },
     'update_feeds': {
         'task': 'videos.tasks.update_from_feed',

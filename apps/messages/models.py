@@ -28,9 +28,20 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.core.urlresolvers import reverse
 from django.utils.html import escape, urlize
+from django.db.models import Q
 
 from auth.models import CustomUser as User
 MESSAGE_MAX_LENGTH = getattr(settings,'MESSAGE_MAX_LENGTH', 1000)
+
+SYSTEM_NOTIFICATION = 'S'
+MESSAGE = 'M'
+OLD_MESSAGE = 'O'
+MESSAGE_TYPES = (SYSTEM_NOTIFICATION, MESSAGE, OLD_MESSAGE)
+MESSAGE_TYPE_CHOICES = (
+    (SYSTEM_NOTIFICATION, 'System Notification'),
+    (MESSAGE, 'Personal Message'),
+    (OLD_MESSAGE, 'Old Type Message'),
+)
 
 class MessageManager(models.Manager):
     use_for_related_fields = True
@@ -40,6 +51,16 @@ class MessageManager(models.Manager):
 
     def for_author(self, user):
         return self.get_query_set().filter(author=user).exclude(deleted_for_author=True)
+
+    def for_user_or_author(self, user):
+        return self.get_query_set().filter((Q(author=user) & Q(deleted_for_author=False)) | (Q(user=user) & Q(deleted_for_user=False)))
+
+    def thread(self, message, user):
+        if message.thread:
+            thread_id = message.thread
+        else:
+            thread_id = message.id
+        return self.get_query_set().filter(Q(thread=thread_id) | Q(id=thread_id)).filter((Q(author=user) & Q(deleted_for_author=False)) | (Q(user=user) & Q(deleted_for_user=False)))
 
     def unread(self):
         return self.get_query_set().filter(read=False)
@@ -71,18 +92,9 @@ class Message(models.Model):
     object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
     objects = MessageManager()
-
+    thread = models.PositiveIntegerField(blank=True, null=True, db_index=True)
     hide_cookie_name = 'hide_new_messages'
 
-    SYSTEM_NOTIFICATION = 'S'
-    MESSAGE = 'M'
-    OLD_MESSAGE = 'O'
-    MESSAGE_TYPES = (SYSTEM_NOTIFICATION, MESSAGE, OLD_MESSAGE)
-    MESSAGE_TYPE_CHOICES = (
-        (SYSTEM_NOTIFICATION, 'System Notification'),
-        (MESSAGE, 'Regular Message'),
-        (OLD_MESSAGE, 'Old Type Message'),
-    )
     def validate_message_type(value):
         if value not in MESSAGE_TYPES:
             raise ValidationError('%s is not a valid message type' % value)
@@ -118,6 +130,7 @@ class Message(models.Model):
             'author-avatar': self.author and self.author.small_avatar() or '',
             'author-username': self.author and unicode(self.author) or '',
             'author-id': self.author and self.author.pk or '',
+            'thread': self.thread or self.id or '',
             'user-avatar': self.user and self.user.small_avatar() or '',
             'user-username': self.user and unicode(self.user) or '',
             'user-id': self.user and self.user.pk or '',
