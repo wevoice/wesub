@@ -22,30 +22,95 @@ var activeMenu = null;
 var toggleAllActive = false;
 
 function openMenu(linkElt) {
-    var menuId = linkElt.data('menu');
-    $('#' + menuId).show();
-    linkElt.addClass('open');
+    var dropdown = initDropDown(linkElt);
+    if(dropdown === null) {
+        return;
+    }
+    if(linkElt.is('.caret')) {
+        linkElt.html('&#9650;');
+    }
+    dropdown.show();
     activeMenu = linkElt;
+    positionDropdown();
+    linkElt.addClass('open');
+    $(document).bind('click.dropdown', onClickWithOpenDropDown);
 }
+
 function closeMenu() {
-    var menuId = activeMenu.data('menu');
-    $('#' + menuId).hide();
+    var dropdown = getDropDown();
+    if(activeMenu.is('.caret')) {
+        activeMenu.html('&#9660;');
+    }
+    dropdown.hide();
     activeMenu.removeClass('open');
     activeMenu = null;
+    $(document).unbind('click.dropdown');
+}
+
+function initDropDown(linkElt) {
+    if(linkElt.data('dropdown')) {
+        // Dropdown already initialized
+        return linkElt.data('dropdown');
+    }
+    var dropdown = linkElt.siblings('ul.dropdown');
+    if(dropdown.length == 0) {
+        return null;
+    }
+    // Make the dropdown element a top-level element.  This way avoids issues
+    // when it has a parent element that has position: relative.
+    dropdown.remove();
+    $(document.body).append(dropdown);
+    linkElt.data('dropdown', dropdown);
+    return dropdown;
+}
+
+function getDropDown() {
+    return activeMenu.data('dropdown');
+}
+
+function positionDropdown() {
+    var dropdown = getDropDown();
+    var parentElt = activeMenu.parent();
+    var maxLeft = $(window).width() - dropdown.width() - 10;
+    // Position the menu at the bottom of the parent element
+    dropdown.css('top', parentElt.offset().top + parentElt.height());
+    // Position the menu at the left of the dropdown button (but make sure
+    // it's not past the edge of the window)
+    dropdown.css('left', Math.min(activeMenu.offset().left, maxLeft));
+}
+
+function onClickWithOpenDropDown(evt) {
+    if($(evt.target).closest('ul.dropdown').length == 0) {
+        // click outside the dropdown
+        closeMenu();
+    }
+}
+
+function onMenuToggleClick(evt) {
+    var linkElt = $(this);
+    if(activeMenu === null) {
+        openMenu(linkElt);
+    } else if (activeMenu[0] == linkElt[0]) {
+        closeMenu();
+    } else {
+        closeMenu();
+        openMenu(linkElt);
+    }
+    evt.preventDefault();
+    evt.stopPropagation();
 }
 
 $(document).ready(function() {
-    $('a.menu-toggle').click(function() {
-        var linkElt = $(this);
-        if(activeMenu === null) {
-            openMenu(linkElt);
-        } else if (activeMenu[0] == linkElt[0]) {
-            closeMenu();
-        } else {
-            closeMenu();
-            openMenu(linkElt);
-        }
+    $('a.menu-toggle').click(onMenuToggleClick);
+    $('.split-button').each(function() {
+        var button = $('button, a.button', this).not('.dropdown button');
+        var caret = $('<button>&#9660;</button>')
+            .attr('class', button.attr('class'))
+            .addClass('caret');
+        button.after(caret);
+        $('button.caret', this).click(onMenuToggleClick);
     });
+    $('.dropdown-button button').click(onMenuToggleClick);
 
     $('button.menu-toggle-all').click(function() {
         var menus = $('ul', $(this).closest('nav'));
@@ -57,4 +122,11 @@ $(document).ready(function() {
         }
     });
 });
+
+$(window).resize(function() {
+    if(activeMenu) {
+        positionDropdown();
+    }
+});
+
 }(this));

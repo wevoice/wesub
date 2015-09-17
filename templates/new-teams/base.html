@@ -30,8 +30,8 @@
     </li>
     {% if projects %}
     <li>
-      <a href="#" class="menu-toggle" data-menu="projects-menu">{% trans "Projects" %}</a>
-      <ul id="projects-menu">
+      <a href="#" class="menu-toggle">{% trans "Projects" %}</a>
+      <ul class="dropdown">
         {% for project in projects %}
         <li>
         <a href="{{ project.get_absolute_url }}">{{ project }} <span class="count">{{ project.videos_count }}</span></a>
@@ -42,8 +42,8 @@
     {% endif %}
     {% if team|can_view_settings_tab:user %}
     <li>
-      <a href="#" class="menu-toggle" data-menu="settings-menu">{% trans "Settings" %}</a>
-      <ul id="settings-menu">
+      <a href="#" class="menu-toggle">{% trans "Settings" %}</a>
+      <ul class="dropdown">
         <li>
           <a href="{% url "teams:settings_basic" slug=team.slug %}">{% trans "Team Settings" %}</a>
         </li>

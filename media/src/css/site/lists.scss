@@ -9,6 +9,10 @@ ul.bullet {
     list-style-position: inside;
 }
 
+li.header {
+    font-weight: $font-weight-bold;
+}
+
 ul.activity {
     li {
         padding: 10px 0;
@@ -95,4 +99,10 @@ ul.thumb-list {
         display: inline;
         margin-bottom: 0;
     }
+}
+
+.list-subheader {
+    // Subheader that splits up a list.  We normally use <h5> for this.
+    color: $darkish-gray;
+    padding: 10px 0;
 }

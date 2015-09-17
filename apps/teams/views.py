@@ -1187,7 +1187,7 @@ def accept_invite(request, invite_pk, accept=True):
     try:
         if accept:
             invite.accept()
-            return redirect(reverse("teams:videos", kwargs={"slug": invite.team.slug}))
+            return redirect(reverse("teams:dashboard", kwargs={"slug": invite.team.slug}))
         else:
             invite.deny()
             return redirect(request.META.get('HTTP_REFERER', '/'))

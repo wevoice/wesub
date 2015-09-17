@@ -26,6 +26,10 @@ p {
     padding: 0 0 $line-height 0;
 }
 
+.small {
+    font-size: $small-font-size;
+}
+
 strong {
     font-weight: $font-weight-bold;
 }
@@ -72,7 +76,7 @@ h5 {
 }
 
 h6 {
-    font-size: 14px;
+    font-size: inherit;
     font-weight: bold;
 }
 
