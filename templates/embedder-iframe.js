@@ -11,10 +11,11 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	var iframeDomain = '';
 	var absoluteURL = new RegExp('^(?:[a-z]+:)?//', 'i');
 	var resize = function(index, width, height) {
-            if (iframes[index].style.visibility == "visible")
+	    if (iframes[index].style.visibility == "visible")
                 iframes[index].parentNode.style.height = "";
 	    var w = width;
-	    if (iframes[index].parentNode && iframes[index].parentNode.parentNode && (iframes[index].parentNode.parentNode.clientWidth < width)) {
+	    if (iframes[index].dataset.resizable && (iframes[index].dataset.resizable == "true") &&
+		iframes[index].parentNode && iframes[index].parentNode.parentNode && (iframes[index].parentNode.parentNode.clientWidth < width)) {
 		width =  iframes[index].parentNode.parentNode.clientWidth;
 		height = parseInt((height - 37) * width / w) + 37;
 		iframes[index].contentWindow.postMessage({resize: true, width: width, height: (height - 37)}, iframeDomain);
@@ -90,6 +91,8 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		iframe.style.overflow = "hidden";
 		iframe.scrolling = "no";
 		iframe.style.opacity = 0;
+		if (currentDiv.dataset.resizable)
+		    iframe.dataset.resizable = currentDiv.dataset.resizable;
 		currentDiv.appendChild(iframe);
 		loadingDivs.push(loadingDiv);
 		iframes.push(iframe);
