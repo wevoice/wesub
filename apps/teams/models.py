@@ -484,9 +484,12 @@ class Team(models.Model):
               the team
             - "invitation" -- user must be invited to join
             - "already-joined" -- user has already joined the team
+            - "login" -- user needs to login first
             - None -- user can't join the team
         """
-        if self.user_is_member(user):
+        if not user.is_authenticated():
+            return 'login'
+        elif self.user_is_member(user):
             return 'already-joined'
         elif self.is_open():
             return 'open'
