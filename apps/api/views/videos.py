@@ -76,7 +76,7 @@ Creating Videos
     :<json video_url: The url for the video. Any url that Amara accepts will 
         work here. You can send the URL for a file (e.g.
         http:///www.example.com/my-video.ogv), or a link to one of our
-        accepted providers (youtube, vimeo, dailymotion, blip.tv)
+        accepted providers (youtube, vimeo, dailymotion)
     :<json title: title of the video
     :<json description: About this video
     :<json duration: Duration in seconds
