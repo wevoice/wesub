@@ -662,12 +662,6 @@ class Action(object):
         if self.complete is not None:
             subtitle_language.subtitles_complete = self.complete
             subtitle_language.save()
-            # In case an action requiring building a billing record
-            # was performed with incomplete subtitles
-            tip = subtitle_language.get_public_tip()
-            if tip:
-                from teams.models import BillingRecord
-                BillingRecord.objects.insert_record(tip)
 
     def editor_data(self):
         """Get a dict of data to pass to the editor for this action."""
