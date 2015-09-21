@@ -166,15 +166,6 @@ class DailymotionVideoTypeTest(TestCase):
         self.assertFalse(self.vt.matches_video_url(''))
         self.assertFalse(self.vt.matches_video_url('http://www.dailymotion.com'))
 
-    def test_type1(self):
-        url = u'http://www.dailymotion.com/video/edit/xjhzgb_projet-de-maison-des-services-a-fauquembergues_news'
-        vt = self.vt(url)
-        try:
-            vt.get_metadata(vt.videoid)
-            self.fail('This link should return wrong response')
-        except VideoTypeError:
-            pass
-
 class FLVVideoTypeTest(TestCase):
     def setUp(self):
         self.vt = FLVVideoType
