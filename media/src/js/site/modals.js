@@ -56,7 +56,7 @@ $document.ready(function() {
         var link = $(this);
         var modal = $('#' + link.data('modal'));
 
-        $link.bind('click', function(e) {
+        link.bind('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             modal.openModal();
