@@ -44,11 +44,7 @@
 		width = model.get("width");
 	    else
 		width = _$(".amara-tools").width();
-	    var height;
-	    if (model && model.get("height"))
-		height = model.get("height") + 37;
-	    else
-		height = _$(".amara-popcorn").height() + _$(".amara-tools").height();
+	    var height = _$(".amara-popcorn").height() + _$(".amara-tools").height();
 	    hostPage.source.postMessage({resize: true, index: hostPage.index,
 					 width: width,
 					 height: height,
