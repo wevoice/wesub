@@ -33,58 +33,6 @@ class BlipTvVideoType(VideoType):
     name = 'Blip.tv'  
     site = 'blip.tv'
 
-    pattern = re.compile(r"^https?://blip.tv/(?P<subsite>[a-zA-Z0-9-]+)/(?P<file_id>[a-zA-Z0-9-]+)/?$")
-    
-    def __init__(self, url):
-        self.url = url
-        self.subsite, self.file_id = self._parse_url()
-        self.json = self._fetch_json()
-    
-    def convert_to_video_url(self):
-        return "http://blip.tv/%s/%s" % (self.subsite, self.file_id)
-
-    @property
-    def video_id(self):
-        if self.json and 'embedLookup' in self.json:
-            return self.json['embedLookup']
-        else:
-            return None
-
     @classmethod
     def matches_video_url(cls, url):
-        return cls.pattern.match(url)
-
-    def set_values(self, video_obj):
-        json = self.json
-
-        if 'title' in json:
-            video_obj.title = unicode(json['title'])
-        
-        if 'description' in json:
-            video_obj.description = unicode(json['description'])
-
-        if 'media' in json:
-            video_obj.duration = int(json['media']['duration'])
-
-        if 'thumbnailUrl' in json:
-            video_obj.thumbnail = json['thumbnailUrl']
-
-    def _parse_url(self):
-        matches = self.pattern.match(self.url).groupdict()
-        return matches['subsite'], matches['file_id']
-
-    def _fetch_json(self):
-        # bliptv just knows how to return jsonp. argh.
-        url = self.url + "?skin=json&callback="
-
-        try:
-            jsonp = urllib2.urlopen(url).read().strip()
-        except Exception:
-            return {}
-
-        # strip the json parentesis. argh.
-        if jsonp.endswith(');'):
-            jsonp = jsonp[1:-2]
-
-        json = simplejson.loads(jsonp)
-        return json[0].get('Post', {}) if len(json) > 0 else None
+        return False

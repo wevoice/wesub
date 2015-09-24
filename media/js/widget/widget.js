@@ -139,9 +139,6 @@ unisubs.widget.Widget.prototype.findVideoSource_ = function() {
     }
 };
 unisubs.widget.Widget.prototype.isVideoSourceImmediatelyUsable_ = function() {
-    if (this.videoSource_ instanceof unisubs.player.BlipTVPlaceholder) {
-        return false;
-    }
     if (this.forceFormat_ || goog.isDefAndNotNull(this.alternateVideoURLs_)) {
         return true;
     } else {
@@ -199,13 +196,6 @@ unisubs.widget.Widget.prototype.addWidget_ = function(el) {
         this.videoSource_.getVideoURL());
 };
 unisubs.widget.Widget.prototype.showWidgetError_ = function() {
-    // call to show_widget timed out.
-    if (!this.isVideoSourceImmediatelyUsable_()) {
-        // waiting for video source from server.
-        if (!this.videoSource_ instanceof unisubs.player.BlipTVPlaceholder) {
-            this.createVideoPlayer_(this.videoSource_);
-        }
-    }
     if (this.videoTab_) {
         this.videoTab_.showError();
     }

@@ -683,8 +683,9 @@ class SubtitlesView(generics.CreateAPIView):
         if not workflow.user_can_edit_subtitles(
             self.request.user, self.kwargs['language_code']):
             raise PermissionDenied()
+        version = super(SubtitlesView, self).create(request, *args, **kwargs)
         videos.tasks.video_changed_tasks.delay(video.pk)
-        return super(SubtitlesView, self).create(request, *args, **kwargs)
+        return version
 
 class ActionsSerializer(serializers.Serializer):
     action = serializers.CharField(source='name')

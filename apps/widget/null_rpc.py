@@ -21,7 +21,6 @@ from django.conf.global_settings import LANGUAGES
 from utils.translation import get_user_languages_from_request
 from videos import models
 from videos.types import video_type_registrar
-from videos.types.bliptv import BlipTvVideoType
 from widget.base_rpc import BaseRpc
 from subtitles import models as subs_models
 
@@ -48,10 +47,7 @@ class NullRpc(BaseRpc):
         if request.user.is_authenticated():
             return_value['username'] = request.user.username
         video_type = video_type_registrar.video_type_for_url(video_url)
-        if isinstance(video_type, BlipTvVideoType):
-            video_urls = video_type.scrape_best_file_url()
-        else:
-            video_urls = [video_url]
+        video_urls = [video_url]
         return_value['video_urls'] = video_urls
         return_value['drop_down_contents'] = []
         return_value['my_languages'] = ['en'];

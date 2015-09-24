@@ -16,13 +16,17 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import httplib
 import json
+import logging
 import re
 
 from django.utils.translation import ugettext_lazy as _
+import requests
+from requests.exceptions import RequestException
 
 from base import VideoType, VideoTypeError
+
+logger = logging.getLogger(__name__)
 
 DAILYMOTION_REGEX = re.compile(r'https?://(?:[^/]+[.])?dailymotion.com/video/(?P<video_id>[-0-9a-zA-Z]+)(?:_.*)?')
 
@@ -65,14 +69,12 @@ class DailymotionVideoType(VideoType):
     @classmethod
     def get_metadata(cls, video_id):
         #FIXME: get_metadata is called twice: in matches_video_url and set_values
-        conn = httplib.HTTPConnection("www.dailymotion.com")
-        conn.request("GET", "/json/video/" + video_id)
+        url = "https://api.dailymotion.com/video/{}".format(video_id)
         try:
-            response = conn.getresponse()
-            body = response.read()
-            try:
-                return json.loads(body)
-            except ValueError:
-                raise VideoTypeError(_(u'Video is unavailable'))
-        except httplib.BadStatusLine:
+            response = requests.get(url, params={
+                'fields': 'id,title,description,thumbnail_url'
+            })
+            return response.json
+        except RequestException, e:
+            logger.warn("Error requesting dailymotion metadata: {}", e)
             return {}
