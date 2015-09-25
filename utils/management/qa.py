@@ -1,3 +1,6 @@
+import itertools
+import logging
+import mock
 import string
 import random
 
@@ -6,13 +9,19 @@ from django.core.management.base import BaseCommand
 from django.template.defaultfilters import slugify
 
 from auth.models import CustomUser as User
+from externalsites.google import VideoInfo
 from utils.factories import *
 
 class QASetupCommand(BaseCommand):
     """Base class for setting up data for QA testing """
     def handle(self, *args, **kwargs):
         settings.EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+        self.video_counter = itertools.count(1)
+        self.set_log_level()
         self.setup()
+
+    def set_log_level(self):
+        logging.getLogger().setLevel(logging.WARN)
 
     def printout(self, string):
         self.stdout.write(string + "\n")
@@ -81,7 +90,15 @@ class QASetupCommand(BaseCommand):
     def create_video(self, team=None):
         url = ('https://www.youtube.com/watch?v=dQw4w9WgXcQ&foo=' +
                ''.join(random.choice(string.letters) for i in range(10)))
-        video = YouTubeVideoFactory(video_url__url=url)
+        # use mock.patch to skip the API query to youtube
+        with mock.patch('externalsites.google.get_video_info') as mocker:
+            mocker.return_value = VideoInfo(
+                channel_id=u'UC38IQsAvIsxxjztdMZQtwHA',
+                title=u'Test video #{}'.format(self.video_counter.next()),
+                description=u'Created for QA Testing',
+                duration=213,
+                thumbnail_url=u'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg')
+            video = YouTubeVideoFactory(video_url__url=url)
         if team is not None:
             TeamVideoFactory(video=video, team=team)
         return video
