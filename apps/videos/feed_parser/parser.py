@@ -166,7 +166,7 @@ class LinkFeedEntryParser(BaseFeedEntryParser):
     """
     This feed entry parser just check "link" atribute of entry.
     So this works for sites witch are supported by UniSub.
-    For example: Youtube, Vimeo, Blip.Tv.
+    For example: Youtube, Vimeo.
     For development can use these links:
     https://gdata.youtube.com/feeds/api/users/universalsubtitles/uploads
     """

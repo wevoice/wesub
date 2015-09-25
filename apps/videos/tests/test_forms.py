@@ -37,7 +37,7 @@ class TestVideoForm(TestCase):
         self.vimeo_urls = ("http://vimeo.com/17853047",)
         self.youtube_urls = ("http://youtu.be/HaAVZ2yXDBo",
                              "http://www.youtube.com/watch?v=HaAVZ2yXDBo")
-        self.html5_urls = ("http://blip.tv/file/get/Miropcf-AboutUniversalSubtitles715.mp4",)
+        self.html5_urls = ("http://www.jplayer.org/video/m4v/Big_Buck_Bunny_Trailer.m4v",)
         self.daily_motion_urls = ("http://www.dailymotion.com/video/xb0hsu_qu-est-ce-que-l-apache-software-fou_tech",)
 
     def _test_urls(self, urls):

@@ -33,7 +33,6 @@ function markdownToHTML(text) {
     var replacements = [
         { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "<b>$2</b>" },
         { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "<i>$2</i>" },
-        { match: /(_)([^_]+)(_{1})/g, replaceWith: "<u>$2</u>" },
         { match: /(\r\n|\n|\r)/gm, replaceWith: "<br />" },
         { match: / {2}/g, replaceWith: "&nbsp;&nbsp;" }
     ];
@@ -56,8 +55,7 @@ function markdownToPlaintext(text) {
 
     var replacements = [
         { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "$2" },
-        { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "$2" },
-        { match: /(_)([^_]+)(_{1})/g, replaceWith: "$2" }
+        { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "$2" }
     ];
 
     for (var i = 0; i < replacements.length; i++) {
@@ -211,8 +209,7 @@ var AmaraDFXPParser = function() {
 
     var MARKUP_REPLACE_SEQ = [
         [/(\*\*)([^\*]+)(\*\*)/g, '<span tts:fontWeight="bold">$2</span>'],
-        [/(\*)([^\*]+)(\*{1})/g, '<span tts:fontStyle="italic">$2</span>'],
-        [/(_)([^_]+)(_{1})/g, '<span tts:textDecoration="underline">$2</span>']
+        [/(\*)([^\*]+)(\*{1})/g, '<span tts:fontStyle="italic">$2</span>']
     ];
 
     var that = this;
