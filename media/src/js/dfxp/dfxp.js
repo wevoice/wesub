@@ -33,7 +33,9 @@ function markdownToHTML(text) {
     var replacements = [
         { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "<b>$2</b>" },
         { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "<i>$2</i>" },
-        { match: /(_)([^_]+)(_{1})/g, replaceWith: "<u>$2</u>" },
+        // For now, we just take out underline syntax, but we could
+        // improve it (issue 583)
+        // { match: /(_)([^_]+)(_{1})/g, replaceWith: "<u>$2</u>" },
         { match: /(\r\n|\n|\r)/gm, replaceWith: "<br />" },
         { match: / {2}/g, replaceWith: "&nbsp;&nbsp;" }
     ];
