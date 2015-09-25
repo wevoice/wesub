@@ -151,8 +151,9 @@ class EditUserForm(forms.ModelForm):
 
 
 class EditAccountForm(forms.ModelForm):
-    current_password = forms.CharField(widget=forms.PasswordInput, required=False)
     new_password = forms.CharField(widget=forms.PasswordInput, required=False)
+    current_password = forms.CharField(widget=forms.PasswordInput,
+                                       required=False)
     new_password_verify = forms.CharField(widget=forms.PasswordInput,
                                           required=False,
                                           label=_(u'Confirm new password:'))
@@ -165,15 +166,20 @@ class EditAccountForm(forms.ModelForm):
         model = User
         fields = ('username', 'email', 'notify_by_email', 'notify_by_message')
 
-    def clean(self):
-        self.cleaned_data = super(EditAccountForm, self).clean()
-        current, new, verify = map(self.cleaned_data.get,
-                    ('current_password', 'new_password', 'new_password_verify'))
-        if current and not self.instance.check_password(current):
-            raise forms.ValidationError(_(u'Invalid password.'))
+    def clean_current_password(self):
+        password = self.cleaned_data.get('current_password')
+        if password and not self.instance.check_password(password):
+            raise forms.ValidationError(_(u'Invalid password'))
+        elif not password and self.cleaned_data.get('new_password'):
+            raise forms.ValidationError(_(u'Must specify current password'))
+        return password
+
+    def clean_new_password_verify(self):
+        new = self.cleaned_data.get('new_password')
+        verify = self.cleaned_data.get('new_password_verify')
         if new and new != verify:
-            raise forms.ValidationError(_(u'The two passwords did not match.'))
-        return self.cleaned_data
+            raise forms.ValidationError(_(u"Passwords don't match"))
+        return verify
 
     def save(self, commit=True):
         password = self.cleaned_data.get('new_password')
