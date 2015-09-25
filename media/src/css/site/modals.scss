@@ -19,6 +19,27 @@ aside.modal {
         display: block;
     }
 
+    button.close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 5px;
+        color: $white;
+        background: $darkish-gray;
+        border: 0;
+        font: normal normal normal 18px/1 FontAwesome;
+        min-width: 18px;
+        text-align: center;
+        cursor: pointer;
+
+        &:after {
+            content: "\f00d";
+        }
+
+        &:hover {
+            background: $medium-gray;
+        }
+    }
 
     p {
         margin-bottom: 20px;
@@ -54,6 +75,11 @@ aside.modal {
             background: $primary;
         }
 
+        &.delete {
+            float: left;
+            background: $red;
+        }
+
         &.link-style {
             background: none;
             color: #4398C5;
@@ -67,7 +93,7 @@ aside.modal {
 }
 
 .modal-overlay {
-    position: absolute;
+    position: fixed;
     left: 0;
     right: 0;
     top: 0;

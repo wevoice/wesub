@@ -20,16 +20,27 @@
 
 var $document = $(document);
 
-$.fn.openModal = function() {
+$.fn.openModal = function(openEvent, setupData) {
     this.each(function() {
         var modal = $(this);
+        if(setupData) {
+            setupModal(modal, setupData);
+        }
         var closeButton = $('button.close', modal);
 
         modal.addClass('shown');
         $('body').append('<div class="modal-overlay"></div>');
         closeButton.bind('click.modal', onClose);
+        modal.trigger('open');
+
         $document.bind('click.modal', function(evt) {
-            if($(evt.target).closest('aside.modal').length == 0) {
+            if(openEvent && evt.timeStamp <= openEvent.timeStamp) return;
+            var clickedModal = $(evt.target).closest('aside.modal');
+            if(clickedModal.length == 0) {
+                // click outside the modal
+                onClose(evt);
+            } else if($(evt.target).closest('button.close', clickedModal).length > 0) {
+                // click on the close button
                 onClose(evt);
             }
         });
@@ -41,27 +52,60 @@ $.fn.openModal = function() {
 
         function onClose(evt) {
             evt.preventDefault();
-            evt.stopPropagation();
             modal.removeClass('shown');
             $('body div.modal-overlay').remove();
             closeButton.unbind('click.modal');
             $document.unbind('click.modal');
             $document.unbind('keydown.modal');
+            modal.trigger('close');
         }
     });
+
+    function setupModal(modal, setupData) {
+        if(setupData['clear-errors']) {
+            $('ul.errorlist', modal).remove();
+        }
+        if(setupData['heading']) {
+            $('h3', modal).text(setupData['heading']);
+        }
+        if(setupData['text']) {
+            $('.text', modal).text(setupData['text']);
+        }
+        if(setupData['setFormValues']) {
+            $.each(setupData['setFormValues'], function(name, value) {
+                $('*[name=' + name + ']', modal).val(value);
+            });
+        }
+        if(setupData['copyInput']) {
+            var inputName = setupData['copyInput'];
+            var form = $('form', modal);
+            // Delete any inputs added before
+            $('input[name=' + inputName + '].copied', form).remove();
+            // Copy any inputs outside of forms into the modal
+            $('input[name=' + inputName + ']')
+                .not(':checkbox:not(:checked)').each(function() {
+                    var input = $(this);
+                    if(input.closest("form").length > 0) {
+                        return;
+                    }
+                    input.clone().attr('type', 'hidden').addClass('copied').appendTo(form);
+                });
+        }
+    }
 }
 
 $document.ready(function() {
-    $('a.open-modal').each(function() {
+    $('.open-modal').each(function() {
         var link = $(this);
         var modal = $('#' + link.data('modal'));
 
         link.bind('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
-            modal.openModal();
+            modal.openModal(e, link.data());
         });
     });
+
+    $('aside.modal.start-open').openModal();
 });
 
 })();

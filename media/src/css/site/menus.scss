@@ -1,6 +1,62 @@
+ul.dropdown {
+    @extend %floating;
+    color: $dark-gray;
+
+    li {
+        float: none;
+
+        a {
+            display: block;
+            padding: 6px 20px;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        &.separator {
+            border-top: 1px solid $light-gray;
+        }
+
+        &:hover {
+            background-color: lighten($primary, 10);
+            color: $white;
+        }
+    }
+
+    .count {
+        float: right;
+        margin-left: 10px;
+    }
+}
+
 nav {
     @extend .content;
 
+    // styles for all links
+    a {
+        color: $darkish-gray;
+
+        img {
+            height: 25px;
+        }
+
+        &:hover {
+            text-decoration: none;
+            background-color: lighten($primary, 10);
+            color: $white;
+        }
+
+        &.home {
+            padding: 10px 0 0 0;
+            margin-right: 5px;
+
+            &:hover {
+                background-color: inherit;
+                color: $darkish-gray;
+            }
+        }
+    }
+
+    // styles for top-level links
     > a {
         padding-top: 10px;
         display: block;
@@ -20,7 +76,6 @@ nav {
     li {
         display: block;
         float: left;
-        position: relative;
 
         a {
             padding: 10px 15px;
@@ -55,7 +110,12 @@ nav {
         z-index: $z-index-menu;
     }
     .burger {
+        position: absolute;
+        right: 10px;
+        top: 0;
         text-align: right;
+        z-index: $z-index-menu;
+
         @include not-small-screen {
             display: none;
         }
@@ -73,45 +133,11 @@ nav {
 
     nav a.menu-toggle.open {
         background: lighten($primary, 10);
-        color: $white !important;
-    }
-
-    nav ul ul {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 200px;
-        background: $off-white;
-        box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.3);
-        border: 1px solid $light-gray;
-        z-index: $z-index-menu;
-
-        li {
-            float: none;
-
-            a {
-                display: block;
-                padding: 6px 20px;
-            }
-
-            &.separator {
-                border-top: 1px solid $light-gray;
-            }
-        }
-
-        .count {
-            float: right;
-        }
+        color: $white;
     }
 
     nav ul.right ul {
         left: auto;
-        right: 0;
-    }
-
-    #user-menu {
-        right: 0;
     }
 }
 @include small-screen {

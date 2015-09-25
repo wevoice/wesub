@@ -1,0 +1,20 @@
+{% extends "new-teams/base.html" %}
+
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+
+<h2>{% trans "Invite members" %}</h2>
+<form method="post" action="" class="team-invite">
+  {% csrf_token %}
+  {% include "_field.html" with field=form.username %}
+  {% include "_field.html" with field=form.message %}
+  {% include "_field.html" with field=form.role %}
+
+  <div class="actions">
+    <button class="submit">{% trans "Invite" %}</button>
+  </div>
+</form>
+
+{% endblock %}

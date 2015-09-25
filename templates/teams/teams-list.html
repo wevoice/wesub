@@ -80,7 +80,7 @@
                             </strong>
                             {{ team|user_role:user }}
                             {% if team|can_leave_team:user %}
-                                (<a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url "teams:leave_team" team.slug %}">{% trans "leave team" %}</a>)
+                                (<a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url "teams:leave" team.slug %}">{% trans "leave team" %}</a>)
                             {% endif %}
                         </p>
                     {% endif %}

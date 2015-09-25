@@ -46,6 +46,7 @@ class MessageTest(TestCase):
         self.user = UserFactory()
         mail.outbox = []
 
+
     def _create_message(self, to_user, message_type='M', reply_to=None):
         self.message = Message(user=to_user,
                            author=self.author,
@@ -336,7 +337,7 @@ class MessageTest(TestCase):
         mail.outbox = []
         message = "Will you be my valentine?"
         f = InviteForm(user=owner.user, team=team,data={
-            "user_id":applying_user.id,
+            'username': applying_user.username,
             "role":"admin",
             "message": message,
         })
@@ -371,7 +372,7 @@ class MessageTest(TestCase):
         team = Team.objects.create(name='test-team', slug='test-team', membership_policy=Team.APPLICATION)
 
         invite_form = InviteForm(team, owner, {
-            'user_id': user.pk,
+            'username': user.username,
             'message': 'Subtitle ALL the things!',
             'role':'contributor',
         })

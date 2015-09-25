@@ -1,0 +1,22 @@
+{% extends "new-base.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+
+<h1>{% blocktrans %}Admins for {{ team }} Team{% endblocktrans %}</h1>
+
+<table>
+  <tr>
+    <th>{% trans "User" %}</th>
+    <th>{% trans "Email" %}</th>
+  </tr>
+{% for member in admins %}
+  <tr>
+    <td>{{ member.user.username}}</td>
+    <td><a href="{{ member.user.email }}">{{ member.user.email }}</a></td>
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}
+

@@ -16,7 +16,10 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from collections import namedtuple
+
 from django.utils.translation import ugettext as _
+
 from teams.models import Team, MembershipNarrowing, Workflow, TeamMember, Task
 from teams.permissions_const import (
     ROLES_ORDER, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_ADMIN, ROLE_MANAGER,
@@ -138,6 +141,28 @@ def roles_user_can_assign(team, user, to_user=None):
         return ROLES_ORDER[2:]
     else:
         return []
+
+EDIT_MEMBER_NOT_PERMITTED = 1
+EDIT_MEMBER_CANT_EDIT_ADMIN = 2
+EDIT_MEMBER_ALL_PERMITTED = 3
+
+def get_edit_member_permissions(member):
+    """Figure out what how one team member can edit another user's membership
+
+    Here are the rules:
+        - Owners can edit any TeamMember, except promote users to owners.
+        - Admins can edit any non-admin TeamMember, except they cannot promote
+          them to admin/ower.
+        - Other roles can't edit TeamMembers
+
+    Returns: one of the EDIT_MEMBER_* values
+    """
+    if member.role == ROLE_OWNER:
+        return EDIT_MEMBER_ALL_PERMITTED
+    elif member.role == ROLE_ADMIN:
+        return EDIT_MEMBER_CANT_EDIT_ADMIN
+    else:
+        return EDIT_MEMBER_NOT_PERMITTED
 
 def roles_user_can_invite(team, user):
     """Return a list of the roles the given user can invite for the given team.
@@ -287,6 +312,12 @@ def can_assign_role(team, user, role, to_user):
     """
     return role in roles_user_can_assign(team, user, to_user)
 
+def can_change_project_managers(team, user):
+    return team.get_member(user).is_admin()
+
+def can_change_language_managers(team, user):
+    return team.get_member(user).is_admin()
+
 def can_join_team(team, user):
     """Return whether the given user can join a team.
 
@@ -355,6 +386,15 @@ def can_move_videos(team, user):
     role = get_role_for_target(user, team, None, None)
     return role in [ROLE_ADMIN, ROLE_OWNER]
 
+def can_move_videos_to(current_team, user):
+    if not can_move_videos(current_team, user):
+        return []
+    qs = (TeamMember.objects.admins()
+          .filter(user=user)
+          .exclude(team=current_team)
+          .select_related('team'))
+    return [m.team for m in qs]
+
 def can_sort_by_primary_language(team, user):
     return team.slug != "ted"
 
@@ -387,6 +427,19 @@ def can_remove_video(team_video, user):
         2: ROLE_MANAGER,
         3: ROLE_ADMIN,
     }[team_video.team.video_policy]
+
+    return role in _perms_equal_or_greater(role_required)
+
+def can_remove_videos(team, user):
+    """Return whether the given user can remove the given team video."""
+
+    role = get_role_for_target(user, team)
+
+    role_required = {
+        1: ROLE_CONTRIBUTOR,
+        2: ROLE_MANAGER,
+        3: ROLE_ADMIN,
+    }[team.video_policy]
 
     return role in _perms_equal_or_greater(role_required)
 
@@ -424,6 +477,18 @@ def can_edit_video(team_video, user):
 
     return role in _perms_equal_or_greater(role_required)
 
+def can_edit_videos(team, user):
+    """Return whether the given user can edit the given video."""
+
+    role = get_role_for_target(user, team)
+
+    role_required = {
+        1: ROLE_CONTRIBUTOR,
+        2: ROLE_MANAGER,
+        3: ROLE_ADMIN,
+    }[team.video_policy]
+
+    return role in _perms_equal_or_greater(role_required)
 
 def can_view_settings_tab(team, user):
     """Return whether the given user can view (and therefore edit) the team's settings.

@@ -1,0 +1,208 @@
+{% extends "new-teams/base.html" %}
+
+{% load i18n videos_tags %}
+{% load url from future %}
+
+{% block content %}
+<h2>{% blocktrans %}Videos for {{ team }}{% endblocktrans %}</h2>
+<div class="split-view">
+  <div class="sidebar">
+    <div class="section filters">
+      <h5>{% trans "Filter and Sort" %}</h5>
+      <form method="GET" action="">
+        {% include "_field.html" with field=filters_form.q %}
+        {% if filters_form.show_project %}
+        {% include "_field.html" with field=filters_form.project %}
+        {% endif %}
+        {% include "_field.html" with field=filters_form.sort %}
+
+        <div class="actions">
+          <button class="submit">Filter</button>
+        </div>
+      </form>
+    </div>
+
+    {% if forms.add.enabled %}
+    <div class="section tools">
+      {% if forms.add.enabled %}
+      <button class="open-modal" data-modal="add-form">{% trans "Add Video" %}</button>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  <div class="main">
+    {% if filters_form.is_filtered %}
+    <div class="current-filter-list">
+      <ul>
+        {% for filter_label in filters_form.get_current_filters %}
+        <li>{{ filter_label }}</li>
+        {% endfor %}
+        <li class="reset"><a href="{% url "teams:videos" team.slug %}">{% trans "Clear filters" %}</a></li>
+      </ul>
+    </div>
+    {% endif %}
+    {% if page %}
+    {% if bulk_mode_enabled %}
+    <div class="select-all-thumbs"><label><input type="checkbox"> {% trans "Select all" %}</label></div>
+    {% endif %}
+    <ul class="thumb-list{% if bulk_mode_enabled %} bulk-mode{% endif %}">
+      {% for team_video in team_videos %}
+      {% with video=team_video.video %}
+      <li>
+        <div class="thumb">
+          <img src="{{ video.get_wide_thumbnail }}" alt="{{ video.title_display }}">
+          {% if video.duration %}<div class="badge">{{ video.duration|format_duration }}</div>{% endif %}
+          {% if bulk_mode_enabled %}
+          <input class="selection" type="checkbox" name="team_videos" value="{{ team_video.id }}">
+          {% endif %}
+        </div>
+        <div class="extra-info">{{ video.get_primary_audio_language_code_display }}</div>
+        <h6 class="one-line">
+          <a href="{% url "videos:video" video_id=video.video_id %}">{{ video.title_display }}</a>
+        </h6>
+        {% with description=video.description|urlize|linebreaks %}
+        {% if forms.edit.enabled %}
+        <div class="three-lines">{{ description }}</div>
+        <button class="open-modal" data-modal="edit-form" data-heading="{% blocktrans with title=video.title_display %}Edit Team Video: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}, "primary_audio_language": "{{ video.primary_audio_language_code }}", "project": "{{team_video.project_id }}" }'>{% trans "edit" %}</button>
+        {% else %}
+        <div class="four-lines">{{ description }}</div>
+        {% endif %}
+        {% endwith %}
+      </li>
+      {% endwith %}
+      {% endfor %}
+    </ul>
+    {% include "_new_paginator.html" %}
+    <div class="total-count">
+      {% if results_are_filtered %}
+      {% blocktrans with count=paginator.count %}{{ count }} matching videos{% endblocktrans %}
+      {% else %}
+      {% blocktrans with count=paginator.count %}{{ count }} total videos{% endblocktrans %}
+      {% endif %}
+    </div>
+    {% else %}
+    <p class="empty">{% trans "No Videos found" %}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom %}
+{% if bulk_mode_enabled %}
+<div class="bottom-sheet" data-title-singular="{% trans "1 videos selected" %}" data-title-plural="{% blocktrans with count="COUNT_PLACEHOLDER" %}{{ count }} videos selected{% endblocktrans %}">
+  {% if forms.bulk_edit.enabled %}
+  <button class="needs-multiple-selected open-modal" data-modal="bulk-edit-form" data-copy-input="team_videos">{% trans "Bulk Edit" %}</button>
+  {% endif %}
+  {% if forms.move.enabled %}
+  <button class="open-modal" data-modal="move-form" data-copy-input="team_videos">{% trans "Move" %}</button>
+  {% endif %}
+  {% if forms.remove.enabled %}
+  <button class="open-modal" data-modal="remove-form" data-copy-input="team_videos">{% trans "Remove" %}</button>
+  {% endif %}
+  <button class="dismiss deselect-all">{% trans "deselect all" %}</button>
+</div>
+{% endif %}
+
+{% if forms.add.enabled %}
+<aside class="modal{% if forms.add.errors %} start-open{% endif %}" id="add-form">
+  <h3>{% trans "Add Video" %}</h3>
+  <button class="close"></button>
+  <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include "_non-field-errors.html" with form=forms.add %}
+    <input type="hidden" name="form" value="add">
+    {% include "_field.html" with field=forms.add.video_url %}
+    {% include "_field.html" with field=forms.add.project %}
+    {% include "_field.html" with field=forms.add.thumbnail %}
+    <footer class="buttons">
+      <button>{% trans "Add" %}</button>
+    </footer>
+  </form>
+</aside>
+{% endif %}
+
+{% if forms.edit.enabled %}
+<aside class="modal{% if forms.edit.errors %} start-open{% endif %}" id="edit-form">
+  <h3></h3>
+  <button class="close"></button>
+  <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include "_non-field-errors.html" with form=forms.edit %}
+    <input type="hidden" name="form" value="edit">
+    {{ forms.edit.team_video.as_hidden }}
+    {% include "_field.html" with field=forms.edit.primary_audio_language %}
+    {% include "_field.html" with field=forms.edit.project %}
+    {% include "_field.html" with field=forms.edit.thumbnail %}
+    <footer class="buttons">
+      <button>{% trans "Update" %}</button>
+    </footer>
+  </form>
+</aside>
+{% endif %}
+
+{% if forms.bulk_edit.enabled %}
+<aside class="modal{% if forms.bulk_edit.errors %} start-open{% endif %}" id="bulk-edit-form">
+  <h3>{% trans "Bulk Edit Videos" %}</h3>
+  <button class="close"></button>
+  <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include "_non-field-errors.html" with form=forms.bulk_edit %}
+    <input type="hidden" name="form" value="bulk_edit">
+    {% include "_field.html" with field=forms.bulk_edit.primary_audio_language %}
+    {% include "_field.html" with field=forms.bulk_edit.project %}
+    {% include "_field.html" with field=forms.bulk_edit.thumbnail %}
+    <footer class="buttons">
+      <button>{% trans "Update" %}</button>
+    </footer>
+  </form>
+</aside>
+{% endif %}
+
+{% if forms.move.enabled %}
+<aside class="modal{% if forms.move.errors %} start-open{% endif %}" id="move-form">
+  <h3>{% trans "Move Videos" %}</h3>
+  <button class="close"></button>
+  <form class="team-bulk-move" action="" method="POST">
+    {% csrf_token %}
+    {% include "_non-field-errors.html" with form=forms.move %}
+    <input type="hidden" name="form" value="move">
+    {% include "_field.html" with field=forms.move.new_team %}
+
+    <label>
+      <span class="label">{{ forms.move.project.label }}</span>
+      {% include "_error-list.html" with errors=forms.move.project.errors %}
+      <select name="project">
+        {% for project_id, project_name, team_id in forms.move.project_options %}
+        <option value="{{ project_id }}" data-team="{{ team_id }}">{{ project_name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <div class="needs-all-selected">
+      {% include "_field.html" with field=forms.move.include_all %}
+    </div>
+
+    <footer class="buttons">
+      <button>{% trans "Move Videos" %}</button>
+    </footer>
+  </form>
+</aside>
+{% endif %}
+
+{% if forms.remove.enabled %}
+<aside class="modal{% if forms.remove.errors %} start-open{% endif %}" id="remove-form">
+  <h3>{% trans "Remove Videos" %}</h3>
+  <button class="close"></button>
+  <form action="" method="POST">
+    {% csrf_token %}
+    {% include "_non-field-errors.html" with form=forms.remove %}
+    <input type="hidden" name="form" value="remove">
+    <p class="confirmation">{% trans "Are you sure you want to remove the video(s) from your team?" %}</p>
+    <footer class="buttons">
+      <button>{% trans "Remove" %}</button>
+    </footer>
+  </form>
+</aside>
+{% endif %}
+
+{% endblock %}
