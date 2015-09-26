@@ -81,7 +81,7 @@ def compute_statistics(team, stats_type):
                 (strip_strings_chrome(ALL_LANGUAGES_DICT[l]),
                  languages_recent.count(l),
                  ALL_LANGUAGES_DICT[l],
-                 "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse('teams:detail_members', args=[], kwargs={'slug': team.slug}) + "?sort=-joined&lang=%s" % l))
+                 "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse('teams:members', args=[], kwargs={'slug': team.slug}) + "?sort=-joined&lang=%s" % l))
                 )
         title_recent = ''
         graph_recent = plot(numbers_recent, graph_type='HorizontalBar', title=title_recent, max_entries=25, labels=True, xlinks=True, total_label="Members: ")

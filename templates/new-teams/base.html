@@ -14,35 +14,36 @@
     <li>
         <a href="{% url "teams:dashboard" team.slug %}">{% trans "Dashboard" %}</a>
     </li>
-    {% for page in team.new_workflow.extra_pages %}
+    {% for page in team|extra_pages:request.user %}
     <li>
         <a href="{{ page.url }}">{{ page.title }}</a>
     </li>
     {% endfor %}
     <li>
-        <a href="{% url "teams:detail" team.slug %}">{% trans "Videos" %}</a>
+        <a href="{% url "teams:videos" team.slug %}">{% trans "Videos" %}</a>
     </li>
     <li>
-        <a href="{% url "teams:detail_members" team.slug %}">{% trans "Members" %}</a>
+        <a href="{% url "teams:members" team.slug %}">{% trans "Members" %}</a>
     </li>
     <li>
         <a href="{% url "teams:activity" team.slug %}">{% trans "Activity" %}</a>
     </li>
     {% if projects %}
     <li>
-      <a href="#" class="menu-toggle" data-menu="projects-menu">{% trans "Projects" %}</a>
-      <ul id="projects-menu">
+      <a href="#" class="menu-toggle">{% trans "Projects" %}</a>
+      <ul class="dropdown">
         {% for project in projects %}
         <li>
-        <a href="{% url "teams:detail" team.slug %}?project={{ project.slug }}">{{ project }} <span class="count">{{ project.videos_count }}</span></a>
+        <a href="{{ project.get_absolute_url }}">{{ project }} <span class="count">{{ project.videos_count }}</span></a>
         </li>
         {% endfor %}
       </ul>
     </li>
     {% endif %}
+    {% if team|can_view_settings_tab:user %}
     <li>
-      <a href="#" class="menu-toggle" data-menu="settings-menu">{% trans "Settings" %}</a>
-      <ul id="settings-menu">
+      <a href="#" class="menu-toggle">{% trans "Settings" %}</a>
+      <ul class="dropdown">
         <li>
           <a href="{% url "teams:settings_basic" slug=team.slug %}">{% trans "Team Settings" %}</a>
         </li>
@@ -52,11 +53,14 @@
         <li>
           <a href="{% url "teams:settings_workflows" slug=team.slug %}">{% trans "Workflow" %}</a>
         </li>
-        {% for page in team.new_workflow.extra_settings_pages %}
+      {% for page in team|extra_settings_pages:request.user %}
         <li>
           <a href="{{ page.url }}">{{ page.title }}</a>
         </li>
         {% endfor %}
+        <li>
+          <a href="{% url "teams:settings_feeds" slug=team.slug %}">{% trans "Video Feeds" %}</a>
+        </li>
         <li>
           <a href="{% url "teams:settings_projects" slug=team.slug %}">{% trans "Projects" %}</a>
         </li>
@@ -65,6 +69,7 @@
         </li>
       </ul>
     </li>
+    {% endif %}
   </ul>
   <ul class="right">
     <li>

@@ -43,6 +43,7 @@ Team workflows are responsible for:
 from collections import namedtuple
 
 from django.core.urlresolvers import reverse
+from django.shortcuts import render
 
 class TeamWorkflow(object):
     type_code = NotImplemented
@@ -76,22 +77,28 @@ class TeamWorkflow(object):
         """Get the SubtitleWorkflow for a video with this workflow.  """
         raise NotImplementedError()
 
-    def extra_pages(self):
+    def extra_pages(self, user):
         """Get extra team pages to handle this workflow.
 
         These pages will be listed as tabs in the team section.  Workflows
         will typically use this for things like dashboard pages.
+
+        Args:
+            user -- user viewing the page
 
         Returns:
             list of :class:`TeamPage` objects
         """
         return []
 
-    def extra_settings_pages(self):
+    def extra_settings_pages(self, user):
         """Get extra team settings pages to handle this workflow.
 
         This works just like extra_pages(), but the pages will show up as
         tabs under the settings section.
+
+        Args:
+            user -- user viewing the page
 
         Returns:
             list of :class:`TeamPage` objects
@@ -106,6 +113,25 @@ class TeamWorkflow(object):
         """
         url = reverse(view_name, kwargs={'slug': self.team.slug})
         return TeamPage(name, title,  url)
+
+    # these can be used to customize the content in the project/language
+    # manager pages
+    def render_project_page(self, request, team, project, page_data):
+        page_data['videos'] = (team.videos
+                             .filter(teamvideo__project=project)
+                             .order_by('-id'))[:5]
+
+        return render(request, 'new-teams/project-page.html', page_data)
+
+    def render_all_languages_page(self, request, team, page_data):
+        return render(request, 'new-teams/all-languages-page.html', page_data)
+
+    def render_language_page(self, request, team, language_code, page_data):
+        qs = (self.team.videos
+              .filter(primary_audio_language_code=language_code)
+              .order_by('-id'))
+        page_data['videos']= qs[:5]
+        return render(request, 'new-teams/language-page.html', page_data)
 
     _type_code_map = {}
 

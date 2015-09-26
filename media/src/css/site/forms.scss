@@ -1,10 +1,5 @@
 form {
-    padding-top: 20px;
     padding-bottom: 40px;
-
-    button {
-        @include button-color($medium-gray);
-    }
 
     button.submit {
         @include button-color($primary);
@@ -28,9 +23,8 @@ legend {
 }
 
 input, textarea, select {
-    font-size: $large-font-size;
-    box-sizing: border-box;
     width: 100%;
+    font-size: inherit;
     border: 1px solid $light-gray;
     padding: 4px;
     margin: 0;
@@ -74,6 +68,13 @@ label {
     display: block;
     padding: 0;
     margin: 0 0 $line-height/2 0;
+    font-size: inherit;
+}
+
+label label {
+    // This covers the nested labels inside a radio select
+    margin: $line-height / 4 10px;
+    font-size: inherit;
 }
 
 p.help {
@@ -84,13 +85,18 @@ p.help {
 }
 
 ul.errorlist {
-    display: inline-block;
     color: $error;
-
-    li {
-        margin-left: 5px;
-    }
 }
 
+.autocomplete {
+    position: absolute;
+    padding: 0 4px;
+    margin: 0;
+    border: 1px solid $light-gray;
+    background: $white;
+    z-index: $z-index-floating;
 
-
+    li {
+        padding: 3px 0;
+    }
+}

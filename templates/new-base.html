@@ -38,7 +38,7 @@
       <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
 
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
   {% media_bundle "new-base.css" %}
   {% media_bundle "new-site.js" %}
 
@@ -50,11 +50,7 @@
     {% announcement %}
     {% if user.is_authenticated %}
         {% messages %}
-        {% block email_confirmation_block %}
-            {% email_confirmation_notification %}
-        {% endblock %}
     {% endif %}
-    {% require_email_dialog %}
 
 <div id="header">
   {% block header %}{% include "new-header.html" %}{% endblock %}
@@ -78,8 +74,8 @@
 </div></div>
 <div id="footer">{% block footer %}{% include 'new-footer.html' %}{% endblock %}</div>
 
+{% block bottom %}{% endblock %}
 {% block bottom_scripts %}{% endblock %}
-
 {% include "_analytics.html" %}
 </body>
 </html>
