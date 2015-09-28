@@ -32,6 +32,9 @@ ul.activity {
         width: $height * 16 / 9;
         height: $height;
         line-height: $height;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }
 
