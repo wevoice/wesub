@@ -120,13 +120,14 @@ class UserSerializer(serializers.ModelSerializer):
         view_name='api:users-detail', lookup_field='username')
     created_by = serializers.CharField(source='created_by.username',
                                        read_only=True)
+    is_partner = serializers.BooleanField(required=False, read_only=True)
 
     class Meta:
         model = User
         fields = (
             'username', 'full_name', 'first_name', 'last_name', 'biography',
             'homepage', 'avatar', 'languages', 'num_videos', 'resource_uri',
-            'created_by',
+            'created_by', 'is_partner',
         )
 
     default_error_messages = {
@@ -165,6 +166,11 @@ class UserCreateSerializer(UserSerializer):
         'username-not-unique': 'Username not unique: {username}',
         'username-too-long': 'Username too long: {username}',
     }
+
+    def __init__(self, *args, **kwargs):
+        super(UserCreateSerializer, self).__init__(*args, **kwargs)
+        if self.context['request'].user.is_partner:
+            self.fields['is_partner'].read_only = False
 
     def validate(self, data):
         if data.get('find_unique_username'):
