@@ -52,14 +52,14 @@ class OldTeamWorkflow(TeamWorkflow):
         else:
             return TeamSubtitlesWorkflow(team_video)
 
-    def extra_pages(self):
+    def extra_pages(self, user):
         pages = [ ]
         if self.team.is_tasks_team():
             pages.append(self.team_page('tasks', _('Tasks'),
                                         'teams:team_tasks'))
         return pages
 
-    def extra_settings_pages(self):
+    def extra_settings_pages(self, user):
         return [
             self.team_page('languages', _('Languages'),
                             'teams:settings_languages')

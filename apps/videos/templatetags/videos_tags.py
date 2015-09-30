@@ -19,6 +19,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
 from django import template
 
 register = template.Library()
@@ -106,6 +107,9 @@ def format_duration(value):
     Based on a Template Tag by Dan Ward 2009 (http://d-w.me)
     Usage: {{ VALUE|format_duration }}
     """
+
+    if value is None:
+        return _("Unknown")
 
     # Place seconds in to integer
     secs = int(value)

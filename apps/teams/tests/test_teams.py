@@ -375,12 +375,12 @@ class TeamsTest(TestCase):
 
     def _tv_search_record_list(self, team):
         test_utils.update_team_video.run_original()
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
         return response.context['team_video_md_list']
 
     def _complete_search_record_list(self, team):
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
         return response.context['team_video_md_list']
 
@@ -389,8 +389,8 @@ class TeamsTest(TestCase):
         manager = UserFactory()
         TeamMemberFactory(team=team, user=manager)
 
-        join_url = reverse('teams:join_team', args=[team.slug])
-        leave_url = reverse('teams:leave_team', args=[team.slug])
+        join_url = reverse('teams:join', args=[team.slug])
+        leave_url = reverse('teams:leave', args=[team.slug])
 
         self.client.login(**self.auth)
 
@@ -525,7 +525,7 @@ class TeamsTest(TestCase):
 
         reset_solr()
 
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
 
         # The video should be in the list.
@@ -565,7 +565,7 @@ class TeamsTest(TestCase):
         team, new_team_video = self._create_new_team_video()
         reset_solr()
         self._set_my_languages('ko')
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.assertEqual(1, len(response.context['team_video_md_list']))
 
@@ -583,7 +583,7 @@ class TeamsTest(TestCase):
 
         reset_solr()
 
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.assertEqual(1, len(response.context['team_video_md_list']))
 
@@ -655,25 +655,25 @@ class TeamsTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
 
         #------------ detail ---------------------
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
 
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url, {'q': 'Lions'})
         self.failUnlessEqual(response.status_code, 200)
 
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
         response = self.client.get(url, {'q': 'empty result'})
         self.failUnlessEqual(response.status_code, 200)
 
         #------------ detail members -------------
 
-        url = reverse("teams:detail_members", kwargs={"slug": team.slug})
+        url = reverse("teams:members", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
 
-        url = reverse("teams:detail_members", kwargs={"slug": team.slug})
+        url = reverse("teams:members", kwargs={"slug": team.slug})
         response = self.client.get(url, {'q': 'test'})
         self.failUnlessEqual(response.status_code, 200)
 
@@ -750,12 +750,12 @@ class TeamsTest(TestCase):
         member.save()
 
         data = {
-            "user_id": user2.id,
+            "username": user2.username,
             "message": u"test message",
             "role": TeamMember.ROLE_CONTRIBUTOR,
         }
         user_mail_box_count = Message.objects.unread().filter(user=user2).count()
-        invite_url = reverse("teams:invite_members", args=(), kwargs={'slug': team.slug})
+        invite_url = reverse("teams:invite", args=(), kwargs={'slug': team.slug})
         response = self.client.post(invite_url, data, follow=True)
         self.failUnlessEqual(response.status_code, 200)
 
@@ -796,13 +796,14 @@ class TeamsTest(TestCase):
         self.client.login()
         TeamMember.objects.filter(user=self.user, team=team).delete()
         self.assertFalse(team.is_member(self.user))
-        url = reverse("teams:join_team", kwargs={"slug": team.slug})
+        url = reverse("teams:join", kwargs={"slug": team.slug})
         response = self.client.post(url)
         self.failUnlessEqual(response.status_code, 302)
         self.assertTrue(team.is_member(self.user))
 
     def test_fixes(self):
-        url = reverse("teams:detail", kwargs={"slug": 'slug-does-not-exist'})
+        url = reverse("teams:videos", kwargs={"slug": 'slug-does-not-exist'})
+        self.client.login(**self.auth)
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 404)
 
@@ -849,7 +850,8 @@ class TeamsTest(TestCase):
         team_video, _ = TeamVideo.objects.get_or_create(video=video, team=team,
                                                         added_by=self.user)
         test_utils.update_team_video.run_original()
-        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        url = reverse("teams:videos", kwargs={"slug": team.slug})
+        self.client.login(**self.auth)
         response = self.client.get(url + u"?q=" + title)
         videos = response.context['team_video_md_list']
 
@@ -1158,7 +1160,7 @@ class TestInvites(TestCase):
 
     def test_invite_invalid_after_accept(self):
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role':'contributor',
         })
@@ -1184,7 +1186,7 @@ class TestInvites(TestCase):
 
     def test_invite_invalid_after_deny(self):
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role':'contributor',
         })
@@ -1208,7 +1210,7 @@ class TestInvites(TestCase):
 
     def test_invite_after_removal(self):
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role': TeamMember.ROLE_MANAGER,
         })
@@ -1230,7 +1232,7 @@ class TestInvites(TestCase):
         self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
         # re-invite
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role': TeamMember.ROLE_CONTRIBUTOR,
         })
@@ -1246,7 +1248,7 @@ class TestInvites(TestCase):
     def test_invite_after_leaving(self):
         # user is invited
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role': TeamMember.ROLE_MANAGER,
         })
@@ -1270,7 +1272,7 @@ class TestInvites(TestCase):
         self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
 
         # user leaves team
-        url = reverse("teams:leave_team", args=(self.team.slug,))
+        url = reverse("teams:leave", args=(self.team.slug,))
         response  = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
@@ -1285,7 +1287,7 @@ class TestInvites(TestCase):
 
 
         invite_form = InviteForm(self.team, self.owner, {
-            'user_id': self.user.pk,
+            'username': self.user.username,
             'message': 'Subtitle ALL the things!',
             'role': TeamMember.ROLE_MANAGER,
         })
@@ -1361,7 +1363,7 @@ class TestApplication(TestCase):
 
 
     def _leave_team(self, user):
-        url = reverse("teams:leave_team", args=(self.team.slug,))
+        url = reverse("teams:leave", args=(self.team.slug,))
         self.client.post(url)
 
     def _remove_member(self, user):

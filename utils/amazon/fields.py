@@ -69,6 +69,8 @@ class S3ImageFieldFile(FieldFile):
 
         dest_image = scale_and_crop(image, size, crop='smart', upscale=True)
         dest_bytes = StringIO()
+        if dest_image.mode != "RGB":
+            dest_image = dest_image.convert("RGB")
         dest_image.save(dest_bytes, format="JPEG")
 
         self.storage.save(self._get_thumbnail_name(size),

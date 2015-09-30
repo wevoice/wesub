@@ -7,18 +7,18 @@
             {% trans "Dashboard" %}
         </a>
     </li>
-    {% for page in team.new_workflow.extra_pages %}
+    {% for page in team|extra_pages:request.user %}
     <li{% if current == page.name %} class="current" {% endif %}>
         <a href="{{ page.url }}">{{ page.title }}</a>
     </li>
     {% endfor %}
     <li{% if current == "videos" %} class="current" {% endif %}>
-        <a href="{% url "teams:detail" team.slug %}">
+        <a href="{% url "teams:videos" team.slug %}">
             {% trans "Videos" %}
         </a>
     </li>
     <li{% if current == "members" %} class="current" {% endif %}>
-        <a href="{% url "teams:detail_members" team.slug %}">
+        <a href="{% url "teams:members" team.slug %}">
             {% trans "Members" %}
         </a>
     </li>

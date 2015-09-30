@@ -560,13 +560,15 @@ class ReviewWorkMode(object):
         heading (str): heading to display in the workflow area
     """
 
-    def __init__(self, heading):
+    def __init__(self, heading, help_text=None):
         self.heading = heading
+        self.help_text = help_text
 
     def editor_data(self):
         return {
             'type': 'review',
             'heading': self.heading,
+            'helpText': self.help_text,
         }
 
 class Action(object):

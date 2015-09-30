@@ -16,10 +16,10 @@
             {{ form.non_field_errors }}
             <fieldset>
                 <legend>{% trans 'Recipient' %}</legend>
-                {{ form.errors.user_id }}
-                <label for="user_id">{% trans 'Username' %}</label>
+                {{ form.errors.username }}
+                <label for="username">{% trans 'Username' %}</label>
                 <div class="ajaxChosen">
-                    <select name="user_id" id="uid">
+                    <select name="username" id="uid">
                         <option value="">-----</option>
                         <option value="">{% trans 'Begin typing to search.' %}</option>
                     </select>
@@ -59,7 +59,7 @@
                 var terms = {};
 
                 $.each(data.results, function (i, val) {
-                    terms[data.results[i][0]] = data.results[i][1] + ' (' + data.results[i][2] + ')';
+                    terms[data.results[i][1]] = data.results[i][1] + ' (' + data.results[i][2] + ')';
                 });
 
                 return terms;

@@ -29,7 +29,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core.files import File
 from django.db import models
-from django.db.models import query, Q
+from django.db.models import query, Q, Count, Sum
 from django.db.models.signals import post_save, post_delete, pre_delete
 from django.http import Http404
 from django.template.loader import render_to_string
@@ -52,6 +52,7 @@ from teams.permissions_const import (
 )
 from teams import tasks
 from teams import workflows
+from teams.exceptions import ApplicationInvalidException
 from teams.notifications import BaseNotification
 from teams.signals import api_subtitles_approved, api_subtitles_rejected
 from utils import DEFAULT_PROTOCOL
@@ -385,11 +386,19 @@ class Team(models.Model):
 
     def is_open(self):
         """Return whether this team's membership is open to the public."""
-        return self.membership_policy == self.OPEN
+        return self.membership_policy == Team.OPEN
 
     def is_by_application(self):
         """Return whether this team's membership is by application only."""
-        return self.membership_policy == self.APPLICATION
+        return self.membership_policy == Team.APPLICATION
+
+    def is_by_invitation(self):
+        """Return whether this team's membership is by application only."""
+        return self.membership_policy in (
+            Team.INVITATION_BY_MANAGER,
+            Team.INVITATION_BY_ALL,
+            Team.INVITATION_BY_ADMIN,
+        )
 
     def get_workflow(self):
         """Return the workflow for the given team.
@@ -457,11 +466,44 @@ class Team(models.Model):
         if user.id in self._member_cache:
             return self._member_cache[user.id]
         try:
-            member = self.members.get(user=user)
+            member = self.members.get(user_id=user.id)
+            member.team = self
+            member.user = user
         except TeamMember.DoesNotExist:
             member = None
         self._member_cache[user.id] = member
         return member
+
+    def get_join_mode(self, user):
+        """Figure out how the user can join the team.
+
+        Returns:
+            - "open" -- user can join the team without any approval
+            - "application" -- user can apply to join the team
+            - "pending-application" -- user has a pending application to join
+              the team
+            - "invitation" -- user must be invited to join
+            - "already-joined" -- user has already joined the team
+            - "login" -- user needs to login first
+            - None -- user can't join the team
+        """
+        if not user.is_authenticated():
+            return 'login'
+        elif self.user_is_member(user):
+            return 'already-joined'
+        elif self.is_open():
+            return 'open'
+        elif self.is_by_invitation():
+            return 'invitation'
+        elif self.is_by_application():
+            try:
+                application = self.applications.get(user=user)
+            except Application.DoesNotExist:
+                return 'application'
+            else:
+                if application.status == Application.STATUS_PENDING:
+                    return 'pending-application'
+        return None
 
     def user_is_member(self, user):
         members = self.cache.get('members')
@@ -783,13 +825,27 @@ class Team(models.Model):
         else:
             return (complete_languages, incomplete_languages)
 
+    def get_video_language_counts(self):
+        """Count team videos for each langugage
 
+        Returns: list of (language_code, count) tuples
+        """
+        return list(self.videos
+                    .values_list('primary_audio_language_code')
+                    .annotate(Count("id"))
+                    .order_by())
 
-    
+    def get_completed_language_counts(self):
+        from subtitles.models import SubtitleLanguage
+        qs = (SubtitleLanguage.objects
+              .filter(video__in=self.videos.all())
+              .values_list('language_code')
+              .annotate(Sum('subtitles_complete')))
+        return [(lc, int(count)) for lc, count in qs]
+
 # This needs to be constructed after the model definition since we need a
 # reference to the class itself.
 Team._meta.permissions = TEAM_PERMISSIONS
-
 
 # Project
 class ProjectManager(models.Manager):
@@ -857,10 +913,13 @@ class Project(models.Model):
         """Return the full, absolute URL for this project, including http:// and the domain."""
         return '%s://%s%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, self.get_absolute_url())
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('teams:project_video_list', [self.team.slug, self.slug])
-
+        if self.team.is_old_style():
+            return reverse('teams:project_video_list',
+                           args=(self.team.slug, self.slug))
+        else:
+            # TODO implement project landing page for new-style teams
+            return reverse('teams:project', args=(self.team.slug, self.slug))
 
     @property
     def videos_count(self):
@@ -1057,9 +1116,6 @@ class TeamVideo(models.Model):
                                               to_team=new_team,
                                               to_project=self.project)
 
-            # Update search data and other things
-            video_changed_tasks.delay(video.pk)
-
             # Create any necessary tasks.
             autocreate_tasks(self)
 
@@ -1067,6 +1123,8 @@ class TeamVideo(models.Model):
             api_teamvideo_new.send(self)
             video_moved_from_team_to_team.send(sender=self,
                                                destination_team=new_team, video=self.video)
+        # Update search data and other things
+        video_changed_tasks.delay(self.video_id)
 
     def get_task_for_editor(self, language_code):
         if not hasattr(self, '_editor_task'):
@@ -1301,6 +1359,12 @@ class TeamMember(models.Model):
     created = models.DateTimeField(default=datetime.datetime.now, null=True,
             blank=True)
 
+    # A project manager is a user who manages a project.  They have slightly
+    # elavated permisions for that project and also new users can look to them
+    # for help.
+    projects_managed = models.ManyToManyField(Project,
+                                              related_name='managers')
+
     objects = TeamMemberManager()
 
     def __unicode__(self):
@@ -1369,9 +1433,41 @@ class TeamMember(models.Model):
         """Test if the user is an admin or owner."""
         return self.role in (ROLE_OWNER, ROLE_ADMIN)
 
+    def get_projects_managed(self):
+        if not hasattr(self, '_projects_managed_cache'):
+            self._projects_managed_cache = list(self.projects_managed.all())
+        return self._projects_managed_cache
+
+    def get_languages_managed(self):
+        if not hasattr(self, '_languages_managed_cache'):
+            self._languages_managed_cache = list(self.languages_managed.all())
+        return self._languages_managed_cache
+
+    def is_project_manager(self, project):
+        if isinstance(project, Project):
+            project_id = project.id
+        else:
+            project_id = project
+        return project_id in (p.id for p in self.get_projects_managed())
+
+    def is_language_manager(self, language_code):
+        return (language_code in
+                (l.code for l in self.get_languages_managed()))
+
+    def make_project_manager(self, project):
+        self.projects_managed.add(project)
+
+    def remove_project_manager(self, project):
+        self.projects_managed.remove(project)
+
+    def make_language_manager(self, language_code):
+        self.languages_managed.create(code=language_code)
+
+    def remove_language_manager(self, language_code):
+        self.languages_managed.filter(code=language_code).delete()
+
     class Meta:
         unique_together = (('team', 'user'),)
-
 
 def clear_tasks(sender, instance, *args, **kwargs):
     """Unassign all tasks assigned to a user.
@@ -1384,6 +1480,10 @@ def clear_tasks(sender, instance, *args, **kwargs):
 
 pre_delete.connect(clear_tasks, TeamMember, dispatch_uid='teams.members.clear-tasks-on-delete')
 
+class LanguageManager(models.Model):
+    member = models.ForeignKey(TeamMember, related_name='languages_managed')
+    code = models.CharField(max_length=16,
+                            choices=translation.ALL_LANGUAGE_CHOICES)
 
 # MembershipNarrowing
 class MembershipNarrowing(models.Model):
@@ -1391,6 +1491,8 @@ class MembershipNarrowing(models.Model):
 
     A single MembershipNarrowing can apply to a project or a language, but not both.
 
+    This model is deprecated and we're planning on replacing it with the
+    projects_managed and languages_managed fields
     """
     member = models.ForeignKey(TeamMember, related_name="narrowings")
     project = models.ForeignKey(Project, null=True, blank=True)
@@ -1436,9 +1538,6 @@ class MembershipNarrowing(models.Model):
 class TeamSubtitleNote(SubtitleNoteBase):
     team = models.ForeignKey(Team, related_name='+')
 
-class ApplicationInvalidException(Exception):
-    pass
-
 class ApplicationManager(models.Manager):
 
     def can_apply(self, team, user):
@@ -1455,6 +1554,8 @@ class ApplicationManager(models.Manager):
         return  not team.is_member(user)
 
     def open(self, team=None, user=None):
+        if user and not user.is_authenticated():
+            return self.none()
         qs =  self.filter(status=Application.STATUS_PENDING)
         if team:
             qs = qs.filter(team=team)
@@ -1493,6 +1594,26 @@ class Application(models.Model):
     class Meta:
         unique_together = (('team', 'user', 'status'),)
 
+    def check_can_submit(self):
+        """Check if a user can submit this application
+
+        Raises: ApplicationInvalidException if the user can't apply.  The
+        message will be set explaining why.
+        """
+        if self.status == Application.STATUS_PENDING and self.pk is not None:
+            raise ApplicationInvalidException(
+                fmt(_(u'You already have a pending application to %(team)s.'),
+                team=self.team)
+            )
+        elif self.status == Application.STATUS_DENIED:
+            raise ApplicationInvalidException(
+                _(u'Your application has been denied.')
+            )
+        elif self.status == Application.STATUS_MEMBER_REMOVED:
+            raise ApplicationInvalidException(
+                fmt(_(u'You have been removed from %(team)s.'),
+                    team=self.team)
+            )
 
     def approve(self, author, interface):
         """Approve the application.
@@ -1575,8 +1696,11 @@ class InviteExpiredException(Exception):
     pass
 
 class InviteManager(models.Manager):
-    def pending_for(self, team, user):
-        return self.filter(team=team, user=user, approved=None)
+    def pending_for(self, team, user=None):
+        if user is not None:
+            return self.filter(team=team, user=user, approved=None)
+        else:
+            return self.filter(team=team, approved=None)
 
     def acted_on(self, team, user):
         return self.filter(team=team, user=user, approved__notnull=True)
