@@ -67,7 +67,7 @@ class VideoType(object):
             try:
                 # prefetch=False must be changed to stream=True
                 # once we upgrade the requests package
-                response = requests.get(url, prefetch=False, timeout=5)
+                response = requests.get(url, prefetch=False, timeout=5, verify=False)
             except requests.ConnectionError as e:
                 logger.error("""Request to download raw audio/video file was not successful, raised ConnectionError error {}""".format(repr(e)))
                 clean(download_file, handle)
