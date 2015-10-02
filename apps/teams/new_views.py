@@ -55,6 +55,7 @@ from subtitles.models import SubtitleLanguage
 from teams.workflows import TeamWorkflow
 from utils.breadcrumbs import BreadCrumb
 from utils.pagination import AmaraPaginator
+from utils.forms import autocomplete_user_view
 from utils.text import fmt
 from utils.translation import get_language_choices, get_language_label
 from videos.models import Action, Video
@@ -435,41 +436,19 @@ def invite(request, team):
     })
 
 @team_view
-def invite_user_search(request, team):
-    query = request.GET.get('query')
-    if query:
-        users = (User.objects
-                 .filter(username__icontains=query, is_active=True)
-                 .exclude(id__in=team.members.values_list('user_id'))
-                 .exclude(id__in=Invite.objects.pending_for(team).values_list('user_id')))
-    else:
-        users = User.objects.none()
-
-    data = [
-        {
-            'value': user.username,
-            'label': fmt(_('%(username)s (%(full_name)s)'),
-                         username=user.username,
-                         full_name=unicode(user)),
-        }
-        for user in users
-    ]
-
-    return HttpResponse(json.dumps(data), mimetype='application/json')
+def autocomplete_invite_user(request, team):
+    return autocomplete_user_view(request, team.invitable_users())
 
 @team_view
-def add_project_manager_search(request, team, project_slug):
-    return member_search(
-        request, team,
-        team.members.exclude(projects_managed__slug=project_slug)
-    )
+def autocomplete_project_manager(request, team, project_slug):
+    project = get_object_or_404(team.project_set, slug=project_slug)
+    return autocomplete_user_view(request, project.potential_managers())
 
 @team_view
-def add_language_manager_search(request, team, language_code):
-    return member_search(
-        request, team,
-        team.members.exclude(languages_managed__code=language_code)
-    )
+def autocomplete_language_manager(request, team, language_code):
+    return autocomplete_user_view(
+        request,
+        team.potential_language_managers(language_code))
 
 def member_search(request, team, qs):
     query = request.GET.get('query')

@@ -518,6 +518,20 @@ class Team(models.Model):
         except KeyError:
             pass
 
+    def invitable_users(self):
+        pending_invites = (Invite.objects
+                           .pending_for(team=self)
+                           .values_list('user_id'))
+        return (User.objects
+                .exclude(team_members__team=self)
+                .exclude(id__in=pending_invites))
+
+    def potential_language_managers(self, language_code):
+        member_qs = (TeamMember.objects
+                     .filter(team=self)
+                     .exclude(languages_managed__code=language_code))
+        return User.objects.filter(team_members__in=member_qs)
+
     def user_can_view_videos(self, user):
         return self.is_visible or self.user_is_member(user)
 
@@ -921,6 +935,12 @@ class Project(models.Model):
             # TODO implement project landing page for new-style teams
             return reverse('teams:project', args=(self.team.slug, self.slug))
 
+    def potential_managers(self):
+        member_qs = (TeamMember.objects
+                     .filter(team_id=self.team_id)
+                     .exclude(projects_managed=self))
+        return User.objects.filter(team_members__in=member_qs)
+
     @property
     def videos_count(self):
         """Return the number of videos in this project.
@@ -953,7 +973,6 @@ class Project(models.Model):
         if not hasattr(self, '_tasks_count'):
             setattr(self, '_tasks_count', self._count_tasks())
         return self._tasks_count
-
 
     class Meta:
         unique_together = (
