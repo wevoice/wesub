@@ -591,7 +591,7 @@ class LanguagesForm(forms.Form):
 
 class InviteForm(forms.Form):
     username = UserAutocompleteField(error_messages={
-        'invalid': _(u'User is already a member of this team!'),
+        'invalid': _(u'User is already a member of this team'),
     })
     message = forms.CharField(required=False,
                               widget=forms.Textarea(attrs={'rows': 4}),

@@ -31,7 +31,7 @@ from utils.text import fmt
 class UserAutocompleteField(forms.CharField):
     default_error_messages = {
         'not-found': _(u'User not found'),
-        'invalid': _(u'User choice'),
+        'invalid': _(u'Invalid user choice'),
     }
 
     def __init__(self, *args, **kwargs):
