@@ -40,7 +40,7 @@
 
 {% block bottom %}
 {% if add_manager_form %}
-<aside class="modal" id="add-manager-form">
+<aside class="modal{% if add_manager_form.errors %} start-open{% endif %}" id="add-manager-form">
   <h3>{% trans "Add Project Manager" %}</h3>
   <button class="close"></button>
   <form action="" method="POST">

@@ -58,8 +58,8 @@ from videos.models import (
 )
 from videos.search_indexes import VideoIndex
 from videos.tasks import import_videos_from_feed
-from utils.forms import ErrorableModelForm, get_label_for_value
-from utils.forms.autocomplete import AutocompleteTextInput
+from utils.forms import (ErrorableModelForm, get_label_for_value,
+                         UserAutocompleteField)
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
@@ -590,7 +590,9 @@ class LanguagesForm(forms.Form):
         return self.cleaned_data
 
 class InviteForm(forms.Form):
-    username = forms.CharField(required=False, widget=AutocompleteTextInput)
+    username = UserAutocompleteField(error_messages={
+        'invalid': _(u'User is already a member of this team'),
+    })
     message = forms.CharField(required=False,
                               widget=forms.Textarea(attrs={'rows': 4}),
                               label=_("Message to user"))
@@ -604,38 +606,17 @@ class InviteForm(forms.Form):
         self.user = user
         self.fields['role'].choices = [(r, ROLE_NAMES[r])
                                        for r in roles_user_can_invite(team, user)]
-        self.fields['username'].widget.set_autocomplete_url(
-            reverse('teams:invite-user-search', args=(team.slug,))
+        self.fields['username'].queryset = team.invitable_users()
+        self.fields['username'].set_autocomplete_url(
+            reverse('teams:autocomplete-invite-user', args=(team.slug,))
         )
-
-    def clean_username(self):
-        username = self.cleaned_data['username']
-
-        try:
-            invited_user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            raise forms.ValidationError(_(u'User does not exist!'))
-        except ValueError:
-            raise forms.ValidationError(_(u'User does not exist!'))
-
-        try:
-            self.team.members.get(user=invited_user)
-        except TeamMember.DoesNotExist:
-            pass
-        else:
-            raise forms.ValidationError(_(u'User is already a member of this team!'))
-
-        # check if there is already an invite pending for this user:
-        if Invite.objects.pending_for(team=self.team, user=invited_user).exists():
-            raise forms.ValidationError(_(u'User has already been invited and has not replied yet.'))
-        self.invited_user = invited_user
-        return username
 
     def save(self):
         from messages import tasks as notifier
         invite = Invite.objects.create(
-            team=self.team, user=self.invited_user, author=self.user,
-            role=self.cleaned_data['role'], note=self.cleaned_data['message'])
+            team=self.team, user=self.cleaned_data['username'], 
+            author=self.user, role=self.cleaned_data['role'],
+            note=self.cleaned_data['message'])
         invite.save()
         notifier.team_invitation_sent.delay(invite.pk)
         return invite
@@ -707,25 +688,20 @@ class EditProjectForm(forms.Form):
         return project
 
 class AddProjectManagerForm(forms.Form):
-    member = TeamMemberInput(widget=AutocompleteTextInput)
+    member = UserAutocompleteField()
 
     def __init__(self, team, project, *args, **kwargs):
         super(AddProjectManagerForm, self).__init__(*args, **kwargs)
         self.team = team
         self.project = project
-        self.fields['member'].set_team(team)
-        self.fields['member'].widget.set_autocomplete_url(
-            reverse('teams:add-project-manager-search',
+        self.fields['member'].queryset = project.potential_managers()
+        self.fields['member'].set_autocomplete_url(
+            reverse('teams:autocomplete-project-manager',
                     args=(team.slug, project.slug))
         )
 
     def clean_member(self):
-        member = self.cleaned_data['member']
-        if member.is_project_manager(self.project):
-            raise forms.ValidationError(fmt(
-                _(u'%(user)s is already a manager of that project'),
-                user=member.user))
-        return member
+        return self.team.get_member(self.cleaned_data['member'])
 
     def save(self):
         member = self.cleaned_data['member']
@@ -752,25 +728,21 @@ class RemoveProjectManagerForm(forms.Form):
         member.remove_project_manager(self.project)
 
 class AddLanguageManagerForm(forms.Form):
-    member = TeamMemberInput(widget=AutocompleteTextInput)
+    member = UserAutocompleteField()
 
     def __init__(self, team, language_code, *args, **kwargs):
         super(AddLanguageManagerForm, self).__init__(*args, **kwargs)
         self.team = team
         self.language_code = language_code
-        self.fields['member'].set_team(team)
+        self.fields['member'].queryset = team.potential_language_managers(
+            language_code)
         self.fields['member'].widget.set_autocomplete_url(
-            reverse('teams:add-language-manager-search',
+            reverse('teams:autocomplete-language-manager',
                     args=(team.slug, language_code))
         )
 
     def clean_member(self):
-        member = self.cleaned_data['member']
-        if member.is_language_manager(self.language_code):
-            raise forms.ValidationError(fmt(
-                _(u'%(user)s is already a manager of that language'),
-                user=member.user))
-        return member
+        return self.team.get_member(self.cleaned_data['member'])
 
     def save(self):
         member = self.cleaned_data['member']
