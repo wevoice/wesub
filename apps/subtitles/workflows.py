@@ -687,6 +687,9 @@ class Publish(Action):
     complete = True
 
     def perform(self, user, video, subtitle_language, saved_version):
+        tip = subtitle_language.get_tip()
+        if not tip.is_public():
+            tip.publish()
         signals.subtitles_published.send(subtitle_language,
                                          version=saved_version)
 
