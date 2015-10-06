@@ -513,7 +513,7 @@ class SubtitlesField(serializers.CharField):
             raise serializers.ValidationError("Invalid subtitle data")
         try:
             return load_subtitles(
-                self.context['language_code'], value,
+                self.context['language_code'], str(value),
                 self.context['sub_format'])
         except babelsubs.SubtitleParserError:
             raise serializers.ValidationError("Invalid subtitle data")

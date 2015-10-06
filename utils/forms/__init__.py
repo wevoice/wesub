@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import re
 
 from django import forms
@@ -7,7 +8,9 @@ from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from utils.forms.recapcha import ReCaptchaField
+from .autocomplete import AutocompleteTextInput
+from .userautocomplete import UserAutocompleteField, autocomplete_user_view
+from .recapcha import ReCaptchaField
 
 assert ReCaptchaField # Shut up, Pyflakes.
 
