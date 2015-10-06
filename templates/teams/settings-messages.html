@@ -1,5 +1,6 @@
 {% extends "teams/base.html" %}
 {% load i18n teams_tags paginator %}
+{% load url from future %}
 
 {% block title %}
     {{ team }} {% trans 'Guidelines' %} | {% trans 'Settings' %} | Amara
@@ -17,6 +18,7 @@
                 {% include 'teams/_subnav_settings.html' %}
             {% endwith %}
         </div>
+	<a href="{% url "teams:settings_lang_messages" team.slug %}">{% trans "Define localized messages" %} >></a>
         <form id="guidelines_messages_form" method="POST" action="" class="settings">
             {% csrf_token %}
             <input type="hidden" name="team" value="" />
@@ -34,7 +36,6 @@
 
                 </fieldset>
                 {% endif %}
-
                 <fieldset>
                     <legend>{% trans 'Custom messages' %}</legend>
 

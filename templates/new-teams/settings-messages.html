@@ -1,9 +1,10 @@
 {% extends "new-teams/base.html" %}
-{% load i18n %}
+{% load i18n teams_tags %}
+{% load url from future %}
 
 {% block content %}
 <h2>{% trans "Team Settings - Messages" %}</h2>
-
+<a href="{% url "teams:settings_lang_messages" team.slug %}">{% trans "Define localized messages" %} >> </a>
 <form method="POST" action="">
     {% csrf_token %}
 
