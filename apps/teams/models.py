@@ -2724,6 +2724,12 @@ class SettingManager(models.Manager):
         })
         return messages
 
+    def localized_messages(self):
+        """Return a QS of settings related to team messages."""
+        keys = [key for key, name in Setting.KEY_CHOICES
+                if name.endswith('localized')]
+        return self.get_query_set().filter(key__in=keys)
+
 class Setting(models.Model):
     KEY_CHOICES = (
         (100, 'messages_invite'),
@@ -2731,6 +2737,7 @@ class Setting(models.Model):
         (102, 'messages_admin'),
         (103, 'messages_application'),
         (104, 'messages_joins'),
+        (105, 'messages_joins_localized'),
         (200, 'guidelines_subtitle'),
         (201, 'guidelines_translate'),
         (202, 'guidelines_review'),
@@ -2755,7 +2762,11 @@ class Setting(models.Model):
     MESSAGE_KEYS = [
         key for key, name in KEY_CHOICES
         if name.startswith('messages_') or name.startswith('guidelines_')
-        or name.startswith('pagetext_')
+        or name.startswith('pagetext_') and not name.endswith('localized')
+    ]
+    MESSAGE_KEYS_LOCALIZED = [
+        key for key, name in KEY_CHOICES
+        if name.endswith('localized')
     ]
     MESSAGE_DEFAULTS = {
         'pagetext_welcome_heading': _("Help %(team)s reach a world audience"),
@@ -2763,14 +2774,16 @@ class Setting(models.Model):
     key = models.PositiveIntegerField(choices=KEY_CHOICES)
     data = models.TextField(blank=True)
     team = models.ForeignKey(Team, related_name='settings')
-
+    language_code = models.CharField(
+        max_length=16, blank=True, default='',
+        choices=translation.ALL_LANGUAGE_CHOICES)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     modified = models.DateTimeField(auto_now=True, editable=False)
 
     objects = SettingManager()
 
     class Meta:
-        unique_together = (('key', 'team'),)
+        unique_together = (('key', 'team', 'language_code'),)
 
     def __unicode__(self):
         return u'%s - %s' % (self.team, self.key_name)

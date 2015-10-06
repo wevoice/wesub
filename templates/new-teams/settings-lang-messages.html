@@ -1,0 +1,25 @@
+{% extends "new-teams/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h2>{% trans "Team Settings - Language-specific Messages" %}</h2>
+
+<form method="POST" action="">
+    {% csrf_token %}
+
+    <fieldset>
+      <legend>{% trans 'Custom messages' %}</legend>
+
+      <p class="notation">
+      {% trans 'Customize the messages sent to your users in their language. The text you enter will accompany the default English message.' %}
+      </p>
+      {% for item in form %}
+      {% include "_field.html" with field=item %}
+      {% endfor %}
+    </fieldset>
+
+    <div class="actions">
+      <button class="submit">{% trans "Save Changes" %} <span class="fa fa-angle-double-right"></span></button>
+    </div>
+</form>
+{% endblock %}

@@ -63,7 +63,7 @@ from utils.forms.autocomplete import AutocompleteTextInput
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
-from utils.translation import get_language_choices
+from utils.translation import get_language_choices, get_language_label
 from utils.text import fmt
 from utils.validators import MaxFileSizeValidator
 
@@ -526,6 +526,20 @@ class GuidelinesMessagesForm(forms.Form):
         label=('When translating'))
     guidelines_review = MessageTextField(
         label=('When reviewing'))
+
+class GuidelinesLangMessagesForm(forms.Form):
+  def __init__(self, *args, **kwargs):
+    languages = kwargs.pop('languages')
+    super(GuidelinesLangMessagesForm, self).__init__(*args, **kwargs)
+    self.fields["messages_joins_language"] = forms.ChoiceField(label=_(u'Message language'), choices=get_language_choices(True),
+                                                               help_text=_(u'Language of the message.'), required=False)
+
+    self.fields["messages_joins_localized"] = MessageTextField(
+        label=_('When a member is invited to join the team'))
+
+    for language in languages:
+        self.fields['messages_joins_localized_%s' % language["code"]] = MessageTextField(initial=language["data"],
+            label=_('When a member joins the team, message in ' + get_language_label(language["code"])))
 
 class SettingsForm(forms.ModelForm):
     logo = forms.ImageField(
