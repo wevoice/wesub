@@ -330,6 +330,7 @@ def all_languages_page(request, team):
          completed_language_counts.get(lc, 0),
         )
         for lc in all_languages
+        if lc != ''
     ]
     languages.sort(key=lambda row: (-row[2], row[1]))
 
