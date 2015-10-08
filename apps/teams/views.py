@@ -289,9 +289,6 @@ def settings_messages(request, team):
 @render_to('teams/settings-lang-messages.html')
 @settings_page
 def settings_lang_messages(request, team):
-    if team.is_old_style():
-        return old_views.settings_lang_messages(request, team)
-
     initial = team.settings.all_messages()
     languages = [{"code": l.language_code, "data": l.data} for l in team.settings.localized_messages()]
     if request.POST:
