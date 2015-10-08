@@ -273,7 +273,7 @@ def team_member_new(member_pk):
             if m.get_key_display() == 'messages_joins':
                 team_default_message = m.data
                 break
-    for ul in UserLanguage.objects.filter(user=member.user):
+    for ul in UserLanguage.objects.filter(user=member.user).order_by("priority"):
         localized_message = Setting.objects.messages().filter(team=member.team, language_code=ul.language)
         if len(localized_message) == 1:
             if team_default_message:

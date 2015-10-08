@@ -1557,7 +1557,6 @@ class ApplicationForm(forms.Form):
                      '%(team)s.  This should be 3-5 sentences, no '
                      'longer!'),
             team=application.team)
-
         for i, language in enumerate(application.user.get_languages()):
             field = self.fields['language{}'.format(i+1)]
             field.initial = language
@@ -1572,9 +1571,9 @@ class ApplicationForm(forms.Form):
     def save(self):
         self.application.note = self.cleaned_data['about_you']
         self.application.save()
-        languages = set()
+        languages = []
         for i in xrange(1, 7):
             value = self.cleaned_data['language{}'.format(i)]
             if value:
-                languages.add(value)
+                languages.append({"language": value, "priority": i})
         self.application.user.set_languages(languages)
