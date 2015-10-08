@@ -531,11 +531,11 @@ class GuidelinesLangMessagesForm(forms.Form):
   def __init__(self, *args, **kwargs):
     languages = kwargs.pop('languages')
     super(GuidelinesLangMessagesForm, self).__init__(*args, **kwargs)
-    self.fields["messages_joins_language"] = forms.ChoiceField(label=_(u'Message language'), choices=get_language_choices(True),
-                                                               help_text=_(u'Language of the message.'), required=False)
+    self.fields["messages_joins_language"] = forms.ChoiceField(label=_(u'New message language'), choices=get_language_choices(True),
+                                                               required=False)
 
     self.fields["messages_joins_localized"] = MessageTextField(
-        label=_('When a member is invited to join the team'))
+        label=_('When a member speaking that language joins the team'))
 
     for language in languages:
         self.fields['messages_joins_localized_%s' % language["code"]] = MessageTextField(initial=language["data"],

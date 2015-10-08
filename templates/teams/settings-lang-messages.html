@@ -23,12 +23,14 @@
 
                 <fieldset>
                     <legend>{% trans 'Custom messages' %}</legend>
-
                     <p class="notation">
-                        {% trans 'Customize the messages sent to your users. The text you enter will accompany the default system message.' %}
+                        {% trans 'Customize the messages sent to your users in their language. The text you enter will accompany the default system message.' %}
                     </p>
+                    <p class="notation">
+		      {% trans 'You can add a new language or modify an existing one.' %}
+		    </p>
 		    {% for item in form %}
-                    <label for="id_messages_invite">{% trans 'When a member is invited to join the team' %}</label>
+                    <label for="id_messages_invite">{% trans 'When a member speaking that language joins the team' %}</label>
                     {{ item.errors }}
                     {{ item }}
 		    {% endfor %}
