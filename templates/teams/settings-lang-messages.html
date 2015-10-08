@@ -30,7 +30,7 @@
 		      {% trans 'You can add a new language or modify an existing one.' %}
 		    </p>
 		    {% for item in form %}
-                    <label for="id_messages_invite">{% trans 'When a member speaking that language joins the team' %}</label>
+                    <label for="id_messages_invite">{{ item.label }}</label>
                     {{ item.errors }}
                     {{ item }}
 		    {% endfor %}

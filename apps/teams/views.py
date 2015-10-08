@@ -55,6 +55,7 @@ from teams.forms import (
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
     make_billing_report_form, TaskCreateSubtitlesForm,
     TeamMultiVideoCreateSubtitlesForm, MoveVideosForm, AddVideoToTeamForm,
+    GuidelinesLangMessagesForm,
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -292,7 +293,7 @@ def settings_lang_messages(request, team):
     initial = team.settings.all_messages()
     languages = [{"code": l.language_code, "data": l.data} for l in team.settings.localized_messages()]
     if request.POST:
-        form = forms.GuidelinesLangMessagesForm(request.POST, languages=languages)
+        form = GuidelinesLangMessagesForm(request.POST, languages=languages)
         if form.is_valid():
             new_language = None
             new_message = None
@@ -331,7 +332,7 @@ def settings_lang_messages(request, team):
             messages.success(request, _(u'Guidelines and messages updated.'))
             return HttpResponseRedirect(request.path)
     else:
-        form = forms.GuidelinesLangMessagesForm(languages=languages)
+        form = GuidelinesLangMessagesForm(languages=languages)
 
     return { 'team': team, 'form': form, }
 

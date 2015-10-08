@@ -537,9 +537,15 @@ class GuidelinesLangMessagesForm(forms.Form):
     self.fields["messages_joins_localized"] = MessageTextField(
         label=_('When a member speaking that language joins the team'))
 
+    keys = []
     for language in languages:
-        self.fields['messages_joins_localized_%s' % language["code"]] = MessageTextField(initial=language["data"],
-            label=_('When a member joins the team, message in ' + get_language_label(language["code"])))
+        key = 'messages_joins_localized_%s' % language["code"]
+        label = _('When a member joins the team, message in ' + get_language_label(language["code"]))
+        keys.append({"key": key, "label": label})
+        self.fields[key] = MessageTextField(initial=language["data"],
+                                            label=label)
+    sorted_keys = map(lambda x: x["key"], sorted(keys, key=lambda x: x["label"]))
+    self.fields.keyOrder = ["messages_joins_language", "messages_joins_localized"] + sorted_keys
 
 class SettingsForm(forms.ModelForm):
     logo = forms.ImageField(
