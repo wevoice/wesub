@@ -18,7 +18,6 @@
                 {% include 'teams/_subnav_settings.html' %}
             {% endwith %}
         </div>
-	<a href="{% url "teams:settings_lang_messages" team.slug %}">{% trans "Define localized messages" %} >></a>
         <form id="guidelines_messages_form" method="POST" action="" class="settings">
             {% csrf_token %}
             <input type="hidden" name="team" value="" />
@@ -42,7 +41,9 @@
                     <p class="notation">
                         {% trans 'Customize the messages sent to your users. The text you enter will accompany the default system message.' %}
                     </p>
-
+		    <p>
+		      <a href="{% url "teams:settings_lang_messages" team.slug %}">{% trans "Add messages in users' preferred languages" %} >></a>
+		    </p>
                     <label for="id_messages_invite">{% trans 'When a member is invited to join the team' %}</label>
                     {{ form.messages_invite.errors }}
                     {{ form.messages_invite }}
