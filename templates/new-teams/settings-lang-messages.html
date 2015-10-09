@@ -13,13 +13,16 @@
       <p class="notation">
         {% trans 'Customize the messages sent to your users in their language. The text you enter will accompany the default system message.' %}
       </p>
-      <p class="notation">
-	{% trans 'You can add a new language or modify an existing one.' %}
-      </p>
+      <legend>
+	{% trans 'Add message in a new language' %}
+      </legend>
       {% for item in form %}
       {% include "_field.html" with field=item %}
       {% if item.id_for_label == 'id_messages_joins_localized' %}
       <hr class="form-separator">
+      <legend>
+	{% trans 'Edit messages' %}
+      </legend>
       {% endif %}
       {% endfor %}
     </fieldset>
