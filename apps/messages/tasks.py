@@ -277,7 +277,7 @@ def team_member_new(member_pk):
         localized_message = Setting.objects.messages().filter(team=member.team, language_code=ul.language)
         if len(localized_message) == 1:
             if team_default_message:
-                team_default_message += u'\n' + localized_message[0].data
+                team_default_message += u'\n\n----------------\n\n' + localized_message[0].data
             else:
                 team_default_message = localized_message[0].data
             break
