@@ -33,6 +33,9 @@
                     <label for="id_messages_invite">{{ item.label }}</label>
                     {{ item.errors }}
                     {{ item }}
+		    {% if item.id_for_label == 'id_messages_joins_localized' %}
+		    <hr class="form-separator">
+		    {% endif %}
 		    {% endfor %}
                 </fieldset>
 

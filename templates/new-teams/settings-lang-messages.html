@@ -18,6 +18,9 @@
       </p>
       {% for item in form %}
       {% include "_field.html" with field=item %}
+      {% if item.id_for_label == 'id_messages_joins_localized' %}
+      <hr class="form-separator">
+      {% endif %}
       {% endfor %}
     </fieldset>
 
