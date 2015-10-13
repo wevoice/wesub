@@ -63,7 +63,7 @@ from utils.forms import (ErrorableModelForm, get_label_for_value,
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
-from utils.translation import get_language_choices
+from utils.translation import get_language_choices, get_language_label
 from utils.text import fmt
 from utils.validators import MaxFileSizeValidator
 
@@ -526,6 +526,26 @@ class GuidelinesMessagesForm(forms.Form):
         label=('When translating'))
     guidelines_review = MessageTextField(
         label=('When reviewing'))
+
+class GuidelinesLangMessagesForm(forms.Form):
+  def __init__(self, *args, **kwargs):
+    languages = kwargs.pop('languages')
+    super(GuidelinesLangMessagesForm, self).__init__(*args, **kwargs)
+    self.fields["messages_joins_language"] = forms.ChoiceField(label=_(u'New message language'), choices=get_language_choices(True),
+                                                               required=False)
+
+    self.fields["messages_joins_localized"] = MessageTextField(
+        label=_('When a member speaking that language joins the team'))
+
+    keys = []
+    for language in languages:
+        key = 'messages_joins_localized_%s' % language["code"]
+        label = _('When a member joins the team, message in ' + get_language_label(language["code"]))
+        keys.append({"key": key, "label": label})
+        self.fields[key] = MessageTextField(initial=language["data"],
+                                            label=label)
+    sorted_keys = map(lambda x: x["key"], sorted(keys, key=lambda x: x["label"]))
+    self.fields.keyOrder = ["messages_joins_language", "messages_joins_localized"] + sorted_keys
 
 class SettingsForm(forms.ModelForm):
     logo = forms.ImageField(
@@ -1543,7 +1563,6 @@ class ApplicationForm(forms.Form):
                      '%(team)s.  This should be 3-5 sentences, no '
                      'longer!'),
             team=application.team)
-
         for i, language in enumerate(application.user.get_languages()):
             field = self.fields['language{}'.format(i+1)]
             field.initial = language
@@ -1558,9 +1577,9 @@ class ApplicationForm(forms.Form):
     def save(self):
         self.application.note = self.cleaned_data['about_you']
         self.application.save()
-        languages = set()
+        languages = []
         for i in xrange(1, 7):
             value = self.cleaned_data['language{}'.format(i)]
             if value:
-                languages.add(value)
+                languages.append({"language": value, "priority": i})
         self.application.user.set_languages(languages)

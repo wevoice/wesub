@@ -714,6 +714,65 @@ def settings_messages(request, team):
     })
 
 @team_settings_view
+def settings_lang_messages(request, team):
+    if team.is_old_style():
+        return old_views.settings_lang_messages(request, team)
+
+    initial = team.settings.all_messages()
+    languages = [{"code": l.language_code, "data": l.data} for l in team.settings.localized_messages()]
+    if request.POST:
+        form = forms.GuidelinesLangMessagesForm(request.POST, languages=languages)
+        if form.is_valid():
+            new_language = None
+            new_message = None
+            for key, val in form.cleaned_data.items():
+                if key == "messages_joins_localized":
+                    new_message = val
+                elif key == "messages_joins_language":
+                    new_language = val
+                else:
+                    l = key.split("messages_joins_localized_")
+                    if len(l) == 2:
+                        code = l[1]
+                        try:
+                            setting = Setting.objects.get(team=team, key=Setting.KEY_IDS["messages_joins_localized"], language_code=code)
+                            if val == "":
+                                setting.delete()
+                            else:
+                                setting.data = val
+                                setting.save()
+                        except:
+                            messages.error(request, _(u'No message for that language.'))
+                            return HttpResponseRedirect(request.path)
+            if new_message and new_language:
+                setting, c = Setting.objects.get_or_create(team=team,
+                                  key=Setting.KEY_IDS["messages_joins_localized"],
+                                  language_code=new_language)
+                if c:
+                    setting.data = new_message
+                    setting.save()
+                else:
+                    messages.error(request, _(u'There is already a message for that language.'))
+                    return HttpResponseRedirect(request.path)
+            elif new_message or new_language:
+                messages.error(request, _(u'Please set the language and the message.'))
+                return HttpResponseRedirect(request.path)
+            messages.success(request, _(u'Guidelines and messages updated.'))
+            return HttpResponseRedirect(request.path)
+    else:
+        form = forms.GuidelinesLangMessagesForm(languages=languages)
+
+    return render(request, "new-teams/settings-lang-messages.html", {
+        'team': team,
+        'form': form,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Settings'), 'teams:settings_basic', team.slug),
+            BreadCrumb(_('Language-specific Messages')),
+        ],
+    })
+
+@team_settings_view
 def settings_feeds(request, team):
     if team.is_old_style():
         return old_views.video_feeds(request, team)

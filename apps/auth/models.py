@@ -266,14 +266,15 @@ class CustomUser(BaseUser):
         return self.cache.get_or_calc("languages", self.calc_languages)
 
     def calc_languages(self):
-        return list(self.userlanguage_set.values_list('language', flat=True))
+        return list(self.userlanguage_set.order_by("priority").values_list('language', flat=True))
 
-    def set_languages(self, language_codes):
+    def set_languages(self, languages):
         with transaction.commit_on_success():
             self.userlanguage_set.all().delete()
             self.userlanguage_set = [
-                UserLanguage(language=lc)
-                for lc in language_codes
+                UserLanguage(language=l["language"],
+                             priority=l["priority"])
+                for l in languages
             ]
         self.cache.invalidate()
 
@@ -480,6 +481,7 @@ class UserLanguage(models.Model):
     user = models.ForeignKey(CustomUser)
     language = models.CharField(max_length=16, choices=ALL_LANGUAGES, verbose_name='languages')
     proficiency = models.IntegerField(choices=PROFICIENCY_CHOICES, default=1)
+    priority = models.IntegerField(null=True)
     follow_requests = models.BooleanField(
         default=False,
         verbose_name=_('follow requests in language'))
