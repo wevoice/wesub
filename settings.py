@@ -251,6 +251,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_SERIALIZER_CLASS':
         'api.pagination.AmaraPaginationSerializer',
     'ORDERING_PARAM': 'order_by',
+    'VIEW_NAME_FUNCTION': 'api.viewdocs.amara_get_view_name',
+    'VIEW_DESCRIPTION_FUNCTION': 'api.viewdocs.amara_get_view_description',
 }
 
 #################
