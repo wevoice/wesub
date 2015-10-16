@@ -712,6 +712,8 @@ class Actions(views.APIView):
             return Response('no action', status=status.HTTP_400_BAD_REQUEST)
         video = get_object_or_404(Video, video_id=video_id)
         workflow = workflows.get_workflow(video)
+        if not workflow.user_can_edit_subtitles(request.user, language_code):
+            raise PermissionDenied()
         try:
             workflow.perform_action(request.user, language_code, action)
         except (ActionError, LookupError), e:
