@@ -16,7 +16,11 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import subprocess, sys
 from videos.types.base import VideoType
+
+import logging
+logger= logging.getLogger(__name__)
 
 class HtmlFiveVideoType(VideoType):
     abbreviation = 'H'
@@ -33,3 +37,13 @@ class HtmlFiveVideoType(VideoType):
 
     def get_direct_url(self):
         return self.url
+
+    def set_values(self, video):
+        cmd = """avprobe -v error -show_format -show_streams "{}" | grep duration= | sed 's/^.*=//' | head -n1""".format(self.url)
+        try:
+            duration = int(float(subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)))
+            video.duration = duration
+        except subprocess.CalledProcessError as e:
+            logger.error("CalledProcessError error({}) when running command {}".format(e.returncode, cmd))
+        except:
+            logger.error("Unexpected error({}) when running command {}".format(sys.exc_info()[0], cmd))

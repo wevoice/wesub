@@ -412,8 +412,9 @@ def get_video_info(video_id):
         })
         return _get_video_info(video_id)
     except APIError, e:
-        logger.error("Youtube API Error: %s", e)
-        raise
+        logger.error("Youtube API Error: %s, falling back", e)
+        p = pafy.new(video_id)
+        return VideoInfo(None, p.title, "", p.length, p.thumb)
 
 def _get_video_info(video_id):
     response = video_get(None, video_id, ['snippet', 'contentDetails'])
