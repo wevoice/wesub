@@ -1195,10 +1195,11 @@ class BulkTeamVideoForm(forms.Form):
         label=_('Include videos on other pages'),
         required=False)
 
-    def __init__(self, team, user, *args, **kwargs):
+    def __init__(self, team, user, videos_qs, *args, **kwargs):
         super(BulkTeamVideoForm, self).__init__(*args, **kwargs)
         self.team = team
         self.user = user
+        self.videos_qs = videos_qs
         self.enabled = self.check_permissions()
         self.fields['team_videos'].choices = [
             (tv.id, tv.id) for tv in team.teamvideo_set.all()
@@ -1211,13 +1212,14 @@ class BulkTeamVideoForm(forms.Form):
         else:
             return super(BulkTeamVideoForm, self).is_valid()
 
-    def save(self, qs):
+    def save(self):
         if not self.enabled:
             raise PermissionDenied("Form not enabled")
-        self.perform_save(self.find_team_videos_to_update(qs))
+        self.perform_save(self.find_team_videos_to_update())
 
-    def find_team_videos_to_update(self, qs):
+    def find_team_videos_to_update(self):
         from haystack.query import SearchQuerySet
+        qs = self.videos_qs
         if not self.cleaned_data['include_all']:
             qs = TeamVideo.objects.filter(
                 id__in=self.cleaned_data['team_videos']
@@ -1421,7 +1423,7 @@ class NewAddTeamVideoForm(VideoForm):
                                 required=False)
     thumbnail = forms.ImageField(required=False)
 
-    def __init__(self, team, user, *args, **kwargs):
+    def __init__(self, team, user, videos_qs, *args, **kwargs):
         super(NewAddTeamVideoForm, self).__init__(user, *args, **kwargs)
         self.team = team
         if not permissions.can_add_video(team, user):
@@ -1486,7 +1488,7 @@ class NewEditTeamVideoForm(forms.Form):
                                 required=False)
     thumbnail = forms.ImageField(label=_('Change thumbnail'), required=False)
 
-    def __init__(self, team, user, *args, **kwargs):
+    def __init__(self, team, user, videos_qs, *args, **kwargs):
         super(NewEditTeamVideoForm, self).__init__(*args, **kwargs)
         self.team = team
         if not permissions.can_edit_videos(team, user):

@@ -132,6 +132,7 @@ class AddTeamVideoFormTest(TestCase):
 
     def make_form(self, data=None, files=None):
         return forms.NewAddTeamVideoForm(self.team, self.user,
+                                         self.team.teamvideo_set.all(),
                                          data=data, files=files)
 
     def test_add(self):
@@ -204,8 +205,9 @@ class EditTeamVideoFormTest(TestCase):
                                            project=self.project)
 
     def make_form(self, data=None, files=None):
-        return forms.NewEditTeamVideoForm(self.team, self.user, data=data,
-                                          files=files)
+        return forms.NewEditTeamVideoForm(self.team, self.user,
+                                          self.team.teamvideo_set.all(),
+                                          data=data, files=files)
 
     @patch_for_test('utils.amazon.fields.S3ImageFieldFile.save')
     def test_update(self, mock_save):
@@ -276,7 +278,8 @@ class BulkTeamVideoFormTest(TestCase):
         class FormClass(forms.BulkTeamVideoForm):
             check_permissions = self.check_permissions
             perform_save = self.perform_save
-        return FormClass(self.team, self.user, *args, **kwargs)
+        return FormClass(self.team, self.user, self.team.teamvideo_set.all(),
+                         *args, **kwargs)
 
     def test_permission_check_pass(self):
         assert_true(self.make_form().enabled)
@@ -291,11 +294,11 @@ class BulkTeamVideoFormTest(TestCase):
             'team_videos': [self.team_videos[0].id],
         })
         with assert_raises(PermissionDenied):
-            bound_form.save(self.team.teamvideo_set.all())
+            bound_form.save()
 
     def check_save(self, form, correct_videos):
         assert_true(form.is_valid(), form.errors.as_text())
-        form.save(qs=self.team.teamvideo_set.all())
+        form.save()
         assert_items_equal(
             form.perform_save.call_args[0][0],
             correct_videos,

@@ -9,6 +9,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from .autocomplete import AutocompleteTextInput
+from .formrouter import FormRouter
 from .userautocomplete import UserAutocompleteField, autocomplete_user_view
 from .recapcha import ReCaptchaField
 

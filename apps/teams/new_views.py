@@ -1,4 +1,4 @@
-# Amara, universalsubtitles.org
+#Get the main project for a team Amara, universalsubtitles.org
 #
 # Copyright (C) 2013 Participatory Culture Foundation
 #
@@ -55,7 +55,7 @@ from subtitles.models import SubtitleLanguage
 from teams.workflows import TeamWorkflow
 from utils.breadcrumbs import BreadCrumb
 from utils.pagination import AmaraPaginator
-from utils.forms import autocomplete_user_view
+from utils.forms import autocomplete_user_view, FormRouter
 from utils.text import fmt
 from utils.translation import get_language_choices, get_language_label
 from videos.models import Action, Video
@@ -160,31 +160,21 @@ def videos(request, team):
             team_videos = team_videos.filter(
                 video__teamvideo__project=main_project)
 
-    # We embed several modal forms on the page, but luckily we can use the
-    # same code to handle them all
-    form_classes = {
-        'add': forms.NewAddTeamVideoForm,
-        'edit': forms.NewEditTeamVideoForm,
-        'bulk_edit': forms.BulkEditTeamVideosForm,
-        'move': forms.MoveTeamVideosForm,
-        'remove': forms.RemoveTeamVideosForm,
-    }
-    page_forms = {}
-    for name, klass in form_classes.items():
-        auto_id = '{}_id-%s'.format(name)
-        if request.method == 'POST' and request.POST.get('form') == name:
-            form = klass(team, request.user, auto_id=auto_id,
-                         data=request.POST, files=request.FILES)
-            if form.is_valid():
-                if isinstance(form, forms.BulkTeamVideoForm):
-                    form.save(qs=team_videos)
-                else:
-                    form.save()
-                messages.success(request, form.message())
-                return HttpResponseRedirect(request.build_absolute_uri())
-        else:
-            form = klass(team, request.user, auto_id=auto_id)
-        page_forms[name] = form
+    form_map = dict(
+        add=forms.NewAddTeamVideoForm,
+        edit=forms.NewEditTeamVideoForm,
+        bulk_edit=forms.BulkEditTeamVideosForm,
+        move=forms.MoveTeamVideosForm,
+        remove=forms.RemoveTeamVideosForm,
+    )
+    page_forms = FormRouter(form_map, request, team, request.user,
+                            team_videos)
+    if page_forms.submitted_form:
+        form = page_forms.submitted_form
+        if form.enabled and form.is_valid():
+            form.save()
+            messages.success(request, form.message())
+            return HttpResponseRedirect(request.build_absolute_uri())
 
     if filters_form.selected_project:
         # use the selected project by default on the add video form
