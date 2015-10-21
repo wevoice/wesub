@@ -28,7 +28,6 @@ from utils.text import fmt
 from utils.translation import get_language_choices, set_user_languages_to_cookie
 from utils.validators import MaxFileSizeValidator
 
-
 class SelectLanguageForm(forms.Form):
     language1 = forms.ChoiceField(choices=(), required=False)
     language2 = forms.ChoiceField(choices=(), required=False)
@@ -53,17 +52,19 @@ class SelectLanguageForm(forms.Form):
         languages = []
 
         for i in xrange(1, 10):
-            if data.get('language%s' % i): languages.append(data.get('language%s' % i))
+            if data.get('language%s' % i): languages.append({"language": data.get('language%s' % i), "priority": i})
 
         if user.is_authenticated():
             UserLanguage.objects.filter(user=user).delete()
             for l in languages:
-                UserLanguage.objects.get_or_create(user=user, language=l)
+                language, c = UserLanguage.objects.get_or_create(user=user, language=l["language"])
+                language.priority = l["priority"]
+                language.save()
         else:
             if not response is None:
                 set_user_languages_to_cookie(response, languages)
             else:
-                return languages
+                return map(languages.sort(key=lambda x: x["priority"]), lambda x: x["language"])
 
 class UserLanguageForm(forms.ModelForm):
 

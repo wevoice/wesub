@@ -24,6 +24,10 @@
         @include small-screen {
             display: none;
         }
+
+        > .section {
+            overflow: hidden;
+        }
     }
 
     > .main {
