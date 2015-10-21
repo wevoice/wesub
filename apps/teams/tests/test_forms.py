@@ -31,6 +31,7 @@ import mock
 from teams import forms
 from teams.models import TeamVideo
 from teams.permissions import *
+from teams.new_views import get_video_page_forms
 from utils.factories import *
 from utils.test_utils import patch_for_test, reload_obj
 from videos.models import Video, VideoUrl
@@ -121,11 +122,7 @@ def test_thumbnail_file():
     return SimpleUploadedFile('thumb.png', content)
 
 class AddTeamVideoFormTest(TestCase):
-    @patch_for_test('teams.permissions.can_add_video')
-    def setUp(self, mock_can_add_video):
-        self.mock_can_add_video = mock_can_add_video
-        self.mock_can_add_video.return_value = True
-
+    def setUp(self):
         self.team = TeamFactory()
         self.user = TeamMemberFactory(team=self.team).user
         self.url = 'http://example.com/video.mp4'
@@ -181,22 +178,8 @@ class AddTeamVideoFormTest(TestCase):
         form = self.make_form({'video_url': self.url})
         assert_false(form.is_valid())
 
-    def test_permissions_check(self):
-        self.mock_can_add_video.return_value = False
-        form = self.make_form({'video_url': self.url})
-        assert_equal(
-            self.mock_can_add_video.call_args,
-            mock.call(self.team, self.user)
-        )
-        assert_false(form.enabled)
-        assert_false(form.is_valid())
-
 class EditTeamVideoFormTest(TestCase):
-    @patch_for_test('teams.permissions.can_edit_videos')
-    def setUp(self, mock_can_edit_videos):
-        self.mock_can_edit_videos = mock_can_edit_videos
-        self.mock_can_edit_videos.return_value = True
-
+    def setUp(self):
         self.team = TeamFactory()
         self.user = TeamMemberFactory(team=self.team).user
         self.project = ProjectFactory(team=self.team)
@@ -252,16 +235,6 @@ class EditTeamVideoFormTest(TestCase):
         assert_equal(mock_save.call_args,
                      mock.call(thumb_file.name, thumb_file))
 
-    def test_permission_check_args(self):
-        form = self.make_form()
-        assert_equal(self.mock_can_edit_videos.call_args,
-                     mock.call(self.team, self.user))
-
-    def test_can_edit_videos_permissions_check(self):
-        self.mock_can_edit_videos.return_value = False
-        form = self.make_form()
-        assert_equal(form.fields['team_video'].choices, [])
-        assert_false(form.enabled)
 
 class BulkTeamVideoFormTest(TestCase):
     def setUp(self):
@@ -280,21 +253,6 @@ class BulkTeamVideoFormTest(TestCase):
             perform_save = self.perform_save
         return FormClass(self.team, self.user, self.team.teamvideo_set.all(),
                          *args, **kwargs)
-
-    def test_permission_check_pass(self):
-        assert_true(self.make_form().enabled)
-
-    def test_permission_check_fail(self):
-        self.check_permissions.return_value = False
-        assert_false(self.make_form().enabled)
-
-    def test_permission_check_fail_prevents_save(self):
-        self.check_permissions.return_value = False
-        bound_form = self.make_form(data={
-            'team_videos': [self.team_videos[0].id],
-        })
-        with assert_raises(PermissionDenied):
-            bound_form.save()
 
     def check_save(self, form, correct_videos):
         assert_true(form.is_valid(), form.errors.as_text())
@@ -330,3 +288,69 @@ class BulkTeamVideoFormTest(TestCase):
             'include_all': 1,
         })
         self.check_save(form, self.team_videos)
+
+class GetVideoPageFormsTest(TestCase):
+    # map form names to form classes
+    FORM_MAP = dict(
+        add=forms.NewAddTeamVideoForm,
+        edit=forms.NewEditTeamVideoForm,
+        bulk_edit=forms.BulkEditTeamVideosForm,
+        move=forms.MoveTeamVideosForm,
+        remove=forms.RemoveTeamVideosForm,
+    )
+    @patch_for_test('teams.permissions.can_add_video')
+    @patch_for_test('teams.permissions.can_edit_videos')
+    @patch_for_test('teams.permissions.can_move_videos_to')
+    @patch_for_test('teams.permissions.can_remove_videos')
+    def setUp(self, mock_can_remove_videos, mock_can_move_videos_to,
+              mock_can_edit_videos, mock_can_add_video):
+        self.user = UserFactory()
+        self.team = TeamFactory(admin=self.user)
+        self.other_team = TeamFactory(admin=self.user)
+
+        self.mock_can_add_video = mock_can_add_video
+        self.mock_can_edit_videos = mock_can_edit_videos
+        self.mock_can_move_videos_to = mock_can_move_videos_to
+        self.mock_can_remove_videos = mock_can_remove_videos
+
+        self.mock_can_add_video.return_value = True
+        self.mock_can_edit_videos.return_value = True
+        self.mock_can_move_videos_to.return_value = [self.other_team]
+        self.mock_can_remove_videos.return_value = True
+
+    def test_permissions_check_calls(self):
+        # test that we call the permissions check with the correct arguments
+        get_video_page_forms(self.team, self.user)
+        assert_equal(self.mock_can_add_video.call_args,
+                     mock.call(self.team, self.user))
+        assert_equal(self.mock_can_edit_videos.call_args,
+                     mock.call(self.team, self.user))
+        assert_equal(self.mock_can_move_videos_to.call_args,
+                     mock.call(self.team, self.user))
+        assert_equal(self.mock_can_remove_videos.call_args,
+                     mock.call(self.team, self.user))
+
+    def check_forms(self, *form_names):
+        rv = get_video_page_forms(self.team, self.user)
+        assert_items_equal(form_names, rv.keys())
+        for name, form_class in rv.items():
+            assert_equal(form_class, self.FORM_MAP[name])
+
+    def test_all_permissions_pass(self):
+        self.check_forms('add', 'edit', 'bulk_edit', 'move', 'remove')
+
+    def test_cant_add_video(self):
+        self.mock_can_add_video.return_value = False
+        self.check_forms('edit', 'bulk_edit', 'move', 'remove')
+
+    def test_cant_edit_video(self):
+        self.mock_can_edit_videos.return_value = False
+        self.check_forms('add', 'move', 'remove')
+
+    def test_cant_move_video(self):
+        self.mock_can_move_videos_to.return_value = []
+        self.check_forms('add', 'edit', 'bulk_edit', 'remove')
+
+    def test_cant_remove_video(self):
+        self.mock_can_remove_videos.return_value = False
+        self.check_forms('add', 'edit', 'bulk_edit', 'move')

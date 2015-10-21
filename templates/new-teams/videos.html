@@ -22,11 +22,9 @@
       </form>
     </div>
 
-    {% if forms.add.enabled %}
+    {% if "add" in forms %}
     <div class="section tools">
-      {% if forms.add.enabled %}
       <button class="open-modal" data-modal="add-form">{% trans "Add Video" %}</button>
-      {% endif %}
     </div>
     {% endif %}
   </div>
@@ -61,7 +59,7 @@
           <a href="{% url "videos:video" video_id=video.video_id %}">{{ video.title_display }}</a>
         </h6>
         {% with description=video.description|urlize|linebreaks %}
-        {% if forms.edit.enabled %}
+        {% if "edit" in forms %}
         <div class="three-lines">{{ description }}</div>
         <button class="open-modal" data-modal="edit-form" data-heading="{% blocktrans with title=video.title_display %}Edit Team Video: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}, "primary_audio_language": "{{ video.primary_audio_language_code }}", "project": "{{team_video.project_id }}" }'>{% trans "edit" %}</button>
         {% else %}
@@ -90,20 +88,20 @@
 {% block bottom %}
 {% if bulk_mode_enabled %}
 <div class="bottom-sheet" data-title-singular="{% trans "1 videos selected" %}" data-title-plural="{% blocktrans with count="COUNT_PLACEHOLDER" %}{{ count }} videos selected{% endblocktrans %}">
-  {% if forms.bulk_edit.enabled %}
+  {% if "bulk_edit" in forms %}
   <button class="needs-multiple-selected open-modal" data-modal="bulk-edit-form" data-copy-input="team_videos">{% trans "Bulk Edit" %}</button>
   {% endif %}
-  {% if forms.move.enabled %}
+  {% if "move" in forms %}
   <button class="open-modal" data-modal="move-form" data-copy-input="team_videos">{% trans "Move" %}</button>
   {% endif %}
-  {% if forms.remove.enabled %}
+  {% if "remove" in forms %}
   <button class="open-modal" data-modal="remove-form" data-copy-input="team_videos">{% trans "Remove" %}</button>
   {% endif %}
   <button class="dismiss deselect-all">{% trans "deselect all" %}</button>
 </div>
 {% endif %}
 
-{% if forms.add.enabled %}
+{% if "add" in forms %}
 <aside class="modal{% if forms.add.errors %} start-open{% endif %}" id="add-form">
   <h3>{% trans "Add Video" %}</h3>
   <button class="close"></button>
@@ -121,7 +119,7 @@
 </aside>
 {% endif %}
 
-{% if forms.edit.enabled %}
+{% if "edit" in forms %}
 <aside class="modal{% if forms.edit.errors %} start-open{% endif %}" id="edit-form">
   <h3></h3>
   <button class="close"></button>
@@ -140,7 +138,7 @@
 </aside>
 {% endif %}
 
-{% if forms.bulk_edit.enabled %}
+{% if "bulk_edit" in forms %}
 <aside class="modal{% if forms.bulk_edit.errors %} start-open{% endif %}" id="bulk-edit-form">
   <h3>{% trans "Bulk Edit Videos" %}</h3>
   <button class="close"></button>
@@ -158,7 +156,7 @@
 </aside>
 {% endif %}
 
-{% if forms.move.enabled %}
+{% if "move" in forms %}
 <aside class="modal{% if forms.move.errors %} start-open{% endif %}" id="move-form">
   <h3>{% trans "Move Videos" %}</h3>
   <button class="close"></button>
@@ -189,7 +187,7 @@
 </aside>
 {% endif %}
 
-{% if forms.remove.enabled %}
+{% if "remove" in forms %}
 <aside class="modal{% if forms.remove.errors %} start-open{% endif %}" id="remove-form">
   <h3>{% trans "Remove Videos" %}</h3>
   <button class="close"></button>

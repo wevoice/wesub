@@ -143,6 +143,19 @@ def fetch_actions_for_activity_page(team, tab, page, params):
                 .select_related('new_language', 'video', 'user',
                                 'new_language__video'))
 
+def get_video_page_forms(team, user):
+    form_map = {}
+    if permissions.can_add_video(team, user):
+        form_map['add'] = forms.NewAddTeamVideoForm
+    if permissions.can_edit_videos(team, user):
+        form_map['edit'] = forms.NewEditTeamVideoForm
+        form_map['bulk_edit'] = forms.BulkEditTeamVideosForm
+    if len(permissions.can_move_videos_to(team, user)) > 0:
+        form_map['move'] = forms.MoveTeamVideosForm
+    if permissions.can_remove_videos(team, user):
+        form_map['remove'] = forms.RemoveTeamVideosForm
+    return form_map
+
 @team_view
 def videos(request, team):
     if team.is_old_style():
@@ -160,18 +173,14 @@ def videos(request, team):
             team_videos = team_videos.filter(
                 video__teamvideo__project=main_project)
 
-    form_map = dict(
-        add=forms.NewAddTeamVideoForm,
-        edit=forms.NewEditTeamVideoForm,
-        bulk_edit=forms.BulkEditTeamVideosForm,
-        move=forms.MoveTeamVideosForm,
-        remove=forms.RemoveTeamVideosForm,
-    )
+    form_map = get_video_page_forms(team, request.user)
     page_forms = FormRouter(form_map, request, team, request.user,
                             team_videos)
+    has_bulk_form = any(issubclass(form, forms.BulkTeamVideoForm)
+                        for form in form_map.values())
     if page_forms.submitted_form:
         form = page_forms.submitted_form
-        if form.enabled and form.is_valid():
+        if form.is_valid():
             form.save()
             messages.success(request, form.message())
             return HttpResponseRedirect(request.build_absolute_uri())
@@ -208,11 +217,7 @@ def videos(request, team):
         'paginator': paginator,
         'filters_form': filters_form,
         'forms': page_forms,
-        'bulk_mode_enabled': team_videos and (
-            page_forms['move'].enabled or
-            page_forms['remove'].enabled or
-            page_forms['bulk_edit'].enabled
-        ),
+        'bulk_mode_enabled': team_videos and has_bulk_form,
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Videos')),

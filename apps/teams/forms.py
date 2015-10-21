@@ -1200,21 +1200,12 @@ class BulkTeamVideoForm(forms.Form):
         self.team = team
         self.user = user
         self.videos_qs = videos_qs
-        self.enabled = self.check_permissions()
         self.fields['team_videos'].choices = [
             (tv.id, tv.id) for tv in team.teamvideo_set.all()
         ]
         self.setup_fields()
 
-    def is_valid(self):
-        if not self.enabled:
-            return False
-        else:
-            return super(BulkTeamVideoForm, self).is_valid()
-
     def save(self):
-        if not self.enabled:
-            raise PermissionDenied("Form not enabled")
         self.perform_save(self.find_team_videos_to_update())
 
     def find_team_videos_to_update(self):
@@ -1232,13 +1223,6 @@ class BulkTeamVideoForm(forms.Form):
             )
         self.count = qs.count()
         return qs
-
-    def check_permissions(self, team, user):
-        """Check if a user has permission to use this form.
-
-        Returns: True/False
-        """
-        raise NotImplementedError()
 
     def setup_fields(self):
         """Override this if you need to dynamically setup the form fields."""
@@ -1258,17 +1242,12 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
                                 required=False)
 
     def setup_fields(self):
-        dest_teams = [self.team] + self.can_move_videos_to
+        dest_teams = [self.team] + permissions.can_move_videos_to(
+            self.team, self.user)
         self.fields['new_team'].choices = [
             (dest.id, dest.name) for dest in dest_teams
         ]
         self.setup_project_field(dest_teams)
-
-    def check_permissions(self):
-        self.can_move_videos_to = permissions.can_move_videos_to(
-            self.team, self.user,
-        )
-        return bool(self.can_move_videos_to)
 
     def setup_project_field(self, dest_teams):
         # choices regular django choices object.  project_options is a list of
@@ -1352,9 +1331,6 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
                    count=self.count)
 
 class RemoveTeamVideosForm(BulkTeamVideoForm):
-    def check_permissions(self):
-        return permissions.can_remove_videos(self.team, self.user)
-
     def perform_save(self, qs):
         qs.delete()
 
@@ -1369,9 +1345,6 @@ class BulkEditTeamVideosForm(BulkTeamVideoForm):
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
     thumbnail = forms.ImageField(label=_('Change thumbnail'), required=False)
-
-    def check_permissions(self):
-        return permissions.can_edit_videos(self.team, self.user)
 
     def setup_fields(self):
         self.fields['primary_audio_language'].choices = \
@@ -1426,25 +1399,13 @@ class NewAddTeamVideoForm(VideoForm):
     def __init__(self, team, user, videos_qs, *args, **kwargs):
         super(NewAddTeamVideoForm, self).__init__(user, *args, **kwargs)
         self.team = team
-        if not permissions.can_add_video(team, user):
-            self.enabled = False
-        else:
-            self.enabled = True
-            self.fields['project'].choices = [
-                ('', _('None')),
-            ] + [
-                (p.id, p.name) for p in Project.objects.for_team(team)
-            ]
+        self.fields['project'].choices = [
+            ('', _('None')),
+        ] + [
+            (p.id, p.name) for p in Project.objects.for_team(team)
+        ]
         if not self.fields['project'].choices:
             del self.fields['project']
-
-    def full_clean(self):
-        if not self.enabled:
-            self._errors = ErrorDict()
-            self._errors['__all__'] = _("You don't have permission to "
-                                        "add videos to this team")
-            return {}
-        return super(NewAddTeamVideoForm, self).full_clean()
 
     def clean(self):
         if not self._errors:
@@ -1491,16 +1452,12 @@ class NewEditTeamVideoForm(forms.Form):
     def __init__(self, team, user, videos_qs, *args, **kwargs):
         super(NewEditTeamVideoForm, self).__init__(*args, **kwargs)
         self.team = team
-        if not permissions.can_edit_videos(team, user):
-            self.enabled = False
-        else:
-            self.enabled = True
-            self.fields['team_video'].choices = [
-                (tv.id, tv.id) for tv in team.teamvideo_set.all()
-            ]
-            self.setup_project_field()
-            self.fields['primary_audio_language'].choices = \
-                    get_language_choices(with_empty=True)
+        self.fields['team_video'].choices = [
+            (tv.id, tv.id) for tv in team.teamvideo_set.all()
+        ]
+        self.setup_project_field()
+        self.fields['primary_audio_language'].choices = \
+                get_language_choices(with_empty=True)
 
     def setup_project_field(self):
         projects = Project.objects.for_team(self.team)
