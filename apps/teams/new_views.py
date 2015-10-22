@@ -131,15 +131,17 @@ def fetch_actions_for_activity_page(team, tab, page, params):
     if params.get('action_type', 'any') != 'any':
         action_qs = action_qs.filter(action_type=params.get('action_type'))
 
-    action_qs = action_qs.select_related('new_language', 'video')
-
     sort = params.get('sort', '-created')
-    action_qs = action_qs.order_by(sort)
+    action_qs = action_qs.order_by(sort)[start:end]
 
-    action_qs = action_qs[start:end].select_related(
-        'user', 'new_language__video'
-    )
-    return list(action_qs)
+    # This query often requires a filesort in mysql.  We can speed things up
+    # by only selecting the ids, which keeps the rows being sorted small.
+    action_ids = list(action_qs.values_list('id', flat=True))
+    # Now do a second query that selects all the columns.
+    return list(Action.objects
+                .filter(id__in=action_ids)
+                .select_related('new_language', 'video', 'user',
+                                'new_language__video'))
 
 @team_view
 def videos(request, team):
