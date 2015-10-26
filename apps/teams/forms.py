@@ -1002,7 +1002,7 @@ class VideoFiltersForm(forms.Form):
         data = {
             name: value
             for name, value in get_data.items()
-            if name != 'page'
+            if name not in ('page', 'selection')
         }
         return data if data else None
 
@@ -1190,19 +1190,16 @@ class EditMembershipForm(forms.Form):
 
 class BulkTeamVideoForm(forms.Form):
     """Base class for forms that operate on multiple team videos at once."""
-    team_videos = forms.MultipleChoiceField(choices=[], required=False)
-    include_all = forms.BooleanField(
-        label=_('Include videos on other pages'),
-        required=False)
+    include_all = forms.BooleanField(label='', required=False)
 
-    def __init__(self, team, user, videos_qs, *args, **kwargs):
+    def __init__(self, team, user, team_videos_qs, selection, all_selected,
+                 *args, **kwargs):
         super(BulkTeamVideoForm, self).__init__(*args, **kwargs)
         self.team = team
         self.user = user
-        self.videos_qs = videos_qs
-        self.fields['team_videos'].choices = [
-            (tv.id, tv.id) for tv in team.teamvideo_set.all()
-        ]
+        self.team_videos_qs = team_videos_qs
+        self.selection = selection
+        self.setup_include_all(team_videos_qs, selection, all_selected)
         self.setup_fields()
 
     def save(self):
@@ -1210,11 +1207,9 @@ class BulkTeamVideoForm(forms.Form):
 
     def find_team_videos_to_update(self):
         from haystack.query import SearchQuerySet
-        qs = self.videos_qs
-        if not self.cleaned_data['include_all']:
-            qs = TeamVideo.objects.filter(
-                id__in=self.cleaned_data['team_videos']
-            )
+        qs = self.team_videos_qs
+        if not self.cleaned_data.get('include_all'):
+            qs = TeamVideo.objects.filter(id__in=self.selection)
         elif isinstance(qs, SearchQuerySet):
             # hack to make this work if we get a SearchQuerySet.  Fixing
             # pculture/unisubs#838 would be really nice
@@ -1223,6 +1218,18 @@ class BulkTeamVideoForm(forms.Form):
             )
         self.count = qs.count()
         return qs
+
+    def setup_include_all(self, team_videos_qs, selection, all_selected):
+        if not all_selected:
+            del self.fields['include_all']
+        else:
+            total_videos = team_videos_qs.count()
+            if total_videos <= len(selection):
+                del self.fields['include_all']
+            else:
+                self.fields['include_all'].label = fmt(
+                    _('Include all %(count)s videos'),
+                    count=total_videos)
 
     def setup_fields(self):
         """Override this if you need to dynamically setup the form fields."""
@@ -1396,7 +1403,7 @@ class NewAddTeamVideoForm(VideoForm):
                                 required=False)
     thumbnail = forms.ImageField(required=False)
 
-    def __init__(self, team, user, videos_qs, *args, **kwargs):
+    def __init__(self, team, user, *args, **kwargs):
         super(NewAddTeamVideoForm, self).__init__(user, *args, **kwargs)
         self.team = team
         self.fields['project'].choices = [
@@ -1443,21 +1450,26 @@ class NewAddTeamVideoForm(VideoForm):
             return _('Existing video added to team.')
 
 class NewEditTeamVideoForm(forms.Form):
-    team_video = forms.ChoiceField(choices=[])
     primary_audio_language = forms.ChoiceField(required=False, choices=[])
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
     thumbnail = forms.ImageField(label=_('Change thumbnail'), required=False)
 
-    def __init__(self, team, user, videos_qs, *args, **kwargs):
+    def __init__(self, team, user, team_videos_qs, selection, all_selected,
+                 *args, **kwargs):
         super(NewEditTeamVideoForm, self).__init__(*args, **kwargs)
         self.team = team
-        self.fields['team_video'].choices = [
-            (tv.id, tv.id) for tv in team.teamvideo_set.all()
-        ]
+        self.fetch_video(selection)
         self.setup_project_field()
-        self.fields['primary_audio_language'].choices = \
-                get_language_choices(with_empty=True)
+        self.setup_primary_audio_language_field()
+
+    def fetch_video(self, selection):
+        if len(selection) != 1:
+            raise ValueError("Exactly 1 video must be selected")
+        self.team_video = (self.team.teamvideo_set
+                           .select_related('video')
+                           .get(id=selection[0]))
+        self.video = self.team_video.video
 
     def setup_project_field(self):
         projects = Project.objects.for_team(self.team)
@@ -1467,17 +1479,18 @@ class NewEditTeamVideoForm(forms.Form):
             ] + [
                 (p.id, p.name) for p in projects
             ]
+            self.fields['project'].initial = self.team_video.project_id
         else:
             # only the default project has been created, don't present a
             # selectbox with that as the only choice
             del self.fields['project']
 
-    def save(self):
-        team_video = (TeamVideo.objects
-                      .select_related('video')
-                      .get(id=self.cleaned_data['team_video']))
-        video = team_video.video
+    def setup_primary_audio_language_field(self):
+        field = self.fields['primary_audio_language']
+        field.choices = get_language_choices(with_empty=True)
+        field.initial = self.video.primary_audio_language_code
 
+    def save(self):
         project = self.cleaned_data.get('project')
         primary_audio_language = self.cleaned_data['primary_audio_language']
         thumbnail = self.cleaned_data['thumbnail']
@@ -1485,15 +1498,15 @@ class NewEditTeamVideoForm(forms.Form):
         if 'project' in self.fields:
             if project == '':
                 project = self.team.default_project.id
-            if project != team_video.project_id:
-                team_video.project_id = project
-                team_video.save()
-        if primary_audio_language != video.primary_audio_language_code:
-            video.primary_audio_language_code = primary_audio_language
-            video.save()
+            if project != self.team_video.project_id:
+                self.team_video.project_id = project
+                self.team_video.save()
+        if primary_audio_language != self.video.primary_audio_language_code:
+            self.video.primary_audio_language_code = primary_audio_language
+            self.video.save()
         if thumbnail:
-            team_video.video.s3_thumbnail.save(thumbnail.name, thumbnail)
-        return team_video
+            self.video.s3_thumbnail.save(thumbnail.name, thumbnail)
+        return self.team_video
 
     def message(self):
         return _('Video updated.')

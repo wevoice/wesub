@@ -3,6 +3,8 @@
 {% load i18n videos_tags %}
 {% load url from future %}
 
+{% block html_attrs %}id="team-videos" {{ block.super }}{% endblock %}
+
 {% block content %}
 <h2>{% blocktrans %}Videos for {{ team }}{% endblocktrans %}</h2>
 <div class="split-view">
@@ -22,7 +24,7 @@
       </form>
     </div>
 
-    {% if "add" in forms %}
+    {% if "add" in forms.enabled %}
     <div class="section tools">
       <button class="open-modal" data-modal="add-form">{% trans "Add Video" %}</button>
     </div>
@@ -59,9 +61,9 @@
           <a href="{% url "videos:video" video_id=video.video_id %}">{{ video.title_display }}</a>
         </h6>
         {% with description=video.description|urlize|linebreaks %}
-        {% if "edit" in forms %}
+        {% if "edit" in forms.enabled %}
         <div class="three-lines">{{ description }}</div>
-        <button class="open-modal" data-modal="edit-form" data-heading="{% blocktrans with title=video.title_display %}Edit Team Video: {{ title }}{% endblocktrans %}" data-set-form-values='{"team_video": {{ team_video.id }}, "primary_audio_language": "{{ video.primary_audio_language_code }}", "project": "{{team_video.project_id }}" }'>{% trans "edit" %}</button>
+        <button class="open-edit-modal" data-team-video-id="{{ team_video.id }}" data-modal-url="{% url "teams:videos-form" team.slug "edit" %}">{% trans "edit" %}</button>
         {% else %}
         <div class="four-lines">{{ description }}</div>
         {% endif %}
@@ -88,119 +90,34 @@
 {% block bottom %}
 {% if bulk_mode_enabled %}
 <div class="bottom-sheet" data-title-singular="{% trans "1 videos selected" %}" data-title-plural="{% blocktrans with count="COUNT_PLACEHOLDER" %}{{ count }} videos selected{% endblocktrans %}">
-  {% if "bulk_edit" in forms %}
-  <button class="needs-multiple-selected open-modal" data-modal="bulk-edit-form" data-copy-input="team_videos">{% trans "Bulk Edit" %}</button>
+  {% if "bulk-edit" in forms.enabled %}
+  <button class="needs-multiple-selected open-modal" data-modal-url="{% url "teams:videos-form" team.slug "bulk-edit" %}">{% trans "Bulk Edit" %}</button>
   {% endif %}
-  {% if "move" in forms %}
-  <button class="open-modal" data-modal="move-form" data-copy-input="team_videos">{% trans "Move" %}</button>
+  {% if "move" in forms.enabled %}
+  <button data-modal-url="{% url "teams:videos-form" team.slug "move" %}">{% trans "Move" %}</button>
   {% endif %}
-  {% if "remove" in forms %}
-  <button class="open-modal" data-modal="remove-form" data-copy-input="team_videos">{% trans "Remove" %}</button>
+  {% if "remove" in forms.enabled %}
+  <button data-modal-url="{% url "teams:videos-form" team.slug "remove" %}">{% trans "Remove" %}</button>
   {% endif %}
   <button class="dismiss deselect-all">{% trans "deselect all" %}</button>
 </div>
 {% endif %}
 
-{% if "add" in forms %}
-<aside class="modal{% if forms.add.errors %} start-open{% endif %}" id="add-form">
+{% if "add" in forms.enabled %}
+<aside class="modal{% if add_form.errors %} start-open{% endif %}" id="add-form">
   <h3>{% trans "Add Video" %}</h3>
   <button class="close"></button>
   <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    {% include "_non-field-errors.html" with form=forms.add %}
+    {% include "_non-field-errors.html" with form=add_form %}
     <input type="hidden" name="form" value="add">
-    {% include "_field.html" with field=forms.add.video_url %}
-    {% include "_field.html" with field=forms.add.project %}
-    {% include "_field.html" with field=forms.add.thumbnail %}
+    {% include "_field.html" with field=add_form.video_url %}
+    {% include "_field.html" with field=add_form.project %}
+    {% include "_field.html" with field=add_form.thumbnail %}
     <footer class="buttons">
       <button>{% trans "Add" %}</button>
     </footer>
   </form>
 </aside>
 {% endif %}
-
-{% if "edit" in forms %}
-<aside class="modal{% if forms.edit.errors %} start-open{% endif %}" id="edit-form">
-  <h3></h3>
-  <button class="close"></button>
-  <form action="" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {% include "_non-field-errors.html" with form=forms.edit %}
-    <input type="hidden" name="form" value="edit">
-    {{ forms.edit.team_video.as_hidden }}
-    {% include "_field.html" with field=forms.edit.primary_audio_language %}
-    {% include "_field.html" with field=forms.edit.project %}
-    {% include "_field.html" with field=forms.edit.thumbnail %}
-    <footer class="buttons">
-      <button>{% trans "Update" %}</button>
-    </footer>
-  </form>
-</aside>
-{% endif %}
-
-{% if "bulk_edit" in forms %}
-<aside class="modal{% if forms.bulk_edit.errors %} start-open{% endif %}" id="bulk-edit-form">
-  <h3>{% trans "Bulk Edit Videos" %}</h3>
-  <button class="close"></button>
-  <form action="" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {% include "_non-field-errors.html" with form=forms.bulk_edit %}
-    <input type="hidden" name="form" value="bulk_edit">
-    {% include "_field.html" with field=forms.bulk_edit.primary_audio_language %}
-    {% include "_field.html" with field=forms.bulk_edit.project %}
-    {% include "_field.html" with field=forms.bulk_edit.thumbnail %}
-    <footer class="buttons">
-      <button>{% trans "Update" %}</button>
-    </footer>
-  </form>
-</aside>
-{% endif %}
-
-{% if "move" in forms %}
-<aside class="modal{% if forms.move.errors %} start-open{% endif %}" id="move-form">
-  <h3>{% trans "Move Videos" %}</h3>
-  <button class="close"></button>
-  <form class="team-bulk-move" action="" method="POST">
-    {% csrf_token %}
-    {% include "_non-field-errors.html" with form=forms.move %}
-    <input type="hidden" name="form" value="move">
-    {% include "_field.html" with field=forms.move.new_team %}
-
-    <label>
-      <span class="label">{{ forms.move.project.label }}</span>
-      {% include "_error-list.html" with errors=forms.move.project.errors %}
-      <select name="project">
-        {% for project_id, project_name, team_id in forms.move.project_options %}
-        <option value="{{ project_id }}" data-team="{{ team_id }}">{{ project_name }}</option>
-        {% endfor %}
-      </select>
-    </label>
-
-    <div class="needs-all-selected">
-      {% include "_field.html" with field=forms.move.include_all %}
-    </div>
-
-    <footer class="buttons">
-      <button>{% trans "Move Videos" %}</button>
-    </footer>
-  </form>
-</aside>
-{% endif %}
-
-{% if "remove" in forms %}
-<aside class="modal{% if forms.remove.errors %} start-open{% endif %}" id="remove-form">
-  <h3>{% trans "Remove Videos" %}</h3>
-  <button class="close"></button>
-  <form action="" method="POST">
-    {% csrf_token %}
-    {% include "_non-field-errors.html" with form=forms.remove %}
-    <input type="hidden" name="form" value="remove">
-    <p class="confirmation">{% trans "Are you sure you want to remove the video(s) from your team?" %}</p>
-    <footer class="buttons">
-      <button>{% trans "Remove" %}</button>
-    </footer>
-  </form>
-</aside>
-{% endif %}
-
 {% endblock %}

@@ -481,13 +481,16 @@ MEDIA_BUNDLES = {
     "new-site.js": {
         "files": [
             'src/js/third-party/jquery-2.1.3.js',
+            'src/js/third-party/jquery.form.js',
             'src/js/site/menus.js',
             'src/js/site/modals.js',
+            'src/js/site/querystring.js',
             'src/js/site/tooltips.js',
             'src/js/site/pagination.js',
             'src/js/site/autocomplete.js',
             'src/js/site/thumb-lists.js',
             'src/js/site/bottom-sheet.js',
+            'src/js/site/team-videos.js',
             'src/js/site/team-bulk-move.js',
             'src/js/site/team-integration-settings.js',
         ],
