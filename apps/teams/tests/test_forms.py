@@ -29,11 +29,12 @@ from nose.tools import *
 import mock
 
 from teams import forms
+from teams import signals
 from teams.models import TeamVideo
 from teams.permissions import *
-from teams.new_views import VideoPageForms
+from teams.new_views import VideoPageForms, VideoPageExtensionForm
 from utils.factories import *
-from utils.test_utils import patch_for_test, reload_obj
+from utils.test_utils import *
 from videos.models import Video, VideoUrl
 
 class EditMemberFormTest(TestCase):
@@ -338,3 +339,30 @@ class VideoPageFormsTest(TestCase):
     def test_cant_remove_video(self):
         self.mock_can_remove_videos.return_value = False
         self.check_forms('add', 'edit', 'bulk-edit', 'move')
+
+    def test_build_video_page_forms_signal(self):
+        # test that we emit the build_video_page_forms signal when creating an
+        # instance.  This gives other apps a chance to call
+        # add_extension_form()
+        team_videos_qs = self.team.teamvideo_set.all()
+        with mock_handler(signals.build_video_page_forms) as handler:
+            video_page_forms = VideoPageForms(self.team, self.user,
+                                              team_videos_qs)
+        assert_true(handler.called)
+        assert_equal(handler.call_args, mock.call(
+            signal=signals.build_video_page_forms, sender=video_page_forms,
+            team=self.team, user=self.user, team_videos_qs=team_videos_qs))
+
+    def test_add_extension_forms(self):
+        video_page_forms = VideoPageForms(self.team, self.user,
+                                          self.team.teamvideo_set.all())
+        ext_form1 = VideoPageExtensionForm('form1', 'Form1', mock.Mock())
+        ext_form2 = VideoPageExtensionForm('form2', 'Form2', mock.Mock())
+        video_page_forms.add_extension_form(ext_form1)
+        video_page_forms.add_extension_form(ext_form2)
+        assert_equal(video_page_forms.get_extension_forms(),
+                     [ext_form1, ext_form2])
+        assert_equal(video_page_forms.lookup_form_class('form1'),
+                     ext_form1.form_class)
+        assert_equal(video_page_forms.lookup_form_class('form2'),
+                     ext_form2.form_class)

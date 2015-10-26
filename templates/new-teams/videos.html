@@ -99,6 +99,9 @@
   {% if "remove" in forms.enabled %}
   <button data-modal-url="{% url "teams:videos-form" team.slug "remove" %}">{% trans "Remove" %}</button>
   {% endif %}
+  {% for ext_form in forms.get_extension_forms %}
+  <button data-modal-url="{% url "teams:videos-form" team.slug ext_form.name %}">{{ ext_form.label }}</button>
+  {% endfor %}
   <button class="dismiss deselect-all">{% trans "deselect all" %}</button>
 </div>
 {% endif %}

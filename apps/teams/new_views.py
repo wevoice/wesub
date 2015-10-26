@@ -27,6 +27,7 @@ import functools
 import json
 import logging
 import pickle
+from collections import namedtuple, OrderedDict
 
 from django.conf import settings
 from django.contrib import messages
@@ -44,6 +45,7 @@ from django.utils.translation import ugettext as _
 from . import views as old_views
 from . import forms
 from . import permissions
+from . import signals
 from . import tasks
 from .behaviors import get_main_project
 from .exceptions import ApplicationInvalidException
@@ -144,12 +146,43 @@ def fetch_actions_for_activity_page(team, tab, page, params):
                 .select_related('new_language', 'video', 'user',
                                 'new_language__video'))
 
+class VideoPageExtensionForm(object):
+    """Define an extra form on the video page.
+
+    This class is used to define extension forms.  See
+    VideoPageForms.add_extension_form() method for how you would use them.
+    """
+    def __init__(self, name, label, form_class, selection_type=None):
+        """Create a VideoPageExtensionForm
+
+        Args:
+            name -- unique name for the form
+            label -- human-friendly label to display
+            form_class -- form class to handle things
+            selection_type -- can one of the following:
+                - single-only: Enabled only for single selections
+                - multiple-only: Enabled only for multiple selections
+        """
+        self.name = name
+        self.label = label
+        self.form_class = form_class
+        self.selection_type = selection_type
+
+    def css_selection_class(self):
+        if self.selection_type == 'single':
+            return 'needs-one-selected'
+        elif self.selection_type == 'multiple':
+            return 'needs-multiple-selected'
+        else:
+            return ''
+
 class VideoPageForms(object):
     """Manages forms on the video page
 
     This class is responsible for
         - Determining which forms should be enabled for the page
         - Building forms
+        - Allowing other apps to extend which forms appear in the bottom sheet
     """
     form_classes = {
         'add': forms.NewAddTeamVideoForm,
@@ -173,12 +206,15 @@ class VideoPageForms(object):
         if permissions.can_remove_videos(team, user):
             self.enabled.add('remove')
         self.has_bulk_form = any(
-            issubclass(self.form_classes[name], forms.BulkTeamVideoForm)
-            for name in self.enabled
+            issubclass(form_class, forms.BulkTeamVideoForm)
+            for form_class in self.enabled_form_classes()
         )
+        self.extension_forms = OrderedDict()
+        signals.build_video_page_forms.send(
+            sender=self, team=team, user=user, team_videos_qs=team_videos_qs)
 
     def build_ajax_form(self, name, request, selection):
-        FormClass = self.form_classes[name]
+        FormClass = self.lookup_form_class(name)
         all_selected = len(selection) >= VIDEOS_PER_PAGE
         if request.method == 'POST':
             return FormClass(self.team, self.user, self.team_videos_qs,
@@ -203,6 +239,32 @@ class VideoPageForms(object):
         else:
             return forms.NewAddTeamVideoForm(self.team, self.user,
                                              initial=initial)
+
+    def add_extension_form(self, extension_form):
+        """Add an extra form to appear on the video page
+
+        Extension forms are a way for other apps to add a form to the video
+        page.  These forms appear on the bottom sheet when videos get
+        selected.  Connect to the build_video_page_forms signal in order to
+        get a chance to call this method when a VideoPageForm is built.
+        """
+        self.extension_forms[extension_form.name] = extension_form
+
+    def get_extension_forms(self):
+        return self.extension_forms.values()
+
+    def lookup_form_class(self, name):
+        if name in self.enabled:
+            return self.form_classes[name]
+        if name in self.extension_forms:
+            return self.extension_forms[name].form_class
+        raise KeyError(name)
+
+    def enabled_form_classes(self):
+        for name in self.enabled:
+            yield self.form_classes[name]
+        for ext_form in self.get_extension_forms():
+            yield ext_form.form_class
 
 def _videos_and_filters_form(request, team):
     filters_form = forms.VideoFiltersForm(team, request.GET)
@@ -279,7 +341,9 @@ def videos_form(request, team, name):
     team_videos_qs, filters_form = _videos_and_filters_form(request, team)
     page_forms = VideoPageForms(team, request.user, team_videos_qs)
 
-    if name not in page_forms.form_classes:
+    try:
+        page_forms.lookup_form_class(name)
+    except KeyError:
         raise Http404
 
     form = page_forms.build_ajax_form(name, request, selection)
