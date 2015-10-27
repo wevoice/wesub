@@ -685,7 +685,11 @@ class SubtitlesView(generics.CreateAPIView):
         if not workflow.user_can_edit_subtitles(
             self.request.user, self.kwargs['language_code']):
             raise PermissionDenied()
-        version = super(SubtitlesView, self).create(request, *args, **kwargs)
+        try:
+            version = super(SubtitlesView, self).create(request, *args,
+                                                        **kwargs)
+        except (ActionError, LookupError), e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         videos.tasks.video_changed_tasks.delay(video.pk)
         return version
 
