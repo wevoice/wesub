@@ -511,9 +511,11 @@ class SubtitlesField(serializers.CharField):
     def to_internal_value(self, value):
         if not isinstance(value, basestring):
             raise serializers.ValidationError("Invalid subtitle data")
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
         try:
             return load_subtitles(
-                self.context['language_code'], str(value),
+                self.context['language_code'], value,
                 self.context['sub_format'])
         except babelsubs.SubtitleParserError:
             raise serializers.ValidationError("Invalid subtitle data")

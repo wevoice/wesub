@@ -190,7 +190,7 @@ div.fix-chosen div.chzn-container {
 #language_modal {
     select {
         color: inherit;
-        margin-right: 25px;
+        margin-right: 20px;
     }
     button.cancel {
         float: left;
@@ -3275,4 +3275,11 @@ a.truncated-expand {
 
 .v1 .message.notification {
     background-color: #DDD;
+}
+
+
+.v1 hr.form-separator {
+    display: block;
+    margin: 20px 0;
+    border: 1px inset;
 }

@@ -69,6 +69,11 @@ label {
     padding: 0;
     margin: 0 0 $line-height/2 0;
     font-size: inherit;
+
+    &.disabled {
+        color: $light-gray;
+        border-color: $light-gray;
+    }
 }
 
 label label {
@@ -99,4 +104,11 @@ ul.errorlist {
     li {
         padding: 3px 0;
     }
+}
+.language-selects select{
+    width: 90%;
+}
+
+hr.form-separator {
+    margin: 20px 0;
 }
