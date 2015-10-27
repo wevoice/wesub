@@ -10,8 +10,9 @@ from django.utils.translation import ugettext_lazy as _
 
 from .autocomplete import AutocompleteTextInput
 from .formrouter import FormRouter
-from .userautocomplete import UserAutocompleteField, autocomplete_user_view
+from .languages import MultipleLanguageChoiceField
 from .recapcha import ReCaptchaField
+from .userautocomplete import UserAutocompleteField, autocomplete_user_view
 
 assert ReCaptchaField # Shut up, Pyflakes.
 
