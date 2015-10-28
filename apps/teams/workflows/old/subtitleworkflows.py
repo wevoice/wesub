@@ -221,3 +221,14 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
         else:
             return (super(TaskTeamSubtitlesWorkflow, self)
                     .action_for_add_subtitles(user, language_code, complete))
+
+class NonTaskTeamPublish(subtitles.workflows.Publish):
+    def perform(self, user, video, subtitle_language, saved_version):
+        super(NonTaskTeamPublish, self).perform(
+            user, video, subtitle_language, saved_version)
+        if saved_version:
+            BillingRecord.objects.insert_record(saved_version)
+
+class NonTaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
+    def get_actions(self, user, language_code):
+        return [subtitles.workflows.SaveDraft(), NonTaskTeamPublish()]
