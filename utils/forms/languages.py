@@ -26,11 +26,24 @@ class MultipleLanguageChoiceField(forms.MultipleChoiceField):
     # TODO: implement a nicer widget for selecting multiple languages
     widget = forms.SelectMultiple
 
-    def __init__(self, choices=None, *args, **kwargs):
-        if choices is None:
-            choices = self.calc_language_choices()
-        super(MultipleLanguageChoiceField, self).__init__(
-            *args, choices=choices, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(MultipleLanguageChoiceField, self).__init__(*args, **kwargs)
+        self._setup_choices()
+
+    def __deepcopy__(self, memo):
+        # This is called when we create a new form and bind this field.  We
+        # need to reset the choice iter in this case.  This code is copied
+        # from ModelChoiceField
+        result = super(forms.ChoiceField, self).__deepcopy__(memo)
+        result._setup_choices()
+        return result
+
+    def _setup_choices(self):
+        self._choices = self.widget.choices = self.choice_iter()
+
+    def choice_iter(self):
+        for choice in self.calc_language_choices():
+            yield choice
 
     def calc_language_choices(self):
         return get_language_choices()
