@@ -205,24 +205,24 @@ class VideoPageForms(object):
             self.enabled.add('move')
         if permissions.can_remove_videos(team, user):
             self.enabled.add('remove')
+        self.extension_forms = OrderedDict()
+        signals.build_video_page_forms.send(
+            sender=self, team=team, user=user, team_videos_qs=team_videos_qs)
         self.has_bulk_form = any(
             issubclass(form_class, forms.BulkTeamVideoForm)
             for form_class in self.enabled_form_classes()
         )
-        self.extension_forms = OrderedDict()
-        signals.build_video_page_forms.send(
-            sender=self, team=team, user=user, team_videos_qs=team_videos_qs)
 
-    def build_ajax_form(self, name, request, selection):
+    def build_ajax_form(self, name, request, selection, filters_form):
         FormClass = self.lookup_form_class(name)
         all_selected = len(selection) >= VIDEOS_PER_PAGE
         if request.method == 'POST':
             return FormClass(self.team, self.user, self.team_videos_qs,
-                             selection, all_selected, data=request.POST,
-                             files=request.FILES)
+                             selection, all_selected, filters_form,
+                             data=request.POST, files=request.FILES)
         else:
             return FormClass(self.team, self.user, self.team_videos_qs,
-                             selection, all_selected)
+                             selection, all_selected, filters_form)
 
     def build_add_form(self, request, filters_form):
         if filters_form.selected_project:
@@ -346,7 +346,7 @@ def videos_form(request, team, name):
     except KeyError:
         raise Http404
 
-    form = page_forms.build_ajax_form(name, request, selection)
+    form = page_forms.build_ajax_form(name, request, selection, filters_form)
 
     if form.is_bound and form.is_valid():
         form.save()

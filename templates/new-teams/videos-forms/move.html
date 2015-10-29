@@ -15,11 +15,13 @@
     <label>
       <span class="label">{{ form.project.label }}</span>
       {% include "_error-list.html" with errors=form.project.errors %}
+      {% with project_value=form.project.value %}
       <select name="project">
         {% for project_id, project_name, team_id in form.project_options %}
-        <option value="{{ project_id }}" data-team="{{ team_id }}">{{ project_name }}</option>
+        <option value="{{ project_id }}" {% if project_id == project_value %}selected{% endif %} data-team="{{ team_id }}">{{ project_name }}</option>
         {% endfor %}
       </select>
+      {% endwith %}
     </label>
 
     {% if form.include_all %}

@@ -1193,12 +1193,13 @@ class BulkTeamVideoForm(forms.Form):
     include_all = forms.BooleanField(label='', required=False)
 
     def __init__(self, team, user, team_videos_qs, selection, all_selected,
-                 *args, **kwargs):
+                 filters_form, *args, **kwargs):
         super(BulkTeamVideoForm, self).__init__(*args, **kwargs)
         self.team = team
         self.user = user
         self.team_videos_qs = team_videos_qs
         self.selection = selection
+        self.filters_form = filters_form
         self.setup_include_all(team_videos_qs, selection, all_selected)
         self.setup_fields()
 
@@ -1260,6 +1261,7 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
         # choices regular django choices object.  project_options is a list of
         # (id, name, team_id) tuples.  We need to store team_id in the
         # <option> tag to make our javascript work
+        field = self['project']
         choices = [ ('', _('None')) ]
         self.project_options = [
             ('', _('None'), 0),
@@ -1273,7 +1275,11 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
             self.project_options.append(
                 (project.id, project.name, project.team_id)
             )
-        self.fields['project'].choices = choices
+        field.choices = choices
+        if self.filters_form.selected_project:
+            field.field.initial = self.filters_form.selected_project.id
+        else:
+            field.field.initial = ''
 
     def clean_project(self):
         try:
@@ -1456,7 +1462,7 @@ class NewEditTeamVideoForm(forms.Form):
     thumbnail = forms.ImageField(label=_('Change thumbnail'), required=False)
 
     def __init__(self, team, user, team_videos_qs, selection, all_selected,
-                 *args, **kwargs):
+                 filters_form, *args, **kwargs):
         super(NewEditTeamVideoForm, self).__init__(*args, **kwargs)
         self.team = team
         self.fetch_video(selection)

@@ -19,7 +19,7 @@
 (function() {
 
 $(document).ready(function() {
-    $('html#team-videos .bottom-sheet button').click(onBottomButtonClick);
+    $('html#team-videos .bottom-sheet button[data-modal-url]').click(onBottomButtonClick);
     $('html#team-videos button.open-edit-modal').click(onEditModalClick);
 });
 

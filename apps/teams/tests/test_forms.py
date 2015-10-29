@@ -191,6 +191,7 @@ class EditTeamVideoFormTest(TestCase):
         return forms.NewEditTeamVideoForm(self.team, self.user,
                                           self.team.teamvideo_set.all(),
                                           [self.team_video.id], False,
+                                          forms.VideoFiltersForm(self.team),
                                           data=data, files=files)
 
     @patch_for_test('utils.amazon.fields.S3ImageFieldFile.save')
@@ -248,7 +249,8 @@ class BulkTeamVideoFormTest(TestCase):
             check_permissions = self.check_permissions
             perform_save = self.perform_save
         return FormClass(self.team, self.user, self.team.teamvideo_set.all(),
-                         selection, all_selected, data=data)
+                         selection, all_selected,
+                         forms.VideoFiltersForm(self.team), data=data)
 
     def check_save(self, form, correct_videos):
         assert_true(form.is_valid(), form.errors.as_text())
