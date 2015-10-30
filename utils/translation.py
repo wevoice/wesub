@@ -10,8 +10,11 @@ from django.utils.translation import (
 )
 from django.utils.translation.trans_real import parse_accept_lang_header
 import babel
+import pyuca
 
 from unilangs import get_language_name_mapping, LanguageCode
+
+collator = pyuca.Collator()
 
 # A set of all language codes we support.
 _supported_languages_map = get_language_name_mapping('unisubs')
@@ -84,7 +87,7 @@ def calc_language_choices(language_code):
         display_name = u'{} - {}'.format(native_name.title(),
                                          translated_name.title())
         languages.append((code, display_name))
-    languages.sort(key=lambda item: item[1])
+    languages.sort(key=lambda item: collator.sort_key(item[1]))
     return languages
 
 babel_locale_blacklist = set(['tw'])
