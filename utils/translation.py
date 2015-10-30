@@ -87,8 +87,11 @@ def calc_language_choices(language_code):
         display_name = u'{} - {}'.format(native_name.title(),
                                          translated_name.title())
         languages.append((code, display_name))
-    languages.sort(key=lambda item: collator.sort_key(item[1]))
+    languages.sort(key=choice_sort_key)
     return languages
+
+def choice_sort_key(item):
+    return collator.sort_key(item[1])
 
 babel_locale_blacklist = set(['tw'])
 def lookup_babel_locale(language_code):
