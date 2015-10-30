@@ -30,7 +30,7 @@ from videos.models import Video, VideoFeed
 from videos.types import video_type_registrar
 from utils import test_utils
 from utils.factories import *
-from utils.translation import get_language_choices
+from utils.translation import get_language_choices, choice_sort_key
 
 class TestVideoForm(TestCase):
     def setUp(self):
@@ -133,8 +133,7 @@ class CreateSubtitlesFormTest(CreateSubtitlesFormTestBase):
             rv = []
             for code in langs_on_top:
                 rv.append((code, choice_map.pop(code)))
-            rv.extend(sorted(choice_map.items(),
-                             key=lambda choice: choice[1]))
+            rv.extend(sorted(choice_map.items(), key=choice_sort_key))
             return rv
 
         self.user = UserFactory(languages=['es', 'fr'])
