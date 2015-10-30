@@ -482,6 +482,7 @@ MEDIA_BUNDLES = {
         "files": [
             'src/js/third-party/jquery-2.1.3.js',
             'src/js/third-party/jquery.form.js',
+            'src/js/third-party/behaviors.js',
             'src/js/site/menus.js',
             'src/js/site/modals.js',
             'src/js/site/querystring.js',

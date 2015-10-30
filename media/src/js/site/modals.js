@@ -111,6 +111,7 @@ window.ajaxOpenModal = function(url, params, setupData) {
     .done(function(data, textStatus, xhr) {
         loadingHTML.remove();
         var modal = $(data)
+        modal.updateBehaviors();
         modal.appendTo(document.body).openModal(null, setupData);
         $('form', modal).ajaxForm({
             url: url + '?' + $.param(params),
