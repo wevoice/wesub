@@ -9,6 +9,7 @@ from django.utils.translation import (
     get_language, get_language_info, ugettext as _
 )
 from django.utils.translation.trans_real import parse_accept_lang_header
+import babel
 
 from unilangs import get_language_name_mapping, LanguageCode
 
@@ -32,17 +33,26 @@ def _only_supported_languages(language_codes):
 
 _get_language_choices_cache = {}
 def get_language_choices(with_empty=False, with_any=False):
-    """Return a list of language code choices labeled appropriately."""
+    """Get a list of language choices
+
+    We display languages as "<native_name> <translated_name">, where native
+    name is the how native speakers of the language would write it and
+    translated_name is the language translated into the language we're
+    using to render the page.
+
+    We use the babel library to lookup language name, however not all
+    of our languages are handled.  As a fallback we use the translations from
+    gettext.
+
+    Args:
+        language_code -- language we're rendering the page in
+    """
 
     language_code = get_language()
     try:
         languages = _get_language_choices_cache[language_code]
     except KeyError:
-        languages = [
-            (code, _(name))
-            for (code, name) in _supported_languages_map.items()
-        ]
-        languages.sort(key=lambda item: item[1])
+        languages = calc_language_choices(language_code)
         _get_language_choices_cache[language_code] = languages
 
     # make a copy of languages before we alter it
@@ -52,6 +62,42 @@ def get_language_choices(with_empty=False, with_any=False):
     if with_empty:
         languages.insert(0, ('', '---------'))
     return languages
+
+def calc_language_choices(language_code):
+    """Do the work for get_language_choices() """
+    languages = []
+    translation_locale = lookup_babel_locale(language_code)
+
+    for code, english_name in _supported_languages_map.items():
+        # try getting the name from babel first
+        locale = lookup_babel_locale(code)
+        if locale is None:
+            # The language isn't in babel, fall back to using gettext
+            native_name = translated_name = _(english_name)
+        else:
+            native_name = locale.display_name
+            translated_name = None
+            if translation_locale:
+                translated_name = locale.get_display_name(translation_locale)
+            if not translated_name:
+                translated_name = _(english_name)
+        display_name = u'{} - {}'.format(native_name.title(),
+                                         translated_name.title())
+        languages.append((code, display_name))
+    languages.sort(key=lambda item: item[1])
+    return languages
+
+babel_locale_blacklist = set(['tw'])
+def lookup_babel_locale(language_code):
+    if language_code == 'tw':
+        # babel parses the Twi language as Akan, but this doesn't work for us
+        # because "aka" is also Akan and we need to use a unique Locale for
+        # each language code.
+        return None
+    try:
+        return babel.Locale.parse(language_code, '-')
+    except (babel.UnknownLocaleError, ValueError):
+        return None
 
 def get_language_choices_as_dicts(with_empty=False):
     """Return a list of language code choices labeled appropriately."""
