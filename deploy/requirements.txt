@@ -12,6 +12,7 @@ South==0.7.4
 easy-thumbnails==1.4
 Pillow==2.6.0
 Babel==2.1.1
+pyuca==1.1
 six==1.9.0
 vendor/django-registration.tar.gz
 vendor/django-piston-0.2.3.tar.gz
