@@ -227,7 +227,11 @@ class NonTaskTeamPublish(subtitles.workflows.Publish):
         super(NonTaskTeamPublish, self).perform(
             user, video, subtitle_language, saved_version)
         if saved_version:
-            BillingRecord.objects.insert_record(saved_version)
+            billing_version = saved_version
+        else:
+            billing_version = subtitle_language.get_tip()
+        if billing_version:
+            BillingRecord.objects.insert_record(billing_version)
 
 class NonTaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
     def get_actions(self, user, language_code):
