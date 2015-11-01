@@ -39,7 +39,7 @@ class HtmlFiveVideoType(VideoType):
         return self.url
 
     def set_values(self, video):
-        cmd = """avprobe -v error -show_format -show_streams "{}" | grep duration= | sed 's/^.*=//' | head -n1""".format(self.url)
+        cmd = """avprobe -v error -show_format -show_streams "{}" 2>&1 | grep duration= | sed 's/^.*=//' | sort -n | head -n1""".format(self.url)
         try:
             duration = int(float(subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)))
             video.duration = duration
