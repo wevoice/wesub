@@ -4,6 +4,7 @@
 {% load url from future %}
 
 {% block content %}
+
 <h2>{% blocktrans %}Videos for {{ team }}{% endblocktrans %}</h2>
 <div class="split-view">
   <div class="sidebar">
@@ -15,6 +16,8 @@
         {% include "_field.html" with field=filters_form.project %}
         {% endif %}
         {% include "_field.html" with field=filters_form.sort %}
+        {% include "_field.html" with field=filters_form.added_between_from %}
+        {% include "_field.html" with field=filters_form.added_between_to %}
 
         <div class="actions">
           <button class="submit">Filter</button>
