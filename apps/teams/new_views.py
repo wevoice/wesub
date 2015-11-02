@@ -210,7 +210,8 @@ def videos(request, team):
         team_videos.sort(key=lambda tv: team_video_order[tv.id])
     else:
         team_videos = list(page)
-
+    total_duration = reduce(lambda x, y: x + (y.video.duration or 0), team_videos, 0)
+    unknown_duration = len(filter(lambda x: x.video.duration is None, team_videos)) > 0
     return render(request, 'new-teams/videos.html', {
         'team': team,
         'team_videos': team_videos,
@@ -218,6 +219,8 @@ def videos(request, team):
         'paginator': paginator,
         'filters_form': filters_form,
         'forms': page_forms,
+        'total_duration': total_duration,
+        'unknown_duration': unknown_duration,
         'bulk_mode_enabled': team_videos and (
             page_forms['move'].enabled or
             page_forms['remove'].enabled or

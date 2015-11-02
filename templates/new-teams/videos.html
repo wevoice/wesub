@@ -68,6 +68,7 @@
         <div class="four-lines">{{ description }}</div>
         {% endif %}
         {% endwith %}
+        <div class="extra-info">{{ video.duration|format_duration }}</div>
       </li>
       {% endwith %}
       {% endfor %}
@@ -79,6 +80,9 @@
       {% else %}
       {% blocktrans with count=paginator.count %}{{ count }} total videos{% endblocktrans %}
       {% endif %}
+    </div>
+    <div class="total-count">
+      {% trans "Total duration" %}{% if unknown_duration %}{% trans " of known videos" %}{% endif %}: {{ total_duration|format_duration }} 
     </div>
     {% else %}
     <p class="empty">{% trans "No Videos found" %}</p>
