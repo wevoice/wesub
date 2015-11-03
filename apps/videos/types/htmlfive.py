@@ -16,11 +16,49 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import subprocess, sys
+import subprocess, sys, re
 from videos.types.base import VideoType
 
 import logging
 logger= logging.getLogger(__name__)
+
+def getDurationFromStreams(streams):
+    # this tries to get around most known cases
+    # of duration set with issues in headers
+    data = {}
+    durations = set()
+    index = None
+    for line in streams.splitlines():
+        index_m = re.match(r"index=(\w+)", line)
+        if index_m:
+            index = index_m.group(1)
+            data[index] = {}
+        duration_m = re.match(r"duration=(\w+)", line)
+        if duration_m and index:
+            duration = duration_m.group(1)
+            data[index]["duration"]=int(float(duration))
+        codec_m = re.match(r"codec_name=(\w+)", line)
+        if codec_m and index:
+            codec = codec_m.group(1)
+            data[index]["codec"]=codec
+        codec_type_m = re.match(r"codec_type=(\w+)", line)
+        if codec_type_m and index:
+            codec_type = codec_type_m.group(1)
+            data[index]["codec_type"]=codec_type
+        frames_m = re.match(r"nb_frames=(\w+)", line)
+        if frames_m and index:
+            frames = frames_m.group(1)
+            try:
+                data[index]["frames"]=int(frames)
+            except:
+                pass
+    for key, val in data.items():
+        if "duration" in val and "codec" in val and val["codec"] != "unknown":
+            if not ("frames" in val and "codec_type" in val and (val["codec_type"] == "video") and ((val["frames"] / 25 / val["duration"] > 1.1) or (val["frames"] / 25 / val["duration"] < 0.9))):
+                durations.add(val["duration"])
+    if len(durations) == 1:
+        return durations.pop()
+    return None
 
 class HtmlFiveVideoType(VideoType):
     abbreviation = 'H'
@@ -39,9 +77,10 @@ class HtmlFiveVideoType(VideoType):
         return self.url
 
     def set_values(self, video):
-        cmd = """avprobe -v error -show_format -show_streams "{}" 2>&1 | grep duration= | sed 's/^.*=//' | sort -n | head -n1""".format(self.url)
+        cmd = """avprobe -v error -show_format -show_streams "{}" 2>&1 """.format(self.url)
         try:
-            duration = int(float(subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)))
+            streams = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+            duration = getDurationFromStreams(streams)
             video.duration = duration
         except subprocess.CalledProcessError as e:
             logger.error("CalledProcessError error({}) when running command {}".format(e.returncode, cmd))
