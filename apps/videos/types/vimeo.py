@@ -16,6 +16,7 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import requests
 from vidscraper.sites import vimeo
 from vidscraper.errors import Error as VidscraperError
 from base import VideoType, VideoTypeError
@@ -74,6 +75,21 @@ class VimeoVideoType(VideoType):
             except Exception:
                 # in case the Vimeo video is private.
                 pass
+        r = requests.get("https://player.vimeo.com/video/{}/config".format(self.video_id))
+        if r.status_code == requests.codes.ok:
+            try:
+                video_obj.duration = r.json[u"video"]["duration"]
+            except:
+                pass
     
     def _get_vimeo_id(self, video_url):
         return vimeo.VIMEO_REGEX.match(video_url).groupdict().get('video_id') 
+
+    def get_direct_url(self):
+        r = requests.get("https://player.vimeo.com/video/{}/config".format(self.video_id))
+        if r.status_code == requests.codes.ok:
+            try:
+                return r.json[u"request"]["files"]["h264"]["mobile"]["url"]
+            except:
+                return None
+        return None
