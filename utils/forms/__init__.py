@@ -12,6 +12,7 @@ from .autocomplete import AutocompleteTextInput
 from .formrouter import FormRouter
 from .languages import MultipleLanguageChoiceField
 from .recapcha import ReCaptchaField
+from .userautocomplete import UserAutocompleteField, autocomplete_user_view
 from utils.translation import get_language_choices
 
 assert ReCaptchaField # Shut up, Pyflakes.
