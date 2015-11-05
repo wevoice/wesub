@@ -19,6 +19,9 @@ table {
             border-width: 1px;
         }
     }
+    th, tr.section-end td {
+        border-color: $darkish-gray;
+    }
     td {
 
         &.actions {

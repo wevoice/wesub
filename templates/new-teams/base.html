@@ -90,3 +90,10 @@
 </div>
 {% endblock %}
 {% endblock %}
+
+{% block page-controls %}
+<ul>
+  <li><strong>Team Admin</strong></li>
+  <li><a href="{% url "teams:video-durations" team.slug %}">Video Durations</a></li>
+</ul>
+{% endblock %}
