@@ -74,13 +74,31 @@ def team_view(view_func):
     def wrapper(request, slug, *args, **kwargs):
         if not request.user.is_authenticated():
             return redirect_to_login(request.path)
+        if isinstance(slug, Team):
+            # we've already fetched the team in with_old_view
+            team = slug
         try:
-            team = Team.objects.get(slug=slug,
-                                    members__user_id=request.user.id)
+            team = Team.objects.get(slug=slug)
         except Team.DoesNotExist:
+            raise Http404
+        if not team.user_is_member(request.user):
             raise Http404
         return view_func(request, team, *args, **kwargs)
     return wrapper
+
+def with_old_view(old_view_func):
+    def wrap(view_func):
+        @functools.wraps(view_func)
+        def wrapper(request, slug, *args, **kwargs):
+            try:
+                team = Team.objects.get(slug=slug)
+            except Team.DoesNotExist:
+                raise Http404
+            if team.is_old_style():
+                return old_view_func(request, team, *args, **kwargs)
+            return view_func(request, team, *args, **kwargs)
+        return wrapper
+    return wrap
 
 def admin_only_view(view_func):
     @functools.wraps(view_func)
@@ -280,11 +298,9 @@ def _videos_and_filters_form(request, team):
                 video__teamvideo__project=main_project)
     return team_videos, filters_form
 
+@with_old_view(old_views.detail)
 @team_view
 def videos(request, team):
-    if team.is_old_style():
-        return old_views.detail(request, team)
-
     team_videos, filters_form = _videos_and_filters_form(request, team)
 
     page_forms = VideoPageForms(team, request.user, team_videos)
@@ -367,11 +383,9 @@ def videos_form(request, team, name):
         'all_selected': len(selection) >= VIDEOS_PER_PAGE,
     })
 
+@with_old_view(old_views.detail_members)
 @team_view
 def members(request, team):
-    if team.is_old_style():
-        return old_views.detail_members(request, team)
-
     member = team.get_member(request.user)
 
     filters_form = forms.MemberFiltersForm(request.GET)
@@ -676,8 +690,11 @@ def admin_list(request, team):
                    .select_related('user'))
     })
 
-@team_view
+@public_team_view
 def activity(request, team, tab):
+    if not team.is_old_style() and not team.user_is_member(request.user):
+        raise Http404
+
     try:
         page = int(request.GET['page'])
     except (ValueError, KeyError):
