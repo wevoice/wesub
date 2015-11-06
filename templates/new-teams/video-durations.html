@@ -21,10 +21,10 @@
         {% if project.videos_without_duration == 0 %}
         {{ project.video_count }}
         {% else %}
-        {% blocktrans with video_count=project.video_count no_duration_count=project.videos_without_duration %}{{ video_count }} (<em>{{ no_duration_count }} without duration</em>){% endblocktrans %}
+        {% blocktrans with video_count=project.video_count no_duration_count=project.videos_without_duration %}{{ video_count }} (<em>{{ no_duration_count }} with unknown duration</em>){% endblocktrans %}
         {% endif %}
       </td>
-      <td>{% if project.total_duration > 0 %}{{ project.total_duration|format_duration }}{% endif %}</td>
+      <td class="right">{% if project.total_duration > 0 %}{{ project.total_duration|format_duration }}{% endif %}</td>
     </tr>
     {% endfor %}
     <tr>
@@ -33,10 +33,10 @@
         {% if totals.1 == 0 %}
         {{ totals.0 }}
         {% else %}
-        {% blocktrans with video_count=totals.0 no_duration_count=totals.1 %}{{ video_count }} (<em>{{ no_duration_count }} without duration</em>){% endblocktrans %}
+        {% blocktrans with video_count=totals.0 no_duration_count=totals.1 %}{{ video_count }} (<em>{{ no_duration_count }} with unknown duration</em>){% endblocktrans %}
         {% endif %}
       </td>
-      <td>{{ totals.2|format_duration }}</td>
+      <td class="right">{{ totals.2|format_duration }}</td>
     </tr>
 </table>
 {% endblock %}
