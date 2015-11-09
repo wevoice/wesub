@@ -31,6 +31,7 @@ from collections import namedtuple, OrderedDict
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.cache import cache
@@ -1060,3 +1061,18 @@ def edit_project(request, team, project_slug):
 @team_settings_view
 def settings_workflows(request, team):
     return team.new_workflow.workflow_settings_view(request, team)
+
+@staff_member_required
+@team_view
+def video_durations(request, team):
+    projects = team.projects_with_video_stats()
+    totals = (
+        sum(p.video_count for p in projects),
+        sum(p.videos_without_duration for p in projects),
+        sum(p.total_duration for p in projects),
+    )
+    return render(request, "new-teams/video-durations.html", {
+        'team': team,
+        'projects': projects,
+        'totals': totals,
+    })
