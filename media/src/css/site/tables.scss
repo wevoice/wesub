@@ -9,6 +9,9 @@ table {
         border: none;
         text-align: left;
         border-bottom: 1px solid $lighter-gray;
+        &.right {
+            text-align: right;
+        }
     }
     th {
         float: none;
@@ -33,9 +36,6 @@ table {
                 margin: 0;
                 padding: 0;
             }
-        }
-        &.right {
-            text-align: right;
         }
     }
     &.resync_table {
