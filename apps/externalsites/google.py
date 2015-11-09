@@ -401,13 +401,13 @@ def get_video_info(video_id):
             'stack': True,
         })
         return _get_video_info(video_id)
-    except APIError, e:
+    except APIError as e:
         logger.error("Youtube API Error: %s, falling back", e)
         try:
             p = pafy.new(video_id)
             return VideoInfo(None, p.title, "", p.length, p.thumb)
         except:
-            raise APIError, e
+            raise e
 
 def _get_video_info(video_id):
     response = video_get(None, video_id, ['snippet', 'contentDetails'])

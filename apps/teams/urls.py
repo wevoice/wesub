@@ -98,6 +98,8 @@ urlpatterns += patterns('teams.new_views',
     url(r'^(?P<slug>[-\w]+)/settings/projects/$', 'settings_projects', name='settings_projects'),
     url(r'^(?P<slug>[-\w]+)/settings/projects/(?P<project_slug>[-\w]+)/edit/$', 'edit_project', name='edit_project'),
     url(r'^(?P<slug>[-\w]+)/settings/workflows/$', 'settings_workflows', name='settings_workflows'),
+    url(r'^(?P<slug>[-\w]+)/video-durations/$', 'video_durations',
+        name='video-durations'),
 )
 
 urlpatterns += patterns('',
