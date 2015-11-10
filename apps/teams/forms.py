@@ -60,7 +60,6 @@ from videos.search_indexes import VideoIndex
 from videos.tasks import import_videos_from_feed
 from utils.forms import (ErrorableModelForm, get_label_for_value,
                          UserAutocompleteField)
-from utils.forms.datepicker import DateInput
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
@@ -990,9 +989,6 @@ class VideoFiltersForm(forms.Form):
         ('-subs', _('Least complete languages')),
     ], initial='-time', required=False)
 
-    added_between_from = forms.DateField(label=_("Added after"), required=False, widget=DateInput())
-    added_between_to = forms.DateField(label=_("Added before"), required=False, widget=DateInput())
-
     def __init__(self, team, get_data=None, **kwargs):
         super(VideoFiltersForm, self).__init__(data=self.calc_data(get_data),
                                                **kwargs)
@@ -1038,6 +1034,7 @@ class VideoFiltersForm(forms.Form):
         project = self.cleaned_data.get('project')
         q = self.cleaned_data['q']
         sort = self.cleaned_data['sort']
+
         qs = SearchQuerySet().models(TeamVideo).filter(team_id=self.team.id)
         if q:
             for term in get_terms(q):

@@ -192,19 +192,6 @@ def videos(request, team):
             'project': filters_form.selected_project.id,
         }
 
-    if filters_form.is_bound and filters_form.is_valid():
-        # created is not in the index, so we need to filter using a db
-        # query, before pagination
-        added_between_from = filters_form.cleaned_data['added_between_from']
-        added_between_to = filters_form.cleaned_data['added_between_to']
-        if added_between_from or added_between_to:
-            team_videos_ids = [ video.pk for video in team_videos]
-            team_videos = TeamVideo.objects.filter(id__in=team_videos_ids)
-            if added_between_from:
-                team_videos = team_videos.filter(created__gte=added_between_from)
-            if added_between_to:
-                team_videos = team_videos.filter(created__lte=added_between_to)
-
     paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
     page = paginator.get_page(request)
 
@@ -212,7 +199,7 @@ def videos(request, team):
         # Hack to convert the search index results to regular Video objects.
         # We will probably be able to drop this when we implement #838
         team_video_order = {
-            int(result.pk): i
+            result.team_video_pk: i
             for i, result in enumerate(page)
         }
         team_videos = list(
@@ -223,8 +210,7 @@ def videos(request, team):
         team_videos.sort(key=lambda tv: team_video_order[tv.id])
     else:
         team_videos = list(page)
-    total_duration = reduce(lambda x, y: x + (y.video.duration or 0), team_videos, 0)
-    unknown_duration = len(filter(lambda x: x.video.duration is None, team_videos)) > 0
+
     return render(request, 'new-teams/videos.html', {
         'team': team,
         'team_videos': team_videos,
@@ -232,8 +218,6 @@ def videos(request, team):
         'paginator': paginator,
         'filters_form': filters_form,
         'forms': page_forms,
-        'total_duration': total_duration,
-        'unknown_duration': unknown_duration,
         'bulk_mode_enabled': team_videos and (
             page_forms['move'].enabled or
             page_forms['remove'].enabled or
