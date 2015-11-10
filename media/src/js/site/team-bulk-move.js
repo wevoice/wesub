@@ -18,13 +18,9 @@
  */
 (function() {
 
-$(document).ready(function() {
-    $('form.team-bulk-move').each(handleTeamBulkMove);
-});
+$.behaviors('form.team-bulk-move', handleTeamBulkMove);
 
-function handleTeamBulkMove() {
-    var form = $(this);
-
+function handleTeamBulkMove(form) {
     var projectField = $('select[name=project]', form);
     var teamField = $('select[name=new_team]', form);
     var projectChoices = $('option', projectField).clone();

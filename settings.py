@@ -251,6 +251,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_SERIALIZER_CLASS':
         'api.pagination.AmaraPaginationSerializer',
     'ORDERING_PARAM': 'order_by',
+    'VIEW_NAME_FUNCTION': 'api.viewdocs.amara_get_view_name',
+    'VIEW_DESCRIPTION_FUNCTION': 'api.viewdocs.amara_get_view_description',
 }
 
 #################
@@ -485,13 +487,17 @@ MEDIA_BUNDLES = {
         "files": [
             'src/js/third-party/jquery-2.1.3.js',
             'src/js/third-party/jquery-ui-1.11.4.custom.js',
+            'src/js/third-party/jquery.form.js',
+            'src/js/third-party/behaviors.js',
             'src/js/site/menus.js',
             'src/js/site/modals.js',
+            'src/js/site/querystring.js',
             'src/js/site/tooltips.js',
             'src/js/site/pagination.js',
             'src/js/site/autocomplete.js',
             'src/js/site/thumb-lists.js',
             'src/js/site/bottom-sheet.js',
+            'src/js/site/team-videos.js',
             'src/js/site/team-bulk-move.js',
             'src/js/site/team-integration-settings.js',
             'src/js/site/dates.js',

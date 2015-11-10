@@ -79,7 +79,7 @@ Creating Videos
         accepted providers (youtube, vimeo, dailymotion)
     :<json title: title of the video
     :<json description: About this video
-    :<json duration: Duration in seconds
+    :<json duration: Duration in seconds, in case it can not be retrieved automatically by Amara
     :<json primary_audio_language_code: language code for the main
         language spoken in the video.
     :<json thumbnail: URL to the video thumbnail
@@ -100,8 +100,8 @@ Creating Videos
 When submitting URLs of external providers (i.e. youtube, vimeo), the metadata
 (title, description, duration) can be fetched from them. If you're submitting
 a link to a file (mp4, flv) then you can make sure those attributes are set
-with these parameters. Note that these parameters override any information
-from the original provider.
+with these parameters. Note that these parameters (except the video duration)
+override any information from the original provider or the file header.
 
 Updating a video object
 +++++++++++++++++++++++
@@ -109,9 +109,10 @@ Updating a video object
 .. http:put:: /api/videos/[video-id]/
 
 With the same parameters for creation, excluding video_url. Note that through
-out our system, a video cannot have it's URLs changed. So you can change other
+out our system, a video cannot have its URLs changed. So you can change other
 video attributes (title, description) but the URL sent must be the same
-original one.
+original one. As with creating video, an update can not override the duration
+received from the provider or specified in the file header.
 
 Moving videos between teams and projects
 ++++++++++++++++++++++++++++++++++++++++
@@ -446,7 +447,11 @@ class VideoSerializer(serializers.Serializer):
         )
         for field_name in simple_fields:
             if field_name in validated_data:
-                setattr(video, field_name, validated_data[field_name])
+                if field_name == "duration":
+                    if not getattr(video, field_name):
+                        setattr(video, field_name, validated_data[field_name])
+                else:
+                    setattr(video, field_name, validated_data[field_name])
         if validated_data.get('metadata'):
             video.update_metadata(validated_data['metadata'], commit=True)
         else:
