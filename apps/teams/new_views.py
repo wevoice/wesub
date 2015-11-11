@@ -78,10 +78,11 @@ def team_view(view_func):
         if isinstance(slug, Team):
             # we've already fetched the team in with_old_view
             team = slug
-        try:
-            team = Team.objects.get(slug=slug)
-        except Team.DoesNotExist:
-            raise Http404
+        else:
+            try:
+                team = Team.objects.get(slug=slug)
+            except Team.DoesNotExist:
+                raise Http404
         if not team.user_is_member(request.user):
             raise Http404
         return view_func(request, team, *args, **kwargs)
