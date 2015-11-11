@@ -25,7 +25,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from teams import views
 from teams.workflows import TeamWorkflow
-from .subtitleworkflows import TaskTeamSubtitlesWorkflow, TeamSubtitlesWorkflow
+from .subtitleworkflows import (TaskTeamSubtitlesWorkflow,
+                                NonTaskTeamSubtitlesWorkflow)
 
 class OldTeamWorkflow(TeamWorkflow):
     """Workflow for old-style teams
@@ -50,7 +51,7 @@ class OldTeamWorkflow(TeamWorkflow):
         if self.team.is_tasks_team():
             return TaskTeamSubtitlesWorkflow(team_video)
         else:
-            return TeamSubtitlesWorkflow(team_video)
+            return NonTaskTeamSubtitlesWorkflow(team_video)
 
     def extra_pages(self, user):
         pages = [ ]

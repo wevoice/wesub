@@ -6,11 +6,14 @@ from django.core import validators
 from django.utils import html
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 from .autocomplete import AutocompleteTextInput
-from .userautocomplete import UserAutocompleteField, autocomplete_user_view
+from .formrouter import FormRouter
+from .languages import MultipleLanguageChoiceField
 from .recapcha import ReCaptchaField
+from .userautocomplete import UserAutocompleteField, autocomplete_user_view
+from utils.translation import get_language_choices
 
 assert ReCaptchaField # Shut up, Pyflakes.
 
@@ -20,6 +23,18 @@ class AjaxForm(object):
         for key, value in self.errors.items():
             output[key] = '/n'.join([force_unicode(i) for i in value])
         return output
+
+class LanguageCodeField(forms.ChoiceField):
+    def __init__(self, *args, **kwargs):
+        self.with_any = kwargs.pop('with_any', None)
+        kwargs['choices'] = self.static_choices() + get_language_choices()
+        super(LanguageCodeField, self).__init__(*args, **kwargs)
+
+    def static_choices(self):
+        choices = []
+        if self.with_any:
+            choices.append(('', ugettext('Any language')))
+        return choices
 
 class StripRegexField(forms.RegexField):
     def to_python(self, value):

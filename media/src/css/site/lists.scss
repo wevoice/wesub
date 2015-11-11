@@ -4,6 +4,14 @@ ol, ul {
     padding: 0;
 }
 
+ul.inline {
+    display: inline;
+    li {
+        display: inline;
+        margin-right: 10px;
+    }
+}
+
 ul.bullet {
     list-style-type: disc;
     list-style-position: inside;

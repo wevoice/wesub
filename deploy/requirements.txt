@@ -82,3 +82,4 @@ selenium
 xvfbwrapper==0.2.4
 factory_boy==2.4.1
 pafy
+isodate==0.5.4

@@ -28,6 +28,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core.files import File
+from django.db import connection
 from django.db import models
 from django.db.models import query, Q, Count, Sum
 from django.db.models.signals import post_save, post_delete, pre_delete
@@ -600,8 +601,41 @@ class Team(models.Model):
                 video__primary_audio_language_code=video_language)
         return Action.objects.filter(video_id__in=video_q)
 
-    # moderation
+    def projects_with_video_stats(self):
+        """Fetch all projects for this team and stats about their videos
 
+        This method returns a list of projects, where each project has these
+        attributes:
+
+        - video_count: total number of videos in the project
+        - videos_with_duration: number of videos with durations set
+        - videos_without_duration: number of videos with NULL durations
+        - total_duration: sum of all video durations (in seconds)
+        """
+
+        # We should be able to do with with an annotate() call, but for some
+        # reason it doesn't work.  I think it has to be a django bug because
+        # when you print out the query and run it you get the correct results,
+        # but when you fetch objects from the queryset, then you get the wrong
+        # results.
+        stats_sql = (
+            'SELECT p.id, COUNT(tv.id), COUNT(v.duration), SUM(v.duration) '
+            'FROM teams_project p '
+            'LEFT JOIN teams_teamvideo tv ON p.id = tv.project_id '
+            'LEFT JOIN videos_video v ON tv.video_id = v.id '
+            'WHERE p.team_id=%s '
+            'GROUP BY p.id')
+        cursor = connection.cursor()
+        cursor.execute(stats_sql, (self.id,))
+        stats_map = { r[0]: r[1:] for r in cursor }
+        projects = list(self.project_set.all())
+        for p in projects:
+            stats = stats_map[p.id]
+            p.video_count = stats[0]
+            p.videos_with_duration = stats[1]
+            p.videos_without_duration = stats[0] - stats[1]
+            p.total_duration = int(stats[2]) if stats[2] is not None else 0
+        return projects
 
     # Moderation
     def moderates_videos(self):

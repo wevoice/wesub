@@ -1,4 +1,4 @@
-# Amara, universalsubtitles.org
+#Get the main project for a team Amara, universalsubtitles.org
 #
 # Copyright (C) 2013 Participatory Culture Foundation
 #
@@ -27,22 +27,26 @@ import functools
 import json
 import logging
 import pickle
+from collections import namedtuple, OrderedDict
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import (Http404, HttpResponse, HttpResponseRedirect,
+                         HttpResponseBadRequest)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext as _
 
 from . import views as old_views
 from . import forms
 from . import permissions
+from . import signals
 from . import tasks
 from .behaviors import get_main_project
 from .exceptions import ApplicationInvalidException
@@ -55,7 +59,7 @@ from subtitles.models import SubtitleLanguage
 from teams.workflows import TeamWorkflow
 from utils.breadcrumbs import BreadCrumb
 from utils.pagination import AmaraPaginator
-from utils.forms import autocomplete_user_view
+from utils.forms import autocomplete_user_view, FormRouter
 from utils.text import fmt
 from utils.translation import get_language_choices, get_language_label
 from videos.models import Action, Video
@@ -143,11 +147,127 @@ def fetch_actions_for_activity_page(team, tab, page, params):
                 .select_related('new_language', 'video', 'user',
                                 'new_language__video'))
 
-@team_view
-def videos(request, team):
-    if team.is_old_style():
-        return old_views.detail(request, team)
+class VideoPageExtensionForm(object):
+    """Define an extra form on the video page.
 
+    This class is used to define extension forms.  See
+    VideoPageForms.add_extension_form() method for how you would use them.
+    """
+    def __init__(self, name, label, form_class, selection_type=None):
+        """Create a VideoPageExtensionForm
+
+        Args:
+            name -- unique name for the form
+            label -- human-friendly label to display
+            form_class -- form class to handle things
+            selection_type -- can one of the following:
+                - single-only: Enabled only for single selections
+                - multiple-only: Enabled only for multiple selections
+        """
+        self.name = name
+        self.label = label
+        self.form_class = form_class
+        self.selection_type = selection_type
+
+    def css_selection_class(self):
+        if self.selection_type == 'single':
+            return 'needs-one-selected'
+        elif self.selection_type == 'multiple':
+            return 'needs-multiple-selected'
+        else:
+            return ''
+
+class VideoPageForms(object):
+    """Manages forms on the video page
+
+    This class is responsible for
+        - Determining which forms should be enabled for the page
+        - Building forms
+        - Allowing other apps to extend which forms appear in the bottom sheet
+    """
+    form_classes = {
+        'add': forms.NewAddTeamVideoForm,
+        'edit': forms.NewEditTeamVideoForm,
+        'bulk-edit': forms.BulkEditTeamVideosForm,
+        'move': forms.MoveTeamVideosForm,
+        'remove': forms.RemoveTeamVideosForm,
+    }
+
+    def __init__(self, team, user, team_videos_qs):
+        self.team = team
+        self.user = user
+        self.team_videos_qs = team_videos_qs
+        self.enabled = set()
+        if permissions.can_add_video(team, user):
+            self.enabled.add('add')
+        if permissions.can_edit_videos(team, user):
+            self.enabled.update(['edit', 'bulk-edit'])
+        if len(permissions.can_move_videos_to(team, user)) > 0:
+            self.enabled.add('move')
+        if permissions.can_remove_videos(team, user):
+            self.enabled.add('remove')
+        self.extension_forms = OrderedDict()
+        signals.build_video_page_forms.send(
+            sender=self, team=team, user=user, team_videos_qs=team_videos_qs)
+        self.has_bulk_form = any(
+            issubclass(form_class, forms.BulkTeamVideoForm)
+            for form_class in self.enabled_form_classes()
+        )
+
+    def build_ajax_form(self, name, request, selection, filters_form):
+        FormClass = self.lookup_form_class(name)
+        all_selected = len(selection) >= VIDEOS_PER_PAGE
+        if request.method == 'POST':
+            return FormClass(self.team, self.user, self.team_videos_qs,
+                             selection, all_selected, filters_form,
+                             data=request.POST, files=request.FILES)
+        else:
+            return FormClass(self.team, self.user, self.team_videos_qs,
+                             selection, all_selected, filters_form)
+
+    def build_add_form(self, request, filters_form):
+        if filters_form.selected_project:
+            # use the selected project by default on the add video form
+            initial = {
+                'project': filters_form.selected_project.id,
+            }
+        else:
+            initial = None
+        if request.method == 'POST':
+            return forms.NewAddTeamVideoForm(self.team, self.user,
+                                             initial=initial,
+                                             data=request.POST)
+        else:
+            return forms.NewAddTeamVideoForm(self.team, self.user,
+                                             initial=initial)
+
+    def add_extension_form(self, extension_form):
+        """Add an extra form to appear on the video page
+
+        Extension forms are a way for other apps to add a form to the video
+        page.  These forms appear on the bottom sheet when videos get
+        selected.  Connect to the build_video_page_forms signal in order to
+        get a chance to call this method when a VideoPageForm is built.
+        """
+        self.extension_forms[extension_form.name] = extension_form
+
+    def get_extension_forms(self):
+        return self.extension_forms.values()
+
+    def lookup_form_class(self, name):
+        if name in self.enabled:
+            return self.form_classes[name]
+        if name in self.extension_forms:
+            return self.extension_forms[name].form_class
+        raise KeyError(name)
+
+    def enabled_form_classes(self):
+        for name in self.enabled:
+            yield self.form_classes[name]
+        for ext_form in self.get_extension_forms():
+            yield ext_form.form_class
+
+def _videos_and_filters_form(request, team):
     filters_form = forms.VideoFiltersForm(team, request.GET)
     if filters_form.is_bound and filters_form.is_valid():
         team_videos = filters_form.get_queryset()
@@ -159,38 +279,23 @@ def videos(request, team):
         if main_project:
             team_videos = team_videos.filter(
                 video__teamvideo__project=main_project)
+    return team_videos, filters_form
 
-    # We embed several modal forms on the page, but luckily we can use the
-    # same code to handle them all
-    form_classes = {
-        'add': forms.NewAddTeamVideoForm,
-        'edit': forms.NewEditTeamVideoForm,
-        'bulk_edit': forms.BulkEditTeamVideosForm,
-        'move': forms.MoveTeamVideosForm,
-        'remove': forms.RemoveTeamVideosForm,
-    }
-    page_forms = {}
-    for name, klass in form_classes.items():
-        auto_id = '{}_id-%s'.format(name)
-        if request.method == 'POST' and request.POST.get('form') == name:
-            form = klass(team, request.user, auto_id=auto_id,
-                         data=request.POST, files=request.FILES)
-            if form.is_valid():
-                if isinstance(form, forms.BulkTeamVideoForm):
-                    form.save(qs=team_videos)
-                else:
-                    form.save()
-                messages.success(request, form.message())
-                return HttpResponseRedirect(request.build_absolute_uri())
-        else:
-            form = klass(team, request.user, auto_id=auto_id)
-        page_forms[name] = form
+@team_view
+def videos(request, team):
+    if team.is_old_style():
+        return old_views.detail(request, team)
 
-    if filters_form.selected_project:
-        # use the selected project by default on the add video form
-        page_forms['add'].initial = {
-            'project': filters_form.selected_project.id,
-        }
+    team_videos, filters_form = _videos_and_filters_form(request, team)
+
+    page_forms = VideoPageForms(team, request.user, team_videos)
+    error_form = error_form_name = None
+
+    add_form = page_forms.build_add_form(request, filters_form)
+    if add_form.is_bound and add_form.is_valid():
+        add_form.save()
+        messages.success(request, add_form.message())
+        return HttpResponseRedirect(request.build_absolute_uri())
 
     paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
     page = paginator.get_page(request)
@@ -218,15 +323,49 @@ def videos(request, team):
         'paginator': paginator,
         'filters_form': filters_form,
         'forms': page_forms,
-        'bulk_mode_enabled': team_videos and (
-            page_forms['move'].enabled or
-            page_forms['remove'].enabled or
-            page_forms['bulk_edit'].enabled
-        ),
+        'add_form': add_form,
+        'error_form': error_form,
+        'error_form_name': error_form_name,
+        'bulk_mode_enabled': team_videos and page_forms.has_bulk_form,
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Videos')),
         ],
+    })
+
+@team_view
+def videos_form(request, team, name):
+    try:
+        selection = request.GET['selection'].split('-')
+    except StandardError:
+        return HttpResponseBadRequest()
+    team_videos_qs, filters_form = _videos_and_filters_form(request, team)
+    page_forms = VideoPageForms(team, request.user, team_videos_qs)
+
+    try:
+        page_forms.lookup_form_class(name)
+    except KeyError:
+        raise Http404
+
+    form = page_forms.build_ajax_form(name, request, selection, filters_form)
+
+    if form.is_bound and form.is_valid():
+        form.save()
+        messages.success(request, form.message())
+        response = HttpResponse("SUCCESS", content_type="text/plain")
+        response['X-Form-Success'] = '1'
+        return response
+
+    first_video = Video.objects.get(
+        teamvideo=team.teamvideo_set.filter(id=selection[0]))
+    template_name = 'new-teams/videos-forms/{}.html'.format(name)
+    return render(request, template_name, {
+        'team': team,
+        'name': name,
+        'form': form,
+        'first_video': first_video,
+        'video_count': len(selection),
+        'all_selected': len(selection) >= VIDEOS_PER_PAGE,
     })
 
 @team_view
@@ -905,3 +1044,18 @@ def edit_project(request, team, project_slug):
 @team_settings_view
 def settings_workflows(request, team):
     return team.new_workflow.workflow_settings_view(request, team)
+
+@staff_member_required
+@team_view
+def video_durations(request, team):
+    projects = team.projects_with_video_stats()
+    totals = (
+        sum(p.video_count for p in projects),
+        sum(p.videos_without_duration for p in projects),
+        sum(p.total_duration for p in projects),
+    )
+    return render(request, "new-teams/video-durations.html", {
+        'team': team,
+        'projects': projects,
+        'totals': totals,
+    })
