@@ -21,30 +21,45 @@ from django.utils.translation import ugettext as _
 from messages.forms import SendMessageForm
 from messages.models import Message
 from messages.tasks import send_new_message_notification
-
 class MessagesApiClass(object):
-    def remove(self, message_id, user):
+    def remove(self, message_ids, user):
         if not user.is_authenticated():
             return {'error': _('You should be authenticated.')}
-
-        try:
+        if not isinstance(message_ids, list):
+            message_ids = [message_ids]
+        for message_id in message_ids:
             try:
-                msg = Message.objects.for_user(user).get(pk=message_id)
+                try:
+                    msg = Message.objects.for_user(user).get(pk=message_id)
+                except Message.DoesNotExist:
+                    msg = Message.objects.for_author(user).get(pk=message_id)
             except Message.DoesNotExist:
-                msg = Message.objects.for_author(user).get(pk=message_id)
-        except Message.DoesNotExist:
-            return {'error': _('Message does not exist.')}
+                return {'error': _('Message does not exist.')}
 
-        msg.delete_for_user(user)
+            msg.delete_for_user(user)
+
+        return {}
+    def remove_sent(self, message_ids, user):
+        if not user.is_authenticated():
+            return {'error': _('You should be authenticated.')}
+        if not isinstance(message_ids, list):
+            message_ids = [message_ids]
+        for message_id in message_ids:
+            try:
+                msg = Message.objects.for_author(user).get(pk=message_id)
+            except Message.DoesNotExist:
+                return {'error': _('Message does not exist.')}
+
+            msg.delete_for_author(user)
 
         return {}
 
-    def mark_as_read(self, message_id, user):
+    def mark_as_read(self, message_ids, user):
         if not user.is_authenticated():
             return {'error': _('You should be authenticated.')}
-
-        Message.objects.filter(pk=message_id, user=user).update(read=True)
-
+        if not isinstance(message_ids, list):
+            message_ids = [message_ids]
+        Message.objects.filter(pk__in=message_ids, user=user).update(read=True)
         return {}
 
     def mark_all_read(self, user):

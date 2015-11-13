@@ -251,6 +251,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_SERIALIZER_CLASS':
         'api.pagination.AmaraPaginationSerializer',
     'ORDERING_PARAM': 'order_by',
+    'VIEW_NAME_FUNCTION': 'api.viewdocs.amara_get_view_name',
+    'VIEW_DESCRIPTION_FUNCTION': 'api.viewdocs.amara_get_view_description',
 }
 
 #################
@@ -418,14 +420,24 @@ MEDIA_BUNDLES = {
             'src/css/site/forms.scss',
             'src/css/site/links.scss',
             'src/css/site/lists.scss',
+            'src/css/site/cards.scss',
             'src/css/site/tables.scss',
+            'src/css/site/graphs.scss',
             'src/css/site/header.scss',
+            'src/css/site/tabs.scss',
+            'src/css/site/split-view.scss',
+            'src/css/site/bottom-sheet.scss',
+            'src/css/site/pagination.scss',
             'src/css/site/menus.scss',
             'src/css/site/modals.scss',
+            'src/css/site/tooltips.scss',
             'src/css/site/banner.scss',
             'src/css/site/messages.scss',
             'src/css/site/footer.scss',
             'src/css/site/teams.scss',
+            'src/css/third-party/jquery-ui-1.11.4.custom.css',
+            'src/css/third-party/jquery-ui.theme-1.11.4.custom.css',
+            'src/css/third-party/jquery-ui.structure-1.11.4.custom.css',
         ],
         "include_path": 'src/css/site',
     },
@@ -474,9 +486,21 @@ MEDIA_BUNDLES = {
     "new-site.js": {
         "files": [
             'src/js/third-party/jquery-2.1.3.js',
+            'src/js/third-party/jquery-ui-1.11.4.custom.js',
+            'src/js/third-party/jquery.form.js',
+            'src/js/third-party/behaviors.js',
             'src/js/site/menus.js',
             'src/js/site/modals.js',
+            'src/js/site/querystring.js',
+            'src/js/site/tooltips.js',
+            'src/js/site/pagination.js',
+            'src/js/site/autocomplete.js',
+            'src/js/site/thumb-lists.js',
+            'src/js/site/bottom-sheet.js',
+            'src/js/site/team-videos.js',
+            'src/js/site/team-bulk-move.js',
             'src/js/site/team-integration-settings.js',
+            'src/js/site/dates.js',
         ],
     },
     "api.js": {
@@ -724,4 +748,4 @@ if DEBUG:
             'TAG': 'div',
         }
 
-optionalapps.add_extra_settings(globals(), locals())
+optionalapps.exec_repository_scripts('settings_extra.py', globals(), locals())

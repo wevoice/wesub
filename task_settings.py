@@ -29,18 +29,6 @@ CELERY_QUEUES = (
 )
 
 CELERYBEAT_SCHEDULE = {
-    'gauge-auth': {
-        'schedule': timedelta(seconds=300),
-        'task': 'auth.tasks.gauge_auth',
-    },
-    'gauge-comments': {
-        'task': 'comments.tasks.gauge_comments',
-        'schedule': timedelta(seconds=300),
-    },
-    'gauge-statistics': {
-        'task': 'statistic.tasks.gauge_statistic',
-        'schedule': timedelta(seconds=300),
-    },
     'expire-tasks': {
         'task': 'teams.tasks.expire_tasks',
         'schedule': crontab(minute=0, hour=7),
@@ -53,13 +41,13 @@ CELERYBEAT_SCHEDULE = {
         'task': 'teams.tasks.add_videos_notification_hourly',
         'schedule': crontab(minute=0),
     },
-    'gauge_teams': {
-        'task': 'teams.tasks.gauge_teams',
-        'schedule': timedelta(seconds=300),
-    },
     'cleanup_videos': {
         'task': 'videos.tasks.cleanup',
         'schedule': crontab(hour=3, day_of_week=1),
+    },
+    'cleanup_messages': {
+        'task': 'messages.tasks.cleanup',
+        'schedule': crontab(minute=30),
     },
     'update_feeds': {
         'task': 'videos.tasks.update_from_feed',
@@ -68,18 +56,6 @@ CELERYBEAT_SCHEDULE = {
     'import_from_accounts': {
         'task': 'externalsites.tasks.import_videos_from_accounts',
         'schedule': crontab(minute=0),
-    },
-    'gauge_videos': {
-        'task': 'videos.tasks.gauge_videos',
-        'schedule': timedelta(seconds=300),
-    },
-    'gauge_videos_long': {
-        'task': 'videos.tasks.gauge_videos_long',
-        'schedule': timedelta(days=1),
-    },
-    'gauge_billing_records': {
-        'task': 'videos.tasks.gauge_billing_records',
-        'schedule': timedelta(seconds=60),
     },
     'retry_failed_sync': {
         'task': 'externalsites.tasks.retry_failed_sync',

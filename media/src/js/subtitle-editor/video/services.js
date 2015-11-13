@@ -22,7 +22,7 @@ var angular = angular || null;
 
     var module = angular.module('amara.SubtitleEditor.video.services', []);
 
-    module.factory('VideoPlayer', ["$rootScope", "SubtitleStorage", function($rootScope, SubtitleStorage) {
+    module.factory('VideoPlayer', ["$rootScope", "SubtitleStorage", "EditorData", function($rootScope, SubtitleStorage, EditorData) {
         var videoURLs = [];
         var pop = null;
         var playing = false;
@@ -77,16 +77,15 @@ var angular = angular || null;
         // Public methods
         return {
             init: function() {
-                videoURLs = SubtitleStorage.getVideoURLs().map(function(url) {
-                    // Hack for apparent Chrome issue with HTML5 videos
-                    // if same video is open twice in the same browser instance
-                    if (window.chrome && /\.(mp4|mv4|ogg|ogv|webm)$/i.test(url))
-                        url += '?amaranoise=' + Date.now();
-                    return url
-                });
-                pop = window.Popcorn.smart('#video', videoURLs, {
-                    controls: false,
-                });
+                videoURLs = SubtitleStorage.getVideoURLs();
+		if (EditorData.video.primaryVideoURLType == "C" && videoURLs.length == 1)
+                    pop = window.Popcorn.brightcove('#video', videoURLs[0], {
+			controls: false,
+                    });
+		else
+                    pop = window.Popcorn.smart('#video', videoURLs, {
+			controls: false,
+                    });
                 handlePopcornEvents();
             },
             play: function() {

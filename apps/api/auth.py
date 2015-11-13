@@ -42,6 +42,9 @@ class TokenAuthentication(authentication.BaseAuthentication):
         except User.DoesNotExist:
             raise exceptions.AuthenticationFailed('No such user')
 
+        if not user.is_active:
+            raise exceptions.AuthenticationFailed('User disabled')
+
         if not ApiKey.objects.filter(user=user, key=api_key).exists():
             raise exceptions.AuthenticationFailed('Invalid API Key')
 

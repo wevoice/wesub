@@ -123,6 +123,8 @@ class Environment(object):
 
     optional_env_var_names = [
         'ROLLBACK_ID',
+        'DB_NAME',
+        'RESET_DB',
     ]
 
     valid_migrate_values = [
@@ -131,19 +133,22 @@ class Environment(object):
         'STOP_SERVERS_TO_MIGRATE'
     ]
 
-    def __init__(self):
+    def __init__(self, needs_migrations=True):
         for name in self.env_var_names + self.optional_env_var_names:
             setattr(self, name, os.environ.get(name, ''))
         missing = [
             name for name in self.env_var_names
             if not getattr(self, name)
         ]
+        if not needs_migrations and 'MIGRATIONS' in missing:
+            missing.remove('MIGRATIONS')
         if missing:
             log("ENV variable(s) missing:")
             for name in missing:
                 log("    {}", name)
             sys.exit(1)
-        if self.MIGRATIONS not in self.valid_migrate_values:
+        if (self.MIGRATIONS not in self.valid_migrate_values and
+            needs_migrations):
             log("Invalid MIGRATIONS value: {}", self.MIGRATIONS)
             sys.exit(1)
 
@@ -299,6 +304,11 @@ class ContainerManager(object):
             # mount the workspace volume inside our container
             '-v', '/var/workspace:/var/workspace',
         ]
+        if self.env.DB_NAME:
+            params.extend([
+                '-e', 'DB_NAME=' + self.env.DB_NAME,
+            ])
+
         if self.building_preview():
             # SETTINGS_REVISION controls how to download the
             # server_local_settings.py file (see .docker/config_env.sh)
@@ -309,8 +319,7 @@ class ContainerManager(object):
         if self.env.BRANCH == 'production':
             return [
                 '-e', ('INTERLOCK_DATA={"alias_domains": '
-                       '["www.amara.org", "universalsubtitles.org", '
-                       '"www.universalsubtitles.org"]}'),
+                       '["www.amara.org"]}'),
                 '-e', 'NEW_RELIC_APP_NAME=AmaraVPC',
                 '-e', ('NEW_RELIC_LICENSE_KEY=' +
                        self.env.NEW_RELIC_LICENSE_KEY)
@@ -341,7 +350,7 @@ class ContainerManager(object):
         return self.container_name_prefix_for_branch() + '{}-{}-'.format(
             self.commit_id[:6], self.env.BUILD_NUMBER)
 
-    def run_app_command(self, command):
+    def run_app_command(self, command, argument=None):
         """Run a command using the app container
 
         Use this to run a command that does something then quits like
@@ -354,6 +363,8 @@ class ContainerManager(object):
         cmd_line = [ 'run', '-t', '--rm', ]
         cmd_line += self.app_params()
         cmd_line += [self.image_name, command]
+        if argument is not None:
+            cmd_line += [argument]
         self.docker.run(self.env.DOCKER_HOST_1, *cmd_line)
 
     def start_worker_container(self, host, name, command):
@@ -475,8 +486,23 @@ class Deploy(object):
         self.setup()
         if not self.env.ROLLBACK_ID:
             self.image_builder.setup_images()
+        if self.env.RESET_DB == 'true':
+            if self.container_manager.building_preview():
+                self.container_manager.run_app_command("reset_db")
+            else:
+                log("Not calling reset_db since we are not "
+                    "building a preview.")
+        if not self.env.ROLLBACK_ID:
             self.container_manager.run_app_command("build_media")
         self.start_and_stop_containers()
+        if self.container_manager.building_preview():
+            self.container_manager.run_app_command("setup_preview_site", argument=self.container_manager.app_hostname())
+        self.container_manager.print_report()
+
+    def build(self):
+        self.setup(needs_migrations=False)
+        self.image_builder.setup_images()
+        self.container_manager.run_app_command("build_media")
         self.container_manager.print_report()
 
     def stop_old_containers(self):
@@ -484,9 +510,9 @@ class Deploy(object):
         old_containers = self.container_manager.find_old_containers()
         self.container_manager.shutdown_old_containers(old_containers)
 
-    def setup(self):
+    def setup(self, needs_migrations=True):
         self.cd_to_project_root()
-        self.env = Environment()
+        self.env = Environment(needs_migrations)
         commit_id = self.get_commit_id()
         self.image_builder = ImageBuilder(self.env, commit_id)
         self.container_manager = ContainerManager(
@@ -614,6 +640,8 @@ def main(argv):
             Deploy().run()
         elif command == 'stop-deploy':
             Deploy().stop_old_containers()
+        elif command == 'build':
+            Deploy().build()
         elif command == 'cleanup':
             Cleanup().run()
         else:

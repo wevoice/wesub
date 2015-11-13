@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import datetime
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -45,15 +46,50 @@ class MessageTest(TestCase):
         self.user = UserFactory()
         mail.outbox = []
 
-    def _create_message(self, to_user):
+
+    def _create_message(self, to_user, message_type='M', reply_to=None):
         self.message = Message(user=to_user,
                            author=self.author,
                            subject=self.subject,
-                          content=self.body)
+                           message_type=message_type,
+                           content=self.body)
+        if reply_to is not None:
+            if reply_to.thread:
+                self.message.thread = reply_to.thread
+            else:
+                self.message.thread = reply_to.pk
         self.message.save()
+        return self.message
 
     def _send_email(self, to_user):
         send_templated_email(to_user, "test email", "messages/email/email-confirmed.html", {})
+
+    def test_message_cleanup(self):
+        self._create_message(self.user)
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 1)
+        Message.objects.cleanup(0)
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 0)
+        self._create_message(self.user)
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 1)
+        Message.objects.filter(user=self.user).update(created=datetime.datetime.now() - datetime.timedelta(days=5))
+        Message.objects.cleanup(6)
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 1)
+        Message.objects.cleanup(4, message_type='S')
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 1)
+        Message.objects.cleanup(4, message_type='M')
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 0)
+
+    def test_message_threads(self):
+        m = self._create_message(self.user)
+        self._create_message(self.user, reply_to=m)
+        self._create_message(self.user, reply_to=m)
+        n = self._create_message(self.user, reply_to=m)
+        n = self._create_message(self.user, reply_to=n)
+        n = self._create_message(self.user, reply_to=n)
+        self._create_message(self.user)
+        self._create_message(self.user)
+        self.assertEquals(Message.objects.thread(n, self.user).count(), 6)
+        self.assertEquals(Message.objects.thread(m, self.user).count(), 6)
 
     def test_send_email_to_allowed_user(self):
         self.user.notify_by_email = True
@@ -301,7 +337,7 @@ class MessageTest(TestCase):
         mail.outbox = []
         message = "Will you be my valentine?"
         f = InviteForm(user=owner.user, team=team,data={
-            "user_id":applying_user.id,
+            'username': applying_user.username,
             "role":"admin",
             "message": message,
         })
@@ -336,7 +372,7 @@ class MessageTest(TestCase):
         team = Team.objects.create(name='test-team', slug='test-team', membership_policy=Team.APPLICATION)
 
         invite_form = InviteForm(team, owner, {
-            'user_id': user.pk,
+            'username': user.username,
             'message': 'Subtitle ALL the things!',
             'role':'contributor',
         })

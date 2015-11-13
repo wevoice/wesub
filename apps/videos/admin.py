@@ -25,7 +25,7 @@ from djcelery.models import TaskState
 from utils.celery_search_index import update_search_index
 from videos.models import (
     Video, SubtitleLanguage, SubtitleVersion, VideoFeed, VideoMetadata,
-    VideoUrl, SubtitleVersionMetadata, Action, Subtitle
+    VideoUrl, SubtitleVersionMetadata, Action, Subtitle, VideoTypeUrlPattern
 )
 from videos.tasks import (
     video_changed_tasks, import_videos_from_feed
@@ -92,9 +92,19 @@ class VideoFeedAdmin(admin.ModelAdmin):
     raw_id_fields = ['user']
     actions = [update]
 
+class VideoTypeUrlPatternAdmin(admin.ModelAdmin):
+    fields = ('type', 'url_pattern')
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name == 'type':
+            return forms.ChoiceField(choices=video_type_choices(),
+                                     label=u'Type')
+        return super(VideoTypeUrlPatternAdmin, self).formfield_for_dbfield(
+            db_field, **kwargs)
+
 admin.site.register(Video, VideoAdmin)
 admin.site.register(VideoMetadata, VideoMetadataAdmin)
 admin.site.register(VideoFeed, VideoFeedAdmin)
+admin.site.register(VideoTypeUrlPattern, VideoTypeUrlPatternAdmin)
 
 class TaskStateForm(forms.ModelForm):
     traceback_display = forms.CharField(required=False, label=u'Traceback')
@@ -129,7 +139,7 @@ class FixedTaskMonitor(TaskMonitor):
 
 
 class ActionAdmin(admin.ModelAdmin):
-    list_display = ('video', 'language', 'user', 'team', 'action_type',
+    list_display = ('video', 'new_language', 'user', 'team', 'action_type',
         'created')
 
     class Meta:

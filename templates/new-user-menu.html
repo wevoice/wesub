@@ -2,8 +2,8 @@
 {% load url from future %}
 {% if user.is_authenticated %}
 {% cache-by-user new-top-panel %}
-<a href="#" class="menu-toggle" data-menu="user-menu">{{ user.username }}</a>
-<ul id="user-menu">
+<a href="#" class="menu-toggle">{{ user.username }}</a>
+<ul class="dropdown">
   <li>
     <a href="{% url "profiles:dashboard" %}">{% trans "Dashboard" %}</a>
   </li>

@@ -20,16 +20,30 @@
 
 var $document = $(document);
 
-$.fn.openModal = function() {
+$.fn.openModal = function(openEvent, setupData) {
+    if(setupData === undefined) {
+        setupData = {}
+    }
     this.each(function() {
         var modal = $(this);
+        if(setupData) {
+            setupModal(modal, setupData);
+        }
         var closeButton = $('button.close', modal);
 
         modal.addClass('shown');
         $('body').append('<div class="modal-overlay"></div>');
         closeButton.bind('click.modal', onClose);
+        modal.trigger('open');
+
         $document.bind('click.modal', function(evt) {
-            if($(evt.target).closest('aside.modal').length == 0) {
+            if(openEvent && evt.timeStamp <= openEvent.timeStamp) return;
+            var clickedModal = $(evt.target).closest('aside.modal');
+            if(clickedModal.length == 0) {
+                // click outside the modal
+                onClose(evt);
+            } else if($(evt.target).closest('button.close', clickedModal).length > 0) {
+                // click on the close button
                 onClose(evt);
             }
         });
@@ -41,27 +55,112 @@ $.fn.openModal = function() {
 
         function onClose(evt) {
             evt.preventDefault();
-            evt.stopPropagation();
-            modal.removeClass('shown');
+            if(setupData.removeOnClose) {
+                modal.remove();
+            } else {
+                modal.removeClass('shown');
+            }
             $('body div.modal-overlay').remove();
             closeButton.unbind('click.modal');
             $document.unbind('click.modal');
             $document.unbind('keydown.modal');
+            modal.trigger('close');
         }
+    });
+
+    function setupModal(modal, setupData) {
+        if(setupData['clear-errors']) {
+            $('ul.errorlist', modal).remove();
+        }
+        if(setupData['heading']) {
+            $('h3', modal).text(setupData['heading']);
+        }
+        if(setupData['text']) {
+            $('.text', modal).text(setupData['text']);
+        }
+        if(setupData['setFormValues']) {
+            $.each(setupData['setFormValues'], function(name, value) {
+                $('*[name=' + name + ']', modal).val(value);
+            });
+        }
+        if(setupData['copyInput']) {
+            var inputName = setupData['copyInput'];
+            var form = $('form', modal);
+            // Delete any inputs added before
+            $('input[name=' + inputName + '].copied', form).remove();
+            // Copy any inputs outside of forms into the modal
+            $('input[name=' + inputName + ']')
+                .not(':checkbox:not(:checked)').each(function() {
+                    var input = $(this);
+                    if(input.closest("form").length > 0) {
+                        return;
+                    }
+                    input.clone().attr('type', 'hidden').addClass('copied').appendTo(form);
+                });
+        }
+    }
+}
+
+window.ajaxOpenModal = function(url, params, setupData) {
+    var setupData = $.extend({}, setupData, {removeOnClose: true});
+    var loadingHTML = $('<div class="modal-overlay"><div class="loading"><span class="fa fa-spinner fa-pulse"></span></div></div>');
+
+    $('body').append(loadingHTML);
+
+    $.get(url, params)
+    .done(function(data, textStatus, xhr) {
+        loadingHTML.remove();
+        var modal = $(data)
+        modal.updateBehaviors();
+        modal.appendTo(document.body).openModal(null, setupData);
+        $('form', modal).ajaxForm({
+            url: url + '?' + $.param(params),
+            beforeSubmit: function(data, form, options) {
+                $('button.submit', form).append(
+                    ' <i class="fa fa-refresh fa-spin"></i>'
+                ).prop('disabled', true);
+            },
+            error: function(xhr, errorString, textStatus) {
+                modal.remove();
+                showErrorModal("Error Submitting Form", textStatus);
+            },
+            success: function(responseText, textStatus, xhr) {
+                if(xhr.getResponseHeader('X-Form-Success')) {
+                    window.location.reload();
+                } else {
+                    var newModal = $(responseText);
+                    modal.replaceWith(newModal);
+                    newModal.openModal();
+                }
+            }
+        });
+    })
+    .fail(function(xhr, textStatus, errorThrown) {
+        console.log("error loading modal from " + url + "(" + textStatus + ")");
+        loadingHTML.remove();
     });
 }
 
+window.showErrorModal = function(header, text) {
+    var header = $('<h3>').text(header);
+    var text = $('<p>').text(text);
+    var closeButton = $('<button class="close">');
+    var modal = $('<aside class="modal">').append(closeButton, header, text);
+    modal.appendTo('body').openModal();
+}
+
 $document.ready(function() {
-    $('a.open-modal').each(function() {
+    $('.open-modal').each(function() {
         var link = $(this);
         var modal = $('#' + link.data('modal'));
 
-        $link.bind('click', function(e) {
+        link.bind('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
-            modal.openModal();
+            modal.openModal(e, link.data());
         });
     });
+
+    $('aside.modal.start-open').openModal();
 });
 
 })();

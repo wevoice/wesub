@@ -26,8 +26,10 @@
 
   Popcorn.player( "brightcove", {
     _canPlayType: function( nodeName, url ) {
-
-      return typeof url === "string" && (/(?:http:\/\/www\.|http:\/\/link\.|http:\/\/|www\.|\.|^)(b(right)?cove)/).test( url ) && nodeName.toLowerCase() !== "video";
+      if (typeof url === "string" && (/(?:http:\/\/www\.|http:\/\/link\.|http:\/\/|www\.|\.|^)(b(right)?cove)/).test( url ) && nodeName.toLowerCase() !== "video")
+          return true;
+      else
+          return undefined;
     },
     _setup: function( options ) {
 

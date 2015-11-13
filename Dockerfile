@@ -6,7 +6,7 @@ RUN (echo "deb http://archive.ubuntu.com/ubuntu trusty-updates main universe mul
 RUN (echo "deb-src http://archive.ubuntu.com/ubuntu trusty-updates main universe multiverse" >> /etc/apt/sources.list)
 RUN apt-get update
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -y --force-yes install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext build-essential gcc dialog mysql-client firefox flashplugin-installer xvfb node-uglify ruby-sass libav-tools curl
+RUN apt-get -y --force-yes install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext build-essential gcc dialog mysql-client firefox flashplugin-installer xvfb node-uglify ruby-sass libav-tools
 ADD . /opt/apps/unisubs
 RUN mkdir -p /opt/extras/pictures
 RUN mkdir -p /opt/extras/videos
@@ -29,6 +29,8 @@ ADD .docker/worker.sh /usr/local/bin/worker
 ADD .docker/test_app.sh /usr/local/bin/test_app
 ADD .docker/update_translations.sh /usr/local/bin/update_translations
 ADD .docker/entry.sh /usr/local/bin/entry
+ADD .docker/reset-db.sh /usr/local/bin/reset-db
+ADD .docker/setup_preview_site.sh /usr/local/bin/setup_preview_site
 RUN easy_install pip
 RUN pip install uwsgi
 RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements.txt)

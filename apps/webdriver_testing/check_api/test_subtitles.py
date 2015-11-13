@@ -172,3 +172,29 @@ class TestCaseSubtitles(APILiveServerTestCase, WebdriverTestCase):
             
         self.assertEqual(errors, [])
 
+    def test_false_subtitles(self):
+        """Return error when 'false' passed for subtitles'
+
+        """
+        video = VideoFactory()
+        url = '/api/videos/%s/languages/' % video.video_id
+        data = {'language_code': 'en', }
+        r, status = self._post(url, data)
+        url = '/api/videos/{0}/languages/en/subtitles/'.format(video.video_id)
+        data = { "subtitles": False,
+                 "sub_format": 'json', 
+                } 
+ 
+        r, status = self._post_subs(url, data)
+        self.logger.info(r)
+        self.assertEqual({u'subtitles': [u'Invalid subtitle data']}, r)
+
+    def test_invalid_videoid(self):
+        """Return error when video id is None'
+
+        """
+        video = VideoFactory()
+        url = '/api/videos/None/languages/en/subtitles/'
+        r = self._get(url)
+        self.logger.info(r)
+        self.assertEqual({u'detail': u'Not found'}, r)

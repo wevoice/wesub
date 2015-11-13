@@ -1,10 +1,8 @@
 from django import template
 from django.conf import settings
-from django.utils.translation import (
-    get_language_info, gettext_lazy as _
-)
 
 from unilangs import get_language_name_mapping
+from utils.translation import get_language_label
 
 import logging
 logger = logging.getLogger('utils.languagetags')
@@ -26,7 +24,7 @@ def to_localized_display(language_code):
     will return a '?'.
     '''
     try:
-        return _(get_language_info(unicode(language_code))['name'].encode('utf-8'))
+        return get_language_label(language_code)
     except KeyError:
         logger.error('Uknown language code to be translated', extra={
             'language_code': unicode(language_code),

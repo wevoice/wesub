@@ -64,9 +64,8 @@ def fetch_subs_youtube(video_url):
 
     access_token = google.get_new_access_token(account.oauth_refresh_token)
     captions_list = google.captions_list(access_token, video_id)
-    for caption_id, youtube_language_code, caption_name in captions_list:
-        language_code = (LanguageCode(youtube_language_code, 'youtube')
-                         .encode('unisubs'))
+    for caption_id, language_code, caption_name in captions_list:
+        language_code = language_code.lower()
         if language_code not in existing_langs:
             dfxp = google.captions_download(access_token, caption_id)
             pipeline.add_subtitles(video_url.video, language_code, dfxp,

@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
 import json
 
 from django.test import TestCase
@@ -28,7 +29,7 @@ from utils import test_utils
 from utils.factories import *
 
 class TestActionsAPI(TestCase):
-    @test_utils.patch_for_test('subtitles.workflows.DefaultWorkflow.get_actions')
+    @test_utils.patch_for_test('subtitles.workflows.DefaultLanguageWorkflow.get_actions')
     def setUp(self, mock_get_actions):
         self.mock_get_actions = mock_get_actions
         self.setup_actions()

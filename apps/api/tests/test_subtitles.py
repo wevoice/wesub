@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
 import json
 
 from django.http import Http404
@@ -27,6 +28,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 import babelsubs
 import mock
 
+from api.tests.utils import format_datetime_field
 from api.views.subtitles import (SubtitleLanguageSerializer,
                                  SubtitleLanguageViewSet,
                                  SubtitlesSerializer,
@@ -59,7 +61,7 @@ class SubtitleLanguageSerializerTest(TestCase):
         serializer_data = self.get_serializer_data()
         assert_equal(serializer_data['id'], self.language.id)
         assert_equal(serializer_data['created'],
-                     self.language.created.isoformat())
+                     format_datetime_field(self.language.created))
         assert_equal(serializer_data['is_original'], True)
         assert_equal(serializer_data['is_primary_audio_language'], True)
         assert_equal(serializer_data['is_rtl'], self.language.is_rtl())
@@ -439,6 +441,15 @@ class SubtitlesSerializerTest(TestCase):
                 'subtitles': 'bad-dfxp-data',
             })
 
+    def test_subtitles_wrong_type(self):
+        with assert_raises(ValidationError):
+            self.run_create({
+                'sub_format': 'dfxp',
+                'subtitles': 123,
+                'title': 'test-title',
+                'description': 'test-description',
+            })
+
 class SubtitlesViewTest(TestCase):
     def setUp(self):
         self.video = VideoFactory()
@@ -563,3 +574,19 @@ class SubtitlesViewTest(TestCase):
         })
         assert_equal(test_utils.video_changed_tasks.delay.call_args,
                      mock.call(self.video.pk))
+
+    def test_invalid_video_id(self):
+        url = reverse('api:subtitles', kwargs={
+            'video_id': 'invalidvideoid',
+            'language_code': 'en',
+        })
+        response = self.client.get(url)
+        assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_invalid_language_code(self):
+        url = reverse('api:subtitles', kwargs={
+            'video_id': self.video.video_id,
+            'language_code': 'invalidlanguage',
+        })
+        response = self.client.get(url)
+        assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)

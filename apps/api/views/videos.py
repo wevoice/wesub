@@ -34,6 +34,7 @@ Get info for a specific video
     :>json team: Slug of the Video's team (or null)
     :>json metadata: Dict mapping metadata names to values
     :>json languages: List of languages that have subtitles started (see below)
+    :>json video_type: Video type identifier
     :>json all_urls: List of URLs for the video (the first one is the primary
      video URL)
     :>json resource_uri: API uri for the video
@@ -75,10 +76,10 @@ Creating Videos
     :<json video_url: The url for the video. Any url that Amara accepts will 
         work here. You can send the URL for a file (e.g.
         http:///www.example.com/my-video.ogv), or a link to one of our
-        accepted providers (youtube, vimeo, dailymotion, blip.tv)
+        accepted providers (youtube, vimeo, dailymotion)
     :<json title: title of the video
     :<json description: About this video
-    :<json duration: Duration in seconds
+    :<json duration: Duration in seconds, in case it can not be retrieved automatically by Amara
     :<json primary_audio_language_code: language code for the main
         language spoken in the video.
     :<json thumbnail: URL to the video thumbnail
@@ -86,20 +87,21 @@ Creating Videos
         extra information about the video.  Right now the type keys supported
         are "speaker-name" and "location".  Values can be any string.
     :<json team: team slug for the video or null to remove it from its team.
-       The string "null" is a synonym for the null object **(deprecated)**
     :<json project: project slug for the video or null to put it in the
-        default project.  The string "null" is a synonym for the null object
-        **(deprecated)**
+        default project.
 
 .. note::
     **Deprecated:** For all fields, if you pass an empty string, we will treat
     it as if the field was not present in the input.
 
+    **Deprecated:** For slug and project, You can use the string "null" as a
+    synonym for the null object.
+
 When submitting URLs of external providers (i.e. youtube, vimeo), the metadata
 (title, description, duration) can be fetched from them. If you're submitting
 a link to a file (mp4, flv) then you can make sure those attributes are set
-with these parameters. Note that these parameters override any information
-from the original provider.
+with these parameters. Note that these parameters (except the video duration)
+override any information from the original provider or the file header.
 
 Updating a video object
 +++++++++++++++++++++++
@@ -107,9 +109,10 @@ Updating a video object
 .. http:put:: /api/videos/[video-id]/
 
 With the same parameters for creation, excluding video_url. Note that through
-out our system, a video cannot have it's URLs changed. So you can change other
+out our system, a video cannot have its URLs changed. So you can change other
 video attributes (title, description) but the URL sent must be the same
-original one.
+original one. As with creating video, an update can not override the duration
+received from the provider or specified in the file header.
 
 Moving videos between teams and projects
 ++++++++++++++++++++++++++++++++++++++++
@@ -203,7 +206,8 @@ from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 import json
 
-from api.fields import LanguageCodeField
+from .apiswitcher import APISwitcherMixin
+from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
 from api.pagination import AmaraPaginationMixin
 from teams import permissions as team_perms
 from teams.models import Team, TeamVideo, Project
@@ -306,6 +310,7 @@ class VideoSerializer(serializers.Serializer):
     # default implementation that it makes more sense to not inherit.
     id = serializers.CharField(source='video_id', read_only=True)
     video_url = serializers.URLField(write_only=True, required=True)
+    video_type = serializers.SerializerMethodField()
     primary_audio_language_code = LanguageCodeField(required=False,
                                                     allow_blank=True)
     original_language = serializers.CharField(source='language',
@@ -314,7 +319,7 @@ class VideoSerializer(serializers.Serializer):
     description = serializers.CharField(required=False, allow_blank=True)
     duration = serializers.IntegerField(required=False)
     thumbnail = serializers.URLField(required=False, allow_blank=True)
-    created = serializers.DateTimeField(read_only=True)
+    created = TimezoneAwareDateTimeField(read_only=True)
     team = TeamSerializer(required=False, allow_null=True)
     project = ProjectSerializer(required=False, allow_null=True)
     all_urls = serializers.SerializerMethodField()
@@ -352,6 +357,16 @@ class VideoSerializer(serializers.Serializer):
         video_urls = list(video.get_video_urls())
         video_urls.sort(key=lambda vurl: vurl.primary, reverse=True)
         return [vurl.url for vurl in video_urls]
+
+    def get_video_type(self, video):
+        types = set()
+        for url in video.get_video_urls():
+            video_type = video_type_registrar.video_type_for_url(url.url)
+            if video_type is not None:
+                types.add(video_type)
+        if len(types) == 1:
+            return types.pop().abbreviation
+        return ""
 
     def will_add_video_to_team(self):
         if not self.team_video:
@@ -432,7 +447,11 @@ class VideoSerializer(serializers.Serializer):
         )
         for field_name in simple_fields:
             if field_name in validated_data:
-                setattr(video, field_name, validated_data[field_name])
+                if field_name == "duration":
+                    if not getattr(video, field_name):
+                        setattr(video, field_name, validated_data[field_name])
+                else:
+                    setattr(video, field_name, validated_data[field_name])
         if validated_data.get('metadata'):
             video.update_metadata(validated_data['metadata'], commit=True)
         else:
@@ -565,7 +584,7 @@ class VideoViewSet(AmaraPaginationMixin,
         return video
 
 class VideoURLSerializer(serializers.Serializer):
-    created = serializers.DateTimeField(read_only=True)
+    created = TimezoneAwareDateTimeField(read_only=True)
     url = serializers.CharField()
     primary = serializers.BooleanField(required=False)
     original = serializers.BooleanField(required=False)
@@ -606,12 +625,14 @@ class VideoURLUpdateSerializer(VideoURLSerializer):
     url = serializers.CharField(read_only=True)
 
 class VideoURLViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
+    serializer_class = VideoURLSerializer
+    update_serializer_class = VideoURLUpdateSerializer
 
     def get_serializer_class(self):
         if 'pk' in self.kwargs:
-            return VideoURLUpdateSerializer
+            return self.update_serializer_class
         else:
-            return VideoURLSerializer
+            return self.serializer_class
 
     @property
     def video(self):
@@ -634,3 +655,19 @@ class VideoURLViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
             'request': self.request,
         }
 
+class VideoViewSetSwitcher(APISwitcherMixin, VideoViewSet):
+    switchover_date = 20150716
+
+    class Deprecated(VideoViewSet):
+        class serializer_class(VideoSerializer):
+            created = serializers.DateTimeField(read_only=True)
+
+class VideoURLViewSetSwitcher(APISwitcherMixin, VideoURLViewSet):
+    switchover_date = 20150716
+
+    class Deprecated(VideoURLViewSet):
+        class serializer_class(VideoURLSerializer):
+            created = serializers.DateTimeField(read_only=True)
+
+        class update_serializer_class(VideoURLUpdateSerializer):
+            created = serializers.DateTimeField()

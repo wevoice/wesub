@@ -36,7 +36,7 @@ from raven.contrib.django.models import client
 
 from celery.task import task
 
-from auth.models import CustomUser as User
+from auth.models import CustomUser as User, UserLanguage
 from localeurl.utils import universal_url
 
 from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
@@ -44,9 +44,9 @@ from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
 
 from messages.models import Message
 from utils import send_templated_email
-from utils.metrics import Meter
 from utils.text import fmt
 from utils.translation import get_language_label
+BATCH_SIZE = 1000
 
 def get_url_base():
     return "http://" + Site.objects.get_current().domain
@@ -54,6 +54,24 @@ def get_url_base():
 def _team_sends_notification(team, notification_setting_name):
     from teams.models import Setting
     return not team.settings.filter( key=Setting.KEY_IDS[notification_setting_name]).exists()
+
+@task()
+def cleanup():
+    # These numbers have to be chosen. Do not cleanup for now
+    # Message.objects.cleanup(364, message_type='S')
+    # Message.objects.cleanup(2*365, message_type='M')
+    # For now we just convert old messages, by small bulks.
+    # We have to do this way because we can not update on
+    # a sliced query
+    for i in range(10):
+        messages = []
+        for message in Message.objects.all().filter(message_type='O', author__isnull=True)[:BATCH_SIZE]:
+            messages.append(message.id)
+        Message.objects.all().filter(id__in=messages).update(message_type='S')
+        messages = []
+        for message in Message.objects.all().filter(message_type='O', author__isnull=False)[:BATCH_SIZE]:
+            messages.append(message.id)
+        Message.objects.all().filter(id__in=messages).update(message_type='M')
 
 @task()
 def send_new_messages_notifications(message_ids):
@@ -86,7 +104,6 @@ def send_new_message_notification(message_id):
         "domain":  Site.objects.get_current().domain,
         "STATIC_URL": settings.STATIC_URL,
     }
-    Meter('templated-emails-sent-by-type.message-received').inc()
     send_templated_email(user, subject, "messages/email/message_received.html", context)
 
 @task()
@@ -127,6 +144,7 @@ def team_invitation_sent(invite_pk):
     if invite.user.notify_by_message:
         body = render_to_string("messages/team-you-have-been-invited.txt", context)
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = title
         msg.user = invite.user
         msg.object = invite
@@ -134,7 +152,6 @@ def team_invitation_sent(invite_pk):
         msg.content = body
         msg.save()
     template_name = 'messages/email/team-you-have-been-invited.html'
-    Meter('templated-emails-sent-by-type.teams.invitation').inc()
     return send_templated_email(invite.user, title, template_name, context)
 
 @task()
@@ -165,13 +182,13 @@ def application_sent(application_pk):
             user=application.user, team=application.team.name)
         if m.user.notify_by_message:
             msg = Message()
+            msg.message_type = 'S'
             msg.subject = subject
             msg.content = body
             msg.user = m.user
             msg.object = application.team
             msg.author = application.user
             msg.save()
-        Meter('templated-emails-sent-by-type.teams.application-sent').inc()
         send_templated_email(m.user, subject, "messages/email/application-sent-email.html", context)
     return True
 
@@ -199,12 +216,12 @@ def team_application_denied(application_pk):
         team=application.team.name)
     if application.user.notify_by_message:
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string("messages/team-application-denied.txt", context)
         msg.user = application.user
         msg.object = application.team
         msg.save()
-    Meter('templated-emails-sent-by-type.teams.application-declined').inc()
     send_templated_email(application.user, subject, template_name, context)
 
 @task()
@@ -239,13 +256,13 @@ def team_member_new(member_pk):
             team=member.team)
         if m.user.notify_by_message:
             msg = Message()
+            msg.message_type = 'S'
             msg.subject = subject
             msg.content = body
             msg.user = m.user
             msg.object = m.team
             msg.save()
         template_name = "messages/email/team-new-member.html"
-        Meter('templated-emails-sent-by-type.teams.new-member').inc()
         send_templated_email(m.user, subject, template_name, context)
 
     # does this team have a custom message for this?
@@ -256,6 +273,14 @@ def team_member_new(member_pk):
             if m.get_key_display() == 'messages_joins':
                 team_default_message = m.data
                 break
+    for ul in UserLanguage.objects.filter(user=member.user).order_by("priority"):
+        localized_message = Setting.objects.messages().filter(team=member.team, language_code=ul.language)
+        if len(localized_message) == 1:
+            if team_default_message:
+                team_default_message += u'\n\n----------------\n\n' + localized_message[0].data
+            else:
+                team_default_message = localized_message[0].data
+            break
     # now send welcome mail to the new member
     template_name = "messages/team-welcome.txt"
     context = {
@@ -268,6 +293,7 @@ def team_member_new(member_pk):
     body = render_to_string(template_name,context)
 
     msg = Message()
+    msg.message_type = 'S'
     msg.subject = fmt(
         ugettext("You've joined the %(team)s team!"),
         team=member.team)
@@ -276,7 +302,6 @@ def team_member_new(member_pk):
     msg.object = member.team
     msg.save()
     template_name = "messages/email/team-welcome.html"
-    Meter('templated-emails-sent-by-type.teams.welcome').inc()
     send_templated_email(msg.user, msg.subject, template_name, context)
 
 @task()
@@ -310,12 +335,12 @@ def team_member_leave(team_pk, user_pk):
         body = render_to_string("messages/team-member-left.txt",context)
         if m.user.notify_by_message:
             msg = Message()
+            msg.message_type = 'S'
             msg.subject = subject
             msg.content = body
             msg.user = m.user
             msg.object = team
             msg.save()
-        Meter('templated-emails-sent-by-type.teams.someone-left').inc()
         send_templated_email(m.user, subject, "messages/email/team-member-left.html", context)
 
 
@@ -328,13 +353,13 @@ def team_member_leave(team_pk, user_pk):
     if user.notify_by_message:
         template_name = "messages/team-member-you-have-left.txt"
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string(template_name,context)
         msg.user = user
         msg.object = team
         msg.save()
     template_name = "messages/email/team-member-you-have-left.html"
-    Meter('templated-emails-sent-by-type.teams.you-left').inc()
     send_templated_email(user, subject, template_name, context)
 
 @task()
@@ -347,12 +372,12 @@ def email_confirmed(user_pk):
         body = render_to_string("messages/email-confirmed.txt", context)
         message  = Message(
             user=user,
+            message_type='S',
             subject=subject,
             content=body
         )
         message.save()
     template_name = "messages/email/email-confirmed.html"
-    Meter('templated-emails-sent-by-type.email-confirmed').inc()
     send_templated_email(user, subject, template_name, context )
     return True
 
@@ -370,13 +395,13 @@ def videos_imported_message(user_pk, imported_videos):
     if user.notify_by_message:
         body = render_to_string("messages/videos-imported.txt", context)
         message  = Message(
+            message_type='S',
             user=user,
             subject=subject,
             content=body
         )
         message.save()
     template_name = "messages/email/videos-imported.html"
-    Meter('templated-emails-sent-by-type.videos-imported').inc()
     send_templated_email(user, subject, template_name, context)
 
 @task()
@@ -407,6 +432,7 @@ def team_task_assigned(task_pk):
     if user.notify_by_message:
         template_name = "messages/team-task-assigned.txt"
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string(template_name,context)
         msg.user = user
@@ -414,7 +440,6 @@ def team_task_assigned(task_pk):
         msg.save()
 
     template_name = "messages/email/team-task-assigned.html"
-    Meter('templated-emails-sent-by-type.teams.task-assigned').inc()
     email_res = send_templated_email(user, subject, template_name, context)
     return msg, email_res
 
@@ -489,6 +514,7 @@ def _reviewed_notification(task_pk, status):
     if user.notify_by_message:
         template_name = "messages/team-task-reviewed.txt"
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string(template_name,context)
         msg.user = user
@@ -496,7 +522,6 @@ def _reviewed_notification(task_pk, status):
         msg.save()
 
     template_name = "messages/email/team-task-reviewed.html"
-    Meter('templated-emails-sent-by-type.teams.task-reviewed').inc()
     email_res =  send_templated_email(user, subject, template_name, context)
 
     if status == REVIEWED_AND_SENT_BACK:
@@ -591,6 +616,7 @@ def approved_notification(task_pk, published=False):
     if user.notify_by_message:
         template_name = template_txt
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string(template_name,context)
         msg.user = user
@@ -598,7 +624,6 @@ def approved_notification(task_pk, published=False):
         msg.save()
 
     template_name = template_html
-    Meter('templated-emails-sent-by-type.teams.approval-result').inc()
     email_res =  send_templated_email(user, subject, template_name, context)
     Action.create_approved_video_handler(version, reviewer)
     return msg, email_res
@@ -651,6 +676,7 @@ def send_reject_notification(task_pk, sent_back):
     if user.notify_by_message:
         template_name = "messages/team-task-rejected.txt"
         msg = Message()
+        msg.message_type = 'S'
         msg.subject = subject
         msg.content = render_to_string(template_name,context)
         msg.user = user
@@ -658,7 +684,6 @@ def send_reject_notification(task_pk, sent_back):
         msg.save()
 
     template_name = "messages/email/team-task-rejected.html"
-    Meter('templated-emails-sent-by-type.teams.task-rejected').inc()
     email_res =  send_templated_email(user, subject, template_name, context)
     Action.create_rejected_video_handler(version, reviewer)
     return msg, email_res
@@ -731,7 +756,6 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     followers = set(video.notification_list(comment.user))
 
     for user in followers:
-        Meter('templated-emails-sent-by-type.new-comment-notification').inc()
         send_templated_email(
             user,
             subject,
@@ -769,7 +793,7 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
 
     for user in message_followers:
         Message.objects.create(user=user, subject=subject, object_pk=object_pk,
-                content_type=content_type, object=obj,
+                               content_type=content_type, object=obj, message_type="S",
                 content=render_to_string('messages/new-comment.html', {
                     "video": video,
                     "language": language,

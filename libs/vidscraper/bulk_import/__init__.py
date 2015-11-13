@@ -1,11 +1,10 @@
 import feedparser
 
-from vidscraper.bulk_import import opensearch, blip, vimeo
+from vidscraper.bulk_import import opensearch, vimeo
 from vidscraper import miroguide_util
 
 IMPORTERS = (
     opensearch,
-    blip,
     vimeo,
     )
 
@@ -13,7 +12,7 @@ def bulk_import(feed_url, parsed_feed=None):
     """
     Takes a URL for a feed, and returns a feedparser instance with the entries
     filled in with all of the videos from that feed.  It'll take care of paging
-    through videos from services like blip.tv and Vimeo or services which
+    through videos from services like Vimeo or services which
     support OpenSearch (like YouTube).
     """
     if parsed_feed is None:

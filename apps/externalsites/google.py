@@ -31,7 +31,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 import jwt
 import requests
-import pafy
+import pafy, isodate
 
 from utils.subtitles import load_subtitles
 from utils.text import fmt
@@ -395,25 +395,19 @@ def get_openid_profile(access_token):
         response.json.get('family_name', ''),
     )
 
-def _parse_8601_duration(duration):
-    """Convert a duration in iso 8601 format to seconds as an integer."""
-    match = re.match(r'PT((\d+)M)?(\d+)S', duration)
-    if match is None:
-        return None
-    rv = int(match.group(3))
-    if match.group(2):
-        rv += int(match.group(2)) * 60
-    return rv
-
 def get_video_info(video_id):
     try:
         logger.info("youtube.get_video_info()", extra={
             'stack': True,
         })
         return _get_video_info(video_id)
-    except APIError, e:
-        logger.error("Youtube API Error: %s", e)
-        raise
+    except APIError as e:
+        logger.error("Youtube API Error: %s, falling back", e)
+        try:
+            p = pafy.new(video_id)
+            return VideoInfo(None, p.title, "", p.length, p.thumb)
+        except:
+            raise e
 
 def _get_video_info(video_id):
     response = video_get(None, video_id, ['snippet', 'contentDetails'])
@@ -423,7 +417,7 @@ def _get_video_info(video_id):
         return VideoInfo(snippet['channelId'],
                          snippet['title'],
                          snippet['description'],
-                         _parse_8601_duration(content_details['duration']),
+                         isodate.parse_duration(content_details['duration']).total_seconds(),
                          snippet['thumbnails']['high']['url'])
     except StandardError, e:
         raise APIError("get_video_info: Unexpected content: %s" % e)

@@ -55,6 +55,7 @@ from teams.forms import (
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
     make_billing_report_form, TaskCreateSubtitlesForm,
     TeamMultiVideoCreateSubtitlesForm, MoveVideosForm, AddVideoToTeamForm,
+    GuidelinesLangMessagesForm,
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -78,7 +79,6 @@ from teams.tasks import (
 from videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
-from utils.metrics import time as timefn
 from utils.objectlist import object_list
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
@@ -287,6 +287,55 @@ def settings_messages(request, team):
 
     return { 'team': team, 'form': form, }
 
+@render_to('teams/settings-lang-messages.html')
+@settings_page
+def settings_lang_messages(request, team):
+    initial = team.settings.all_messages()
+    languages = [{"code": l.language_code, "data": l.data} for l in team.settings.localized_messages()]
+    if request.POST:
+        form = GuidelinesLangMessagesForm(request.POST, languages=languages)
+        if form.is_valid():
+            new_language = None
+            new_message = None
+            for key, val in form.cleaned_data.items():
+                if key == "messages_joins_localized":
+                    new_message = val
+                elif key == "messages_joins_language":
+                    new_language = val
+                else:
+                    l = key.split("messages_joins_localized_")
+                    if len(l) == 2:
+                        code = l[1]
+                        try:
+                            setting = Setting.objects.get(team=team, key=Setting.KEY_IDS["messages_joins_localized"], language_code=code)
+                            if val == "":
+                                setting.delete()
+                            else:
+                                setting.data = val
+                                setting.save()
+                        except:
+                            messages.error(request, _(u'No message for that language.'))
+                            return HttpResponseRedirect(request.path)
+            if new_message and new_language:
+                setting, c = Setting.objects.get_or_create(team=team,
+                                  key=Setting.KEY_IDS["messages_joins_localized"],
+                                  language_code=new_language)
+                if c:
+                    setting.data = new_message
+                    setting.save()
+                else:
+                    messages.error(request, _(u'There is already a message for that language.'))
+                    return HttpResponseRedirect(request.path)
+            elif new_message or new_language:
+                messages.error(request, _(u'Please set the language and the message.'))
+                return HttpResponseRedirect(request.path)
+            messages.success(request, _(u'Guidelines and messages updated.'))
+            return HttpResponseRedirect(request.path)
+    else:
+        form = GuidelinesLangMessagesForm(languages=languages)
+
+    return { 'team': team, 'form': form, }
+
 @render_to('teams/settings-workflows.html')
 def old_team_settings_workflows(request, team):
     workflow = Workflow.get_for_target(team.id, 'team')
@@ -438,7 +487,6 @@ def _get_videos_for_detail_page(team, user, query, project, language_code,
     return team.get_videos_for_languages_haystack(**kwargs)
 
 # Videos
-@timefn
 @render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
     team = get_team_for_view(slug, request.user)
@@ -558,7 +606,6 @@ def detail(request, slug, project_slug=None, languages=None):
                     record._team_video.completed_langs = record.video_completed_langs
     return extra_context
 
-@timefn
 @render_to('teams/move_videos.html')
 def move_videos(request, slug, project_slug=None, languages=None):
     team = get_team_for_view(slug, request.user)
@@ -826,7 +873,7 @@ def add_videos(request, slug):
     if form.is_valid():
         form.save()
         messages.success(request, form.success_message())
-        return redirect(reverse('teams:video_feeds', kwargs={
+        return redirect(reverse('teams:settings_feeds', kwargs={
             'slug': team.slug,
         }))
 
@@ -920,111 +967,7 @@ class TableCell():
     def __repr__(self):
         return str(self.content)
 
-@login_required
-def statistics(request, slug, tab='teamstats'):
-    """For the team activity, statistics tabs
-    """
-    team = get_team_for_view(slug, request.user)
-    if tab == 'teamstats' and not can_view_stats_tab(team, request.user):
-        return HttpResponseForbidden("Not allowed")
-    cache_key = 'stats-' + slug + '-' + tab
-    cached_context = cache.get(cache_key)
-    if cached_context:
-        context = pickle.loads(cached_context)
-    else:
-        context = compute_statistics(team, stats_type=tab)
-        cache.set(cache_key, pickle.dumps(context), 60*60*24)
-    context['activity_tab'] = tab
-    context['team'] = team
-    return render(request, 'teams/statistics.html', context)
-
-def activity(request, slug, tab='videos'):
-    team = get_team_for_view(slug, request.user)
-
-    try:
-        page = int(request.GET['page'])
-    except (ValueError, KeyError):
-        page = 1
-
-    user = request.user if request.user.is_authenticated() else None
-    try:
-        member = team.members.get(user=user)
-    except TeamMember.DoesNotExist:
-        member = None
-
-    # This section is here to work around MySQL's poor decisions.
-    #
-    # Much like the Tasks page, this query performs extremely poorly when run
-    # normally.  So we split it into two parts here so that each will run fast.
-    if tab == 'team':
-        action_qs = Action.objects.filter(team=team)
-    else:
-        video_language = request.GET.get('video_language')
-        if video_language == 'any':
-            video_language = None
-        subtitles_language = request.GET.get('subtitles_language')
-        if subtitles_language == 'any':
-            subtitles_language = None
-        action_qs = team.fetch_video_actions(video_language,
-                                             subtitles_language)
-    end = page * ACTIONS_ON_PAGE
-    start = end - ACTIONS_ON_PAGE
-
-    if request.GET.get('action_type') and request.GET.get('action_type') != 'any':
-        action_qs = action_qs.filter(action_type = int(request.GET.get('action_type')))
-
-    action_qs = action_qs.select_related('new_language', 'video')
-
-    sort = request.GET.get('sort', '-created')
-    action_qs = action_qs.order_by(sort)
-
-    action_qs = action_qs[start:end].select_related(
-        'user', 'new_language__video'
-    )
-
-    activity_list = list(action_qs)
-    language_choices = None
-    if tab == 'videos':
-        readable_langs = TeamLanguagePreference.objects.get_readable(team)
-        language_choices = [(code, name) for code, name in get_language_choices()
-                            if code in readable_langs]
-    action_types = Action.TYPES_CATEGORIES[tab]
-
-    has_more = len(activity_list) >= ACTIONS_ON_PAGE
-
-    query = request.GET.get('q', '')
-
-    filtered = bool(set(request.GET.keys()).intersection([
-        'action_type', 'language', 'sort']))
-
-    context = {
-        'activity_list': activity_list,
-        'query': query,
-        'filtered': filtered,
-        'action_types': action_types,
-        'language_choices': language_choices,
-        'team': team,
-        'member': member,
-        'activity_tab': tab,
-        'next_page': page + 1,
-        'has_more': has_more
-    }
-    if not request.is_ajax():
-        return render(request, 'teams/activity.html', context)
-    else:
-        # for ajax requests we only want to return the activity list, since
-        # that's all that the JS code needs.
-        return render(request, 'teams/_activity-list.html', context)
-
-def team_activity(request, slug):
-    return activity(request, slug, tab='team')
-def teamstatistics_activity(request, slug):
-    return statistics(request, slug, tab='teamstats')
-def videosstatistics_activity(request, slug):
-    return statistics(request, slug, tab='videosstats')
-
 # Members
-@timefn
 @render_to('teams/members-list.html')
 def detail_members(request, slug, role=None):
     q = request.REQUEST.get('q')
@@ -1111,7 +1054,7 @@ def remove_member(request, slug, user_pk):
 
     member = get_object_or_404(TeamMember, team=team, user__pk=user_pk)
 
-    return_path = reverse('teams:detail_members', args=[], kwargs={'slug': slug})
+    return_path = reverse('teams:members', args=[], kwargs={'slug': team.slug})
 
     if can_assign_role(team, request.user, member.role, member.user):
         user = member.user
@@ -1288,38 +1231,13 @@ def deny_application(request, slug, application_pk):
         messages.error(request, _(u'Application already processed.'))
     return redirect('teams:applications', team.slug)
 
-@render_to('teams/invite_members.html')
-@login_required
-def invite_members(request, slug):
-    team = get_team_for_view(slug, request.user)
-
-    if not can_invite(team, request.user):
-        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
-    if request.POST:
-        form = InviteForm(team, request.user, request.POST)
-        if form.is_valid():
-            # the form will fire the notifications for invitees
-            # this cannot be done on model signal, since you might be
-            # sending invites twice for the same user, and that borks
-            # the naive signal for only created invitations
-            form.save()
-            return HttpResponseRedirect(reverse('teams:detail_members',
-                                                args=[], kwargs={'slug': team.slug}))
-    else:
-        form = InviteForm(team, request.user)
-
-    return {
-        'team': team,
-        'form': form,
-    }
-
 @login_required
 def accept_invite(request, invite_pk, accept=True):
     invite = get_object_or_404(Invite, pk=invite_pk, user=request.user)
     try:
         if accept:
             invite.accept()
-            return redirect(reverse("teams:detail", kwargs={"slug": invite.team.slug}))
+            return redirect(reverse("teams:dashboard", kwargs={"slug": invite.team.slug}))
         else:
             invite.deny()
             return redirect(request.META.get('HTTP_REFERER', '/'))
@@ -1327,20 +1245,6 @@ def accept_invite(request, invite_pk, accept=True):
         return HttpResponseServerError(render_to_response("generic-error.html", {
             "error_msg": _("This invite is no longer valid"),
         }, RequestContext(request)))
-
-@login_required
-def join_team(request, slug):
-    team = get_object_or_404(Team, slug=slug)
-    user = request.user
-
-    if not can_join_team(team, user):
-        messages.error(request, _(u'You cannot join this team.'))
-    else:
-        member = TeamMember(team=team, user=user, role=TeamMember.ROLE_CONTRIBUTOR)
-        member.save()
-        messages.success(request, _(u'You are now a member of this team.'))
-        notifier.team_member_new.delay(member.pk)
-    return redirect(team)
 
 def _check_can_leave(team, user):
     """Return an error message if the member cannot leave the team, otherwise None."""
@@ -1445,7 +1349,7 @@ def search_members(request, slug):
 
 def role_saved(request, slug):
     messages.success(request, _(u'Member saved.'))
-    return_path = reverse('teams:detail_members', args=[], kwargs={'slug': slug})
+    return_path = reverse('teams:members', args=[], kwargs={'slug': slug})
     return HttpResponseRedirect(return_path)
 
 
@@ -1661,7 +1565,6 @@ def old_dashboard(request, team):
 
     return context
 
-@timefn
 @render_to('teams/tasks.html')
 def team_tasks(request, slug, project_slug=None):
     team = get_team_for_view(slug, request.user)
@@ -2518,7 +2421,7 @@ def video_feed(request, team, feed_id):
             feed.update()
         elif action == 'delete':
             feed.delete()
-            return redirect(reverse('teams:video_feeds', kwargs={
+            return redirect(reverse('teams:settings_feeds', kwargs={
                 'slug': team.slug,
             }))
         return redirect(reverse('teams:video_feed', kwargs={

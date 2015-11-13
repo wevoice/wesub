@@ -29,7 +29,7 @@
 
     {% block select_language_dialog %}
         {% if not team|is_team_member:user %}
-            {% url "teams:join_team" slug=team.slug as redirect_url %}
+            {% url "teams:join" slug=team.slug as redirect_url %}
             {% select_language_dialog hide_link="True" redirect=redirect_url %}
         {% else %}
             {% select_language_dialog hide_link="True" %}
@@ -85,14 +85,14 @@
                             Just find a video that interests you and click the button below it to get started!
                         {% endblocktrans %}
                     <p>
-                    <p class="prompt"><a href="http://support.universalsubtitles.org/solution/categories/13504">{% trans "Learn more" %}</a>{% trans " about subtitling in Amara." %}</p>
+                    <p class="prompt"><a href="http://support.amara.org/support/home">{% trans "Learn more" %}</a>{% trans " about subtitling in Amara." %}</p>
                 </div>
             {% endif %}
         {% else %} {# user is not a team member #}
             <div class="get-started">
                 <h3>{% trans "Welcome!" %}</h3>
                 {% if not team.is_open and not team.is_by_application %} {# team is by invite only #}
-                    <p>This team is invitation only. If you're interested in helping out, <a href="{% url "teams:detail_members" slug=team.slug %}admin/">contact a team admin</a>.</p>
+                    <p>This team is invitation only. If you're interested in helping out, <a href="{% url "teams:admin-list" slug=team.slug %}">contact a team admin</a>.</p>
                 {% else %}
                     <p>
                         {% blocktrans %}
@@ -211,7 +211,7 @@
                         <a href="#" data-modal="language_modal" id="lang_select_btn">{% trans "Select the languages you can caption or translate" %}</a>
                     </li>
                     <li>
-                        <a href="{% url "teams:detail" team.slug %}">Browse all videos</a>
+                        <a href="{% url "teams:videos" team.slug %}">Browse all videos</a>
                     </li>
                     {% if can_add_video %}
                         <li><a href="{% url "teams:add_video" team.slug %}">{% trans "Add videos to the team" %}</a></li>

@@ -33,4 +33,7 @@ def smart_field_render(field):
 
 @register.filter
 def is_checkbox(field):
-    return isinstance(field.field.widget, CheckboxInput)
+    try:
+        return isinstance(field.field.widget, CheckboxInput)
+    except StandardError:
+        return False

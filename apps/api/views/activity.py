@@ -92,6 +92,8 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.reverse import reverse
 
+from .apiswitcher import APISwitcherMixin
+from api.fields import TimezoneAwareDateTimeField
 from api.pagination import AmaraPaginationMixin
 from subtitles.models import SubtitleLanguage
 from teams.models import Team
@@ -101,6 +103,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     type = serializers.IntegerField(source='action_type')
     user = serializers.CharField(source='user.username')
     comment = serializers.CharField(source='comment.content')
+    created = TimezoneAwareDateTimeField(read_only=True)
     video = serializers.CharField(source='video.video_id')
     video_uri = serializers.HyperlinkedRelatedField(
         source='video',
@@ -188,3 +191,11 @@ class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(
                 created__gte=datetime.fromtimestamp(int(params['after'])))
         return queryset
+
+
+class ActivityViewSetSwitcher(APISwitcherMixin, ActivityViewSet):
+    switchover_date = 20150824
+
+    class Deprecated(ActivityViewSet):
+        class serializer_class(ActivitySerializer):
+            created = serializers.DateTimeField(read_only=True)

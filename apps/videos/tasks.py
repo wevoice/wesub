@@ -33,7 +33,6 @@ from babelsubs.storage import diff as diff_subtitles
 from messages.models import Message
 from messages import tasks
 from utils import send_templated_email, DEFAULT_PROTOCOL
-from utils.metrics import Gauge, Meter
 from videos.models import VideoFeed, Video, VIDEO_TYPE_YOUTUBE, VideoUrl
 from subtitles.models import (
     SubtitleLanguage, SubtitleVersion
@@ -208,7 +207,6 @@ def send_change_title_email(video_id, user_id, old_title, new_title):
             'new_title': new_title,
             "STATIC_URL": settings.STATIC_URL,
         }
-        Meter('templated-emails-sent-by-type.videos.title-changed').inc()
         send_templated_email(obj, subject,
                              'videos/email_title_changed.html',
                              context, fail_silently=not settings.DEBUG)
@@ -256,7 +254,6 @@ def send_new_translation_notification(translation_version):
         }
         subject = 'New %s translation by %s of "%s"' % \
             (language.language_display(), translation_version.user.__unicode__(), video.__unicode__())
-        Meter('templated-emails-sent-by-type.videos.new-translation-started').inc()
         send_templated_email(user, subject,
                              'videos/email_start_notification.html',
                              context, fail_silently=not settings.DEBUG)
@@ -326,21 +323,19 @@ def notify_for_version(version):
                 context['user'] = item.author
                 context['hash'] = item.author.hash_for_video(context['video'].video_id)
                 context['user_is_rtl'] = item.author.guess_is_rtl()
-                Meter('templated-emails-sent-by-type.videos.new-edits').inc()
                 send_templated_email(item.author, subject,
                                  'videos/email_notification.html',
                                  context, fail_silently=not settings.DEBUG)
             if item.author.notify_by_message:
                 # TODO: Add body
                 Message.objects.create(user=item.author, subject=subject,
-                        content='')
+                                       content='', message_type='S')
             followers.discard(item.author)
 
     for user in followers:
         context['user'] = user
         context['hash'] = user.hash_for_video(context['video'].video_id)
         context['user_is_rtl'] = user.guess_is_rtl()
-        Meter('templated-emails-sent-by-type.videos.new-edits-non-editors').inc()
         send_templated_email(user, subject,
                              'videos/email_notification_non_editors.html',
                              context, fail_silently=not settings.DEBUG)
@@ -352,23 +347,3 @@ def _save_video_feed(feed_url, user):
         return VideoFeed.objects.get(url=feed_url, user=user)
     except VideoFeed.DoesNotExist:
         return VideoFeed.objects.create(url=feed_url, user=user)
-
-@task
-def gauge_videos():
-    Gauge('videos.Video').report(Video.objects.count())
-    Gauge('videos.Video-captioned').report(
-        SubtitleLanguage.objects.video_count())
-    Gauge('videos.SubtitleVersion').report(SubtitleVersion.objects.count())
-    Gauge('videos.SubtitleLanguage').report(SubtitleLanguage.objects.count())
-
-
-@task
-def gauge_videos_long():
-    Gauge('videos.Subtitle').report(
-        SubtitleVersion.objects.subtitle_count())
-
-@task
-def gauge_billing_records():
-    from teams.models import BillingRecord
-    Gauge('teams.BillingRecord').report(BillingRecord.objects.count())
-

@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
 from datetime import datetime, timedelta
 import time
 
@@ -26,6 +27,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 import factory
 import mock
 
+from api.tests.utils import format_datetime_field
 from auth.models import CustomUser as User
 from subtitles import pipeline
 from teams.models import Team, TeamMember, Task, Application
@@ -412,8 +414,9 @@ class ProjectAPITest(TeamAPITestBase):
         assert_equal(data['slug'], project.slug)
         assert_equal(data['description'], project.description)
         assert_equal(data['guidelines'], project.guidelines)
-        assert_equal(data['created'], project.created.isoformat())
-        assert_equal(data['modified'], project.modified.isoformat())
+        assert_equal(data['created'], format_datetime_field(project.created))
+        assert_equal(data['modified'],
+                     format_datetime_field(project.modified))
         assert_equal(data['workflow_enabled'], project.workflow_enabled)
         assert_equal(data['resource_uri'],
                      reverse('api:projects-detail', kwargs={
@@ -574,7 +577,8 @@ class TasksAPITest(TeamAPITestBase):
             assert_equal(data['assignee'], None)
         assert_equal(data['priority'], task.priority)
         if task.completed:
-            assert_equal(data['completed'], task.completed.isoformat())
+            assert_equal(data['completed'],
+                         format_datetime_field(task.completed))
         else:
             assert_equal(data['completed'], None)
         assert_equal(data['approved'], task.get_approved_display())
@@ -1001,9 +1005,11 @@ class TeamApplicationAPITest(TeamAPITestBase):
         assert_equal(data['note'], application.note)
         assert_equal(data['status'], application.get_status_display())
         assert_equal(data['id'], application.id)
-        assert_equal(data['created'], application.created.isoformat())
+        assert_equal(data['created'],
+                     format_datetime_field(application.created))
         if application.modified:
-            assert_equal(data['modified'], application.modified.isoformat())
+            assert_equal(data['modified'],
+                         format_datetime_field(application.modified))
         else:
             assert_equal(data['modified'], None)
         assert_equal(data['resource_uri'], self.detail_url(application))

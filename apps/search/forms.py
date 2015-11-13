@@ -99,10 +99,7 @@ class SearchForm(forms.Form):
     def queryset_from_query(self):
         q = self.data.get('q', '').strip()
         if q:
-            qs = VideoIndex.public()
-            return (qs
-                    .auto_query(q)
-                    .filter_or(title=qs.query.clean(q)))
+            return VideoIndex.public().auto_query(q)
         else:
             return VideoIndex.public()
 

@@ -12,8 +12,8 @@
 {{ block.super }}
 <div class="banner">
   <div class="content group">
-    <h1>{{ messages.pagetext_welcome_heading }}</h1>
-    {% if team.description %}<p>{{ team.description }}</p>{% endif %}
+    <h1>{{ team_messages.pagetext_welcome_heading }}</h1>
+    {% if team.description %}{{ team.description|urlize|linebreaks }}{% endif %}
 
     <ol class="group">
       <li>
@@ -34,12 +34,15 @@
     </ol>
 
     <div>
-    {% if team.is_open %}
-
-    <a class="button" href="{% url "teams:join_team" slug=team.slug %}">{% trans "Join the team" %} <span class="fa fa-angle-double-right"></span></a>
-    {% elif team.is_by_application %}
-    <a class="button" href="{% url "teams:join_team" slug=team.slug %}">{% trans "Apply to join the team" %} <span class="fa fa-angle-double-right"></span></a>
-    {% endif %}
+      {% if join_mode == "open" %}
+      <a class="button" href="{% url "teams:join" slug=team.slug %}">{% trans "Join the team" %} <span class="fa fa-angle-double-right"></span></a>
+      {% elif join_mode == "application" %}
+      <a class="button" href="{% url "teams:join" slug=team.slug %}">{% trans "Apply to join the team" %} <span class="fa fa-angle-double-right"></span></a>
+      {% elif join_mode == "invitation" %}
+      <p>This team is invitation only. If you're interested in helping out, <a href="{% url "teams:admin-list" slug=team.slug %}">contact a team admin</a>.</p>
+      {% elif join_mode == "login" %}
+      <a class="button" href="{% url "auth:login" %}">{% trans "Login to join the team" %} <span class="fa fa-angle-double-right"></span></a>
+      {% endif %}
     </div>
   </div>
 </div>

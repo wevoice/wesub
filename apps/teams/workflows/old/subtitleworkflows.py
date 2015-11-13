@@ -29,18 +29,21 @@ from django.utils.translation import ugettext_lazy
 from localeurl.utils import universal_url
 from messages.models import Message
 from subtitles.signals import subtitles_published
-from teams.models import Task
+from teams.models import Task, BillingRecord
 from teams.permissions import can_add_version, can_assign_task
 from teams.workflows.notes import TeamEditorNotes
+from teams.workflows.subtitleworkflows import TeamSubtitlesWorkflow
 from utils import send_templated_email
 from utils import translation
 from utils.text import fmt
 from videos.tasks import video_changed_tasks
 import subtitles.workflows
 
-def _send_subtitles_published_if_needed(subtitle_language, version):
-    if subtitle_language.get_tip(public=True):
+def _publish_subtitles_if_needed(subtitle_language, version):
+    public_tip = subtitle_language.get_tip(public=True)
+    if public_tip:
         subtitles_published.send(subtitle_language, version=version)
+        BillingRecord.objects.insert_record(public_tip)
 
 def _complete_task(user, video, subtitle_language, saved_version, approved):
     team_video = video.get_team_video()
@@ -80,7 +83,7 @@ class Complete(subtitles.workflows.Action):
             return
         else:
             task.complete()
-        _send_subtitles_published_if_needed(subtitle_language, saved_version)
+        _publish_subtitles_if_needed(subtitle_language, saved_version)
 
 class Approve(subtitles.workflows.Action):
     name = 'approve'
@@ -93,7 +96,7 @@ class Approve(subtitles.workflows.Action):
     def perform(self, user, video, subtitle_language, saved_version):
         _complete_task(user, video, subtitle_language, saved_version,
                        Task.APPROVED_IDS['Approved'])
-        _send_subtitles_published_if_needed(subtitle_language, saved_version)
+        _publish_subtitles_if_needed(subtitle_language, saved_version)
 
 class SendBack(subtitles.workflows.Action):
     name = 'send-back'
@@ -106,7 +109,7 @@ class SendBack(subtitles.workflows.Action):
     def perform(self, user, video, subtitle_language, saved_version):
         _complete_task(user, video, subtitle_language, saved_version,
                        Task.APPROVED_IDS['Rejected'])
-        _send_subtitles_published_if_needed(subtitle_language, saved_version)
+        _publish_subtitles_if_needed(subtitle_language, saved_version)
 
 class TaskSaveDraft(subtitles.workflows.SaveDraft):
     subtitle_visibility = 'private'
@@ -158,27 +161,8 @@ class TaskTeamEditorNotes(TeamEditorNotes):
                                  fail_silently=not settings.DEBUG)
 
             Message.objects.create(
-                user=user, subject=subject,
+                user=user, subject=subject, message_type="S",
                 content=render_to_string(message_template, data))
-
-class TeamSubtitlesWorkflow(subtitles.workflows.DefaultWorkflow):
-    def __init__(self, team_video):
-        subtitles.workflows.DefaultWorkflow.__init__(self, team_video.video)
-        self.team_video = team_video
-        self.team = team_video.team
-
-    def get_editor_notes(self, language_code):
-        return TeamEditorNotes(self.team_video.team, self.team_video.video,
-                               language_code)
-
-    def user_can_view_video(self, user):
-        return self.team.is_visible or self.team.is_member(user)
-
-    def user_can_view_private_subtitles(self, user, language_code):
-        return self.team_video.team.is_member(user)
-
-    def user_can_edit_subtitles(self, user, language_code):
-        return can_add_version(user, self.video, language_code)
 
 class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
     def get_work_mode(self, user, language_code):
@@ -191,7 +175,10 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
             else:
                 # get_task_for_editor should only return approve/review tasks
                 raise ValueError("Wrong task type: %s" % task)
-            return subtitles.workflows.ReviewWorkMode(heading)
+            help_text = _('Watch the video and verify that the subtitles '
+                          'are correct. Click Approve when done, or Save '
+                          'Draft to finish later')
+            return subtitles.workflows.ReviewWorkMode(heading, help_text)
         else:
             return subtitles.workflows.NormalWorkMode()
 
@@ -234,3 +221,18 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
         else:
             return (super(TaskTeamSubtitlesWorkflow, self)
                     .action_for_add_subtitles(user, language_code, complete))
+
+class NonTaskTeamPublish(subtitles.workflows.Publish):
+    def perform(self, user, video, subtitle_language, saved_version):
+        super(NonTaskTeamPublish, self).perform(
+            user, video, subtitle_language, saved_version)
+        if saved_version:
+            billing_version = saved_version
+        else:
+            billing_version = subtitle_language.get_tip()
+        if billing_version:
+            BillingRecord.objects.insert_record(billing_version)
+
+class NonTaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
+    def get_actions(self, user, language_code):
+        return [subtitles.workflows.SaveDraft(), NonTaskTeamPublish()]

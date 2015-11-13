@@ -18,6 +18,7 @@
 
 """Django models represention subtitles."""
 
+import collections
 import itertools
 import json
 from datetime import datetime, date, timedelta
@@ -386,6 +387,27 @@ class SubtitleLanguage(models.Model):
 
     class Meta:
         unique_together = [('video', 'language_code')]
+
+    @classmethod
+    def calc_completed_languages(cls, video_list, names=False):
+        """Calculate completed languages for a list of videos.
+
+        Arguments:
+            video_list: list of Videos or PKs
+            names: return language names instead of codes
+
+        Returns:
+            dict mapping video PKs to a list of language codes
+        """
+        qs = (cls.objects
+              .filter(subtitles_complete=True, video_id__in=video_list)
+              .values_list('video_id', 'language_code'))
+        completed_languages = collections.defaultdict(list)
+        for video_id, language in qs:
+            if names:
+                language = translation.get_language_label(language)
+            completed_languages[video_id].append(language)
+        return completed_languages
 
     def __init__(self, *args, **kwargs):
         super(SubtitleLanguage, self).__init__(*args, **kwargs)

@@ -254,9 +254,10 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
+from .apiswitcher import APISwitcherMixin
+from .videos import VideoMetadataSerializer
 from api.pagination import AmaraPaginationMixin
-from api.fields import LanguageCodeField
-from api.views.videos import VideoMetadataSerializer
+from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
 from videos.models import Video
 from subtitles import compat
 from subtitles import pipeline
@@ -313,7 +314,7 @@ class SubtitleLanguageListSerializer(serializers.ListSerializer):
 
 class SubtitleLanguageSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    created = serializers.DateTimeField(read_only=True)
+    created = TimezoneAwareDateTimeField(read_only=True)
     language_code = LanguageCodeField()
     is_primary_audio_language = serializers.BooleanField(required=False)
     is_rtl = serializers.BooleanField(read_only=True)
@@ -508,6 +509,10 @@ class SubtitlesField(serializers.CharField):
             return value
 
     def to_internal_value(self, value):
+        if not isinstance(value, basestring):
+            raise serializers.ValidationError("Invalid subtitle data")
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
         try:
             return load_subtitles(
                 self.context['language_code'], value,
@@ -620,7 +625,11 @@ class SubtitlesView(generics.CreateAPIView):
 
     def get_video(self):
         if not hasattr(self, '_video'):
-            self._video = Video.objects.get(video_id=self.kwargs['video_id'])
+            try:
+                self._video = Video.objects.get(
+                    video_id=self.kwargs['video_id'])
+            except Video.DoesNotExist:
+                raise Http404
         return self._video
 
     def get_serializer_context(self):
@@ -676,8 +685,13 @@ class SubtitlesView(generics.CreateAPIView):
         if not workflow.user_can_edit_subtitles(
             self.request.user, self.kwargs['language_code']):
             raise PermissionDenied()
+        try:
+            version = super(SubtitlesView, self).create(request, *args,
+                                                        **kwargs)
+        except (ActionError, LookupError), e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         videos.tasks.video_changed_tasks.delay(video.pk)
-        return super(SubtitlesView, self).create(request, *args, **kwargs)
+        return version
 
 class ActionsSerializer(serializers.Serializer):
     action = serializers.CharField(source='name')
@@ -691,6 +705,8 @@ class Actions(views.APIView):
     def get(self, request, video_id, language_code, format=None):
         video = get_object_or_404(Video, video_id=video_id)
         workflow = workflows.get_workflow(video)
+        if not workflow.user_can_edit_subtitles(request.user, language_code):
+            raise PermissionDenied()
         action_list = workflow.get_actions(request.user, language_code)
         serializer = ActionsSerializer(action_list, many=True)
         return Response(serializer.data)
@@ -702,6 +718,8 @@ class Actions(views.APIView):
             return Response('no action', status=status.HTTP_400_BAD_REQUEST)
         video = get_object_or_404(Video, video_id=video_id)
         workflow = workflows.get_workflow(video)
+        if not workflow.user_can_edit_subtitles(request.user, language_code):
+            raise PermissionDenied()
         try:
             workflow.perform_action(request.user, language_code, action)
         except (ActionError, LookupError), e:
@@ -711,7 +729,7 @@ class Actions(views.APIView):
 
 class NotesSerializer(serializers.Serializer):
     user = serializers.CharField(source='user.username', read_only=True)
-    created = serializers.DateTimeField(read_only=True)
+    created = TimezoneAwareDateTimeField(read_only=True)
     body = serializers.CharField()
 
     def create(self, validated_data):
@@ -739,3 +757,18 @@ class NotesList(generics.ListCreateAPIView):
             'editor_notes': self.editor_notes,
             'user': self.request.user,
         }
+
+class SubtitleLanguageViewSetSwitcher(APISwitcherMixin,
+                                      SubtitleLanguageViewSet):
+    switchover_date = 20150716
+
+    class Deprecated(SubtitleLanguageViewSet):
+        class serializer_class(SubtitleLanguageSerializer):
+            created = serializers.DateTimeField(read_only=True)
+
+class NotesListSwitcher(APISwitcherMixin, NotesList):
+    switchover_date = 20150716
+
+    class Deprecated(NotesList):
+        class serializer_class(NotesSerializer):
+            created = serializers.DateTimeField(read_only=True)

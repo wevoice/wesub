@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
+
 from django.test import TestCase
 from nose.tools import *
 from rest_framework import status
@@ -107,6 +109,7 @@ class UserAPITest(TestCase):
         return user, response
 
     def test_create_user(self):
+        self.user.is_partner = True
         self.check_post({
             'username': 'test-user',
             'email': 'test@example.com',
@@ -132,6 +135,26 @@ class UserAPITest(TestCase):
             'homepage': 'http://example.com/test/'
         })
         assert_equal(user.username, 'test-user00')
+
+    def test_create_partner(self):
+        self.user.is_partner = True
+        user, response = self.check_post({
+            'username': 'test-user',
+            'email': 'test@example.com',
+            'password': 'test-password',
+            'is_partner': True,
+        })
+        assert_true(user.is_partner)
+
+    def test_only_partners_can_create_partners(self):
+        self.user.is_partner = False
+        user, response = self.check_post({
+            'username': 'test-user',
+            'email': 'test@example.com',
+            'password': 'test-password',
+            'is_partner': True,
+        })
+        assert_false(user.is_partner)
 
     def test_username_max_length(self):
         # we should only allow 30 chars for the username length

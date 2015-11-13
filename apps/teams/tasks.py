@@ -12,14 +12,12 @@ from django.utils.translation import ugettext_lazy as _
 from haystack import site
 
 from utils import send_templated_email
-from utils.metrics import Gauge, Meter
 from widget.video_cache import (
     invalidate_cache as invalidate_video_cache,
     invalidate_video_moderation,
     invalidate_video_visibility
 )
 
-from utils.metrics import Timer
 from utils.text import fmt
 from videos.tasks import video_changed_tasks
 
@@ -54,14 +52,13 @@ def invalidate_video_visibility_caches(team):
 def update_video_public_field(team_id):
     from teams.models import Team
 
-    with Timer("update-video-public-field-time"):
-        team = Team.objects.get(pk=team_id)
+    team = Team.objects.get(pk=team_id)
 
-        for team_video in team.teamvideo_set.all():
-            video = team_video.video
-            video.is_public = team.is_visible
-            video.save()
-            video_changed_tasks(video.id)
+    for team_video in team.teamvideo_set.all():
+        video = team_video.video
+        video.is_public = team.is_visible
+        video.save()
+        video_changed_tasks(video.id)
 
 @task
 def expire_tasks():
@@ -132,7 +129,6 @@ def _notify_teams_of_new_videos(team_qs):
                 "STATIC_URL": settings.STATIC_URL,
             }
 
-            Meter('templated-emails-sent-by-type.team.new-videos-ready').inc()
             send_templated_email(user, subject,
                                  'teams/email_new_videos.html',
                                  context, fail_silently=not settings.DEBUG)
@@ -181,17 +177,8 @@ def api_notify_on_application_activity(team_pk, event_name, application_pk):
         team_pk, event_name, application_pk=application_pk)
 
 
-@task
-def gauge_teams():
-    from teams.models import Task, Team, TeamMember
-    Gauge('teams.Task').report(Task.objects.count())
-    Gauge('teams.Team').report(Team.objects.count())
-    Gauge('teams.TeamMember').report(TeamMember.objects.count())
-
-
 @task()
 def process_billing_report(billing_report_pk):
     from teams.models import BillingReport
     report = BillingReport.objects.get(pk=billing_report_pk)
-    with Timer('billing-csv-time'):
-        report.process()
+    report.process()
