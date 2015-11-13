@@ -28,15 +28,20 @@ from messages.forms import TeamAdminPageMessageForm
 from teams.models import (
     Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing,
     Project, TeamLanguagePreference, TeamNotificationSetting, BillingReport,
-    Partner, Application, ApplicationInvalidException, Invite, BillingRecord
+    Partner, Application, ApplicationInvalidException, Invite, BillingRecord,
+    LanguageManager
 )
 from utils.text import fmt
 from videos.models import SubtitleLanguage
 
 
-class TeamMemberInline(admin.TabularInline):
-    model = TeamMember
-    raw_id_fields = ['user']
+class ProjectManagerInline(admin.TabularInline):
+    model = TeamMember.projects_managed.through
+    verbose_name_plural = 'Project Manager For:'
+
+class LanguageManagerInline(admin.TabularInline):
+    model = LanguageManager
+    verbose_name_plural = 'Language Manager For:'
 
 class TeamAdmin(admin.ModelAdmin):
     search_fields = ('name'),
@@ -110,6 +115,11 @@ class TeamMemberAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'team__name', 'user__first_name', 'user__last_name')
     list_display = ('role', 'team_link', 'user_link', 'created',)
     raw_id_fields = ('user', 'team')
+    exclude = ('projects_managed',)
+    inlines = [
+        ProjectManagerInline,
+        LanguageManagerInline,
+    ]
 
     def get_changelist(self, request, **kwargs):
         return TeamMemberChangeList

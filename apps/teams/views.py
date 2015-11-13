@@ -55,6 +55,7 @@ from teams.forms import (
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
     make_billing_report_form, TaskCreateSubtitlesForm,
     TeamMultiVideoCreateSubtitlesForm, MoveVideosForm, AddVideoToTeamForm,
+    GuidelinesLangMessagesForm,
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -283,6 +284,55 @@ def settings_messages(request, team):
             return HttpResponseRedirect(request.path)
     else:
         form = GuidelinesMessagesForm(initial=initial)
+
+    return { 'team': team, 'form': form, }
+
+@render_to('teams/settings-lang-messages.html')
+@settings_page
+def settings_lang_messages(request, team):
+    initial = team.settings.all_messages()
+    languages = [{"code": l.language_code, "data": l.data} for l in team.settings.localized_messages()]
+    if request.POST:
+        form = GuidelinesLangMessagesForm(request.POST, languages=languages)
+        if form.is_valid():
+            new_language = None
+            new_message = None
+            for key, val in form.cleaned_data.items():
+                if key == "messages_joins_localized":
+                    new_message = val
+                elif key == "messages_joins_language":
+                    new_language = val
+                else:
+                    l = key.split("messages_joins_localized_")
+                    if len(l) == 2:
+                        code = l[1]
+                        try:
+                            setting = Setting.objects.get(team=team, key=Setting.KEY_IDS["messages_joins_localized"], language_code=code)
+                            if val == "":
+                                setting.delete()
+                            else:
+                                setting.data = val
+                                setting.save()
+                        except:
+                            messages.error(request, _(u'No message for that language.'))
+                            return HttpResponseRedirect(request.path)
+            if new_message and new_language:
+                setting, c = Setting.objects.get_or_create(team=team,
+                                  key=Setting.KEY_IDS["messages_joins_localized"],
+                                  language_code=new_language)
+                if c:
+                    setting.data = new_message
+                    setting.save()
+                else:
+                    messages.error(request, _(u'There is already a message for that language.'))
+                    return HttpResponseRedirect(request.path)
+            elif new_message or new_language:
+                messages.error(request, _(u'Please set the language and the message.'))
+                return HttpResponseRedirect(request.path)
+            messages.success(request, _(u'Guidelines and messages updated.'))
+            return HttpResponseRedirect(request.path)
+    else:
+        form = GuidelinesLangMessagesForm(languages=languages)
 
     return { 'team': team, 'form': form, }
 
@@ -823,7 +873,7 @@ def add_videos(request, slug):
     if form.is_valid():
         form.save()
         messages.success(request, form.success_message())
-        return redirect(reverse('teams:video_feeds', kwargs={
+        return redirect(reverse('teams:settings_feeds', kwargs={
             'slug': team.slug,
         }))
 
@@ -1004,7 +1054,7 @@ def remove_member(request, slug, user_pk):
 
     member = get_object_or_404(TeamMember, team=team, user__pk=user_pk)
 
-    return_path = reverse('teams:detail_members', args=[], kwargs={'slug': slug})
+    return_path = reverse('teams:members', args=[], kwargs={'slug': team.slug})
 
     if can_assign_role(team, request.user, member.role, member.user):
         user = member.user
@@ -1181,38 +1231,13 @@ def deny_application(request, slug, application_pk):
         messages.error(request, _(u'Application already processed.'))
     return redirect('teams:applications', team.slug)
 
-@render_to('teams/invite_members.html')
-@login_required
-def invite_members(request, slug):
-    team = get_team_for_view(slug, request.user)
-
-    if not can_invite(team, request.user):
-        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
-    if request.POST:
-        form = InviteForm(team, request.user, request.POST)
-        if form.is_valid():
-            # the form will fire the notifications for invitees
-            # this cannot be done on model signal, since you might be
-            # sending invites twice for the same user, and that borks
-            # the naive signal for only created invitations
-            form.save()
-            return HttpResponseRedirect(reverse('teams:detail_members',
-                                                args=[], kwargs={'slug': team.slug}))
-    else:
-        form = InviteForm(team, request.user)
-
-    return {
-        'team': team,
-        'form': form,
-    }
-
 @login_required
 def accept_invite(request, invite_pk, accept=True):
     invite = get_object_or_404(Invite, pk=invite_pk, user=request.user)
     try:
         if accept:
             invite.accept()
-            return redirect(reverse("teams:detail", kwargs={"slug": invite.team.slug}))
+            return redirect(reverse("teams:dashboard", kwargs={"slug": invite.team.slug}))
         else:
             invite.deny()
             return redirect(request.META.get('HTTP_REFERER', '/'))
@@ -1220,20 +1245,6 @@ def accept_invite(request, invite_pk, accept=True):
         return HttpResponseServerError(render_to_response("generic-error.html", {
             "error_msg": _("This invite is no longer valid"),
         }, RequestContext(request)))
-
-@login_required
-def join_team(request, slug):
-    team = get_object_or_404(Team, slug=slug)
-    user = request.user
-
-    if not can_join_team(team, user):
-        messages.error(request, _(u'You cannot join this team.'))
-    else:
-        member = TeamMember(team=team, user=user, role=TeamMember.ROLE_CONTRIBUTOR)
-        member.save()
-        messages.success(request, _(u'You are now a member of this team.'))
-        notifier.team_member_new.delay(member.pk)
-    return redirect(team)
 
 def _check_can_leave(team, user):
     """Return an error message if the member cannot leave the team, otherwise None."""
@@ -1338,7 +1349,7 @@ def search_members(request, slug):
 
 def role_saved(request, slug):
     messages.success(request, _(u'Member saved.'))
-    return_path = reverse('teams:detail_members', args=[], kwargs={'slug': slug})
+    return_path = reverse('teams:members', args=[], kwargs={'slug': slug})
     return HttpResponseRedirect(return_path)
 
 
@@ -2410,7 +2421,7 @@ def video_feed(request, team, feed_id):
             feed.update()
         elif action == 'delete':
             feed.delete()
-            return redirect(reverse('teams:video_feeds', kwargs={
+            return redirect(reverse('teams:settings_feeds', kwargs={
                 'slug': team.slug,
             }))
         return redirect(reverse('teams:video_feed', kwargs={

@@ -44,8 +44,6 @@ class OpenSearchBulkImportTestCase(unittest.TestCase):
         self.assertEquals(opensearch.video_count(SMALL_FEED_PARSED), 1)
         self.assert_(58 <= opensearch.video_count(BIG_FEED_PARSED) <= 62,
                      opensearch.video_count(BIG_FEED_PARSED))
-        self.assertEquals(opensearch.video_count(
-                feedparser.parse('http://miropcf.blip.tv/rss')), None)
 
     def test_bulk_import_big(self):
         """

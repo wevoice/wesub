@@ -7,3 +7,7 @@ input.enable-field[type=checkbox] {
     width: 15px;
     height: 15px;
 }
+
+.api-description .nav-tabs > li {
+    float: left;
+}

@@ -28,7 +28,6 @@ from utils.text import fmt
 from utils.translation import get_language_choices, set_user_languages_to_cookie
 from utils.validators import MaxFileSizeValidator
 
-
 class SelectLanguageForm(forms.Form):
     language1 = forms.ChoiceField(choices=(), required=False)
     language2 = forms.ChoiceField(choices=(), required=False)
@@ -53,17 +52,19 @@ class SelectLanguageForm(forms.Form):
         languages = []
 
         for i in xrange(1, 10):
-            if data.get('language%s' % i): languages.append(data.get('language%s' % i))
+            if data.get('language%s' % i): languages.append({"language": data.get('language%s' % i), "priority": i})
 
         if user.is_authenticated():
             UserLanguage.objects.filter(user=user).delete()
             for l in languages:
-                UserLanguage.objects.get_or_create(user=user, language=l)
+                language, c = UserLanguage.objects.get_or_create(user=user, language=l["language"])
+                language.priority = l["priority"]
+                language.save()
         else:
             if not response is None:
                 set_user_languages_to_cookie(response, languages)
             else:
-                return languages
+                return map(languages.sort(key=lambda x: x["priority"]), lambda x: x["language"])
 
 class UserLanguageForm(forms.ModelForm):
 
@@ -151,8 +152,9 @@ class EditUserForm(forms.ModelForm):
 
 
 class EditAccountForm(forms.ModelForm):
-    current_password = forms.CharField(widget=forms.PasswordInput, required=False)
     new_password = forms.CharField(widget=forms.PasswordInput, required=False)
+    current_password = forms.CharField(widget=forms.PasswordInput,
+                                       required=False)
     new_password_verify = forms.CharField(widget=forms.PasswordInput,
                                           required=False,
                                           label=_(u'Confirm new password:'))
@@ -165,15 +167,20 @@ class EditAccountForm(forms.ModelForm):
         model = User
         fields = ('username', 'email', 'notify_by_email', 'notify_by_message')
 
-    def clean(self):
-        self.cleaned_data = super(EditAccountForm, self).clean()
-        current, new, verify = map(self.cleaned_data.get,
-                    ('current_password', 'new_password', 'new_password_verify'))
-        if current and not self.instance.check_password(current):
-            raise forms.ValidationError(_(u'Invalid password.'))
+    def clean_current_password(self):
+        password = self.cleaned_data.get('current_password')
+        if password and not self.instance.check_password(password):
+            raise forms.ValidationError(_(u'Invalid password'))
+        elif not password and self.cleaned_data.get('new_password'):
+            raise forms.ValidationError(_(u'Must specify current password'))
+        return password
+
+    def clean_new_password_verify(self):
+        new = self.cleaned_data.get('new_password')
+        verify = self.cleaned_data.get('new_password_verify')
         if new and new != verify:
-            raise forms.ValidationError(_(u'The two passwords did not match.'))
-        return self.cleaned_data
+            raise forms.ValidationError(_(u"Passwords don't match"))
+        return verify
 
     def save(self, commit=True):
         password = self.cleaned_data.get('new_password')

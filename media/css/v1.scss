@@ -190,7 +190,7 @@ div.fix-chosen div.chzn-container {
 #language_modal {
     select {
         color: inherit;
-        margin-right: 25px;
+        margin-right: 20px;
     }
     button.cancel {
         float: left;
@@ -474,10 +474,6 @@ div.fix-chosen div.chzn-container {
         p {
             margin: .5em 0;
         }
-        .bulkable {
-            position: absolute;
-            top: 3em; left: 44px;
-        }
         .thumb {
             position: absolute;
             top: 2em; left: 0;
@@ -629,6 +625,12 @@ div.fix-chosen div.chzn-container {
 
 .v1 .listing.videos {
         padding: 0 1px;
+}
+
+.v1 .messages .bulkable {
+    position: absolute;
+    top: 2px; left: 10px;
+    margin: 0;
 }
 
 .v1 .listing.videos > li {
@@ -3273,4 +3275,11 @@ a.truncated-expand {
 
 .v1 .message.notification {
     background-color: #DDD;
+}
+
+
+.v1 hr.form-separator {
+    display: block;
+    margin: 20px 0;
+    border: 1px inset;
 }

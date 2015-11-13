@@ -12,6 +12,6 @@ Hi {{ user }},
 Great news! {{ new_member}} has joined the {{ team.name }} team as a(n) {{ role }}.
 
 <a href="{{url_base}}{% url "messages:new" %}">Send {{ invitee }} a message</a>
- or <a href="{{url_base}}{% url "teams:detail_members" slug=team.slug %}">view the team’s members</a>.
+ or <a href="{{url_base}}{% url "teams:members" slug=team.slug %}">view the team’s members</a>.
 {% endblock %}
 {% block dont_send %}{% endblock %}

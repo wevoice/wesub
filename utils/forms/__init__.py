@@ -1,13 +1,19 @@
+from __future__ import absolute_import
 import re
 
 from django import forms
 from django.core import validators
 from django.utils import html
-from django.utils.encoding import force_unicode
+from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 
-from utils.forms.recapcha import ReCaptchaField
+from .autocomplete import AutocompleteTextInput
+from .formrouter import FormRouter
+from .languages import MultipleLanguageChoiceField
+from .recapcha import ReCaptchaField
+from .userautocomplete import UserAutocompleteField, autocomplete_user_view
+from utils.translation import get_language_choices
 
 assert ReCaptchaField # Shut up, Pyflakes.
 
@@ -17,6 +23,18 @@ class AjaxForm(object):
         for key, value in self.errors.items():
             output[key] = '/n'.join([force_unicode(i) for i in value])
         return output
+
+class LanguageCodeField(forms.ChoiceField):
+    def __init__(self, *args, **kwargs):
+        self.with_any = kwargs.pop('with_any', None)
+        kwargs['choices'] = self.static_choices() + get_language_choices()
+        super(LanguageCodeField, self).__init__(*args, **kwargs)
+
+    def static_choices(self):
+        choices = []
+        if self.with_any:
+            choices.append(('', ugettext('Any language')))
+        return choices
 
 class StripRegexField(forms.RegexField):
     def to_python(self, value):
@@ -144,3 +162,19 @@ def flatten_errorlists(errorlists):
         errors += ['%s%s' % (label, error) for error in errorlist]
 
     return errors
+
+def get_label_for_value(form, name):
+    """Get a label that represents the current value for a form field.
+
+    For many fields this is just the value from cleaned_data.  For
+    ChoiceField, it's the label that's associated with that value.
+    """
+    value = form.cleaned_data.get(name)
+    if value is None:
+        return ''
+    field = form.fields[name]
+    if isinstance(field, forms.ChoiceField):
+        for choice in field.choices:
+            if smart_unicode(choice[0]) == value:
+                return unicode(choice[1])
+    return value

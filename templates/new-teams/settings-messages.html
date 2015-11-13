@@ -1,9 +1,9 @@
 {% extends "new-teams/base.html" %}
-{% load i18n %}
+{% load i18n teams_tags %}
+{% load url from future %}
 
 {% block content %}
 <h2>{% trans "Team Settings - Messages" %}</h2>
-
 <form method="POST" action="">
     {% csrf_token %}
 
@@ -23,12 +23,15 @@
       <p class="notation">
       {% trans 'Customize the messages sent to your users. The text you enter will accompany the default system message.' %}
       </p>
+      <p>
+	<a href="{% url "teams:settings_lang_messages" team.slug %}">{% trans "Add messages in users' preferred languages" %} >></a>
+      </p>
 
       {% include "_field.html" with field=form.messages_invite %}
       {% include "_field.html" with field=form.messages_application %}
+      {% include "_field.html" with field=form.messages_joins %}
       {% include "_field.html" with field=form.messages_manager %}
       {% include "_field.html" with field=form.messages_admin %}
-      {% include "_field.html" with field=form.messages_joins %}
     </fieldset>
 
     <fieldset>

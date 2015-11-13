@@ -40,7 +40,7 @@ automatically pull them in if they are present.  Here's how we do it:
 .. autofunction:: get_repository_paths
 .. autofunction:: get_apps
 .. autofunction:: get_urlpatterns
-.. autofunction:: add_extra_settings
+.. autofunction:: exec_repository_scripts
 
 """
 
@@ -113,15 +113,15 @@ def get_urlpatterns():
 
     return urlpatterns
 
-def add_extra_settings(globals, locals):
+def exec_repository_scripts(filename, globals, locals):
     """Add extra values to the settings module.
 
-    This function looks for files named settings_extra.py in each optional
+    This function looks for files named filename in each optional
     repository.  If that exists, then we call execfile() to run the code using
     the settings globals/locals.  This simulates that code being inside the
-    settings module.
+    current scope.
     """
     for directory in get_repository_paths():
-        settings_extra = os.path.join(directory, 'settings_extra.py')
-        if os.path.exists(settings_extra):
-            execfile(settings_extra, globals, locals)
+        script_path = os.path.join(directory, filename)
+        if os.path.exists(script_path):
+            execfile(script_path, globals, locals)

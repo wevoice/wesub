@@ -155,7 +155,7 @@ class SubtitleEditorBase(View):
 
     def check_can_writelock(self):
         if not self.editing_language.can_writelock(self.request.browser_id):
-            msg = _("You can't edit this subtitle because it's locked")
+            msg = _("Sorry, you cannot edit these subtitles now because they are being edited by another user. Please check back later.")
             messages.error(self.request, msg)
             return False
         else:

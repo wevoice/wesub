@@ -10,7 +10,7 @@ aside.modal {
     overflow: auto;
 
     border-radius: 3px;
-    box-shadow: 0, 0, 30px, rgba(black, .4);
+    box-shadow: 0 0 30px rgba(black, .4);
     background: $darker-gray;
     color: $off-white;
     padding: 20px 40px;
@@ -19,6 +19,27 @@ aside.modal {
         display: block;
     }
 
+    button.close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 5px;
+        color: $white;
+        background: $darkish-gray;
+        border: 0;
+        font: normal normal normal 18px/1 FontAwesome;
+        min-width: 18px;
+        text-align: center;
+        cursor: pointer;
+
+        &:after {
+            content: "\f00d";
+        }
+
+        &:hover {
+            background: $medium-gray;
+        }
+    }
 
     p {
         margin-bottom: 20px;
@@ -27,11 +48,15 @@ aside.modal {
     h3 {
         font-weight: normal;
         margin-bottom: 20px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         color: inherit;
         border-bottom: 1px solid #777;
     }
 
     footer.buttons {
+        @extend %clearfix;
         margin-top: 24px;
         text-align: right;
     }
@@ -54,6 +79,11 @@ aside.modal {
             background: $primary;
         }
 
+        &.delete {
+            float: left;
+            background: $red;
+        }
+
         &.link-style {
             background: none;
             color: #4398C5;
@@ -67,11 +97,21 @@ aside.modal {
 }
 
 .modal-overlay {
-    position: absolute;
+    position: fixed;
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
     z-index: $z-index-overlay;
     background: rgba(245, 245, 238, .7);
+
+    .loading {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        margin-top: -50px;
+        font-size: 100px;
+        text-align: center;
+    }
 }

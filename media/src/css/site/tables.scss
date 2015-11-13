@@ -8,17 +8,34 @@ table {
         margin: 0;
         border: none;
         text-align: left;
+        border-bottom: 1px solid $lighter-gray;
+        &.right {
+            text-align: right;
+        }
     }
     th {
         float: none;
-        border-bottom: 2px solid $lighter-gray;
+        border-width: 2px;
         font-weight: bold;
+
+        &.secondary {
+            border-width: 1px;
+        }
+    }
+    th, tr.section-end td {
+        border-color: $darkish-gray;
     }
     td {
-        border-bottom: 1px solid $lighter-gray;
 
         &.actions {
             text-align: right;
+            min-width: 200px;
+
+            form {
+                display: inline;
+                margin: 0;
+                padding: 0;
+            }
         }
     }
     &.resync_table {

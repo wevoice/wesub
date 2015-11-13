@@ -19,6 +19,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
 from django import template
 
 register = template.Library()
@@ -107,6 +108,9 @@ def format_duration(value):
     Usage: {{ VALUE|format_duration }}
     """
 
+    if value is None:
+        return _("Unknown")
+
     # Place seconds in to integer
     secs = int(value)
 
@@ -124,46 +128,35 @@ def format_duration(value):
         # Create string to hold outout
         durationString = ''
 
-        # Calculate number of days from seconds
-        days = int(math.floor(secs / int(daySecs)))
-
-        # Subtract days from seconds
-        secs = secs - (days * int(daySecs))
-
-        # Calculate number of hours from seconds (minus number of days)
+        # Calculate number of hours from seconds
         hours = int(math.floor(secs / int(hourSecs)))
 
         # Subtract hours from seconds
         secs = secs - (hours * int(hourSecs))
 
-        # Calculate number of minutes from seconds (minus number of days and hours)
+        # Calculate number of minutes from seconds (minus number of hours)
         minutes = int(math.floor(secs / int(minSecs)))
 
-        # Subtract days from seconds
+        # Subtract minutes from seconds
         secs = secs - (minutes * int(minSecs))
 
-        # Calculate number of seconds (minus days, hours and minutes)
+        # Calculate number of seconds (minus hours and minutes)
         seconds = secs
 
-        # If number of days is greater than 0
-        if days > 0:
-
-            durationString += '%02d' % (days,) + ':'
-
         # Determine if next string is to be shown
-        if hours > 0 or days > 0:
+        if hours > 0:
 
             durationString += '%02d' % (hours,) + ':'
 
         # If number of minutes is greater than 0
-        if minutes > 0 or days > 0 or hours > 0:
+        if minutes > 0 or hours > 0:
 
             durationString += '%02d' % (minutes,) + ':'
 
         # If number of seconds is greater than 0
-        if seconds > 0 or minutes > 0 or days > 0 or hours > 0:
+        if seconds > 0 or minutes > 0 or hours > 0:
 
-            if minutes == 0 and days == 0 and hours == 0:
+            if minutes == 0 and hours == 0:
                 durationString += '0:%02d' % (seconds,)
             else:
                 durationString += '%02d' % (seconds,)

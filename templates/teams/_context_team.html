@@ -26,7 +26,7 @@
                             {% if '/tasks/' in request.path %}
                                 <a href="{% url "teams:team_tasks" team.slug %}{% query_string request.GET project=project.slug %}">
                             {% else %}
-                                <a href="{% url "teams:detail" team.slug %}{% query_string request.GET project=project.slug %}">
+                                <a href="{% url "teams:videos" team.slug %}{% query_string request.GET project=project.slug %}">
                             {% endif %}
                                 {{ project }}
                                 <span class="count">
@@ -80,7 +80,7 @@
             </li>
         {% endif %}
         {% if team|can_leave_team:user %}
-            <li><a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url "teams:leave_team" team.slug %}">{% trans "Leave team" %}</a></li>
+            <li><a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url "teams:leave" team.slug %}">{% trans "Leave team" %}</a></li>
         {% endif %}
     </ul>
 {% endif %}
