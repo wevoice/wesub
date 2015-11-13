@@ -781,14 +781,19 @@ class Team(models.Model):
             for term in get_terms(query):
                 qs = qs.auto_query(qs.query.clean(term).decode('utf-8'))
 
-        if language:
-            qs = qs.filter(video_completed_langs=language)
-
-        if exclude_language:
-            qs = qs.exclude(video_completed_langs=exclude_language)
-
         if num_completed_langs is not None:
             qs = qs.filter(num_completed_langs=num_completed_langs)
+
+        if language:
+            qs = qs.filter(video_completed_langs=language)
+            for v in qs:
+                if language not in v.video_completed_langs:
+                    qs = qs.exclude(id=v.id)
+
+        if exclude_language:
+            for v in qs:
+                if exclude_language in v.video_completed_langs:
+                    qs = qs.exclude(id=v.id)
 
         qs = qs.order_by({
              'name':  'video_title_exact',
