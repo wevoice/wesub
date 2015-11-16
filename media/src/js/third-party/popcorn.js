@@ -4945,7 +4945,8 @@
       playerReadyCallbacks = [],
       timeUpdateInterval,
       currentTimeInterval,
-      lastCurrentTime = 0;
+      lastCurrentTime = 0,
+      onPlayerReadyCalled = false;
 
     // Namespace all events we'll produce
     self._eventNamespace = Popcorn.guid( "HTMLVimeoVideoElement::" );
@@ -4960,6 +4961,7 @@
     }
 
     function onPlayerReady( event ) {
+      onPlayerReadyCalled = true;
       player.addEventListener( 'loadProgress' );
       player.addEventListener( 'playProgress' );
       player.addEventListener( 'play' );
@@ -5169,6 +5171,7 @@
           if( duration > 0 && !playerReady ) {
             playerReady = true;
             player.pause();
+            window.setTimeout(forcePause, 2000);
           }
           break;
         case "pause":
@@ -5178,6 +5181,16 @@
           window.addEventListener( "message", onStateChange, false );
           onPlayerReady();
           break;
+      }
+    }
+
+    function forcePause() {
+      if (!onPlayerReadyCalled) {
+        player.setVolume( 1 );
+        // Switch message pump to use run-time message callback vs. startup
+        window.removeEventListener( "message", startupMessage, false );
+        window.addEventListener( "message", onStateChange, false );
+        onPlayerReady();
       }
     }
 
