@@ -36,7 +36,7 @@ from raven.contrib.django.models import client
 
 from celery.task import task
 
-from auth.models import CustomUser as User
+from auth.models import CustomUser as User, UserLanguage
 from localeurl.utils import universal_url
 
 from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
@@ -46,7 +46,6 @@ from messages.models import Message
 from utils import send_templated_email
 from utils.text import fmt
 from utils.translation import get_language_label
-
 BATCH_SIZE = 1000
 
 def get_url_base():
@@ -274,6 +273,14 @@ def team_member_new(member_pk):
             if m.get_key_display() == 'messages_joins':
                 team_default_message = m.data
                 break
+    for ul in UserLanguage.objects.filter(user=member.user).order_by("priority"):
+        localized_message = Setting.objects.messages().filter(team=member.team, language_code=ul.language)
+        if len(localized_message) == 1:
+            if team_default_message:
+                team_default_message += u'\n\n----------------\n\n' + localized_message[0].data
+            else:
+                team_default_message = localized_message[0].data
+            break
     # now send welcome mail to the new member
     template_name = "messages/team-welcome.txt"
     context = {

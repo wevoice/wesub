@@ -21,6 +21,9 @@
 var $document = $(document);
 
 $.fn.openModal = function(openEvent, setupData) {
+    if(setupData === undefined) {
+        setupData = {}
+    }
     this.each(function() {
         var modal = $(this);
         if(setupData) {
@@ -52,7 +55,11 @@ $.fn.openModal = function(openEvent, setupData) {
 
         function onClose(evt) {
             evt.preventDefault();
-            modal.removeClass('shown');
+            if(setupData.removeOnClose) {
+                modal.remove();
+            } else {
+                modal.removeClass('shown');
+            }
             $('body div.modal-overlay').remove();
             closeButton.unbind('click.modal');
             $document.unbind('click.modal');
@@ -92,6 +99,54 @@ $.fn.openModal = function(openEvent, setupData) {
                 });
         }
     }
+}
+
+window.ajaxOpenModal = function(url, params, setupData) {
+    var setupData = $.extend({}, setupData, {removeOnClose: true});
+    var loadingHTML = $('<div class="modal-overlay"><div class="loading"><span class="fa fa-spinner fa-pulse"></span></div></div>');
+
+    $('body').append(loadingHTML);
+
+    $.get(url, params)
+    .done(function(data, textStatus, xhr) {
+        loadingHTML.remove();
+        var modal = $(data)
+        modal.updateBehaviors();
+        modal.appendTo(document.body).openModal(null, setupData);
+        $('form', modal).ajaxForm({
+            url: url + '?' + $.param(params),
+            beforeSubmit: function(data, form, options) {
+                $('button.submit', form).append(
+                    ' <i class="fa fa-refresh fa-spin"></i>'
+                ).prop('disabled', true);
+            },
+            error: function(xhr, errorString, textStatus) {
+                modal.remove();
+                showErrorModal("Error Submitting Form", textStatus);
+            },
+            success: function(responseText, textStatus, xhr) {
+                if(xhr.getResponseHeader('X-Form-Success')) {
+                    window.location.reload();
+                } else {
+                    var newModal = $(responseText);
+                    modal.replaceWith(newModal);
+                    newModal.openModal();
+                }
+            }
+        });
+    })
+    .fail(function(xhr, textStatus, errorThrown) {
+        console.log("error loading modal from " + url + "(" + textStatus + ")");
+        loadingHTML.remove();
+    });
+}
+
+window.showErrorModal = function(header, text) {
+    var header = $('<h3>').text(header);
+    var text = $('<p>').text(text);
+    var closeButton = $('<button class="close">');
+    var modal = $('<aside class="modal">').append(closeButton, header, text);
+    modal.appendTo('body').openModal();
 }
 
 $document.ready(function() {

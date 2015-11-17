@@ -26,6 +26,7 @@ from nose.tools import *
 from utils import test_utils
 from utils.subtitles import load_subtitles
 from externalsites import google
+import isodate
 
 @override_settings(YOUTUBE_API_KEY='test-youtube-api-key')
 class YouTubeTestCase(TestCase):
@@ -229,10 +230,10 @@ class YouTubeTestCase(TestCase):
 
 class TestTimeParsing(TestCase):
     def test_with_minutes(self):
-        self.assertEqual(google._parse_8601_duration('PT10M10S'), 610)
+        self.assertEqual(isodate.parse_duration('PT10M10S').total_seconds(), 610)
 
     def test_without_minutes(self):
-        self.assertEqual(google._parse_8601_duration('PT10S'), 10)
+        self.assertEqual(isodate.parse_duration('PT10S').total_seconds(), 10)
 
     def test_invalid(self):
-        self.assertEqual(google._parse_8601_duration('foo'), None)
+        self.assertRaises(Exception, isodate.parse_duration, 'foo')

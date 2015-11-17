@@ -39,6 +39,9 @@ body {
     max-width: $content-max-width-narrow;
 }
 
+.section {
+    margin-bottom: 60px;
+}
 
 %clearfix:after, .group:after {
     content: "";

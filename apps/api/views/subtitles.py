@@ -685,7 +685,11 @@ class SubtitlesView(generics.CreateAPIView):
         if not workflow.user_can_edit_subtitles(
             self.request.user, self.kwargs['language_code']):
             raise PermissionDenied()
-        version = super(SubtitlesView, self).create(request, *args, **kwargs)
+        try:
+            version = super(SubtitlesView, self).create(request, *args,
+                                                        **kwargs)
+        except (ActionError, LookupError), e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         videos.tasks.video_changed_tasks.delay(video.pk)
         return version
 
@@ -701,6 +705,8 @@ class Actions(views.APIView):
     def get(self, request, video_id, language_code, format=None):
         video = get_object_or_404(Video, video_id=video_id)
         workflow = workflows.get_workflow(video)
+        if not workflow.user_can_edit_subtitles(request.user, language_code):
+            raise PermissionDenied()
         action_list = workflow.get_actions(request.user, language_code)
         serializer = ActionsSerializer(action_list, many=True)
         return Response(serializer.data)
@@ -712,6 +718,8 @@ class Actions(views.APIView):
             return Response('no action', status=status.HTTP_400_BAD_REQUEST)
         video = get_object_or_404(Video, video_id=video_id)
         workflow = workflows.get_workflow(video)
+        if not workflow.user_can_edit_subtitles(request.user, language_code):
+            raise PermissionDenied()
         try:
             workflow.perform_action(request.user, language_code, action)
         except (ActionError, LookupError), e:

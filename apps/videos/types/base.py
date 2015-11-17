@@ -81,7 +81,7 @@ class VideoType(object):
                 clean(download_file, handle)
                 return None
             if not response.ok:
-                logger.error("""Request to download raw audio/video file was not successful, returned error {}""".format(r.status_code))
+                logger.error("""Request to download raw audio/video file was not successful, returned error {}""".format(response.status_code))
                 clean(download_file, handle)
                 return None
             for block in response.iter_content(1024):
