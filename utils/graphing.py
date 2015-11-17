@@ -17,14 +17,10 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import math
 import pygal
 from pygal.style import Style
-from tempfile import NamedTemporaryFile
-import base64, math
-import unicodedata
-import logging
-
-logger = logging.getLogger("Graphs")
+import os, settings
 
 custom_css = '''
 {{ id }}.tooltip rect {
@@ -35,7 +31,8 @@ custom_css = '''
 }
 '''
 
-custom_css_file = '/tmp/pygal_custom_style.css'
+custom_css_file = os.path.join(settings.TMP_FOLDER, 'pygal_custom_style.css')
+
 with open(custom_css_file, 'w') as f:
   f.write(custom_css)
 
