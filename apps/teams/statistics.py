@@ -30,7 +30,7 @@ def compute_statistics(team, stats_type):
         for l in unique_languages:
             count_complete = complete_languages.count(l)
             count_incomplete = incomplete_languages.count(l)
-            numbers.append((ALL_LANGUAGES_DICT[l], count_complete + count_incomplete, "%s - Published: %s" % (ALL_LANGUAGES_DICT[l], count_complete)))
+            numbers.append((ALL_LANGUAGES_DICT[l], count_complete + count_incomplete, "Published: %s, total edits:" % count_complete))
             total += count_complete + count_incomplete
         summary = 'Top languages (all time)'
         title = ""
@@ -45,7 +45,7 @@ def compute_statistics(team, stats_type):
         for l in unique_languages_recent:
             count_complete_recent = complete_languages_recent.count(l)
             count_incomplete_recent = incomplete_languages_recent.count(l)
-            numbers_recent.append((ALL_LANGUAGES_DICT[l], count_complete_recent + count_incomplete_recent, "%s - Published: %s" % (ALL_LANGUAGES_DICT[l], count_complete_recent)))
+            numbers_recent.append((ALL_LANGUAGES_DICT[l], count_complete_recent + count_incomplete_recent, "Published: %s, total edits:" % count_complete_recent))
             total_recent += count_complete_recent + count_incomplete_recent
         title_recent = ""
         graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20, y_title=y_title)
