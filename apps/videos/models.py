@@ -369,13 +369,8 @@ class Video(models.Model):
             signals.title_changed.send(sender=self, old_title=old_title)
 
     def update_search_index(self):
-        """Queue a Celery task that will update this video's Solr entry."""
+        """Update this video's search index text."""
 
-        # Update using the old Solr index
-        from utils.celery_search_index import update_search_index
-        update_search_index.delay(self.__class__, self.pk)
-
-        # Also update using the new MySQL index
         VideoIndex.index_video(self)
 
     def title_display(self, use_language_title=True):
@@ -1098,10 +1093,6 @@ def create_video_id(sender, instance, **kwargs):
 
 def video_delete_handler(sender, instance, **kwargs):
     video_cache.invalidate_cache(instance.video_id)
-    # avoid circular dependencies, import here
-    from haystack import site
-    search_index = site.get_index(Video)
-    search_index.backend.remove(instance)
 
 models.signals.pre_save.connect(create_video_id, sender=Video)
 models.signals.pre_delete.connect(video_delete_handler, sender=Video)
