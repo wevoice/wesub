@@ -435,6 +435,9 @@ MEDIA_BUNDLES = {
             'src/css/site/messages.scss',
             'src/css/site/footer.scss',
             'src/css/site/teams.scss',
+            'src/css/third-party/jquery-ui-1.11.4.custom.css',
+            'src/css/third-party/jquery-ui.theme-1.11.4.custom.css',
+            'src/css/third-party/jquery-ui.structure-1.11.4.custom.css',
         ],
         "include_path": 'src/css/site',
     },
@@ -483,6 +486,7 @@ MEDIA_BUNDLES = {
     "new-site.js": {
         "files": [
             'src/js/third-party/jquery-2.1.3.js',
+            'src/js/third-party/jquery-ui-1.11.4.custom.js',
             'src/js/third-party/jquery.form.js',
             'src/js/third-party/behaviors.js',
             'src/js/site/menus.js',
@@ -496,18 +500,13 @@ MEDIA_BUNDLES = {
             'src/js/site/team-videos.js',
             'src/js/site/team-bulk-move.js',
             'src/js/site/team-integration-settings.js',
+            'src/js/site/dates.js',
         ],
     },
     "api.js": {
         "files": (
             "js/jquery-1.4.3.js",
             "src/js/api.js",
-        ),
-    },
-    "graphs.js": {
-        "files": (
-            "js/libs/pygal-tooltips.js",
-            "js/libs/svg.jquery.js",
         ),
     },
     "teams.js": {
