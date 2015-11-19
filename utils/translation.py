@@ -38,14 +38,12 @@ _get_language_choices_cache = {}
 def get_language_choices(with_empty=False, with_any=False):
     """Get a list of language choices
 
-    We display languages as "<native_name> <translated_name">, where native
-    name is the how native speakers of the language would write it and
-    translated_name is the language translated into the language we're
-    using to render the page.
+    We display languages as "<native_name> [code]", where native
+    name is the how native speakers of the language would write it.
 
-    We use the babel library to lookup language name, however not all
-    of our languages are handled.  As a fallback we use the translations from
-    gettext.
+    We use the babel library to lookup the native name, however not all of our
+    languages are handled by babel.  As a fallback we use the translations
+    from gettext.
 
     Args:
         language_code -- language we're rendering the page in
@@ -76,18 +74,12 @@ def calc_language_choices(language_code):
         locale = lookup_babel_locale(code)
         if locale is None:
             # The language isn't in babel, fall back to using gettext
-            native_name = translated_name = _(english_name)
+            native_name = _(english_name)
         else:
             native_name = locale.display_name
-            translated_name = None
-            if translation_locale:
-                translated_name = locale.get_display_name(translation_locale)
-            if not translated_name:
-                translated_name = _(english_name)
-        display_name = u'{} - {}'.format(native_name.title(),
-                                         translated_name.title())
+        display_name = u'{} [{}]'.format(native_name.title(), code)
         languages.append((code, display_name))
-    languages.sort(key=choice_sort_key)
+    languages.sort()
     return languages
 
 def choice_sort_key(item):
