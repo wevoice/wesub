@@ -1943,10 +1943,7 @@ class SubtitleNoteBase(models.Model):
         abstract = True
 
     def get_username(self):
-        if self.user:
-            return self.user.username
-        else:
-            return ugettext('None')
+        return unicode(self.user)
 
 class SubtitleNote(SubtitleNoteBase):
     pass
