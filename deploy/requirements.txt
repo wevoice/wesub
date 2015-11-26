@@ -26,7 +26,7 @@ django-celery==3.0.10
 vendor/pycrypto-2.1.0.tar.gz
 oauth==1.0.1
 oauth2==1.5.211
-pyOpenSSL==0.15.1
+pyOpenSSL==0.9
 django-haystack==1.2.7
 djangorestframework==3.0.3
 -e git+git://github.com/teddziuba/django-sslserver.git#egg=django-sslserver
