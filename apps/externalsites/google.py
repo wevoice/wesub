@@ -103,7 +103,7 @@ def _oauth_token_post(**params):
     response = requests.post("https://accounts.google.com/o/oauth2/token",
                              data=params, headers={
         "Content-Type": "application/x-www-form-urlencoded"
-    })
+                             }, verify=False)
 
     if response.status_code != 200:
         logger.error("Error requesting Youtube OAuth token", extra={
@@ -170,7 +170,7 @@ def get_new_access_token(refresh_token):
 
 def revoke_auth_token(refresh_token):
     requests.get('https://accounts.google.com/o/oauth2/revoke',
-                 params={'token': refresh_token})
+                 params={'token': refresh_token}, verify=False)
 
 def multipart_format(parts):
     """Make a multipart message
@@ -222,6 +222,7 @@ def _make_api_request(method, access_token, url, **kwargs):
         if 'params' not in kwargs:
             kwargs['params'] = {}
         kwargs['params']['key'] = settings.YOUTUBE_API_KEY
+    kwargs['verify'] = False
     response = requests.request(method, url, **kwargs)
     if method == 'delete':
         expected_status_code = 204
