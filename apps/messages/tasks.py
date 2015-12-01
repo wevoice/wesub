@@ -111,7 +111,7 @@ def team_invitation_sent(invite_pk):
     from messages.models import Message
     from teams.models import Invite, Setting, TeamMember
     invite = Invite.objects.get(pk=invite_pk)
-    if not team_sends_notification(invite.team,'block_invitation_sent_message'):
+    if not team_sends_notification(invite.team,'block_invitation_sent_message') or not invite.user.is_active:
         return False
     # does this team have a custom message for this?
     team_default_message = None
@@ -163,8 +163,8 @@ def application_sent(application_pk):
     application = Application.objects.get(pk=application_pk)
     if not team_sends_notification(application.team,'block_application_sent_message'):
         return False
-    notifiable = TeamMember.objects.filter( team=application.team,
-       role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
+    notifiable = TeamMember.objects.filter(team=application.team, user__is_active=True,
+                 role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
     for m in notifiable:
 
         template_name = "messages/application-sent.txt"
@@ -201,7 +201,7 @@ def team_application_denied(application_pk):
     from messages.models import Message
     from teams.models import Application
     application = Application.objects.get(pk=application_pk)
-    if not team_sends_notification(application.team,'block_application_denided_message'):
+    if not team_sends_notification(application.team,'block_application_denided_message') or not application.user.is_active:
         return False
     template_name = "messages/email/team-application-denied.html"
     context = {
@@ -240,7 +240,7 @@ def team_member_new(member_pk):
     # to show up on all of them
     Action.create_new_member_handler(member)
     # notify  admins and owners through messages
-    notifiable = TeamMember.objects.filter( team=member.team,
+    notifiable = TeamMember.objects.filter(team=member.team, user__is_active=True,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER]).exclude(pk=member.pk)
     for m in notifiable:
         context = {
@@ -312,7 +312,7 @@ def team_member_leave(team_pk, user_pk):
     from teams.models import TeamMember, Team
     user = User.objects.get(pk=user_pk)
     team = Team.objects.get(pk=team_pk)
-    if not team_sends_notification(team,'block_team_member_leave_message'):
+    if not team_sends_notification(team,'block_team_member_leave_message') or not user.is_active:
         return False
     from videos.models import Action
     # the feed item should appear on the timeline for all team members
@@ -320,7 +320,7 @@ def team_member_leave(team_pk, user_pk):
     # to show up on all of them
     Action.create_member_left_handler(team, user)
     # notify  admins and owners through messages
-    notifiable = TeamMember.objects.filter( team=team,
+    notifiable = TeamMember.objects.filter(team=team, user__is_active=True,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
     subject = fmt(
         ugettext(u"%(user)s has left the %(team)s team"),
@@ -385,6 +385,8 @@ def email_confirmed(user_pk):
 def videos_imported_message(user_pk, imported_videos):
     from messages.models import Message
     user = User.objects.get(pk=user_pk)
+    if not user.is_active:
+        return False
     subject = u"Your videos were imported!"
     url = "%s%s" % (get_url_base(),
                     reverse("profiles:videos", kwargs={'user_id': user_pk}))
@@ -410,13 +412,13 @@ def team_task_assigned(task_pk):
     from messages.models import Message
     try:
         task = Task.objects.select_related("team_video__video", "team_video", "assignee").get(pk=task_pk, assignee__isnull=False)
-        if not team_sends_notification(task.team,'block_task_assigned_message'):
-            return False
     except Task.DoesNotExist:
         return False
     task_type = Task.TYPE_NAMES[task.type]
     subject = ugettext(u"You have a new task assignment on Amara!")
     user = task.assignee
+    if not team_sends_notification(task.team,'block_task_assigned_message') or not user.is_active:
+        return False
     task_language = None
     if task.language:
         task_language = get_language_label(task.language)
@@ -461,7 +463,11 @@ def _reviewed_notification(task_pk, status):
         REVIEWED_AND_PENDING_APPROVAL: 'block_reviewed_and_pending_approval_message',
         REVIEWED_AND_SENT_BACK: 'block_reviewed_and_sent_back_message',
     }[status]
-    if not team_sends_notification(task.team, notification_setting_name):
+    if task.new_review_base_version:
+        user = task.new_review_base_version.author
+    else:
+        user = version.author
+    if not team_sends_notification(task.team, notification_setting_name) or not user.is_active:
         return False
 
     subject = ugettext(u"Your subtitles have been reviewed")
@@ -470,10 +476,6 @@ def _reviewed_notification(task_pk, status):
 
     version = task.get_subtitle_version()
 
-    if task.new_review_base_version:
-        user = task.new_review_base_version.author
-    else:
-        user = version.author
 
     task_language = get_language_label(task.language)
     reviewer = task.assignee
@@ -583,11 +585,13 @@ def approved_notification(task_pk, published=False):
         template_txt = "messages/team-task-approved-sentback.txt"
         template_html ="messages/email/team-task-approved-sentback.html"
         subject = ugettext(u"Your subtitles have been returned for further editing")
-    version = task.get_subtitle_version()
     if task.new_review_base_version:
         user = task.new_review_base_version.author
     else:
         user = version.author
+    if not user.is_active:
+        return False
+    version = task.get_subtitle_version()
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
@@ -641,12 +645,14 @@ def send_reject_notification(task_pk, sent_back):
     except Task.DoesNotExist:
         return False
 
-    version = task.get_subtitle_version()
-    subject = ugettext(u"Your subtitles were not accepted")
     if task.new_review_base_version:
         user = task.new_review_base_version.author
     else:
         user = version.author
+    if not user.is_active:
+        return False
+    version = task.get_subtitle_version()
+    subject = ugettext(u"Your subtitles were not accepted")
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
