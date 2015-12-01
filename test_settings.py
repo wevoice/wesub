@@ -34,7 +34,7 @@ CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 DEFAULT_PROTOCOL = 'https'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_PLUGINS = ['utils.test_utils.UnisubsTestPlugin']
+NOSE_PLUGINS = ['utils.test_utils.plugin.UnisubsTestPlugin']
 CELERY_ALWAYS_EAGER = True
 
 # Use MD5 password hashing, other algorithms are purposefully slow to increase
