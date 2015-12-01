@@ -1122,6 +1122,7 @@ class MemberFiltersForm(forms.Form):
             if term:
                 qs = qs.filter(Q(user__first_name__icontains=term)
                                | Q(user__last_name__icontains=term)
+                               | Q(user__full_name__icontains=term)
                                | Q(user__email__icontains=term)
                                | Q(user__username__icontains=term)
                                | Q(user__biography__icontains=term))
