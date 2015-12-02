@@ -19,3 +19,4 @@
 from django import dispatch
 
 feed_imported = dispatch.Signal(providing_args=['new_videos'])
+title_changed = dispatch.Signal(providing_args=['old_title'])

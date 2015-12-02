@@ -301,12 +301,20 @@ class Video(models.Model):
     def __init__(self, *args, **kwargs):
         super(Video, self).__init__(*args, **kwargs)
         self._language_fetcher = SubtitleLanguageFetcher()
+        self.orig_title = self.title
 
     def __unicode__(self):
         title = self.title_display()
         if len(title) > 35:
             title = title[:35]+'...'
         return title
+
+    def save(self, *args, **kwargs):
+        super(Video, self).save(*args, **kwargs)
+        if self.title != self.orig_title:
+            old_title = self.orig_title
+            self.orig_title = self.title
+            signals.title_changed.send(sender=self, old_title=old_title)
 
     def update_search_index(self):
         """Queue a Celery task that will update this video's Solr entry."""
