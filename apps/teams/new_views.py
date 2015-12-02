@@ -692,11 +692,8 @@ def admin_list(request, team):
                    .select_related('user'))
     })
 
-@public_team_view
+@team_view
 def activity(request, team, tab):
-    if not team.is_old_style() and not team.user_is_member(request.user):
-        raise Http404
-
     try:
         page = int(request.GET['page'])
     except (ValueError, KeyError):
