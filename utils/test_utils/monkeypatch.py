@@ -35,8 +35,10 @@ function.  For example:
     > monkeypatch.update_one_team_video.run_original()
 """
 
+from datetime import datetime, timedelta
 import contextlib
 import functools
+import itertools
 
 from celery.task import Task
 import mock
@@ -44,6 +46,23 @@ import mock
 from subtitles.workflows import SaveDraft
 import externalsites.google
 
+class MockNow(mock.Mock):
+    def __init__(self):
+        super(MockNow, self).__init__()
+        self.reset()
+
+    def reset(self):
+        self.set(2015, 1, 1)
+
+    def set(self, *args, **kwargs):
+        self.current = datetime(*args, **kwargs)
+
+    def __call__(self):
+        rv = self.current
+        self.current += timedelta(minutes=1)
+        return rv
+
+mock_now = MockNow()
 save_thumbnail_in_s3 = mock.Mock()
 video_changed_tasks = mock.Mock()
 update_team_video = mock.Mock()
@@ -77,6 +96,7 @@ class MonkeyPatcher(object):
     """Replace a functions with mock objects for the tests.
     """
     patch_info = [
+        ('utils.dates.now', mock_now),
         ('videos.tasks.save_thumbnail_in_s3', save_thumbnail_in_s3),
         ('videos.tasks.video_changed_tasks', video_changed_tasks),
         ('teams.tasks.update_one_team_video', update_team_video),
@@ -166,6 +186,7 @@ class MonkeyPatcher(object):
             # unittests set.  So we save side_effect right after we create the
             # mock and restore it here
             mock_obj.side_effect = side_effect
+        mock_now.reset()
 
 def patch_for_test(spec):
     """Use mock to patch a function for the test case.
