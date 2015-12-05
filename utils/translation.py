@@ -27,6 +27,44 @@ SUPPORTED_LANGUAGE_CHOICES = list(sorted(_supported_languages_map.items(),
 ALL_LANGUAGE_CHOICES = list(sorted(_all_languages_map.items(),
                                    key=lambda c: c[1]))
 
+# Rough language order.  Based on a query of completed subtitle languages around 2016
+LANGUAGE_POPULARITY = [
+    'en', 'es', 'fr', 'ja', 'pt-br', 'ru', 'it', 'de', 'en-gb', 'tr', 'zh-cn',
+    'ko', 'ar', 'pl', 'pt', 'zh-tw', 'cs', 'el', 'es-mx', 'nl', 'he', 'ro',
+    'en-us', 'vi', 'hu', 'bg', 'sv', 'id', 'sr', 'uk', 'th', 'da', 'sk', 'hr',
+    'nb', 'fa', 'ka', 'hi', 'ca', 'es-ar', 'fr-ca', 'fi', 'et', 'ms', 'sq',
+    'ta', 'lt', 'sl', 'my', 'lv', 'eo', 'mk', 'es-419', 'es-es', 'hy',
+    'zh-hk', 'mn', 'meta-tw', 'eu', 'ur', 'fil', 'gl', 'bn', 'ab', 'az', 'af',
+    'zh', 'ml', 'sr-latn', 'bs', 'ku', 'mr', 'sh', 'zh-hant', 'meta-geo',
+    'en-ca', 'is', 'te', 'gu', 'swa', 'be', 'tl', 'nl-be', 'la', 'zul', 'jv',
+    'aa', 'kk', 'es-ni', 'arq', 'kn', 'zh-sg', 'km', 'no', 'iw', 'nn', 'amh',
+    'ht', 'ga', 'cy', 'mt', 'ase', 'zh-hans', 'ne', 'yi', 'meta-audio', 'uz',
+    'si', 'srp', 'ia', 'pt-pt', 'rm', 'bo', 'ast', 'de-ch', 'aka', 'que',
+    'vls', 'fr-be', 'ry', 'lo', 'pan', 'xho', 'som', 'ug', 'ay', 'tlh', 'efi',
+    'hau', 'ky', 'kl', 'an', 'ltg', 'meta-wiki', 'rup', 'as', 'ik', 'oc',
+    'mus', 'mlg', 'ceb', 'bnt', 'en-ie', 'de-at', 'fy-nl', 'prs', 'wol', 'lb',
+    'mi', 'tk', 'lg', 'lin', 'aeb', 'sco', 'tt', 'tg', 'yor', 'fo', 'lld',
+    'ee', 'ps', 'ibo', 'kw', 'dz', 'cku', 'br', 'av', 'ie', 'nya', 'ce', 'cr',
+    'sgn', 'ber', 'or', 'fr-ch', 'dv', 'bi', 'sm', 'pap', 'bam', 'gd', 'pi',
+    'tet', 'orm', 'lkt', 'nr', 'hup', 'tir', 'bh', 'ae', 'nv', 'gn', 'tw',
+    'kar', 'zam', 'cho', 'co', 'hz', 'sd', 'am', 'fj', 'inh', 'ful', 'ksh',
+    'mos', 'sc', 'ch', 'ba', 'mo', 'iro', 'pnb', 'sw', 'se', 'to', 'cu',
+    'arc', 'hb', 'io', 've', 'ff', 'sa', 'iu', 'cnh', 'nan', 'szl', 'ln',
+    'hsb', 'kik', 'dsb', 'su', 'ho', 'pam', 'sg', 'kj', 'yaq', 'kau', 'za',
+    'luo', 'kin', 'ss', 'ng', 'li', 'haw', 'gsw', 'bug', 'nd', 'gv', 'ii',
+    'toj', 'tsz', 'wa', 'tsn', 'sn', 'pa', 'mh', 'kon', 'ctu', 'tzo', 'na',
+    'run', 'ti', 'hai', 'fy', 'got', 'cv', 'mnk', 'luy', 'hus', 'haz', 'mad',
+    'wbl', 'vo', 'kv', 'din', 'hch', 'umb',
+]
+
+SUPPORTED_LANGUAGE_CODES_BY_POPULARITY = [
+    code for code in LANGUAGE_POPULARITY
+    if code in SUPPORTED_LANGUAGE_CODES
+]
+SUPPORTED_LANGUAGE_CODES_BY_POPULARITY.extend(
+    SUPPORTED_LANGUAGE_CODES.difference(SUPPORTED_LANGUAGE_CODES_BY_POPULARITY)
+)
+
 def _only_supported_languages(language_codes):
     """Filter the given list of language codes to contain only codes we support."""
 
@@ -38,7 +76,7 @@ _get_language_choices_cache = {}
 def get_language_choices(with_empty=False, with_any=False):
     """Get a list of language choices
 
-    We display languages as "[code] <native_name>", where native
+    We display languages as "<native_name> [code]", where native
     name is the how native speakers of the language would write it.
 
     We use the babel library to lookup the native name, however not all of our
@@ -68,19 +106,22 @@ def calc_language_choices(language_code):
     """Do the work for get_language_choices() """
     languages = []
     translation_locale = lookup_babel_locale(language_code)
-
-    for code, english_name in _supported_languages_map.items():
-        # try getting the name from babel first
+    def label(code):
         locale = lookup_babel_locale(code)
         if locale is None:
             # The language isn't in babel, fall back to using gettext
+            english_name = _supported_languages_map[code]
             native_name = _(english_name)
         else:
             native_name = locale.display_name
-        display_name = u'[{}] - {}'.format(code,
-                                           native_name.title())
-        languages.append((code, display_name))
-    languages.sort()
+        return u'{} [{}]'.format(native_name.title(), code)
+    languages.append((_('Popular'), [
+        (code, label(code)) for code in
+        SUPPORTED_LANGUAGE_CODES_BY_POPULARITY[:25]
+    ]))
+    languages.append((_('All'), [
+        (code, label(code)) for code in sorted(SUPPORTED_LANGUAGE_CODES)
+    ]))
     return languages
 
 def choice_sort_key(item):
