@@ -22,7 +22,6 @@ vacuum = true
 pythonpath = $APP_ROOT
 wsgi-file = $APP_DIR/deploy/unisubs.wsgi
 static-map = /static=/usr/local/lib/python2.7/site-packages/django/contrib/admin/static
-logformat = [pid: %(pid)|app: ??|req: ??/??] %(addr) (%(user)) {%(vars) vars in %(pktsize) bytes} [%(ctime)] %(method) %(uri) => generated %(rsize) bytes in %(msecs) msecs (%(proto) %(status)) %(headers) headers in (hsize) bytes (%(switches) switches on core %(core)) body: %(body)
 EOF
 
 if [ ! -z "$NEW_RELIC_LICENSE_KEY" ] ; then

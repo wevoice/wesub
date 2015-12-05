@@ -28,13 +28,7 @@ except ImportError:
     # production, dev and local installs shouldn have that
     pass
     
-import uwsgi
 def application(environ, start_response):
-    try:
-        uwsgi.set_logvar('body', environ['wsgi.input'].read(request_body_size))
-    except:
-        uwsgi.set_logvar('body', '(unknown)')
-
     if os.path.exists(disabled_file_path):
         start_response('503 Service Unavailable', [('Content-type', 'text/html; charset=utf-8')])
         
