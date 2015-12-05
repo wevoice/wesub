@@ -103,19 +103,19 @@ class RequestsMocker(object):
             patcher.stop()
         self.patchers = []
 
-    def mock_get(self, url, params=None, data=None, headers=None):
+    def mock_get(self, url, params=None, data=None, headers=None, verify=True):
         return self.check_request('get', url, params, data, headers)
 
-    def mock_post(self, url, params=None, data=None, headers=None):
+    def mock_post(self, url, params=None, data=None, headers=None, verify=True):
         return self.check_request('post', url, params, data, headers)
 
-    def mock_put(self, url, params=None, data=None, headers=None):
+    def mock_put(self, url, params=None, data=None, headers=None, verify=True):
         return self.check_request('put', url, params, data, headers)
 
-    def mock_delete(self, url, params=None, data=None, headers=None):
+    def mock_delete(self, url, params=None, data=None, headers=None, verify=True):
         return self.check_request('delete', url, params, data, headers)
 
-    def mock_request(self, method, url, params=None, data=None, headers=None):
+    def mock_request(self, method, url, params=None, data=None, headers=None, verify=True):
         return self.check_request(method.lower(), url, params, data, headers)
 
     def check_request(self, method, url, params, data, headers):

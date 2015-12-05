@@ -22,11 +22,13 @@
             {% trans "Members" %}
         </a>
     </li>
+    {% if team|is_team_member:user %}
     <li{% if current == "activity" %} class="current" {% endif %}>
         <a href="{% url "teams:activity" team.slug %}">
             {% trans "Activity" %}
         </a>
     </li>
+    {% endif %}
 
     {% if team|is_team_member:user %}
         {% if team|can_view_settings_tab:user %}

@@ -79,5 +79,5 @@ mock==1.0.1
 selenium
 xvfbwrapper==0.2.4
 factory_boy==2.4.1
-pafy==0.3.74
+pafy==0.4.2
 isodate==0.5.4

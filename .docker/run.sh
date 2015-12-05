@@ -8,6 +8,9 @@ cat << EOF > $APP_ROOT/$APP_NAME.ini
 [uwsgi]
 master = true
 workers = 4
+harakiri = 20
+max-requests = 5000
+memory-report
 http-socket = 0.0.0.0:8000
 add-header = Node: $HOSTNAME
 die-on-term = true
