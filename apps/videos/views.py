@@ -440,6 +440,7 @@ def feedback(request, hide_captcha=False):
     return HttpResponse(json.dumps(output), "text/javascript")
 
 def email_friend(request):
+    raise Http404()
     text = request.GET.get('text', '')
     link = request.GET.get('link', '')
     if link:
