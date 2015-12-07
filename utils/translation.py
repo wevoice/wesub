@@ -109,14 +109,9 @@ def calc_language_choices(language_code):
     languages = []
     translation_locale = lookup_babel_locale(language_code)
     def label(code):
-        locale = lookup_babel_locale(code)
-        if locale is None:
-            # The language isn't in babel, fall back to using gettext
-            english_name = _supported_languages_map[code]
-            native_name = _(english_name)
-        else:
-            native_name = locale.display_name
-        return u'{} [{}]'.format(native_name.title(), code)
+        english_name = _supported_languages_map[code]
+        translated_name = _(english_name)
+        return u'{} [{}]'.format(translated_name, code)
     languages.append((_('Popular'), [
         (code, label(code)) for code in
         SUPPORTED_LANGUAGE_CODES_BY_POPULARITY[:25]
