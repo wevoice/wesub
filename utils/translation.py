@@ -73,7 +73,7 @@ def _only_supported_languages(language_codes):
 
 
 _get_language_choices_cache = {}
-def get_language_choices(with_empty=False, with_any=False):
+def get_language_choices(with_empty=False, with_any=False, flat=False):
     """Get a list of language choices
 
     We display languages as "<native_name> [code]", where native
@@ -96,6 +96,8 @@ def get_language_choices(with_empty=False, with_any=False):
 
     # make a copy of languages before we alter it
     languages = list(languages)
+    if flat:
+        languages = languages[1][1]
     if with_any:
         languages.insert(0, ('', _('--- Any Language ---')))
     if with_empty:
