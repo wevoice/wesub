@@ -68,7 +68,7 @@ class SearchForm(forms.Form):
         video_lang = self.data.get('video_lang')
         langs = self.data.get('langs')
 
-        qs = Video.objects.all()
+        qs = Video.objects.public()
         if q:
             qs = qs.search(q)
         if video_lang:

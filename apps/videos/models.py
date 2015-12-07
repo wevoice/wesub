@@ -137,7 +137,10 @@ class VideoManager(models.Manager):
         return self.filter(featured__isnull=False).order_by('-featured')
 
     def latest(self):
-        return self.filter(is_public=True).order_by('-created')
+        return self.public().order_by('-created')
+
+    def public(self):
+        return self.filter(is_public=True)
 
 class VideoQueryset(query.QuerySet):
     def select_has_public_version(self):
