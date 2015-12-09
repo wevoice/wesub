@@ -26,7 +26,7 @@ from django.views.generic.base import TemplateView, RedirectView
 from sitemaps import sitemaps, sitemap_view, sitemap_index
 from socialauth.models import AuthMeta, OpenidProfile
 from django.views.decorators.clickjacking import xframe_options_exempt
-
+from auth.forms import CustomPasswordResetForm
 import optionalapps
 from utils.genericviews import JSTemplateView
 
@@ -74,11 +74,13 @@ urlpatterns = patterns('',
         'django.contrib.auth.views.logout', name='logout'),
     url(r'^admin/billing/$', 'teams.views.billing', name='billing'),
     url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset',
-        name='password_reset'),
+        {'password_reset_form': CustomPasswordResetForm}, name='password_reset'),
     url(r'^password_reset/done/$',
         'django.contrib.auth.views.password_reset_done'),
     url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
         'django.contrib.auth.views.password_reset_confirm'),
+    url(r'^reset-external/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        'django.contrib.auth.views.password_reset_confirm', {'extra_context': {'external_account': True}}, name='password_reset_confirm_external'),
     url(r'^reset/done/$',
         'django.contrib.auth.views.password_reset_complete'),
     url(r'^socialauth/',
