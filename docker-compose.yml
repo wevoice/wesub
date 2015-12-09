@@ -13,8 +13,6 @@ app:
   hostname: 'unisubs.example.com'
   ports:
     - "8000:8000"
-  expose:
-    - "8000:8000"
   links:
     - db
     - queue
@@ -46,8 +44,6 @@ bash:
 
   hostname: 'unisubs.example.com'
   ports:
-    - "8000:8000"
-  expose:
     - "8000:8000"
   links:
     - db
