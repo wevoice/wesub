@@ -24,8 +24,7 @@ apps/webdriver_testing/Screenshots/
 nosetests.xml
 .deploy_keys
 /babelsubs
-/babelsubs-git
 /unilangs
-/unilangs-git
-/amara-enterprise
-/src
+babelsubs-git/
+unilangs-git/
+amara-enterprise/
