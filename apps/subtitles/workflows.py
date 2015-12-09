@@ -217,9 +217,11 @@ class Workflow(object):
         """
         action = self.lookup_action(user, language_code, action_name)
         subtitle_language = self.video.subtitle_language(language_code)
+        subtitle_language.freeze()
         action.validate(user, self.video, subtitle_language, None)
         action.update_language(user, self.video, subtitle_language, None)
         action.perform(user, self.video, subtitle_language, None)
+        subtitle_language.thaw()
 
     def user_can_view_private_subtitles(self, user, language_code):
         """Check if a user can view private subtitles
@@ -466,9 +468,11 @@ class LanguageWorkflow(object):
         """
         action = self.lookup_action(user, action_name)
         subtitle_language = self.video.subtitle_language(self.language_code)
+        subtitle_language.freeze()
         action.validate(user, self.video, subtitle_language, None)
         action.update_language(user, self.video, subtitle_language, None)
         action.perform(user, self.video, subtitle_language, None)
+        subtitle_language.thaw()
 
     def user_can_view_private_subtitles(self, user):
         """Check if a user can view private subtitles
@@ -662,8 +666,10 @@ class Action(object):
                 action.  Will be None if no changes were made.
         """
         if self.complete is not None:
-            subtitle_language.subtitles_complete = self.complete
-            subtitle_language.save()
+            if self.complete:
+                subtitle_language.mark_complete()
+            else:
+                subtitle_language.mark_incomplete()
 
     def editor_data(self):
         """Get a dict of data to pass to the editor for this action."""
