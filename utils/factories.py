@@ -226,6 +226,12 @@ class UserFactory(DjangoModelFactory):
                 auth.models.UserLanguage.objects.create(
                     user=self, language=language_code)
 
+    @factory.post_generation
+    def team(self, create, extracted, **kwargs):
+        if extracted:
+            role = kwargs.get('role', teams.models.TeamMember.ROLE_ADMIN)
+            TeamMemberFactory(user=self, team=extracted, role=role)
+
 class TeamFactory(DjangoModelFactory):
     FACTORY_FOR = teams.models.Team
 

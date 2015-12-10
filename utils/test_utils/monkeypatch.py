@@ -264,6 +264,7 @@ class _MockSignalHandler(object):
         def wrapper(self, *args, **kwargs):
             signal.connect(handler, weak=False)
             self.addCleanup(signal.disconnect, handler)
+            self.addCleanup(handler.reset_mock)
             return func(self, handler, *args, **kwargs)
         return wrapper
 

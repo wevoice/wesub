@@ -505,6 +505,7 @@ class SubtitleLanguage(models.Model):
             return
         thawed = self._frozen_signals
         del self._frozen_signals
+        self._frozen = False
         for signal, kwargs in thawed.items():
             signal.send(self, **kwargs)
 

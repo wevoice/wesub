@@ -731,8 +731,10 @@ class APIComplete(Action):
     complete = None
 
     def update_language(self, user, video, subtitle_language, saved_version):
-        subtitle_language.subtitles_complete = saved_version.is_synced()
-        subtitle_language.save()
+        if saved_version.is_synced():
+            subtitle_language.mark_complete()
+        else:
+            subtitle_language.mark_incomplete()
 
     def perform(self, user, video, subtitle_language, saved_version):
         if subtitle_language.subtitles_complete:
