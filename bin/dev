@@ -119,7 +119,8 @@ class Bash(Command):
     """Run a bash script inside the app container."""
 
     def run_inner(self, args, options):
-        subprocess.call(["docker-compose", "run", "--rm", "bash", "/bin/bash"])
+        subprocess.call(["docker-compose", "run", "--rm", "--entrypoint=bash",
+                         "app"])
 
 class Build(Command):
     """Build the app container."""
@@ -196,8 +197,8 @@ class DBDump(Command):
         mysql_cmd = ("mysqldump -u amara --host=$DB_1_PORT_3306_TCP_ADDR "
                      "--port=$DB_1_PORT_3306_TCP_PORT amara --password=amara")
         with open(path, 'w') as f:
-            subprocess.call(['docker-compose', 'run', '--rm', 'app',
-                             'bash', '-c', mysql_cmd], stdout=f)
+            subprocess.call(['docker-compose', 'run', '--rm',
+                             '--entrypoint=bash', 'app', '-c', mysql_cmd], stdout=f)
 
 class DBLoad(Command):
     """Load the database from a file."""
@@ -214,19 +215,13 @@ class DBLoad(Command):
 
 class Up(Command):
     """Start docker containers."""
-    options = [
-        optparse.make_option("-S", "--ssl", action="store_true", dest="ssl"),
-    ]
 
     def run_inner(self, args, options):
-        if options.ssl:
-            subprocess.call(['docker-compose', 'up', 'sslapp', 'worker'])
-        else:
-            subprocess.call(['docker-compose', 'up', 'app', 'worker'])
+        subprocess.call(['docker-compose', 'up', 'app', 'worker'])
 
 def run_manage(args, **kwargs):
-    subprocess.call(['docker-compose', 'run', '--rm', 'app', 'python',
-                     'manage.py'] + args, **kwargs)
+    subprocess.call(['docker-compose', 'run', '--rm', '--entrypoint', 'python', 
+                     'app', 'manage.py'] + args, **kwargs)
 
 def usage():
     print "Usage %s [command]" % progname()

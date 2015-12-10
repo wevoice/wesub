@@ -8,9 +8,10 @@ import startup
 DEFAULT_LANGUAGE = 'en'
 
 sys.stdout = sys.stderr
-os.environ['DJANGO_SETTINGS_MODULE'] = 'unisubs.unisubs_settings'
 
 startup.startup()
+
+from django.conf import settings
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 application = django.core.handlers.wsgi.WSGIHandler()
@@ -27,6 +28,16 @@ try:
 except ImportError:
     # production, dev and local installs shouldn have that
     pass
+
+if settings.DEBUG:
+    import uwsgi
+    from uwsgidecorators import timer
+    from django.utils import autoreload
+
+    @timer(3)
+    def change_code_gracefull_reload(sig):
+        if autoreload.code_changed():
+            uwsgi.reload()
     
 def application(environ, start_response):
     if os.path.exists(disabled_file_path):
