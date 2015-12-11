@@ -484,7 +484,7 @@ def _get_videos_for_detail_page(team, user, query, project, language_code,
             qs = qs.has_completed_language(language_code)
     elif language_mode == '-':
         if language_code is not None:
-            qs = qs.missing_completed_language(language_mode)
+            qs = qs.missing_completed_language(language_code)
         else:
             qs = qs.no_completed_languages()
 
