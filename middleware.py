@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import re
 import random
 import time
@@ -76,3 +77,17 @@ class StripGoogleAnalyticsCookieMiddleware(object):
             request.META['HTTP_COOKIE'] = cookie
         except:
             pass
+
+class LogRequest(object):
+    logger = logging.getLogger('access')
+    def process_request(self, request):
+        request._start_time = time.time()
+
+    def process_response(self, request, response):
+        total_time = time.time() - request._start_time
+        msg = '{} ({:.3f}s)'.format(request.path, total_time)
+        self.logger.info(msg, extra={
+            'path': getattr(request, 'path_info', '?'),
+            'time': total_time,
+        })
+        return response

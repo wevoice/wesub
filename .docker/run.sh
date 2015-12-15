@@ -16,10 +16,12 @@ http-socket = 0.0.0.0:8000
 add-header = Node: $HOSTNAME
 die-on-term = true
 enable-threads = true
+enable-metrics
 buffer-size = 32768
 reload-on-as = 512
 no-orphans = true
 vacuum = true
+disable-logging
 pythonpath = $APP_ROOT
 wsgi-file = $APP_DIR/deploy/unisubs.wsgi
 static-map = /static=/usr/local/lib/python2.7/site-packages/django/contrib/admin/static

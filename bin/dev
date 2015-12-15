@@ -119,7 +119,7 @@ class Bash(Command):
     """Run a bash script inside the app container."""
 
     def run_inner(self, args, options):
-        subprocess.call(["docker-compose", "run", "--rm", "--entrypoint=bash",
+        subprocess.call(["docker-compose", "run", "--rm", '-p', '8000:8000', "--entrypoint=bash",
                          "app"])
 
 class Build(Command):

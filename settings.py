@@ -122,6 +122,7 @@ TEMPLATE_LOADERS = (
 
 
 MIDDLEWARE_CLASSES = (
+    'middleware.LogRequest',
     'middleware.StripGoogleAnalyticsCookieMiddleware',
     'utils.ajaxmiddleware.AjaxErrorMiddleware',
     'localeurl.middleware.LocaleURLMiddleware',
@@ -221,6 +222,7 @@ STARTUP_MODULES = [
 CELERY_IGNORE_RESULT = True
 CELERY_SEND_EVENTS = False
 CELERY_SEND_TASK_ERROR_EMAILS = True
+CELERYD_HIJACK_ROOT_LOGGER = False
 BROKER_POOL_LIMIT = 10
 
 REST_FRAMEWORK = {
@@ -632,16 +634,30 @@ EMAIL_NOTIFICATION_RECEIVERS = ("arthur@stimuli.com.br", "steve@stevelosh.com", 
 # settings_local.py
 RUN_LOCALLY = False
 
+def log_handler_info():
+    json_logging = os.environ.get("JSON_LOGGING")
+    if json_logging and json_logging != '0':
+        return {
+            'level': 'INFO',
+            'class': 'utils.jsonlogging.JSONHandler',
+        }
+    else:
+        return {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard'
+        }
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'root': {
-        'level': 'WARNING',
-        'handlers': ['console', 'sentry'],
+        'level': 'INFO',
+        'handlers': ['main'],
     },
     'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        'standard': {
+            'format': '%(levelname)s %(asctime)s %(name)s %(message)s'
         },
     },
     'handlers': {
@@ -649,58 +665,18 @@ LOGGING = {
             'level':'DEBUG',
             'class':'django.utils.log.NullHandler',
         },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        },
-        'sentry': {
-            'level': 'WARN',
-            'class': 'raven.contrib.django.handlers.SentryHandler',
-        },
+        'main': log_handler_info(),
     },
     'loggers': {
-        'django.db.backends': {
-            'level': 'ERROR',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'raven': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'sentry.errors': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'bleach': {
-            'level': 'ERROR',
-            'handlers': ['null'],
-            'propagate': False,
-        },
-        'api': {
+        'celery': {
             'level': 'INFO',
-            'handlers': ['sentry', 'console'],
-            'propagate': False
-        },
-        'utils.youtube': {
-            'level': 'INFO',
-            'handlers': ['sentry', 'console'],
-            'propagate': False
-        },
-        'timing': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False
-        },
+        }
     },
 }
 
 TMP_FOLDER = "/tmp/"
-
 from task_settings import *
+
 
 if DEBUG:
     try:

@@ -3,12 +3,14 @@ app:
   entrypoint: ["/usr/local/bin/run"]
   environment:
     DJANGO_SETTINGS_MODULE: dev_settings
-    DJANGO_LIVE_TEST_SERVER_ADDRESS: 'localhost:8081,8090-8100,9000-9200' 
+    DJANGO_LIVE_TEST_SERVER_ADDRESS: 'localhost:8081,8090-8100,9000-9200'
     LANG: en_US.UTF-8
     WORKERS: 2
+    # Uncomment to test out the json logs that we use on production
+    # JSON_LOGGING: 1
   volumes:
     - .:/opt/apps/unisubs
-  hostname: 'unisubs.example.com'
+  hostname: unisubs.example.com
   ports:
     - "8000:8000"
   links:
@@ -19,7 +21,12 @@ app:
 worker:
   image: amara-app
   entrypoint: ["/usr/bin/env"]
-  command: /usr/bin/python manage.py celery worker -Q celery,feeds --scheduler=djcelery.schedulers.DatabaseScheduler --loglevel=DEBUG -B -E --settings=dev_settings
+  command: /usr/bin/python manage.py celery worker -Q celery,feeds --scheduler=djcelery.schedulers.DatabaseScheduler -B -E
+  environment:
+    DJANGO_SETTINGS_MODULE: dev_settings
+    LANG: en_US.UTF-8
+    # Uncomment to test out the json logs that we use on production
+    # JSON_LOGGING: 1
   volumes:
     - .:/opt/apps/unisubs
   links:
