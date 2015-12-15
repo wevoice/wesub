@@ -32,4 +32,4 @@ if [ ! -z "$NEW_RELIC_LICENSE_KEY" ] ; then
     PRE="newrelic-admin run-program "
 fi
 
-$PRE $CMD
+exec $PRE $CMD

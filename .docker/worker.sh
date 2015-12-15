@@ -2,7 +2,8 @@
 source /usr/local/bin/config_env
 
 PRE=""
-CMD="python manage.py celery worker --scheduler=djcelery.schedulers.DatabaseScheduler --loglevel=DEBUG -E $CELERY_OPTS --settings=unisubs_settings"
+CELERY_QUEUES=${CELERY_QUEUES:-celery}
+CMD="python manage.py celery worker -Q $CELERY_QUEUES --scheduler=djcelery.schedulers.DatabaseScheduler --loglevel=DEBUG -E $CELERY_OPTS"
 
 cd $APP_DIR
 if [ ! -z "$NEW_RELIC_LICENSE_KEY" ] ; then
@@ -11,4 +12,5 @@ if [ ! -z "$NEW_RELIC_LICENSE_KEY" ] ; then
 fi
 
 echo "Starting Worker..."
-$PRE $CMD
+echo $PRE $CMD
+exec $PRE $CMD
