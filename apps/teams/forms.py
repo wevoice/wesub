@@ -1425,12 +1425,16 @@ class NewAddTeamVideoForm(VideoForm):
         if not self._errors:
             video, created = Video.get_or_create_for_url(
                 self.cleaned_data['video_url'], self._video_type, self.user,
+                set_values={'is_public': self.team.is_visible},
             )
             if not created and video.get_team_video() is not None:
                 self._errors['video_url'] = self.error_class([
                     _(u'Video is already part of a team')
                 ])
                 return
+            if not created:
+                video.is_public = self.team.is_visible
+                video.save()
             self.video = video
             self.created = created
         return self.cleaned_data
