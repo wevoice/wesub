@@ -80,14 +80,29 @@ class StripGoogleAnalyticsCookieMiddleware(object):
 
 class LogRequest(object):
     logger = logging.getLogger('access')
+    MAX_BODY_SIZE = 2048
+
     def process_request(self, request):
         request._start_time = time.time()
 
     def process_response(self, request, response):
         total_time = time.time() - request._start_time
-        msg = '{} ({:.3f}s)'.format(request.path, total_time)
-        self.logger.info(msg, extra={
-            'path': getattr(request, 'path_info', '?'),
+        msg = '{} {} ({:.3f}s)'.format(request.method, request.path_info, total_time)
+        extra = {
+            'method': request.method,
+            'path': request.path_info,
             'time': total_time,
-        })
+        }
+        if request.GET:
+            extra['query'] = request.GET
+        if request.body:
+            extra['data'] = self.calc_post(request)
+
+        self.logger.info(msg, extra=extra)
         return response
+
+    def calc_post(self, request):
+        if len(request.body) < self.MAX_BODY_SIZE:
+            return request.POST
+        else:
+            return '{} bytes'.format(len(request.body))
