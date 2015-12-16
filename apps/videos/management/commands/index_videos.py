@@ -20,21 +20,24 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
-from videos.models import VideoIndex
+from videos.models import Video, VideoIndex
 
 class Command(BaseCommand):
     help = "Adds indexes that have to be defined with raw SQL commands"
-    option_list = BaseCommand.option_list + (
-        make_option('-a', '--all',
-                    action='store_true',
-                    dest='all',
-                    default=False,
-                    help='Reindex all videos'),
-    )
-
     def handle(self, **options):
-        VideoIndex.objects.create_missing()
-        if options['all']:
-            VideoIndex.objects.all().update(needs_update=True)
-        while not VideoIndex.objects.all_indexed():
-            VideoIndex.objects.index_videos(100)
+        last_id = -1
+        count = 0
+        while True:
+            if last_id:
+                qs = Video.objects.filter(id__gt=last_id)
+            else:
+                qs = Video.objects.all()
+            qs = qs.order_by('id')[:100]
+            videos = list(qs)
+            if not videos:
+                break
+            for video in videos:
+                VideoIndex.index_video(video)
+                last_id = max(last_id, video.id)
+                count += 1
+            self.stdout.write('indexed {} videos\n'.format(count))

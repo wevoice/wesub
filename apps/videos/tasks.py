@@ -348,11 +348,3 @@ def _save_video_feed(feed_url, user):
         return VideoFeed.objects.get(url=feed_url, user=user)
     except VideoFeed.DoesNotExist:
         return VideoFeed.objects.create(url=feed_url, user=user)
-
-@task
-def index_videos():
-    VideoIndex.objects.index_videos(limit=100)
-
-@task
-def create_missing_video_index_objects():
-    VideoIndex.objects.create_missing()

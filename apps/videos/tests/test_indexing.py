@@ -27,48 +27,24 @@ from subtitles import pipeline
 from videos.models import VideoIndex
 
 class VideoIndexingTest(TestCase):
-    def test_create_index_for_new_video(self):
+    @patch_for_test('videos.models.VideoIndex.calc_text')
+    def test_index_new_video(self, mock_calc_text):
+        mock_calc_text.return_value = 'test text'
         v = VideoFactory()
-        index = VideoIndex.objects.get(video=v)
-        assert_true(index.needs_update)
-        assert_equal(index.update_lock_time, None)
-        assert_equal(index.update_lock_key, '')
-
-    def make_video_index(self, **attrs):
-        index = VideoFactory().index
-        for name, value in attrs.items():
-            setattr(index, name, value)
-        index.save()
-        return index
-
-    def test_lock_for_indexing(self):
-        # needs an update and no one has locked it
-        should_index = self.make_video_index(needs_update=True)
-        # Doesn't need an update
-        shouldnt_index = self.make_video_index(needs_update=False)
-        # Needs an update, but another process has locked it
-        shouldnt_index2 = self.make_video_index(needs_update=True,
-                                            update_lock_key='abc',
-                                            update_lock_time=datetime.now())
-        # Needs an update, has a lock, but the lock has timed out
-        should_index2 = self.make_video_index(
-            needs_update=True, update_lock_key='abc',
-            update_lock_time=datetime.now() - timedelta(days=2))
-
-        assert_items_equal(VideoIndex.objects.lock_for_indexing(),
-                           [should_index.video, should_index2.video])
-
-    def test_lock_for_indexing_with_limit(self):
-        for i in xrange(3):
-            VideoFactory()
-        assert_equal(len(VideoIndex.objects.lock_for_indexing(limit=2)), 2)
-
-    def test_create_missing_index_objects(self):
-        v = VideoFactory()
-        v.index.delete()
         assert_false(VideoIndex.objects.filter(video=v).exists())
-        VideoIndex.objects.create_missing()
-        assert_true(VideoIndex.objects.filter(video=v).exists())
+
+        index = VideoIndex.index_video(v)
+        assert_equal(VideoIndex.objects.get(video=v).text, 'test text')
+
+    @patch_for_test('videos.models.VideoIndex.calc_text')
+    def test_update_index(self, mock_calc_text):
+        mock_calc_text.return_value = 'old text'
+        v = VideoFactory()
+        VideoIndex.index_video(v)
+
+        mock_calc_text.return_value = 'new text'
+        VideoIndex.index_video(v)
+        assert_equal(VideoIndex.objects.get(video=v).text, 'new text')
 
     def test_index_text(self):
         video = VideoFactory(title='video_title',
@@ -95,8 +71,7 @@ class VideoIndexingTest(TestCase):
             'speaker-name': 'es_speaker',
         }, visibility='private')
 
-        VideoIndex.objects.index_videos()
-        index_text = VideoIndex.objects.get(video=video).text
+        index_text = VideoIndex.index_video(video).text
         assert_true('video_title' in index_text)
         assert_true('video_description' in index_text)
         assert_true('url_1' in index_text)
@@ -114,50 +89,6 @@ class VideoIndexingTest(TestCase):
         assert_false('es_line1' in index_text)
         assert_false('es_line2' in index_text)
 
-    def test_release_lock(self):
-        video = VideoFactory()
-        VideoIndex.objects.index_videos()
-        index = VideoIndex.objects.get(video=video)
-        assert_false(index.needs_update)
-        assert_equal(index.update_lock_key, '')
-        assert_equal(index.update_lock_time, None)
-
     # FIXME we should have searching tests, but we can't since we use sqlite
     # databases for our unittests and it has a different matching syntax then
     # MySQL
-
-class ReindexingTest(TestCase):
-    def setUp(self):
-        self.video = VideoFactory()
-
-    @contextmanager
-    def assert_causes_reindex(self):
-        self.video.index.needs_update = False
-        self.video.index.save()
-        yield
-        index = reload_obj(self.video.index)
-        assert_true(index.needs_update)
-
-    def test_update_video(self):
-        with self.assert_causes_reindex():
-            self.video.title = 'new title'
-            self.video.save()
-
-    def test_create_version(self):
-        with self.assert_causes_reindex():
-            pipeline.add_subtitles(self.video, 'en', SubtitleSetFactory(),
-                                   visibility='public')
-
-    def test_publish_version(self):
-        version = pipeline.add_subtitles(self.video, 'en',
-                                         SubtitleSetFactory(),
-                                         visibility='private')
-        with self.assert_causes_reindex():
-            version.publish()
-
-    def test_add_url(self):
-        version = pipeline.add_subtitles(self.video, 'en',
-                                         SubtitleSetFactory(),
-                                         visibility='private')
-        with self.assert_causes_reindex():
-            VideoURLFactory(video=self.video)

@@ -78,7 +78,7 @@ db:
     MYSQL_PASSWORD: amara
     MYSQL_DATABASE: amara
   volumes:
-    - docker-dev/mysql/conf.d/:/etc/mysql/conf.d
+    - ./docker-dev/mysql/conf.d/:/etc/mysql/conf.d
   ports:
     - "3306"
 
