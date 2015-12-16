@@ -1,8 +1,9 @@
 #!/bin/bash
+
 AWS_ID=${AWS_ACCESS_ID:-}
 AWS_KEY=${AWS_SECRET_KEY:-}
 S3_PASSPHRASE=${S3_PASSPHRASE:-}
-APP_NAME=unisubs
+APP_NAME=amara
 APP_ROOT=/opt/apps
 APP_DIR=$APP_ROOT/$APP_NAME
 REV=${REVISION:-staging}
@@ -16,6 +17,8 @@ MAILNAME=${MAILNAME:-pculture.org}
 NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME:-}
 NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-}
 SKIP_CODE_PULL=${SKIP_CODE_PULL:-}
+
+export PYTHONPATH=${APP_ROOT}/${APP_NAME}
 
 if [ ! -z "$AWS_ID" ] && [ ! -z "$AWS_SECRET_KEY" ] ; then
     # create s3cfg

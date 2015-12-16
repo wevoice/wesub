@@ -119,14 +119,15 @@ class Bash(Command):
     """Run a bash script inside the app container."""
 
     def run_inner(self, args, options):
-        subprocess.call(["docker-compose", "run", "--rm", '-p', '8000:8000', "--entrypoint=bash",
-                         "app"])
+        subprocess.call(["docker-compose", "run", "--rm", '-p', '8000:8000',
+                         '-u', 'root', "--entrypoint=bash", "app"])
 
 class Build(Command):
     """Build the app container."""
 
     def run_inner(self, args, options):
-        subprocess.call(["docker", "build", "-t", "amara-app", "."])
+        build_script = os.path.join(unisubs_root(), 'bin', 'build.py')
+        subprocess.call(['python', build_script, 'amara-app'])
 
 class Bump(Command):
     """Bump the version of optional repository."""
@@ -166,7 +167,8 @@ class Test(Command):
     raw_args = True
 
     def run_inner(self, args, options):
-        run_manage(['test', '--settings=dev_settings_test'] + args)
+        run_manage(['test', '--settings=dev_settings_test',
+                    '--where=/opt/apps/amara'] + args)
 
 class JSTest(Command):
     """Run Javascript unittests."""
@@ -221,7 +223,7 @@ class Up(Command):
 
 def run_manage(args, **kwargs):
     subprocess.call(['docker-compose', 'run', '--rm', '--entrypoint', 'python', 
-                     'app', 'manage.py'] + args, **kwargs)
+                     'app', '/opt/apps/amara/manage.py'] + args, **kwargs)
 
 def usage():
     print "Usage %s [command]" % progname()

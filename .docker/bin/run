@@ -2,10 +2,10 @@
 source /usr/local/bin/config_env
 
 PRE=""
-CMD="uwsgi --ini $APP_ROOT/$APP_NAME.ini"
+CMD="uwsgi --ini /var/run/amara/$APP_NAME.ini"
 WORKERS=${WORKERS:-4}
 
-cat << EOF > $APP_ROOT/$APP_NAME.ini
+cat << EOF > /var/run/amara/$APP_NAME.ini
 [uwsgi]
 master = true
 workers = ${WORKERS}
@@ -22,7 +22,6 @@ reload-on-as = 512
 no-orphans = true
 vacuum = true
 disable-logging
-pythonpath = $APP_ROOT
 wsgi-file = $APP_DIR/deploy/unisubs.wsgi
 static-map = /static=/usr/local/lib/python2.7/site-packages/django/contrib/admin/static
 EOF

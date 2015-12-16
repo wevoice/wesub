@@ -9,7 +9,7 @@ app:
     # Uncomment to test out the json logs that we use on production
     # JSON_LOGGING: 1
   volumes:
-    - .:/opt/apps/unisubs
+    - .:/opt/apps/amara
   hostname: unisubs.example.com
   ports:
     - "8000:8000"
@@ -28,7 +28,7 @@ worker:
     # Uncomment to test out the json logs that we use on production
     # JSON_LOGGING: 1
   volumes:
-    - .:/opt/apps/unisubs
+    - .:/opt/apps/amara
   links:
     - db
     - queue
