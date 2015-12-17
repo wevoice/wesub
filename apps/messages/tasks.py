@@ -463,6 +463,9 @@ def _reviewed_notification(task_pk, status):
         REVIEWED_AND_PENDING_APPROVAL: 'block_reviewed_and_pending_approval_message',
         REVIEWED_AND_SENT_BACK: 'block_reviewed_and_sent_back_message',
     }[status]
+
+    version = task.get_subtitle_version()
+
     if task.new_review_base_version:
         user = task.new_review_base_version.author
     else:
@@ -473,9 +476,6 @@ def _reviewed_notification(task_pk, status):
     subject = ugettext(u"Your subtitles have been reviewed")
     if status == REVIEWED_AND_PUBLISHED:
         subject += ugettext(" and published")
-
-    version = task.get_subtitle_version()
-
 
     task_language = get_language_label(task.language)
     reviewer = task.assignee
@@ -585,13 +585,13 @@ def approved_notification(task_pk, published=False):
         template_txt = "messages/team-task-approved-sentback.txt"
         template_html ="messages/email/team-task-approved-sentback.html"
         subject = ugettext(u"Your subtitles have been returned for further editing")
+    version = task.get_subtitle_version()
     if task.new_review_base_version:
         user = task.new_review_base_version.author
     else:
         user = version.author
     if not user.is_active:
         return False
-    version = task.get_subtitle_version()
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
