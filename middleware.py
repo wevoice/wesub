@@ -111,10 +111,20 @@ class LogRequest(object):
         extra = {
             'method': request.method,
             'path': request.path_info,
+            'size': request.META.get('CONTENT_LENGTH'),
         }
         if request.GET:
             extra['query'] = data_printer.printout(request.GET)
-        if request.body:
-            extra['data'] = data_printer.printout(request.POST)
-            extra['size'] = len(request.body)
+        try:
+            post_data = request.POST
+        except StandardError, e:
+            extra['data'] = 'parse error: {}'.format(e)
+        else:
+            if post_data:
+                extra['data'] = data_printer.printout(
+                    self.scrub_post_data(post_data))
         return extra
+
+    def scrub_post_data(self, post_data):
+        return dict((k, v if 'password' not in k else '*scrubbed')
+                    for (k, v) in post_data.items())
