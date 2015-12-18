@@ -439,31 +439,6 @@ def feedback(request, hide_captcha=False):
         output['errors'] = form.get_errors()
     return HttpResponse(json.dumps(output), "text/javascript")
 
-def email_friend(request):
-    text = request.GET.get('text', '')
-    link = request.GET.get('link', '')
-    if link:
-        text = link if not text else '%s\n%s' % (text, link)
-    from_email = ''
-    if request.user.is_authenticated():
-        from_email = request.user.email
-    initial = dict(message=text, from_email=from_email)
-    if request.method == 'POST':
-        form = EmailFriendForm(request.POST, auto_id="email_friend_id_%s", label_suffix="")
-        if form.is_valid():
-            form.send()
-            messages.info(request, 'Email Sent!')
-
-            return redirect(request.get_full_path())
-    else:
-        form = EmailFriendForm(auto_id="email_friend_id_%s", initial=initial, label_suffix="")
-    context = {
-        'form': form
-    }
-    return render_to_response('videos/email_friend.html', context,
-                              context_instance=RequestContext(request))
-
-
 @get_video_from_code
 def legacy_history(request, video, lang=None):
     """

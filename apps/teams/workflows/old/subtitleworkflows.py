@@ -142,7 +142,7 @@ class TaskTeamEditorNotes(TeamEditorNotes):
         tasks_url = universal_url('teams:team_tasks', kwargs={
             'slug': self.team.slug,
         })
-        filter_query = '?team_video={0}&assignee=anyone&language_code={1}'
+        filter_query = '?team_video={0}&assignee=anyone&lang={1}'
         filter_query = filter_query.format(self.team_video.pk,
                                            self.language_code)
         data = {

@@ -22,16 +22,10 @@ def make_twitter_url(page_url, message):
     url_param = urlencode({'text': message, 'url': page_url})
     return url % url_param
 
-def make_email_url(message):
-    url = reverse('videos:email_friend')
-    return "%s?%s" % (url, urlencode({'text': message}))
-
-def share_panel_context(facebook_url, twitter_url, embed_params, email_url,
-                         permalink):
+def share_panel_context(facebook_url, twitter_url, embed_params, permalink):
     return {
         "share_panel_facebook_url": facebook_url,
         "share_panel_twitter_url": twitter_url,
-        "share_panel_email_url": email_url,
         "share_panel_permalink": permalink,
     }
 
@@ -53,7 +47,6 @@ def share_panel_context_for_video(video):
         make_facebook_url(abs_page_url, msg),
         make_twitter_url(abs_page_url, msg), 
         { 'video_url': video.get_video_url() },
-        make_email_url(email_message),
         abs_page_url
     )
 
@@ -81,6 +74,5 @@ def add_share_panel_context_for_history(context, video, language=None):
         make_facebook_url(abs_page_url, msg),
         make_twitter_url(abs_page_url, msg),
         { 'video_url': video.get_video_url(), 'base_state': base_state },
-        make_email_url(email_message),
         abs_page_url
     ))
