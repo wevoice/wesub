@@ -176,7 +176,6 @@ INSTALLED_APPS = (
     'django.contrib.webdesign',
     # third party apps
     'djcelery',
-    'raven.contrib.django.raven_compat',
     'south',
     'rest_framework',
     'tastypie',

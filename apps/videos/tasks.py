@@ -25,7 +25,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.files.base import ContentFile
 from django.db.models import ObjectDoesNotExist
-from raven.contrib.django.models import client
 import requests
 
 from babelsubs.storage import diff as diff_subtitles
@@ -107,8 +106,9 @@ def update_video_feed(video_feed_id):
         video_feed = VideoFeed.objects.get(pk=video_feed_id)
         video_feed.update()
     except VideoFeed:
-        msg = '**update_video_feed**. VideoFeed does not exist. ID: %s' % video_feed_id
-        client.captureMessage(msg)
+        logging.warn(
+            '**update_video_feed**. VideoFeed does not exist. ID: %s',
+            video_feed_id)
 
 @task(rate_limit='500/m')
 def update_video_feed_with_rate_limit(video_feed_id):
