@@ -39,6 +39,11 @@ def setup_path():
     import optionalapps
     sys.path.extend(optionalapps.get_repository_paths())
 
+def setup_ca():
+    # This lets the requests library use the system CA certs, which are more
+    # up-to-date.  In particular, they work with the google HTTPS
+    os.environ['REQUESTS_CA_BUNDLE'] = "/etc/ssl/certs/ca-certificates.crt"
+
 def setup_patch_reverse():
     from localeurl import patch_reverse
     patch_reverse()
@@ -63,6 +68,7 @@ def startup():
     other code.
     """
     setup_path()
+    setup_ca()
     setup_patch_reverse()
     setup_celery_loader()
     run_startup_modules()

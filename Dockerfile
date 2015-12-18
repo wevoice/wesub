@@ -14,6 +14,7 @@ RUN (cd $CLOSURE_PATH && git checkout adbcc8ef6530ea16bac9f877901fe6b32995c5ff)
 ADD . /opt/apps/amara
 RUN ln -sf $CLOSURE_PATH $APP_DIR/media/js/closure-library
 RUN easy_install pip
+# install urllib3[secure] before other packages.  This prevents SSL warnings
 RUN pip install urllib3[secure]
 RUN (cd $APP_DIR/deploy && pip install --src /opt/src/amara/ -r requirements.txt)
 RUN mkdir -p /opt/extras/pictures
