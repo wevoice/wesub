@@ -651,7 +651,6 @@ var Site = function(Site) {
                 return DIFFING_URL.replace(/<<first_pk>>/, first_pk).replace(/<<second_pk>>/, second_pk);
             }
             function setupRevisions() {
-                $('.version_checkbox:first', '.revisions').attr('checked', 'checked');
                 $('.version_checkbox', '.revisions').change( function() {
                     var $this = $(this);
                     var checked_length = $('.version_checkbox:checked').length;

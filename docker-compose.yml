@@ -13,22 +13,10 @@ app:
   hostname: 'unisubs.example.com'
   ports:
     - "8000:8000"
-  expose:
-    - "8000:8000"
   links:
     - db
     - queue
     - cache
-    - search
-
-initdb:
-  image: amara-app
-  entrypoint: ["/bin/bash"]
-  command: ./bin/dev_syncdb.sh
-  environment:
-      DJANGO_SETTINGS_MODULE: dev_settings
-  links:
-    - db
     - search
 
 bash:
@@ -46,8 +34,6 @@ bash:
 
   hostname: 'unisubs.example.com'
   ports:
-    - "8000:8000"
-  expose:
     - "8000:8000"
   links:
     - db
@@ -85,11 +71,14 @@ worker:
     - search
 
 db:
-  image: orchardup/mysql
+  image: mysql
   environment:
+    MYSQL_ROOT_PASSWORD: amara
     MYSQL_USER: amara
     MYSQL_PASSWORD: amara
     MYSQL_DATABASE: amara
+  volumes:
+    - ./docker-dev/mysql/conf.d/:/etc/mysql/conf.d
   ports:
     - "3306"
 

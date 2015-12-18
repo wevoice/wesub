@@ -20,6 +20,7 @@ from __future__ import absolute_import
 import json
 
 from django import forms
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
@@ -62,7 +63,10 @@ def autocomplete_user_view(request, queryset, limit=10):
     limit -= len(users)
     # add non-exact matches next
     users.extend(
-        queryset.filter(username__icontains=query)
+        queryset.filter(Q(username__icontains=query)|
+                        Q(first_name__icontains=query)|
+                        Q(last_name__icontains=query)|
+                        Q(full_name__icontains=query))
         .exclude(username=query)[:limit]
     )
     data = [

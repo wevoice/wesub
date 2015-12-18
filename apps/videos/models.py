@@ -16,11 +16,12 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from collections import defaultdict
+from datetime import datetime, date, timedelta
 import logging
 import json
 import string
 import random
-from datetime import datetime, date
 import time
 import re
 import urlparse
@@ -28,10 +29,11 @@ import urlparse
 from django.utils.safestring import mark_safe
 from django.core.cache import cache
 from django.dispatch import receiver
-from django.db import models, IntegrityError
+from django.db import connection, models, IntegrityError
 from django.db.models.signals import post_save, pre_delete
 from django.db.models import Q
 from django.db.models import query
+from django.db import transaction
 from django.db import IntegrityError
 from django.utils.dateformat import format as date_format
 from django.conf import settings
@@ -50,6 +52,7 @@ from videos.types import video_type_registrar, video_type_choices
 from videos.feed_parser import VideoImporter
 from comments.models import Comment
 from widget import video_cache
+from utils import codes
 from utils import translation
 from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
@@ -310,8 +313,13 @@ class Video(models.Model):
 
     def update_search_index(self):
         """Queue a Celery task that will update this video's Solr entry."""
+
+        # Update using the old Solr index
         from utils.celery_search_index import update_search_index
         update_search_index.delay(self.__class__, self.pk)
+
+        # Also update using the new MySQL index
+        VideoIndex.index_video(self)
 
     def title_display(self, use_language_title=True):
         """
@@ -1039,6 +1047,44 @@ models.signals.pre_save.connect(create_video_id, sender=Video)
 models.signals.pre_delete.connect(video_delete_handler, sender=Video)
 models.signals.m2m_changed.connect(User.video_followers_change_handler, sender=Video.followers.through)
 
+class VideoIndex(models.Model):
+    video = models.OneToOneField(Video, primary_key=True, related_name='index')
+    text = models.TextField()
+
+    @classmethod
+    def index_video(cls, video):
+        # Run calc_text inside a transaction.  It does a bunch of queries on
+        # the regular InnoDB tables and we want to avoid any issues with
+        # deadlocking.  For example, if we need to wait on a table lock to
+        # update the row in the index table, we don't want to have a bunch of
+        # innodb locks still open.
+        with transaction.commit_on_success():
+            text = cls.calc_text(video)
+        index, created = cls.objects.get_or_create(video=video,
+                                                   defaults={'text': text})
+        if not created:
+            index.text = text
+            index.save()
+        return index
+
+    @staticmethod
+    def calc_text(video):
+        parts = [
+            video.title_display(),
+            video.description,
+            video.meta_1_content,
+            video.meta_2_content,
+            video.meta_3_content,
+        ]
+        parts.extend(vurl.url for vurl in video.get_video_urls())
+        for tip in video.newsubtitleversion_set.public_tips():
+            parts.extend([
+                tip.title, tip.description,
+                tip.meta_1_content, tip.meta_2_content, tip.meta_3_content,
+            ])
+            parts.extend(sub.text for sub in tip.get_subtitles())
+
+        return '\n'.join(p for p in parts if p is not None)
 
 # VideoMetadata
 #
