@@ -32,9 +32,10 @@ import os
 import sys
 
 def setup_path():
-    root_dir = os.path.abspath(os.path.dirname(__file__))
+    root_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
     sys.path.insert(0, os.path.join(root_dir, 'apps'))
     sys.path.insert(0, os.path.join(root_dir, 'libs'))
+    sys.path.insert(0, root_dir)
     # add paths from optional repositories
     import optionalapps
     sys.path.extend(optionalapps.get_repository_paths())
