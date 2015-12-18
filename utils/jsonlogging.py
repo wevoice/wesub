@@ -17,10 +17,16 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from datetime import datetime
+import inspect
 import json
 import logging
 
+from utils.dataprintout import DataPrinter
+
 EXTRA_FIELDS = ['path', 'view', 'query', 'data', 'metrics']
+
+data_printer = DataPrinter(
+    max_size=500, max_item_size=100, max_repr_size=50)
 
 def record_data(record):
     data = {
@@ -31,16 +37,41 @@ def record_data(record):
         'name': record.name,
     }
     if record.exc_info:
-        data['exception'] = str(record.exc_info[1])
+        data['exception'] = str(record.exc_info[0])
+        data['traceback'] = format_traceback(record.exc_info[2])
     for name in EXTRA_FIELDS:
         if hasattr(record, name):
             data[name] = getattr(record, name)
     return data
 
+def exception_data(record, exc):
+    return {
+        '@version': '1',
+        '@timestamp': format_timestamp(record.created),
+        'message': 'Error formatting record: {}'.format(exc),
+        'level': 'ERROR',
+        'name': 'logging'
+    }
+
 def format_timestamp(time):
     tstamp = datetime.utcfromtimestamp(time)
     return (tstamp.strftime("%Y-%m-%dT%H:%M:%S") +
             ".%03d" % (tstamp.microsecond / 1000) + "Z")
+
+def format_traceback(tb):
+    parts = []
+    for frame in inspect.getinnerframes(tb, 5):
+        line_info = '{} {}:{}\n'.format(frame[3], frame[1], frame[2])
+        parts.append(line_info)
+        parts.append('-' * (len(line_info)-1))
+        parts.append('\n')
+        if frame[0].f_locals:
+            parts.append(data_printer.printout(frame[0].f_locals))
+        for i, line in enumerate(frame[4]):
+            prefix = '* ' if i == frame[5] else '  '
+            parts.append(prefix + line)
+        parts.append('\n')
+    return ''.join(parts)
 
 class JSONHandler(logging.Handler):
     def emit(self, record):

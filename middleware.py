@@ -2,6 +2,7 @@ import hashlib
 import logging
 import re
 import random
+import sys
 import time
 
 import debug_toolbar
@@ -13,12 +14,20 @@ from django.core.validators import validate_ipv4_address
 from django.utils.cache import patch_vary_headers
 from django.utils.http import cookie_date
 
+from utils.dataprintout import DataPrinter
+
+access_logger = logging.getLogger('access')
+error_logger = logging.getLogger('request_error')
+
 SECTIONS = {
     'widget': 'widget',
     'api': 'api-v1',
     'api2': 'api-v2',
     'teams': 'teams',
 }
+
+data_printer = DataPrinter(
+    max_size=1024, max_item_size=100, max_repr_size=50)
 
 class P3PHeaderMiddleware(object):
     def process_response(self, request, response):
@@ -79,30 +88,33 @@ class StripGoogleAnalyticsCookieMiddleware(object):
             pass
 
 class LogRequest(object):
-    logger = logging.getLogger('access')
     MAX_BODY_SIZE = 2048
 
     def process_request(self, request):
         request._start_time = time.time()
 
+    def process_exception(self, request, exception):
+        msg = 'Error processing request: {} {}'.format(
+            request.method, request.path_info)
+        access_logger.error(msg, extra=self.calc_extra(request),
+                            exc_info=True)
+
     def process_response(self, request, response):
         total_time = time.time() - request._start_time
         msg = '{} {} ({:.3f}s)'.format(request.method, request.path_info, total_time)
+        extra = self.calc_extra(request)
+        extra['time'] = total_time
+        access_logger.info(msg, extra=extra)
+        return response
+
+    def calc_extra(self, request):
         extra = {
             'method': request.method,
             'path': request.path_info,
-            'time': total_time,
         }
         if request.GET:
-            extra['query'] = request.GET
+            extra['query'] = data_printer.printout(request.GET)
         if request.body:
-            extra['data'] = self.calc_post(request)
-
-        self.logger.info(msg, extra=extra)
-        return response
-
-    def calc_post(self, request):
-        if len(request.body) < self.MAX_BODY_SIZE:
-            return request.POST
-        else:
-            return '{} bytes'.format(len(request.body))
+            extra['data'] = data_printer.printout(request.POST)
+            extra['size'] = len(request.body)
+        return extra
