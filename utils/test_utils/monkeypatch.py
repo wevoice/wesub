@@ -35,8 +35,10 @@ function.  For example:
     > monkeypatch.update_one_team_video.run_original()
 """
 
+from datetime import datetime, timedelta
 import contextlib
 import functools
+import itertools
 
 from celery.task import Task
 import mock
@@ -44,6 +46,23 @@ import mock
 from subtitles.workflows import SaveDraft
 import externalsites.google
 
+class MockNow(mock.Mock):
+    def __init__(self):
+        super(MockNow, self).__init__()
+        self.reset()
+
+    def reset(self):
+        self.set(2015, 1, 1)
+
+    def set(self, *args, **kwargs):
+        self.current = datetime(*args, **kwargs)
+
+    def __call__(self):
+        rv = self.current
+        self.current += timedelta(minutes=1)
+        return rv
+
+mock_now = MockNow()
 save_thumbnail_in_s3 = mock.Mock()
 video_changed_tasks = mock.Mock()
 update_team_video = mock.Mock()
@@ -76,41 +95,52 @@ get_language_facet_counts = mock.Mock(return_value=([], []))
 class MonkeyPatcher(object):
     """Replace a functions with mock objects for the tests.
     """
+    patch_info = [
+        ('utils.dates.now', mock_now),
+        ('videos.tasks.save_thumbnail_in_s3', save_thumbnail_in_s3),
+        ('videos.tasks.video_changed_tasks', video_changed_tasks),
+        ('teams.tasks.update_one_team_video', update_team_video),
+        ('utils.celery_search_index.update_search_index',
+         update_search_index),
+        ('externalsites.google.get_video_info', youtube_get_video_info),
+        ('externalsites.google.get_youtube_user_info',
+         youtube_get_user_info),
+        ('externalsites.google.get_uploaded_video_ids',
+         youtube_get_uploaded_video_ids),
+        ('externalsites.google.get_new_access_token',
+         youtube_get_new_access_token),
+        ('externalsites.google.revoke_auth_token',
+         youtube_revoke_auth_token),
+        ('externalsites.google.update_video_description',
+         youtube_update_video_description),
+        ('utils.applock.acquire_lock', acquire_lock),
+        ('utils.applock.release_lock', release_lock),
+        ('utils.http.url_exists', url_exists),
+        ('widget.video_cache.invalidate_cache',
+         invalidate_widget_video_cache),
+        ('externalsites.tasks.update_subtitles', update_subtitles),
+        ('externalsites.tasks.delete_subtitles', delete_subtitles),
+        ('externalsites.tasks.update_all_subtitles', update_all_subtitles),
+        ('externalsites.tasks.fetch_subs', fetch_subs_task),
+        ('videos.tasks.import_videos_from_feed', import_videos_from_feed),
+        ('search.forms._get_language_facet_counts',
+         get_language_facet_counts)
+    ]
+    @classmethod
+    def register_patch(cls, spec, mock_obj):
+        """Register another patch to make during the unittests.
+        
+        Args:
+            spec: mock function/object spec to patch
+            mock_obj: mock object to use for the patch
+        """
+        cls.patch_info.append((spec, mock_obj))
+
     def patch_functions(self):
         # list of (function, mock object tuples)
-        patch_info = [
-            ('videos.tasks.save_thumbnail_in_s3', save_thumbnail_in_s3),
-            ('videos.tasks.video_changed_tasks', video_changed_tasks),
-            ('teams.tasks.update_one_team_video', update_team_video),
-            ('utils.celery_search_index.update_search_index',
-             update_search_index),
-            ('externalsites.google.get_video_info', youtube_get_video_info),
-            ('externalsites.google.get_youtube_user_info',
-             youtube_get_user_info),
-            ('externalsites.google.get_uploaded_video_ids',
-             youtube_get_uploaded_video_ids),
-            ('externalsites.google.get_new_access_token',
-             youtube_get_new_access_token),
-            ('externalsites.google.revoke_auth_token',
-             youtube_revoke_auth_token),
-            ('externalsites.google.update_video_description',
-             youtube_update_video_description),
-            ('utils.applock.acquire_lock', acquire_lock),
-            ('utils.applock.release_lock', release_lock),
-            ('utils.http.url_exists', url_exists),
-            ('widget.video_cache.invalidate_cache',
-             invalidate_widget_video_cache),
-            ('externalsites.tasks.update_subtitles', update_subtitles),
-            ('externalsites.tasks.delete_subtitles', delete_subtitles),
-            ('externalsites.tasks.update_all_subtitles', update_all_subtitles),
-            ('externalsites.tasks.fetch_subs', fetch_subs_task),
-            ('videos.tasks.import_videos_from_feed', import_videos_from_feed),
-            ('search.forms._get_language_facet_counts',
-             get_language_facet_counts)
-        ]
         self.patches = []
         self.initial_side_effects = {}
-        for func_name, mock_obj in patch_info:
+        for func_name, mock_obj in self.patch_info:
             self.start_patch(func_name, mock_obj)
 
     def start_patch(self, func_name, mock_obj):
@@ -156,6 +186,7 @@ class MonkeyPatcher(object):
             # unittests set.  So we save side_effect right after we create the
             # mock and restore it here
             mock_obj.side_effect = side_effect
+        mock_now.reset()
 
 def patch_for_test(spec):
     """Use mock to patch a function for the test case.
@@ -233,6 +264,7 @@ class _MockSignalHandler(object):
         def wrapper(self, *args, **kwargs):
             signal.connect(handler, weak=False)
             self.addCleanup(signal.disconnect, handler)
+            self.addCleanup(handler.reset_mock)
             return func(self, handler, *args, **kwargs)
         return wrapper
 

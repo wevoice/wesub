@@ -357,14 +357,11 @@ def _get_language(video, language_code):
         # Use select_for_update() to lock the row for the language we're about
         # to update.  Since we know that we're going to do some work, then
         # update the language, locking at the start prevents deadlocks.
-        sl = (SubtitleLanguage.objects.select_for_update()
+        return (SubtitleLanguage.objects.select_for_update()
               .get(video=video, language_code=language_code))
-        language_needs_save = False
     except SubtitleLanguage.DoesNotExist:
-        sl = SubtitleLanguage(video=video, language_code=language_code)
-        language_needs_save = True
-
-    return sl, language_needs_save
+        return SubtitleLanguage.objects.create(video=video,
+                                               language_code=language_code)
 
 def _timings_changed(subtitle_language, new_version):
     """Calculate if the number of subtitles or the timings the subtitles have
@@ -380,7 +377,7 @@ def _timings_changed(subtitle_language, new_version):
     return new_timings != old_timings
 
 
-def _add_subtitles(video, language_code, subtitles, title, description, author,
+def _add_subtitles(video, sl, subtitles, title, description, author,
                    visibility, visibility_override, parents,
                    rollback_of_version_number, committer, created, note,
                    origin, metadata, action):
@@ -393,9 +390,6 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
     # that we're going to do some work, then potentially update the video,
     # locking at the start prevents deadlocks.
     Video.objects.select_for_update(id=video.id)
-    sl, language_needs_save = _get_language(video, language_code)
-    if language_needs_save:
-        sl.save()
 
     data = {'title': title, 'description': description, 'author': author,
             'visibility': visibility, 'visibility_override': visibility_override,
@@ -434,7 +428,7 @@ def _rollback_to(video, language_code, version_number, rollback_author):
     # The new version is mostly a copy of the target.
     data = {
         'video': target.video,
-        'language_code': target.language_code,
+        'sl': target.video.subtitle_language(language_code),
         'subtitles': target.get_subtitles(),
         'title': target.title,
         'description': target.description,
@@ -540,7 +534,9 @@ def add_subtitles(video, language_code, subtitles,
     if action:
         visibility = action.subtitle_visibility
     with transaction.commit_on_success():
-        version = _add_subtitles(video, language_code, subtitles, title,
+        subtitle_language = _get_language(video, language_code)
+        subtitle_language.freeze()
+        version = _add_subtitles(video, subtitle_language, subtitles, title,
                                  description, author, visibility,
                                  visibility_override, parents, None, committer,
                                  created, note, origin, metadata, action)
@@ -548,6 +544,8 @@ def add_subtitles(video, language_code, subtitles,
     api_subtitles_edited.send(version)
     if action:
         action.perform(author, video, version.subtitle_language, version)
+    subtitle_language.thaw()
+
     return version
 
 def _calc_action_for_add_subtitles(video, language_code, author, complete,
