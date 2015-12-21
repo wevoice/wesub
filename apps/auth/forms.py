@@ -16,9 +16,9 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
-
+from captcha.fields import CaptchaField
 from models import CustomUser as User
 
 
@@ -48,3 +48,6 @@ class ChooseUserForm(forms.Form):
             raise forms.ValidationError("User doesn't exist.")
 
         return data
+
+class SecureAuthenticationForm(AuthenticationForm):
+    captcha = CaptchaField()

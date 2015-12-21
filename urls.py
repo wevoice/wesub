@@ -178,6 +178,10 @@ urlpatterns = patterns('',
 
 urlpatterns += optionalapps.get_urlpatterns()
 
+urlpatterns += patterns('',
+    url(r'^captcha/', include('captcha.urls')),
+)
+
 try:
     import debug_toolbar
 except ImportError:

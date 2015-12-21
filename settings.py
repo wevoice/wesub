@@ -204,6 +204,7 @@ INSTALLED_APPS = (
     'videos',
     'widget',
     'subtitles',
+    'captcha',
 )
 
 STARTUP_MODULES = [
@@ -707,6 +708,10 @@ LOGGING = {
 }
 
 TMP_FOLDER = "/tmp/"
+
+SOUTH_MIGRATION_MODULES = {
+    'captcha': 'captcha.south_migrations',
+}
 
 from task_settings import *
 

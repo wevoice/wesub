@@ -36,7 +36,7 @@ from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from oauth import oauth
 
-from auth.forms import CustomUserCreationForm, ChooseUserForm
+from auth.forms import CustomUserCreationForm, ChooseUserForm, SecureAuthenticationForm
 from auth.models import (
     UserLanguage, EmailConfirmation, LoginToken
 )
@@ -44,7 +44,6 @@ from auth.providers import get_authentication_provider
 from socialauth.models import AuthMeta, OpenidProfile
 from socialauth.views import get_url_host
 from utils.translation import get_user_languages_from_cookie
-
 
 def login(request):
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
@@ -109,7 +108,11 @@ def delete_user(request):
 
 def login_post(request):
     redirect_to = make_redirect_to(request)
-    form = AuthenticationForm(data=request.POST, label_suffix="")
+    no_captcha = 'captcha_0' not in request.POST
+    if no_captcha:
+        form = AuthenticationForm(data=request.POST, label_suffix="")
+    else:
+        form = SecureAuthenticationForm(data=request.POST, label_suffix="")
     try:
         if form.is_valid():
             auth_login(request, form.get_user())
@@ -117,8 +120,12 @@ def login_post(request):
                 request.session.delete_test_cookie()
             return HttpResponseRedirect(redirect_to)
         else:
+            if no_captcha:
+                form = SecureAuthenticationForm(data=request.POST, label_suffix="")
             return render_login(request, CustomUserCreationForm(label_suffix=""), form, redirect_to)
     except ValueError:
+            if no_captcha:
+                form = SecureAuthenticationForm(data=request.POST, label_suffix="")
             return render_login(request, CustomUserCreationForm(label_suffix=""), form, redirect_to)
 
 
