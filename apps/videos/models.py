@@ -154,7 +154,7 @@ class SubtitleLanguageFetcher(object):
         self.cache = {}
         self.all_languages_fetched = False
 
-    def fetch_one_language(self, video, language_code):
+    def fetch_one_language(self, video, language_code, create=False):
         if language_code in self.cache:
             return self.cache[language_code]
         try:
@@ -162,7 +162,11 @@ class SubtitleLanguageFetcher(object):
                     .get(language_code=language_code))
             lang.video = video
         except models.ObjectDoesNotExist:
-            lang = None
+            if create:
+                lang = video.newsubtitlelanguage_set.create(
+                    language_code=language_code)
+            else:
+                lang = None
         self.cache[language_code] = lang
         return lang
 
@@ -304,12 +308,20 @@ class Video(models.Model):
     def __init__(self, *args, **kwargs):
         super(Video, self).__init__(*args, **kwargs)
         self._language_fetcher = SubtitleLanguageFetcher()
+        self.orig_title = self.title
 
     def __unicode__(self):
         title = self.title_display()
         if len(title) > 35:
             title = title[:35]+'...'
         return title
+
+    def save(self, *args, **kwargs):
+        super(Video, self).save(*args, **kwargs)
+        if self.title != self.orig_title:
+            old_title = self.orig_title
+            self.orig_title = self.title
+            signals.title_changed.send(sender=self, old_title=old_title)
 
     def update_search_index(self):
         """Queue a Celery task that will update this video's Solr entry."""
@@ -699,7 +711,7 @@ class Video(models.Model):
         return (self.primary_audio_language_code
                 and translation.is_rtl(self.primary_audio_language_code))
 
-    def subtitle_language(self, language_code=None):
+    def subtitle_language(self, language_code=None, create=False):
         """Get as SubtitleLanguage for this video
 
         If None is passed as a language_code, the original language
@@ -709,8 +721,11 @@ class Video(models.Model):
         if language_code is None:
             language_code = self.primary_audio_language_code
             if not language_code:
+                if create:
+                    raise ValueError("no primary audio language set")
                 return None
-        return self._language_fetcher.fetch_one_language(self, language_code)
+        return self._language_fetcher.fetch_one_language(self, language_code,
+                                                         create)
 
     def all_subtitle_languages(self):
         return self._language_fetcher.fetch_all_languages(self)
