@@ -28,6 +28,7 @@ from django.contrib.auth import (
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, render_to_response, redirect
@@ -41,14 +42,21 @@ from auth.models import (
     UserLanguage, EmailConfirmation, LoginToken
 )
 from auth.providers import get_authentication_provider
+from ipware.ip import get_real_ip, get_ip
 from socialauth.models import AuthMeta, OpenidProfile
 from socialauth.views import get_url_host
 from utils.translation import get_user_languages_from_cookie
 
+LOGIN_CACHE_TIMEOUT = 60
+
 def login(request):
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
+    if cache_get(request):
+        form = SecureAuthenticationForm(label_suffix="")
+    else:
+        form = AuthenticationForm(label_suffix="")
     return render_login(request, CustomUserCreationForm(label_suffix=""),
-                        AuthenticationForm(label_suffix=""), redirect_to)
+                        form, redirect_to)
 
 def confirm_email(request, confirmation_key):
     confirmation_key = confirmation_key.lower()
@@ -106,27 +114,48 @@ def delete_user(request):
         return HttpResponseRedirect('/')
     return render(request, 'auth/delete_user.html')
 
+def cache_key(request):
+    ip = get_real_ip(request)
+    if ip is None:
+        ip = get_ip(request)
+        if ip is None:
+            ip = ""
+    return "failed_attempt_{}".format(ip)
+
+def cache_set(request):
+    cache.set(cache_key(request), True, LOGIN_CACHE_TIMEOUT)
+
+def cache_get(request):
+    return cache.get(cache_key(request))
+
+def cache_delete(request):
+    cache.delete(cache_key(request))
+
 def login_post(request):
     redirect_to = make_redirect_to(request)
-    no_captcha = 'captcha_0' not in request.POST
-    if no_captcha:
-        form = AuthenticationForm(data=request.POST, label_suffix="")
-    else:
+    form_has_no_captcha = False
+    if 'captcha_0' in request.POST or cache_get(request):
         form = SecureAuthenticationForm(data=request.POST, label_suffix="")
+    else:
+        form_has_no_captcha = True
+        form = AuthenticationForm(data=request.POST, label_suffix="")
     try:
         if form.is_valid():
+            cache_delete(request)
             auth_login(request, form.get_user())
             if request.session.test_cookie_worked():
                 request.session.delete_test_cookie()
             return HttpResponseRedirect(redirect_to)
         else:
-            if no_captcha:
+            cache_set(request)
+            if form_has_no_captcha:
                 form = SecureAuthenticationForm(data=request.POST, label_suffix="")
             return render_login(request, CustomUserCreationForm(label_suffix=""), form, redirect_to)
     except ValueError:
-            if no_captcha:
-                form = SecureAuthenticationForm(data=request.POST, label_suffix="")
-            return render_login(request, CustomUserCreationForm(label_suffix=""), form, redirect_to)
+        cache_set(request)
+        if form_has_no_captcha:
+            form = SecureAuthenticationForm(data=request.POST, label_suffix="")
+        return render_login(request, CustomUserCreationForm(label_suffix=""), form, redirect_to)
 
 
 def token_login(request, token):
