@@ -89,6 +89,12 @@ class VideoIndexingTest(TestCase):
         assert_false('es_line1' in index_text)
         assert_false('es_line2' in index_text)
 
+    def test_max_text_size(self):
+        video = VideoFactory(title='abc' * 100,
+                             video_url__url='http://example.com/url_1')
+        index_text = VideoIndex.calc_text(video, max_length=100)
+        assert_equal(len(index_text), 100)
+
     # FIXME we should have searching tests, but we can't since we use sqlite
     # databases for our unittests and it has a different matching syntax then
     # MySQL
