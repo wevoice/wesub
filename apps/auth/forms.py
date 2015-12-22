@@ -23,6 +23,7 @@ from models import CustomUser as User
 
 
 class CustomUserCreationForm(UserCreationForm):
+    captcha = CaptchaField()
     class Meta:
         model = User
         fields = ("username", "email")
