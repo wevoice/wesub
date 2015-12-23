@@ -1099,7 +1099,6 @@ class VideoIndex(models.Model):
                 tip.title, tip.description,
                 tip.meta_1_content, tip.meta_2_content, tip.meta_3_content,
             ])
-            parts.extend(sub.text for sub in tip.get_subtitles())
 
         text = '\n'.join(p for p in parts if p is not None)
         if max_length is not None:

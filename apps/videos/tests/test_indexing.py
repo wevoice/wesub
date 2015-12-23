@@ -51,25 +51,22 @@ class VideoIndexingTest(TestCase):
                              description='video_description',
                              video_url__url='http://example.com/url_1')
         VideoURLFactory(video=video, url='http://example.com/url_2')
-        pipeline.add_subtitles(video, 'en', [
-            (0, 500, 'en_line1'),
-            (1000, 1500, 'en_line2'),
-        ], title='en_title', description='en_description', metadata={
-            'speaker-name': 'en_speaker',
-        }, visibility='public')
-        pipeline.add_subtitles(video, 'fr', [
-            (0, 500, 'fr_line1'),
-            (1000, 1500, 'fr_line2'),
-        ], title='fr_title', description='fr_description', metadata={
-            'speaker-name': 'fr_speaker',
-        }, visibility='public')
+        pipeline.add_subtitles(
+            video, 'en', SubtitleSetFactory(),
+            title='en_title', description='en_description', metadata={
+                'speaker-name': 'en_speaker',
+            }, visibility='public')
+        pipeline.add_subtitles(
+            video, 'fr', SubtitleSetFactory(),
+            title='fr_title', description='fr_description', metadata={
+                'speaker-name': 'fr_speaker',
+            }, visibility='public')
         # add a private tip, this text should not be included in the index
-        pipeline.add_subtitles(video, 'es', [
-            (0, 500, 'es_line1'),
-            (1000, 1500, 'es_line2'),
-        ], title='es_title', description='es_description', metadata={
-            'speaker-name': 'es_speaker',
-        }, visibility='private')
+        pipeline.add_subtitles(
+            video, 'es', SubtitleSetFactory(),
+            title='es_title', description='es_description', metadata={
+                'speaker-name': 'es_speaker',
+            }, visibility='private')
 
         index_text = VideoIndex.index_video(video).text
         assert_true('video_title' in index_text)
@@ -78,16 +75,10 @@ class VideoIndexingTest(TestCase):
         assert_true('url_2' in index_text)
         assert_true('en_title' in index_text)
         assert_true('en_description' in index_text)
-        assert_true('en_line1' in index_text)
-        assert_true('en_line2' in index_text)
         assert_true('fr_title' in index_text)
         assert_true('fr_description' in index_text)
-        assert_true('fr_line1' in index_text)
-        assert_true('fr_line2' in index_text)
         assert_false('es_title' in index_text)
         assert_false('es_description' in index_text)
-        assert_false('es_line1' in index_text)
-        assert_false('es_line2' in index_text)
 
     def test_max_text_size(self):
         video = VideoFactory(title='abc' * 100,
