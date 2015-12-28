@@ -26,12 +26,11 @@ from django.views.generic.base import TemplateView, RedirectView
 from sitemaps import sitemaps, sitemap_view, sitemap_index
 from socialauth.models import AuthMeta, OpenidProfile
 from django.views.decorators.clickjacking import xframe_options_exempt
-
 import optionalapps
 from utils.genericviews import JSTemplateView
-
+from auth.views import login as user_login
 admin.autodiscover()
-
+admin.site.login = user_login
 # these really should be unregistred but while in development the dev server
 # might have not registred yet, so we silence this exception
 try:
