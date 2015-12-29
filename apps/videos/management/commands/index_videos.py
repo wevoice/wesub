@@ -21,10 +21,21 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 
 from videos.models import Video, VideoIndex
+import time
 
 class Command(BaseCommand):
     help = "Adds indexes that have to be defined with raw SQL commands"
+    option_list = BaseCommand.option_list + (
+        make_option('-b', '--batch-size', dest='batch-size', default=100,
+                    help='Set amount of videos to update at once'),
+        make_option('-l', '--rate-limit', dest='rate-limit', metavar='COUNT',
+                    help='Only update COUNT videos per second'),
+    )
+
     def handle(self, **options):
+        batch_size = options['batch-size']
+        rate_limit = float(options['rate-limit'])
+        start_time = time.time()
         last_id = -1
         count = 0
         while True:
@@ -32,7 +43,7 @@ class Command(BaseCommand):
                 qs = Video.objects.filter(id__gt=last_id)
             else:
                 qs = Video.objects.all()
-            qs = qs.order_by('id')[:100]
+            qs = qs.order_by('id')[:batch_size]
             videos = list(qs)
             if not videos:
                 break
@@ -40,4 +51,9 @@ class Command(BaseCommand):
                 VideoIndex.index_video(video)
                 last_id = max(last_id, video.id)
                 count += 1
-            self.stdout.write('indexed {} videos\n'.format(count))
+            current_time = time.time()
+            rate = count / (current_time - start_time)
+            self.stdout.write('indexed {} videos ({:.2f} videos/sec last_id: {})\n'.format(
+                count, rate, last_id))
+            if rate_limit is not None and rate > rate_limit:
+                time.sleep((count / rate_limit) - (current_time - start_time))

@@ -1066,6 +1066,8 @@ class VideoIndex(models.Model):
     video = models.OneToOneField(Video, primary_key=True, related_name='index')
     text = models.TextField()
 
+    MAX_TEXT_LENGTH = 10 * 1000 * 1000
+
     @classmethod
     def index_video(cls, video):
         # Run calc_text inside a transaction.  It does a bunch of queries on
@@ -1074,7 +1076,7 @@ class VideoIndex(models.Model):
         # update the row in the index table, we don't want to have a bunch of
         # innodb locks still open.
         with transaction.commit_on_success():
-            text = cls.calc_text(video)
+            text = cls.calc_text(video, max_length=cls.MAX_TEXT_LENGTH)
         index, created = cls.objects.get_or_create(video=video,
                                                    defaults={'text': text})
         if not created:
@@ -1083,7 +1085,7 @@ class VideoIndex(models.Model):
         return index
 
     @staticmethod
-    def calc_text(video):
+    def calc_text(video, max_length=None):
         parts = [
             video.title_display(),
             video.description,
@@ -1097,9 +1099,11 @@ class VideoIndex(models.Model):
                 tip.title, tip.description,
                 tip.meta_1_content, tip.meta_2_content, tip.meta_3_content,
             ])
-            parts.extend(sub.text for sub in tip.get_subtitles())
 
-        return '\n'.join(p for p in parts if p is not None)
+        text = '\n'.join(p for p in parts if p is not None)
+        if max_length is not None:
+            text = text[:max_length]
+        return text
 
 # VideoMetadata
 #
