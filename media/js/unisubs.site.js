@@ -603,7 +603,7 @@ var Site = function(Site) {
             if ($('div.note').length) {
                 $('.note .hide-announcement').click(function() {
                     var $this = $(this);
-                    $this.parents('#announce-banner').hide();
+                    $this.parents('.announce-banner').hide();
                     var d = new Date();
                     d.setTime(d.getTime() + 60*60*24*365*1000);
                     document.cookie = window.COOKIE + d.toUTCString();
