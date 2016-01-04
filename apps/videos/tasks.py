@@ -25,7 +25,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.files.base import ContentFile
 from django.db.models import ObjectDoesNotExist
-from haystack import site
 from raven.contrib.django.models import client
 import requests
 
@@ -141,8 +140,8 @@ def raise_exception(msg, **kwargs):
 def video_changed_tasks(video_pk, new_version_id=None):
     from videos import metadata_manager
     from videos.models import Video
-
     from teams.models import TeamVideo, BillingRecord
+
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
         send_new_version_notification(new_version_id)
@@ -155,13 +154,6 @@ def video_changed_tasks(video_pk, new_version_id=None):
                 "exception": str(e)})
 
     video = Video.objects.get(pk=video_pk)
-
-    tv = video.get_team_video()
-
-    if tv:
-        tv_search_index = site.get_index(TeamVideo)
-        tv_search_index.backend.update(tv_search_index, [tv])
-
     video.update_search_index()
 
 @task
