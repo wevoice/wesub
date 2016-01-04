@@ -63,6 +63,10 @@
         padding-right: 9px;
         border-left: 1px solid $white;
     }
+
+    &.title-action {
+        float: right;
+    }
 }
 
 @mixin full-button {

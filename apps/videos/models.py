@@ -16,11 +16,12 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from collections import defaultdict
+from datetime import datetime, date, timedelta
 import logging
 import json
 import string
 import random
-from datetime import datetime, date
 import time
 import re
 import urlparse
@@ -28,10 +29,11 @@ import urlparse
 from django.utils.safestring import mark_safe
 from django.core.cache import cache
 from django.dispatch import receiver
-from django.db import models, IntegrityError
+from django.db import connection, models, IntegrityError
 from django.db.models.signals import post_save, pre_delete
 from django.db.models import Q
 from django.db.models import query
+from django.db import transaction
 from django.db import IntegrityError
 from django.utils.dateformat import format as date_format
 from django.conf import settings
@@ -50,6 +52,7 @@ from videos.types import video_type_registrar, video_type_choices
 from videos.feed_parser import VideoImporter
 from comments.models import Comment
 from widget import video_cache
+from utils import codes
 from utils import translation
 from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
@@ -151,7 +154,7 @@ class SubtitleLanguageFetcher(object):
         self.cache = {}
         self.all_languages_fetched = False
 
-    def fetch_one_language(self, video, language_code):
+    def fetch_one_language(self, video, language_code, create=False):
         if language_code in self.cache:
             return self.cache[language_code]
         try:
@@ -159,7 +162,11 @@ class SubtitleLanguageFetcher(object):
                     .get(language_code=language_code))
             lang.video = video
         except models.ObjectDoesNotExist:
-            lang = None
+            if create:
+                lang = video.newsubtitlelanguage_set.create(
+                    language_code=language_code)
+            else:
+                lang = None
         self.cache[language_code] = lang
         return lang
 
@@ -301,6 +308,7 @@ class Video(models.Model):
     def __init__(self, *args, **kwargs):
         super(Video, self).__init__(*args, **kwargs)
         self._language_fetcher = SubtitleLanguageFetcher()
+        self.orig_title = self.title
 
     def __unicode__(self):
         title = self.title_display()
@@ -308,10 +316,22 @@ class Video(models.Model):
             title = title[:35]+'...'
         return title
 
+    def save(self, *args, **kwargs):
+        super(Video, self).save(*args, **kwargs)
+        if self.title != self.orig_title:
+            old_title = self.orig_title
+            self.orig_title = self.title
+            signals.title_changed.send(sender=self, old_title=old_title)
+
     def update_search_index(self):
         """Queue a Celery task that will update this video's Solr entry."""
+
+        # Update using the old Solr index
         from utils.celery_search_index import update_search_index
         update_search_index.delay(self.__class__, self.pk)
+
+        # Also update using the new MySQL index
+        VideoIndex.index_video(self)
 
     def title_display(self, use_language_title=True):
         """
@@ -691,7 +711,7 @@ class Video(models.Model):
         return (self.primary_audio_language_code
                 and translation.is_rtl(self.primary_audio_language_code))
 
-    def subtitle_language(self, language_code=None):
+    def subtitle_language(self, language_code=None, create=False):
         """Get as SubtitleLanguage for this video
 
         If None is passed as a language_code, the original language
@@ -701,8 +721,11 @@ class Video(models.Model):
         if language_code is None:
             language_code = self.primary_audio_language_code
             if not language_code:
+                if create:
+                    raise ValueError("no primary audio language set")
                 return None
-        return self._language_fetcher.fetch_one_language(self, language_code)
+        return self._language_fetcher.fetch_one_language(self, language_code,
+                                                         create)
 
     def all_subtitle_languages(self):
         return self._language_fetcher.fetch_all_languages(self)
@@ -1039,6 +1062,48 @@ models.signals.pre_save.connect(create_video_id, sender=Video)
 models.signals.pre_delete.connect(video_delete_handler, sender=Video)
 models.signals.m2m_changed.connect(User.video_followers_change_handler, sender=Video.followers.through)
 
+class VideoIndex(models.Model):
+    video = models.OneToOneField(Video, primary_key=True, related_name='index')
+    text = models.TextField()
+
+    MAX_TEXT_LENGTH = 10 * 1000 * 1000
+
+    @classmethod
+    def index_video(cls, video):
+        # Run calc_text inside a transaction.  It does a bunch of queries on
+        # the regular InnoDB tables and we want to avoid any issues with
+        # deadlocking.  For example, if we need to wait on a table lock to
+        # update the row in the index table, we don't want to have a bunch of
+        # innodb locks still open.
+        with transaction.commit_on_success():
+            text = cls.calc_text(video, max_length=cls.MAX_TEXT_LENGTH)
+        index, created = cls.objects.get_or_create(video=video,
+                                                   defaults={'text': text})
+        if not created:
+            index.text = text
+            index.save()
+        return index
+
+    @staticmethod
+    def calc_text(video, max_length=None):
+        parts = [
+            video.title_display(),
+            video.description,
+            video.meta_1_content,
+            video.meta_2_content,
+            video.meta_3_content,
+        ]
+        parts.extend(vurl.url for vurl in video.get_video_urls())
+        for tip in video.newsubtitleversion_set.public_tips():
+            parts.extend([
+                tip.title, tip.description,
+                tip.meta_1_content, tip.meta_2_content, tip.meta_3_content,
+            ])
+
+        text = '\n'.join(p for p in parts if p is not None)
+        if max_length is not None:
+            text = text[:max_length]
+        return text
 
 # VideoMetadata
 #
