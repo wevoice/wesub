@@ -30,8 +30,7 @@ from oauth import oauth
 
 from socialauth.lib import oauthtwitter2 as oauthtwitter
 from socialauth.views import get_url_host
-from thirdpartyaccounts.auth_backends import FacebookAccount
-
+from thirdpartyaccounts.auth_backends import FacebookAccount, FacebookAuthBackend
 
 # Twitter ---------------------------------------------------------------------
 
@@ -131,11 +130,14 @@ def _fb64_decode(s):
     return base64.b64decode(str(s), ['-', '_']).decode('utf-8')
 
 
-def _fb_callback_url(request, fb64_next):
+def _fb_callback_url(request, fb64_next, confirmed=False):
     '''Return the callback URL for the given request and eventual destination.'''
+    login_done = "thirdpartyaccounts:facebook_login_done"
+    if confirmed:
+        login_done += "_confirmed"
     return '%s%s' % (
         get_url_host(request),
-        reverse("thirdpartyaccounts:facebook_login_done", kwargs={'next': fb64_next}))
+        reverse(login_done, kwargs={'next': fb64_next}))
 
 def _fb_fallback_url(fb64_next):
     '''Return a fallback URL that we'll redirect to if the authentication fails.
@@ -154,17 +156,15 @@ def _fb_fallback_url(fb64_next):
         return u'%s?next=%s' % (reverse('auth:login'), final_target_url)
 
 
-def facebook_login(request, next=None):
+def facebook_login(request, next=None, confirmed=False):
     next = request.GET.get('next', settings.LOGIN_REDIRECT_URL)
-    callback_url = _fb_callback_url(request, _fb64_encode(next))
-
+    callback_url = _fb_callback_url(request, _fb64_encode(next), confirmed=confirmed)
     fb = _facebook()
     request.facebook = fb
     signin_url = fb.get_login_url(next=callback_url)
-
     return HttpResponseRedirect(signin_url)
 
-def facebook_login_done(request, next):
+def facebook_login_done(request, next, confirmed=False):
     # The next parameter we get here is base64'ed.
     fb64_next = next
 
@@ -176,12 +176,14 @@ def facebook_login_done(request, next):
         # Redirect them to the fallback.
         return HttpResponseRedirect(fallback_url)
 
-    callback_url = _fb_callback_url(request, fb64_next)
+    callback_url = _fb_callback_url(request, fb64_next, confirmed=confirmed)
 
     fb = _facebook()
     fb.oauth2_access_token(code, callback_url)
 
     request.facebook = fb
+    if not confirmed and not FacebookAuthBackend.pre_authenticate(fb, request):
+        return redirect('auth:confirm_create_user', 'facebook')
 
     if request.session.get('fb-no-login', False):
         # Don't create a new user
@@ -213,5 +215,4 @@ def facebook_login_done(request, next):
         # We were not able to authenticate the user.
         # Redirect them to login page, preserving their destination.
         return HttpResponseRedirect(fallback_url)
-
 

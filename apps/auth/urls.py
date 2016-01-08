@@ -20,6 +20,7 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('auth.views',
     url(r'^login/$', 'login', name='login'),
+    url(r'^confirm_create/(?P<account_type>\w+)/$', 'confirm_create_user', name='confirm_create_user'),
     url(r'^create/$', 'create_user', name='create_user'),
     url(r'^delete/$', 'delete_user', name='delete_user'),
     url(r'^login_post/$', 'login_post', name='login_post'),

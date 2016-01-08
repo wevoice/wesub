@@ -24,7 +24,6 @@ from auth.models import CustomUser as User
 from thirdpartyaccounts.models import FacebookAccount, TwitterAccount
 from socialauth.lib import oauthtwitter
 
-
 TWITTER_CONSUMER_KEY = getattr(settings, 'TWITTER_CONSUMER_KEY', '')
 TWITTER_CONSUMER_SECRET = getattr(settings, 'TWITTER_CONSUMER_SECRET', '')
 FACEBOOK_API_KEY = getattr(settings, 'FACEBOOK_API_KEY', '')
@@ -106,7 +105,8 @@ class TwitterAuthBackend(object):
 
 
 class FacebookAuthBackend(object):
-    def _get_existing_user(self, data):
+    @staticmethod
+    def _get_existing_user(data):
         try:
             tpa = FacebookAccount.objects.get(uid=data['uid'])
             return User.objects.get(pk=tpa.user_id)
@@ -142,7 +142,6 @@ class FacebookAuthBackend(object):
             img = ContentFile(requests.get(img_url).content)
             name = img_url.split('/')[-1]
             user.picture.save(name, img, False)
-
         FacebookAccount.objects.create(uid=facebook_uid, user=user,
                                        avatar=img_url)
 
@@ -151,13 +150,12 @@ class FacebookAuthBackend(object):
 
     def authenticate(self, facebook, request):
         facebook.oauth2_check_session(request)
-
         facebook.uid = facebook.users.getLoggedInUser()
         user_info = facebook.users.getInfo([facebook.uid],
                                            ['first_name', 'last_name', 'pic_square'])[0]
 
         # Check if we already have an active user for this Facebook user
-        user = self._get_existing_user(user_info)
+        user = FacebookAuthBackend._get_existing_user(user_info)
         if user:
             # If so, then we authenticate them if the user account is active, or
             # just return None if it's not.
@@ -170,6 +168,19 @@ class FacebookAuthBackend(object):
         # make them an Amara account, Facebook TPA, and link the two.
         return self._create_user(user_info)
 
+    @staticmethod
+    def pre_authenticate(facebook, request):
+        facebook.oauth2_check_session(request)
+        facebook.uid = facebook.users.getLoggedInUser()
+        user_info = facebook.users.getInfo([facebook.uid],
+                                           ['first_name', 'last_name', 'pic_square'])[0]
+
+        # Check if we already have an active user for this Facebook user
+        user = FacebookAuthBackend._get_existing_user(user_info)
+        if user:
+            return True
+        else:
+            return False
 
     def get_user(self, user_id):
         try:

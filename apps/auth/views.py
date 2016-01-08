@@ -45,11 +45,15 @@ from socialauth.models import AuthMeta, OpenidProfile
 from socialauth.views import get_url_host
 from utils.translation import get_user_languages_from_cookie
 
-
 def login(request):
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
     return render_login(request, CustomUserCreationForm(label_suffix=""),
                         AuthenticationForm(label_suffix=""), redirect_to)
+
+def confirm_create_user(request, account_type):
+    redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
+    return render_login(request, CustomUserCreationForm(label_suffix=""),
+                        AuthenticationForm(label_suffix=""), redirect_to, confirm_type=account_type)
 
 def confirm_email(request, confirmation_key):
     confirmation_key = confirmation_key.lower()
@@ -168,18 +172,22 @@ def login_trap(request):
 
 # Helpers
 
-def render_login(request, user_creation_form, login_form, redirect_to):
+def render_login(request, user_creation_form, login_form, redirect_to, confirm_type=None):
     redirect_to = redirect_to or '/'
-    ted_auth = get_authentication_provider('ted')
-    stanford_auth = get_authentication_provider('stanford')
+    context = {
+        REDIRECT_FIELD_NAME: redirect_to,
+    }
+    if confirm_type is None:
+        context['creation_form'] = user_creation_form
+        context['login_form'] = login_form
+        context['ted_auth'] = get_authentication_provider('ted')
+        context['stanford_auth'] = get_authentication_provider('stanford')
+        template = 'auth/login.html'
+    else:
+        context['confirm_type'] = confirm_type
+        template = 'auth/login_create.html'
     return render_to_response(
-        'auth/login.html', {
-            'creation_form': user_creation_form,
-            'login_form' : login_form,
-            'ted_auth': ted_auth,
-            'stanford_auth': stanford_auth,
-            REDIRECT_FIELD_NAME: redirect_to,
-            }, context_instance=RequestContext(request))
+        template, context, context_instance=RequestContext(request))
 
 def make_redirect_to(request, default=''):
     """Get the URL to redirect to after logging a user in.
