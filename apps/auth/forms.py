@@ -48,3 +48,6 @@ class ChooseUserForm(forms.Form):
             raise forms.ValidationError("User doesn't exist.")
 
         return data
+
+class DeleteUserForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput())

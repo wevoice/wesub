@@ -29,6 +29,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
+from django.forms.util import ErrorList
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext
@@ -36,7 +37,7 @@ from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from oauth import oauth
 
-from auth.forms import CustomUserCreationForm, ChooseUserForm
+from auth.forms import CustomUserCreationForm, ChooseUserForm, DeleteUserForm
 from auth.models import (
     UserLanguage, EmailConfirmation, LoginToken
 )
@@ -44,7 +45,6 @@ from auth.providers import get_authentication_provider
 from socialauth.models import AuthMeta, OpenidProfile
 from socialauth.views import get_url_host
 from utils.translation import get_user_languages_from_cookie
-
 
 def login(request):
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
@@ -91,21 +91,29 @@ def create_user(request):
 
 @login_required
 def delete_user(request):
-    if request.POST.get('delete'):
-        user = request.user
-
-        AuthMeta.objects.filter(user=user).delete()
-        OpenidProfile.objects.filter(user=user).delete()
-        # TODO: TPA?
-
-        user.team_members.all().delete()
-
-        user.is_active = False
-        user.save()
-        logout(request)
-        messages.success(request, _(u'Your account was deleted.'))
-        return HttpResponseRedirect('/')
-    return render(request, 'auth/delete_user.html')
+    if request.method == 'POST':
+        form = DeleteUserForm(request.POST)
+        if form.is_valid():
+             username = request.user.username
+             password = form.cleaned_data['password']
+             user = authenticate(username=username, password=password)
+             if user:
+                 AuthMeta.objects.filter(user=user).delete()
+                 OpenidProfile.objects.filter(user=user).delete()
+                 user.team_members.all().delete()
+                 user.is_active = False
+                 user.save()
+                 logout(request)
+                 messages.success(request, _(u'Your account was deleted.'))
+                 return HttpResponseRedirect('/')
+             else:
+                 errors = form._errors.setdefault("password", ErrorList())
+                 errors.append(_(u"Incorrect Password"))
+    else:
+        form = DeleteUserForm()
+    return render_to_response('auth/delete_user.html', {
+        'form': form
+    }, context_instance=RequestContext(request))
 
 def login_post(request):
     redirect_to = make_redirect_to(request)
