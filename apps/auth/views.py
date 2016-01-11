@@ -186,6 +186,10 @@ def render_login(request, user_creation_form, login_form, redirect_to, confirm_t
     else:
         context['confirm_type'] = confirm_type
         template = 'auth/login_create.html'
+        if confirm_type == 'ted':
+            context['ted_auth'] = get_authentication_provider('ted')
+        if confirm_type == 'stanford':
+            context['stanford_auth'] = get_authentication_provider('stanford')
     return render_to_response(
         template, context, context_instance=RequestContext(request))
 

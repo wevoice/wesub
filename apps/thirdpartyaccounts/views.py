@@ -30,17 +30,20 @@ from oauth import oauth
 
 from socialauth.lib import oauthtwitter2 as oauthtwitter
 from socialauth.views import get_url_host
-from thirdpartyaccounts.auth_backends import FacebookAccount, FacebookAuthBackend
+from thirdpartyaccounts.auth_backends import FacebookAccount, FacebookAuthBackend, TwitterAuthBackend
 
 # Twitter ---------------------------------------------------------------------
 
-def twitter_login(request, next=None):
+def twitter_login(request, next=None, confirmed=False):
     callback_url = None
     next = request.GET.get('next', next)
     if next is not None:
+        callback_view = "thirdpartyaccounts:twitter_login_done"
+        if confirmed:
+            callback_view += "_confirmed"
         callback_url = '%s%s?next=%s' % \
              (get_url_host(request),
-             reverse("thirdpartyaccounts:twitter_login_done"),
+             reverse(callback_view),
              urlquote(next))
     twitter = oauthtwitter.TwitterOAuthClient(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
     try:
@@ -52,7 +55,7 @@ def twitter_login(request, next=None):
     signin_url = twitter.authorize_token_url(request_token)
     return HttpResponseRedirect(signin_url)
 
-def twitter_login_done(request):
+def twitter_login_done(request, confirmed=False):
     request_token = request.session.get('request_token', None)
     oauth_verifier = request.GET.get("oauth_verifier", None)
 
@@ -87,6 +90,8 @@ def twitter_login_done(request):
         return redirect('auth:login')
 
     request.session['access_token'] = access_token.to_string()
+    if not confirmed and not TwitterAuthBackend.pre_authenticate(access_token):
+        return redirect('auth:confirm_create_user', 'twitter')
     user = authenticate(access_token=access_token)
 
     # if user is authenticated then login user

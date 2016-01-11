@@ -33,7 +33,8 @@ FACEBOOK_REST_SERVER = getattr(settings, 'FACEBOOK_REST_SERVER',
 
 
 class TwitterAuthBackend(object):
-    def _get_existing_user(self, data):
+    @staticmethod
+    def _get_existing_user(data):
         try:
             tpa = TwitterAccount.objects.get(username=data.screen_name)
             return User.objects.get(pk=tpa.user_id)
@@ -80,6 +81,22 @@ class TwitterAuthBackend(object):
 
         return user
 
+    @staticmethod
+    def pre_authenticate(access_token):
+        twitter = oauthtwitter.OAuthApi(TWITTER_CONSUMER_KEY,
+                                        TWITTER_CONSUMER_SECRET,
+                                        access_token)
+        try:
+            userinfo = twitter.GetUserInfo()
+        except:
+            # If we cannot get the user information, user cannot be authenticated
+            raise
+
+        user = TwitterAuthBackend._get_existing_user(userinfo)
+        if user:
+            return True
+
+        return False
 
     def authenticate(self, access_token):
         twitter = oauthtwitter.OAuthApi(TWITTER_CONSUMER_KEY,
@@ -91,7 +108,7 @@ class TwitterAuthBackend(object):
             # If we cannot get the user information, user cannot be authenticated
             raise
 
-        user = self._get_existing_user(userinfo)
+        user = TwitterAuthBackend._get_existing_user(userinfo)
         if not user:
             user = self._create_user(access_token, userinfo)
 
