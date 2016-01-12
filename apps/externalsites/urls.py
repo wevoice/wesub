@@ -24,4 +24,5 @@ urlpatterns = patterns('externalsites.views',
         name='youtube-add-account'),
     url(r'^google-callback/', 'google_callback', name='google-callback'),
     url(r'^google-login/', 'google_login', name='google-login'),
+    url(r'^google-login-confirmed/', 'google_login', {'confirmed': True}, name='google-login-confirmed'),
 )

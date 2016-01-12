@@ -29,6 +29,24 @@ OpenIDConnectInfo = namedtuple('OpenIDConnectInfo',
                                'sub email openid_key profile_data')
 
 class OpenIDConnectBackend(CustomUserBackend):
+    @staticmethod
+    def pre_authenticate(**credentials):
+        connect_info = credentials.get('openid_connect_info')
+        if connect_info is None:
+            return None
+        try:
+            u = User.objects.get(openid_connect_link__sub=connect_info.sub)
+            return True
+        except User.DoesNotExist:
+            pass
+        if connect_info.openid_key:
+            try:
+                u = OpenIDConnectBackend._get_openid20_user(connect_info)
+                return True
+            except User.DoesNotExist:
+                pass
+        return False
+
     def authenticate(self, **credentials):
         connect_info = credentials.get('openid_connect_info')
         if connect_info is None:
@@ -53,12 +71,13 @@ class OpenIDConnectBackend(CustomUserBackend):
             pass
         if connect_info.openid_key:
             try:
-                return self._get_openid20_user(connect_info)
+                return OpenIDConnectBackend._get_openid20_user(connect_info)
             except User.DoesNotExist:
                 pass
         return self._create_new_user(connect_info)
 
-    def _get_openid20_user(self, connect_info):
+    @staticmethod
+    def _get_openid20_user(connect_info):
         user = User.objects.get(
             openidprofile__openid_key=connect_info.openid_key)
         for name, value in connect_info.profile_data.items():

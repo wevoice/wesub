@@ -32,7 +32,7 @@ from django.utils.translation import ugettext as _
 from auth.models import CustomUser as User
 from externalsites import forms
 from externalsites import google
-from externalsites.auth_backends import OpenIDConnectInfo
+from externalsites.auth_backends import OpenIDConnectInfo, OpenIDConnectBackend
 from externalsites.exceptions import YouTubeAccountExistsError
 from externalsites.models import get_sync_account, YouTubeAccount, SyncHistory
 from localeurl.utils import universal_url
@@ -172,15 +172,18 @@ def google_callback_url():
         'externalsites:google-callback',
         protocol_override=settings.OAUTH_CALLBACK_PROTOCOL)
 
-def google_login(request):
+def google_login(request, confirmed=False):
+    state_type = 'login'
+    if confirmed:
+        state_type += '-confirmed'
     state = {
-        'type': 'login',
+        'type': state_type,
         'next': request.GET.get('next')
     }
     return redirect(google.request_token_url(
         google_callback_url(), 'online', state, ['profile', 'email']))
 
-def handle_login_callback(request, auth_info):
+def handle_login_callback(request, auth_info, confirmed=False):
     profile_info = google.get_openid_profile(auth_info.access_token)
     openid_connect_info = OpenIDConnectInfo(
         auth_info.sub, profile_info.email, auth_info.openid_id, {
@@ -189,6 +192,9 @@ def handle_login_callback(request, auth_info):
             'last_name': profile_info.last_name
         }
     )
+    existing_user = OpenIDConnectBackend.pre_authenticate(openid_connect_info=openid_connect_info)
+    if not confirmed and not existing_user:
+        return redirect('auth:confirm_create_user', 'google')
     user = auth.authenticate(openid_connect_info=openid_connect_info)
     if not user:
         messages.error(request, _("OpenID Connect error"))
@@ -264,8 +270,10 @@ def google_callback(request):
         return redirect('videos.views.index')
 
     callback_type = auth_info.state.get('type')
-    if callback_type == 'login':
-        return handle_login_callback(request, auth_info)
+    if callback_type == 'login-confirmed':
+        return handle_login_callback(request, auth_info, confirmed=True)
+    elif callback_type == 'login':
+        return handle_login_callback(request, auth_info, confirmed=False)
     elif callback_type == 'add-account':
         return handle_add_account_callback(request, auth_info)
     else:
