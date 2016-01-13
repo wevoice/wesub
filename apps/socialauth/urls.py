@@ -19,10 +19,14 @@ urlpatterns = patterns('socialauth.views',
     url(r'^gmail_login/complete/$', complete, name='socialauth_google_complete'),
     url(r'^openid/$', 'openid_login', name='socialauth_openid_login'),
     url(r'^openid/complete/$', complete, name='socialauth_openid_complete'),
+    url(r'^openid/complete/confirmed/$', complete, {'confirmed': True}, name='socialauth_openid_complete_confirmed'),
     url(r'^udacity/$', 'udacity_login', name='socialauth_udacity_login'),
     url(r'^udacity/complete/$', complete, name='socialauth_udacity_complete'),
+    url(r'^udacity_confirmed/$', 'udacity_login', {'confirmed': True}, name='socialauth_udacity_login_confirmed'),
+    url(r'^udacity_confirmed/complete/$', complete, {'confirmed': True}, name='socialauth_udacity_complete_confirmed'),
     url(r'^openid/signout/$', signout, name='openid_signout'),
     url(r'^openid/done/$', 'openid_done', name='openid_openid_done'),
+    url(r'^openid/done/confirmed/$', 'openid_done', {'confirmed': True}, name='openid_openid_done'),
 )
 
 #Other views.

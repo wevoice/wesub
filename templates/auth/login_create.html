@@ -28,7 +28,7 @@
 	      {% elif confirm_type == 'ted' %}
                 <li><a class="provider" id="ted" href="{{ ted_auth.url_confirmed }}">ted</a></li>
 	      {% elif confirm_type == 'udacity' %}
-              <li><a class="provider" id="udacity" href="{% url "socialauth_udacity_login" %}?next={{ next }}">udacity</a></li>
+              <li><a class="provider" id="udacity" href="{% url "socialauth_udacity_login_confirmed" %}?next={{ next }}">udacity</a></li>
 	      {% endif %}
             </ul>
             <h5>{% trans "If this is not what you meant to do, you can go back to the" %}</h5>

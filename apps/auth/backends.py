@@ -48,9 +48,18 @@ class OpenIdBackend(object):
     supports_object_permissions = False
     supports_anonymous_user = False
 
+
+    @staticmethod
+    def pre_authenticate(openid_key, request, provider):
+        try:
+            assoc = OpenIdBackend._lookup_association(openid_key, request, provider)
+            return True
+        except UserAssociation.DoesNotExist:
+            return False
+
     def authenticate(self, openid_key, request, provider):
         try:
-            assoc = self._lookup_association(openid_key, request, provider)
+            assoc = OpenIdBackend._lookup_association(openid_key, request, provider)
             if assoc.user.is_active:
                 return assoc.user
             else:
@@ -113,14 +122,16 @@ class OpenIdBackend(object):
             auth_meta.save()
             return user
 
-    def _lookup_association(self, openid_key, request, provider):
+    @staticmethod
+    def _lookup_association(openid_key, request, provider):
         if provider == 'Google':
-            return self._lookup_gmail_assocation(openid_key, request,
+            return OpenIdBackend._lookup_gmail_assocation(openid_key, request,
                                                  provider)
         else:
             return UserAssociation.objects.get(openid_key = openid_key)
 
-    def _lookup_gmail_assocation(self, openid_key, request, provider):
+    @staticmethod
+    def _lookup_gmail_assocation(openid_key, request, provider):
         email = request.openid.ax.get('http://axschema.org/contact/email')[-1]
         try:
             rv = UserAssociation.objects.filter(email=email)[0]

@@ -51,7 +51,7 @@ def is_valid_next_url(next):
     # path, not a complete URL.
     return bool(next_url_re.match(next))
 
-def begin(request, redirect_to=None, on_failure=None, user_url=None, template_name='openid_consumer/signin.html'):
+def begin(request, confirmed=False, redirect_to=None, on_failure=None, user_url=None, template_name='openid_consumer/signin.html'):
     on_failure = on_failure or default_on_failure
     trust_root = getattr(
         settings, 'OPENID_TRUST_ROOT', get_url_host(request) + '/'
@@ -136,7 +136,7 @@ def begin(request, redirect_to=None, on_failure=None, user_url=None, template_na
     redirect_url = auth_request.redirectURL(trust_root, redirect_to)
     return HttpResponseRedirect(redirect_url)
 
-def complete(request, on_success=None, on_failure=None, failure_template='openid_consumer/failure.html'):
+def complete(request, confirmed=False, on_success=None, on_failure=None, failure_template='openid_consumer/failure.html'):
     on_success = on_success or default_on_success
     on_failure = on_failure or default_on_failure
     
@@ -154,7 +154,7 @@ def complete(request, on_success=None, on_failure=None, failure_template='openid
     url = get_url_host(request) + request.path
     openid_response = consumer.complete(query_dict, url)
     if openid_response.status == SUCCESS:
-        return on_success(request, openid_response.identity_url, openid_response)
+        return on_success(request, openid_response.identity_url, openid_response, confirmed=confirmed)
     elif openid_response.status == CANCEL:
         return on_failure(request, _('The request was cancelled'), failure_template)
     elif openid_response.status == FAILURE:
@@ -164,7 +164,7 @@ def complete(request, on_success=None, on_failure=None, failure_template='openid
     else:
         assert False, "Bad openid status: %s" % openid_response.status
 
-def default_on_success(request, identity_url, openid_response):
+def default_on_success(request, identity_url, openid_response, confirmed=False):
     if 'openids' not in request.session.keys():
         request.session['openids'] = []
     
@@ -178,12 +178,15 @@ def default_on_success(request, identity_url, openid_response):
     OpenIDMiddleware().process_request(request)
     
     next = request.GET.get('next', '').strip()
-    if not next or not is_valid_next_url(next):
-        next = getattr(settings, 'OPENID_REDIRECT_NEXT', '/')
+    if confirmed:
+        redirect_next = 'OPENID_REDIRECT_CONFIRMED_NEXT'
     else:
-        next = "%s?next=%s" % (getattr(settings, 'OPENID_REDIRECT_NEXT', '/'),
+        redirect_next = 'OPENID_REDIRECT_NEXT'
+    if not next or not is_valid_next_url(next):
+        next = getattr(settings, redirect_next, '/')
+    else:
+        next = "%s?next=%s" % (getattr(settings, redirect_next, '/'),
                                next)
-
     return HttpResponseRedirect(next)
 
 def default_on_failure(request, message, template_name='openid_consumer/failure.html'):
