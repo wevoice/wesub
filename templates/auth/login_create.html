@@ -18,17 +18,17 @@
             <h5>{% trans "Click to Proceed" %}</h5>
             <ul class="providers">
 	      {% if confirm_type == 'google' %}
-              <li><a class="provider" id="google" href="{% url "externalsites:google-login-confirmed" %}?next={{ next }}">google</a></li>
+              <li><a class="provider" id="google" href="{% url "externalsites:google-login" %}?next={{ next }}">google</a></li>
 	      {% elif confirm_type == 'facebook' %}
-                <li><a class="provider" id="facebook" href="{% url "thirdpartyaccounts:facebook_login_confirmed" %}?next={{ next }}">facebook</a></li>
+                <li><a class="provider" id="facebook" href="{% url "thirdpartyaccounts:facebook_login" %}?next={{ next }}">facebook</a></li>
 	      {% elif confirm_type == 'twitter' %}
-                <li><a class="provider" id="twitter" href="{% url "thirdpartyaccounts:twitter_login_confirmed" %}?next={{ next }}"> twitter</a></li>
+                <li><a class="provider" id="twitter" href="{% url "thirdpartyaccounts:twitter_login" %}?next={{ next }}"> twitter</a></li>
 	      {% elif confirm_type == 'openid' %}
                 <li><a class="provider" id="open-id" href="{% url "socialauth_openid_login" %}?next={{ next }}">openid</a></li>
 	      {% elif confirm_type == 'ted' %}
-                <li><a class="provider" id="ted" href="{{ ted_auth.url_confirmed }}">ted</a></li>
+                <li><a class="provider" id="ted" href="{{ ted_auth.url }}">ted</a></li>
 	      {% elif confirm_type == 'udacity' %}
-              <li><a class="provider" id="udacity" href="{% url "socialauth_udacity_login_confirmed" %}?next={{ next }}">udacity</a></li>
+              <li><a class="provider" id="udacity" href="{% url "socialauth_udacity_login" %}?next={{ next }}">udacity</a></li>
 	      {% endif %}
             </ul>
             <h5>{% trans "If this is not what you meant to do, you can go back to the" %}</h5>

@@ -158,7 +158,7 @@ def gmail_login(request):
     request.session['openid_provider'] = 'Google'
     return begin(request, user_url='https://www.google.com/accounts/o8/id')
 
-def udacity_login(request, confirmed=False):
+def udacity_login(request, confirmed=True):
     request.session['openid_provider'] = 'Udacity'
     return begin(request, user_url='https://www.udacity.com/openid/server', confirmed=confirmed)
 
@@ -169,7 +169,7 @@ def yahoo_login(request):
     request.session['openid_provider'] = 'Yahoo'
     return begin(request, user_url='http://yahoo.com/')
 
-def openid_done(request, provider=None, confirmed=False):
+def openid_done(request, provider=None, confirmed=True):
     """
     When the request reaches here, the user has completed the Openid
     authentication flow. He has authorised us to login via Openid, so

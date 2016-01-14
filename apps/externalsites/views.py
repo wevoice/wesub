@@ -172,7 +172,7 @@ def google_callback_url():
         'externalsites:google-callback',
         protocol_override=settings.OAUTH_CALLBACK_PROTOCOL)
 
-def google_login(request, confirmed=False):
+def google_login(request, confirmed=True):
     state_type = 'login'
     if confirmed:
         state_type += '-confirmed'
@@ -183,7 +183,7 @@ def google_login(request, confirmed=False):
     return redirect(google.request_token_url(
         google_callback_url(), 'online', state, ['profile', 'email']))
 
-def handle_login_callback(request, auth_info, confirmed=False):
+def handle_login_callback(request, auth_info, confirmed=True):
     profile_info = google.get_openid_profile(auth_info.access_token)
     openid_connect_info = OpenIDConnectInfo(
         auth_info.sub, profile_info.email, auth_info.openid_id, {

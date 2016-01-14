@@ -279,7 +279,7 @@ SOLR_ROOT = rel('..', 'buildout', 'parts', 'solr', 'example')
 
 # socialauth-related
 OPENID_REDIRECT_NEXT = '/socialauth/openid/done/'
-OPENID_REDIRECT_CONFIRMED_NEXT = '/socialauth/openid/done/confirmed/'
+OPENID_REDIRECT_CONFIRM_NEXT = '/socialauth/openid/done/confirm/'
 
 OPENID_SREG = {"required": "nickname, email", "optional":"postcode, country", "policy_url": ""}
 OPENID_AX = [{"type_uri": "http://axschema.org/contact/email", "count": 1, "required": True, "alias": "email"},

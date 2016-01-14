@@ -51,7 +51,7 @@ def is_valid_next_url(next):
     # path, not a complete URL.
     return bool(next_url_re.match(next))
 
-def begin(request, confirmed=False, redirect_to=None, on_failure=None, user_url=None, template_name='openid_consumer/signin.html'):
+def begin(request, confirmed=True, redirect_to=None, on_failure=None, user_url=None, template_name='openid_consumer/signin.html'):
     on_failure = on_failure or default_on_failure
     trust_root = getattr(
         settings, 'OPENID_TRUST_ROOT', get_url_host(request) + '/'
@@ -136,7 +136,7 @@ def begin(request, confirmed=False, redirect_to=None, on_failure=None, user_url=
     redirect_url = auth_request.redirectURL(trust_root, redirect_to)
     return HttpResponseRedirect(redirect_url)
 
-def complete(request, confirmed=False, on_success=None, on_failure=None, failure_template='openid_consumer/failure.html'):
+def complete(request, confirmed=True, on_success=None, on_failure=None, failure_template='openid_consumer/failure.html'):
     on_success = on_success or default_on_success
     on_failure = on_failure or default_on_failure
     
@@ -164,7 +164,7 @@ def complete(request, confirmed=False, on_success=None, on_failure=None, failure
     else:
         assert False, "Bad openid status: %s" % openid_response.status
 
-def default_on_success(request, identity_url, openid_response, confirmed=False):
+def default_on_success(request, identity_url, openid_response, confirmed=True):
     if 'openids' not in request.session.keys():
         request.session['openids'] = []
     
@@ -179,9 +179,9 @@ def default_on_success(request, identity_url, openid_response, confirmed=False):
     
     next = request.GET.get('next', '').strip()
     if confirmed:
-        redirect_next = 'OPENID_REDIRECT_CONFIRMED_NEXT'
-    else:
         redirect_next = 'OPENID_REDIRECT_NEXT'
+    else:
+        redirect_next = 'OPENID_REDIRECT_CONFIRM_NEXT'
     if not next or not is_valid_next_url(next):
         next = getattr(settings, redirect_next, '/')
     else:
