@@ -403,9 +403,16 @@ class CustomUser(BaseUser):
             from thirdpartyaccounts import get_thirdpartyaccount_types
             for thirdpartyaccount_type in get_thirdpartyaccount_types():
                 m = get_model(thirdpartyaccount_type[0], thirdpartyaccount_type[1])
-                if len(m.objects.for_user(self)) > 0:
+                if (m is not None) and (len(m.objects.for_user(self)) > 0):
                     return True
         return False
+
+    def unlink_external(self):
+        from thirdpartyaccounts import get_thirdpartyaccount_types
+        for thirdpartyaccount_type in get_thirdpartyaccount_types():
+            m = get_model(thirdpartyaccount_type[0], thirdpartyaccount_type[1])
+            if m is not None:
+                m.objects.for_user(self).delete()
 
     def get_api_key(self):
         return ApiKey.objects.get_or_create(user=self)[0].key

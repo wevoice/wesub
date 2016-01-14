@@ -100,6 +100,7 @@ def delete_user(request):
 
         AuthMeta.objects.filter(user=user).delete()
         OpenidProfile.objects.filter(user=user).delete()
+        user.unlink_external()
         # TODO: TPA?
 
         user.team_members.all().delete()
