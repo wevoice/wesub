@@ -51,7 +51,6 @@ class ChooseUserForm(forms.Form):
 
         return data
 
-
 class CustomPasswordResetForm(forms.Form):
     """
     This custom version of the password reset form has two differences with
@@ -126,3 +125,6 @@ class CustomPasswordResetForm(forms.Form):
             self.send_mail(subject_template_name, email_template_name,
                            context, from_email, user.email,
                            html_email_template_name=html_email_template_name)
+
+class DeleteUserForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput())
