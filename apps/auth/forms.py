@@ -18,11 +18,12 @@
 
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from django.template import loader
+from django.utils.http import int_to_base36
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.tokens import default_token_generator
-
+from django.contrib.sites.models import get_current_site
 from models import CustomUser as User
-
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
@@ -62,69 +63,57 @@ class CustomPasswordResetForm(forms.Form):
     can describe better what will happen to the account if password is
     reset
     """
-    email = forms.EmailField(label=_("Email"), max_length=254)
+    error_messages = {
+        'unknown': _("That e-mail address doesn't have an associated "
+                     "user account. Are you sure you've registered?"),
+        'unusable': _("The user account associated with this e-mail "
+                      "address cannot reset the password."),
+    }
+    email = forms.EmailField(label=_("E-mail"), max_length=75)
 
-    def send_mail(self, subject_template_name, email_template_name,
-                  context, from_email, to_email, html_email_template_name=None):
+    def clean_email(self):
         """
-        Sends a django.core.mail.EmailMultiAlternatives to `to_email`.
+        Validates that an active user exists with the given email address.
         """
-        subject = loader.render_to_string(subject_template_name, context)
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        body = loader.render_to_string(email_template_name, context)
-
-        email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
-        if html_email_template_name is not None:
-            html_email = loader.render_to_string(html_email_template_name, context)
-            email_message.attach_alternative(html_email, 'text/html')
-
-        email_message.send()
-
-    def get_users(self, email):
-        """Given an email, return matching user(s) who should receive a reset.
-
-        This allows subclasses to more easily customize the default policies
-        that prevent inactive users and users with unusable passwords from
-        resetting their password.
-        """
-        active_users = get_user_model()._default_manager.filter(
-            email__iexact=email, is_active=True)
-        return active_users
+        email = self.cleaned_data["email"]
+        self.users_cache = User.objects.filter(email__iexact=email,
+                                               is_active=True)
+        if not len(self.users_cache):
+            raise forms.ValidationError(self.error_messages['unknown'])
+        return email
 
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
              email_template_name='registration/password_reset_email.html',
              use_https=False, token_generator=default_token_generator,
-             from_email=None, request=None, html_email_template_name=None,
-             extra_email_context=None):
+             from_email=None, request=None):
         """
         Generates a one-use only link for resetting password and sends to the
         user.
         """
-        email = self.cleaned_data["email"]
-        for user in self.get_users(email):
+        from django.core.mail import send_mail
+        for user in self.users_cache:
             if not domain_override:
                 current_site = get_current_site(request)
                 site_name = current_site.name
                 domain = current_site.domain
             else:
                 site_name = domain = domain_override
-            context = {
+            c = {
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'uid': int_to_base36(user.id),
                 'user': user,
                 'token': token_generator.make_token(user),
-                'protocol': 'https' if use_https else 'http',
+                'protocol': use_https and 'https' or 'http',
                 'amara_user': user.has_usable_password(),
             }
-            if extra_email_context is not None:
-                context.update(extra_email_context)
-            self.send_mail(subject_template_name, email_template_name,
-                           context, from_email, user.email,
-                           html_email_template_name=html_email_template_name)
+            subject = loader.render_to_string(subject_template_name, c)
+            # Email subject *must not* contain newlines
+            subject = ''.join(subject.splitlines())
+            email = loader.render_to_string(email_template_name, c)
+            send_mail(subject, email, from_email, [user.email])
 
 class DeleteUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput())
