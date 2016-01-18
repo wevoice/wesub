@@ -132,11 +132,14 @@ class FacebookAuthBackend(object):
 
     def _find_available_username(self, data):
         username = data.get('first_name', 'FACEBOOK_USER')
-
-        name_count = User.objects.filter(username__istartswith=username).count()
-        if name_count:
-            username = '%s%d' % (username, name_count + 1)
-
+        taken_names = map(lambda x: x.username.lower(), set(User.objects.filter(username__istartswith=username)))
+        if username.lower() in taken_names:
+            index = 1
+            username_to_try = '%s%d' % (username, index)
+            while username_to_try.lower() in taken_names:
+                index +=1
+                username_to_try = '%s%d' % (username, index)
+            username = username_to_try
         return username
 
     def _create_user(self, data):
