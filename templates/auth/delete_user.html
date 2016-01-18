@@ -7,9 +7,10 @@
 
 {% block main_content %}
 <div class="grid_12">
-<h2>{% trans 'Are you sure that you want to permanently delete your profile?' %}</h2>
-<h4>{% trans "This can't be undone!" %}</h4>
-<h3>{% trans 'Please enter your login password to confirm' %}</h4>
+  <h2>{% trans 'Are you sure that you want to permanently delete your profile?' %}</h2>
+  {% if form %}
+  <h4>{% trans "This can't be undone!" %}</h4>
+  <h3>{% trans 'Please enter your login password to confirm' %}</h3>
   <form action="." method="post">
     {% csrf_token %}
     {{ form.as_p }}
@@ -17,5 +18,9 @@
     <a class="red_button huge" href="{% url "profiles:profile" user.username %}">{% trans 'Cancel' %}</a>
   </form>
   <h3>If you do not know your password, you can <a href="{% url "password_reset" %}"> reset it</a>.</h3>
+  {% else %}
+  <h3>You must have a valid password in order to complete this action. In order to set a valid password, you can reset it using the</h3>
+  <h2><a href="{% url "password_reset" %}">Password Reset page</a>.</h2>
+  {% endif %}
 <div/>
 {% endblock %}

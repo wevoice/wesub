@@ -96,6 +96,9 @@ def create_user(request):
 
 @login_required
 def delete_user(request):
+    if not request.user.has_valid_password():
+        return render_to_response('auth/delete_user.html', {
+        }, context_instance=RequestContext(request))
     if request.method == 'POST':
         form = DeleteUserForm(request.POST)
         if form.is_valid():

@@ -107,7 +107,7 @@ class CustomPasswordResetForm(forms.Form):
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': use_https and 'https' or 'http',
-                'amara_user': user.has_usable_password(),
+                'amara_user': user.has_valid_password(),
             }
             subject = loader.render_to_string(subject_template_name, c)
             # Email subject *must not* contain newlines

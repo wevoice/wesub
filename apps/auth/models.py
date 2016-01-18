@@ -407,6 +407,9 @@ class CustomUser(BaseUser):
                     return True
         return False
 
+    def has_valid_password(self):
+        return len(self.password) > 0 and self.has_usable_password()
+
     def unlink_external(self):
         from thirdpartyaccounts import get_thirdpartyaccount_types
         for thirdpartyaccount_type in get_thirdpartyaccount_types():
