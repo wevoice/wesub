@@ -11,7 +11,6 @@ PyYAML==3.10
 South==0.7.4
 easy-thumbnails==1.4
 Pillow==2.6.0
-six==1.9.0
 vendor/django-registration.tar.gz
 vendor/django-piston-0.2.3.tar.gz
 vendor/django-keyedcache.tar.gz
@@ -29,7 +28,6 @@ oauth2==1.5.211
 pyOpenSSL==0.9
 djangorestframework==3.0.3
 -e git+git://github.com/teddziuba/django-sslserver.git#egg=django-sslserver
-chardet==1.0.1
 vendor/boto-2.1.0-0.tar.gz
 -e git+https://github.com/linsomniac/python-memcached.git@bacb8058152873e46e6a2367452a353e4d98a065#egg=python-memcached
 feedparser==5.2.1
