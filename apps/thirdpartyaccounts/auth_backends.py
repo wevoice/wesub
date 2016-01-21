@@ -111,8 +111,10 @@ class TwitterAuthBackend(object):
         user = TwitterAuthBackend._get_existing_user(userinfo)
         if not user:
             user = self._create_user(access_token, userinfo)
-
-        return user
+        if user.is_active:
+            return user
+        else:
+            return
 
     def get_user(self, user_id):
         try:

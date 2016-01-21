@@ -10,7 +10,7 @@ class CustomUserBackend(ModelBackend):
 
     def authenticate(self, username=None, password=None):
         try:
-            user = User.objects.get(username=username)
+            user = User.objects.get(username=username, is_active=True)
             if user.check_password(password):
                 return user
         except User.DoesNotExist:
@@ -26,7 +26,11 @@ class OpenIdBackend:
     def authenticate(self, openid_key, request, provider):
         try:
             assoc = UserAssociation.objects.get(openid_key = openid_key)
-            return User.objects.get(pk=assoc.user.pk)
+            user = User.objects.get(pk=assoc.user.pk)
+            if user.is_active:
+                return user
+            else:
+                return
         except (UserAssociation.DoesNotExist, User.DoesNotExist):
             #fetch if openid provider provides any simple registration fields
             nickname = None

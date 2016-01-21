@@ -66,12 +66,20 @@ class OpenIDConnectBackend(CustomUserBackend):
         #     OpenIDConnectLink instance, and update their user data
         #
         try:
-            return User.objects.get(openid_connect_link__sub=connect_info.sub)
+            user = User.objects.get(openid_connect_link__sub=connect_info.sub)
+            if user.is_active:
+                return user
+            else:
+                return
         except User.DoesNotExist:
             pass
         if connect_info.openid_key:
             try:
-                return OpenIDConnectBackend._get_openid20_user(connect_info)
+                user = OpenIDConnectBackend._get_openid20_user(connect_info)
+                if user.is_active:
+                    return user
+                else:
+                    return
             except User.DoesNotExist:
                 pass
         return self._create_new_user(connect_info)
