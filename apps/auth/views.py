@@ -33,6 +33,7 @@ from django.forms.util import ErrorList
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext
+from django.template.response import TemplateResponse
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from oauth import oauth
@@ -165,6 +166,22 @@ def token_login(request, token):
     except LoginToken.DoesNotExist:
         pass
     return HttpResponseForbidden("Invalid user token")
+
+def password_reset_complete(request,
+                            template_name='registration/password_reset_complete.html',
+                            current_app=None, extra_context=None):
+    """
+    The difference with the complete view from the contrib package
+    is that is logs out the user.
+    """
+    context = {
+        'login_url': settings.LOGIN_URL
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    logout(request)
+    return TemplateResponse(request, template_name, context,
+                            current_app=current_app)
 
 
 @user_passes_test(lambda u: u.is_superuser)
