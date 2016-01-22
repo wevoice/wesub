@@ -43,7 +43,6 @@ from auth.models import (
     UserLanguage, EmailConfirmation, LoginToken
 )
 from auth.providers import get_authentication_provider
-from socialauth.models import AuthMeta, OpenidProfile
 from socialauth.views import get_url_host
 from utils.translation import get_user_languages_from_cookie
 
@@ -107,8 +106,6 @@ def delete_user(request):
              password = form.cleaned_data['password']
              user = authenticate(username=username, password=password)
              if user:
-                 AuthMeta.objects.filter(user=user).delete()
-                 OpenidProfile.objects.filter(user=user).delete()
                  user.unlink_external()
                  user.team_members.all().delete()
                  user.is_active = False
