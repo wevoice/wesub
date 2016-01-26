@@ -28,6 +28,7 @@ from django.contrib.auth import (
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import password_reset as contrib_password_reset
 from django.core.urlresolvers import reverse
 from django.forms.util import ErrorList
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
@@ -36,9 +37,10 @@ from django.template import RequestContext
 from django.template.response import TemplateResponse
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.csrf import csrf_protect
 from oauth import oauth
 
-from auth.forms import CustomUserCreationForm, ChooseUserForm, DeleteUserForm
+from auth.forms import CustomUserCreationForm, ChooseUserForm, DeleteUserForm, CustomPasswordResetForm
 from auth.models import (
     UserLanguage, EmailConfirmation, LoginToken
 )
@@ -231,3 +233,10 @@ def make_redirect_to(request, default=''):
         return '/'
     else:
         return redirect_to
+
+@csrf_protect
+def password_reset(request):
+    extra_context = {}
+    if request.user.is_authenticated():
+        extra_context = {'email_address': request.user.email}
+    return contrib_password_reset(request, password_reset_form=CustomPasswordResetForm, extra_context=extra_context)

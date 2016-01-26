@@ -76,6 +76,7 @@ class CustomPasswordResetForm(forms.Form):
         Validates that an active user exists with the given email address.
         """
         email = self.cleaned_data["email"]
+        logger.error(email)
         self.users_cache = User.objects.filter(email__iexact=email,
                                                is_active=True)
         if not len(self.users_cache):
