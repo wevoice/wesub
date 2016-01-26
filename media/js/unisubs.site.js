@@ -1041,7 +1041,9 @@ var Site = function(Site) {
             });
             $.urlParam = function(name){
                 var results = new RegExp('[\\?&amp;]' + name + '=([^&amp;#]*)').exec(window.location.href);
-                return results[1] || 0;
+                if (results)
+                    return results[1];
+                return 0;
             }
             if($.urlParam('prompt') == 'true') {
                 $('a[href="#youtube-modal"]').click();
