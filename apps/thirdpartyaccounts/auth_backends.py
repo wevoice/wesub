@@ -144,6 +144,10 @@ class FacebookAuthBackend(object):
             username = username_to_try
         return username
 
+    @staticmethod
+    def _generate_email(first_name):
+        return '%s@facebookuser.%s.com' % (first_name, settings.SITE_NAME)
+
     def _create_user(self, data):
         username = self._find_available_username(data)
 
@@ -152,7 +156,7 @@ class FacebookAuthBackend(object):
         facebook_uid = data.get('uid')
         img_url = data.get('pic_square')
 
-        email = '%s@facebookuser.%s.com' % (first_name, settings.SITE_NAME)
+        email = FacebookAuthBackend._generate_email(first_name)
 
         user = User(username=username, email=email, first_name=first_name,
                     last_name=last_name)
@@ -175,7 +179,6 @@ class FacebookAuthBackend(object):
         facebook.uid = facebook.users.getLoggedInUser()
         user_info = facebook.users.getInfo([facebook.uid],
                                            ['first_name', 'last_name', 'pic_square'])[0]
-
         # Check if we already have an active user for this Facebook user
         user = FacebookAuthBackend._get_existing_user(user_info)
         if user:
@@ -196,7 +199,6 @@ class FacebookAuthBackend(object):
         facebook.uid = facebook.users.getLoggedInUser()
         user_info = facebook.users.getInfo([facebook.uid],
                                            ['first_name', 'last_name', 'pic_square'])[0]
-
         # Check if we already have an active user for this Facebook user
         user = FacebookAuthBackend._get_existing_user(user_info)
         if user:
