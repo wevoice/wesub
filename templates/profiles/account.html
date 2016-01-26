@@ -14,16 +14,35 @@
     <div class="account">
         <form class="edit_profile" action="." method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.non_field_errors }}
+            {{ editaccountform.non_field_errors }}
             <h3>{% trans "User Details" %}</h3>
             <fieldset>
-                <div class="grid_4 alpha">
-                    {% include "_form_field.html" with field=form.username %}
-                </div>
+              <div class="grid_4 alpha">
+                {% include "_form_field.html" with field=editaccountform.username %}
+                {% include "_form_field.html" with field=editaccountform.email %}
+              </div>
+              <div class="grid_4 omega">
+                {% include "_form_field.html" with field=editaccountform.new_password %}
+                {% include "_form_field.html" with field=editaccountform.new_password_verify %}
+              </div>
+            </fieldset>
+            <fieldset>
+              <div class="grid_4 alpha">
+		<button name="editaccount" class="button save" type="submit" value="Save">
+		  {% trans 'Save Changes' %}
+		</button>
+		<p>
+		  You need to enter your current password to be able to change those.
+		</p>
+              </div>
                 <div class="grid_4 omega">
-                    {% include "_form_field.html" with field=form.email %}
+                  {% include "_form_field.html" with field=editaccountform.current_password %}
                 </div>
             </fieldset>
+	</form>
+        <form class="edit_profile" action="." method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ editnotificationsform.non_field_errors }}
             <div class="grid_8 alpha third-party">
                 <fieldset>
                     <h3>{% trans "YouTube Sync" %}</h3>
@@ -79,34 +98,29 @@
                         {% endif %}
                     </ul>
                 </fieldset>
-
             </div>
             <div class="grid_4 alpha">
                 <fieldset>
-                    <h3>{% trans "Change Password" %}</h3>
-                    <!-- fix this, the setting cannot be false for notify_by_message and notify_by_email  -->
-                    {% include "_form_field.html" with field=form.current_password %}
-                    {% include "_form_field.html" with field=form.new_password %}
-                    {% include "_form_field.html" with field=form.new_password_verify %}
+                    <h3>{% trans "Notifications" %}</h3>
+                    {% include "_form_field.html" with field=editnotificationsform.notify_by_message widget_type="checkbox" %}
+                    <p class="notation">{% trans "Send notifications to my amara.org inbox" %}</p>
+                    {% include "_form_field.html" with field=editnotificationsform.notify_by_email widget_type="checkbox" %}
+                    <p class="notation">{% trans "Send an email notification for each message received" %}</p>
+		    <button name="editnotifications" class="button save" type="submit" value="Save">
+		      {% trans 'Save Changes' %}
+		    </button>
                 </fieldset>
             </div>
             <div class="grid_4 omega">
-                <fieldset>
-                    <h3>{% trans "Notifications" %}</h3>
-                    {% include "_form_field.html" with field=form.notify_by_message widget_type="checkbox" %}
-                    <p class="notation">{% trans "Send notifications to my amara.org inbox" %}</p>
-                    {% include "_form_field.html" with field=form.notify_by_email widget_type="checkbox" %}
-                    <p class="notation">{% trans "Send an email notification for each message received" %}</p>
-                </fieldset>
                 <fieldset id="api">
-                    <legend>{% trans "API Access" %}</legend>
-                    <div{% if not form.instance.api_key.key %} style="display:none"{% endif %}>
+                    <h3>{% trans "API Access" %}</h3>
+                    <div{% if not editnotificationsform.instance.api_key.key %} style="display:none"{% endif %}>
                         <label>{% trans "Your API key" %}</label>
-                        <textarea class="api-key-holder" readonly="readonly">{{form.instance.api_key.key}}</textarea>
+                        <textarea class="api-key-holder" readonly="readonly">{{editnotificationsform.instance.api_key.key}}</textarea>
                         <p class="api-key-status"></p>
                     </div>
                     <a href="{% url "profiles:generate-api-key" %}" class="get-new-api-bt button reduced">
-                        {% if form.instance.api_key.key %}
+                        {% if editnotificationsform.instance.api_key.key %}
                             {% trans "Reset your API key" %}
                         {% else %}
                             {% trans "Get an API key" %}
@@ -115,9 +129,6 @@
                 </fieldset>
             </div>
             <div class="submit">
-                <button class="button save" type="submit" value="Save">
-                    {% trans 'Save Changes' %}
-                </button>
                 <a class="button delete" onclick="return confirm('Are you sure you want to permanently delete your account? This action is irreversible.');" href="{% url "auth:delete_user" %}">{% trans 'Delete Your Account' %}</a>
             </div>
         </form>
