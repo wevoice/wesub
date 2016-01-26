@@ -52,6 +52,9 @@ class ChooseUserForm(forms.Form):
 
         return data
 
+class EmailForm(forms.Form):
+    email = forms.EmailField(label=_("E-mail"), max_length=75)
+
 class CustomPasswordResetForm(forms.Form):
     """
     This custom version of the password reset form has two differences with
@@ -76,7 +79,6 @@ class CustomPasswordResetForm(forms.Form):
         Validates that an active user exists with the given email address.
         """
         email = self.cleaned_data["email"]
-        logger.error(email)
         self.users_cache = User.objects.filter(email__iexact=email,
                                                is_active=True)
         if not len(self.users_cache):
