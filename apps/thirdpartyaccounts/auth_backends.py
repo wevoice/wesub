@@ -34,6 +34,10 @@ FACEBOOK_REST_SERVER = getattr(settings, 'FACEBOOK_REST_SERVER',
 
 class TwitterAuthBackend(object):
     @staticmethod
+    def _generate_email(twitter_username):
+        return '%s@twitteruser.%s.com' % (twitter_username, settings.SITE_NAME)
+
+    @staticmethod
     def _get_existing_user(data):
         try:
             tpa = TwitterAccount.objects.get(username=data.screen_name)
@@ -67,7 +71,7 @@ class TwitterAuthBackend(object):
         first_name, last_name = self._get_first_last_name(data)
         avatar = data.profile_image_url
 
-        email = '%s@twitteruser.%s.com' % (twitter_username, settings.SITE_NAME)
+        email = TwitterAuthBackend._generate_email(twitter_username)
 
         user = User(username=username, email=email, first_name=first_name,
                     last_name=last_name)
@@ -94,9 +98,9 @@ class TwitterAuthBackend(object):
 
         user = TwitterAuthBackend._get_existing_user(userinfo)
         if user:
-            return True
+            return (True, '')
 
-        return False
+        return (False, TwitterAuthBackend._generate_email(userinfo.screen_name))
 
     def authenticate(self, access_token):
         twitter = oauthtwitter.OAuthApi(TWITTER_CONSUMER_KEY,
@@ -202,9 +206,10 @@ class FacebookAuthBackend(object):
         # Check if we already have an active user for this Facebook user
         user = FacebookAuthBackend._get_existing_user(user_info)
         if user:
-            return True
+            return (True, None)
         else:
-            return False
+            email = FacebookAuthBackend._generate_email(user_info.get('first_name'))
+            return (False, email)
 
     def get_user(self, user_id):
         try:

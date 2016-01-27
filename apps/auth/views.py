@@ -40,12 +40,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from oauth import oauth
 
-from auth.forms import CustomUserCreationForm, ChooseUserForm, DeleteUserForm, CustomPasswordResetForm
+from auth.forms import CustomUserCreationForm, ChooseUserForm, DeleteUserForm, CustomPasswordResetForm, EmailForm
 from auth.models import (
     UserLanguage, EmailConfirmation, LoginToken
 )
 from auth.providers import get_authentication_provider
 from socialauth.views import get_url_host
+from thirdpartyaccounts.views import facebook_login, twitter_login
+from externalsites.views import google_login
 from utils.translation import get_user_languages_from_cookie
 
 def login(request):
@@ -53,10 +55,30 @@ def login(request):
     return render_login(request, CustomUserCreationForm(label_suffix=""),
                         AuthenticationForm(label_suffix=""), redirect_to)
 
-def confirm_create_user(request, account_type):
+def confirm_create_user(request, account_type, email):
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            if account_type == 'facebook':
+                return facebook_login(request, next=redirect_to, confirmed=True, email=form.cleaned_data['email'])
+            if account_type == 'google':
+                return google_login(request, next=redirect_to, confirmed=True, email=form.cleaned_data['email'])
+            if account_type == 'twitter':
+                return twitter_login(request, next=redirect_to, confirmed=True, email=form.cleaned_data['email'])
+            if account_type == 'openid':
+                pass
+            if account_type == 'ted':
+                pass
+            if account_type == 'udacity':
+                pass
+    else:
+        initial = {}
+        if email:
+            initial['email'] = email
+        form = EmailForm(initial=initial)
     return render_login(request, CustomUserCreationForm(label_suffix=""),
-                        AuthenticationForm(label_suffix=""), redirect_to, confirm_type=account_type)
+                        AuthenticationForm(label_suffix=""), redirect_to, email_form=form, confirm_type=account_type)
 
 def confirm_email(request, confirmation_key):
     confirmation_key = confirmation_key.lower()
@@ -201,7 +223,7 @@ def login_trap(request):
 
 # Helpers
 
-def render_login(request, user_creation_form, login_form, redirect_to, confirm_type=None):
+def render_login(request, user_creation_form, login_form, redirect_to, email_form=None, confirm_type=None):
     redirect_to = redirect_to or '/'
     context = {
         REDIRECT_FIELD_NAME: redirect_to,
@@ -213,7 +235,8 @@ def render_login(request, user_creation_form, login_form, redirect_to, confirm_t
         context['stanford_auth'] = get_authentication_provider('stanford')
         template = 'auth/login.html'
     else:
-        context['confirm_type'] = confirm_type
+        if email_form:
+            context['email_form'] = email_form
         template = 'auth/login_create.html'
         if confirm_type == 'ted':
             context['ted_auth'] = get_authentication_provider('ted')

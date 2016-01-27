@@ -644,3 +644,11 @@ h5.community-header {
 		width: 65%;
 	}
 }
+
+form.email-form {
+    text-align: center;
+}
+
+form.email-form input {
+    width: 80%;
+}

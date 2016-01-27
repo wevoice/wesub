@@ -36,16 +36,16 @@ class OpenIDConnectBackend(CustomUserBackend):
             return None
         try:
             u = User.objects.get(openid_connect_link__sub=connect_info.sub)
-            return True
+            return (True, '')
         except User.DoesNotExist:
             pass
         if connect_info.openid_key:
             try:
                 u = OpenIDConnectBackend._get_openid20_user(connect_info)
-                return True
+                return (True, '')
             except User.DoesNotExist:
                 pass
-        return False
+        return (False, connect_info.email)
 
     def authenticate(self, **credentials):
         connect_info = credentials.get('openid_connect_info')

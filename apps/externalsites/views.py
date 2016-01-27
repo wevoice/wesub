@@ -172,14 +172,16 @@ def google_callback_url():
         'externalsites:google-callback',
         protocol_override=settings.OAUTH_CALLBACK_PROTOCOL)
 
-def google_login(request, confirmed=True):
+def google_login(request, next=None, confirmed=True, email=None):
     state_type = 'login'
     if confirmed:
         state_type += '-confirmed'
     state = {
         'type': state_type,
-        'next': request.GET.get('next')
+        'next': next or request.GET.get('next'),
     }
+    if email is not None:
+        state['email'] = email
     return redirect(google.request_token_url(
         google_callback_url(), 'online', state, ['profile', 'email']))
 
@@ -192,13 +194,17 @@ def handle_login_callback(request, auth_info, confirmed=True):
             'last_name': profile_info.last_name
         }
     )
-    existing_user = OpenIDConnectBackend.pre_authenticate(openid_connect_info=openid_connect_info)
+    (existing_user, email) = OpenIDConnectBackend.pre_authenticate(openid_connect_info=openid_connect_info)
     if not confirmed and not existing_user:
-        return redirect('auth:confirm_create_user', 'google')
+        return redirect('auth:confirm_create_user', 'google', email)
     user = auth.authenticate(openid_connect_info=openid_connect_info)
     if not user:
         messages.error(request, _("OpenID Connect error"))
         return redirect('videos.videos.index')
+    email = auth_info.state.get('email')
+    if email != user.email:
+        user.email = email
+        user.save()
     auth.login(request, user)
     next_url = auth_info.state.get('next')
     if next_url and is_safe_url(next_url):

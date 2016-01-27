@@ -185,7 +185,7 @@ def openid_done(request, provider=None, confirmed=True):
         openid_key = str(request.openid)
         #authenticate and login
         if not confirmed and not OpenIdBackend.pre_authenticate(openid_key=openid_key, request=request, provider=provider) and provider == 'Udacity':
-            return redirect('auth:confirm_create_user', 'udacity')
+            return redirect('auth:confirm_create_user', 'udacity', '')
         user = authenticate(openid_key=openid_key, request=request, provider=provider)
         if user:
             if not user.userlanguage_set.exists():

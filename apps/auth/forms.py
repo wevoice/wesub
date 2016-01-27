@@ -53,7 +53,7 @@ class ChooseUserForm(forms.Form):
         return data
 
 class EmailForm(forms.Form):
-    email = forms.EmailField(label=_("E-mail"), max_length=75)
+    email = forms.EmailField(label=_("E-mail"), max_length=100)
 
 class CustomPasswordResetForm(forms.Form):
     """
