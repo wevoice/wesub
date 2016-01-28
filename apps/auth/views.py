@@ -69,7 +69,8 @@ def confirm_create_user(request, account_type, email):
             if account_type == 'openid':
                 pass
             if account_type == 'ted':
-                pass
+                provider = get_authentication_provider('ted')
+                return provider.view(request, confirmed=True, email=form.cleaned_data['email'])
             if account_type == 'udacity':
                 pass
     else:
