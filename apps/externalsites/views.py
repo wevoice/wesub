@@ -202,7 +202,7 @@ def handle_login_callback(request, auth_info, confirmed=True):
         messages.error(request, _("OpenID Connect error"))
         return redirect('videos.videos.index')
     email = auth_info.state.get('email')
-    if email != user.email:
+    if email and email != user.email:
         user.email = email
         user.save()
     auth.login(request, user)
