@@ -197,14 +197,14 @@ def handle_login_callback(request, auth_info, confirmed=True):
     (existing_user, email) = OpenIDConnectBackend.pre_authenticate(openid_connect_info=openid_connect_info)
     if not confirmed and not existing_user:
         return redirect('auth:confirm_create_user', 'google', email)
-    user = auth.authenticate(openid_connect_info=openid_connect_info)
+    if 'email' in auth_info.state:
+        email = auth_info.state['email']
+    else:
+        email = None
+    user = auth.authenticate(openid_connect_info=openid_connect_info, email=email)
     if not user:
         messages.error(request, _("OpenID Connect error"))
         return redirect('videos.videos.index')
-    email = auth_info.state.get('email')
-    if email and email != user.email:
-        user.email = email
-        user.save()
     auth.login(request, user)
     next_url = auth_info.state.get('next')
     if next_url and is_safe_url(next_url):

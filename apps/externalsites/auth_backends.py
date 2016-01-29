@@ -49,6 +49,7 @@ class OpenIDConnectBackend(CustomUserBackend):
 
     def authenticate(self, **credentials):
         connect_info = credentials.get('openid_connect_info')
+        email = credentials.get('email')
         if connect_info is None:
             return None
 
@@ -82,7 +83,7 @@ class OpenIDConnectBackend(CustomUserBackend):
                     return
             except User.DoesNotExist:
                 pass
-        return self._create_new_user(connect_info)
+        return self._create_new_user(connect_info, email=email)
 
     @staticmethod
     def _get_openid20_user(connect_info):
@@ -95,12 +96,14 @@ class OpenIDConnectBackend(CustomUserBackend):
         OpenIDConnectLink.objects.create(user=user, sub=connect_info.sub)
         return user
 
-    def _create_new_user(self, connect_info):
+    def _create_new_user(self, connect_info, email=None):
         usernames = self._generate_usernames(connect_info.email)
+        if not email:
+            email = connect_info.email
         while True:
             try:
                 user = User.objects.create(username=usernames.next(),
-                                           email=connect_info.email,
+                                           email=email,
                                            **connect_info.profile_data)
                 break
             except IntegrityError:
