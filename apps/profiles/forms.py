@@ -170,7 +170,7 @@ class EditAccountForm(forms.ModelForm):
         password = self.cleaned_data.get('current_password')
         if not password:
             raise forms.ValidationError(_(u'Must specify current password'))
-        if not self.instance.check_password(password):
+        if not (self.instance.has_valid_password() and self.instance.check_password(password)):
             raise forms.ValidationError(_(u'Invalid password'))
         return password
 
