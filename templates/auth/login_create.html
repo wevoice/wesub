@@ -14,7 +14,7 @@
 
         <div class="sso">
             <h2>{% trans "Sign Up" %}</h2>
-            <h5>{% trans "You are about to create a new account using this login provider, and using this e-mail address. Correct it if necessary." %}</h5>
+            <h5>{% trans "You are about to create a new Amara account using an external provider (Google, FB, Twitter, OAuth, etc). This new account will be associated with the following e-mail address:" %}</h5>
 	    <form method='post' action="." class="email-form">
               {% csrf_token %}
 	      <ul>
@@ -37,8 +37,9 @@
 	      {% endif %}
 	      -->
 	    </form>
-	    <h5>{% trans "If you do not set a valid e-mail address, some Amara features will remain inaccessible and you will not be able to change the e-mail address in the future without help from tech support." %}</h5>
-            <h5>{% trans "If this is not what you meant to do, you can go back to the" %}</h5>
+	    <h5>{% trans "IMPORTANT: If you do not set a valid e-mail address now, some Amara features will remain inaccessible and you will not be able to change the address in the future. Please check the e-mail carefully and correct if necessary." %}</h5>
+            <h5>{% trans "Amara respects your privacy. This address will be used exclusively for updating your Amara account settings and (if you choose) for messaging you about changes to videos and teams monitored by you. It will not be publicized or disclosed to any third parties." %}</h5>
+            <h5>{% trans "If you did not intend to create a new Amara account with an external provider, you can go back to the" %}</h5>
             <h5><a href="{% url "auth:login" %}">Sign Up page</a></h5>
         </div>
       </div>
