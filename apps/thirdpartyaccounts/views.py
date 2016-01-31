@@ -125,13 +125,10 @@ def twitter_login_done(request, confirmed=True):
         (existing, email) = TwitterAuthBackend.pre_authenticate(access_token)
         if not existing:
             return redirect('auth:confirm_create_user', 'twitter', email)
-    user = authenticate(access_token=access_token)
+    email = request.GET.get('email', None)
+    user = authenticate(access_token=access_token, email=email)
     # if user is authenticated then login user
     if user:
-        email = request.GET.get('email', None)
-        if email and email != user.email:
-            user.email = email
-            user.save()
         auth_login(request, user)
     else:
         # We were not able to authenticate user

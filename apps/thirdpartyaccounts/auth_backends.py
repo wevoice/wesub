@@ -64,14 +64,14 @@ class TwitterAuthBackend(object):
 
         return first_name, last_name
 
-    def _create_user(self, access_token, data):
+    def _create_user(self, access_token, data, email):
         username = self._find_available_username(data)
 
         twitter_username = data.screen_name
         first_name, last_name = self._get_first_last_name(data)
         avatar = data.profile_image_url
-
-        email = TwitterAuthBackend._generate_email(twitter_username)
+        if email is None:
+            email = TwitterAuthBackend._generate_email(twitter_username)
 
         user = User(username=username, email=email, first_name=first_name,
                     last_name=last_name)
@@ -102,7 +102,7 @@ class TwitterAuthBackend(object):
 
         return (False, TwitterAuthBackend._generate_email(userinfo.screen_name))
 
-    def authenticate(self, access_token):
+    def authenticate(self, access_token, email=None):
         twitter = oauthtwitter.OAuthApi(TWITTER_CONSUMER_KEY,
                                         TWITTER_CONSUMER_SECRET,
                                         access_token)
@@ -114,7 +114,7 @@ class TwitterAuthBackend(object):
 
         user = TwitterAuthBackend._get_existing_user(userinfo)
         if not user:
-            user = self._create_user(access_token, userinfo)
+            user = self._create_user(access_token, userinfo, email)
         if user.is_active:
             return user
         else:
