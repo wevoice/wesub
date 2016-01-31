@@ -152,15 +152,15 @@ class FacebookAuthBackend(object):
     def _generate_email(first_name):
         return '%s@facebookuser.%s.com' % (first_name, settings.SITE_NAME)
 
-    def _create_user(self, data):
+    def _create_user(self, data, email):
         username = self._find_available_username(data)
 
         first_name = data.get('first_name')
         last_name = data.get('last_name')
         facebook_uid = data.get('uid')
         img_url = data.get('pic_square')
-
-        email = FacebookAuthBackend._generate_email(first_name)
+        if email is None:
+            email = FacebookAuthBackend._generate_email(first_name)
 
         user = User(username=username, email=email, first_name=first_name,
                     last_name=last_name)
@@ -178,7 +178,7 @@ class FacebookAuthBackend(object):
         return user
 
 
-    def authenticate(self, facebook, request):
+    def authenticate(self, facebook, request, email=None):
         facebook.oauth2_check_session(request)
         facebook.uid = facebook.users.getLoggedInUser()
         user_info = facebook.users.getInfo([facebook.uid],
@@ -195,7 +195,7 @@ class FacebookAuthBackend(object):
 
         # Otherwise this is a Facebook user we've never seen before, so we'll
         # make them an Amara account, Facebook TPA, and link the two.
-        return self._create_user(user_info)
+        return self._create_user(user_info, email)
 
     @staticmethod
     def pre_authenticate(facebook, request):

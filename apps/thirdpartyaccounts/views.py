@@ -244,20 +244,15 @@ def facebook_login_done(request, next, confirmed=True, email=None):
         return redirect('profiles:account')
 
     if not confirmed:
-        (exist, email) = FacebookAuthBackend.pre_authenticate(fb, request)
+        (exist, suggested_email) = FacebookAuthBackend.pre_authenticate(fb, request)
         if not exist:
-            return redirect('auth:confirm_create_user', 'facebook', email)
-
-    user = authenticate(facebook=fb, request=request)
-        
+            return redirect('auth:confirm_create_user', 'facebook', suggested_email)
+    if email:
+        email = _fb64_decode(email)
+    user = authenticate(facebook=fb, request=request, email=email)
     if user:
         # If authentication was successful, log the user in and then redirect them
         # to their (decoded) destination.
-        if email:
-            email = _fb64_decode(email)
-            if email != user.email:
-                user.email = email
-                user.save()
         auth_login(request, user)
         return HttpResponseRedirect(_fb64_decode(fb64_next))
     else:
