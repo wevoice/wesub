@@ -184,9 +184,12 @@ def openid_done(request, provider=None, confirmed=True):
         #check for already existing associations
         openid_key = str(request.openid)
         #authenticate and login
-        if not confirmed and not OpenIdBackend.pre_authenticate(openid_key=openid_key, request=request, provider=provider) and provider == 'Udacity':
-            return redirect('auth:confirm_create_user', 'udacity', '')
-        user = authenticate(openid_key=openid_key, request=request, provider=provider)
+        if not confirmed and provider == 'Udacity':
+            (existing, suggested_email) = OpenIdBackend.pre_authenticate(openid_key=openid_key, request=request, provider=provider)
+            if not existing:
+                return redirect('auth:confirm_create_user', 'udacity', suggested_email)
+        email = request.GET.get('email', None)
+        user = authenticate(openid_key=openid_key, request=request, provider=provider, email=email)
         if user:
             if not user.userlanguage_set.exists():
                 langs = get_user_languages_from_cookie(request)

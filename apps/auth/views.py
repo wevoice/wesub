@@ -39,7 +39,7 @@ from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from oauth import oauth
-
+from openid_consumer.views import begin as begin_openid
 from auth.forms import CustomUserCreationForm, ChooseUserForm, DeleteUserForm, CustomPasswordResetForm, EmailForm
 from auth.models import (
     UserLanguage, EmailConfirmation, LoginToken
@@ -60,19 +60,21 @@ def confirm_create_user(request, account_type, email):
     if request.method == 'POST':
         form = EmailForm(request.POST)
         if form.is_valid():
+            email = form.cleaned_data['email']
             if account_type == 'facebook':
-                return facebook_login(request, next=redirect_to, confirmed=True, email=form.cleaned_data['email'])
+                return facebook_login(request, next=redirect_to, confirmed=True, email=email)
             if account_type == 'google':
-                return google_login(request, next=redirect_to, confirmed=True, email=form.cleaned_data['email'])
+                return google_login(request, next=redirect_to, confirmed=True, email=email)
             if account_type == 'twitter':
-                return twitter_login(request, next=redirect_to, confirmed=True, email=form.cleaned_data['email'])
+                return twitter_login(request, next=redirect_to, confirmed=True, email=email)
             if account_type == 'openid':
                 pass
             if account_type == 'ted':
                 provider = get_authentication_provider('ted')
-                return provider.view(request, confirmed=True, email=form.cleaned_data['email'])
+                return provider.view(request, confirmed=True, email=email)
             if account_type == 'udacity':
-                pass
+                request.session['openid_provider'] = 'Udacity'
+                return begin_openid(request, user_url='https://www.udacity.com/openid/server', redirect_to=reverse('socialauth_udacity_complete', args=(email,)), confirmed=True)
     else:
         initial = {}
         if email:

@@ -23,7 +23,7 @@ class CustomUserBackend(ModelBackend):
             return None
 
 class OpenIdBackend:
-    def authenticate(self, openid_key, request, provider):
+    def authenticate(self, openid_key, request, provider, email=None):
         try:
             assoc = UserAssociation.objects.get(openid_key = openid_key)
             user = User.objects.get(pk=assoc.user.pk)
@@ -34,26 +34,32 @@ class OpenIdBackend:
         except (UserAssociation.DoesNotExist, User.DoesNotExist):
             #fetch if openid provider provides any simple registration fields
             nickname = None
-            email = None
             if request.openid and request.openid.sreg:
-                email = request.openid.sreg.get('email')
+                if email is None:
+                    email = request.openid.sreg.get('email')
                 nickname = request.openid.sreg.get('nickname')
             elif request.openid and request.openid.ax:
-                email = request.openid.ax.get('email')
+                if email is None:
+                    email = request.openid.ax.get('email')
                 nickname = request.openid.ax.get('nickname')
             if nickname is None :
                 nickname =  ''.join([random.choice('abcdefghijklmnopqrstuvwxyz') for i in xrange(10)])
-            if email is None :
+            if email is None:
                 valid_username = False
                 email =  '%s@%s.%s.com'%(nickname, provider, settings.SITE_NAME)
             else:
                 valid_username = True
-            name_count = User.objects.filter(username__startswith = nickname).count()
-            if name_count:
-                username = '%s%s'%(nickname, name_count + 1)
-                user = User.objects.create_user(username,email)
+            existing_users = User.objects.filter(username=nickname).count()
+            if existing_users > 0:
+                index = 0
+                username = '%s%s'%(nickname, index)
+                while existing_users > 0:
+                    username = '%s%s'%(nickname, index)
+                    existing_users = User.objects.filter(username=username).count()
+                    index += 1
+                user = User.objects.create_user(username, email)
             else:
-                user = User.objects.create_user(nickname,email)
+                user = User.objects.create_user(nickname, email)
             user.save()
 
             #create openid association

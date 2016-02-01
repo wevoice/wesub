@@ -35,7 +35,8 @@ admin.autodiscover()
 # these really should be unregistred but while in development the dev server
 # might have not registred yet, so we silence this exception
 try:
-    admin.site.unregister([AuthMeta, OpenidProfile])
+    #admin.site.unregister([AuthMeta, OpenidProfile])
+    admin.site.unregister([AuthMeta,])
 except admin.sites.NotRegistered:
     pass
 
