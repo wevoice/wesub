@@ -35,8 +35,6 @@ from django.db.models.signals import post_save, post_delete, pre_delete
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _, ugettext
-from haystack import site
-from haystack.query import SQ
 
 import teams.moderation_const as MODERATION
 from caching import ModelCacheManager
@@ -60,7 +58,6 @@ from utils import DEFAULT_PROTOCOL
 from utils import translation
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
-from utils.searching import get_terms
 from utils.text import fmt
 from videos.models import (Video, VideoUrl, SubtitleVersion, SubtitleLanguage,
                            Action)
@@ -763,55 +760,6 @@ class Team(models.Model):
             setattr(self, '_applications_count', self.applications.count())
         return self._applications_count
 
-
-    # Language pairs
-    def _lang_pair(self, lp, suffix):
-        return SQ(content="{0}_{1}_{2}".format(lp[0], lp[1], suffix))
-
-    def get_videos_for_languages_haystack(self, language=None,
-                                          num_completed_langs=None,
-                                          project=None, user=None, query=None,
-                                          sort=None, exclude_language=None):
-        qs = self.get_videos_for_user(user)
-
-        if project:
-            qs = qs.filter(project_pk=project.pk)
-
-        if query:
-            for term in get_terms(query):
-                qs = qs.auto_query(qs.query.clean(term).decode('utf-8'))
-
-        if language:
-            qs = qs.filter(video_completed_langs=language)
-
-        if exclude_language:
-            qs = qs.exclude(video_completed_langs=exclude_language)
-
-        if num_completed_langs is not None:
-            qs = qs.filter(num_completed_langs=num_completed_langs)
-
-        qs = qs.order_by({
-             'name':  'video_title_exact',
-            '-name': '-video_title_exact',
-             'subs':  'num_completed_langs',
-            '-subs': '-num_completed_langs',
-             'time':  'team_video_create_date',
-            '-time': '-team_video_create_date',
-        }.get(sort or '-time'))
-
-        return qs
-
-    def get_videos_for_user(self, user):
-        from teams.search_indexes import TeamVideoLanguagesIndex
-
-        is_member = (user and user.is_authenticated()
-                     and self.members.filter(user=user).exists())
-
-        if is_member:
-            return TeamVideoLanguagesIndex.results_for_members(self).filter(team_id=self.id)
-        else:
-            return TeamVideoLanguagesIndex.results().filter(team_id=self.id)
-
     # Projects
     @property
     def default_project(self):
@@ -1207,16 +1155,6 @@ class TeamVideo(models.Model):
         else:
             return None
 
-    @staticmethod
-    def get_videos_non_language_ids(team, language_code, non_empty_language_code=False):
-        if non_empty_language_code:
-            return TeamVideo.objects.filter(
-                team=team).exclude(
-                    video__primary_audio_language_code__gt=language_code).values_list('id', flat=True)
-        return TeamVideo.objects.filter(
-            team=team).exclude(
-                video__primary_audio_language_code=language_code).values_list('id', flat=True)
-
 class TeamVideoMigration(models.Model):
     from_team = models.ForeignKey(Team, related_name='+')
     to_team = models.ForeignKey(Team, related_name='+')
@@ -1264,9 +1202,7 @@ def _create_translation_tasks(team_video, subtitle_version=None):
         # we should only update the team video after all tasks for
         # this video are saved, else we end up with a lot of
         # wasted tasks
-        task.save(update_team_video_index=False)
-
-    tasks.update_one_team_video.delay(team_video.pk)
+        task.save()
 
 def autocreate_tasks(team_video):
     workflow = Workflow.get_for_team_video(team_video)
@@ -1294,14 +1230,6 @@ def autocreate_tasks(team_video):
         _create_translation_tasks(team_video)
 
 
-def team_video_save(sender, instance, created, **kwargs):
-    """Update the Solr index for this team video.
-
-    TODO: Rename this to something more specific.
-
-    """
-    tasks.update_one_team_video.delay(instance.id)
-
 def team_video_delete(sender, instance, **kwargs):
     """Perform necessary actions for when a TeamVideo is deleted.
 
@@ -1309,11 +1237,6 @@ def team_video_delete(sender, instance, **kwargs):
 
     """
     from videos import metadata_manager
-    # not using an async task for this since the async task
-    # could easily execute way after the instance is gone,
-    # and backend.remove requires the instance.
-    tv_search_index = site.get_index(TeamVideo)
-    tv_search_index.backend.remove(instance)
     try:
         video = instance.video
 
@@ -1326,7 +1249,6 @@ def team_video_delete(sender, instance, **kwargs):
         video.save()
 
         metadata_manager.update_metadata(video.pk)
-        video.update_search_index()
     except Video.DoesNotExist:
         pass
     if instance.video_id is not None:
@@ -1372,7 +1294,6 @@ def team_video_rm_video_moderation(sender, instance, **kwargs):
         pass
 
 
-post_save.connect(team_video_save, TeamVideo, dispatch_uid="teams.teamvideo.team_video_save")
 post_save.connect(team_video_autocreate_task, TeamVideo, dispatch_uid='teams.teamvideo.team_video_autocreate_task')
 post_save.connect(team_video_add_video_moderation, TeamVideo, dispatch_uid='teams.teamvideo.team_video_add_video_moderation')
 post_delete.connect(team_video_delete, TeamVideo, dispatch_uid="teams.teamvideo.team_video_delete")
@@ -2724,7 +2645,7 @@ class Task(models.Model):
                     return True
         return not can_perform
 
-    def save(self, update_team_video_index=True, *args, **kwargs):
+    def save(self, *args, **kwargs):
         is_review_or_approve = self.get_type_display() in ('Review', 'Approve')
 
         if self.language:
@@ -2733,9 +2654,6 @@ class Task(models.Model):
                     "Subtitle Language should be a valid code.")
 
         result = super(Task, self).save(*args, **kwargs)
-
-        if update_team_video_index:
-            tasks.update_one_team_video.delay(self.team_video.pk)
 
         Video.cache.invalidate_by_pk(self.team_video.video_id)
 
