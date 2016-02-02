@@ -171,11 +171,14 @@ def _fb64_decode(s):
 def _fb_callback_url(request, fb64_next, confirmed=True, email=None):
     '''Return the callback URL for the given request and eventual destination.'''
     login_done = "thirdpartyaccounts:facebook_login_done"
-    if not confirmed:
-        login_done += "_confirm"
     kwargs = {'next': fb64_next}
-    if email and confirmed:
-        kwargs['email'] = email
+    if confirmed:
+        if email:
+            kwargs['email'] = email
+        else:
+            login_done += "_noemail"
+    else:
+        login_done += "_confirm"
     return '%s%s' % (
         get_url_host(request),
         reverse(login_done, kwargs=kwargs))
