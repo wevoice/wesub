@@ -236,7 +236,7 @@ ul {
 	font-weight: 200;
 	font-size: 15px;
 	margin-top: 5px;
-	margin-bottom: 5px;
+	margin-bottom: 15px;
 }
 
 #login-bg .help {
@@ -390,7 +390,11 @@ ul {
 }
 
 #login-bg .content form {
-	margin: 0 140px;
+        margin: 0 140px;
+}
+
+#login-bg div.sso form ul {
+    padding: 0;
 }
 
 #login-bg button, #login-bg button[disabled]:hover {

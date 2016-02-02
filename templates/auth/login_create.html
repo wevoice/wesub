@@ -18,26 +18,12 @@
 	    <form method='post' action="." class="email-form">
               {% csrf_token %}
 	      <ul>
-	      <li>{{ email_form.email }}</li>
-              <li><button type="submit">Proceed</button></li>
+		<li>{{ email_form.email }}</li>
+		<li><button type="submit">Proceed</button></li>
 	      </ul>
-	      <!--
-	      {% if confirm_type == 'google' %}
-              <a class="provider" id="google" href="{% url "externalsites:google-login" %}?next={{ next }}">google</a>
-	      {% elif confirm_type == 'facebook' %}
-              <button class="provider" id="facebook" type="submit">facebook</button>
-	      {% elif confirm_type == 'twitter' %}
-                <a class="provider" id="twitter" href="{% url "thirdpartyaccounts:twitter_login" %}?next={{ next }}"> twitter</a>
-	      {% elif confirm_type == 'openid' %}
-                <a class="provider" id="open-id" href="{% url "socialauth_openid_login" %}?next={{ next }}">openid</a>
-	      {% elif confirm_type == 'ted' %}
-                <a class="provider" id="ted" href="{{ ted_auth.url }}">ted</a>
-	      {% elif confirm_type == 'udacity' %}
-              <a class="provider" id="udacity" href="{% url "socialauth_udacity_login" %}?next={{ next }}">udacity</a>
-	      {% endif %}
-	      -->
 	    </form>
-	    <h5>{% trans "IMPORTANT: Without a valid email, some Amara features will remain inaccessible and password retrieval will not be possible. Amara respects your privacy." %}</h5>
+	    <h5>{% trans "IMPORTANT: Without a valid email, some Amara features will remain inaccessible and password retrieval will not be possible." %}</h5>
+	    <h5><a href="http://pculture.org/pcf/websites-privacy/" target="_blank">{% trans "Amara respects your privacy." %}</a></h5>
             <h5>{% trans "If you did not intend to create a new Amara account with an external provider, you can go back to the" %}</h5>
             <h5><a href="{% url "auth:login" %}">Sign Up page</a></h5>
         </div>
