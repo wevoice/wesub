@@ -138,7 +138,7 @@ def twitter_login_done(request, confirmed=True):
         return HttpResponseRedirect(reverse('auth:login'))
 
     # authentication was successful, use is now logged in
-    return HttpResponseRedirect(request.GET.get('next', settings.LOGIN_REDIRECT_URL))
+    return HttpResponseRedirect(request.GET.get('next') or settings.LOGIN_REDIRECT_URL)
 
 
 # Facebook --------------------------------------------------------------------
