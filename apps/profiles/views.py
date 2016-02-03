@@ -25,7 +25,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import  reverse
 from django.db.models import Q
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_unicode
@@ -216,6 +216,8 @@ def account(request):
                 messages.success(request, _('Your account has been updated.'))
                 return redirect('profiles:account')
             editaccountform = EditAccountForm(instance=request.user, label_suffix="", prefix='account')
+        else:
+            return HttpResponseBadRequest()
     else:
         editnotificationsform = EditNotificationsForm(instance=request.user, label_suffix="", prefix='notifications')
         editaccountform = EditAccountForm(instance=request.user, label_suffix="", prefix='account')
