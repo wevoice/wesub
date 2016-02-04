@@ -26,6 +26,7 @@ import mock
 from auth.models import CustomUser as User
 from subtitles import pipeline
 from subtitles.models import SubtitleLanguage
+from videos import signals
 from videos.models import Action, Video, VideoTypeUrlPattern
 from videos.tasks import video_changed_tasks
 from videos.tests.data import (
@@ -153,6 +154,23 @@ class TestVideo(TestCase):
         # like a new version.
         make_rollback_to(sl_en, 1)
         _assert_title("New Title")
+
+    def test_title_changed_signal(self):
+        video = VideoFactory(title='old_title')
+        with test_utils.mock_handler(signals.title_changed) as mock_handler:
+            # normal saves shouldn't cause the signal to emit
+            video.save()
+            assert_equal(mock_handler.call_count, 0)
+            # saves that change the title should
+            video.title = 'new_title'
+            video.save()
+            assert_equal(mock_handler.call_count, 1)
+            assert_equal(mock_handler.call_args,
+                         mock.call(signal=signals.title_changed,
+                                   sender=video, old_title='old_title'))
+            # test that 1 more save doesn't cause a second signal
+            video.save()
+            assert_equal(mock_handler.call_count, 1)
 
 class TestModelsSaving(TestCase):
     # TODO: These tests may be more at home in the celery_tasks test file...

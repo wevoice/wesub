@@ -18,6 +18,7 @@
 
 """utils.test_utils.plugin -- Amara nose Plugin
 """
+from __future__ import absolute_import
 import os
 
 from django.dispatch import Signal
@@ -29,8 +30,7 @@ from utils.test_utils import monkeypatch
 from utils.test_utils import xvfb
 import optionalapps
 
-test_case_will_start = Signal()
-test_case_complete = Signal()
+before_tests = Signal()
 
 class UnisubsTestPlugin(Plugin):
     name = 'Amara Test Plugin'
@@ -57,8 +57,8 @@ class UnisubsTestPlugin(Plugin):
         self.include_webdriver_tests = options.webdriver
 
     def begin(self):
+        before_tests.send(self)
         self.patcher.patch_functions()
-        test_case_will_start.send(self)
 
     def finalize(self, result):
         self.patcher.unpatch_functions()
@@ -67,7 +67,6 @@ class UnisubsTestPlugin(Plugin):
     def afterTest(self, test):
         self.patcher.reset_mocks()
         cache.clear()
-        test_case_complete.send(self)
 
     def wantDirectory(self, dirname):
         if dirname in self.directories_to_skip:
