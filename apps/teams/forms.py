@@ -1154,7 +1154,7 @@ class EditMembershipForm(forms.Form):
         (TeamMember.ROLE_CONTRIBUTOR, _('Contributor')),
         (TeamMember.ROLE_MANAGER, _('Manager')),
         (TeamMember.ROLE_ADMIN, _('Admin')),
-    ], initial=TeamMember.ROLE_CONTRIBUTOR)
+    ], initial=TeamMember.ROLE_CONTRIBUTOR, label=_('Member Role'))
     language_narrowings = forms.MultipleChoiceField(required=False)
     project_narrowings = forms.MultipleChoiceField(required=False)
 

@@ -90,7 +90,7 @@
     {% csrf_token %}
     <button class="close"></button>
     <input id="member-id" type="hidden" name="member">
-    {{ edit_form.role }}
+    {% include "_field.html" with field=edit_form.role %}
     <footer class="buttons">
       <button>{% trans "Update" %}</button>
       {% if edit_form.show_remove_button %}
