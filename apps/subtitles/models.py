@@ -413,6 +413,7 @@ class SubtitleLanguage(models.Model):
         super(SubtitleLanguage, self).__init__(*args, **kwargs)
         self._tip_cache = {}
         self._translation_source_version_cache = {}
+        self._frozen = False
 
     # Writelocking
     @property
@@ -481,6 +482,45 @@ class SubtitleLanguage(models.Model):
         else:
             return self.writelock_owner.__unicode__()
 
+    def freeze(self):
+        """Suspend sending signals until thaw() is called
+
+        Right now the only signal this controls is subtitles_completed.  Maybe
+        we will add more in the future.
+        """
+        if self._frozen:
+            return
+        self._frozen = True
+        self._frozen_signals = {}
+
+    def send_signal(self, signal, **kwargs):
+        if not self._frozen:
+            signal.send(self, **kwargs)
+        else:
+            self._frozen_signals[signal] = kwargs
+
+    def thaw(self):
+        """Start sending signals again after a call to freeze()"""
+        if not self._frozen:
+            return
+        thawed = self._frozen_signals
+        del self._frozen_signals
+        self._frozen = False
+        for signal, kwargs in thawed.items():
+            signal.send(self, **kwargs)
+
+    def mark_complete(self):
+        if self.subtitles_complete:
+            return
+        self.subtitles_complete = True
+        self.save()
+        self.send_signal(signals.subtitles_completed)
+
+    def mark_incomplete(self):
+        if not self.subtitles_complete:
+            return
+        self.subtitles_complete = False
+        self.save()
 
     def is_rtl(self):
         return translation.is_rtl(self.language_code)

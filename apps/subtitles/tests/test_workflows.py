@@ -28,6 +28,7 @@ from subtitles import workflows
 from subtitles import pipeline
 from subtitles.exceptions import ActionError
 from subtitles.models import SubtitleNote
+from subtitles.signals import subtitles_published, subtitles_completed
 from utils.factories import *
 from utils import test_utils
 
@@ -153,3 +154,59 @@ class SubtitleNotesTest(TestCase):
         self.check_format_created(datetime(2014, 1, 1, 10, 30),
                                   datetime(2014, 2, 1, 12),
                                   'Jan 1 2014, 10:30 AM')
+
+class CompletePublishLogicTestBase(TestCase):
+    @test_utils.mock_handler(subtitles_published)
+    @test_utils.mock_handler(subtitles_completed)
+    def setUp(self, subtitles_completed_handler, subtitles_published_handler):
+        self.video = VideoFactory()
+        self.language_code = 'en'
+        self.language = self.video.subtitle_language(self.language_code,
+                                                     create=True)
+        self.subtitles_completed_handler = subtitles_completed_handler
+        self.subtitles_published_handler = subtitles_published_handler
+
+    def add_subtitles(self, user, action, **kwargs):
+        version = pipeline.add_subtitles(self.video, self.language_code,
+                                         SubtitleSetFactory(), author=user,
+                                         action=action, **kwargs)
+        # reload video/language to avoid issues with caching and calling
+        # add_subtitles multiple times
+        self.reload_models()
+        return version
+
+    def perform_action(self, user, action):
+        workflow = self.video.get_workflow()
+        workflow.perform_action(user, self.language_code, action)
+        self.reload_models()
+
+    def reload_models(self):
+        self.video = test_utils.reload_obj(self.video)
+        self.language = test_utils.reload_obj(self.language)
+
+    def check_language_state(self, subtitles_complete, public_versions,
+                             should_have_emitted_completed,
+                             should_have_emitted_published):
+        assert_equal(self.language.subtitles_complete, subtitles_complete)
+        version_set = self.language.subtitleversion_set
+        assert_equal([v.version_number for v in version_set.public()],
+                     [v.version_number for v in public_versions])
+        assert_equal(self.subtitles_completed_handler.called,
+                     should_have_emitted_completed)
+        assert_equal(self.subtitles_published_handler.called,
+                     should_have_emitted_published)
+
+class CompletePublishLogicTest(CompletePublishLogicTestBase):
+    def test_complete_publish_logic(self):
+        user = UserFactory()
+        v1 = self.add_subtitles(user, 'save-draft')
+        self.check_language_state(False, [v1], False, False)
+        self.perform_action(user, 'publish')
+        self.check_language_state(True, [v1], True, True)
+
+    def test_complete_publish_logic_with_api_complete(self):
+        user = UserFactory()
+        v1 = self.add_subtitles(user, 'save-draft')
+        self.check_language_state(False, [v1], False, False)
+        v2 = self.add_subtitles(user, None, complete=True)
+        self.check_language_state(True, [v1, v2], True, True)

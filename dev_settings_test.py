@@ -36,7 +36,7 @@ DATABASES = {
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_PLUGINS = ['utils.test_utils.UnisubsTestPlugin']
+NOSE_PLUGINS = ['utils.test_utils.plugin.UnisubsTestPlugin']
 CELERY_ALWAYS_EAGER = True
 
 YOUTUBE_CLIENT_ID = 'test-youtube-id'
