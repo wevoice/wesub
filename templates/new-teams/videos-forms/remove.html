@@ -18,6 +18,11 @@
       Are you sure you want to remove the videos from your team?
       {% endblocktrans %}
     </p>
+
+    {% if form.include_all %}
+      {% include "_field.html" with field=form.include_all %}
+    {% endif %}
+
     <footer class="buttons">
       <button>{% trans "Remove" %}</button>
     </footer>

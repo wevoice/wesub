@@ -474,7 +474,8 @@ class VideoViewSetTest(TestCase):
                                          query_params=self.query_params)
         self.viewset.kwargs = {}
 
-    def test_listing(self):
+    def test_listing_with_no_filters(self):
+        # Listing videos without a filter should return 0 videos
         public_team = TeamFactory()
         private_team = TeamFactory(is_visible=False)
         user_team = TeamFactory(is_visible=False, member=self.user)
@@ -487,7 +488,7 @@ class VideoViewSetTest(TestCase):
         TeamVideoFactory(video=v3, team=user_team)
         TeamVideoFactory(video=v4, team=private_team)
 
-        assert_items_equal([v1, v2, v3], self.viewset.get_queryset())
+        assert_items_equal([], self.viewset.get_queryset())
 
     @test_utils.patch_for_test('subtitles.workflows.get_workflow')
     def test_get_detail_checks_workflow_permissions(self, mock_get_workflow):

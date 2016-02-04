@@ -3,11 +3,15 @@ source /usr/local/bin/config_env
 
 PRE=""
 CMD="uwsgi --ini $APP_ROOT/$APP_NAME.ini"
+WORKERS=${WORKERS:-4}
 
 cat << EOF > $APP_ROOT/$APP_NAME.ini
 [uwsgi]
 master = true
-workers = 4
+workers = ${WORKERS}
+harakiri = 20
+max-requests = 5000
+memory-report
 http-socket = 0.0.0.0:8000
 add-header = Node: $HOSTNAME
 die-on-term = true

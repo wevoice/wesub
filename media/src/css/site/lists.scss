@@ -15,6 +15,7 @@ ul.inline {
 ul.bullet {
     list-style-type: disc;
     list-style-position: inside;
+    margin-bottom: $line-height;
 }
 
 li.header {

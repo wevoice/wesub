@@ -107,6 +107,10 @@ class Environment(object):
         # Global jenkins config
         'AWS_ACCESS_ID',
         'AWS_SECRET_KEY',
+        'STAGING_AWS_ACCESS_ID',
+        'STAGING_AWS_SECRET_KEY',
+        'PRODUCTION_AWS_ACCESS_ID',
+        'PRODUCTION_AWS_SECRET_KEY',
         'DOCKER_AUTH_EMAIL',
         'DOCKER_AUTH_PASSWORD',
         'DOCKER_AUTH_USERNAME',
@@ -154,6 +158,15 @@ class Environment(object):
 
     def docker_hosts(self):
         return self.DOCKER_HOSTS.split()
+
+    def aws_credentials(self, limited=False):
+        if not limited:
+            return (self.AWS_ACCESS_ID, self.AWS_SECRET_KEY)
+        if self.BRANCH == 'production':
+            return (self.PRODUCTION_AWS_ACCESS_ID,
+                    self.PRODUCTION_AWS_SECRET_KEY)
+        else:
+            return (self.STAGING_AWS_ACCESS_ID, self.STAGING_AWS_SECRET_KEY)
 
 class Docker(object):
     """Run docker commands.  """
@@ -290,13 +303,14 @@ class ContainerManager(object):
     def building_preview(self):
         return self.env.BRANCH not in ('staging', 'production')
 
-    def app_params(self):
+    def app_params(self, limited=False):
         """Get docker params to used for both app containers and workers
         """
+        aws_access_id, aws_secret_key = self.env.aws_credentials(limited)
         params = [
             # AWS Auth info
-            '-e', 'AWS_ACCESS_ID=' + self.env.AWS_ACCESS_ID,
-            '-e', 'AWS_SECRET_KEY=' + self.env.AWS_SECRET_KEY,
+            '-e', 'AWS_ACCESS_ID=' + aws_access_id,
+            '-e', 'AWS_SECRET_KEY=' + aws_secret_key,
             # REVISION controls the git revision we check out before starting
             # this is actually somewhat redundant since we already copy the
             # files into the docker image
@@ -386,7 +400,7 @@ class ContainerManager(object):
             '-h', host_name,
             '--name', name,
             '--restart=always',
-        ] + self.app_params() + [self.image_name, command]
+        ] + self.app_params(limited=True) + [self.image_name, command]
         cid = self.docker.run_and_return_output(host, *cmd_line).strip()
         log("container id: {}", cid)
         self.containers_started.append(ContainerInfo(host, name, cid))
@@ -406,7 +420,7 @@ class ContainerManager(object):
             '-h', self.app_hostname(),
             '--name', name,
             '--restart=always',
-        ] + self.app_params() + self.interlock_params() + [self.image_name]
+        ] + self.app_params(limited=True) + self.interlock_params() + [self.image_name]
         cid = self.docker.run_and_return_output(host, *cmd_line).strip()
         log("container id: {}", cid)
         self.containers_started.append(ContainerInfo(host, name, cid))

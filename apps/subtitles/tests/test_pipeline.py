@@ -40,27 +40,6 @@ class TestHelperFunctions(TestCase):
         self.video = make_video()
         self.video2 = make_video_2()
 
-    def test_get_language(self):
-        sl, needs_save = pipeline._get_language(self.video, 'en')
-        self.assertEqual(sl.language_code, 'en')
-        self.assertEqual(needs_save, True)
-
-        sl, needs_save = pipeline._get_language(self.video, 'fr')
-        self.assertEqual(sl.language_code, 'fr')
-        self.assertEqual(needs_save, True)
-
-        l = SubtitleLanguage(video=self.video, language_code='en')
-        l.save()
-
-        sl, needs_save = pipeline._get_language(self.video, 'en')
-        self.assertEqual(sl.language_code, 'en')
-        self.assertEqual(needs_save, False)
-        self.assertEqual(sl.id, l.id)
-
-        sl, needs_save = pipeline._get_language(self.video, 'fr')
-        self.assertEqual(sl.language_code, 'fr')
-        self.assertEqual(needs_save, True)
-
     def test_get_version(self):
         def _assert_eq(a, b):
             if (not a) or (not b):
