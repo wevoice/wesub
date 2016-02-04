@@ -27,50 +27,43 @@ SUPPORTED_LANGUAGE_CHOICES = list(sorted(_supported_languages_map.items(),
 ALL_LANGUAGE_CHOICES = list(sorted(_all_languages_map.items(),
                                    key=lambda c: c[1]))
 
-# Rough language order.  Based on a query of completed subtitle languages around 2016
-LANGUAGE_POPULARITY = [
-    'en', 'es', 'fr', 'ja', 'pt-br', 'ru', 'it', 'de', 'en-gb', 'tr', 'zh-cn',
-    'ko', 'ar', 'pl', 'pt', 'zh-tw', 'cs', 'el', 'es-mx', 'nl', 'he', 'ro',
-    'en-us', 'vi', 'hu', 'bg', 'sv', 'id', 'sr', 'uk', 'th', 'da', 'sk', 'hr',
-    'nb', 'fa', 'ka', 'hi', 'ca', 'es-ar', 'fr-ca', 'fi', 'et', 'ms', 'sq',
-    'ta', 'lt', 'sl', 'my', 'lv', 'eo', 'mk', 'es-419', 'es-es', 'hy',
-    'zh-hk', 'mn', 'meta-tw', 'eu', 'ur', 'fil', 'gl', 'bn', 'ab', 'az', 'af',
-    'zh', 'ml', 'sr-latn', 'bs', 'ku', 'mr', 'sh', 'zh-hant', 'meta-geo',
-    'en-ca', 'is', 'te', 'gu', 'swa', 'be', 'tl', 'nl-be', 'la', 'zul', 'jv',
-    'aa', 'kk', 'es-ni', 'arq', 'kn', 'zh-sg', 'km', 'no', 'iw', 'nn', 'amh',
-    'ht', 'ga', 'cy', 'mt', 'ase', 'zh-hans', 'ne', 'yi', 'meta-audio', 'uz',
-    'si', 'srp', 'ia', 'pt-pt', 'rm', 'bo', 'ast', 'de-ch', 'aka', 'que',
-    'vls', 'fr-be', 'ry', 'lo', 'pan', 'xho', 'som', 'ug', 'ay', 'tlh', 'efi',
-    'hau', 'ky', 'kl', 'an', 'ltg', 'meta-wiki', 'rup', 'as', 'ik', 'oc',
-    'mus', 'mlg', 'ceb', 'bnt', 'en-ie', 'de-at', 'fy-nl', 'prs', 'wol', 'lb',
-    'mi', 'tk', 'lg', 'lin', 'aeb', 'sco', 'tt', 'tg', 'yor', 'fo', 'lld',
-    'ee', 'ps', 'ibo', 'kw', 'dz', 'cku', 'br', 'av', 'ie', 'nya', 'ce', 'cr',
-    'sgn', 'ber', 'or', 'fr-ch', 'dv', 'bi', 'sm', 'pap', 'bam', 'gd', 'pi',
-    'tet', 'orm', 'lkt', 'nr', 'hup', 'tir', 'bh', 'ae', 'nv', 'gn', 'tw',
-    'kar', 'zam', 'cho', 'co', 'hz', 'sd', 'am', 'fj', 'inh', 'ful', 'ksh',
-    'mos', 'sc', 'ch', 'ba', 'mo', 'iro', 'pnb', 'sw', 'se', 'to', 'cu',
-    'arc', 'hb', 'io', 've', 'ff', 'sa', 'iu', 'cnh', 'nan', 'szl', 'ln',
-    'hsb', 'kik', 'dsb', 'su', 'ho', 'pam', 'sg', 'kj', 'yaq', 'kau', 'za',
-    'luo', 'kin', 'ss', 'ng', 'li', 'haw', 'gsw', 'bug', 'nd', 'gv', 'ii',
-    'toj', 'tsz', 'wa', 'tsn', 'sn', 'pa', 'mh', 'kon', 'ctu', 'tzo', 'na',
-    'run', 'ti', 'hai', 'fy', 'got', 'cv', 'mnk', 'luy', 'hus', 'haz', 'mad',
-    'wbl', 'vo', 'kv', 'din', 'hch', 'umb',
+# Top 24 popular languages, taken from:
+# https://en.wikipedia.org/wiki/Languages_used_on_the_Internet
+POPULAR_LANGUAGES = [
+    'en',
+    'ru',
+    'de',
+    'ja',
+    'es',
+    'fr',
+    # "Chinese" and "Portuguese" have 2 main variants.  Include them both.
+    'zh-cn',
+    'zh-tw',
+    'pt',
+    'pt-br',
+    'it',
+    'pl',
+    'tr',
+    'nl',
+    'fa',
+    'ar',
+    'ko',
+    'cs',
+    'sv',
+    'vi',
+    'id',
+    'el',
+    'ro',
+    'hu',
+    'da',
+    'th',
 ]
-
-SUPPORTED_LANGUAGE_CODES_BY_POPULARITY = [
-    code for code in LANGUAGE_POPULARITY
-    if code in SUPPORTED_LANGUAGE_CODES
-]
-SUPPORTED_LANGUAGE_CODES_BY_POPULARITY.extend(
-    SUPPORTED_LANGUAGE_CODES.difference(SUPPORTED_LANGUAGE_CODES_BY_POPULARITY)
-)
+POPULAR_LANGUAGES.sort()
 
 def _only_supported_languages(language_codes):
     """Filter the given list of language codes to contain only codes we support."""
-
     # TODO: Figure out the codec issue here.
     return [code for code in language_codes if code in SUPPORTED_LANGUAGE_CODES]
-
 
 _get_language_choices_cache = {}
 def get_language_choices(with_empty=False, with_any=False, flat=False):
@@ -113,8 +106,7 @@ def calc_language_choices(language_code):
         translated_name = _(english_name)
         return u'{} [{}]'.format(translated_name, code)
     languages.append((_('Popular'), [
-        (code, label(code)) for code in
-        SUPPORTED_LANGUAGE_CODES_BY_POPULARITY[:25]
+        (code, label(code)) for code in POPULAR_LANGUAGES
     ]))
     languages.append((_('All'), [
         (code, label(code)) for code in sorted(SUPPORTED_LANGUAGE_CODES)
