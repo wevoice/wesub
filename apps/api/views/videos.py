@@ -60,13 +60,17 @@ Listing videos
     :query video_url:  list only videos with the given URL, useful for finding out information about a video already on Amara.
     :query team:       Only show videos that belong to a team identified by ``slug``.
     :query project:    Only show videos that belong to a project with the given slug.
-        Passing in ``null`` will return only videos that don't belong to a project.
+        Passing in ``null`` will return only videos that don't belong to a
+        project.  You must pass in the `team` filter along with `project`.
     :query order_by:   Applies sorting to the video list. Possible values:
 
         * `title`: ascending
         * `-title`: descending
         * `created`: older videos first
         * `-created` : newer videos
+
+.. note:: You *must* pass in either `team` or `video_url` or no videos will be
+    returned.
 
 Creating Videos
 +++++++++++++++
@@ -361,11 +365,9 @@ class VideoSerializer(serializers.Serializer):
     def get_video_type(self, video):
         types = set()
         for url in video.get_video_urls():
-            video_type = video_type_registrar.video_type_for_url(url.url)
-            if video_type is not None:
-                types.add(video_type)
+            types.add(url.type)
         if len(types) == 1:
-            return types.pop().abbreviation
+            return types.pop()
         return ""
 
     def will_add_video_to_team(self):
@@ -502,6 +504,8 @@ class VideoViewSet(AmaraPaginationMixin,
 
     def get_queryset(self):
         query_params = self.request.query_params
+        if 'team' not in query_params and 'video_url' not in query_params:
+            return Video.objects.none()
         if 'team' not in query_params:
             qs = self.get_videos_for_user()
         else:

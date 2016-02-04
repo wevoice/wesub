@@ -63,6 +63,23 @@ class VideoFactory(DjangoModelFactory):
             video.followers.add(video.user)
 
     @factory.post_generation
+    def make_version(video, create, extracted, **attrs):
+        if extracted:
+            if extracted is True:
+                languages = ['en']
+            elif isinstance(extracted, (list, tuple)):
+                languages = extracted
+            else:
+                languages = [extracted]
+            for language in languages:
+                make_version(video, language)
+
+    @factory.post_generation
+    def team(video, create, extracted, **attrs):
+        if extracted:
+            TeamVideoFactory(team=extracted, video=video)
+
+    @factory.post_generation
     def with_many_visibility_combinations(video, create, extracted, **kwargs):
         """Make languages with many different combinations of
         visibility/visibility_override_choices
@@ -208,6 +225,12 @@ class UserFactory(DjangoModelFactory):
             for language_code in extracted:
                 auth.models.UserLanguage.objects.create(
                     user=self, language=language_code)
+
+    @factory.post_generation
+    def team(self, create, extracted, **kwargs):
+        if extracted:
+            role = kwargs.get('role', teams.models.TeamMember.ROLE_ADMIN)
+            TeamMemberFactory(user=self, team=extracted, role=role)
 
 class TeamFactory(DjangoModelFactory):
     FACTORY_FOR = teams.models.Team
@@ -447,5 +470,18 @@ def bulk_subs(sub_data):
                 versions[video_title, language_code, v.version_number] = v
     return videos, langs, versions
 
-__all__ = ['bulk_subs']
+def make_version(video, language_code, subtitle_set=None,
+                 subtitles_complete=True,
+                 **kwargs):
+    """Make a version without going through the workflow logic."""
+    language, _ = subtitles.models.SubtitleLanguage.objects.get_or_create(
+        video=video, language_code=language_code)
+    if subtitles_complete != language.subtitles_complete:
+        language.subtitles_complete = subtitles_complete
+        language.save()
+    if subtitle_set is None:
+        subtitle_set = SubtitleSetFactory()
+    return language.add_version(subtitles=subtitle_set, **kwargs)
+
+__all__ = ['bulk_subs', 'make_version']
 __all__.extend(name for name in globals() if 'Factory' in name)
