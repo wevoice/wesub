@@ -1,0 +1,16 @@
+{% load i18n %}
+{% load url from future %}
+<h3>{% trans "Teams" %}</h3>
+{% if teams %}
+<ul>
+  {% for t in teams %}
+  <li>
+    <a href="{% url "teams:dashboard" slug=t.slug %}">{{ t }}</a>{% if not t.is_visible %} {% trans "(private)" %}{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<em>
+  {{ user_info }} {% trans "hasn't joined any teams yet." %}
+</em>
+{% endif %}
