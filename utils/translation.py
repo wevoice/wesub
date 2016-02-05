@@ -66,7 +66,8 @@ def _only_supported_languages(language_codes):
     return [code for code in language_codes if code in SUPPORTED_LANGUAGE_CODES]
 
 _get_language_choices_cache = {}
-def get_language_choices(with_empty=False, with_any=False, flat=False):
+def get_language_choices(with_empty=False, with_any=False, flat=False,
+                         limit_to=None):
     """Get a list of language choices
 
     We display languages as "<native_name> [code]", where native
@@ -77,7 +78,11 @@ def get_language_choices(with_empty=False, with_any=False, flat=False):
     from gettext.
 
     Args:
-        language_code -- language we're rendering the page in
+        with_empty: Should we include a null choice?
+        with_any: Should we include a choice for any language?
+        flat: Make all items in the list (code, name), instead of using the
+           django optgroup style for some
+        limit_to: limit choices to a list of language codes
     """
 
     language_code = get_language()
@@ -89,6 +94,11 @@ def get_language_choices(with_empty=False, with_any=False, flat=False):
 
     # make a copy of languages before we alter it
     languages = list(languages)
+    if limit_to:
+        limit_to = set(limit_to)
+        def filter_optgroup(og):
+            return (og[0], [item for item in og[1] if item[0] in limit_to])
+        languages = [filter_optgroup(o) for o in languages]
     if flat:
         languages = languages[1][1]
     if with_any:
@@ -132,7 +142,7 @@ def get_language_choices_as_dicts(with_empty=False):
     """Return a list of language code choices labeled appropriately."""
     return [
         {'code': code, 'name': name}
-        for (code, name) in get_language_choices(with_empty)
+        for (code, name) in get_language_choices(with_empty, flat=True)
     ]
 
 def get_language_label(code):

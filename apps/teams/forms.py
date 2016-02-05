@@ -346,8 +346,8 @@ class TaskCreateForm(ErrorableModelForm):
         # TODO: This is bad for teams with 10k members.
         team_user_ids = team.members.values_list('user', flat=True)
 
-        langs = [l for l in get_language_choices(with_empty=True)
-                 if l[0] in team.get_writable_langs()]
+        langs = get_language_choices(with_empty=True,
+                                     limit_to=team.get_writable_langs())
         self.fields['language'].choices = langs
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
