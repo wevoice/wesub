@@ -20,7 +20,7 @@ SKIP_CODE_PULL=${SKIP_CODE_PULL:-}
 
 if [ ! -z "$AWS_ID" ] && [ ! -z "$AWS_SECRET_KEY" ] ; then
     # create s3cfg
-    cat << EOF > /etc/s3cfg
+    cat << EOF > ~/.s3cfg
 [default]
 access_key = $AWS_ID
 acl_public = False
