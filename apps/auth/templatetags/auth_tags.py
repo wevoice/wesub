@@ -15,11 +15,23 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+from datetime import datetime, timedelta
 from django import template
 from django.utils.translation import ugettext_lazy as _
 
 
 register = template.Library()
+
+@register.inclusion_tag('auth/_new_user_notification.html', takes_context=True)
+def new_user_notification(context, force=False):
+    """
+    To make clear to users when authenticating with an
+    external service actually created a new account
+    """
+    user = context['request'].user
+    if user.is_authenticated() and user.date_joined > datetime.now() - timedelta(minutes=2) and user.is_external:
+        context['new_user'] = True
+    return context
 
 @register.inclusion_tag('auth/_email_confirmation_notification.html', takes_context=True)
 def email_confirmation_notification(context, force=False):
