@@ -1,8 +1,9 @@
 #!/bin/bash
+
 AWS_ID=${AWS_ACCESS_ID:-}
 AWS_KEY=${AWS_SECRET_KEY:-}
 S3_PASSPHRASE=${S3_PASSPHRASE:-}
-APP_NAME=unisubs
+APP_NAME=amara
 APP_ROOT=/opt/apps
 APP_DIR=$APP_ROOT/$APP_NAME
 REV=${REVISION:-staging}

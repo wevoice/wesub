@@ -46,8 +46,9 @@ def _make_write_request(write_token, method, **params):
     if not hasattr(response, 'json'):
         raise SyncingError("Invalid response data: %s" % response.content)
 
-    if response.json.get('error') is not None:
-        error = response.json['error']
+    response_data = response.json()
+    if response_data.get('error') is not None:
+        error = response_data['error']
         try:
             code = error['code']
             msg = error['message']

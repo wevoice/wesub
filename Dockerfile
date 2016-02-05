@@ -1,47 +1,37 @@
 FROM ubuntu:14.04
 MAINTAINER Amara "http://amara.org"
+ENV DEBIAN_FRONTEND noninteractive
 RUN (echo "deb http://archive.ubuntu.com/ubuntu trusty main universe multiverse" > /etc/apt/sources.list)
 RUN (echo "deb-src http://archive.ubuntu.com/ubuntu trusty main universe multiverse" >> /etc/apt/sources.list)
 RUN (echo "deb http://archive.ubuntu.com/ubuntu trusty-updates main universe multiverse" >> /etc/apt/sources.list)
 RUN (echo "deb-src http://archive.ubuntu.com/ubuntu trusty-updates main universe multiverse" >> /etc/apt/sources.list)
 RUN apt-get update
-ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -y --force-yes install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext build-essential gcc dialog mysql-client firefox flashplugin-installer xvfb node-uglify ruby-sass libav-tools
-ADD . /opt/apps/unisubs
-RUN mkdir -p /opt/extras/pictures
-RUN mkdir -p /opt/extras/videos
-ENV REVISION staging
-ENV APP_DIR /opt/apps/unisubs
+RUN apt-get -y --force-yes install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libffi-dev libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext build-essential gcc dialog mysql-client firefox flashplugin-installer xvfb node-uglify ruby-sass libav-tools
+ENV APP_DIR /opt/apps/amara
 ENV CLOSURE_PATH /opt/google-closure
-ENV DJANGO_SETTINGS_MODULE unisubs_settings
 RUN git clone https://github.com/google/closure-library $CLOSURE_PATH
 RUN (cd $CLOSURE_PATH && git checkout adbcc8ef6530ea16bac9f877901fe6b32995c5ff)
+ADD . /opt/apps/amara
 RUN ln -sf $CLOSURE_PATH $APP_DIR/media/js/closure-library
-ADD .docker/known_hosts /root/.ssh/known_hosts
-ADD .docker/config_env.sh /usr/local/bin/config_env
-ADD .docker/build_media.sh /usr/local/bin/build_media
-ADD .docker/run_migrations.sh /usr/local/bin/run_migrations
-ADD .docker/rebuild_index.sh /usr/local/bin/rebuild_index
-ADD .docker/update_index.sh /usr/local/bin/update_index
-ADD .docker/master-worker.sh /usr/local/bin/master-worker
-ADD .docker/feed-worker.sh /usr/local/bin/feed-worker
-ADD .docker/worker.sh /usr/local/bin/worker
-ADD .docker/test_app.sh /usr/local/bin/test_app
-ADD .docker/update_translations.sh /usr/local/bin/update_translations
-ADD .docker/entry.sh /usr/local/bin/entry
-ADD .docker/reset-db.sh /usr/local/bin/reset-db
-ADD .docker/setup_preview_site.sh /usr/local/bin/setup_preview_site
 RUN easy_install pip
-RUN pip install uwsgi
-RUN (cd $APP_DIR/deploy && pip install --src /opt/src/unisubs/ -r requirements.txt)
-RUN (cd $APP_DIR && python deploy/create_commit_file.py)
-
+# install urllib3[secure] before other packages.  This prevents SSL warnings
+RUN pip install --upgrade urllib3[secure]
+RUN (cd $APP_DIR/deploy && pip install --src /opt/src/amara/ -r requirements.txt)
+RUN mkdir -p /opt/extras/pictures
+RUN mkdir -p /opt/extras/videos
+ADD .docker/known_hosts /root/.ssh/known_hosts
+ADD .docker/bin/* /usr/local/bin/
 # this fixes the nose bug (https://github.com/django-nose/django-nose/issues/54)
 RUN rm /usr/local/man
-ADD .docker/run.sh /usr/local/bin/run
-
-WORKDIR /opt/apps/unisubs
-VOLUME /opt/apps/unisubs
+RUN mkdir -p /var/run/amara
+RUN useradd --home /var/run/amara --shell /bin/bash amara
+RUN chown amara:amara /var/run/amara
+RUN ln -s /opt/apps/amara/manage.py /opt/apps/amara/startup.py /var/run/amara/
+USER amara
+WORKDIR /var/run/amara
 EXPOSE 8000
+ENV PYTHON_PATH $APP_DIR
+ENV DJANGO_SETTINGS_MODULE unisubs_settings
+ENV REVISION staging
 ENTRYPOINT ["/usr/local/bin/entry"]
 CMD ["app"]
