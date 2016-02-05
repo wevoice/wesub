@@ -58,11 +58,8 @@ use_https = False
 verbosity = WARNING
 EOF
 
-    chown root:root /etc/s3cfg
-    chmod 600 /etc/s3cfg
-
     cd $APP_DIR
-    s3cmd -c /etc/s3cfg get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
+    s3cmd get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
     # get transifex config
-    s3cmd -c /etc/s3cfg get --force s3://amara/settings/transifexrc /.transifexrc
+    s3cmd get --force s3://amara/settings/transifexrc /.transifexrc
 fi
