@@ -30,19 +30,22 @@ from oauth import oauth
 
 from socialauth.lib import oauthtwitter2 as oauthtwitter
 from socialauth.views import get_url_host
-from thirdpartyaccounts.auth_backends import FacebookAccount
-
+from thirdpartyaccounts.auth_backends import FacebookAccount, FacebookAuthBackend, TwitterAuthBackend, TwitterAccount
 
 # Twitter ---------------------------------------------------------------------
 
-def twitter_login(request, next=None):
+def twitter_login(request, next=None, confirmed=True, email=''):
     callback_url = None
     next = request.GET.get('next', next)
     if next is not None:
-        callback_url = '%s%s?next=%s' % \
+        callback_view = "thirdpartyaccounts:twitter_login_done"
+        if not confirmed:
+            callback_view += "_confirm"
+        callback_url = '%s%s?next=%s&email=%s' % \
              (get_url_host(request),
-             reverse("thirdpartyaccounts:twitter_login_done"),
-             urlquote(next))
+             reverse(callback_view),
+              urlquote(next),
+              urlquote(email))
     twitter = oauthtwitter.TwitterOAuthClient(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
     try:
         request_token = twitter.fetch_request_token(callback_url)
@@ -53,7 +56,7 @@ def twitter_login(request, next=None):
     signin_url = twitter.authorize_token_url(request_token)
     return HttpResponseRedirect(signin_url)
 
-def twitter_login_done(request):
+def twitter_login_done(request, confirmed=True):
     request_token = request.session.get('request_token', None)
     oauth_verifier = request.GET.get("oauth_verifier", None)
 
@@ -87,9 +90,43 @@ def twitter_login_done(request):
         messages.error(request, 'Problem connecting to Twitter. Try again.')
         return redirect('auth:login')
 
-    request.session['access_token'] = access_token.to_string()
-    user = authenticate(access_token=access_token)
+    if request.session.get('no-login', False):
+        if not request.user.is_authenticated():
+            messages.error(request, 'You must be logged in.')
+            return redirect('auth:login')
 
+        try:
+            from socialauth.lib.oauthtwitter import OAuthApi
+            twitter = OAuthApi(settings.TWITTER_CONSUMER_KEY,
+                                settings.TWITTER_CONSUMER_SECRET, access_token)
+            userinfo = twitter.GetUserInfo()
+        except Exception, e:
+            # TODO: Raise something more useful here
+            raise e
+
+        username = userinfo.screen_name
+
+        try:
+            account = TwitterAccount.objects.get(username=username)
+            if request.user.pk != account.user.pk:
+                messages.error(request, 'Account already linked')
+                return redirect('profiles:account')
+
+        except TwitterAccount.DoesNotExist:
+            TwitterAccount.objects.create(user=request.user,
+                    username=username, access_token=access_token.to_string())
+
+        del request.session['no-login']
+        messages.info(request, 'Successfully linked a Twitter account')
+        return redirect('profiles:account')
+
+    request.session['access_token'] = access_token.to_string()
+    if not confirmed:
+        (existing, email) = TwitterAuthBackend.pre_authenticate(access_token)
+        if not existing:
+            return redirect('auth:confirm_create_user', 'twitter', email)
+    email = request.GET.get('email', None)
+    user = authenticate(access_token=access_token, email=email)
     # if user is authenticated then login user
     if user:
         auth_login(request, user)
@@ -101,7 +138,7 @@ def twitter_login_done(request):
         return HttpResponseRedirect(reverse('auth:login'))
 
     # authentication was successful, use is now logged in
-    return HttpResponseRedirect(request.GET.get('next', settings.LOGIN_REDIRECT_URL))
+    return HttpResponseRedirect(request.GET.get('next') or settings.LOGIN_REDIRECT_URL)
 
 
 # Facebook --------------------------------------------------------------------
@@ -131,11 +168,20 @@ def _fb64_decode(s):
     return base64.b64decode(str(s), ['-', '_']).decode('utf-8')
 
 
-def _fb_callback_url(request, fb64_next):
+def _fb_callback_url(request, fb64_next, confirmed=True, email=None):
     '''Return the callback URL for the given request and eventual destination.'''
+    login_done = "thirdpartyaccounts:facebook_login_done"
+    kwargs = {'next': fb64_next}
+    if confirmed:
+        if email:
+            kwargs['email'] = email
+        else:
+            login_done += "_noemail"
+    else:
+        login_done += "_confirm"
     return '%s%s' % (
         get_url_host(request),
-        reverse("thirdpartyaccounts:facebook_login_done", kwargs={'next': fb64_next}))
+        reverse(login_done, kwargs=kwargs))
 
 def _fb_fallback_url(fb64_next):
     '''Return a fallback URL that we'll redirect to if the authentication fails.
@@ -153,18 +199,17 @@ def _fb_fallback_url(fb64_next):
     else:
         return u'%s?next=%s' % (reverse('auth:login'), final_target_url)
 
-
-def facebook_login(request, next=None):
+def facebook_login(request, next=None, confirmed=True, email=None):
     next = request.GET.get('next', settings.LOGIN_REDIRECT_URL)
-    callback_url = _fb_callback_url(request, _fb64_encode(next))
-
+    if email:
+        email = _fb64_encode(email)
+    callback_url = _fb_callback_url(request, _fb64_encode(next), email=email, confirmed=confirmed)
     fb = _facebook()
     request.facebook = fb
     signin_url = fb.get_login_url(next=callback_url)
-
     return HttpResponseRedirect(signin_url)
 
-def facebook_login_done(request, next):
+def facebook_login_done(request, next, confirmed=True, email=None):
     # The next parameter we get here is base64'ed.
     fb64_next = next
 
@@ -176,13 +221,12 @@ def facebook_login_done(request, next):
         # Redirect them to the fallback.
         return HttpResponseRedirect(fallback_url)
 
-    callback_url = _fb_callback_url(request, fb64_next)
+    callback_url = _fb_callback_url(request, fb64_next, confirmed=confirmed, email=email)
 
     fb = _facebook()
     fb.oauth2_access_token(code, callback_url)
 
     request.facebook = fb
-
     if request.session.get('fb-no-login', False):
         # Don't create a new user
         if not request.user.is_authenticated():
@@ -202,8 +246,13 @@ def facebook_login_done(request, next):
         messages.info(request, 'Successfully linked a Facebook account')
         return redirect('profiles:account')
 
-    user = authenticate(facebook=fb, request=request)
-
+    if not confirmed:
+        (exist, suggested_email) = FacebookAuthBackend.pre_authenticate(fb, request)
+        if not exist:
+            return redirect('auth:confirm_create_user', 'facebook', suggested_email)
+    if email:
+        email = _fb64_decode(email)
+    user = authenticate(facebook=fb, request=request, email=email)
     if user:
         # If authentication was successful, log the user in and then redirect them
         # to their (decoded) destination.
@@ -213,5 +262,4 @@ def facebook_login_done(request, next):
         # We were not able to authenticate the user.
         # Redirect them to login page, preserving their destination.
         return HttpResponseRedirect(fallback_url)
-
 

@@ -36,7 +36,7 @@ div.admin-edit-specific-version select {
 
 /*ANNOUNCE BANNER*/
 
-#announce-banner {
+.announce-banner {
   background-color: #f2f2f3;
   padding: 0;
   color: #656565;
@@ -49,14 +49,14 @@ div.admin-edit-specific-version select {
   line-height: 1.42857;
 }
 
-#announce-banner li {
+.announce-banner li {
   padding: 8px 0;
   text-align: center;
   list-style-type: none;
   border-bottom: 1px solid #77A700;
 }
 
-#announce-banner li a, #announce-banner li a:visited, #announce-banner li a:hover {
+.announce-banner li a, .announce-banner li a:visited, .announce-banner li a:hover {
   color: #77A700;
   text-decoration: none;
   font-weight: 300;

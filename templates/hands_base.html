@@ -74,6 +74,7 @@
     {% announcement %}
     {% if user.is_authenticated %}
         {% messages %}
+        {% new_user_notification %}
     {% endif %}
   {% include 'header.html' %}
 
