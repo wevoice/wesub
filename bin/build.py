@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import os
 import sys
 import subprocess
@@ -13,15 +14,25 @@ def update_commit_file():
     with open(os.path.join(ROOT_DIR, 'commit.py'), 'w') as f:
         f.write("LAST_COMMIT_GUID = '{0}'\n".format(commit_id))
 
-def run_docker_build(image_name):
-    cmdline = ['docker', 'build', '-t', image_name, ROOT_DIR]
-    print 'running docker build'
+def run_docker_build(image_name, no_cache):
+    cmdline = ['docker', 'build', '-t', image_name]
+    if no_cache:
+        cmdline.append('--no-cache')
+    cmdline.append(ROOT_DIR)
+    print 'running {}'.format(' '.join(cmdline))
     subprocess.check_call(cmdline)
 
+def build_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--no-cache', action='store_true')
+    parser.add_argument('image_name')
+    return parser
+
 def main(argv):
-    image_name = sys.argv[1]
+    parser = build_parser()
+    args = parser.parse_args(sys.argv[1:])
     update_commit_file()
-    run_docker_build(image_name)
+    run_docker_build(args.image_name, args.no_cache)
 
 if __name__ == '__main__':
     main(sys.argv)
