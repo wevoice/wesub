@@ -30,7 +30,7 @@ RUN ln -s /opt/apps/amara/manage.py /opt/apps/amara/startup.py /var/run/amara/
 USER amara
 WORKDIR /var/run/amara
 EXPOSE 8000
-ENV PYTHON_PATH $APP_DIR
+ENV PYTHONPATH /var/run/amara
 ENV DJANGO_SETTINGS_MODULE unisubs_settings
 ENV REVISION staging
 ENTRYPOINT ["/usr/local/bin/entry"]
