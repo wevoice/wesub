@@ -57,9 +57,5 @@ urlencoding_mode = normal
 use_https = False
 verbosity = WARNING
 EOF
-
-    cd $APP_DIR
     s3cmd get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
-    # get transifex config
-    s3cmd get --force s3://amara/settings/transifexrc /.transifexrc
 fi
