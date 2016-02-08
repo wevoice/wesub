@@ -59,7 +59,6 @@ from utils.searching import get_terms
 from utils.subtitles import create_new_subtitles, dfxp_merge
 from utils.text import fmt
 from teams.moderation_const import MODERATION_STATUSES, UNMODERATED
-from raven.contrib.django.models import client
 
 logger = logging.getLogger("videos-models")
 
