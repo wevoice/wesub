@@ -116,7 +116,7 @@
                 {% for label, choices in language_choices %}
                 <optgroup label="{{ label }}">
                   {% for code, name in choices %}
-                  <option {% if language_code == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
+                  <option {% if primary_audio_language_code == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
                   {% endfor %}
                 </optgroup>
                 {% endfor %}

@@ -1085,7 +1085,7 @@ def approvals(request, slug):
             except:
                 HttpResponseForbidden(_(u'Invalid task to approve'))
 
-    extra_context['language_choices'] =  [(code, name) for code, name in get_language_choices()]
+    extra_context['language_choices'] =  get_language_choices()
     extra_context['project_choices'] = team.project_set.exclude(name=Project.DEFAULT_NAME)
 
     language_filter = request.GET.get('lang')
