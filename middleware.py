@@ -94,8 +94,7 @@ class LogRequest(object):
         request._start_time = time.time()
 
     def process_exception(self, request, exception):
-        msg = 'Error processing request: {} {}'.format(
-            request.method, request.path_info)
+        msg = '{}'.format(exception)
         error_logger.error(msg, extra=self.calc_extra(request),
                             exc_info=True)
 
