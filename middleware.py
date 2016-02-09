@@ -113,6 +113,10 @@ class LogRequest(object):
             'path': request.path_info,
             'size': request.META.get('CONTENT_LENGTH'),
         }
+        try:
+            extra['user'] = request.user.username
+        except AttributeError:
+            extra['user'] = '<null>'
         if request.GET:
             extra['query'] = data_printer.printout(request.GET)
         try:
