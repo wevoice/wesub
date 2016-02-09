@@ -17,7 +17,7 @@ from django.utils.http import cookie_date
 from utils.dataprintout import DataPrinter
 
 access_logger = logging.getLogger('access')
-error_logger = logging.getLogger('request_error')
+error_logger = logging.getLogger('unhandled_error')
 
 SECTIONS = {
     'widget': 'widget',
@@ -96,7 +96,7 @@ class LogRequest(object):
     def process_exception(self, request, exception):
         msg = 'Error processing request: {} {}'.format(
             request.method, request.path_info)
-        access_logger.error(msg, extra=self.calc_extra(request),
+        error_logger.error(msg, extra=self.calc_extra(request),
                             exc_info=True)
 
     def process_response(self, request, response):
