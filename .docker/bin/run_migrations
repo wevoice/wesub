@@ -2,4 +2,4 @@
 source /usr/local/bin/config_env
 
 echo "Running migrations..."
-python manage.py migrate --settings=unisubs_settings
+python ${MANAGE_SCRIPT} migrate --settings=unisubs_settings

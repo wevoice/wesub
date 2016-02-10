@@ -23,7 +23,7 @@ import logging
 
 from utils.dataprintout import DataPrinter
 
-EXTRA_FIELDS = ['path', 'view', 'query', 'data', 'metrics']
+EXTRA_FIELDS = ['path', 'view', 'query', 'data', 'metrics', 'user']
 
 data_printer = DataPrinter(
     max_size=500, max_item_size=100, max_repr_size=50)
@@ -44,15 +44,6 @@ def record_data(record):
             data[name] = getattr(record, name)
     return data
 
-def exception_data(record, exc):
-    return {
-        '@version': '1',
-        '@timestamp': format_timestamp(record.created),
-        'message': 'Error formatting record: {}'.format(exc),
-        'level': 'ERROR',
-        'name': 'logging'
-    }
-
 def format_timestamp(time):
     tstamp = datetime.utcfromtimestamp(time)
     return (tstamp.strftime("%Y-%m-%dT%H:%M:%S") +
@@ -67,7 +58,12 @@ def format_traceback(tb):
         parts.append('\n')
         if frame[0].f_locals:
             parts.append(data_printer.printout(frame[0].f_locals))
+        leading_space = min([len(l) - len(l.lstrip()) for l in frame[4] if
+                             l.lstrip()])
+        parts.append('\n')
         for i, line in enumerate(frame[4]):
+            if line.lstrip():
+                line = line[leading_space:]
             prefix = '* ' if i == frame[5] else '  '
             parts.append(prefix + line)
         parts.append('\n')

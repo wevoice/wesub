@@ -26,11 +26,11 @@ RUN rm /usr/local/man
 RUN mkdir -p /var/run/amara
 RUN useradd --home /var/run/amara --shell /bin/bash amara
 RUN chown amara:amara /var/run/amara
-RUN ln -s /opt/apps/amara/manage.py /opt/apps/amara/startup.py /var/run/amara/
 USER amara
 WORKDIR /var/run/amara
 EXPOSE 8000
-ENV PYTHONPATH /var/run/amara
+ENV PYTHONPATH /var/run/amara:/opt/apps/amara:/opt/apps/amara/libs:/opt/apps/amara/apps
+ENV MANAGE_SCRIPT /opt/apps/amara/manage.py
 ENV DJANGO_SETTINGS_MODULE unisubs_settings
 ENV REVISION staging
 ENTRYPOINT ["/usr/local/bin/entry"]
