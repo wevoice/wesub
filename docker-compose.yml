@@ -6,8 +6,7 @@ app:
     DJANGO_LIVE_TEST_SERVER_ADDRESS: 'localhost:8081,8090-8100,9000-9200'
     LANG: en_US.UTF-8
     WORKERS: 2
-    # Uncomment to test out the json logs that we use on production
-    # JSON_LOGGING: 1
+    JSON_LOGGING:
   volumes:
     - .:/opt/apps/amara
   hostname: unisubs.example.com
@@ -26,8 +25,7 @@ worker:
     CELERY_QUEUES: celery,feeds
     DJANGO_SETTINGS_MODULE: dev_settings
     LANG: en_US.UTF-8
-    # Uncomment to test out the json logs that we use on production
-    # JSON_LOGGING: 1
+    JSON_LOGGING:
   volumes:
     - .:/opt/apps/amara
   links:

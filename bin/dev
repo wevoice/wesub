@@ -218,7 +218,14 @@ class DBLoad(Command):
 class Up(Command):
     """Start docker containers."""
 
+    options = [
+        optparse.make_option('--json', action='store_true',
+                             help='Use JSON formatted logging')
+    ]
+
     def run_inner(self, args, options):
+        if options.json:
+            os.environ['JSON_LOGGING'] = '1'
         subprocess.call(['docker-compose', 'up', 'app', 'worker'])
 
 def run_manage(args, **kwargs):
