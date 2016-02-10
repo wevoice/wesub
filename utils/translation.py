@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import copy
 import json
 import time
 
@@ -93,7 +94,7 @@ def get_language_choices(with_empty=False, with_any=False, flat=False,
         _get_language_choices_cache[language_code] = languages
 
     # make a copy of languages before we alter it
-    languages = list(languages)
+    languages = copy.deepcopy(languages)
     if limit_to:
         limit_to = set(limit_to)
         def filter_optgroup(og):
