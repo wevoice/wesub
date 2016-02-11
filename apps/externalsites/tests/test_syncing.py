@@ -775,7 +775,7 @@ class BrightcoveAPITest(TestCase):
                           self.write_token, self.video_id)
 
     def setup_add_captions_success_response(self):
-        self.mock_requests.post.return_value.json ={
+        self.mock_requests.post.return_value.json.return_value = {
             'id': None,
             'error': None,
             'result': {
@@ -792,14 +792,14 @@ class BrightcoveAPITest(TestCase):
         }
 
     def setup_delete_captions_success_response(self):
-        self.mock_requests.post.return_value.json = {
+        self.mock_requests.post.return_value.json.return_value = {
             'id': None,
             'result': {},
             'error': None,
         }
 
     def setup_invalid_token_response(self):
-        self.mock_requests.post.return_value.json = {
+        self.mock_requests.post.return_value.json.return_value = {
             'id': None,
             'result': None,
             'error': {
@@ -810,7 +810,7 @@ class BrightcoveAPITest(TestCase):
         }
 
     def setup_invalid_video_id_response(self):
-        self.mock_requests.post.return_value.json = {
+        self.mock_requests.post.return_value.json.return_value = {
             'id': None,
             'result': None,
             'error': {

@@ -409,8 +409,6 @@ def upload_subtitles(request):
     except Exception, e:
         import traceback
         traceback.print_exc()
-        from raven.contrib.django.models import client
-        client.create_from_exception()
         output['errors'] = {'__all__': [force_unicode(e)]}
 
     return HttpResponse(json.dumps(output))

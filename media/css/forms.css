@@ -614,7 +614,7 @@ input.open-id {
 #login .content form {
     margin: 0 140px;
 }
-#login button.green_button {
+#login .green_button,.red_button {
     float: none;
     margin-top: 2em;
 }

@@ -292,21 +292,21 @@ class TestCaseTED(WebdriverTestCase):
         """TED api returns translated title from published version."""
         url_part = '%sapi2/ted/videos/1806/languages/sv' % self.base_url
         r = self.data_utils.make_request(self.admin, 'get', url_part)
-        response = r.json
+        response = r.json()
         self.assertEqual(response['title'], 'sv subs title')
 
     def test_ted_api_speaker_draft(self):
         """TED api returns translated speaker name from draft version."""
         url_part = '%sapi2/ted/videos/1806/languages/de' % self.base_url
         r = self.data_utils.make_request(self.admin, 'get', url_part)
-        response = r.json
+        response = r.json()
         self.assertEqual(response['metadata']['speaker-name'], 'Klaus')
 
     def test_ted_api_title_draft(self):
         """TED api returns translated speaker name from draft version."""
         url_part = '%sapi2/ted/videos/1806/languages/de' % self.base_url
         r = self.data_utils.make_request(self.admin, 'get', url_part)
-        response = r.json
+        response = r.json()
         self.assertEqual(response['title'], 'de subs title')
 
 
@@ -315,7 +315,7 @@ class TestCaseTED(WebdriverTestCase):
         url_part = '%sapi2/ted/videos/1806/languages/ru' % self.base_url
         r = self.data_utils.make_request(self.admin, 'get', url_part)
         self.logger.info(r)
-        response = r.json
+        response = r.json()
         self.assertEqual(response['metadata']['speaker-name'], '')
 
 
@@ -331,7 +331,7 @@ class TestCaseTED(WebdriverTestCase):
         """Amara api returns '' when only draft version. """
         url_part = '/api/videos/%s/languages/de' % self.speaker_video.video_id
         r = self.data_utils.make_request(self.admin, 'get', url_part)
-        response = r.json
+        response = r.json()
         self.logger.info(r)
         self.assertEqual(response['metadata']['speaker-name'], '')
 
@@ -339,7 +339,7 @@ class TestCaseTED(WebdriverTestCase):
         """Amara api returns '' when no speaker name translated. """
         url_part = '/api/videos/%s/languages/ru' % self.speaker_video.video_id
         r = self.data_utils.make_request(self.admin, 'get', url_part)
-        response = r.json
+        response = r.json()
         self.assertEqual(response['metadata']['speaker-name'], '')
 
     def test_site_search_video_speakername(self):

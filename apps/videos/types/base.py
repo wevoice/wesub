@@ -65,9 +65,7 @@ class VideoType(object):
         download_file = os.path.join(settings.TMP_FOLDER, str(uuid.uuid4()))
         with open(download_file, 'wb') as handle:
             try:
-                # prefetch=False must be changed to stream=True
-                # once we upgrade the requests package
-                response = requests.get(url, prefetch=False, timeout=5, verify=False)
+                response = requests.get(url, stream=True, timeout=5, verify=False)
             except requests.ConnectionError as e:
                 logger.error("""Request to download raw audio/video file was not successful, raised ConnectionError error {}""".format(repr(e)))
                 clean(download_file, handle)

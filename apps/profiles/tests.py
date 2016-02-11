@@ -41,8 +41,10 @@ class TestViews(TestCase):
         self._simple_test('profiles:account')
 
         data = {
-            'username': 'new_username_for_admin',
-            'email': self.user.email,
+            'editaccount': True,
+            'account-username': 'new_username_for_admin',
+            'account-email': self.user.email,
+            'account-current_password': 'admin',
             'userlanguage_set-TOTAL_FORMS': '0',
             'userlanguage_set-INITIAL_FORMS': '0',
             'userlanguage_set-MAX_NUM_FORMS': ''
@@ -50,10 +52,10 @@ class TestViews(TestCase):
         response = self.client.post(reverse('profiles:account'), data=data)
         self.assertEqual(response.status_code, 302)
         user = User.objects.get(pk=self.user.pk)
-        self.assertEqual(user.username, data['username'])
+        self.assertEqual(user.username, data['account-username'])
 
         other_user = UserFactory()
-        data['username'] = other_user.username
+        data['account-username'] = other_user.username
         response = self.client.post(reverse('profiles:account'), data=data)
         self.assertEqual(response.status_code, 200)
 
