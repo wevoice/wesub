@@ -1,0 +1,5 @@
+#!/bin/bash
+source /usr/local/bin/config_env
+
+echo "Uploading to S3..."
+python ${MANAGE_SCRIPT} send_to_s3 --settings=unisubs_settings --skip-commit-check

@@ -15,15 +15,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-from django.conf import settings
-from django.shortcuts import render_to_response
 
-from videos.forms import  FeedbackForm
+import logging
 
+from django.contrib.admin.views.decorators import staff_member_required
 
-def get_feedback(request):
-    form = FeedbackForm(request.POST, initial={'captcha': request.META['REMOTE_ADDR']})
-    return render_to_response("videos/_feedback_form.html", {
-            'form':form,
-            'key': settings.RECAPTCHA_PUBLIC
-    })
+logger = logging.getLogger(__name__)
+
+@staff_member_required
+def errortest(request):
+    foo = 'bar'
+    baz = 12345
+    try:
+        1/0
+    except:
+        logging.error("Errortest: handled exception", exc_info=True)
+
+    raise AssertionError("Errortest: unhandled exception")

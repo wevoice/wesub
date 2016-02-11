@@ -25,6 +25,9 @@ Currently we support:
 Messages models will trigger an email to be sent if
 the user has allowed email notifications
 """
+import logging
+
+from celery.task import task
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -32,21 +35,17 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from django.template.loader import render_to_string
 from django.contrib.contenttypes.models import ContentType
 
-from raven.contrib.django.models import client
-
-from celery.task import task
-
 from auth.models import CustomUser as User, UserLanguage
 from localeurl.utils import universal_url
-
 from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
      REVIEWED_AND_PENDING_APPROVAL, REVIEWED_AND_SENT_BACK
-
 from messages.models import Message
 from utils import send_templated_email
 from utils.text import fmt
 from utils.translation import get_language_label
 BATCH_SIZE = 1000
+
+logger = logging.getLogger(__name__)
 
 def get_url_base():
     return "http://" + Site.objects.get_current().domain
@@ -84,8 +83,9 @@ def send_new_message_notification(message_id):
     try:
         message = Message.objects.get(pk=message_id)
     except Message.DoesNotExist:
-        msg = '**send_new_message_notification**. Message does not exist. ID: %s' % message_id
-        client.create_from_text(msg, logger='celery')
+        logger.warn(
+            'send_new_message_notification: Message does not exist. ID: %s',
+            message_id)
         return
 
     user = message.user
