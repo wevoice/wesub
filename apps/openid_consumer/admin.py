@@ -1,28 +1,31 @@
 # Amara, universalsubtitles.org
-#
-# Copyright (C) 2013 Participatory Culture Foundation
-#
+# 
+# Copyright (C) 2016 Participatory Culture Foundation
+# 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-#
+# 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-#
+# 
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see
+# along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.conf.urls import patterns, url
+#  Based on: http://www.djangosnippets.org/snippets/73/
+#
+#  Modified by Sean Reifschneider to be smarter about surrounding page
+#  link context.  For usage documentation see:
+#
+#     http://www.tummy.com/Community/Articles/django-pagination/
 
-urlpatterns = patterns('externalsites.views',
-    url(r'^resync/(?P<video_url_id>\d+)/(?P<language_code>[\w-]+)/$', 'resync', name='resync'),
-    url(r'^youtube-add-account/', 'youtube_add_account',
-        name='youtube-add-account'),
-    url(r'^google-callback/', 'google_callback', name='google-callback'),
-    url(r'^google-login/', 'google_login', name='google-login'),
-    url(r'^google-login-confirm/', 'google_login', {'confirmed': False}, name='google-login-confirm'),
-)
+from django.contrib import admin
+from django.conf import settings
+from openid_consumer.models import Nonce, Association
+
+admin.site.register(Nonce)
+admin.site.register(Association)
