@@ -148,7 +148,10 @@ class Message(models.Model):
         content = []
 
         if self.content:
-            escaped_content = escape(self.content)
+            if self.message_type == SYSTEM_NOTIFICATION:
+                escaped_content = self.content
+            else:
+                escaped_content = escape(self.content)
             try:
                 my_content_with_links = urlize(escaped_content)
             except ValueError:
