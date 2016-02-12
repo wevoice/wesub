@@ -125,13 +125,35 @@ class CreateSubtitlesFormTest(CreateSubtitlesFormTestBase):
         self.video.primary_audio_language_code = 'en'
         self.assertEquals(self.make_form().needs_primary_audio_language, False)
 
-    def test_subtitle_language_filter(self):
+    def check_language_choices(self, correct_choices):
+        choices = self.make_form()['subtitle_language_code'].field.choices
+        for optgroup, correct_optgroup in zip(choices, correct_choices):
+            assert_equal(unicode(optgroup[0]), unicode(correct_optgroup[0]))
+            assert_equal(optgroup[1], correct_optgroup[1])
+
+    def test_subtitle_language_filter_top_section(self):
+        # We should use the user's languages as our top section (if set)
+        self.user.set_languages([
+            dict(language='en', priority=0),
+            dict(language='fr', priority=1),
+        ])
+
+        self.check_language_choices(get_language_choices(top_section=(
+            ('Your Languages', [
+                (u'en', 'English'),
+                (u'fr', 'French'),
+            ])
+        )))
+
+    def test_subtitle_language_filter_top_section_no_languages_set(self):
+        self.user.set_languages([])
+        self.check_language_choices(get_language_choices())
+
+    def test_subtitle_language_filter_excludes_languages(self):
         # test that we don't allow languages that already have subtitles
         pipeline.add_subtitles(self.video, 'en', None)
         pipeline.add_subtitles(self.video, 'fr', None)
-        assert_items_equal(
-            self.make_form()['subtitle_language_code'].field.choices,
-            get_language_choices(exclude=['en', 'fr']))
+        self.check_language_choices(get_language_choices(exclude=['en', 'fr']))
 
     def check_redirect(self, response, language_code):
         self.assertEquals(response.__class__, HttpResponseRedirect)

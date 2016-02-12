@@ -377,7 +377,13 @@ class CreateSubtitlesForm(CreateSubtitlesFormBase):
     def get_language_choices(self):
         # remove languages that already have subtitles
         current_langs = set(self.video.languages_with_versions())
-        return get_language_choices(exclude=current_langs)
+        user_language_choices = self.user.get_language_codes_and_names()
+        if user_language_choices:
+            top_section = (_('Your Languages'), user_language_choices)
+        else:
+            top_section = None
+        return get_language_choices(top_section=top_section,
+                                    exclude=current_langs)
 
     def set_primary_audio_language(self):
         if self.needs_primary_audio_language:

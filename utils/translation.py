@@ -68,7 +68,7 @@ def _only_supported_languages(language_codes):
 
 _get_language_choices_cache = {}
 def get_language_choices(with_empty=False, with_any=False, flat=False,
-                         limit_to=None, exclude=None):
+                         top_section=None, limit_to=None, exclude=None):
     """Get a list of language choices
 
     We display languages as "<native_name> [code]", where native
@@ -83,6 +83,8 @@ def get_language_choices(with_empty=False, with_any=False, flat=False,
         with_any: Should we include a choice for any language?
         flat: Make all items in the list (code, name), instead of using the
            django optgroup style for some
+        top_section: (code, choices) tuple to use for the top section, instead
+           of the popular languages
         limit_to: limit choices to a list of language codes
         exclude: exclude choices from the list of language codes
     """
@@ -96,6 +98,8 @@ def get_language_choices(with_empty=False, with_any=False, flat=False,
 
     # make a copy of languages before we alter it
     languages = copy.deepcopy(languages)
+    if top_section:
+        languages[0] = top_section
     if limit_to or exclude:
         if limit_to is not None:
             limit_to = set(limit_to)
