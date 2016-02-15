@@ -34,11 +34,11 @@ from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.db import models
 from django.db import transaction
+from django.db.models.loading import get_model
 from django.db.models.signals import post_save
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _, ugettext
 from tastypie.models import ApiKey
-
 from caching import CacheGroup, ModelCacheManager
 from utils.amazon import S3EnabledImageField
 from utils import translation
@@ -394,6 +394,41 @@ class CustomUser(BaseUser):
     @property
     def is_anonymous(self):
         return self.pk == settings.ANONYMOUS_USER_ID
+
+    @property
+    def is_external(self):
+        """
+        Checks whether accout is external
+        It can me an OpeenId link or a token stored as
+        a ThirdPartyAccount
+        """
+        try:
+            l = self.openid_connect_link
+            return True
+        except:
+            from thirdpartyaccounts import get_thirdpartyaccount_types
+            for thirdpartyaccount_type in get_thirdpartyaccount_types():
+                m = get_model(thirdpartyaccount_type[0], thirdpartyaccount_type[1])
+                if (m is not None) and (len(m.objects.for_user(self)) > 0):
+                    return True
+        return False
+
+    def has_valid_password(self):
+        return len(self.password) > 0 and self.has_usable_password()
+
+    def unlink_external(self):
+        from thirdpartyaccounts import get_thirdpartyaccount_types
+        for thirdpartyaccount_type in get_thirdpartyaccount_types():
+            m = get_model(thirdpartyaccount_type[0], thirdpartyaccount_type[1])
+            if m is not None:
+                m.objects.for_user(self).delete()
+        from socialauth.models import AuthMeta, OpenidProfile
+        AuthMeta.objects.filter(user=self).delete()
+        OpenidProfile.objects.filter(user=self).delete()
+        try:
+            self.openid_connect_link.delete()
+        except:
+            pass
 
     def get_api_key(self):
         return ApiKey.objects.get_or_create(user=self)[0].key

@@ -29,8 +29,27 @@ OpenIDConnectInfo = namedtuple('OpenIDConnectInfo',
                                'sub email openid_key profile_data')
 
 class OpenIDConnectBackend(CustomUserBackend):
+    @staticmethod
+    def pre_authenticate(**credentials):
+        connect_info = credentials.get('openid_connect_info')
+        if connect_info is None:
+            return None
+        try:
+            u = User.objects.get(openid_connect_link__sub=connect_info.sub)
+            return (True, '')
+        except User.DoesNotExist:
+            pass
+        if connect_info.openid_key:
+            try:
+                u = OpenIDConnectBackend._get_openid20_user(connect_info)
+                return (True, '')
+            except User.DoesNotExist:
+                pass
+        return (False, connect_info.email)
+
     def authenticate(self, **credentials):
         connect_info = credentials.get('openid_connect_info')
+        email = credentials.get('email')
         if connect_info is None:
             return None
 
@@ -48,17 +67,26 @@ class OpenIDConnectBackend(CustomUserBackend):
         #     OpenIDConnectLink instance, and update their user data
         #
         try:
-            return User.objects.get(openid_connect_link__sub=connect_info.sub)
+            user = User.objects.get(openid_connect_link__sub=connect_info.sub)
+            if user.is_active:
+                return user
+            else:
+                return
         except User.DoesNotExist:
             pass
         if connect_info.openid_key:
             try:
-                return self._get_openid20_user(connect_info)
+                user = OpenIDConnectBackend._get_openid20_user(connect_info)
+                if user.is_active:
+                    return user
+                else:
+                    return
             except User.DoesNotExist:
                 pass
-        return self._create_new_user(connect_info)
+        return self._create_new_user(connect_info, email=email)
 
-    def _get_openid20_user(self, connect_info):
+    @staticmethod
+    def _get_openid20_user(connect_info):
         user = User.objects.get(
             openidprofile__openid_key=connect_info.openid_key)
         for name, value in connect_info.profile_data.items():
@@ -68,12 +96,14 @@ class OpenIDConnectBackend(CustomUserBackend):
         OpenIDConnectLink.objects.create(user=user, sub=connect_info.sub)
         return user
 
-    def _create_new_user(self, connect_info):
+    def _create_new_user(self, connect_info, email=None):
         usernames = self._generate_usernames(connect_info.email)
+        if not email:
+            email = connect_info.email
         while True:
             try:
                 user = User.objects.create(username=usernames.next(),
-                                           email=connect_info.email,
+                                           email=email,
                                            **connect_info.profile_data)
                 break
             except IntegrityError:

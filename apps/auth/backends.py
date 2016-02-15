@@ -48,20 +48,16 @@ class OpenIdBackend(object):
     supports_object_permissions = False
     supports_anonymous_user = False
 
-    def authenticate(self, openid_key, request, provider):
+
+    @staticmethod
+    def pre_authenticate(openid_key, request, provider):
         try:
-            assoc = self._lookup_association(openid_key, request, provider)
-            if assoc.user.is_active:
-                return assoc.user
-            else:
-                return
+            assoc = OpenIdBackend._lookup_association(openid_key, request, provider)
+            return (True, '')
         except UserAssociation.DoesNotExist:
-            #fetch if openid provider provides any simple registration fields
-            nickname = None
             email = None
             if request.openid and request.openid.sreg:
                 email = request.openid.sreg.get('email')
-                nickname = request.openid.sreg.get('nickname')
             elif request.openid and request.openid.ax:
                 if provider in ('Google', 'Yahoo'):
                     key = 'http://axschema.org/contact/email'
@@ -69,6 +65,33 @@ class OpenIdBackend(object):
                 else:
                     try:
                         email = request.openid.ax.get('email')
+                    except KeyError:
+                        pass
+            return (False, email)
+
+    def authenticate(self, openid_key, request, provider, email=None):
+        try:
+            assoc = OpenIdBackend._lookup_association(openid_key, request, provider)
+            if assoc.user.is_active:
+                return assoc.user
+            else:
+                return
+        except UserAssociation.DoesNotExist:
+            #fetch if openid provider provides any simple registration fields
+            nickname = None
+            if request.openid and request.openid.sreg:
+                if email is None:
+                    email = request.openid.sreg.get('email')
+                nickname = request.openid.sreg.get('nickname')
+            elif request.openid and request.openid.ax:
+                if provider in ('Google', 'Yahoo'):
+                    key = 'http://axschema.org/contact/email'
+                    if email is None:
+                        email = request.openid.ax.get(key)[-1]
+                else:
+                    try:
+                        if email is None:
+                            email = request.openid.ax.get('email')
                     except KeyError:
                         pass
 
@@ -82,18 +105,22 @@ class OpenIdBackend(object):
                     nickname = email.split('@')[0]
                 else:
                     nickname =  ''.join([random.choice('abcdefghijklmnopqrstuvwxyz') for i in xrange(10)])
-            if email is None :
+            if email is None:
                 valid_username = False
                 email =  None #'%s@example.openid.com'%(nickname)
             else:
                 valid_username = True
-            name_count = AuthUser.objects.filter(username__startswith = nickname).count()
-
-            if name_count:
-                username = '%s%s'%(nickname, name_count + 1)
-                user = User.objects.create_user(username,email or '')
+            existing_users = User.objects.filter(username=nickname).count()
+            if existing_users > 0:
+                index = 0
+                username = '%s%s'%(nickname, index)
+                while existing_users > 0:
+                    username = '%s%s'%(nickname, index)
+                    existing_users = User.objects.filter(username=username).count()
+                    index += 1
+                user = User.objects.create_user(username, email)
             else:
-                user = User.objects.create_user(nickname,email or '')
+                user = User.objects.create_user(nickname, email)
             user.save()
 
             #create openid association
@@ -113,14 +140,16 @@ class OpenIdBackend(object):
             auth_meta.save()
             return user
 
-    def _lookup_association(self, openid_key, request, provider):
+    @staticmethod
+    def _lookup_association(openid_key, request, provider):
         if provider == 'Google':
-            return self._lookup_gmail_assocation(openid_key, request,
+            return OpenIdBackend._lookup_gmail_assocation(openid_key, request,
                                                  provider)
         else:
             return UserAssociation.objects.get(openid_key = openid_key)
 
-    def _lookup_gmail_assocation(self, openid_key, request, provider):
+    @staticmethod
+    def _lookup_gmail_assocation(openid_key, request, provider):
         email = request.openid.ax.get('http://axschema.org/contact/email')[-1]
         try:
             rv = UserAssociation.objects.filter(email=email)[0]

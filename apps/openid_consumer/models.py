@@ -6,7 +6,7 @@ class Nonce(models.Model):
     salt       = models.CharField( max_length=50 )
 
     def __unicode__(self):
-        return "Nonce: %s" % self.nonce
+        return "Nonce: %s %s %s" % (self.server_url, self.timestamp, self.salt)
 
 class Association(models.Model):
     server_url = models.TextField(max_length=2047)
