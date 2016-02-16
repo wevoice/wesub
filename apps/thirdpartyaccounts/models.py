@@ -22,6 +22,9 @@ from django.db import models
 
 from auth.models import CustomUser as User
 
+class ThirdPartyAccountManager(models.Manager):
+    def for_user(self, user):
+        return self.filter(user=user)
 
 class ThirdPartyAccount(models.Model):
     """The (abstract) base model for the concept of a third-party account.
@@ -80,6 +83,8 @@ class ThirdPartyAccount(models.Model):
 
     created = models.DateTimeField(editable=False)
     modified = models.DateTimeField(editable=False)
+
+    objects = ThirdPartyAccountManager()
 
     class Meta:
         abstract = True

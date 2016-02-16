@@ -93,7 +93,7 @@ class ViewsTests(TestCase):
             "name": u"New team",
             "is_visible": u"0",
             "description": u"testing",
-            "logo": open(path.join(settings.MEDIA_ROOT, "test/71600102.jpg"), "rb")
+            "logo": open(path.join(settings.STATIC_ROOT, "test/71600102.jpg"), "rb")
         }
 
         url = reverse("teams:settings_basic", kwargs={"slug": team.slug})

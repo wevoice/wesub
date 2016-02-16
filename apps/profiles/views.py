@@ -25,7 +25,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import  reverse
 from django.db.models import Q
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_unicode
@@ -33,7 +33,7 @@ from tastypie.models import ApiKey
 
 from auth.models import CustomUser as User
 from profiles.forms import (EditUserForm, EditAccountForm, SendMessageForm,
-                            EditAvatarForm, AdminProfileForm)
+                            EditAvatarForm, AdminProfileForm, EditNotificationsForm)
 from profiles.rpc import ProfileApiClass
 import externalsites.models
 from utils.objectlist import object_list
@@ -194,26 +194,40 @@ def edit(request):
     }
     return render(request, 'profiles/edit.html', context)
 
-
 @login_required
 def account(request):
     if request.method == 'POST':
-        form = EditAccountForm(request.POST,
-                            instance=request.user,
-                            files=request.FILES, label_suffix="")
-        if form.is_valid():
-            form.save()
-            messages.success(request, _('Your account has been updated.'))
-            return redirect('profiles:account')
-
+        if 'editaccount' in request.POST:
+            editaccountform = EditAccountForm(request.POST,
+                                              instance=request.user,
+                                              files=request.FILES, label_suffix="",
+                                              prefix='account')
+            if editaccountform.is_valid():
+                editaccountform.save()
+                messages.success(request, _('Your account has been updated.'))
+                return redirect('profiles:account')
+            editnotificationsform = EditNotificationsForm(instance=request.user, label_suffix="", prefix='notifications')
+        elif 'editnotifications' in request.POST:
+            editnotificationsform = EditNotificationsForm(request.POST,
+                                                          instance=request.user,
+                                                          files=request.FILES, label_suffix="", prefix='notifications')
+            if editnotificationsform.is_valid():
+                editnotificationsform.save()
+                messages.success(request, _('Your account has been updated.'))
+                return redirect('profiles:account')
+            editaccountform = EditAccountForm(instance=request.user, label_suffix="", prefix='account')
+        else:
+            return HttpResponseBadRequest()
     else:
-        form = EditAccountForm(instance=request.user, label_suffix="")
+        editnotificationsform = EditNotificationsForm(instance=request.user, label_suffix="", prefix='notifications')
+        editaccountform = EditAccountForm(instance=request.user, label_suffix="", prefix='account')
 
     twitters = request.user.twitteraccount_set.all()
     facebooks = request.user.facebookaccount_set.all()
 
     context = {
-        'form': form,
+        'editnotificationsform': editnotificationsform,
+        'editaccountform': editaccountform,
         'user_info': request.user,
         'edit_profile_page': True,
         'youtube_accounts': (externalsites.models.YouTubeAccount

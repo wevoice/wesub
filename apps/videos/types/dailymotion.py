@@ -74,7 +74,7 @@ class DailymotionVideoType(VideoType):
             response = requests.get(url, params={
                 'fields': 'id,title,description,thumbnail_url'
             })
-            return response.json
+            return response.json()
         except RequestException, e:
             logger.warn("Error requesting dailymotion metadata: {}", e)
             return {}

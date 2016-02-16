@@ -53,8 +53,11 @@ def getDurationFromStreams(streams):
             except:
                 pass
     for key, val in data.items():
-        if "duration" in val and "codec" in val and val["codec"] != "unknown":
-            if not ("frames" in val and "codec_type" in val and (val["codec_type"] == "video") and ((val["frames"] / 25 / val["duration"] > 1.1) or (val["frames"] / 25 / val["duration"] < 0.9))):
+        if "duration" in val and val["duration"] > 0 and "codec" in val and val["codec"] != "unknown":
+            if not ("frames" in val and
+                    "codec_type" in val and
+                    (val["codec_type"] == "video") and
+                    ((val["frames"] / 25 / val["duration"] > 1.1) or (val["frames"] / 25 / val["duration"] < 0.9))):
                 durations.add(val["duration"])
     if len(durations) == 1:
         return durations.pop()

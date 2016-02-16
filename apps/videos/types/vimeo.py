@@ -78,7 +78,7 @@ class VimeoVideoType(VideoType):
         r = requests.get("https://player.vimeo.com/video/{}/config".format(self.video_id))
         if r.status_code == requests.codes.ok:
             try:
-                video_obj.duration = r.json[u"video"]["duration"]
+                video_obj.duration = r.json()[u"video"]["duration"]
             except:
                 pass
     
@@ -89,7 +89,7 @@ class VimeoVideoType(VideoType):
         r = requests.get("https://player.vimeo.com/video/{}/config".format(self.video_id))
         if r.status_code == requests.codes.ok:
             try:
-                return r.json[u"request"]["files"]["h264"]["mobile"]["url"]
+                return r.json()[u"request"]["files"]["h264"]["mobile"]["url"]
             except:
                 return None
         return None

@@ -16,7 +16,7 @@ import sphinx_rtd_theme
 
 # HACK: something weird happens to six.moves in the process of starting up
 # django.  I'm not sure if it's our old django version, or some of our old
-# modules like raven, but somehow six.moves gets replaced with a version that
+# modules like haystack, but somehow six.moves gets replaced with a version that
 # doesn't have any of the moved modules in it.  Then we fail with something
 # like "cannot import range".  So we save the six.moves psuedo-module here and
 # restore it after startup() is called.
