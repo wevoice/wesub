@@ -14,7 +14,8 @@ class SSODecoder(object):
     def decode(self, data):
         data = data.encode('ascii')
         cipher = AES.new(self.secret)
-        enc = base64.urlsafe_b64decode(data)
+        padding = 4 - len(data) % 4
+        enc = base64.urlsafe_b64decode(data + '=' * padding)
         padding = 16 - len(enc) % 16
         enc = enc + '=' * padding
         decrypted = cipher.decrypt(enc)[:16]
