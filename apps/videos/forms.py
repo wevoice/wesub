@@ -377,7 +377,10 @@ class CreateSubtitlesForm(CreateSubtitlesFormBase):
     def get_language_choices(self):
         # remove languages that already have subtitles
         current_langs = set(self.video.languages_with_versions())
-        user_language_choices = self.user.get_language_codes_and_names()
+        if self.user.is_authenticated():
+            user_language_choices = self.user.get_language_codes_and_names()
+        else:
+            user_language_choices = []
         if user_language_choices:
             top_section = (_('Your Languages'), user_language_choices)
         else:
