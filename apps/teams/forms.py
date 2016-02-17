@@ -594,8 +594,8 @@ class LanguagesForm(forms.Form):
         super(LanguagesForm, self).__init__(*args, **kwargs)
 
         self.team = team
-        self.fields['preferred'].choices = get_language_choices()
-        self.fields['blacklisted'].choices = get_language_choices()
+        self.fields['preferred'].choices = get_language_choices(flat=True)
+        self.fields['blacklisted'].choices = get_language_choices(flat=True)
 
     def clean(self):
         preferred = set(self.cleaned_data['preferred'])
