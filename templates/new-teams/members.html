@@ -71,7 +71,7 @@
         <ul class="actions">
           <li><a class="medium" href="{{ member.user.send_message_url }}">{% trans "Send message" %}</a></li>
           {% if member.id in edit_form.editable_member_ids %}
-          <li><a class="medium edit open-modal" data-modal="edit-form" data-set-form-values='{"member": {{ member.id }}, "role":"{{ member.role }}"}' data-heading="{% blocktrans with user=member.user.display_name %}Edit Membership for {{ user }}{% endblocktrans %}" href="#">{% trans "Edit membership" %}</a></li>
+          <li><a class="medium edit" data-set-form-values='{"member": {{ member.id }}, "role":"{{ member.role }}"}' data-name="{{ member.user }}" href="#">{% trans "Edit membership" %}</a></li>
           {% endif %}
         </ul>
       </li>
@@ -85,7 +85,7 @@
 </div>
 {% if edit_form.editable_member_ids %}
 <aside class="modal" id="edit-form">
-  <h3></h3>
+  <h3>{% trans "Edit Team Membership" %}<span class="subheading name"></span></h3>
   <form action="" method="POST">
     {% csrf_token %}
     <button class="close"></button>
