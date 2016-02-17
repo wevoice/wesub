@@ -94,15 +94,18 @@ class LogRequest(object):
         request._start_time = time.time()
 
     def process_exception(self, request, exception):
-        msg = '{}'.format(exception)
-        error_logger.error(msg, extra=self.calc_extra(request),
-                            exc_info=True)
+        try:
+            msg = u'{}'.format(exception)
+            error_logger.error(msg, extra=self.calc_extra(request),
+                                exc_info=True)
+        except Exception, e:
+            error_logger.error(u'error logging exception: %s', e)
 
     def process_response(self, request, response):
         try:
             self.log_response(request, response)
         except Exception, e:
-            error_logger.error('error logging request: %s', e)
+            error_logger.error(u'error logging request: %s', e)
         return response
 
     def log_response(self, request, response):
