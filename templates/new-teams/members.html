@@ -71,7 +71,7 @@
         <ul class="actions">
           <li><a class="medium" href="{{ member.user.send_message_url }}">{% trans "Send message" %}</a></li>
           {% if member.id in edit_form.editable_member_ids %}
-          <li><a class="medium edit" data-set-form-values='{"member": {{ member.id }}, "role":"{{ member.role }}"}' data-name="{{ member.user }}" href="#">{% trans "Edit membership" %}</a></li>
+          <li><a class="medium edit" data-set-form-values='{"member": {{ member.id }}, "role":"{{ member.role }}"}' data-name="{{ member.user.display_name }}" href="#">{% trans "Edit membership" %}</a></li>
           {% endif %}
         </ul>
       </li>
