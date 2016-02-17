@@ -69,6 +69,6 @@ def format_traceback(tb):
         parts.append('\n')
     return ''.join(parts)
 
-class JSONHandler(logging.Handler):
-    def emit(self, record):
-        print(json.dumps(record_data(record)))
+class JSONHandler(logging.StreamHandler):
+    def format(self, record):
+        return json.dumps(record_data(record))

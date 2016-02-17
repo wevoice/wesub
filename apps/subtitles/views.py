@@ -186,6 +186,7 @@ class SubtitleEditorBase(View):
                 'x-apikey': self.request.user.get_api_key()
             },
             'username': self.request.user.username,
+            'user_fullname': unicode(self.request.user),
             'video': {
                 'id': self.video.video_id,
                 'title': self.video.title,

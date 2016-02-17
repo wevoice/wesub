@@ -9,7 +9,7 @@ cat << EOF > /var/run/amara/$APP_NAME.ini
 [uwsgi]
 master = true
 workers = ${WORKERS}
-harakiri = 20
+harakiri = 30
 max-requests = 5000
 memory-report
 http-socket = 0.0.0.0:8000
@@ -27,7 +27,6 @@ static-map = /static=/usr/local/lib/python2.7/site-packages/django/contrib/admin
 EOF
 
 if [ ! -z "$NEW_RELIC_LICENSE_KEY" ] ; then
-    pip install -U newrelic
     PRE="newrelic-admin run-program "
 fi
 

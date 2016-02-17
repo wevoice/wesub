@@ -76,3 +76,4 @@ factory_boy==2.4.1
 pafy==0.4.2
 isodate==0.5.4
 uwsgi==2.0.11.2
+newrelic
