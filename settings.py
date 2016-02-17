@@ -640,6 +640,7 @@ def log_handler_info():
         return {
             'level': 'INFO',
             'class': 'utils.jsonlogging.JSONHandler',
+            'formatter': 'standard'
         }
     else:
         return {

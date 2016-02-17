@@ -30,6 +30,7 @@ elif [ "$ACTION" = "reset_db" ]; then
     exec /usr/local/bin/reset-db
 elif [ "$ACTION" = "shell" ]; then
     echo "Running shell..."
+    echo "Use the manage alias to run django management commands"
     echo "source /usr/local/bin/config_env" >> ~/.bash_profile
     exec /bin/bash -l
 else
