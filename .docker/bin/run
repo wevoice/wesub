@@ -27,7 +27,6 @@ static-map = /static=/usr/local/lib/python2.7/site-packages/django/contrib/admin
 EOF
 
 if [ ! -z "$NEW_RELIC_LICENSE_KEY" ] ; then
-    pip install -U newrelic
     PRE="newrelic-admin run-program "
 fi
 

@@ -3,17 +3,15 @@
 
 {% block content %}
 
-{% load i18n %}{% blocktrans with current_site.name as site_name and user.email as email %}Hi,
+{% load i18n %}
+<p>{% blocktrans count video_count=imported_videos %}Your video was successfully imported!{% plural %}Your {{ video_count }} videos were successfully imported!{% endblocktrans %}</p>
 
-{{ imported_videos }} your videos were successfully imported!<br/>
+<p>{% blocktrans %}To see them, you can go to <a href="{{ my_videos_url }}">your user page</a>{% endblocktrans %}</p>
 
-<p>To see them, you can go to <a href="{{ my_videos_url }}">your user page</a></p>
+<p>{% blocktrans %}If you believe you've received this message in error, we apologize—feel free to ignore it. If you have any concerns, please contact us at feedback@amara.org.{% endblocktrans %}</p>
 
-<p>If you believe you've received this message in error, we apologize—feel free to ignore it. If you have any concerns, please contact us at feedback@amara.org.</p>
-
-Thanks, <br/>
-The Amara team
-{% endblocktrans %}
+<p>{% filter linebreaksbr %}{% blocktrans %}Thanks,
+The Amara team{% endblocktrans %}{% endfilter %}</p>
 {% endblock %}
 
 {% block dont_send %} {% endblock %}

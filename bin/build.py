@@ -9,7 +9,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 
 def update_commit_file():
     cmdline = ['git', 'rev-parse', '--short=8', 'HEAD']
-    commit_id = subprocess.check_output(cmdline).strip()
+    commit_id = subprocess.check_output(cmdline, cwd=ROOT_DIR).strip()
     print 'git commit: {}'.format(commit_id)
     with open(os.path.join(ROOT_DIR, 'commit.py'), 'w') as f:
         f.write("LAST_COMMIT_GUID = '{0}'\n".format(commit_id))

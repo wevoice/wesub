@@ -18,6 +18,8 @@ NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME:-}
 NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-}
 SKIP_CODE_PULL=${SKIP_CODE_PULL:-}
 
+alias manage="python $MANAGE_SCRIPT"
+
 if [ ! -z "$AWS_ID" ] && [ ! -z "$AWS_SECRET_KEY" ] ; then
     # create s3cfg
     cat << EOF > ~/.s3cfg
