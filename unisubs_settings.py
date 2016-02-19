@@ -30,7 +30,6 @@ if INSTALLATION == DEV:
     SITE_NAME = 'unisubsdev'
     REDIS_DB = "3"
     EMAIL_SUBJECT_PREFIX = '[usubs-dev]'
-    SENTRY_TESTING = True
     CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 elif INSTALLATION == STAGING:
     SITE_ID = 17
@@ -51,7 +50,6 @@ elif INSTALLATION == PRODUCTION:
 elif INSTALLATION == DEMO:
     DEBUG = True
     REDIS_DB = "4"
-    SENTRY_TESTING = True
 elif INSTALLATION == LOCAL:
     SITE_ID = 14
     SITE_NAME = 'unisubsstaging'
