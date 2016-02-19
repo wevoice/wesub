@@ -194,6 +194,7 @@ INSTALLED_APPS = (
     'messages',
     'profiles',
     'search',
+    'staff',
     'staticmedia',
     'teams',
     'testhelpers',
