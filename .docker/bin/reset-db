@@ -1,0 +1,8 @@
+#!/bin/bash
+source /usr/local/bin/config_env
+
+python ${MANAGE_SCRIPT} drop_all_tables
+python ${MANAGE_SCRIPT} syncdb --all --noinput
+python ${MANAGE_SCRIPT} migrate --fake
+python ${MANAGE_SCRIPT} setup_indexes
+python ${MANAGE_SCRIPT} setup_test_data

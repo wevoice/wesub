@@ -28,16 +28,21 @@ from django.contrib.auth import (
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import password_reset as contrib_password_reset
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.forms.util import ErrorList
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext
+from django.template.response import TemplateResponse
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.csrf import csrf_protect
 from oauth import oauth
-
 from auth.forms import CustomUserCreationForm, ChooseUserForm, SecureAuthenticationForm
+from openid_consumer.views import begin as begin_openid
+from auth.forms import CustomUserCreationForm, ChooseUserForm, DeleteUserForm, CustomPasswordResetForm, EmailForm
 from auth.models import (
     UserLanguage, EmailConfirmation, LoginToken
 )
@@ -45,6 +50,8 @@ from auth.providers import get_authentication_provider
 from ipware.ip import get_real_ip, get_ip
 from socialauth.models import AuthMeta, OpenidProfile
 from socialauth.views import get_url_host
+from thirdpartyaccounts.views import facebook_login, twitter_login
+from externalsites.views import google_login
 from utils.translation import get_user_languages_from_cookie
 
 LOGIN_CACHE_TIMEOUT = 60
@@ -57,6 +64,34 @@ def login(request):
         form = AuthenticationForm(label_suffix="")
     return render_login(request, CustomUserCreationForm(label_suffix=""),
                         form, redirect_to)
+
+def confirm_create_user(request, account_type, email):
+    redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            if account_type == 'facebook':
+                return facebook_login(request, next=redirect_to, confirmed=True, email=email)
+            if account_type == 'google':
+                return google_login(request, next=redirect_to, confirmed=True, email=email)
+            if account_type == 'twitter':
+                return twitter_login(request, next=redirect_to, confirmed=True, email=email)
+            if account_type == 'openid':
+                pass
+            if account_type == 'ted':
+                provider = get_authentication_provider('ted')
+                return provider.view(request, confirmed=True, email=email)
+            if account_type == 'udacity':
+                request.session['openid_provider'] = 'Udacity'
+                return begin_openid(request, user_url='https://www.udacity.com/openid/server', redirect_to=reverse('socialauth_udacity_complete', args=(email,)), confirmed=True)
+    else:
+        initial = {}
+        if email:
+            initial['email'] = email
+        form = EmailForm(initial=initial)
+    return render_login(request, CustomUserCreationForm(label_suffix=""),
+                        AuthenticationForm(label_suffix=""), redirect_to, email_form=form, confirm_type=account_type)
 
 def confirm_email(request, confirmation_key):
     confirmation_key = confirmation_key.lower()
@@ -98,21 +133,31 @@ def create_user(request):
 
 @login_required
 def delete_user(request):
-    if request.POST.get('delete'):
-        user = request.user
-
-        AuthMeta.objects.filter(user=user).delete()
-        OpenidProfile.objects.filter(user=user).delete()
-        # TODO: TPA?
-
-        user.team_members.all().delete()
-
-        user.is_active = False
-        user.save()
-        logout(request)
-        messages.success(request, _(u'Your account was deleted.'))
-        return HttpResponseRedirect('/')
-    return render(request, 'auth/delete_user.html')
+    if not request.user.has_valid_password():
+        return render_to_response('auth/delete_user.html', {
+        }, context_instance=RequestContext(request))
+    if request.method == 'POST':
+        form = DeleteUserForm(request.POST)
+        if form.is_valid():
+             username = request.user.username
+             password = form.cleaned_data['password']
+             user = authenticate(username=username, password=password)
+             if user:
+                 user.unlink_external()
+                 user.team_members.all().delete()
+                 user.is_active = False
+                 user.save()
+                 logout(request)
+                 messages.success(request, _(u'Your account was deleted.'))
+                 return HttpResponseRedirect('/')
+             else:
+                 errors = form._errors.setdefault("password", ErrorList())
+                 errors.append(_(u"Incorrect Password"))
+    else:
+        form = DeleteUserForm()
+    return render_to_response('auth/delete_user.html', {
+        'form': form
+    }, context_instance=RequestContext(request))
 
 def cache_key(request):
     ip = get_real_ip(request)
@@ -185,6 +230,22 @@ def token_login(request, token):
         pass
     return HttpResponseForbidden("Invalid user token")
 
+def password_reset_complete(request,
+                            template_name='registration/password_reset_complete.html',
+                            current_app=None, extra_context=None):
+    """
+    The difference with the complete view from the contrib package
+    is that is logs out the user.
+    """
+    context = {
+        'login_url': settings.LOGIN_URL
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    logout(request)
+    return TemplateResponse(request, template_name, context,
+                            current_app=current_app)
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def login_trap(request):
@@ -204,18 +265,27 @@ def login_trap(request):
 
 # Helpers
 
-def render_login(request, user_creation_form, login_form, redirect_to):
+def render_login(request, user_creation_form, login_form, redirect_to, email_form=None, confirm_type=None):
     redirect_to = redirect_to or '/'
-    ted_auth = get_authentication_provider('ted')
-    stanford_auth = get_authentication_provider('stanford')
+    context = {
+        REDIRECT_FIELD_NAME: redirect_to,
+    }
+    if confirm_type is None:
+        context['creation_form'] = user_creation_form
+        context['login_form'] = login_form
+        context['ted_auth'] = get_authentication_provider('ted')
+        context['stanford_auth'] = get_authentication_provider('stanford')
+        template = 'auth/login.html'
+    else:
+        if email_form:
+            context['email_form'] = email_form
+        template = 'auth/login_create.html'
+        if confirm_type == 'ted':
+            context['ted_auth'] = get_authentication_provider('ted')
+        if confirm_type == 'stanford':
+            context['stanford_auth'] = get_authentication_provider('stanford')
     return render_to_response(
-        'auth/login.html', {
-            'creation_form': user_creation_form,
-            'login_form' : login_form,
-            'ted_auth': ted_auth,
-            'stanford_auth': stanford_auth,
-            REDIRECT_FIELD_NAME: redirect_to,
-            }, context_instance=RequestContext(request))
+        template, context, context_instance=RequestContext(request))
 
 def make_redirect_to(request, default=''):
     """Get the URL to redirect to after logging a user in.
@@ -228,3 +298,10 @@ def make_redirect_to(request, default=''):
         return '/'
     else:
         return redirect_to
+
+@csrf_protect
+def password_reset(request):
+    extra_context = {}
+    if request.user.is_authenticated():
+        extra_context = {'email_address': request.user.email}
+    return contrib_password_reset(request, password_reset_form=CustomPasswordResetForm, extra_context=extra_context)

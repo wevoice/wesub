@@ -31,9 +31,8 @@ from django.core.cache import cache
 from django.dispatch import receiver
 from django.db import connection, models, IntegrityError
 from django.db.models.signals import post_save, pre_delete
-from django.db.models import Q
-from django.db.models import query
 from django.db import transaction
+from django.db.models import Q, query
 from django.db import IntegrityError
 from django.utils.dateformat import format as date_format
 from django.conf import settings
@@ -56,10 +55,10 @@ from utils import codes
 from utils import translation
 from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
+from utils.searching import get_terms
 from utils.subtitles import create_new_subtitles, dfxp_merge
 from utils.text import fmt
 from teams.moderation_const import MODERATION_STATUSES, UNMODERATED
-from raven.contrib.django.models import client
 
 logger = logging.getLogger("videos-models")
 
@@ -133,6 +132,15 @@ class VideoManager(models.Manager):
     def get_query_set(self):
         return VideoQueryset(self.model, using=self._db)
 
+    def featured(self):
+        return self.filter(featured__isnull=False).order_by('-featured')
+
+    def latest(self):
+        return self.public().order_by('-created')
+
+    def public(self):
+        return self.filter(is_public=True)
+
 class VideoQueryset(query.QuerySet):
     def select_has_public_version(self):
         """Add a subquery to check if there is a public version for this video
@@ -147,6 +155,49 @@ EXISTS(
             OR (sv.visibility_override = '' AND sv.visibility='public')))"""
 
         return self.extra({ '_has_public_version': sql })
+
+    def search(self, query):
+        # only use terms with 3 or more chars.  Terms with less chars are not indexed, so they will never match anything.
+        terms = [t for t in get_terms(query) if len(t) > 2]
+        query = u' '.join(u'+"{}"'.format(t) for t in terms)
+        return self.filter(index__text__search=query)
+
+    def add_num_completed_languages(self):
+        sql = ("""
+               (SELECT COUNT(*) FROM subtitles_subtitlelanguage sl
+               WHERE sl.video_id=videos_video.id AND
+               sl.subtitles_complete)""")
+        return self.extra(select={
+            'num_completed_languages': sql
+        })
+
+    def any_completed_languages(self):
+        sql = ("""
+               EXISTS (SELECT * FROM subtitles_subtitlelanguage sl
+               WHERE sl.video_id=videos_video.id AND
+               sl.subtitles_complete)""")
+        return self.extra(where=[sql])
+
+    def no_completed_languages(self):
+        sql = ("""
+               NOT EXISTS (SELECT * FROM subtitles_subtitlelanguage sl
+               WHERE sl.video_id=videos_video.id AND
+               sl.subtitles_complete)""")
+        return self.extra(where=[sql])
+
+    def has_completed_language(self, language_code):
+        sql = ("""
+               EXISTS (SELECT * FROM subtitles_subtitlelanguage sl
+               WHERE sl.video_id=videos_video.id AND
+               sl.language_code=%s AND sl.subtitles_complete)""")
+        return self.extra(where=[sql], params=[language_code])
+
+    def missing_completed_language(self, language_code):
+        sql = ("""
+               NOT EXISTS (SELECT * FROM subtitles_subtitlelanguage sl
+               WHERE sl.video_id=videos_video.id AND
+               sl.language_code=%s AND sl.subtitles_complete)""")
+        return self.extra(where=[sql], params=[language_code])
 
 class SubtitleLanguageFetcher(object):
     """Fetches/caches subtitle languages for videos."""
@@ -324,13 +375,8 @@ class Video(models.Model):
             signals.title_changed.send(sender=self, old_title=old_title)
 
     def update_search_index(self):
-        """Queue a Celery task that will update this video's Solr entry."""
+        """Update this video's search index text."""
 
-        # Update using the old Solr index
-        from utils.celery_search_index import update_search_index
-        update_search_index.delay(self.__class__, self.pk)
-
-        # Also update using the new MySQL index
         VideoIndex.index_video(self)
 
     def title_display(self, use_language_title=True):
@@ -1053,10 +1099,6 @@ def create_video_id(sender, instance, **kwargs):
 
 def video_delete_handler(sender, instance, **kwargs):
     video_cache.invalidate_cache(instance.video_id)
-    # avoid circular dependencies, import here
-    from haystack import site
-    search_index = site.get_index(Video)
-    search_index.backend.remove(instance)
 
 models.signals.pre_save.connect(create_video_id, sender=Video)
 models.signals.pre_delete.connect(video_delete_handler, sender=Video)

@@ -29,10 +29,10 @@ INSTALLED_APPS += (
 )
 
 BROKER_BACKEND = 'amqplib'
-BROKER_HOST = os.environ.get('QUEUE_1_PORT_5672_TCP_ADDR')
+BROKER_HOST = 'queue'
 BROKER_USER = 'guest'
 BROKER_PASSWORD = 'guest'
-BROKER_PORT = os.environ.get('QUEUE_1_PORT_5672_TCP_PORT')
+BROKER_PORT = 5672
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 JS_USE_COMPILED = True
@@ -46,21 +46,17 @@ DATABASES = {
         'NAME': "amara",
         'USER': "amara",
         'PASSWORD': "amara",
-        'HOST': os.environ.get('DB_1_PORT_3306_TCP_ADDR'),
-        'PORT': os.environ.get('DB_1_PORT_3306_TCP_PORT'),
+        'HOST': 'db',
+        'PORT': 3306
         }
     }
 
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '{}:{}'.format(os.environ.get('CACHE_1_PORT_11211_TCP_ADDR'),
-            os.environ.get('CACHE_1_PORT_11211_TCP_PORT')),
+        'LOCATION': 'cache:11211',
     }
 }
-
-HAYSTACK_SOLR_URL = 'http://{}:{}/solr/'.format(os.environ.get('SEARCH_1_PORT_8983_TCP_ADDR'),
-        os.environ.get('SEARCH_1_PORT_8983_TCP_PORT'))
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'a9yr_yzp2vmj-2q1zq)d2+b^w(7fqu2o&jh18u9dozjbd@-$0!'
@@ -96,11 +92,6 @@ CACHE_PREFIX = 'unisubsdevsettings'
 CACHE_TIMEOUT = 0
 
 COMPRESS_MEDIA = not DEBUG
-
-# Log more more things to the console
-LOGGING['root']['level'] = 'INFO'
-# disable sentry logging
-LOGGING['handlers']['sentry']['class'] = 'logging.NullHandler'
 
 try:
     from dev_settings_local import *

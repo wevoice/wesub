@@ -37,6 +37,7 @@ automatically pull them in if they are present.  Here's how we do it:
 * The optionalapps module handles figuring out which repositories are present
   and how we should modify things at runtime
 
+.. autofunction:: setup_path
 .. autofunction:: get_repository_paths
 .. autofunction:: get_apps
 .. autofunction:: get_urlpatterns
@@ -45,6 +46,7 @@ automatically pull them in if they are present.  Here's how we do it:
 """
 
 import os
+import sys
 
 from django.conf.urls import patterns, include, url
 
@@ -58,6 +60,12 @@ def _repositories_present():
             continue
         if os.path.exists(os.path.join(project_root, name)):
             yield name
+
+def setup_path():
+    """
+    Add optional repositories to the python path
+    """
+    sys.path.extend(get_repository_paths())
 
 def get_repository_paths():
     """Get paths to optional repositories that are present

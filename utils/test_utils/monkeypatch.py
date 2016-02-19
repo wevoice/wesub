@@ -31,8 +31,8 @@ function.  For example:
 
     > from utils.test_utils import monkeypatch
     > # run some code
-    > monkeypatch.update_one_team_video.assert_called_with(...)
-    > monkeypatch.update_one_team_video.run_original()
+    > monkeypatch.video_changed_tasks.assert_called_with(...)
+    > monkeypatch.video_changed_tasks.run_original()
 """
 
 from datetime import datetime, timedelta
@@ -65,8 +65,6 @@ class MockNow(mock.Mock):
 mock_now = MockNow()
 save_thumbnail_in_s3 = mock.Mock()
 video_changed_tasks = mock.Mock()
-update_team_video = mock.Mock()
-update_search_index = mock.Mock()
 
 test_video_info = externalsites.google.VideoInfo(
     'test-channel-id', 'test-title', 'test-description', 60,
@@ -90,7 +88,6 @@ delete_subtitles = mock.Mock()
 update_all_subtitles = mock.Mock()
 fetch_subs_task = mock.Mock()
 import_videos_from_feed = mock.Mock()
-get_language_facet_counts = mock.Mock(return_value=([], []))
 
 class MonkeyPatcher(object):
     """Replace a functions with mock objects for the tests.
@@ -99,9 +96,6 @@ class MonkeyPatcher(object):
         ('utils.dates.now', mock_now),
         ('videos.tasks.save_thumbnail_in_s3', save_thumbnail_in_s3),
         ('videos.tasks.video_changed_tasks', video_changed_tasks),
-        ('teams.tasks.update_one_team_video', update_team_video),
-        ('utils.celery_search_index.update_search_index',
-         update_search_index),
         ('externalsites.google.get_video_info', youtube_get_video_info),
         ('externalsites.google.get_youtube_user_info',
          youtube_get_user_info),
@@ -123,8 +117,6 @@ class MonkeyPatcher(object):
         ('externalsites.tasks.update_all_subtitles', update_all_subtitles),
         ('externalsites.tasks.fetch_subs', fetch_subs_task),
         ('videos.tasks.import_videos_from_feed', import_videos_from_feed),
-        ('search.forms._get_language_facet_counts',
-         get_language_facet_counts)
     ]
     @classmethod
     def register_patch(cls, spec, mock_obj):

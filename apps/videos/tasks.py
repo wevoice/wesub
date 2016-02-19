@@ -25,8 +25,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.files.base import ContentFile
 from django.db.models import ObjectDoesNotExist
-from haystack import site
-from raven.contrib.django.models import client
 import requests
 
 from babelsubs.storage import diff as diff_subtitles
@@ -108,8 +106,9 @@ def update_video_feed(video_feed_id):
         video_feed = VideoFeed.objects.get(pk=video_feed_id)
         video_feed.update()
     except VideoFeed:
-        msg = '**update_video_feed**. VideoFeed does not exist. ID: %s' % video_feed_id
-        client.captureMessage(msg)
+        logging.warn(
+            '**update_video_feed**. VideoFeed does not exist. ID: %s',
+            video_feed_id)
 
 @task(rate_limit='500/m')
 def update_video_feed_with_rate_limit(video_feed_id):
@@ -141,8 +140,8 @@ def raise_exception(msg, **kwargs):
 def video_changed_tasks(video_pk, new_version_id=None):
     from videos import metadata_manager
     from videos.models import Video
-
     from teams.models import TeamVideo, BillingRecord
+
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
         send_new_version_notification(new_version_id)
@@ -155,13 +154,6 @@ def video_changed_tasks(video_pk, new_version_id=None):
                 "exception": str(e)})
 
     video = Video.objects.get(pk=video_pk)
-
-    tv = video.get_team_video()
-
-    if tv:
-        tv_search_index = site.get_index(TeamVideo)
-        tv_search_index.backend.update(tv_search_index, [tv])
-
     video.update_search_index()
 
 @task
