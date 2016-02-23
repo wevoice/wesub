@@ -141,7 +141,7 @@ window.ajaxOpenModal = function(url, params, setupData) {
     $.get(url, params)
     .done(function(data, textStatus, xhr) {
         loadingHTML.remove();
-        var modal = $(data)
+        var modal = $(data);
         modal.appendTo(document.body).openModal(null, setupData);
         setupAjaxModal(modal);
     })
