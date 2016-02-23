@@ -346,8 +346,8 @@ class TaskCreateForm(ErrorableModelForm):
         # TODO: This is bad for teams with 10k members.
         team_user_ids = team.members.values_list('user', flat=True)
 
-        langs = [l for l in get_language_choices(with_empty=True)
-                 if l[0] in team.get_writable_langs()]
+        langs = get_language_choices(with_empty=True,
+                                     limit_to=team.get_writable_langs())
         self.fields['language'].choices = langs
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
@@ -594,8 +594,8 @@ class LanguagesForm(forms.Form):
         super(LanguagesForm, self).__init__(*args, **kwargs)
 
         self.team = team
-        self.fields['preferred'].choices = get_language_choices()
-        self.fields['blacklisted'].choices = get_language_choices()
+        self.fields['preferred'].choices = get_language_choices(flat=True)
+        self.fields['blacklisted'].choices = get_language_choices(flat=True)
 
     def clean(self):
         preferred = set(self.cleaned_data['preferred'])

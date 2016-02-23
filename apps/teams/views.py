@@ -571,8 +571,7 @@ def detail(request, slug, project_slug=None, languages=None):
         })
 
     readable_langs = TeamLanguagePreference.objects.get_readable(team)
-    language_choices = [(code, name) for code, name in get_language_choices()
-                        if code in readable_langs]
+    language_choices = get_language_choices(limit_to=readable_langs)
 
     extra_context['project_choices'] = team.project_set.exclude(name='_root')
 
@@ -727,8 +726,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
         })
 
     readable_langs = TeamLanguagePreference.objects.get_readable(team)
-    language_choices = [(code, name) for code, name in get_language_choices()
-                        if code in readable_langs]
+    language_choices = get_language_choices(limit_to=readable_langs)
 
     extra_context['project_choices'] = team.project_set.exclude(name='_root')
 
@@ -1087,7 +1085,7 @@ def approvals(request, slug):
             except:
                 HttpResponseForbidden(_(u'Invalid task to approve'))
 
-    extra_context['language_choices'] =  [(code, name) for code, name in get_language_choices()]
+    extra_context['language_choices'] =  get_language_choices()
     extra_context['project_choices'] = team.project_set.exclude(name=Project.DEFAULT_NAME)
 
     language_filter = request.GET.get('lang')
@@ -1693,7 +1691,7 @@ def create_task(request, slug, team_video_pk):
     subtitlable = json.dumps(can_create_task_subtitle(team_video, request.user))
     translatable_languages = json.dumps(can_create_task_translate(team_video, request.user))
 
-    language_choices = json.dumps(get_language_choices(True))
+    language_choices = json.dumps(get_language_choices(True, flat=True))
 
     return { 'form': form, 'team': team, 'team_video': team_video,
              'translatable_languages': translatable_languages,
