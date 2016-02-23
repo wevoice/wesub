@@ -123,6 +123,9 @@ class CustomPasswordResetForm(forms.Form):
             email = loader.render_to_string(email_template_name, c)
             send_mail(subject, email, from_email, [user.email])
 
+class SecureCustomPasswordResetForm(CustomPasswordResetForm):
+    captcha = CaptchaField()
+
 class DeleteUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput())
 

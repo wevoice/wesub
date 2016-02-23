@@ -40,9 +40,9 @@ from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from oauth import oauth
-from auth.forms import CustomUserCreationForm, ChooseUserForm, SecureAuthenticationForm
+from auth.forms import CustomUserCreationForm, ChooseUserForm, SecureAuthenticationForm, \
+    DeleteUserForm, CustomPasswordResetForm, SecureCustomPasswordResetForm, EmailForm
 from openid_consumer.views import begin as begin_openid
-from auth.forms import CustomUserCreationForm, ChooseUserForm, DeleteUserForm, CustomPasswordResetForm, EmailForm
 from auth.models import (
     UserLanguage, EmailConfirmation, LoginToken
 )
@@ -304,4 +304,7 @@ def password_reset(request):
     extra_context = {}
     if request.user.is_authenticated():
         extra_context = {'email_address': request.user.email}
-    return contrib_password_reset(request, password_reset_form=CustomPasswordResetForm, extra_context=extra_context)
+        form = CustomPasswordResetForm
+    else:
+        form = SecureCustomPasswordResetForm
+    return contrib_password_reset(request, password_reset_form=form, extra_context=extra_context)
