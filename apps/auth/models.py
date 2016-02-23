@@ -141,14 +141,12 @@ class CustomUser(BaseUser):
         if not self.is_active:
             return ugettext('Retired user')
 
-        if self.first_name:
-            if self.last_name:
-                return self.get_full_name()
-            else:
-                return self.first_name
-        if self.full_name:
+        if self.first_name or self.last_name:
+            return self.get_full_name()
+        elif self.full_name:
             return self.full_name
-        return self.username
+        else:
+            return self.username
 
     def has_fullname_set(self):
         return any([self.first_name, self.last_name, self.full_name])
