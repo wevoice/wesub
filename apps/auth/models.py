@@ -150,6 +150,15 @@ class CustomUser(BaseUser):
             return self.full_name
         return self.username
 
+    def has_fullname_set(self):
+        return any([self.first_name, self.last_name, self.full_name])
+
+    def display_name(self):
+        if self.has_fullname_set():
+            return u'{} ({})'.format(unicode(self), self.username)
+        else:
+            return unicode(self.username)
+
     def save(self, *args, **kwargs):
         send_confirmation = False
 
