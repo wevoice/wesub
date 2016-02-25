@@ -494,6 +494,7 @@ MEDIA_BUNDLES = {
             'src/js/site/bottom-sheet.js',
             'src/js/site/team-videos.js',
             'src/js/site/team-bulk-move.js',
+            'src/js/site/team-members.js',
             'src/js/site/team-integration-settings.js',
             'src/js/site/dates.js',
         ],
