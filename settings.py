@@ -56,9 +56,6 @@ METADATA_LANGUAGES = (
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-PISTON_EMAIL_ERRORS = True
-PISTON_DISPLAY_ERRORS = False
-
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
