@@ -16,8 +16,6 @@ RUN ln -sf $CLOSURE_PATH $APP_DIR/media/js/closure-library
 RUN easy_install pip
 # install urllib3[secure] before other packages.  This prevents SSL warnings
 RUN pip install --upgrade urllib3[secure]
-# Setuptools 20.2.1 doesn't work with some of our packages
-RUN pip install setuptools==20.1.1
 RUN (cd $APP_DIR/deploy && pip install --src /opt/src/amara/ -r requirements.txt)
 RUN mkdir -p /opt/extras/pictures
 RUN mkdir -p /opt/extras/videos
