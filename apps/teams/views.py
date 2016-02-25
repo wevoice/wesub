@@ -1011,7 +1011,7 @@ def detail_members(request, slug, role=None):
         'query': q,
         'role': role,
         'assignable_roles': assignable_roles,
-        'languages': sorted(languages_with_labels(user_langs).items(), key=lambda pair: pair[1]),
+        'languages': get_language_choices(limit_to=user_langs, flat=True),
     })
 
     if team.video:
