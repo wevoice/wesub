@@ -69,9 +69,6 @@ table.key-value {
 
         &:first-of-type {
             padding-right: 20px;
-            &:after {
-                content: ":";
-            }
         }
 
         &.breakup {
