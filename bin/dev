@@ -236,8 +236,8 @@ class Up(Command):
         subprocess.call(['docker-compose', 'up', 'app', 'worker'])
 
 def run_manage(args, **kwargs):
-    subprocess.call(['docker-compose', 'run', '--rm', '--entrypoint', 'python', 
-                     'app', '/opt/apps/amara/manage.py'] + args, **kwargs)
+    subprocess.call(['docker-compose', 'run', 'app', 'manage'] + args,
+                    **kwargs)
 
 def usage():
     print "Usage %s [command]" % progname()
