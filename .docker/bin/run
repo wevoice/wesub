@@ -24,6 +24,7 @@ vacuum = true
 disable-logging
 wsgi-file = $APP_DIR/deploy/unisubs.wsgi
 static-map = /static=/usr/local/lib/python2.7/site-packages/django/contrib/admin/static
+pythonpath = /var/run/amara
 pythonpath = /opt/apps/amara
 pythonpath = /opt/apps/amara/libs
 pythonpath = /opt/apps/amara/apps
