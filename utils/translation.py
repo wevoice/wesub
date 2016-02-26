@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import copy
 import json
 import time
 
@@ -9,8 +10,12 @@ from django.utils.translation import (
     get_language, get_language_info, ugettext as _
 )
 from django.utils.translation.trans_real import parse_accept_lang_header
+import babel
+import pyuca
 
 from unilangs import get_language_name_mapping, LanguageCode
+
+collator = pyuca.Collator()
 
 # A set of all language codes we support.
 _supported_languages_map = get_language_name_mapping('unisubs')
@@ -23,41 +28,132 @@ SUPPORTED_LANGUAGE_CHOICES = list(sorted(_supported_languages_map.items(),
 ALL_LANGUAGE_CHOICES = list(sorted(_all_languages_map.items(),
                                    key=lambda c: c[1]))
 
+# Top 24 popular languages, taken from:
+# https://en.wikipedia.org/wiki/Languages_used_on_the_Internet
+POPULAR_LANGUAGES = [
+    'en',
+    'ru',
+    'de',
+    'ja',
+    'es',
+    'fr',
+    # "Chinese" and "Portuguese" have 2 main variants.  Include them both.
+    'zh-cn',
+    'zh-tw',
+    'pt',
+    'pt-br',
+    'it',
+    'pl',
+    'tr',
+    'nl',
+    'fa',
+    'ar',
+    'ko',
+    'cs',
+    'sv',
+    'vi',
+    'id',
+    'el',
+    'ro',
+    'hu',
+    'da',
+    'th',
+]
+POPULAR_LANGUAGES.sort()
+
 def _only_supported_languages(language_codes):
     """Filter the given list of language codes to contain only codes we support."""
-
     # TODO: Figure out the codec issue here.
     return [code for code in language_codes if code in SUPPORTED_LANGUAGE_CODES]
 
-
 _get_language_choices_cache = {}
-def get_language_choices(with_empty=False, with_any=False):
-    """Return a list of language code choices labeled appropriately."""
+def get_language_choices(with_empty=False, with_any=False, flat=False,
+                         top_section=None, limit_to=None, exclude=None):
+    """Get a list of language choices
+
+    We display languages as "<native_name> [code]", where native
+    name is the how native speakers of the language would write it.
+
+    We use the babel library to lookup the native name, however not all of our
+    languages are handled by babel.  As a fallback we use the translations
+    from gettext.
+
+    Args:
+        with_empty: Should we include a null choice?
+        with_any: Should we include a choice for any language?
+        flat: Make all items in the list (code, name), instead of using the
+           django optgroup style for some
+        top_section: (code, choices) tuple to use for the top section, instead
+           of the popular languages
+        limit_to: limit choices to a list of language codes
+        exclude: exclude choices from the list of language codes
+    """
 
     language_code = get_language()
     try:
         languages = _get_language_choices_cache[language_code]
     except KeyError:
-        languages = [
-            (code, _(name))
-            for (code, name) in _supported_languages_map.items()
-        ]
-        languages.sort(key=lambda item: item[1])
+        languages = calc_language_choices(language_code)
         _get_language_choices_cache[language_code] = languages
 
     # make a copy of languages before we alter it
-    languages = list(languages)
+    languages = copy.deepcopy(languages)
+    if top_section:
+        languages[0] = top_section
+    if limit_to or exclude:
+        if limit_to is not None:
+            limit_to = set(limit_to)
+        else:
+            limit_to = set(SUPPORTED_LANGUAGE_CODES)
+        if exclude is not None:
+            limit_to = limit_to.difference(exclude)
+        def filter_optgroup(og):
+            return (og[0], [item for item in og[1] if item[0] in limit_to])
+        languages = [filter_optgroup(o) for o in languages]
+    if flat:
+        languages = languages[1][1]
     if with_any:
         languages.insert(0, ('', _('--- Any Language ---')))
     if with_empty:
         languages.insert(0, ('', '---------'))
     return languages
 
+def calc_language_choices(language_code):
+    """Do the work for get_language_choices() """
+    languages = []
+    translation_locale = lookup_babel_locale(language_code)
+    def label(code):
+        english_name = _supported_languages_map[code]
+        translated_name = _(english_name)
+        return u'{} [{}]'.format(translated_name, code)
+    languages.append((_('Popular'), [
+        (code, label(code)) for code in POPULAR_LANGUAGES
+    ]))
+    languages.append((_('All'), [
+        (code, label(code)) for code in sorted(SUPPORTED_LANGUAGE_CODES)
+    ]))
+    return languages
+
+def choice_sort_key(item):
+    return collator.sort_key(item[1])
+
+babel_locale_blacklist = set(['tw'])
+def lookup_babel_locale(language_code):
+    if language_code == 'tw':
+        # babel parses the Twi language as Akan, but this doesn't work for us
+        # because "aka" is also Akan and we need to use a unique Locale for
+        # each language code.
+        return None
+    try:
+        return babel.Locale.parse(language_code, '-')
+    except (babel.UnknownLocaleError, ValueError):
+        return None
+
 def get_language_choices_as_dicts(with_empty=False):
     """Return a list of language code choices labeled appropriately."""
     return [
         {'code': code, 'name': name}
-        for (code, name) in get_language_choices(with_empty)
+        for (code, name) in get_language_choices(with_empty, flat=True)
     ]
 
 def get_language_label(code):
