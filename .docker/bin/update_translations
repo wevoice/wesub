@@ -23,8 +23,8 @@ cat << EOF > /root/.gitconfig
 EOF
 
 echo "Running makemessages"
-python ${MANAGE_SCRIPT} makemessages -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
-python ${MANAGE_SCRIPT} makemessages -d djangojs -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
+manage makemessages -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
+manage makemessages -d djangojs -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
 
 echo "Uploading to transifex"
 tx push --source
@@ -33,7 +33,7 @@ echo "Pulling from transifex"
 tx pull -a -f
 
 echo "Compiling messages"
-python ${MANAGE_SCRIPT} compilemessages
+manage compilemessages
 
 echo "Committing and pushing to repository"
 git checkout $1

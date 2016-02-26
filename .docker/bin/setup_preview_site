@@ -8,5 +8,5 @@ fi
 source /usr/local/bin/config_env
 echo "Setting up preview site to $1"
 
-python ${MANAGE_SCRIPT} setup_current_site $1
+manage setup_current_site $1
 

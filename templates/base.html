@@ -163,7 +163,7 @@
                     <li><a target="_blank" href="{% url "admin:index" %}">{% trans 'Admin' %}</a></li>
                 {% endif %}
                 {% if user.is_superuser %}
-                    <li><a target="_blank" href="//sentry.pculture.org:9000">{% trans 'Sentry' %}</a></li>
+                    <li><a target="_blank" href="https://logs.amara.org">{% trans 'Amara Logs' %}</a></li>
                 {% endif %}
                 {% if user.is_superuser %}
                     <li><a target="_blank" href="{% url "auth:login_trap" %}">{% trans 'Impersonate' %}</a></li>

@@ -38,7 +38,7 @@ def _calc_sorted_language_choices():
           .values_list('primary_audio_language_code')
           .annotate(count=Count('primary_audio_language_code')))
     language_counts = dict(qs)
-    choices = get_language_choices()
+    choices = get_language_choices(flat=True)
     choices.sort(key=lambda c: language_counts.get(c[0], 0), reverse=True)
     return [('', _('All Languages'))] + choices
 
