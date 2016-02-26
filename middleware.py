@@ -110,15 +110,17 @@ class LogRequest(object):
 
     def log_response(self, request, response):
         total_time = time.time() - request._start_time
-        msg = u'{} {} ({:.3f}s)'.format(request.method, request.path_info, total_time)
-        extra = self.calc_extra(request)
+        msg = u'{} {} {} ({:.3f}s)'.format(request.method, request.path_info,
+                                           response.status_code, total_time)
+        extra = self.calc_extra(request, response)
         extra['time'] = total_time
         access_logger.info(msg, extra=extra)
 
-    def calc_extra(self, request):
+    def calc_extra(self, request, response):
         extra = {
             'method': request.method,
             'path': request.path_info,
+            'status_code': response.status_code,
             'size': request.META.get('CONTENT_LENGTH'),
         }
         try:
