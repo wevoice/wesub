@@ -41,18 +41,20 @@ aside.modal {
         }
     }
 
-    p {
-        margin-bottom: 20px;
-    }
-
     h3 {
-        font-weight: normal;
         margin-bottom: 20px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         color: inherit;
         border-bottom: 1px solid #777;
+
+        .subheading {
+            display: block;
+            font-size: $default-font-size;
+            font-weight: $font-weight-normal;
+            line-height: $line-height;
+        }
     }
 
     footer.buttons {

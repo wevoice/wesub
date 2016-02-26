@@ -29,7 +29,6 @@ RUN chown amara:amara /var/run/amara
 USER amara
 WORKDIR /var/run/amara
 EXPOSE 8000
-ENV PYTHONPATH /var/run/amara:/opt/apps/amara:/opt/apps/amara/libs:/opt/apps/amara/apps
 ENV MANAGE_SCRIPT /opt/apps/amara/manage.py
 ENV DJANGO_SETTINGS_MODULE unisubs_settings
 ENV REVISION staging
