@@ -28,6 +28,10 @@ elif [ "$ACTION" = "setup_preview_site" ]; then
 elif [ "$ACTION" = "reset_db" ]; then
     echo "Reseting database"
     exec /usr/local/bin/reset-db
+elif [ "$ACTION" = "manage" ]; then
+    source /usr/local/bin/config_env
+    shift
+    manage "$@"
 elif [ "$ACTION" = "shell" ]; then
     echo "Running shell..."
     echo "Use the manage alias to run django management commands"
