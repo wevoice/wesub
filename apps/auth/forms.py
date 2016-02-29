@@ -54,6 +54,7 @@ class ChooseUserForm(forms.Form):
 
 class EmailForm(forms.Form):
     email = forms.EmailField(label=_("E-mail"), max_length=100)
+    url = forms.URLField(required=False, widget=forms.HiddenInput())
 
 class CustomPasswordResetForm(forms.Form):
     """

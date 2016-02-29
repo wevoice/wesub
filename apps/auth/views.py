@@ -68,7 +68,16 @@ def confirm_create_user(request, account_type, email):
             if account_type == 'twitter':
                 return twitter_login(request, next=redirect_to, confirmed=True, email=email)
             if account_type == 'openid':
-                pass
+                openid_url = None
+                if 'google.com' in request.POST.get('openid_url', ''):
+                    request.session['openid_provider'] = 'Google'
+                    return begin_openid(request, user_url='https://www.google.com/accounts/o8/id', redirect_to=reverse('socialauth_udacity_complete', args=(email,)), confirmed=True)
+                elif 'yahoo.com' in request.POST.get('openid_url', ''):
+                    request.session['openid_provider'] = 'Yahoo'
+                else:
+                    request.session['openid_provider'] = 'Openid'
+                    openid_url = form.cleaned_data['url']
+                return begin_openid(request, redirect_to=reverse('socialauth_openid_complete', args=(email,)), confirmed=True, user_url=openid_url)
             if account_type == 'ted':
                 provider = get_authentication_provider('ted')
                 return provider.view(request, confirmed=True, email=email)
@@ -79,6 +88,9 @@ def confirm_create_user(request, account_type, email):
         initial = {}
         if email:
             initial['email'] = email
+        openid_url = request.GET.get('openid_url', '')
+        if openid_url:
+            initial['url'] = openid_url
         form = EmailForm(initial=initial)
     return render_login(request, CustomUserCreationForm(label_suffix=""),
                         AuthenticationForm(label_suffix=""), redirect_to, email_form=form, confirm_type=account_type)
