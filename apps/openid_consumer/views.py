@@ -65,7 +65,6 @@ def begin(request, confirmed=True, redirect_to=None, on_failure=None, user_url=N
     # In case they were lazy...
     if not redirect_to.startswith('http://') or redirect_to.startswith('https://'):
         redirect_to =  get_url_host(request) + redirect_to
-    
     if request.GET.get('next') and is_valid_next_url(request.GET['next']):
         if '?' in redirect_to:
             join = '&'
@@ -73,6 +72,15 @@ def begin(request, confirmed=True, redirect_to=None, on_failure=None, user_url=N
             join = '?'
         redirect_to += join + urlencode({
             'next': request.GET['next']
+        })
+    openid_url = request.REQUEST.get('openid_url', None)
+    if openid_url:
+        if '?' in redirect_to:
+            join = '&'
+        else:
+            join = '?'
+        redirect_to += join + urlencode({
+            'openid_url': openid_url
         })
     if not user_url:
         user_url = request.REQUEST.get('openid_url', None)
@@ -83,7 +91,6 @@ def begin(request, confirmed=True, redirect_to=None, on_failure=None, user_url=N
             request_path += '?' + urlencode({
                 'next': request.GET['next']
             })
-        
         return render(template_name, {
             'action': request_path,
         }, RequestContext(request))
@@ -178,7 +185,7 @@ def default_on_success(request, identity_url, openid_response, confirmed=True, e
     OpenIDMiddleware().process_request(request)
     
     next = request.GET.get('next', '').strip()
-
+    openid_url = request.GET.get('openid_url', '').strip()
     if confirmed:
         redirect_next = 'OPENID_REDIRECT_NEXT'
     else:
@@ -190,6 +197,10 @@ def default_on_success(request, identity_url, openid_response, confirmed=True, e
     else:
         next = "%s?next=%s&email=%s" % (getattr(settings, redirect_next, '/'),
                                next, email)
+    if openid_url:
+        next += '&' + urlencode({
+            'openid_url': openid_url
+        })
     return HttpResponseRedirect(next)
 
 def default_on_failure(request, message, template_name='openid_consumer/failure.html'):

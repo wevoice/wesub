@@ -23,7 +23,7 @@ import logging
 
 from utils.dataprintout import DataPrinter
 
-EXTRA_FIELDS = ['path', 'view', 'query', 'data', 'metrics', 'user']
+EXTRA_FIELDS = ['path', 'status_code', 'method', 'view', 'query', 'data', 'metrics', 'user']
 
 data_printer = DataPrinter(
     max_size=500, max_item_size=100, max_repr_size=50)
@@ -69,6 +69,6 @@ def format_traceback(tb):
         parts.append('\n')
     return ''.join(parts)
 
-class JSONHandler(logging.Handler):
-    def emit(self, record):
-        print(json.dumps(record_data(record)))
+class JSONHandler(logging.StreamHandler):
+    def format(self, record):
+        return json.dumps(record_data(record))
