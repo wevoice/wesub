@@ -17,9 +17,10 @@ MAILNAME=${MAILNAME:-pculture.org}
 NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME:-}
 NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-}
 SKIP_CODE_PULL=${SKIP_CODE_PULL:-}
+AMARAPYTHONPATH=/var/run/amara:/opt/apps/amara:/opt/apps/amara/libs:/opt/apps/amara/apps
 
 function manage() {
-  PYTHONPATH=/var/run/amara:/opt/apps/amara:/opt/apps/amara/libs:/opt/apps/amara/apps python $MANAGE_SCRIPT "$@"
+  PYTHONPATH=${AMARAPYTHONPATH} python ${MANAGE_SCRIPT} "$@"
 }
 
 if [ ! -z "$AWS_ID" ] && [ ! -z "$AWS_SECRET_KEY" ] ; then
