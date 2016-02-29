@@ -16,8 +16,9 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
+from captcha.fields import CaptchaField
 from django.template import loader
 from django.utils.http import int_to_base36
 from django.utils.translation import ugettext_lazy as _
@@ -26,6 +27,7 @@ from django.contrib.sites.models import get_current_site
 from models import CustomUser as User
 
 class CustomUserCreationForm(UserCreationForm):
+    captcha = CaptchaField()
     class Meta:
         model = User
         fields = ("username", "email")
@@ -51,6 +53,9 @@ class ChooseUserForm(forms.Form):
             raise forms.ValidationError("User doesn't exist.")
 
         return data
+
+class SecureAuthenticationForm(AuthenticationForm):
+    captcha = CaptchaField()
 
 class EmailForm(forms.Form):
     email = forms.EmailField(label=_("E-mail"), max_length=100)
@@ -119,5 +124,9 @@ class CustomPasswordResetForm(forms.Form):
             email = loader.render_to_string(email_template_name, c)
             send_mail(subject, email, from_email, [user.email])
 
+class SecureCustomPasswordResetForm(CustomPasswordResetForm):
+    captcha = CaptchaField()
+
 class DeleteUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput())
+
