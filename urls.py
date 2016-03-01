@@ -29,9 +29,9 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from auth.forms import CustomPasswordResetForm
 import optionalapps
 from utils.genericviews import JSTemplateView
-
+from auth.views import login as user_login
 admin.autodiscover()
-
+admin.site.login = user_login
 # these really should be unregistred but while in development the dev server
 # might have not registred yet, so we silence this exception
 try:
@@ -88,8 +88,8 @@ urlpatterns = patterns('',
         'auth.views.password_reset_complete'),
     url(r'^socialauth/',
         include('socialauth.urls')),
-    url(r'^admin/',
-        include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^staff/', include('staff.urls', namespace='staff')),
     url(r'^subtitles/',
         include('subtitles.urls', namespace='subtitles')),
     url(r'^embed(?P<version_no>\d+)?.js$', 'widget.views.embed',
@@ -182,6 +182,10 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += optionalapps.get_urlpatterns()
+
+urlpatterns += patterns('',
+    url(r'^captcha/', include('captcha.urls')),
+)
 
 try:
     import debug_toolbar

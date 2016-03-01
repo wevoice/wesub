@@ -129,13 +129,6 @@ def test_task(n):
         print '.',
         sleep(0.5)
 
-@task
-def raise_exception(msg, **kwargs):
-    print "TEST TASK FOR CELERY. RAISE EXCEPTION WITH MESSAGE: %s" % msg
-    logger = raise_exception.get_logger()
-    logger.error('Test error logging to Sentry from Celery')
-    raise TypeError(msg)
-
 @task()
 def video_changed_tasks(video_pk, new_version_id=None):
     from videos import metadata_manager

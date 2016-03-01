@@ -62,8 +62,12 @@
                     {% trans 'Language:' %}
                     <select name="lang" id="lang">
                         <option value="any"{% if language_code == None %}selected="selected"{% endif %}>{% trans 'any' %}</option>
-                        {% for code, name in language_choices %}
+                        {% for label, choices in language_choices %}
+                        <optgroup label="{{ label }}">
+                          {% for code, name in choices %}
                             <option {% if language_code == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
+                          {% endfor %}
+                        </optgroup>
                         {% endfor %}
                     </select>
                 </div>

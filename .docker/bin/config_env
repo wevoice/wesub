@@ -17,10 +17,15 @@ MAILNAME=${MAILNAME:-pculture.org}
 NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME:-}
 NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-}
 SKIP_CODE_PULL=${SKIP_CODE_PULL:-}
+AMARAPYTHONPATH=/var/run/amara:/opt/apps/amara:/opt/apps/amara/libs:/opt/apps/amara/apps
+
+function manage() {
+  PYTHONPATH=${AMARAPYTHONPATH} python ${MANAGE_SCRIPT} "$@"
+}
 
 if [ ! -z "$AWS_ID" ] && [ ! -z "$AWS_SECRET_KEY" ] ; then
     # create s3cfg
-    cat << EOF > /etc/s3cfg
+    cat << EOF > ~/.s3cfg
 [default]
 access_key = $AWS_ID
 acl_public = False
@@ -57,12 +62,5 @@ urlencoding_mode = normal
 use_https = False
 verbosity = WARNING
 EOF
-
-    chown root:root /etc/s3cfg
-    chmod 600 /etc/s3cfg
-
-    cd $APP_DIR
-    s3cmd -c /etc/s3cfg get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
-    # get transifex config
-    s3cmd -c /etc/s3cfg get --force s3://amara/settings/transifexrc /.transifexrc
+    s3cmd get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
 fi

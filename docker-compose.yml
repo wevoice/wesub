@@ -1,13 +1,12 @@
 app:
   image: amara-app
-  entrypoint: ["/usr/local/bin/run"]
+  command: app
   environment:
     DJANGO_SETTINGS_MODULE: dev_settings
     DJANGO_LIVE_TEST_SERVER_ADDRESS: 'localhost:8081,8090-8100,9000-9200'
     LANG: en_US.UTF-8
     WORKERS: 2
-    # Uncomment to test out the json logs that we use on production
-    # JSON_LOGGING: 1
+    JSON_LOGGING:
   volumes:
     - .:/opt/apps/amara
   hostname: unisubs.example.com
@@ -20,13 +19,13 @@ app:
 
 worker:
   image: amara-app
-  entrypoint: ["/usr/bin/env"]
-  command: /usr/bin/python manage.py celery worker -Q celery,feeds --scheduler=djcelery.schedulers.DatabaseScheduler -B -E
+  command: worker
   environment:
+    CELERY_OPTS: -B
+    CELERY_QUEUES: celery,feeds
     DJANGO_SETTINGS_MODULE: dev_settings
     LANG: en_US.UTF-8
-    # Uncomment to test out the json logs that we use on production
-    # JSON_LOGGING: 1
+    JSON_LOGGING:
   volumes:
     - .:/opt/apps/amara
   links:

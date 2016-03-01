@@ -56,9 +56,6 @@ METADATA_LANGUAGES = (
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-PISTON_EMAIL_ERRORS = True
-PISTON_DISPLAY_ERRORS = False
-
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
@@ -194,6 +191,7 @@ INSTALLED_APPS = (
     'messages',
     'profiles',
     'search',
+    'staff',
     'staticmedia',
     'teams',
     'testhelpers',
@@ -203,6 +201,7 @@ INSTALLED_APPS = (
     'videos',
     'widget',
     'subtitles',
+    'captcha',
 )
 
 STARTUP_MODULES = [
@@ -493,6 +492,7 @@ MEDIA_BUNDLES = {
             'src/js/site/bottom-sheet.js',
             'src/js/site/team-videos.js',
             'src/js/site/team-bulk-move.js',
+            'src/js/site/team-members.js',
             'src/js/site/team-integration-settings.js',
             'src/js/site/dates.js',
         ],
@@ -640,6 +640,7 @@ def log_handler_info():
         return {
             'level': 'INFO',
             'class': 'utils.jsonlogging.JSONHandler',
+            'formatter': 'standard'
         }
     else:
         return {
@@ -675,6 +676,11 @@ LOGGING = {
 }
 
 TMP_FOLDER = "/tmp/"
+
+SOUTH_MIGRATION_MODULES = {
+    'captcha': 'captcha.south_migrations',
+}
+
 from task_settings import *
 
 
