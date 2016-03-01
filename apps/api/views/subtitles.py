@@ -249,7 +249,7 @@ from rest_framework import serializers
 from rest_framework import status
 from rest_framework import views
 from rest_framework import viewsets
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -657,27 +657,34 @@ class SubtitlesView(generics.CreateAPIView):
         language_code = self.kwargs['language_code']
         if not workflow.user_can_view_video(self.request.user):
             raise PermissionDenied()
+        language = video.subtitle_language(language_code)
+        if language is None:
+            raise Http404
         version_number = self.request.query_params.get('version_number')
         if version_number is None:
             version_number = self.request.query_params.get('version')
         if version_number is not None:
-            version = video.newsubtitleversion_set.get(
-                language_code=language_code,
-                version_number=version_number)
+            version = self.get_object_from_version_number(language,
+                                                          version_number)
         else:
-            language = video.subtitle_language(language_code)
-            if language is None:
-                raise Http404
             version = language.get_public_tip()
-            if version is None:
-                raise Http404
-        if version.is_deleted():
+        if version is None or version.is_deleted():
             raise Http404
         if (not version.is_public() and
             not workflow.user_can_view_private_subtitles(self.request.user,
                                                          language_code)):
             raise PermissionDenied()
         return version
+
+    def get_object_from_version_number(self, language, version_number):
+        if version_number == 'last':
+            return language.get_tip()
+        try:
+            version_number = int(version_number)
+        except ValueError:
+            raise ValidationError('invalid version number')
+        return get_object_or_404(language.subtitleversion_set.extant(),
+                                 version_number=version_number)
 
     def create(self, request, *args, **kwargs):
         video = self.get_video()
