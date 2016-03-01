@@ -148,7 +148,10 @@ class Message(models.Model):
         content = []
 
         if self.content:
-            escaped_content = escape(self.content)
+            if self.message_type == SYSTEM_NOTIFICATION:
+                escaped_content = self.content
+            else:
+                escaped_content = escape(self.content)
             try:
                 my_content_with_links = urlize(escaped_content)
             except ValueError:
@@ -178,9 +181,16 @@ class Message(models.Model):
         if not self.user.notify_by_message:
             self.read = True
 
-        if not getattr(settings, "MESSAGES_DISABLED", False):
-            super (Message, self).save(*args, **kwargs)
-        
+        if getattr(settings, "MESSAGES_DISABLED", False):
+            return
+        self.auto_truncate_subject()
+        super (Message, self).save(*args, **kwargs)
+
+    def auto_truncate_subject(self):
+         max_length = self._meta.get_field('subject').max_length
+         if self.subject and len(self.subject) > max_length:
+             self.subject = self.subject[:max_length-3] + '...'
+
     @classmethod
     def on_delete(cls, sender, instance, **kwargs):
         ct = ContentType.objects.get_for_model(sender)
