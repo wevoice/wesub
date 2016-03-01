@@ -116,13 +116,14 @@ class LogRequest(object):
         extra['time'] = total_time
         access_logger.info(msg, extra=extra)
 
-    def calc_extra(self, request, response):
+    def calc_extra(self, request, response=None):
         extra = {
             'method': request.method,
             'path': request.path_info,
-            'status_code': response.status_code,
             'size': request.META.get('CONTENT_LENGTH'),
         }
+        if response is not None:
+            extra['status_code'] = response.status_code
         try:
             extra['user'] = request.user.username
         except AttributeError:
