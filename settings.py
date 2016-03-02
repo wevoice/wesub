@@ -481,6 +481,7 @@ MEDIA_BUNDLES = {
             'src/js/third-party/jquery-2.1.3.js',
             'src/js/third-party/jquery-ui-1.11.4.custom.js',
             'src/js/third-party/jquery.form.js',
+            'src/js/third-party/jquery.formset.js',
             'src/js/third-party/behaviors.js',
             'src/js/site/menus.js',
             'src/js/site/modals.js',
@@ -495,6 +496,7 @@ MEDIA_BUNDLES = {
             'src/js/site/team-members.js',
             'src/js/site/team-integration-settings.js',
             'src/js/site/dates.js',
+            'src/js/site/formsets.js',
         ],
     },
     "api.js": {

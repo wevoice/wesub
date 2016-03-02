@@ -28,6 +28,7 @@ from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.db import transaction
+from django.forms.formsets import formset_factory
 from django.forms.util import ErrorDict
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
@@ -57,6 +58,7 @@ from videos.models import (
         VideoMetadata, VIDEO_META_TYPE_IDS, Video, VideoFeed,
 )
 from videos.tasks import import_videos_from_feed
+from videos.types import video_type_registrar, VideoTypeError
 from utils.forms import (ErrorableModelForm, get_label_for_value,
                          UserAutocompleteField)
 from utils.forms.unisub_video_form import UniSubBoundVideoField
@@ -1405,13 +1407,13 @@ class BulkEditTeamVideosForm(BulkTeamVideoForm):
                         self.count)
         return fmt(msg, count=self.count)
 
-class NewAddTeamVideoForm(VideoForm):
+class NewAddTeamVideoDataForm(forms.Form):
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
     thumbnail = forms.ImageField(required=False)
 
-    def __init__(self, team, user, *args, **kwargs):
-        super(NewAddTeamVideoForm, self).__init__(user, *args, **kwargs)
+    def __init__(self, team, *args, **kwargs):
+        super(NewAddTeamVideoDataForm, self).__init__(*args, **kwargs)
         self.team = team
         self.fields['project'].choices = [
             ('', _('None')),
@@ -1420,6 +1422,11 @@ class NewAddTeamVideoForm(VideoForm):
         ]
         if not self.fields['project'].choices:
             del self.fields['project']
+
+class NewAddTeamVideoForm(NewAddTeamVideoDataForm, VideoForm):
+    def __init__(self, team, user, *args, **kwargs):
+        NewAddTeamVideoDataForm.__init__(team, *args, **kwargs)
+        VideoForm.__init__(user, *args, **kwargs)
 
     def clean(self):
         if not self._errors:
@@ -1566,3 +1573,33 @@ class ApplicationForm(forms.Form):
             if value:
                 languages.append({"language": value, "priority": i})
         self.application.user.set_languages(languages)
+
+class TeamVideoURLForm(forms.Form):
+    video_url = forms.URLField()
+    def save(self, team, user, project=None):
+        errors = ""
+        from videos.models import Video
+        if 'video_url' not in self.cleaned_data:
+            return (False, "")
+        video_url = self.cleaned_data['video_url']
+        if video_url:
+            try:
+                video_type = video_type_registrar.video_type_for_url(video_url)
+            except VideoTypeError, e:
+                return (False, fmt(_(u"Unknown video type: %(url)s"), url=video_url))
+            video_url = video_type.convert_to_video_url()
+            video, created = Video.get_or_create_for_url(video_url, video_type, user, set_values={'is_public': team.is_visible})
+            if not created and video.get_team_video() is not None:
+                return (False, fmt(_(u"Video is already part of a team: %(url)s"), url=video_url))
+            if not created:
+                video.is_public = self.team.is_visible
+                video.save()
+            if project:
+                project_id = project
+            else:
+                project_id = None
+            team_video = TeamVideo.objects.create(video=video, team=team, project_id=project_id)
+        else:
+            return (False, _(u"no video URL provided"))
+        return (True, "")
+TeamVideoURLFormSet = formset_factory(TeamVideoURLForm)

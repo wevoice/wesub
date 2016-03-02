@@ -28,7 +28,7 @@
 
     {% if "add" in forms.enabled %}
     <div class="section tools">
-      <button class="open-modal" data-modal="add-form">{% trans "Add Video" %}</button>
+      <button class="open-modal" data-modal="add-form">{% trans "Add Videos" %}</button>
     </div>
     {% endif %}
   </div>
@@ -115,9 +115,14 @@
     {% csrf_token %}
     {% include "_non-field-errors.html" with form=add_form %}
     <input type="hidden" name="form" value="add">
-    {% include "_field.html" with field=add_form.video_url %}
     {% include "_field.html" with field=add_form.project %}
     {% include "_field.html" with field=add_form.thumbnail %}
+    {{ add_formset.management_form }}
+    <table class="formset-table">
+      {% for form in add_formset %}
+      {{ form }}
+      {% endfor %}
+    </table>
     <footer class="buttons">
       <button>{% trans "Add" %}</button>
     </footer>

@@ -260,6 +260,21 @@ class VideoPageForms(object):
             return forms.NewAddTeamVideoForm(self.team, self.user,
                                              initial=initial)
 
+    def build_add_multiple_forms(self, request, filters_form):
+        if filters_form.selected_project:
+            # use the selected project by default on the add video form
+            initial = {
+                'project': filters_form.selected_project.id,
+            }
+        else:
+            initial = None
+        if request.method == 'POST':
+            return (forms.NewAddTeamVideoDataForm(self.team, request.POST),
+                    forms.TeamVideoURLFormSet(request.POST))
+        else:
+            return (forms.NewAddTeamVideoDataForm(self.team),
+                    forms.TeamVideoURLFormSet())
+
     def add_extension_form(self, extension_form):
         """Add an extra form to appear on the video page
 
@@ -308,12 +323,22 @@ def videos(request, team):
     page_forms = VideoPageForms(team, request.user, team_videos)
     error_form = error_form_name = None
 
-    add_form = page_forms.build_add_form(request, filters_form)
-    if add_form.is_bound and add_form.is_valid():
-        add_form.save()
-        messages.success(request, add_form.message())
+    add_form, add_formset = page_forms.build_add_multiple_forms(request, filters_form)
+    if add_form.is_bound and add_form.is_valid() and add_formset.is_bound and add_formset.is_valid():
+        logger.error(add_form.cleaned_data)
+        logger.error(add_formset.cleaned_data)
+        errors = ""
+        added = 0
+        project = add_form.cleaned_data['project']
+        for form in add_formset:
+            created, error = form.save(team, request.user, project)
+            if len(error) > 0:
+                errors += error + "<br/>"
+            if created:
+                added += 1
+        message = fmt(_(u"%(added)i videos added<br/>%(errors)s"), added=added, errors=errors)
+        messages.success(request, message)
         return HttpResponseRedirect(request.build_absolute_uri())
-
     paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
     page = paginator.get_page(request)
 
@@ -324,6 +349,7 @@ def videos(request, team):
         'filters_form': filters_form,
         'forms': page_forms,
         'add_form': add_form,
+        'add_formset': add_formset,
         'error_form': error_form,
         'error_form_name': error_form_name,
         'bulk_mode_enabled': page and page_forms.has_bulk_form,
