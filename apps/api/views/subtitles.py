@@ -104,7 +104,8 @@ Fetching subtitles for a given language
         dicts.
     :query version_number: version number to fetch.  Versions are listed in the
         VideoLanguageResouce request.  If none is specified, the latest public
-        version will be returned.
+        version will be returned.  If you want the latest private version (and
+        have access to it) use "last".
     :query version: Alias for version_number **(deprecated)**
     :>json version_number: version number for the subtitles
     :>json subtitles: Subtitle data (str)
