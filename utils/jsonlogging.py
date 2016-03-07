@@ -23,7 +23,7 @@ import logging
 
 from utils.dataprintout import DataPrinter
 
-EXTRA_FIELDS = ['path', 'view', 'query', 'data', 'metrics', 'user']
+EXTRA_FIELDS = ['path', 'status_code', 'method', 'view', 'query', 'data', 'metrics', 'user']
 
 data_printer = DataPrinter(
     max_size=500, max_item_size=100, max_repr_size=50)

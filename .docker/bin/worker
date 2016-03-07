@@ -12,4 +12,5 @@ fi
 
 echo "Starting Worker..."
 echo $PRE $CMD
+export PYTHONPATH=${AMARAPYTHONPATH}
 exec $PRE $CMD

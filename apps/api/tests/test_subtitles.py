@@ -455,7 +455,7 @@ class SubtitlesViewTest(TestCase):
         self.video = VideoFactory()
         self.version = pipeline.add_subtitles(self.video, 'en',
                                               SubtitleSetFactory(num_subs=1))
-        self.user = UserFactory()
+        self.user = UserFactory(is_staff=True)
         self.client = APIClient()
         self.client.force_authenticate(self.user)
         self.url = reverse('api:subtitles', kwargs={
@@ -507,6 +507,27 @@ class SubtitlesViewTest(TestCase):
         returned_object = self.run_get_object(
             version=self.version.version_number)
         assert_equal(returned_object, self.version)
+
+    def test_last_version(self):
+        # version=last should return the last version, private or public
+        new_version = pipeline.add_subtitles(self.video, 'en',
+                                             SubtitleSetFactory(num_subs=1),
+                                             visibility='private')
+        returned_object = self.run_get_object(version='last')
+        assert_equal(returned_object, new_version)
+
+    def test_non_existant_version_raises_404(self):
+        # verison should work the same as version_number
+        with assert_raises(Http404):
+            self.run_get_object(version=-1)
+
+    def test_invalid_version(self):
+        # verison should work the same as version_number
+        new_version = pipeline.add_subtitles(self.video, 'en',
+                                             SubtitleSetFactory(num_subs=1),
+                                             visibility='private')
+        with assert_raises(ValidationError):
+            self.run_get_object(version='one')
 
     def test_deleted_version_raises_404(self):
         v = pipeline.add_subtitles(self.video, 'en',
