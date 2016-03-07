@@ -3,7 +3,7 @@ source /usr/local/bin/config_env
 
 PRE=""
 CELERY_QUEUES=${CELERY_QUEUES:-celery}
-CMD="python ${MANAGE_SCRIPT} celery worker -P solo -Q $CELERY_QUEUES --scheduler=djcelery.schedulers.DatabaseScheduler --loglevel=INFO -E $CELERY_OPTS"
+CMD="python ${MANAGE_SCRIPT} celery worker -Q $CELERY_QUEUES -c 16 --scheduler=djcelery.schedulers.DatabaseScheduler --loglevel=INFO -E $CELERY_OPTS"
 
 if [ ! -z "$NEW_RELIC_LICENSE_KEY" ] ; then
     pip install -U newrelic
