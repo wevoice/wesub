@@ -332,7 +332,7 @@ var AmaraDFXPParser = function() {
 
             // If the XML does not have a tts namespace set on the <tt> element, we need to
             // set it specifically. This is an IE9 issue.
-            if (xmlString.substring(0).search(/\<tt.*xmlns:tts="http:\/\/www.w3.org\/ns\/ttml#styling" /)) {
+            if (xmlString.substring(0).search(/\<tt.*xmlns:tts="http:\/\/www.w3.org\/ns\/ttml#styling"/)) {
                 xmlString = xmlString.replace(/\<tt /g, '<tt xmlns:tts="http:\/\/www.w3.org\/ns\/ttml#styling" ');
             }
 
