@@ -19,6 +19,14 @@ aside.modal {
         display: block;
     }
 
+    table th, td {
+        border-style: none none none;
+    }
+
+    a.add-row {
+        color: $white;
+    }
+
     button.close {
         position: absolute;
         top: 0;
