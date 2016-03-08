@@ -1576,7 +1576,7 @@ class ApplicationForm(forms.Form):
 
 class TeamVideoURLForm(forms.Form):
     video_url = forms.URLField()
-    def save(self, team, user, project=None):
+    def save(self, team, user, project=None, thumbnail=None):
         errors = ""
         from videos.models import Video
         if 'video_url' not in self.cleaned_data:
@@ -1599,6 +1599,8 @@ class TeamVideoURLForm(forms.Form):
             else:
                 project_id = None
             team_video = TeamVideo.objects.create(video=video, team=team, project_id=project_id)
+            if thumbnail is not None:
+                video.s3_thumbnail.save(thumbnail.name, thumbnail)
         else:
             return (False, _(u"no video URL provided"))
         return (True, "")

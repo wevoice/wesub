@@ -255,7 +255,7 @@ class VideoPageForms(object):
         if request.method == 'POST':
             return forms.NewAddTeamVideoForm(self.team, self.user,
                                              initial=initial,
-                                             data=request.POST)
+                                             data=request.POST, files=request.FILES)
         else:
             return forms.NewAddTeamVideoForm(self.team, self.user,
                                              initial=initial)
@@ -269,7 +269,7 @@ class VideoPageForms(object):
         else:
             initial = None
         if request.method == 'POST':
-            return (forms.NewAddTeamVideoDataForm(self.team, request.POST),
+            return (forms.NewAddTeamVideoDataForm(self.team, request.POST, files=request.FILES),
                     forms.TeamVideoURLFormSet(request.POST))
         else:
             return (forms.NewAddTeamVideoDataForm(self.team),
@@ -325,13 +325,12 @@ def videos(request, team):
 
     add_form, add_formset = page_forms.build_add_multiple_forms(request, filters_form)
     if add_form.is_bound and add_form.is_valid() and add_formset.is_bound and add_formset.is_valid():
-        logger.error(add_form.cleaned_data)
-        logger.error(add_formset.cleaned_data)
         errors = ""
         added = 0
         project = add_form.cleaned_data['project']
+        thumbnail = add_form.cleaned_data['thumbnail']
         for form in add_formset:
-            created, error = form.save(team, request.user, project)
+            created, error = form.save(team, request.user, project=project, thumbnail=thumbnail)
             if len(error) > 0:
                 errors += error + "<br/>"
             if created:
