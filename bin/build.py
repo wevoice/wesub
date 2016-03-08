@@ -15,7 +15,7 @@ def update_commit_file():
         f.write("LAST_COMMIT_GUID = '{0}'\n".format(commit_id))
 
 def run_docker_build(image_name, no_cache):
-    cmdline = ['docker', 'build', '-t', image_name]
+    cmdline = ['docker', 'build', '--pull', '-t', image_name]
     if no_cache:
         cmdline.append('--no-cache')
     cmdline.append(ROOT_DIR)
