@@ -521,10 +521,9 @@ class SubtitleLanguage(models.Model):
             signal.send(self, **kwargs)
 
     def mark_complete(self):
-        if self.subtitles_complete:
-            return
-        self.subtitles_complete = True
-        self.save()
+        if not self.subtitles_complete:
+            self.subtitles_complete = True
+            self.save()
         self.send_signal(signals.subtitles_completed)
 
     def mark_incomplete(self):
