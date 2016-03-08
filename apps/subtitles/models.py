@@ -21,6 +21,7 @@
 import collections
 import itertools
 import json
+import logging
 from datetime import datetime, date, timedelta
 
 from django.core.exceptions import ValidationError
@@ -46,6 +47,8 @@ from utils import translation
 from videos.behaviors import make_video_title
 
 WRITELOCK_EXPIRATION = 30 # 30 seconds
+
+logger = logging.getLogger(__name__)
 
 # Utility functions -----------------------------------------------------------
 def mapcat(fn, iterable):
@@ -521,6 +524,8 @@ class SubtitleLanguage(models.Model):
             signal.send(self, **kwargs)
 
     def mark_complete(self):
+        logger.info("In mark_complete (subtitles_completed=%s)",
+                    self.subtitles_complete)
         if not self.subtitles_complete:
             self.subtitles_complete = True
             self.save()
