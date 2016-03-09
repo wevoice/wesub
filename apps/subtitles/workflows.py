@@ -93,6 +93,7 @@ them.
 
 from collections import namedtuple
 from datetime import datetime, timedelta
+import logging
 
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext as _
@@ -101,6 +102,8 @@ from subtitles import signals
 from subtitles.exceptions import ActionError
 from subtitles.models import SubtitleNote
 from utils.behaviors import behavior
+
+logger = logging.getLogger(__name__)
 
 class Workflow(object):
     """
@@ -665,6 +668,7 @@ class Action(object):
                 created for subtitle changes that happened alongside this
                 action.  Will be None if no changes were made.
         """
+        logger.info("In update_language (complete=%s)", self.complete)
         if self.complete is not None:
             if self.complete:
                 subtitle_language.mark_complete()
