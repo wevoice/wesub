@@ -410,6 +410,11 @@ def can_add_video(team, user, project=None):
 
     return role in _perms_equal_or_greater(role_required)
 
+def can_add_videos_bulk(user):
+    """Return whether the given user can add videos in bulk (using a CSV file).
+    It also implies user can create projects."""
+    return user.is_staff or user.is_superuser
+
 def can_add_video_somewhere(team, user):
     """Return whether the given user can add a video somewhere in the given team."""
 

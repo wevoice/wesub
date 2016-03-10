@@ -1605,3 +1605,7 @@ class TeamVideoURLForm(forms.Form):
             return (False, _(u"no video URL provided"))
         return (True, "")
 TeamVideoURLFormSet = formset_factory(TeamVideoURLForm)
+
+class TeamVideoCSVForm(forms.Form):
+    csv_file = forms.FileField(label=_(u"CSV file"),
+                               help_text=_("A CSV file can be created with a text editor or using the export function of a spreadsheet editor"), required=True, allow_empty_file=False)

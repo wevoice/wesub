@@ -31,6 +31,11 @@
       <button class="open-modal" data-modal="add-form">{% trans "Add Videos" %}</button>
     </div>
     {% endif %}
+    {% if "add_csv" in forms.enabled %}
+    <div class="section tools">
+      <button class="open-modal" data-modal="add-csv-form">{% trans "Add Videos from CSV" %}</button>
+    </div>
+    {% endif %}
   </div>
   <div class="main">
     {% if filters_form.is_filtered %}
@@ -127,6 +132,23 @@
       <button>{% trans "Add" %}</button>
     </footer>
   </form>
+</aside>
+{% endif %}
+{% if "add_csv" in forms.enabled %}
+<aside class="modal{% if add_csv_form.errors %} start-open{% endif %}" id="add-csv-form">
+  <h3>{% trans "Add Videos from CSV" %}</h3>
+  <button class="close"></button>
+  <p>{% trans "Your file should be a CSV file, with the first line being the header. Regardless the header names, the first four columns are the project name, the video URL, the title and the description. You can also add the following columns (determined by their header): duration and primary audio language code." %}</p>
+  <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include "_non-field-errors.html" with form=add_csv_form %}
+    <input type="hidden" name="form" value="add-csv">
+    {{ add_csv_form }}
+    <footer class="buttons">
+      <button>{% trans "Upload" %}</button>
+    </footer>
+  </form>
+  <p>{% trans "Upon completion, you will recieve a summary by email." %}</p>
 </aside>
 {% endif %}
 {% endblock %}

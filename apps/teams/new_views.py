@@ -49,6 +49,7 @@ from . import permissions
 from . import signals
 from . import tasks
 from .behaviors import get_main_project
+from .bulk_actions import add_videos_from_csv
 from .exceptions import ApplicationInvalidException
 from .models import (Invite, Setting, Team, Project, TeamVideo,
                      TeamLanguagePreference, TeamMember, Application)
@@ -206,6 +207,7 @@ class VideoPageForms(object):
     """
     form_classes = {
         'add': forms.NewAddTeamVideoForm,
+        'add_csv': forms.TeamVideoCSVForm,
         'edit': forms.NewEditTeamVideoForm,
         'bulk-edit': forms.BulkEditTeamVideosForm,
         'move': forms.MoveTeamVideosForm,
@@ -219,6 +221,8 @@ class VideoPageForms(object):
         self.enabled = set()
         if permissions.can_add_video(team, user):
             self.enabled.add('add')
+        if permissions.can_add_videos_bulk(user):
+            self.enabled.add('add_csv')
         if permissions.can_edit_videos(team, user):
             self.enabled.update(['edit', 'bulk-edit'])
         if len(permissions.can_move_videos_to(team, user)) > 0:
@@ -268,7 +272,8 @@ class VideoPageForms(object):
             }
         else:
             initial = None
-        if request.method == 'POST':
+        if request.method == 'POST' and 'form' in request.POST and request.POST['form'] == 'add':
+            logger.error(request)
             return (forms.NewAddTeamVideoDataForm(self.team, request.POST, files=request.FILES),
                     forms.TeamVideoURLFormSet(request.POST))
         else:
@@ -341,6 +346,20 @@ def videos(request, team):
     paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
     page = paginator.get_page(request)
 
+    if request.method == 'POST':
+        csv_form = forms.TeamVideoCSVForm(data=request.POST, files=request.FILES)
+        if csv_form.is_bound and csv_form.is_valid():
+            csv_file = csv_form.cleaned_data['csv_file']
+            if csv_file is not None:
+                try:
+                    add_videos_from_csv(team, request.user, csv_file)
+                    message = fmt(_(u"File successfully uploaded, you should receive the summary shortly."))
+                except:
+                    message = fmt(_(u"File was not successfully parsed."))
+                messages.success(request, message)
+    else:
+        csv_form = forms.TeamVideoCSVForm()
+
     return render(request, 'new-teams/videos.html', {
         'team': team,
         'page': page,
@@ -349,6 +368,7 @@ def videos(request, team):
         'forms': page_forms,
         'add_form': add_form,
         'add_formset': add_formset,
+        'add_csv_form': csv_form,
         'error_form': error_form,
         'error_form_name': error_form_name,
         'bulk_mode_enabled': page and page_forms.has_bulk_form,
