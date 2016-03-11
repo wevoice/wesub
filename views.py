@@ -18,7 +18,7 @@
 
 import logging
 
-from django.contrib.admin.views.decorators import staff_member_required
+from utils.decorators import staff_member_required
 
 logger = logging.getLogger(__name__)
 

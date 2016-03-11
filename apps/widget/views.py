@@ -24,7 +24,6 @@ import babelsubs
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import ObjectDoesNotExist
@@ -44,6 +43,7 @@ from auth.models import CustomUser
 from teams.models import Task
 from teams.permissions import get_member
 from utils import DEFAULT_PROTOCOL
+from utils.decorators import staff_member_required
 from videos import models
 from widget.models import SubtitlingSession
 from widget.null_rpc import NullRpc
