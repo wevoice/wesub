@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
-
+import requests
 from utils import send_templated_email
 from widget.video_cache import (
     invalidate_cache as invalidate_video_cache,
@@ -174,6 +174,8 @@ def add_team_videos(team_pk, user_pk, videos):
     from videos.models import Video
     from videos.types import video_type_registrar
     from auth.models import CustomUser as User
+    from utils.subtitles import load_subtitles
+    from subtitles.pipeline import add_subtitles
     user = User.objects.get(pk=int(user_pk))
     team = Team.objects.get(pk=int(team_pk))
     num_successful_videos = 0
@@ -211,13 +213,25 @@ def add_team_videos(team_pk, user_pk, videos):
                 modified_video = True
             if 'language' in video_item:
                 try:
-                    video.primary_audio_language_code = video_item['language']
+                    video.primary_audio_language_code = video_item['language'].lower()
                 except:
                     message += fmt(_(u"Badly formated language for %(url)s: %(language)s\n"), url=video_url, language=video_item['language'])
                     continue
                 modified_video = True
             if modified_video:
                 video.save()
+            if 'transcript' in video_item and len(video_item['transcript']) > 0 and video.primary_audio_language_code:
+                try:
+                    sub_type = video_item['transcript'].split(".")[-1]
+                    r = requests.get(video_item['transcript'])
+                    if r.ok:
+                        subs = load_subtitles(video.primary_audio_language_code, r.text, sub_type)
+                        version = add_subtitles(video, video.primary_audio_language_code, subs)
+                    else:
+                        raise Exception("Request not successful")
+                except Exception, e:
+                    logger.error("Error while importing transcript file: {}".format(str(e))
+                    message += fmt(_(u"Invalid transcript file or language code for video %(url)s\n"), url=video_url)
             if created:
                 num_successful_videos += 1
             project = video_item['project']
@@ -228,7 +242,7 @@ def add_team_videos(team_pk, user_pk, videos):
                 project_id = None
             team_video = TeamVideo.objects.create(video=video, team=team, project_id=project_id)
     else:
-        message = fmt(_(u'You are not authorized to perform such action'))
+        message = fmt(_(u'You are not authorized to perform such action\n'))
     message += fmt(_(u"Number of videos added to team: %(num)i\n"), num=num_successful_videos)
     domain = Site.objects.get_current().domain
     context = {
