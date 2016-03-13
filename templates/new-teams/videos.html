@@ -138,7 +138,9 @@
 <aside class="modal{% if add_csv_form.errors %} start-open{% endif %}" id="add-csv-form">
   <h3>{% trans "Add Videos from CSV" %}</h3>
   <button class="close"></button>
-  <p>{% trans "Your file should be a CSV file, with the first line being the header. Regardless the header names, the first four columns are the project name, the video URL, the title and the description. You can also add the following columns (determined by their header): duration and primary audio language code." %}</p>
+  <p>{% trans "Please use this " %}<a href="{{ STATIC_URL }}images/template.csv" download>{% trans "CSV Import Template" %}</a>{% trans " as the basis for your import. The Video URL field is mandatory, but all other fields can be left blank." %}</p>
+  <p>{% trans "A CSV file can be created with a text editor or using the export function of a spreadsheet editor." %}</p>
+  <p>{% trans "Upon completion, you will receive a summary by email." %}</p>
   <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% include "_non-field-errors.html" with form=add_csv_form %}
@@ -148,7 +150,6 @@
       <button>{% trans "Upload" %}</button>
     </footer>
   </form>
-  <p>{% trans "Upon completion, you will recieve a summary by email." %}</p>
 </aside>
 {% endif %}
 {% endblock %}

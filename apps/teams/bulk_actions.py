@@ -17,19 +17,13 @@ def complete_approve_tasks(tasks):
 def add_videos_from_csv(team, user, csv_file):
     from .tasks import add_team_videos
     videos = []
-    fields = ['project', 'url', 'title', 'description']
+    fields = ['project', 'url', 'title', 'description', 'duration', 'language', 'transcript']
     num_fields = len(fields)
-    possible_fields = ['duration', 'language', 'transcript']
     try:
         reader = UnicodeReader(csv_file)
         header = reader.next()
-        if len(header) < num_fields:
+        if len(header) != num_fields:
             raise Exception()
-        for field in header[num_fields:]:
-            if field in possible_fields:
-                fields.append(field)
-            else:
-                raise Exception()
     except:
         raise ValueError(u'CSV format is not valid')
     for row in reader:

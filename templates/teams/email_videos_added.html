@@ -9,9 +9,13 @@
             was processed completely. Here is a summary.
         {% endblocktrans %}
     </p>
-    <p>
+    <ul>
+      {% for message in messages %}
+      <li>
         {{ message }}
-   </p>
+      </li>
+      {% endfor %}
+    </ul>
 {% endblock %}
 
 {% block dont_send %}{% endblock %}
