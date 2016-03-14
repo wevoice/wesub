@@ -334,8 +334,9 @@ def videos(request, team):
         added = 0
         project = add_form.cleaned_data['project']
         thumbnail = add_form.cleaned_data['thumbnail']
+        language = add_form.cleaned_data['language']
         for form in add_formset:
-            created, error = form.save(team, request.user, project=project, thumbnail=thumbnail)
+            created, error = form.save(team, request.user, project=project, thumbnail=thumbnail, language=language)
             if len(error) > 0:
                 errors += error + "<br/>"
             if created:

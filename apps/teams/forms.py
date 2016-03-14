@@ -1410,11 +1410,13 @@ class BulkEditTeamVideosForm(BulkTeamVideoForm):
 class NewAddTeamVideoDataForm(forms.Form):
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
+    language = forms.ChoiceField(choices=(), required=False)
     thumbnail = forms.ImageField(required=False)
 
     def __init__(self, team, *args, **kwargs):
         super(NewAddTeamVideoDataForm, self).__init__(*args, **kwargs)
         self.team = team
+        self.fields['language'].choices = get_language_choices(with_empty=True)
         self.fields['project'].choices = [
             ('', _('None')),
         ] + [
@@ -1576,7 +1578,7 @@ class ApplicationForm(forms.Form):
 
 class TeamVideoURLForm(forms.Form):
     video_url = forms.URLField()
-    def save(self, team, user, project=None, thumbnail=None):
+    def save(self, team, user, project=None, thumbnail=None, language=None):
         errors = ""
         from videos.models import Video
         if 'video_url' not in self.cleaned_data:
@@ -1588,7 +1590,10 @@ class TeamVideoURLForm(forms.Form):
             except VideoTypeError, e:
                 return (False, fmt(_(u"Unknown video type: %(url)s"), url=video_url))
             video_url = video_type.convert_to_video_url()
-            video, created = Video.get_or_create_for_url(video_url, video_type, user, set_values={'is_public': team.is_visible})
+            set_values={'is_public': team.is_visible}
+            if language is not None:
+                set_values['primary_audio_language_code'] = language
+            video, created = Video.get_or_create_for_url(video_url, video_type, user, set_values=set_values)
             if not created and video.get_team_video() is not None:
                 return (False, fmt(_(u"Video is already part of a team: %(url)s"), url=video_url))
             if not created:
