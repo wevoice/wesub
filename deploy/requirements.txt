@@ -46,7 +46,7 @@ vendor/django-tastypie-0.9.11.tar.gz
 requests==2.9.0
 rauth==0.4.12
 -e git+https://github.com/jsocol/bleach.git@105b4cfc2f00cc1954bcab3b39b16fbfaf8863e0#egg=bleach
-markdown2==2.0.0
+markdown==2.6.5
 -e git+https://github.com/pculture/babelsubs.git#egg=babelsubs
 -e git+https://github.com/pculture/unilangs.git#egg=unilangs
 pytz==2012f

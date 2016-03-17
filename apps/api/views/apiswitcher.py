@@ -53,6 +53,10 @@ class APISwitcherMixin(object):
 
         return view
 
+    def get_view_description(self, html=False):
+        func = self.settings.VIEW_DESCRIPTION_FUNCTION
+        return func(self.find_view_name_class(), html)
+
     def get_view_name(self):
         func = self.settings.VIEW_NAME_FUNCTION
         return func(self.find_view_name_class(), getattr(self, 'suffix', None))

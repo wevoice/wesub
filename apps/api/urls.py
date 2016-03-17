@@ -46,6 +46,7 @@ router.register(r'activity', views.activity.ActivityViewSetSwitcher,
                 base_name='activity')
 
 urlpatterns = router.urls + patterns('',
+    url(r'^$', views.index.index, name='index'),
     url(r'^videos/(?P<video_id>[\w\d]+)'
         '/languages/(?P<language_code>[\w-]+)/subtitles/$',
         views.subtitles.SubtitlesView.as_view(), name='subtitles'),
