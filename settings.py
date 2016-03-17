@@ -226,16 +226,16 @@ BROKER_POOL_LIMIT = 10
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
-        'rest_framework.parsers.YAMLParser',
-        'rest_framework.parsers.XMLParser',
+        'rest_framework_yaml.parsers.YAMLParser',
+        'rest_framework_xml.parsers.XMLParser',
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.YAMLRenderer',
+        'rest_framework_yaml.renderers.YAMLRenderer',
         'api.renderers.AmaraBrowsableAPIRenderer',
-        'rest_framework.renderers.XMLRenderer',
+        'rest_framework_xml.renderers.XMLRenderer',
     ),
     'URL_FORMAT_OVERRIDE': 'format',
     'DEFAULT_CONTENT_NEGOTIATION_CLASS':
@@ -247,8 +247,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_PAGINATION_SERIALIZER_CLASS':
-        'api.pagination.AmaraPaginationSerializer',
+    'DEFAULT_PAGINATION_CLASS': 'api.pagination.AmaraPagination',
     'ORDERING_PARAM': 'order_by',
     'VIEW_NAME_FUNCTION': 'api.viewdocs.amara_get_view_name',
     'VIEW_DESCRIPTION_FUNCTION': 'api.viewdocs.amara_get_view_description',

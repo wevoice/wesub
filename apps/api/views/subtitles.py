@@ -257,7 +257,6 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .apiswitcher import APISwitcherMixin
 from .videos import VideoMetadataSerializer
-from api.pagination import AmaraPaginationMixin
 from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
 from videos.models import Video
 from subtitles import compat
@@ -418,8 +417,7 @@ class SubtitleLanguageSerializer(serializers.Serializer):
         videos.tasks.video_changed_tasks.delay(video.pk)
         return language
 
-class SubtitleLanguageViewSet(AmaraPaginationMixin,
-                              mixins.CreateModelMixin,
+class SubtitleLanguageViewSet(mixins.CreateModelMixin,
                               mixins.RetrieveModelMixin,
                               mixins.UpdateModelMixin,
                               mixins.ListModelMixin,

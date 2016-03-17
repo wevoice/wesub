@@ -212,7 +212,6 @@ import json
 
 from .apiswitcher import APISwitcherMixin
 from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
-from api.pagination import AmaraPaginationMixin
 from teams import permissions as team_perms
 from teams.models import Team, TeamVideo, Project
 from subtitles.models import SubtitleLanguage
@@ -480,8 +479,7 @@ class VideoSerializer(serializers.Serializer):
                                          project=project)
         video.clear_team_video_cache()
 
-class VideoViewSet(AmaraPaginationMixin,
-                   mixins.CreateModelMixin,
+class VideoViewSet(mixins.CreateModelMixin,
                    mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
                    mixins.ListModelMixin,
@@ -628,7 +626,7 @@ class VideoURLSerializer(serializers.Serializer):
 class VideoURLUpdateSerializer(VideoURLSerializer):
     url = serializers.CharField(read_only=True)
 
-class VideoURLViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
+class VideoURLViewSet(viewsets.ModelViewSet):
     serializer_class = VideoURLSerializer
     update_serializer_class = VideoURLUpdateSerializer
 

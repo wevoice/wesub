@@ -304,7 +304,6 @@ from rest_framework.reverse import reverse
 
 from .apiswitcher import APISwitcherMixin
 from api.fields import TimezoneAwareDateTimeField
-from api.pagination import AmaraPaginationMixin
 from auth.models import CustomUser as User
 from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
                           Application)
@@ -368,8 +367,7 @@ class TeamUpdateSerializer(TeamSerializer):
     name = serializers.CharField(required=False)
     slug = serializers.SlugField(required=False)
 
-class TeamViewSet(AmaraPaginationMixin,
-                  mixins.CreateModelMixin,
+class TeamViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
                   mixins.ListModelMixin,
@@ -463,7 +461,7 @@ class TeamSubviewMixin(object):
 class TeamSubview(TeamSubviewMixin, viewsets.ModelViewSet):
     pass
 
-class TeamMemberViewSet(AmaraPaginationMixin, TeamSubview):
+class TeamMemberViewSet(TeamSubview):
     lookup_field = 'username'
     paginate_by = 20
 
@@ -727,7 +725,7 @@ class TaskUpdateSerializer(TaskSerializer):
             task.assignee = self.context['user']
         task.complete()
 
-class TaskViewSet(AmaraPaginationMixin, TeamSubview):
+class TaskViewSet(TeamSubview):
     lookup_field = 'id'
     paginate_by = 20
 
@@ -862,8 +860,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             instance.deny(self.context['user'], 'API')
         return instance
 
-class TeamApplicationViewSet(AmaraPaginationMixin,
-                             TeamSubviewMixin,
+class TeamApplicationViewSet(TeamSubviewMixin,
                              mixins.RetrieveModelMixin,
                              mixins.UpdateModelMixin,
                              mixins.ListModelMixin,

@@ -94,7 +94,6 @@ from rest_framework.reverse import reverse
 
 from .apiswitcher import APISwitcherMixin
 from api.fields import TimezoneAwareDateTimeField
-from api.pagination import AmaraPaginationMixin
 from subtitles.models import SubtitleLanguage
 from teams.models import Team
 from videos.models import Action, Video
@@ -133,7 +132,7 @@ class ActivitySerializer(serializers.ModelSerializer):
             'resource_uri'
         )
 
-class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
+class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'id'
     serializer_class = ActivitySerializer
     paginate_by = 20
