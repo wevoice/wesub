@@ -164,12 +164,6 @@ class VideoPage(UnisubsPage):
         if self.is_element_present(team_link):
             return True
 
-    def feature_video(self):
-        self.click_link_text('Feature video')
-
-    def unfeature_video(self):
-        self.click_link_text('Unfeature video')
-
     def displays_add_subtitles(self):
         contrib_text = self.get_text_by_css(self._CONTRIBUTE)
         return (self._ADD_SUBS_TEXT in contrib_text)
