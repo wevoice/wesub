@@ -55,7 +55,7 @@ urlpatterns = router.urls + patterns('',
         views.subtitles.Actions.as_view(), name='subtitle-actions'),
     url(r'^videos/(?P<video_id>[\w\d]+)'
         '/languages/(?P<language_code>[\w-]+)/subtitles/notes/$',
-        views.subtitles.NotesListSwitcher.as_view()),
+        views.subtitles.NotesListSwitcher.as_view(), name='subtitle-notes'),
     url(r'^languages/$', views.languages.languages, name='languages'),
     url(r'^message/$', views.messages.Messages.as_view(), name='messages'),
 )

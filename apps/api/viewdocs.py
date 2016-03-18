@@ -25,6 +25,7 @@ import markdown
 
 markdown_formatter = markdown.Markdown(safe_mode=False, extensions=[
     'headerid(level=2)',
+    'tables',
 ])
 
 def amara_get_view_name(view_cls, suffix=None):
