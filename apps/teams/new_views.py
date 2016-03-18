@@ -206,7 +206,6 @@ class VideoPageForms(object):
         - Allowing other apps to extend which forms appear in the bottom sheet
     """
     form_classes = {
-        'add': forms.NewAddTeamVideoForm,
         'add_csv': forms.TeamVideoCSVForm,
         'edit': forms.NewEditTeamVideoForm,
         'bulk-edit': forms.BulkEditTeamVideosForm,
@@ -219,8 +218,6 @@ class VideoPageForms(object):
         self.user = user
         self.team_videos_qs = team_videos_qs
         self.enabled = set()
-        if permissions.can_add_video(team, user):
-            self.enabled.add('add')
         if permissions.can_add_videos_bulk(user):
             self.enabled.add('add_csv')
         if permissions.can_edit_videos(team, user):
@@ -247,22 +244,6 @@ class VideoPageForms(object):
         else:
             return FormClass(self.team, self.user, self.team_videos_qs,
                              selection, all_selected, filters_form)
-
-    def build_add_form(self, request, filters_form):
-        if filters_form.selected_project:
-            # use the selected project by default on the add video form
-            initial = {
-                'project': filters_form.selected_project.id,
-            }
-        else:
-            initial = None
-        if request.method == 'POST':
-            return forms.NewAddTeamVideoForm(self.team, self.user,
-                                             initial=initial,
-                                             data=request.POST, files=request.FILES)
-        else:
-            return forms.NewAddTeamVideoForm(self.team, self.user,
-                                             initial=initial)
 
     def build_add_multiple_forms(self, request, filters_form):
         if filters_form.selected_project:

@@ -1425,50 +1425,6 @@ class NewAddTeamVideoDataForm(forms.Form):
         if not self.fields['project'].choices:
             del self.fields['project']
 
-class NewAddTeamVideoForm(NewAddTeamVideoDataForm, VideoForm):
-    def __init__(self, team, user, *args, **kwargs):
-        NewAddTeamVideoDataForm.__init__(team, *args, **kwargs)
-        VideoForm.__init__(user, *args, **kwargs)
-
-    def clean(self):
-        if not self._errors:
-            video, created = Video.get_or_create_for_url(
-                self.cleaned_data['video_url'], self._video_type, self.user,
-                set_values={'is_public': self.team.is_visible},
-            )
-            if not created and video.get_team_video() is not None:
-                self._errors['video_url'] = self.error_class([
-                    _(u'Video is already part of a team')
-                ])
-                return
-            if not created:
-                video.is_public = self.team.is_visible
-                video.save()
-            self.video = video
-            self.created = created
-        return self.cleaned_data
-
-    def save(self):
-        if 'project' in self.fields:
-            project_id = self.cleaned_data['project']
-            if not project_id:
-                project_id = None
-        else:
-            project_id = None
-        team_video = TeamVideo.objects.create(
-            video=self.video, team=self.team, project_id=project_id,
-        )
-        if self.cleaned_data['thumbnail']:
-            thumb = self.cleaned_data['thumbnail']
-            self.video.s3_thumbnail.save(thumb.name, thumb)
-        return team_video
-
-    def message(self):
-        if self.created:
-            return _('Video added to team.')
-        else:
-            return _('Existing video added to team.')
-
 class NewEditTeamVideoForm(forms.Form):
     primary_audio_language = forms.ChoiceField(required=False, choices=[])
     project = forms.ChoiceField(label=_('Project'), choices=[],
@@ -1612,5 +1568,4 @@ class TeamVideoURLForm(forms.Form):
 TeamVideoURLFormSet = formset_factory(TeamVideoURLForm)
 
 class TeamVideoCSVForm(forms.Form):
-    csv_file = forms.FileField(label=_(u"CSV file"),
-                               help_text=_("A CSV file can be created with a text editor or using the export function of a spreadsheet editor"), required=True, allow_empty_file=False)
+    csv_file = forms.FileField(label=_(u"CSV file"), required=True, allow_empty_file=False)
