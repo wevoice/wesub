@@ -26,7 +26,7 @@
       </form>
     </div>
 
-    {% if "add" in forms.enabled %}
+    {% if "add_form" in forms.enabled %}
     <div class="section tools">
       <button class="open-modal" data-modal="add-form">{% trans "Add Videos" %}</button>
     </div>
@@ -112,7 +112,7 @@
 </div>
 {% endif %}
 
-{% if "add" in forms.enabled %}
+{% if "add_form" in forms.enabled %}
 <aside class="modal{% if add_form.errors %} start-open{% endif %}" id="add-form">
   <h3>{% trans "Add Videos" %}</h3>
   <button class="close"></button>

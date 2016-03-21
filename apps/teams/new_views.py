@@ -206,6 +206,7 @@ class VideoPageForms(object):
         - Allowing other apps to extend which forms appear in the bottom sheet
     """
     form_classes = {
+        'add_form': forms.NewAddTeamVideoDataForm,
         'add_csv': forms.TeamVideoCSVForm,
         'edit': forms.NewEditTeamVideoForm,
         'bulk-edit': forms.BulkEditTeamVideosForm,
@@ -220,6 +221,8 @@ class VideoPageForms(object):
         self.enabled = set()
         if permissions.can_add_videos_bulk(user):
             self.enabled.add('add_csv')
+        if permissions.can_add_videos_bulk(user):
+            self.enabled.add('add_form')
         if permissions.can_edit_videos(team, user):
             self.enabled.update(['edit', 'bulk-edit'])
         if len(permissions.can_move_videos_to(team, user)) > 0:
