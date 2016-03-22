@@ -27,7 +27,7 @@ Every request must have the username and the API keys as headers. For example::
 
 So a sample request would look like this:
 
-.. http:get:: amara.org/api/videos/
+.. http:get:: https://amara.org/api/videos/
 
   :reqheader X-api-username: <Username>
   :reqheader X-api-key: <API key>
@@ -144,41 +144,35 @@ operations.
 
 To view a list of videos on the site you can use
 
-.. http:get:: amara.org/api/videos/
+.. http:get:: https://amara.org/api/videos/
 
 To get info about the video with id "foo" you can use
 
-.. http:get:: amara.org/api/videos/foo
+.. http:get:: https://amara.org/api/videos/foo
 
 Many of the available resources will allow you to filter the response by a
 certain field.  Filters are specified as GET parameters on the request.  For
 example, if you wanted to view all videos belong to a team called
 "butterfly-club", you could do:
 
-.. http:get:: amara.org/api/videos/?team=butterfly-club
+.. http:get:: https://amara.org/api/videos/?team=butterfly-club
 
 In addition to filters, you can request that the response is ordered in some
 way.  To order videos by title, you would do
 
-.. http:get:: amara.org/api/videos/?order_by=title
+.. http:get:: https://amara.org/api/videos/?order_by=title
 
 To create a video you can use
 
-.. http:post:: amara.org/api/videos/
+.. http:post:: https://amara.org/api/videos/
 
 To update the video with video id `foo` use:
 
-.. http:put:: amara.org/api/videos/foo
+.. http:put:: https://amara.org/api/videos/foo
 
-Available Resources
+Available Endpoints
 -------------------
 
-The following resources are available to end users:
-
-.. automodule:: api.views.videos
-.. automodule:: api.views.subtitles
-.. automodule:: api.views.languages
-.. automodule:: api.views.users
-.. automodule:: api.views.teams
-.. automodule:: api.views.activity
-.. automodule:: api.views.messages
+Visit the root API URL (https://amara.org/api/) to discover our API endpoints.
+If you use a browser to view this, you can see documentation on each endpoint on
+its page.

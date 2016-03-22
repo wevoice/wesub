@@ -23,7 +23,7 @@ from utils import translation
 @api_view(['GET'])
 def languages(request):
     """
-    API endpont that lists all available languages on the Amara platform.
+    API endpoint that lists all available languages on the Amara platform.
 
     ## `GET /api/languages/`
     List available languages
