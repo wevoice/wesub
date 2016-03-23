@@ -11,6 +11,7 @@ from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 import requests
 from utils import send_templated_email
+from utils.panslugify import pan_slugify
 from utils.translation import get_language_choices
 from widget.video_cache import (
     invalidate_cache as invalidate_video_cache,
@@ -242,7 +243,7 @@ def add_team_videos(team_pk, user_pk, videos):
             if created:
                 num_successful_videos += 1
             if 'project' in video_item and len(video_item['project']) > 0:
-                project, created = Project.objects.get_or_create(team=team, slug=video_item['project'], defaults={'name': video_item['project']})
+                project, created = Project.objects.get_or_create(team=team, slug=pan_slugify(video_item['project']), defaults={'name': video_item['project']})
                 project_id = project.id
             else:
                 project_id = None
