@@ -2826,6 +2826,16 @@ class TeamLanguagePreferenceManager(models.Manager):
         from teams.cache import get_writable_langs
         return get_writable_langs(team)
 
+    def get_blacklisted(self, team):
+        """Return the set of blacklisted language codes.
+
+        Note: we don't use memcache like the other functions, mostly because I
+        want to avoid touching that code (BDK).
+        """
+        qs = self.for_team(team).filter(preferred=False, allow_reads=False,
+                                        allow_writes=False)
+        return set(tlp.language_code for tlp in qs)
+
     def get_preferred(self, team):
         """Return the set of language codes that are preferred for this team.
 

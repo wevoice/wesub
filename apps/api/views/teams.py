@@ -20,20 +20,25 @@ from datetime import datetime
 
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.views import APIView
 
 from api.fields import TimezoneAwareDateTimeField
 from auth.models import CustomUser as User
 from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
-                          Application)
+                          Application, TeamLanguagePreference)
 import messages.tasks
 import teams.permissions as team_permissions
+from utils.translation import ALL_LANGUAGE_CODES
 import videos.tasks
 
 def timestamp_to_datetime(timestamp):
@@ -88,6 +93,7 @@ class TeamSerializer(serializers.ModelSerializer):
     projects_uri = serializers.SerializerMethodField()
     applications_uri = serializers.SerializerMethodField()
     tasks_uri = serializers.SerializerMethodField()
+    languages_uri = serializers.SerializerMethodField()
     resource_uri = serializers.SerializerMethodField()
 
     def get_members_uri(self, team):
@@ -112,6 +118,13 @@ class TeamSerializer(serializers.ModelSerializer):
             'team_slug': team.slug,
         }, request=self.context['request'])
 
+    def get_languages_uri(self, team):
+        if not team.is_old_style():
+            return None
+        return reverse('api:team-languages', kwargs={
+            'team_slug': team.slug,
+        }, request=self.context['request'])
+
     def get_tasks_uri(self, team):
         if not team.workflow_enabled:
             return None
@@ -129,7 +142,8 @@ class TeamSerializer(serializers.ModelSerializer):
         fields = ('name', 'slug', 'description', 'is_visible',
                   'membership_policy', 'video_policy',
                   'members_uri', 'safe_members_uri', 'projects_uri',
-                  'applications_uri', 'tasks_uri', 'resource_uri')
+                  'applications_uri', 'languages_uri', 'tasks_uri',
+                  'resource_uri')
 
 class TeamUpdateSerializer(TeamSerializer):
     name = serializers.CharField(required=False)
@@ -175,6 +189,8 @@ class TeamViewSet(mixins.CreateModelMixin,
     - **projects_uri**: API endpoint for the team's projects
     - **applications_uri**: API endpoint for the team's applications (or null
     if the membership policy is not by application)
+    - **languages_uri**: API endpoint for the team's preferred/blacklisted
+    languages
     - **tasks_uri**: API endpoint for the team's tasks (or null
     if tasks are not enabled)
     - **resource_uri**: API endpoint for the team
@@ -951,3 +967,93 @@ class TeamApplicationViewSet(TeamSubviewMixin,
         if 'before' in params:
             qs = qs.filter(created__lt=timestamp_to_datetime(params['before']))
         return qs
+
+@api_view(['GET'])
+def team_languages(request, team_slug):
+    """
+    Links to a team's preferred/blacklisted language endpoints.
+
+    These endpoints allows you to control which languages you want worked on in
+    a team.  Preferred languages will have tasks auto-created for each video.
+    Subtitles for blacklisted languages will not be allowed.
+    """
+
+    return Response({
+        'preferred': reverse('api:team-languages-preferred', kwargs={
+            'team_slug': team_slug,
+        }, request=request),
+        'blacklisted': reverse('api:team-languages-blacklisted', kwargs={
+            'team_slug': team_slug,
+        }, request=request),
+    })
+
+class TeamLanguageView(TeamSubviewMixin, APIView):
+    def queryset(self):
+        return (TeamLanguagePreference.objects.for_team(self.team)
+                .filter(**self.field_values))
+
+    def get(self, request, *args, **kwargs):
+        return Response(sorted(tlp.language_code for tlp in self.queryset()))
+
+    def put(self, request, *args, **kwargs):
+        if not isinstance(request.data, list):
+            raise serializers.ValidationError("Data must be a list")
+        for code in request.data:
+            if code not in ALL_LANGUAGE_CODES:
+                raise serializers.ValidationError(
+                    "Invalid language code: {}".format(code))
+        with transaction.commit_on_success():
+            self.add_languages(request.data)
+            self.remove_languages(request.data)
+        return Response(sorted(request.data))
+
+    def add_languages(self, language_codes):
+        for code in language_codes:
+            tlp, created = TeamLanguagePreference.objects.get_or_create(
+                team=self.team, language_code=code,
+                defaults=self.field_values)
+            if not created:
+                for name, value in self.field_values.items():
+                    setattr(tlp, name, value)
+                tlp.save()
+
+    def remove_languages(self, language_codes):
+        self.queryset().exclude(language_code__in=language_codes).delete()
+
+class TeamPreferredLanguagesView(TeamLanguageView):
+    """
+    Endpoint for a team's preferred languages.
+
+    Preferred languages will have tasks auto-created for each video.
+
+    # Updating #
+
+    ## `PUT /api/teams/[team-slug]/languages/preferred/`
+
+    Send a list of language codes as the PUT data.
+
+    """
+    field_values = {
+        'preferred': True,
+        'allow_reads': False,
+        'allow_writes': False,
+    }
+
+class TeamBlacklistedLanguagesView(TeamLanguageView):
+    """
+    Endpoint for a team's blacklisted languages.
+
+    Subtitles for blacklisted languages will not be allowed.
+
+    # Updating #
+
+    ## `PUT /api/teams/[team-slug]/languages/blacklisted/`
+
+    Send a list of language codes as the PUT data.
+
+    """
+    field_values = {
+        'preferred': False,
+        'allow_reads': False,
+        'allow_writes': False,
+    }
