@@ -24,7 +24,6 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.reverse import reverse
 
-from .apiswitcher import APISwitcherMixin
 from api.fields import TimezoneAwareDateTimeField
 from subtitles.models import SubtitleLanguage
 from teams.models import Team
@@ -185,11 +184,3 @@ class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(
                 created__gte=datetime.fromtimestamp(int(params['after'])))
         return queryset
-
-
-class ActivityViewSetSwitcher(APISwitcherMixin, ActivityViewSet):
-    switchover_date = 20150824
-
-    class Deprecated(ActivityViewSet):
-        class serializer_class(ActivitySerializer):
-            created = serializers.DateTimeField(read_only=True)

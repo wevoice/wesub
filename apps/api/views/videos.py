@@ -31,7 +31,6 @@ from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 import json
 
-from .apiswitcher import APISwitcherMixin
 from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
 from teams import permissions as team_perms
 from teams.models import Team, TeamVideo, Project
@@ -683,20 +682,3 @@ class VideoURLViewSet(viewsets.ModelViewSet):
             'user': self.request.user,
             'request': self.request,
         }
-
-class VideoViewSetSwitcher(APISwitcherMixin, VideoViewSet):
-    switchover_date = 20150716
-
-    class Deprecated(VideoViewSet):
-        class serializer_class(VideoSerializer):
-            created = serializers.DateTimeField(read_only=True)
-
-class VideoURLViewSetSwitcher(APISwitcherMixin, VideoURLViewSet):
-    switchover_date = 20150716
-
-    class Deprecated(VideoURLViewSet):
-        class serializer_class(VideoURLSerializer):
-            created = serializers.DateTimeField(read_only=True)
-
-        class update_serializer_class(VideoURLUpdateSerializer):
-            created = serializers.DateTimeField()

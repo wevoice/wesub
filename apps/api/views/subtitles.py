@@ -36,7 +36,6 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from .apiswitcher import APISwitcherMixin
 from .videos import VideoMetadataSerializer
 from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
 from videos.models import Video
@@ -789,18 +788,3 @@ class NotesList(generics.ListCreateAPIView):
             'editor_notes': self.editor_notes,
             'user': self.request.user,
         }
-
-class SubtitleLanguageViewSetSwitcher(APISwitcherMixin,
-                                      SubtitleLanguageViewSet):
-    switchover_date = 20150716
-
-    class Deprecated(SubtitleLanguageViewSet):
-        class serializer_class(SubtitleLanguageSerializer):
-            created = serializers.DateTimeField(read_only=True)
-
-class NotesListSwitcher(APISwitcherMixin, NotesList):
-    switchover_date = 20150716
-
-    class Deprecated(NotesList):
-        class serializer_class(NotesSerializer):
-            created = serializers.DateTimeField(read_only=True)

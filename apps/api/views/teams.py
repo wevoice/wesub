@@ -28,7 +28,6 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.reverse import reverse
 
-from .apiswitcher import APISwitcherMixin
 from api.fields import TimezoneAwareDateTimeField
 from auth.models import CustomUser as User
 from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
@@ -952,30 +951,3 @@ class TeamApplicationViewSet(TeamSubviewMixin,
         if 'before' in params:
             qs = qs.filter(created__lt=timestamp_to_datetime(params['before']))
         return qs
-
-class ProjectViewSetSwitcher(APISwitcherMixin, ProjectViewSet):
-    switchover_date = 20150716
-
-    class Deprecated(ProjectViewSet):
-        class serializer_class(ProjectSerializer):
-            created = serializers.DateTimeField(read_only=True)
-            modified = serializers.DateTimeField(read_only=True)
-
-        class update_serializer_class(ProjectUpdateSerializer):
-            created = serializers.DateTimeField(read_only=True)
-            modified = serializers.DateTimeField(read_only=True)
-
-class TeamApplicationViewSetSwitcher(APISwitcherMixin, TeamApplicationViewSet):
-    switchover_date = 20150716
-
-    class Deprecated(TeamApplicationViewSet):
-        class serializer_class(ApplicationSerializer):
-            created = serializers.DateTimeField(read_only=True)
-            modified = serializers.DateTimeField(read_only=True)
-
-class TaskViewSetSwitcher(APISwitcherMixin, TaskViewSet):
-    switchover_date = 20150716
-
-    class Deprecated(TaskViewSet):
-        class serializer_class(TaskSerializer):
-            completed = serializers.DateTimeField(read_only=True)
