@@ -278,6 +278,7 @@ class SubtitleLanguageViewSet(mixins.CreateModelMixin,
     - **is_complete:** Alias for subtitles_complete  **(deprecated)**
 
     """
+    DOC_NAME = 'Subtitle Language'
 
     serializer_class = SubtitleLanguageSerializer
     paginate_by = 20
@@ -714,7 +715,7 @@ class Actions(views.APIView):
 
     def post(self, request, video_id, language_code, format=None):
         try:
-            action = request.DATA['action']
+            action = request.data['action']
         except KeyError:
             return Response('no action', status=status.HTTP_400_BAD_REQUEST)
         video = get_object_or_404(Video, video_id=video_id)
