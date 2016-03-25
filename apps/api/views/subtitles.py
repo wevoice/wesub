@@ -37,6 +37,7 @@ from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .videos import VideoMetadataSerializer
+from api import extra
 from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
 from videos.models import Video
 from subtitles import compat
@@ -158,6 +159,9 @@ class SubtitleLanguageSerializer(serializers.Serializer):
         data['num_versions'] = len(data['versions'])
         data['is_original'] = data['is_primary_audio_language']
         self.add_reviewer_and_approver(data, language)
+        extra.video_language.add_data(self.context['request'], data,
+                                      video=self.context['video'],
+                                      language=language)
         return data
 
     def add_reviewer_and_approver(self, data, language):

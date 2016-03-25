@@ -2177,6 +2177,12 @@ class Task(models.Model):
     def is_approve_task(self):
         return self.type == Task.TYPE_IDS['Approve']
 
+    def was_approved(self):
+        return self.approved == Task.APPROVED_IDS['Approved']
+
+    def was_rejected(self):
+        return self.approved == Task.APPROVED_IDS['Rejected']
+
     @property
     def workflow(self):
         '''Return the most specific workflow for this task's TeamVideo.'''
