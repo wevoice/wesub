@@ -159,9 +159,10 @@ class SubtitleLanguageSerializer(serializers.Serializer):
         data['num_versions'] = len(data['versions'])
         data['is_original'] = data['is_primary_audio_language']
         self.add_reviewer_and_approver(data, language)
-        extra.video_language.add_data(self.context['request'], data,
-                                      video=self.context['video'],
-                                      language=language)
+        if self.context['allow_extra']:
+            extra.video_language.add_data(self.context['request'], data,
+                                          video=self.context['video'],
+                                          language=language)
         return data
 
     def add_reviewer_and_approver(self, data, language):
@@ -311,6 +312,7 @@ class SubtitleLanguageViewSet(mixins.CreateModelMixin,
 
     def get_serializer_context(self):
         return {
+            'allow_extra': self.action == 'retrieve',
             'request': self.request,
             'video': self.video,
             'show_private_versions': self.show_private_versions,
