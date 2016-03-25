@@ -214,7 +214,7 @@ class VideoSerializer(serializers.Serializer):
         return self.team_video.team != self.validated_data['team']
 
     def to_internal_value(self, data):
-        data = self.fixup_data(data)
+        self.fixup_data(data)
         data = super(VideoSerializer, self).to_internal_value(data)
         # we have to wait until now because we can't fetch the project until
         # we know the team
@@ -230,19 +230,14 @@ class VideoSerializer(serializers.Serializer):
 
     def fixup_data(self, data):
         """Alter incoming data to support deprecated behavior."""
-        # iterate over data to build a new dictionary.  This is required
-        # because data is a MergeDict, which has issues with deletion.
-        new_data = {}
         for name, value in data.items():
-            # Remove any field has the empty string as its value
-            # This is deprecated behavior form the old API.
             if value == '':
-                continue
-            # Replace "null" with None for team/project
-            if name in ('team', 'project') and value == 'null':
-                value = None
-            new_data[name] = value
-        return new_data
+                # Remove any field has the empty string as its value
+                # This is deprecated behavior form the old API.
+                del data[name]
+            elif name in ('team', 'project') and value == 'null':
+                # Replace "null" with None for team/project
+                data[name] = None
 
     def to_representation(self, video):
         data = super(VideoSerializer, self).to_representation(video)
