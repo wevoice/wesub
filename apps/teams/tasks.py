@@ -9,8 +9,10 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
-
+import requests
 from utils import send_templated_email
+from utils.panslugify import pan_slugify
+from utils.translation import get_language_choices
 from widget.video_cache import (
     invalidate_cache as invalidate_video_cache,
     invalidate_video_moderation,
@@ -19,6 +21,8 @@ from widget.video_cache import (
 
 from utils.text import fmt
 from videos.tasks import video_changed_tasks
+
+LANGUAGE_CHOICES = [l[0] for l in get_language_choices(flat=True)]
 
 @task()
 def invalidate_video_caches(team_id):
@@ -161,9 +165,100 @@ def api_notify_on_application_activity(team_pk, event_name, application_pk):
     TeamNotificationSetting.objects.notify_team(
         team_pk, event_name, application_pk=application_pk)
 
-
 @task()
 def process_billing_report(billing_report_pk):
     from teams.models import BillingReport
     report = BillingReport.objects.get(pk=billing_report_pk)
     report.process()
+
+@task()
+def add_team_videos(team_pk, user_pk, videos):
+    from .permissions import can_add_videos_bulk
+    from teams.models import Team, Project, TeamVideo
+    from videos.models import Video
+    from videos.types import video_type_registrar
+    from auth.models import CustomUser as User
+    from utils.subtitles import load_subtitles
+    from subtitles.pipeline import add_subtitles
+    user = User.objects.get(pk=int(user_pk))
+    team = Team.objects.get(pk=int(team_pk))
+    num_successful_videos = 0
+    messages = []
+    if can_add_videos_bulk(user):
+        for video_item in videos:
+            video_url = video_item['url']
+            try:
+                video_type = video_type_registrar.video_type_for_url(video_url)
+                video_url = video_type.convert_to_video_url()
+            except:
+                messages.append(fmt(_(u"Unknown video type: %(url)s\n"), url=video_url))
+                continue
+            title = u""
+            description = u""
+            if len(video_item['description']) > 0:
+                description = video_item['description']
+            set_values = {'is_public': team.is_visible}
+            if len(video_item['title']) > 0:
+                set_values['title'] = video_item['title']
+            if len(video_item['description']) > 0:
+                set_values['description'] = video_item['description']
+            video, created = Video.get_or_create_for_url(video_url, video_type, user,
+                                                         set_values=set_values)
+            if not created and video.get_team_video() is not None:
+                messages.append(fmt(_(u"Video is already part of a team: %(url)s\n"), url=video_url))
+                continue
+            modified_video = False
+            if not created:
+                video.is_public = team.is_visible
+                video.title = video_item['title']
+                video.description = video_item['description']
+                modified_video = True
+            if 'language' in video_item and len(video_item['language']) > 0:
+                language = video_item['language'].lower()
+                if language in LANGUAGE_CHOICES:
+                    video.primary_audio_language_code = language
+                    modified_video = True
+                else:
+                    messages.append(fmt(_(u"Badly formated language for %(url)s: %(language)s, ignoring it."), url=video_url, language=video_item['language']))
+            if 'duration' in video_item and len(video_item['duration']) > 0:
+                try:
+                    video.duration = int(video_item['duration'])
+                    modified_video = True
+                except:
+                    messages.append(fmt(_(u"Badly formated duration for %(url)s: %(duration)s, ignoring it."), url=video_url, duration=video_item['duration']))
+            if modified_video:
+                video.save()
+            if 'transcript' in video_item and len(video_item['transcript']) > 0 and video.primary_audio_language_code:
+                try:
+                    sub_type = video_item['transcript'].split(".")[-1]
+                    r = requests.get(video_item['transcript'])
+                    if r.ok:
+                        subs = load_subtitles(video.primary_audio_language_code, r.text, sub_type)
+                        version = add_subtitles(video, video.primary_audio_language_code, subs)
+                    else:
+                        raise Exception("Request not successful")
+                except Exception, e:
+                    logger.error("Error while importing transcript file: {}".format(str(e)))
+                    messages.append(fmt(_(u"Invalid transcript file or language code for video %(url)s\n"), url=video_url))
+            if created:
+                num_successful_videos += 1
+            if 'project' in video_item and len(video_item['project']) > 0:
+                project, created = Project.objects.get_or_create(team=team, slug=pan_slugify(video_item['project']), defaults={'name': video_item['project']})
+                project_id = project.id
+            else:
+                project_id = None
+            team_video = TeamVideo.objects.create(video=video, team=team, project_id=project_id)
+    else:
+        messages.append(fmt(_(u'You are not authorized to perform such action\n')))
+    messages.append(fmt(_(u"Number of videos added to team: %(num)i\n"), num=num_successful_videos))
+    domain = Site.objects.get_current().domain
+    context = {
+        'domain': domain,
+        'user': user,
+        'team': team,
+        'messages': messages,
+        "STATIC_URL": settings.STATIC_URL,
+    }
+    send_templated_email(user, "Summary of videos added to team on Amara",
+                         'teams/email_videos_added.html',
+                         context, fail_silently=not settings.DEBUG)
