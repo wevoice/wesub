@@ -28,7 +28,11 @@ old_moves = six.moves
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
-sys.path.insert(0, os.path.abspath('../'))
+root_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(0, root_dir)
+sys.path.insert(0, os.path.join(root_dir, 'apps'))
+sys.path.insert(0, os.path.join(root_dir, 'libs'))
+print sys.path
 import startup
 startup.startup()
 
