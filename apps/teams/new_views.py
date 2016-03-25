@@ -31,7 +31,6 @@ from collections import namedtuple, OrderedDict
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.cache import cache
@@ -58,6 +57,7 @@ from messages import tasks as messages_tasks
 from subtitles.models import SubtitleLanguage
 from teams.workflows import TeamWorkflow
 from utils.breadcrumbs import BreadCrumb
+from utils.decorators import staff_member_required
 from utils.pagination import AmaraPaginator
 from utils.forms import autocomplete_user_view, FormRouter
 from utils.text import fmt

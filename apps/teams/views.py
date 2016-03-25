@@ -26,7 +26,6 @@ import babelsubs
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.sites.models import Site
@@ -78,6 +77,7 @@ from teams.tasks import (
 )
 from videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
+from utils.decorators import staff_member_required
 from utils.forms import flatten_errorlists
 from utils.objectlist import object_list
 from utils.panslugify import pan_slugify
