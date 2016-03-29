@@ -203,7 +203,7 @@ def add_team_videos(team_pk, user_pk, videos):
             if len(video_item['description']) > 0:
                 set_values['description'] = video_item['description']
             video, created = Video.get_or_create_for_url(video_url, video_type, user,
-                                                         set_values=set_values)
+                                                         set_values=set_values, in_task=True)
             if not created and video.get_team_video() is not None:
                 messages.append(fmt(_(u"Video is already part of a team: %(url)s\n"), url=video_url))
                 continue
