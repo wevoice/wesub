@@ -85,14 +85,16 @@ class ExtraDispatcher(object):
         Add extra data to an API response.
 
         This method figures out if any functions registered with register()
-        should be called and calls them.  It passes the functions data, plus
-        an additional kwargs passed in.
+        should be called and calls them.  The arguments are:
+            - request.user
+            - data
+            - Any additional kwargs
         """
         extra = request.query_params.get('extra')
         if extra:
             for name in extra.split(','):
                 callback = self.callbacks.get(name)
                 if callback:
-                    callback(data, **kwargs)
+                    callback(request.user, data, **kwargs)
 
 video_language = ExtraDispatcher()
