@@ -133,10 +133,10 @@ class LogRequest(object):
         try:
             post_data = request.POST
         except StandardError, e:
-            extra['data'] = 'parse error: {}'.format(e)
+            extra['post_data'] = 'parse error: {}'.format(e)
         else:
             if post_data:
-                extra['data'] = data_printer.printout(
+                extra['post_data'] = data_printer.printout(
                     self.scrub_post_data(post_data))
         return extra
 
