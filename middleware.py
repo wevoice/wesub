@@ -80,6 +80,18 @@ class UserUUIDMiddleware(object):
 # http://www.randallmorey.com/blog/2010/feb/17/django-cache-sessions-and-google-analytics/
 class StripGoogleAnalyticsCookieMiddleware(object):
     strip_re = re.compile(r'(__utm.=.+?(?:; |$))')
+    def process_response(self, request, response):
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
+
+class AmaraSecurityMiddleware(object):
+    """
+    Middleware that sets various security-related headers.
+
+    This should be replaced by the django standard SecurityMiddleware once we
+    update our django version.
+    """
+    strip_re = re.compile(r'(__utm.=.+?(?:; |$))')
     def process_request(self, request):
         try:
             cookie = self.strip_re.sub('', request.META['HTTP_COOKIE'])
