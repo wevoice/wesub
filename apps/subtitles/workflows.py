@@ -668,7 +668,6 @@ class Action(object):
                 created for subtitle changes that happened alongside this
                 action.  Will be None if no changes were made.
         """
-        logger.info("In update_language (complete=%s)", self.complete)
         if self.complete is not None:
             if self.complete:
                 subtitle_language.mark_complete()

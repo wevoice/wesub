@@ -360,6 +360,7 @@ class Video(models.Model):
         super(Video, self).__init__(*args, **kwargs)
         self._language_fetcher = SubtitleLanguageFetcher()
         self.orig_title = self.title
+        self.orig_duration = self.duration
 
     def __unicode__(self):
         title = self.title_display()
@@ -373,6 +374,11 @@ class Video(models.Model):
             old_title = self.orig_title
             self.orig_title = self.title
             signals.title_changed.send(sender=self, old_title=old_title)
+        if self.duration != self.orig_duration:
+            old_duration = self.orig_duration
+            self.orig_duration = self.duration
+            signals.duration_changed.send(sender=self,
+                                          old_duration=old_duration)
 
     def update_search_index(self):
         """Update this video's search index text."""
