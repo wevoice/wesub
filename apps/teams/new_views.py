@@ -221,7 +221,7 @@ class VideoPageForms(object):
         self.enabled = set()
         if permissions.can_add_videos_bulk(user):
             self.enabled.add('add_csv')
-        if permissions.can_add_videos_bulk(user):
+        if permissions.can_add_video(team, user):
             self.enabled.add('add_form')
         if permissions.can_edit_videos(team, user):
             self.enabled.update(['edit', 'bulk-edit'])
