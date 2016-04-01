@@ -39,7 +39,7 @@ if settings.DEBUG:
             uwsgi.reload()
 
 metrics_logger = logging.getLogger('metrics')
-@timer(3)
+@timer(30)
 def log_metrics(sig):
     keys = [
         'core.avg_response_time',

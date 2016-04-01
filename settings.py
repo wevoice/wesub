@@ -672,7 +672,7 @@ LOGGING = {
     },
     'loggers': {
         'celery': {
-            'level': 'INFO',
+            'level': 'WARNING',
         }
     },
 }
