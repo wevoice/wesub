@@ -4,11 +4,6 @@ API Documentation
 Amara provides a REST API to interactive with the site.  Please contact us if
 you’d like to use the Amara API for commercial purposes.
 
-.. note:: This documentation is for the upcoming Amara API.  It is currently
-  being actively developed and not yet fully functional. See
-  `the API changes blog post <http://about.amara.org/2015/01/20/api-changes/>`_
-  for more info.
-
 Authentication
 --------------
 
