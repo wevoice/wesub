@@ -434,6 +434,47 @@ class SafeTeamMemberViewSet(TeamMemberViewSet):
     - If no user exists with the username, and an ``email`` field is included
     in the POST data, we will create a user and send an email to the email
     account.
+
+    # Listing/Details #
+
+    ## `GET /api/teams/[team-slug]/members/[username]`
+
+    Get details on a single member
+
+    ## `GET /api/teams/[team-slug]/members/`
+
+    List all members of a team
+
+    ### Fields:
+
+    - **username:** username
+    - **role:** One of: ``owner``, ``admin``, ``manager``, or ``contributor``
+
+    # Adding/Updating Members #
+
+
+    ## `POST /api/teams/[team-slug]/members/`
+
+    Invite a new member to a team
+
+    ### Fields:
+
+    - **username:** username of the user to add
+    - **email:** if set and there is no user for username, then we create a
+    new user account and send an email with instructions for logging in.
+    - **role:** One of: ``owner``, ``admin``, ``manager``, or ``contributor``
+
+    ## `PUT /api/teams/[team-slug]/members/[username]/`
+
+    Change a team member's role
+
+    ### Field:
+
+    - **role:** One of: ``owner``, ``admin``, ``manager``, or ``contributor``
+
+    ## `DELETE /api/teams/[team-slug]/members/[username]/`
+
+    Removing a user from a team
     """
 
     def get_serializer_class(self):
