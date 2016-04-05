@@ -78,12 +78,12 @@ class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
     - **team-activity:** If team is given, we normally return activity on the
        team's videos.  If you want to see activity for the team itself (members
        joining/leaving and team video deletions, then add team-activity=1)
-    - **video-id video:** Show only items related to a given video
-    - **integer type:** Show only items with a given activity type (see
+    - **video:** Show only items related to a given video
+    - **type:** Show only items with a given activity type (see
         below for values)
-    - **language-code language:** Show only items with a given language
-    - **integer before:** A unix timestamp in seconds
-    - **integer after:** A unix timestamp in seconds
+    - **language:** Show only items with a given language code
+    - **before:** A unix timestamp in seconds
+    - **after:** A unix timestamp in seconds
 
     **Note:** If both team and video are given as GET params, then team will
     be used and video will be ignored.
