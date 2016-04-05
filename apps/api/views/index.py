@@ -33,6 +33,7 @@ INDEX_ENDPOINTS = [
     ('teams', 'api:teams-list'),
     ('activity', 'api:activity-list'),
     ('languages', 'api:languages'),
+    ('messages', 'api:messages'),
 ]
 
 
