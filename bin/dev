@@ -29,6 +29,7 @@ Run "dev" for a list of commands and "dev help <command>" for help on a
 specific command.
 """
 
+from datetime import date
 import sys
 import os
 import optparse
@@ -234,6 +235,78 @@ class Up(Command):
         if options.json:
             os.environ['JSON_LOGGING'] = '1'
         subprocess.call(['docker-compose', 'up', 'app', 'worker'])
+
+class PrepDeploy(Command):
+    """Start docker containers."""
+
+    def run_inner(self, args, options):
+        try:
+            if args[0] == 'staging':
+                return self.prep_staging()
+            elif args[0] == 'production':
+                return self.prep_production()
+        except IndexError:
+            pass
+        print "Must specify staging or production"
+
+    def prep_staging(self):
+        self.check_branch('staging')
+        self.check_optional_commits()
+        self.push('staging')
+
+    def prep_production(self):
+        self.check_branch('production')
+        self.merge_branch('staging')
+        self.check_optional_commits()
+        self.tag_deploy()
+        self.push('production')
+
+    def run_git(self, *args, **kwargs):
+        subprocess.call(['git'] + list(args))
+
+    def get_git_output(self, *args, **kwargs):
+        return subprocess.check_output(['git'] + list(args), **kwargs).strip()
+
+    def check_value(self, label, value, correct_value):
+        if value != correct_value:
+            raise AssertionError(
+                "{} is {} instead of {}".format(label, value, correct_value))
+        print "{} is {}".format(label, value)
+
+    def check_branch(self, correct_branch):
+        self.run_git('fetch')
+        branch = self.get_git_output('symbolic-ref', '--short', 'HEAD')
+        self.check_value("Current branch", branch, correct_branch)
+
+    def check_optional_commits(self):
+        self.check_optional_commit('amara-enterprise')
+
+    def check_optional_commit(self, repo_name):
+        repo_dir = os.path.join(unisubs_root(), repo_name)
+        commit_file = os.path.join(unisubs_root(), 'optional', repo_name)
+        with open(commit_file) as f:
+            commit_from_file = f.read().strip()
+        self.run_git('fetch', cwd=repo_dir)
+        commit_from_remote = self.get_git_output('rev-parse', 'origin/HEAD',
+                                                 cwd=repo_dir)
+        self.check_value('{} commit'.format(repo_name), commit_from_file,
+                         commit_from_remote)
+
+    def merge_branch(self, from_branch):
+        print "Merging {}".format(from_branch)
+        self.run_git('merge', '--ff-only', from_branch)
+
+    def tag_deploy(self):
+        today = date.today()
+        tag_name = 'deploy-{:04}-{:02}-{:02}'.format(today.year, today.month,
+                                                     today.day)
+        print "Creating {} tag".format(tag_name)
+        self.run_git('tag', tag_name)
+        self.run_git('push', 'origin', tag_name)
+
+    def push(self, branch):
+        print "Pushing {}".format(branch)
+        self.run_git('push', 'origin', branch)
 
 def run_manage(args, **kwargs):
     subprocess.call(['docker-compose', 'run', 'app', 'manage'] + args,

@@ -360,6 +360,7 @@ class Video(models.Model):
         super(Video, self).__init__(*args, **kwargs)
         self._language_fetcher = SubtitleLanguageFetcher()
         self.orig_title = self.title
+        self.orig_duration = self.duration
 
     def __unicode__(self):
         title = self.title_display()
@@ -373,6 +374,11 @@ class Video(models.Model):
             old_title = self.orig_title
             self.orig_title = self.title
             signals.title_changed.send(sender=self, old_title=old_title)
+        if self.duration != self.orig_duration:
+            old_duration = self.orig_duration
+            self.orig_duration = self.duration
+            signals.duration_changed.send(sender=self,
+                                          old_duration=old_duration)
 
     def update_search_index(self):
         """Update this video's search index text."""
@@ -601,7 +607,13 @@ class Video(models.Model):
     @classmethod
     def get_or_create_for_url(cls, video_url=None, vt=None, user=None,
                               timestamp=None, fetch_subs_async=True,
-                              set_values=None):
+                              set_values=None, in_task=False):
+        """
+        If used withing a backgound task in which one wants to
+        modify the video afterwards, then in_task must be set 
+        to True to avoid having the video being modified twice
+        at the same time.
+        """
         assert video_url or vt, 'should be video URL or VideoType'
         from types.base import VideoTypeError
         from videos.tasks import (
@@ -644,8 +656,10 @@ class Video(models.Model):
                 obj.title = make_title_from_url(vt.convert_to_video_url())
             obj.user = user
             obj.save()
-
-            save_thumbnail_in_s3.delay(obj.pk)
+            if in_task:
+                save_thumbnail_in_s3(obj.pk)
+            else:
+                save_thumbnail_in_s3.delay(obj.pk)
             Action.create_video_handler(obj, user)
 
             #Save video url

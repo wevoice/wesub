@@ -20,10 +20,11 @@ from datetime import datetime
 import inspect
 import json
 import logging
+import traceback
 
 from utils.dataprintout import DataPrinter
 
-EXTRA_FIELDS = ['path', 'status_code', 'method', 'view', 'query', 'data', 'metrics', 'user']
+EXTRA_FIELDS = ['path', 'status_code', 'method', 'view', 'query', 'post_data', 'metrics', 'user']
 
 data_printer = DataPrinter(
     max_size=500, max_item_size=100, max_repr_size=50)
@@ -50,6 +51,16 @@ def format_timestamp(time):
             ".%03d" % (tstamp.microsecond / 1000) + "Z")
 
 def format_traceback(tb):
+    try:
+        return format_pretty_traceback(tb)
+    except:
+        pass
+    try:
+        return ''.join(traceback.format_tb(tb))
+    except:
+        return 'Error formatting traceback'
+
+def format_pretty_traceback(tb):
     parts = []
     for frame in inspect.getinnerframes(tb, 5):
         line_info = '{} {}:{}\n'.format(frame[3], frame[1], frame[2])

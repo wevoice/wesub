@@ -1105,7 +1105,7 @@
 		'                <div class="modal-body">' +    
 		'                    <p>Step 1: paste this anywhere in your document:</p>' +
                 '                        <pre class="pre-small">' +
-                '&lt;script type="text/javascript" src="//amara.org/embedder-iframe"&gt;\n' +
+                '&lt;script type="text/javascript" src="https://amara.org/embedder-iframe"&gt;\n' +
                 '&lt;/script&gt;' +
                 '                        </pre>' +
                 '                        <p>Step 2: paste this somewhere inside your HTML body, wherever you would like your widgets to appear, with the height, width and options of your choosing:</p>' +

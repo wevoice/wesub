@@ -19,7 +19,6 @@ from datetime import datetime, timedelta
 import logging
 
 from celery.schedules import crontab, timedelta
-from celery.signals import task_failure
 from celery.task import task
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -42,26 +41,6 @@ from videos.types import UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
 from videos.types import VideoTypeError
 
 celery_logger = logging.getLogger('celery.task')
-
-def process_failure_signal(exception, traceback, sender, task_id,
-                           signal, args, kwargs, einfo, **kw):
-    exc_info = (type(exception), exception, traceback)
-    try:
-        celery_logger.error(
-            'Celery job exception: %s(%s)' % (exception.__class__.__name__, exception),
-            exc_info=exc_info,
-            extra={
-                'data': {
-                    'task_id': task_id,
-                    'sender': sender,
-                    'args': args,
-                    'kwargs': kwargs,
-                }
-            }
-        )
-    except:
-        pass
-task_failure.connect(process_failure_signal)
 
 @task
 def cleanup():

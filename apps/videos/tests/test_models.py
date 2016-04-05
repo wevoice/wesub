@@ -172,6 +172,23 @@ class TestVideo(TestCase):
             video.save()
             assert_equal(mock_handler.call_count, 1)
 
+    def test_duration_changed_signal(self):
+        video = VideoFactory(duration=100)
+        with test_utils.mock_handler(signals.duration_changed) as mock_handler:
+            # normal saves shouldn't cause the signal to emit
+            video.save()
+            assert_equal(mock_handler.call_count, 0)
+            # saves that change the duration should
+            video.duration = 200
+            video.save()
+            assert_equal(mock_handler.call_count, 1)
+            assert_equal(mock_handler.call_args,
+                         mock.call(signal=signals.duration_changed,
+                                   sender=video, old_duration=100))
+            # test that 1 more save doesn't cause a second signal
+            video.save()
+            assert_equal(mock_handler.call_count, 1)
+
 class TestModelsSaving(TestCase):
     # TODO: These tests may be more at home in the celery_tasks test file...
     def test_video_languages_count(self):

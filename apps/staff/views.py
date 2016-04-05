@@ -16,7 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.contrib.admin.views.decorators import staff_member_required
+from utils.decorators import staff_member_required
 from django.shortcuts import render
 
 import staff

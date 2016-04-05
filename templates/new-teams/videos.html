@@ -26,9 +26,14 @@
       </form>
     </div>
 
-    {% if "add" in forms.enabled %}
+    {% if "add_form" in forms.enabled %}
     <div class="section tools">
-      <button class="open-modal" data-modal="add-form">{% trans "Add Video" %}</button>
+      <button class="open-modal" data-modal="add-form">{% trans "Add Videos" %}</button>
+    </div>
+    {% endif %}
+    {% if "add_csv" in forms.enabled %}
+    <div class="section tools">
+      <button class="open-modal" data-modal="add-csv-form">{% trans "Add Videos from CSV" %}</button>
     </div>
     {% endif %}
   </div>
@@ -107,19 +112,43 @@
 </div>
 {% endif %}
 
-{% if "add" in forms.enabled %}
+{% if "add_form" in forms.enabled %}
 <aside class="modal{% if add_form.errors %} start-open{% endif %}" id="add-form">
-  <h3>{% trans "Add Video" %}</h3>
+  <h3>{% trans "Add Videos" %}</h3>
   <button class="close"></button>
   <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% include "_non-field-errors.html" with form=add_form %}
     <input type="hidden" name="form" value="add">
-    {% include "_field.html" with field=add_form.video_url %}
     {% include "_field.html" with field=add_form.project %}
+    {% include "_field.html" with field=add_form.language %}
     {% include "_field.html" with field=add_form.thumbnail %}
+    {{ add_formset.management_form }}
+    <table class="formset-table">
+      {% for form in add_formset %}
+      {{ form }}
+      {% endfor %}
+    </table>
     <footer class="buttons">
       <button>{% trans "Add" %}</button>
+    </footer>
+  </form>
+</aside>
+{% endif %}
+{% if "add_csv" in forms.enabled %}
+<aside class="modal{% if add_csv_form.errors %} start-open{% endif %}" id="add-csv-form">
+  <h3>{% trans "Add Videos from CSV" %}</h3>
+  <button class="close"></button>
+  <p>{% trans "Please use this " %}<a href="{{ STATIC_URL }}images/template.csv" download>{% trans "CSV Import Template" %}</a>{% trans " as the basis for your import. The Video URL field is mandatory, but all other fields can be left blank." %}</p>
+  <p>{% trans "A CSV file can be created with a text editor or using the export function of a spreadsheet editor." %}</p>
+  <p>{% trans "Upon completion, you will receive a summary by email." %}</p>
+  <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include "_non-field-errors.html" with form=add_csv_form %}
+    <input type="hidden" name="form" value="add-csv">
+    {{ add_csv_form }}
+    <footer class="buttons">
+      <button>{% trans "Upload" %}</button>
     </footer>
   </form>
 </aside>

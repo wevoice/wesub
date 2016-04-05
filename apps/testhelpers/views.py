@@ -7,12 +7,12 @@ from django.views.decorators.csrf import csrf_exempt
 
 from teams.models import Team, TeamVideo
 from videos.models import Video
-from django.contrib.admin.views.decorators import staff_member_required
 from auth.models import  CustomUser
 from django.db import transaction
 
 from subtitles import pipeline
 from subtitles import models as sub_models
+from utils.decorators import staff_member_required
 
 import babelsubs
 from babelsubs.storage import SubtitleSet
