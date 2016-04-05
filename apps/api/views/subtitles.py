@@ -15,225 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
-"""
-Video Language Resource
-^^^^^^^^^^^^^^^^^^^^^^^
-
-Container for subtitles in a language for a video on Amara.
-
-Listing video languages
-+++++++++++++++++++++++
-
-.. http:get:: /api/videos/[video-id]/languages/
-
-    ``paginated``
-
-    :>json language_code: BCP 47 code for this language
-    :>json name: Human-readable name for this language
-    :>json is_primary_audio_language: Is this language the primary language
-        spoken in the video?
-    :>json is_rtl: Is this language RTL?
-    :>json resource_uri: API URL for the language
-    :>json created: date/time the language was created
-    :>json title: Video title, translated into this language
-    :>json description: Video description, translated into this language
-    :>json metadata: Video metadata, translated into this language
-    :>json subtitles_complete: Are the subtitles complete for this language?
-    :>json subtitle_count: Number of subtitles for this language
-    :>json reviewer: Username of the reviewer fro task-based teams
-    :>json approver: Username of the approver for task-based teams
-    :>json is_translation: Is this language translated from other languages
-        **(deprecated)**
-    :>json original_language_code: Source translation language **(deprecated)**
-    :>json num_versions: Number of subtitle versions, the length of the
-        versions array should be used instead of this **(deprecated)**
-    :>json id: Internal ID for the language **(deprecated)**
-    :>json is_original: alias for is_primary_audio_language **(deprecated)**
-    :>json versions: List of subtitle version data
-    :>json versions.author: Subtitle author's username
-    :>json versions.version_no: number of the version 
-    :>json versions.published: is this version publicly viewable?
-
-.. note:
-    The `original_language_code` and `is_translation` fields are remnants
-    from the old subtitle system.  With the new editor, users can use multiple
-    languages as a translation source.  These fields are should not be relied
-    on.
-
-Creating Video Languages
-++++++++++++++++++++++++
-
-.. http:post:: /api/videos/[video-id]/languages/
-
-    :form language_code: bcp-47 code for the language
-    :form is_primary_audio_language: Boolean indicating if this is the primary
-        spoken language of the video *(optional)*.
-    :form subtitles_complete: Boolean indicating if the subtitles for this
-        languagge is complete *(optional)*.
-    :form is_original: Alias for is_primary_audio_language **(deprecated)**
-    :form is_complete: Alias for subtitles_complete  **(deprecated)**
-
-Getting details on a specific language
-++++++++++++++++++++++++++++++++++++++
-
-.. http:get:: /api/videos/[video-id]/languages/[lang-identifier]/
-
-    :param lang-identifier: language code to fetch.  **deprecated:** this can
-        also be value from the id field
-
-.. seealso::  To list available languages, see ``Language Resource``.
-
-.. _subtitles-resource:
-
-Subtitles Resource
-^^^^^^^^^^^^^^^^^^
-
-Get/create subtitles for a video
-
-Fetching subtitles for a given language
-+++++++++++++++++++++++++++++++++++++++
-
-.. http:get:: /api/videos/[video-id]/languages/[language-code]/subtitles/
-
-    :param video-id: Amara Video ID
-    :param language-code: BCP-47 language code.  **deprecated:** you can also
-        specify the internal ID for a langauge
-    :query sub_format: The format to return the subtitles in.  This can be any
-        format that amara supports including dfxp, srt, vtt, and sbv.  The
-        default is json, which returns subtitle data encoded list of json
-        dicts.
-    :query version_number: version number to fetch.  Versions are listed in the
-        VideoLanguageResouce request.  If none is specified, the latest public
-        version will be returned.  If you want the latest private version (and
-        have access to it) use "last".
-    :query version: Alias for version_number **(deprecated)**
-    :>json version_number: version number for the subtitles
-    :>json subtitles: Subtitle data (str)
-    :>json sub_format: Format of the subtitles
-    :>json language: Language data
-    :>json language.code: BCP-47 language code
-    :>json language.name: Human readable name for the language
-    :>json language.dir: Language direction ("ltr" or "rtl")
-    :>json title: Video title, translated into the subtitle's language
-    :>json description: Video description, translated into the subtitle's
-        language
-    :>json metadata: Video metadata, translated into the subtitle's language
-    :>json video_title: Video title, translated into the video's language
-    :>json video_description: Video description, translated into the video's
-        language
-    :>json resource_uri: API URI for the subtitles
-    :>json site_uri: URI to view the subtitles on site
-    :>json video: Copy of video_title **(deprecated)**
-    :>json version_no: Copy of version_number **(deprecated)**
-
-Getting subtitle data only
-++++++++++++++++++++++++++
-
-Sometimes you want just subtitles data without the rest of the data.
-This is possible using a special Accept headers or format query strings.  This
-can be used to download a DFXP, SRT, or any other subtitle format that Amara
-supports.  If one of these is used, then the sub_format param will be ignored.
-
-====================  ======================  ==================
-Format                Accept header           format query param
-====================  ======================  ==================
-DFXP                  application/ttml+xml    dfxp
-SBV                   text/sbv                sbv
-SRT                   text/srt                srt
-SSA                   text/ssa                ssa
-WEBVTT                text/vtt                vtt
-====================  ======================  ==================
-
-Examples:
-
-.. http:get:: /api/videos/abcdef/languages/en/subtitles/?format=dfxp
-
-.. http:get:: /api/videos/abcdef/languages/en/subtitles/
-
-   :reqheader Accept: text/vtt
-
-
-Creating new subtitles
-++++++++++++++++++++++
-
-.. http:post:: /api/videos/[video-id]/languages/[language-code]/subtitles/
-
-    :param video-id: Amara Video ID
-    :param language-code: BCP-47 language code.  **deprecated:** you can also
-        specify the internal ID for a langauge
-    :<json subtitles: The subtitles to submit
-    :<json sub_format: The format used to parse the subs. The same formats as
-        for fetching subtitles are accepted. Optional - defaults to ``dfxp``.
-    :<json title: Give a title to the new revision
-    :<json description: Give a description to the new revision
-    :<json action: Name of the action to perform - optional, but recommended.
-        If given, the is_complete param will be ignored.  See the
-        :ref:`subtitles-action-resource` for details.
-    :<json is_complete: Boolean indicating if the complete subtitling set is
-        available for this language - optional, defaults to false.
-        **(deprecated, use action instead)**
-
-.. _subtitles-action-resource:
-
-Subtitles Action Resource
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Actions are operations on subtitles.  Actions correspond to the buttons in the
-upper-right hand corner of the subtitle editor (save, save a draft, approve,
-reject, etc).  This resource is used to list and perform actions on the
-subtitle set.
-
-.. note:: You can also perform an action together a new set of subtitles using
-    the action param of the :ref:`subtitles-resource`.
-
-Get the list of possible actions:
-
-.. http:get:: /api/videos/[video-id]/languages/[lang-identifier]/subtitles/actions/
-
-    :param video-id: ID of the video
-    :param lang-identifier: subtitle language code
-    :>json action: Action name
-    :>json label: Human-friendly string for the action
-    :>json complete: Does this action complete the subtitles?  If true, then
-        when the action is performed, we will mark the subtitles complete.  If
-        false, we will mark them incomplete.  If null, then we will not change
-        the subtitles_complete flag.
-
-Perform an action on a subtitle set
-
-.. http:post:: /api/videos/[video-id]/languages/[lang-identifier]/subtitles/actions/
-
-    :query video-id: ID of the video
-    :query lang-identifier: subtitle language code
-    :<json action: name of the action to perform
-
-Subtitles Notes Resource
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-Get/Create notes saved in the editor.
-
-.. note:: Subtitle notes are currently only supported for team videos
-
-Get the list of notes:
-
-.. http:get:: /api/videos/[video-id]/languages/[lang-identifier]/subtitles/notes
-
-    :query video-id: ID of the video
-    :query lang-identifier: subtitle language code
-    :>json user: Username of the note author
-    :>json created: date/time that the note was created
-    :>json body: text of the note.
-
-
-Create a new note
-
-.. http:post:: /api/videos/[video-id]/languages/[lang-identifier]/subtitles/actions/
-
-    :query video-id: ID of the video
-    :query lang-identifier: subtitle language code
-    :<json body: note body
-"""
-
 from __future__ import absolute_import
 
 import json
@@ -255,9 +36,8 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from .apiswitcher import APISwitcherMixin
 from .videos import VideoMetadataSerializer
-from api.pagination import AmaraPaginationMixin
+from api import extra
 from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
 from videos.models import Video
 from subtitles import compat
@@ -274,8 +54,16 @@ import videos.tasks
 class MiniSubtitleVersionSerializer(serializers.Serializer):
     """Serialize a subtitle version for SubtitleLanguageSerializer """
     author = serializers.CharField(source='author.username')
+    author_uri = serializers.SerializerMethodField()
     published = serializers.BooleanField(source='is_public')
     version_no = serializers.IntegerField(source='version_number')
+
+    def get_author_uri(self, version):
+        kwargs = {
+            'username': version.author.username,
+        }
+        return reverse('api:users-detail', kwargs=kwargs,
+                       request=self.context['request'])
 
 class MiniSubtitleVersionsField(serializers.ListField):
     """Serialize the list of versions for SubtitleLanguageSerializer """
@@ -331,6 +119,7 @@ class SubtitleLanguageSerializer(serializers.Serializer):
                                               source='get_subtitle_count')
     subtitles_complete = serializers.BooleanField(required=False)
     versions = MiniSubtitleVersionsField(read_only=True)
+    subtitles_uri = serializers.SerializerMethodField()
     resource_uri = serializers.SerializerMethodField()
 
     default_error_messages = {
@@ -351,6 +140,14 @@ class SubtitleLanguageSerializer(serializers.Serializer):
     def get_original_language_code(self, language):
         return compat.subtitlelanguage_original_language_code(language)
 
+    def get_subtitles_uri(self, language):
+        kwargs = {
+            'video_id': language.video.video_id,
+            'language_code': language.language_code,
+        }
+        return reverse('api:subtitles', kwargs=kwargs,
+                       request=self.context['request'])
+
     def get_resource_uri(self, language):
         kwargs = {
             'video_id': language.video.video_id,
@@ -370,6 +167,10 @@ class SubtitleLanguageSerializer(serializers.Serializer):
         data['num_versions'] = len(data['versions'])
         data['is_original'] = data['is_primary_audio_language']
         self.add_reviewer_and_approver(data, language)
+        if self.context['allow_extra']:
+            extra.video_language.add_data(self.context['request'], data,
+                                          video=self.context['video'],
+                                          language=language)
         return data
 
     def add_reviewer_and_approver(self, data, language):
@@ -418,12 +219,80 @@ class SubtitleLanguageSerializer(serializers.Serializer):
         videos.tasks.video_changed_tasks.delay(video.pk)
         return language
 
-class SubtitleLanguageViewSet(AmaraPaginationMixin,
-                              mixins.CreateModelMixin,
+class SubtitleLanguageViewSet(mixins.CreateModelMixin,
                               mixins.RetrieveModelMixin,
                               mixins.UpdateModelMixin,
                               mixins.ListModelMixin,
                               viewsets.GenericViewSet):
+    """
+    Subtitle languages are containers the subtitles for video in a given
+    language.  Subtitle languages are typically created when the first editing
+    session is started.
+
+    To see all possible languages see <a href="/api/languages">the
+    languages API endpoint</a>.
+
+    # Listing/Details #
+
+    ## `GET /api/videos/[video-id]/languages/`
+
+    Get a list of subtitle languages for a video.  The results are paginated.
+
+    ## `GET /api/videos/[video-id]/languages/[language-code]/`
+
+    Get details on a specific subtitle language.
+
+    ### Fields:
+
+    - **language_code:** BCP 47 code for this language
+    - **name:** Human-readable name for this language
+    - **is_primary_audio_language:** Is this language the primary language
+        spoken in the video?
+    - **is_rtl:** Is this language RTL?
+    - **resource_uri:** API URL for the language
+    - **created:** date/time the language was created
+    - **title:** Video title, translated into this language
+    - **description:** Video description, translated into this language
+    - **metadata:** Video metadata, translated into this language
+    - **subtitles_complete:** Are the subtitles complete for this language?
+    - **subtitle_count:** Number of subtitles for this language
+    - **reviewer:** Username of the reviewer fro task-based teams
+    - **approver:** Username of the approver for task-based teams
+    - **is_translation:** Is this language translated from other languages
+       **(deprecated)**
+    - **original_language_code:** Source translation language **(deprecated)**
+    - **num_versions:** Number of subtitle versions, the length of the
+        versions array should be used instead of this **(deprecated)**
+    - **id:** Internal ID for the language **(deprecated)**
+    - **is_original:** alias for is_primary_audio_language **(deprecated)**
+    - **versions:** List of subtitle version data
+    - **versions.author:** Subtitle author's username
+    - **versions.version_no:** number of the version 
+    - **versions.published:** is this version publicly viewable?
+
+    **Note:** `original_language_code` and `is_translation` fields are
+    remnants from the old subtitle system.  With the new editor, users can use
+    multiple languages as a translation source.  These fields are should not
+    be relied on.
+
+
+    # Creating #
+
+    ## `POST /api/videos/[video-id]/languages/`
+
+    Fields:
+
+    - **language_code:** bcp-47 code for the language
+    - **is_primary_audio_language:** Boolean indicating if this is the
+      primary spoken language of the video *(optional)*.
+    - **subtitles_complete:** Boolean indicating if the subtitles for this
+      language is complete *(optional)*.
+    - **is_original:** Alias for is_primary_audio_language **(deprecated)**
+    - **is_complete:** Alias for subtitles_complete  **(deprecated)**
+
+    """
+    DOC_NAME = 'Subtitle Language'
+
     serializer_class = SubtitleLanguageSerializer
     paginate_by = 20
 
@@ -451,6 +320,7 @@ class SubtitleLanguageViewSet(AmaraPaginationMixin,
 
     def get_serializer_context(self):
         return {
+            'allow_extra': self.action == 'retrieve',
             'request': self.request,
             'video': self.video,
             'show_private_versions': self.show_private_versions,
@@ -554,8 +424,26 @@ class SubtitlesSerializer(serializers.Serializer):
                                         read_only=True)
     video_description = serializers.CharField(source='video.description',
                                               read_only=True)
+    actions_uri = serializers.SerializerMethodField()
+    notes_uri = serializers.SerializerMethodField()
     resource_uri = serializers.SerializerMethodField()
     site_uri = serializers.SerializerMethodField()
+
+    def get_actions_uri(self, version):
+        kwargs = {
+            'video_id': version.video.video_id,
+            'language_code': version.language_code,
+        }
+        return reverse('api:subtitle-actions', kwargs=kwargs,
+                      request=self.context['request'])
+
+    def get_notes_uri(self, version):
+        kwargs = {
+            'video_id': version.video.video_id,
+            'language_code': version.language_code,
+        }
+        return reverse('api:subtitle-notes', kwargs=kwargs,
+                      request=self.context['request'])
 
     def get_resource_uri(self, version):
         kwargs = {
@@ -617,6 +505,88 @@ class SubtitlesSerializer(serializers.Serializer):
             origin=origin)
 
 class SubtitlesView(generics.CreateAPIView):
+    """
+    Contains subtitle data for a video in a specific language.
+
+    # Fetching #
+
+    ## `GET /api/videos/[video-id]/languages/[language-code]/subtitles/`
+
+    ### Query Paramaters:
+
+    - **sub_format:** The format to return the subtitles in.  This can be any
+    format that amara supports including dfxp, srt, vtt, and sbv.  The default
+    is json, which returns subtitle data encoded list of json dicts.
+    - **version_number:** version number to fetch.  Versions are listed in the
+    VideoLanguageResouce request.  If none is specified, the latest public
+    version will be returned.  If you want the latest private version (and
+    have access to it) use "last".
+    - **version:** Alias for version_number **(deprecated)**
+
+    ### Fields:
+
+    - **version_number:** version number for the subtitles
+    - **subtitles:** Subtitle data (str)
+    - **sub_format:** Format of the subtitles
+    - **language:** Language data
+    - **language.code:** BCP-47 language code
+    - **language.name:** Human readable name for the language
+    - **language.dir:** Language direction ("ltr" or "rtl")
+    - **title:** Video title, translated into the subtitle's language
+    - **description:** Video description, translated into the subtitle's
+    language
+    - **metadata:** Video metadata, translated into the subtitle's language
+    - **video_title:** Video title, translated into the video's language
+    - **video_description:** Video description, translated into the video's
+    language
+    - **notes_uri:** API URI for the subtitle notes
+    - **actions_uri:** API URI for the subtitle actions
+    - **resource_uri:** API URI for the subtitles
+    - **site_uri:** URI to view the subtitles on site
+    - **video:** Copy of video_title **(deprecated)**
+    - **version_no:** Copy of version_number **(deprecated)**
+
+    ## Getting subtitle data only
+
+    Sometimes you want just subtitles data without the rest of the data.  This
+    is possible using a special Accept headers or the `format` query
+    parameter.  This can be used to download a DFXP, SRT, or any other
+    subtitle format that Amara supports.  If one of these is used, then the
+    sub_format param will be ignored.
+
+    Format              | Accept header         | format query param
+    --------------------|-----------------------|-------------------
+    DFXP                | application/ttml+xml  | dfxp
+    SBV                 | text/sbv              | sbv
+    SRT                 | text/srt              | srt
+    SSA                 | text/ssa              | ssa
+    WEBVTT              | text/vtt              | vtt
+
+    ### Examples:
+
+    - `curl [auth-headers] -H [subtitle-url]?format=dfxp`
+    - `curl [auth-headers] -H 'Accept: application/ttml+xml' [subtitle-url]`
+
+    # Creating #
+
+    ## `POST /api/videos/[video-id]/languages/[language-code]/subtitles/`
+
+    - **video-id:** Amara Video ID
+    - **language-code:** BCP-47 language code.  **deprecated:** you can also
+    specify the internal ID for a langauge
+    - **subtitles:** The subtitles to submit
+    - **sub_format:** The format used to parse the subs. The same formats as
+    for fetching subtitles are accepted. Optional - defaults to ``dfxp``.
+    - **title:** Give a title to the new revision
+    - **description:** Give a description to the new revision
+    - **action:** Name of the action to perform - optional, but recommended.
+    If given, the is_complete param will be ignored.  For more details, see
+    the subtitles action documentation by following the `actions_uri` field.
+    - **is_complete:** Boolean indicating if the complete subtitling set is
+    available for this language - optional, defaults to false.
+    **(deprecated, use action instead)**
+    """
+
     serializer_class = SubtitlesSerializer
     renderer_classes = views.APIView.renderer_classes + [
         DFXPRenderer, SBVRenderer, SSARenderer, SRTRenderer, VTTRenderer,
@@ -707,6 +677,44 @@ class ActionsSerializer(serializers.Serializer):
     complete = serializers.BooleanField(read_only=True)
 
 class Actions(views.APIView):
+    """
+    Subtitle actions are operations on subtitles.  Actions correspond to the
+    buttons in the upper-right hand corner of the subtitle editor (save, save
+    a draft, approve, reject, etc).  This resource is used to list and perform
+    actions on the subtitle set.
+
+    **Note:** You can also perform an action together a new set of subtitles
+    using the action param of the subtitles resource.
+
+    # Listing actions #
+
+    ## ` GET /api/videos/[video-id]/languages/[language-code]/subtitles/actions/`
+
+    Get a list of possible actions for a subtitle set.
+
+    ### Fields:
+
+    - **action:** Action name
+    - **label:** Human-friendly string for the action
+    - **complete:** Does this action complete the subtitles?  If true, then
+    when the action is performed, we will mark the subtitles complete.  If
+    false, we will mark them incomplete.  If null, then we will not change
+    the subtitles_complete flag.
+
+    # Performing actions #
+
+    ## `POST /api/videos/[video-id]/languages/[language-code]/subtitles/actions/`
+
+    Perform an action on a subtitle set.  This is like opening the subtitles
+    in the editor, not changing anything, and clicking an action button
+    (Publish, Save Draft, etc.)
+
+    ### Fields:
+
+    - **action:** name of the action to perform
+
+    """
+
     def get_serializer(self, **kwargs):
         return ActionsSerializer(**kwargs)
 
@@ -721,7 +729,7 @@ class Actions(views.APIView):
 
     def post(self, request, video_id, language_code, format=None):
         try:
-            action = request.DATA['action']
+            action = request.data['action']
         except KeyError:
             return Response('no action', status=status.HTTP_400_BAD_REQUEST)
         video = get_object_or_404(Video, video_id=video_id)
@@ -749,6 +757,32 @@ class NotesSerializer(serializers.Serializer):
             self.context['user'], validated_data['body'])
 
 class NotesList(generics.ListCreateAPIView):
+    """
+    Subtitle notes saved in the editor.
+
+    **Note:** subtitle notes are currently only supported for team videos
+
+    # Fetching #
+
+    ## `GET /api/videos/[video-id]/languages/[language-code]/subtitles/notes`
+
+    Fields:
+
+    - **user:** Username of the note author
+    - **created:** date/time that the note was created
+    - **body:** text of the note.
+
+    # Creating #
+
+    ## `POST /api/videos/[video-id]/languages/[language-code]/subtitles/actions/`
+
+    Fields:
+
+    - **body:** note body
+    """
+
+    DOC_NAME = 'Subtitle Notes'
+
     serializer_class = NotesSerializer
 
     @csrf_exempt
@@ -769,18 +803,3 @@ class NotesList(generics.ListCreateAPIView):
             'editor_notes': self.editor_notes,
             'user': self.request.user,
         }
-
-class SubtitleLanguageViewSetSwitcher(APISwitcherMixin,
-                                      SubtitleLanguageViewSet):
-    switchover_date = 20150716
-
-    class Deprecated(SubtitleLanguageViewSet):
-        class serializer_class(SubtitleLanguageSerializer):
-            created = serializers.DateTimeField(read_only=True)
-
-class NotesListSwitcher(APISwitcherMixin, NotesList):
-    switchover_date = 20150716
-
-    class Deprecated(NotesList):
-        class serializer_class(NotesSerializer):
-            created = serializers.DateTimeField(read_only=True)

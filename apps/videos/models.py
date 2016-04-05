@@ -646,7 +646,7 @@ class Video(models.Model):
             if set_values:
                 for name, value in set_values.items():
                     if name == 'metadata':
-                        self.update_metadata(value, commit=False)
+                        obj.update_metadata(value, commit=False)
                     elif name == 'duration':
                         if value and not getattr(obj, name):
                             setattr(obj, name, value)

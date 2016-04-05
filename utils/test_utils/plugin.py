@@ -77,6 +77,9 @@ class UnisubsTestPlugin(Plugin):
             return False
         if not self.include_webdriver_tests and 'webdriver' in dirname:
             return False
+        if os.path.basename(dirname) in ('api', 'vimeoapi', 'enterpriseapi'):
+            # Need to exclude these for now until we upgrade django
+            return False
         if dirname == os.path.join(settings.PROJECT_ROOT, 'apps'):
             # force the tests from the apps directory to be loaded, even
             # though it's not a package

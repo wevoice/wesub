@@ -21,13 +21,19 @@ from django.utils.encoding import smart_text
 from django.utils.safestring import mark_safe
 from rest_framework.views import get_view_name, get_view_description
 from rest_framework.utils import formatting
+import markdown
+
+markdown_formatter = markdown.Markdown(safe_mode=False, extensions=[
+    'headerid(level=2)',
+    'tables',
+])
 
 def amara_get_view_name(view_cls, suffix=None):
     if hasattr(view_cls, 'DOC_NAME'):
         return view_cls.DOC_NAME
     return get_view_name(view_cls, suffix)
 
-tab_markup = re.compile("^#\s*(\w+)\s+#$", re.M)
+tab_markup = re.compile("^#\s*([\w\s/]+)\s+#$", re.M)
 
 def amara_get_view_description(view_cls, html=False):
     description = view_cls.__doc__ or ''
@@ -41,7 +47,7 @@ def markup_description(description):
     split_into_tabs = tab_markup.split(description)
     if len(split_into_tabs) == 1:
         # no tabs just return straight markup
-        return formatting.markup_description(description)
+        return markdown_formatter.convert(description)
     tab_content = split_into_tabs[0:None:2]
     tab_labels = ['About'] + split_into_tabs[1:None:2]
     chunks = []
@@ -50,7 +56,7 @@ def markup_description(description):
         chunks.append(make_tab_item(i+1, label))
     chunks.append('</ul><div class="well tab-content">')
     for i, content in enumerate(tab_content):
-        chunks.append(make_tab_pane(i+1, markup_description(content)))
+        chunks.append(make_tab_pane(i+1, markdown_formatter.convert(content)))
     chunks.append('</div>')
     return ''.join(chunks)
 
