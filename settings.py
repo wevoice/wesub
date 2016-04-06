@@ -32,6 +32,10 @@ DEFAULT_PROTOCOL  = 'http'
 def rel(*x):
     return os.path.join(PROJECT_ROOT, *x)
 
+def env_flag_set(name):
+    value = os.environ.get(name)
+    return bool(value and value != '0')
+
 # Rebuild the language dicts to support more languages.
 
 # We use a custom format for our language labels:
@@ -637,19 +641,18 @@ EMAIL_NOTIFICATION_RECEIVERS = ("arthur@stimuli.com.br", "steve@stevelosh.com", 
 RUN_LOCALLY = False
 
 def log_handler_info():
-    json_logging = os.environ.get("JSON_LOGGING")
-    if json_logging and json_logging != '0':
-        return {
-            'level': 'INFO',
-            'class': 'utils.jsonlogging.JSONHandler',
-            'formatter': 'standard'
-        }
+    rv = {
+        'formatter': 'standard' ,
+    }
+    if env_flag_set('DB_LOGGING'):
+        rv['level'] = 'DEBUG'
     else:
-        return {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'standard'
-        }
+        rv['level'] = 'INFO'
+    if env_flag_set('JSON_LOGGING'):
+        rv['class'] = 'utils.jsonlogging.JSONHandler'
+    else:
+        rv['class'] = 'logging.StreamHandler'
+    return rv
 
 LOGGING = {
     'version': 1,
@@ -673,9 +676,11 @@ LOGGING = {
     'loggers': {
         'celery': {
             'level': 'WARNING',
-        }
+        },
     },
 }
+if env_flag_set('DB_LOGGING'):
+    LOGGING['loggers']['django.db'] = { 'level': 'DEBUG' }
 
 TMP_FOLDER = "/tmp/"
 
