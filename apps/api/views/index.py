@@ -31,7 +31,6 @@ INDEX_ENDPOINTS = [
     ('videos', 'api:video-list'),
     ('users', 'api:users-list'),
     ('teams', 'api:teams-list'),
-    ('activity', 'api:activity-list'),
     ('languages', 'api:languages'),
     ('messages', 'api:messages'),
 ]
