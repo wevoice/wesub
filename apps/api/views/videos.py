@@ -666,6 +666,24 @@ class VideoURLViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.video.videourl_set.all().select_related('video')
 
+    def check_view_permissions(self):
+        workflow = self.video.get_workflow()
+        if not workflow.user_can_view_video(self.request.user):
+            raise PermissionDenied()
+
+    def check_edit_permissions(self):
+        workflow = self.video.get_workflow()
+        if not workflow.user_can_edit_video(self.request.user):
+            raise PermissionDenied()
+
+    def perform_create(self, serializer):
+        self.check_edit_permissions()
+        return serializer.save()
+
+    def perform_update(self, serializer):
+        self.check_edit_permissions()
+        return serializer.update()
+
     def perform_destroy(self, instance):
         if instance.primary:
             raise serializers.ValidationError("Can't delete the primary URL")
