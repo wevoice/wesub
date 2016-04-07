@@ -165,9 +165,10 @@ To update the video with video id `foo` use:
 
 .. http:put:: https://amara.org/api/videos/foo
 
-Available Endpoints
--------------------
+Endpoint Documentation
+----------------------
 
-Visit the root API URL (https://amara.org/api/) to discover our API endpoints.
-If you use a browser to view this, you can see documentation on each endpoint on
-its page.
+We are currently in the process of changing how our endpoints are documented.  Right now there are 2 ways to get the info:
+
+* http://amara.readthedocs.org/en/old-api-docs/api.html is a readthedocs page with documentation on all the endpoints.  This contains all endpoints in 1 page and is good for looking at an overview of the system and for searching through.
+* You also open any API endpoint in a browser to see inline documentation on it.  To explore this, log in to amara.org, then navigate to the root API URL (https://amara.org/api/)
