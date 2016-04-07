@@ -7,6 +7,7 @@ app:
     LANG: en_US.UTF-8
     WORKERS: 2
     JSON_LOGGING:
+    DB_LOGGING:
   volumes:
     - .:/opt/apps/amara
   hostname: unisubs.example.com

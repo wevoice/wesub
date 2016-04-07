@@ -22,8 +22,10 @@ PyJWT==0.4.3
 oauth2==1.5.211
 feedparser
 unidecode
+isodate==0.5.4
+pyuca==1.1
 gdata==2.0.16
-django-math-captcha==0.1
+django-simple-captcha==0.5.1
 django-registration
 pygal
 pafy

@@ -227,14 +227,19 @@ class Up(Command):
     """Start docker containers."""
 
     options = [
-        optparse.make_option('--json', action='store_true',
-                             help='Use JSON formatted logging')
+        optparse.make_option('--jsonlog', action='store_true',
+                             help='Use JSON formatted logging'),
+        optparse.make_option('--dblog', action='store_true',
+                             help='Log DB queries'),
     ]
 
     def run_inner(self, args, options):
-        if options.json:
-            os.environ['JSON_LOGGING'] = '1'
-        subprocess.call(['docker-compose', 'up', 'app', 'worker'])
+        env = os.environ.copy()
+        if options.jsonlog:
+            env['JSON_LOGGING'] = '1'
+        if options.dblog:
+            env['DB_LOGGING'] = '1'
+        subprocess.call(['docker-compose', 'up', 'app', 'worker'], env=env)
 
 class PrepDeploy(Command):
     """Start docker containers."""

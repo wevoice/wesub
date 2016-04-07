@@ -20,6 +20,7 @@ from datetime import datetime
 import inspect
 import json
 import logging
+import traceback
 
 from utils.dataprintout import DataPrinter
 
@@ -50,6 +51,16 @@ def format_timestamp(time):
             ".%03d" % (tstamp.microsecond / 1000) + "Z")
 
 def format_traceback(tb):
+    try:
+        return format_pretty_traceback(tb)
+    except:
+        pass
+    try:
+        return ''.join(traceback.format_tb(tb))
+    except:
+        return 'Error formatting traceback'
+
+def format_pretty_traceback(tb):
     parts = []
     for frame in inspect.getinnerframes(tb, 5):
         line_info = '{} {}:{}\n'.format(frame[3], frame[1], frame[2])

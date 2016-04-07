@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2015 Participatory Culture Foundation
+# Copyright (C) 2016 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -15,23 +15,35 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+"""
+API index view.
+
+This links to the main top-level API endpoints.
+"""
+
+from collections import OrderedDict
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
-from utils import translation
+INDEX_ENDPOINTS = [
+    ('videos', 'api:video-list'),
+    ('users', 'api:users-list'),
+    ('teams', 'api:teams-list'),
+    ('languages', 'api:languages'),
+    ('messages', 'api:messages'),
+]
+
 
 @api_view(['GET'])
-def languages(request):
+def index(request):
     """
-    API endpoint that lists all available languages on the Amara platform.
+    Welcome to the Amara API.
 
-    ## `GET /api/languages/`
-    List available languages
-
-    - **languages:** maps language codes to language names
-
+    Follow a link to start exploring.
     """
-
-    return Response({
-        'languages': dict(translation.SUPPORTED_LANGUAGE_CHOICES)
-    })
+    return Response(OrderedDict(
+        (name, reverse(view_name, request=request))
+        for name, view_name in INDEX_ENDPOINTS
+    ))

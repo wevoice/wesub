@@ -32,6 +32,10 @@ DEFAULT_PROTOCOL  = 'http'
 def rel(*x):
     return os.path.join(PROJECT_ROOT, *x)
 
+def env_flag_set(name):
+    value = os.environ.get(name)
+    return bool(value and value != '0')
+
 # Rebuild the language dicts to support more languages.
 
 # We use a custom format for our language labels:
@@ -119,6 +123,7 @@ TEMPLATE_LOADERS = (
 
 
 MIDDLEWARE_CLASSES = (
+    'middleware.AmaraSecurityMiddleware',
     'middleware.LogRequest',
     'middleware.StripGoogleAnalyticsCookieMiddleware',
     'utils.ajaxmiddleware.AjaxErrorMiddleware',
@@ -226,16 +231,16 @@ BROKER_POOL_LIMIT = 10
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
-        'rest_framework.parsers.YAMLParser',
-        'rest_framework.parsers.XMLParser',
+        'rest_framework_yaml.parsers.YAMLParser',
+        'rest_framework_xml.parsers.XMLParser',
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.YAMLRenderer',
+        'rest_framework_yaml.renderers.YAMLRenderer',
         'api.renderers.AmaraBrowsableAPIRenderer',
-        'rest_framework.renderers.XMLRenderer',
+        'rest_framework_xml.renderers.XMLRenderer',
     ),
     'URL_FORMAT_OVERRIDE': 'format',
     'DEFAULT_CONTENT_NEGOTIATION_CLASS':
@@ -247,8 +252,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_PAGINATION_SERIALIZER_CLASS':
-        'api.pagination.AmaraPaginationSerializer',
+    'DEFAULT_PAGINATION_CLASS': 'api.pagination.AmaraPagination',
     'ORDERING_PARAM': 'order_by',
     'VIEW_NAME_FUNCTION': 'api.viewdocs.amara_get_view_name',
     'VIEW_DESCRIPTION_FUNCTION': 'api.viewdocs.amara_get_view_description',
@@ -637,19 +641,18 @@ EMAIL_NOTIFICATION_RECEIVERS = ("arthur@stimuli.com.br", "steve@stevelosh.com", 
 RUN_LOCALLY = False
 
 def log_handler_info():
-    json_logging = os.environ.get("JSON_LOGGING")
-    if json_logging and json_logging != '0':
-        return {
-            'level': 'INFO',
-            'class': 'utils.jsonlogging.JSONHandler',
-            'formatter': 'standard'
-        }
+    rv = {
+        'formatter': 'standard' ,
+    }
+    if env_flag_set('DB_LOGGING'):
+        rv['level'] = 'DEBUG'
     else:
-        return {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'standard'
-        }
+        rv['level'] = 'INFO'
+    if env_flag_set('JSON_LOGGING'):
+        rv['class'] = 'utils.jsonlogging.JSONHandler'
+    else:
+        rv['class'] = 'logging.StreamHandler'
+    return rv
 
 LOGGING = {
     'version': 1,
@@ -672,10 +675,12 @@ LOGGING = {
     },
     'loggers': {
         'celery': {
-            'level': 'INFO',
-        }
+            'level': 'WARNING',
+        },
     },
 }
+if env_flag_set('DB_LOGGING'):
+    LOGGING['loggers']['django.db'] = { 'level': 'DEBUG' }
 
 TMP_FOLDER = "/tmp/"
 
