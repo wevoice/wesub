@@ -561,7 +561,7 @@ class VideoURLSerializer(serializers.Serializer):
             added_by=self.context['user'],
         )
         if validated_data.get('primary'):
-            new_url.make_primary()
+            new_url.make_primary(self.context['user'])
         return new_url
 
     def update(self, video_url, validated_data):
@@ -571,7 +571,7 @@ class VideoURLSerializer(serializers.Serializer):
             video_url.save()
 
         if validated_data.get('primary'):
-            video_url.make_primary()
+            video_url.make_primary(self.context['user'])
 
         return video_url
 
@@ -682,12 +682,13 @@ class VideoURLViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         self.check_edit_permissions()
-        return serializer.update()
+        return serializer.save()
 
     def perform_destroy(self, instance):
+        self.check_edit_permissions()
         if instance.primary:
             raise serializers.ValidationError("Can't delete the primary URL")
-        instance.delete()
+        instance.remove(self.request.user)
 
     def get_serializer_context(self):
         return {
