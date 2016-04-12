@@ -372,7 +372,8 @@ class TeamMemberViewSet(TeamSubview):
         return member
 
     def perform_create(self, serializer):
-        if not team_permissions.can_add_member(self.team, self.request.user):
+        if not team_permissions.can_add_member(
+            self.team, self.request.user, serializer.validated_data['role']):
             raise PermissionDenied()
         serializer.save()
 
