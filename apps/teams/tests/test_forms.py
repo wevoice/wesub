@@ -35,6 +35,9 @@ from utils.factories import *
 from utils.test_utils import *
 from videos.models import Video, VideoUrl
 
+import logging
+logger = logging.getLogger("TESTS")
+
 class EditMemberFormTest(TestCase):
     @patch_for_test('teams.permissions.get_edit_member_permissions')
     def setUp(self, mock_permission_check):
@@ -286,7 +289,7 @@ class VideoPageFormsTest(TestCase):
         assert_items_equal(video_page_forms.enabled, correct_forms)
 
     def test_all_permissions_pass(self):
-        self.check_forms('edit', 'bulk-edit', 'move', 'remove')
+        self.check_forms('edit', 'bulk-edit', 'move', 'remove', 'add_form')
 
     def test_cant_add_video(self):
         self.mock_can_add_video.return_value = False
@@ -294,15 +297,15 @@ class VideoPageFormsTest(TestCase):
 
     def test_cant_edit_video(self):
         self.mock_can_edit_videos.return_value = False
-        self.check_forms('move', 'remove')
+        self.check_forms('move', 'remove', 'add_form')
 
     def test_cant_move_video(self):
         self.mock_can_move_videos_to.return_value = []
-        self.check_forms('edit', 'bulk-edit', 'remove')
+        self.check_forms('edit', 'bulk-edit', 'remove', 'add_form')
 
     def test_cant_remove_video(self):
         self.mock_can_remove_videos.return_value = False
-        self.check_forms('edit', 'bulk-edit', 'move')
+        self.check_forms('edit', 'bulk-edit', 'move', 'add_form')
 
     def test_build_video_page_forms_signal(self):
         # test that we emit the build_video_page_forms signal when creating an
