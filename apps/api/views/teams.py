@@ -798,7 +798,7 @@ class TaskViewSet(TeamSubview):
     def get_queryset(self):
         if not self.team.user_is_member(self.request.user):
             raise PermissionDenied()
-        return (self.order_queryset(self.team.task_set.all())
+        return (self.order_queryset(self.team.task_set.not_deleted())
                 .select_related('team_video__video', 'assignee'))
 
     def order_queryset(self, qs):
@@ -872,7 +872,8 @@ class TaskViewSet(TeamSubview):
             self.team, self.request.user, instance.team_video.project,
             instance.language):
             raise PermissionDenied()
-        instance.delete()
+        instance.deleted = True
+        instance.save()
 
     def _post_save(self, task):
         if task.assignee and not self.task_was_assigned:
