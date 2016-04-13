@@ -371,10 +371,21 @@ class TeamMemberViewSet(TeamSubview):
                                    user__username=self.kwargs['username'])
         return member
 
-    def perform_create(self, serializer):
-        if not team_permissions.can_add_member(
-            self.team, self.request.user, serializer.validated_data['role']):
+    def check_join_permissions(self, role):
+        if not (role == TeamMember.ROLE_CONTRIBUTOR and
+                team_permissions.can_join_team(self.team, self.request.user)):
             raise PermissionDenied()
+
+    def check_add_permissions(self, role):
+        if not team_permissions.can_add_member(
+                self.team, self.request.user, role):
+            raise PermissionDenied()
+
+    def perform_create(self, serializer):
+        if serializer.user == self.request.user:
+            self.check_join_permissions(serializer.validated_data['role'])
+        else:
+            self.check_add_permissions(serializer.validated_data['role'])
         serializer.save()
 
     def perform_update(self, serializer):
