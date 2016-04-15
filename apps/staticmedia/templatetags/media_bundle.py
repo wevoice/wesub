@@ -21,6 +21,7 @@ from __future__ import absolute_import
 from django import template
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.translation import to_locale
 
 from staticmedia import bundles
 from staticmedia import utils
@@ -45,3 +46,13 @@ def url_for(bundle_name):
 @register.simple_tag
 def static_url():
     return utils.static_url()
+
+@register.simple_tag(takes_context=True)
+def js_18n_catalog(context):
+    if settings.STATIC_MEDIA_USES_S3:
+        locale = to_locale(context['LANGUAGE_CODE'])
+        src = utils.static_url() + 'jsi18catalog/{}.js'.format(locale)
+    else:
+        src = reverse('staticmedia:js_i18n_catalog')
+    return '<script type="text/javascript" src="{}"></script>'.format(src)
+

@@ -21,11 +21,14 @@ import os
 from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.shortcuts import render
+from django.utils.translation import to_locale
 from django.views import static
 
 from staticmedia import bundles
 from staticmedia import oldembedder
 from staticmedia import utils
+from staticmedia.jsi18ncompat import (get_javascript_catalog,
+                                      render_javascript_catalog)
 
 def js_bundle(request, bundle_name):
     return _bundle(request, bundle_name, bundles.JavascriptBundle)
@@ -41,6 +44,11 @@ def _bundle(request, bundle_name, correct_type):
     if not isinstance(bundle, correct_type):
         raise Http404()
     return HttpResponse(bundle.get_contents(), bundle.mime_type)
+
+def js_i18n_catalog(request):
+    catalog, plural = get_javascript_catalog(
+        to_locale(request.LANGUAGE_CODE), 'djangojs', [])
+    return render_javascript_catalog(catalog, plural)
 
 def old_embedder_js(request):
     return HttpResponse(oldembedder.js_code(), 'text/javascript')

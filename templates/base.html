@@ -37,7 +37,7 @@
     <![endif]-->
     <link href='//fonts.googleapis.com/css?family=Roboto:300,400' rel='stylesheet' type='text/css'>
     {% media_bundle "site.js" %}
-    <script type="text/javascript" src="{% url "js_i18n_catalog" %}"></script>
+    {% js_18n_catalog %}
     <script src="{% url "profiles:rpc_api" %}" type="text/javascript"></script>
     <script type="text/javascript" src='{% url "embedder_iframe" %}'>
     </script>
