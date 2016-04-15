@@ -222,7 +222,6 @@ class DBLoad(Command):
         with open(path, 'r') as f:
             run_manage(['dbshell'], stdin=f)
 
-
 class Up(Command):
     """Start docker containers."""
 
@@ -313,9 +312,16 @@ class PrepDeploy(Command):
         print "Pushing {}".format(branch)
         self.run_git('push', 'origin', branch)
 
+NEEDS_ROOT = [
+    'build_docs',
+    'update_translations',
+]
 def run_manage(args, **kwargs):
-    subprocess.call(['docker-compose', 'run', 'app', 'manage'] + args,
-                    **kwargs)
+    if args[0] in NEEDS_ROOT:
+        cmdline = ['docker-compose', 'run', '-u', 'root', 'app', 'manage']
+    else:
+        cmdline = ['docker-compose', 'run', 'app', 'manage']
+    subprocess.call(cmdline + args, **kwargs)
 
 def usage():
     print "Usage %s [command]" % progname()
