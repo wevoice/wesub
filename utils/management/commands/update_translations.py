@@ -64,12 +64,19 @@ class TranslationDomain(object):
     # Name of the domain
     name = NotImplemented
 
+    # directories to exclude from find_files()
+    DIRS_TO_SKIP = []
+
     def pot_path(self):
         return os.path.join(locale_dir(), '{}.pot'.format(self.name))
 
     def po_path(self, locale_name):
         return os.path.join(locale_dir(), locale_name, 'LC_MESSAGES',
                             '{}.po'.format(self.name))
+
+    def mo_path(self, locale_name):
+        return os.path.join(locale_dir(), locale_name, 'LC_MESSAGES',
+                            '{}.mo'.format(self.name))
 
     def build_pot_file(self):
         """Build the .pot file for this domain
@@ -152,7 +159,30 @@ class DjangoTranslationDomain(TranslationDomain):
 
 class DjangoJSTranslationDomain(TranslationDomain):
     name = 'djangojs'
-    # TODO: implement this
+
+    def build_pot_file(self):
+        cmdline = [
+            'xgettext',
+            '-d', 'djangojs', '-L', 'Javascript',
+            '-D', settings.PROJECT_ROOT,
+            '--from-code=UTF-8',
+            '-o', self.pot_path(),
+        ]
+        cmdline.extend(self.find_javascript_files())
+        check_xgettext_call(cmdline)
+
+    def find_javascript_files(self):
+        dirs_to_search = [
+            os.path.join(settings.PROJECT_ROOT, 'media/src/js/')
+        ]
+        for repo_dir in optionalapps.get_repository_paths():
+            js_dir = os.path.join(repo_dir, 'media/js')
+            if os.path.isdir(js_dir):
+                dirs_to_search.append(js_dir)
+
+        for dir_path in dirs_to_search:
+            for path in self.find_files(dir_path, '.js'):
+                yield path
 
 class Locale(object):
     """
@@ -168,7 +198,13 @@ class Locale(object):
     def directory(self):
         return os.path.join(locale_dir(), self.name)
 
-    def merge_pot_file(self, domain):
+    def build_po_file(self, domain):
+        if os.path.exists(domain.po_path(self.name)):
+            self.merge_po_file(domain)
+        else:
+            self.create_po_file(domain)
+
+    def merge_po_file(self, domain):
         subprocess.check_call([
             'msgmerge', '--previous', '-q',
             '-o', domain.po_path(self.name),
@@ -177,6 +213,21 @@ class Locale(object):
         ])
         self.remove_obsolete_messages(domain)
 
+    def create_po_file(self, domain):
+        subprocess.check_call([
+            'msginit',
+            '--no-translator',
+            '-i', domain.pot_path(),
+            '-o', domain.po_path(self.name),
+        ])
+
+    def compile_mo_file(self, domain):
+        subprocess.check_call([
+            'msgfmt', '--check-format',
+            '-o', domain.mo_path(self.name),
+            domain.po_path(self.name),
+        ])
+
     def remove_obsolete_messages(self, domain):
         subprocess.check_call([
             'msgattrib', '--no-obsolete',
@@ -184,26 +235,33 @@ class Locale(object):
             domain.po_path(self.name),
         ])
 
+
+def all_domains():
+    return [
+        DjangoTranslationDomain(),
+        DjangoJSTranslationDomain(),
+    ]
+
+def all_locales():
+    rv = []
+    for name in os.listdir(locale_dir()):
+        if os.path.isdir(os.path.join(locale_dir(), name)):
+            rv.append(Locale(name))
+    return rv
+
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         os.chdir(settings.PROJECT_ROOT)
 
-        self.domains = [
-            DjangoTranslationDomain(),
-            #DjangoJSTranslationDomain(),
-        ]
+        domains = all_domains()
+        locales = all_locales()
 
-        for domain in self.domains:
+        for domain in domains:
             self.stdout.write("building {}\n".format(domain.pot_path()))
             domain.build_pot_file()
 
-        for domin in self.domains:
-            for locale in self.all_locales():
+        for domain in domains:
+            for locale in locales:
                 self.stdout.write(
                     "building {}\n".format(domain.po_path(locale.name)))
-                locale.merge_pot_file(domain)
-
-    def all_locales(self):
-        for name in os.listdir(locale_dir()):
-            if os.path.isdir(os.path.join(locale_dir(), name)):
-                yield Locale(name)
+                locale.build_po_file(domain)

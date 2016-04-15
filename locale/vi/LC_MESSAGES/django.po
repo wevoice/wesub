@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-15 09:26-0500\n"
+"POT-Creation-Date: 2016-04-15 13:19-0500\n"
 "PO-Revision-Date: 2014-03-21 23:02+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/"
@@ -50,7 +50,7 @@ msgstr "Công việc đó đã được hoàn thành."
 
 #: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/messages/rpc.py:27
 #: apps/messages/rpc.py:44 apps/messages/rpc.py:59 apps/messages/rpc.py:67
-#: apps/messages/rpc.py:75 apps/videos/rpc.py:37
+#: apps/messages/rpc.py:75
 msgid "You should be authenticated."
 msgstr "Bạn cần phải xác minh."
 
@@ -166,8 +166,8 @@ msgid "Video In"
 msgstr "Phim có trong"
 
 #: apps/teams/permissions_const.py:44 apps/teams/forms.py:1158
-#: apps/teams/models.py:1326 templates/new-base.html:107
-#: templates/hands_base.html:94 templates/base.html:163
+#: apps/teams/models.py:1326 templates/hands_base.html:94
+#: templates/base.html:163 templates/new-base.html:108
 msgid "Admin"
 msgstr "Quản trị viên"
 
@@ -302,49 +302,6 @@ msgstr "Người dùng"
 #| msgid "You are now a member of this team."
 msgid "%(username)s is not a member of the team"
 msgstr "Giờ thì bạn đã là thành viên của nhóm này."
-
-#: apps/teams/subtitle_actions.py:29
-#: apps/teams/workflows/old/subtitleworkflows.py:76
-#: amara-enterprise/collab/models.py:370
-msgid "Complete"
-msgstr ""
-
-#: apps/teams/subtitle_actions.py:30
-#: apps/teams/workflows/old/subtitleworkflows.py:77
-#: apps/subtitles/workflows.py:710 apps/subtitles/workflows.py:728
-#: apps/subtitles/workflows.py:735 apps/subtitles/workflows.py:748
-#, fuzzy
-msgid "Saving"
-msgstr "Đang lưu..."
-
-#: apps/teams/subtitle_actions.py:69
-#: apps/teams/workflows/old/subtitleworkflows.py:96
-#: apps/teams/workflows/old/subtitleworkflows.py:178
-#: amara-enterprise/collab/subtitle_workflow.py:296
-#: amara-enterprise/collab/forms/dashboard.py:102
-#: amara-enterprise/vimeo/workflows.py:83 templates/teams/applications.html:62
-#: templates/teams/tasks.html:78
-msgid "Approve"
-msgstr "Chấp thuận"
-
-#: apps/teams/subtitle_actions.py:70
-#: apps/teams/workflows/old/subtitleworkflows.py:97
-#, fuzzy
-msgid "Approving"
-msgstr "Chấp thuận"
-
-#: apps/teams/subtitle_actions.py:80
-#: apps/teams/workflows/old/subtitleworkflows.py:109
-#, fuzzy
-msgid "Send Back"
-msgstr "Gửi phản hồi"
-
-#: apps/teams/subtitle_actions.py:81
-#: apps/teams/workflows/old/subtitleworkflows.py:110
-#: amara-enterprise/collab/subtitle_workflow.py:126
-#, fuzzy
-msgid "Sending back"
-msgstr "Gửi phản hồi"
 
 #: apps/teams/forms.py:78 apps/teams/forms.py:200 apps/teams/forms.py:980
 #: apps/teams/forms.py:1252 apps/teams/forms.py:1361 apps/teams/forms.py:1411
@@ -671,9 +628,8 @@ msgstr "Dự án"
 msgid "Any language"
 msgstr "Tất cả ngôn ngữ"
 
-#: apps/teams/forms.py:1088 templates/footer.html:36
-#: templates/new-base.html:96 templates/base.html:135
-#: templates/search/_search_form.html:32
+#: apps/teams/forms.py:1088 templates/footer.html:36 templates/base.html:135
+#: templates/new-base.html:97 templates/search/_search_form.html:32
 #: amara-enterprise/collab/templates/collab/_collab-search-form.html:27
 #: amara-enterprise/collab/templates/collab/_video-search-form.html:11
 msgid "Search"
@@ -859,7 +815,7 @@ msgstr "Tin nhắn đã được gửi thành công."
 
 #: apps/teams/new_views.py:362 amara-enterprise/collab/views.py:114
 #: templates/footer.html:35 templates/new-user-menu.html:14
-#: templates/new-base.html:95 templates/base.html:134
+#: templates/base.html:134 templates/new-base.html:96
 #: templates/profiles/_tabs.html:12 templates/profiles/_user_menu.html:22
 #: templates/teams/_tabs_projects.html:7
 #: templates/teams/_subnav_activity.html:6 templates/teams/_tabs.html:17
@@ -1573,6 +1529,13 @@ msgstr "Công việc"
 msgid "%(user)s added a note while editing %(title)s"
 msgstr "%(user)s để lại lời bình trên đoạn phim %(title)s"
 
+#: apps/teams/workflows/old/subtitleworkflows.py:178
+#: amara-enterprise/collab/subtitle_workflow.py:296
+#: amara-enterprise/collab/forms/dashboard.py:102
+#: templates/teams/applications.html:62 templates/teams/tasks.html:78
+msgid "Approve"
+msgstr "Chấp thuận"
+
 #: apps/teams/workflows/old/subtitleworkflows.py:180
 #: amara-enterprise/collab/subtitle_workflow.py:294
 #: amara-enterprise/collab/forms/dashboard.py:99
@@ -1736,25 +1699,6 @@ msgstr "Đã được tải lên"
 #: apps/subtitles/models.py:1346
 msgid "Through web editor"
 msgstr "Thông qua trình biên tập web"
-
-#: apps/subtitles/workflows.py:709
-#, fuzzy
-msgid "Publish"
-msgstr "Đã được đăng tải"
-
-#: apps/subtitles/workflows.py:727
-#, fuzzy
-msgid "Unpublish"
-msgstr " và cho đăng tải"
-
-#: apps/subtitles/workflows.py:734 templates/editor/header.html:17
-#, fuzzy
-msgid "Save Draft"
-msgstr "bản thảo mới đây nhất"
-
-#: apps/subtitles/workflows.py:747
-msgid "API Complete"
-msgstr ""
 
 #: apps/subtitles/workflows.py:779
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:65
@@ -2073,14 +2017,6 @@ msgstr "[không chủ đề]"
 #: apps/messages/models.py:174
 msgid "You should enter subject or message."
 msgstr "Bạn nên nhập chủ đề hoặc tin nhắn."
-
-#: apps/videos/metadata.py:57
-msgid "Speaker Name"
-msgstr ""
-
-#: apps/videos/metadata.py:58
-msgid "Location"
-msgstr ""
 
 #: apps/videos/rpc.py:48 apps/videos/rpc.py:62
 msgid "You have not permission"
@@ -2617,7 +2553,7 @@ msgstr "Hiện giờ Feed không thể hoạt động."
 msgid "Unknown"
 msgstr ""
 
-#: apps/externalsites/credit.py:34 apps/externalsites/syncing/youtube.py:40
+#: apps/externalsites/credit.py:34
 msgid "Help us caption & translate this video!"
 msgstr ""
 
@@ -2625,31 +2561,6 @@ msgstr ""
 #, fuzzy
 msgid "Resyncing subtitles"
 msgstr "phụ đề"
-
-#: apps/externalsites/forms.py:103
-msgid "Import all new videos"
-msgstr ""
-
-#: apps/externalsites/forms.py:104
-msgid "Import videos with tags:"
-msgstr ""
-
-#: apps/externalsites/forms.py:107 apps/externalsites/models.py:241
-#, fuzzy
-msgid "Publisher ID"
-msgstr "Đã được đăng tải"
-
-#: apps/externalsites/forms.py:109
-msgid "Sync subtitles with this write token"
-msgstr ""
-
-#: apps/externalsites/forms.py:112
-msgid "Import Videos From Feed"
-msgstr ""
-
-#: apps/externalsites/forms.py:114
-msgid "Player ID"
-msgstr ""
 
 #: apps/externalsites/forms.py:148
 msgid "Must specify a player id to import from a feed"
@@ -2662,16 +2573,6 @@ msgstr ""
 #: apps/externalsites/forms.py:156
 msgid "Must specify tags to import"
 msgstr ""
-
-#: apps/externalsites/forms.py:188
-#, fuzzy
-msgid "Add YouTube account"
-msgstr "Có tài khoản YouTube chưa?"
-
-#: apps/externalsites/forms.py:212
-#: templates/profiles/remove-third-party.html:24
-msgid "Remove account"
-msgstr "Xóa tài khoản"
 
 #: apps/externalsites/forms.py:251
 #, python-format
@@ -2704,6 +2605,11 @@ msgstr ""
 #, python-format
 msgid "partner id %(partner_id)s"
 msgstr ""
+
+#: apps/externalsites/models.py:241
+#, fuzzy
+msgid "Publisher ID"
+msgstr "Đã được đăng tải"
 
 #: apps/externalsites/models.py:247
 #, fuzzy
@@ -2786,10 +2692,6 @@ msgstr ""
 #, fuzzy, python-format
 msgid "That youtube account has already been linked to the %(team)s team."
 msgstr "Người dùng đó đã được phân công tối đa số công việc."
-
-#: apps/externalsites/syncing/youtube.py:38
-msgid "Subtitles by the Amara.org community"
-msgstr "Phụ đề được thực hiện bởi cộng đồng Amara.org"
 
 #: apps/amaradotorg/behaviors.py:38
 #, python-format
@@ -2891,6 +2793,10 @@ msgstr ""
 msgid "Being approved"
 msgstr "Đã được chấp thuận"
 
+#: amara-enterprise/collab/models.py:370
+msgid "Complete"
+msgstr ""
+
 #: amara-enterprise/collab/models.py:545
 #: amara-enterprise/collab/models.py:1225
 #, fuzzy, python-format
@@ -2977,7 +2883,6 @@ msgid "Endorsement"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:1169
-#: amara-enterprise/collab/subtitle_workflow.py:125
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:121
 #, fuzzy
 msgid "Send back"
@@ -3172,13 +3077,6 @@ msgstr ""
 msgid "%(user)s unassigned provider %(other_user)s"
 msgstr ""
 
-#: amara-enterprise/collab/team_workflow.py:23
-#: amara-enterprise/collab/forms/search.py:189
-#: amara-enterprise/collab/templates/collab/_collab-search-form.html:5
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:9
-msgid "Collaboration"
-msgstr ""
-
 #: amara-enterprise/collab/team_workflow.py:35
 #: amara-enterprise/collab/views.py:116 amara-enterprise/collab/views.py:353
 #: amara-enterprise/collab/views.py:387 amara-enterprise/collab/views.py:398
@@ -3186,12 +3084,6 @@ msgstr ""
 #: amara-enterprise/ondemand/templates/ondemand/dashboard.html:26
 msgid "Collaborations"
 msgstr ""
-
-#: amara-enterprise/collab/team_workflow.py:97
-#, fuzzy
-#| msgid "Custom messages"
-msgid "Customer"
-msgstr "Tùy chọn tin nhắn"
 
 #: amara-enterprise/collab/views.py:50 amara-enterprise/collab/views.py:68
 #: templates/teams/_subnav_settings.html:14
@@ -3232,16 +3124,6 @@ msgstr "Hoạt động trong nhóm của bạn"
 msgid "Activity for %(language)s"
 msgstr "Lựa chọn Ngôn ngữ của bạn"
 
-#: amara-enterprise/collab/subtitle_workflow.py:51
-#: amara-enterprise/collab/subtitle_workflow.py:69
-msgid "Endorse"
-msgstr ""
-
-#: amara-enterprise/collab/subtitle_workflow.py:52
-#: amara-enterprise/collab/subtitle_workflow.py:70
-msgid "Endorsing"
-msgstr ""
-
 #: amara-enterprise/collab/subtitle_workflow.py:155
 #, python-format
 msgid "%(user)s has sent back subtitles for additional work."
@@ -3257,16 +3139,6 @@ msgstr ""
 #| msgid "Subtitle Editor"
 msgid "Open subtitle editor"
 msgstr "Trình Biên tập Phụ đề"
-
-#: amara-enterprise/collab/subtitle_workflow.py:180
-#, fuzzy
-#| msgid "Create Subtitles"
-msgid "Update Subtitles"
-msgstr "Tạo Phụ đề"
-
-#: amara-enterprise/collab/subtitle_workflow.py:181
-msgid "Updating"
-msgstr ""
 
 #: amara-enterprise/collab/subtitle_workflow.py:257
 #, python-format
@@ -3437,12 +3309,6 @@ msgstr "Chấp thuận"
 msgid "Never"
 msgstr ""
 
-#: amara-enterprise/collab/forms/workflow.py:40
-#, python-format
-msgid "After %(number)s day"
-msgid_plural "After %(number)s days"
-msgstr[0] ""
-
 #: amara-enterprise/collab/forms/workflow.py:51
 #, fuzzy
 msgid "Peer-review needed"
@@ -3529,6 +3395,12 @@ msgstr "Ngôn ngữ"
 #| msgid "Video Language"
 msgid "Any Video Language"
 msgstr "Ngôn ngữ Phim"
+
+#: amara-enterprise/collab/forms/search.py:189
+#: amara-enterprise/collab/templates/collab/_collab-search-form.html:5
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:9
+msgid "Collaboration"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:195
 #, fuzzy
@@ -3858,37 +3730,9 @@ msgstr ""
 msgid "Invalid format"
 msgstr "Mật khẩu không hợp lệ."
 
-#: amara-enterprise/providers/types/vocapia.py:27
-msgid "Vocapia"
-msgstr ""
-
 #: amara-enterprise/providers/types/queue.py:17
 #: amara-enterprise/providers/templates/providers/user-queue.html:7
 msgid "Provider Queue"
-msgstr ""
-
-#: amara-enterprise/providers/types/cielo.py:39
-msgid "Cielo"
-msgstr ""
-
-#: amara-enterprise/providers/types/dummy.py:19
-msgid "Dummy"
-msgstr ""
-
-#: amara-enterprise/providers/types/threeplay.py:23
-msgid "ThreePlay - Standard"
-msgstr ""
-
-#: amara-enterprise/providers/types/threeplay.py:168
-msgid "ThreePlay - Expedited"
-msgstr ""
-
-#: amara-enterprise/providers/types/threeplay.py:175
-msgid "ThreePlay - Same Day"
-msgstr ""
-
-#: amara-enterprise/providers/types/threeplay.py:182
-msgid "ThreePlay - Rush"
 msgstr ""
 
 #: amara-enterprise/reports/views.py:17
@@ -3902,8 +3746,8 @@ msgid "Current Collaborations"
 msgstr "Ngôn ngữ hiện tại là"
 
 #: amara-enterprise/reports/startup.py:7 amara-enterprise/billing/startup.py:9
-#: templates/new-base.html:112 templates/hands_base.html:103
-#: templates/base.html:172
+#: templates/hands_base.html:103 templates/base.html:172
+#: templates/new-base.html:113
 msgid "Billing"
 msgstr "Hóa đơn"
 
@@ -3946,10 +3790,6 @@ msgstr "Không thể xác thực với TED."
 #, fuzzy
 msgid "Approve subtitles"
 msgstr "phụ đề"
-
-#: amara-enterprise/vimeo/workflows.py:175
-msgid "Vimeo"
-msgstr ""
 
 #: amara-enterprise/vimeoeditor/views.py:113
 msgid "powered by amara"
@@ -5378,43 +5218,43 @@ msgstr ""
 msgid "Amara is a project of the"
 msgstr ""
 
-#: templates/footer.html:30 templates/new-base.html:90 templates/base.html:129
+#: templates/footer.html:30 templates/base.html:129 templates/new-base.html:91
 msgid "Blog"
 msgstr ""
 
-#: templates/footer.html:31 templates/new-base.html:91 templates/base.html:130
+#: templates/footer.html:31 templates/base.html:130 templates/new-base.html:92
 msgid "Help"
 msgstr "Trợ giúp"
 
-#: templates/footer.html:32 templates/new-base.html:92 templates/base.html:131
+#: templates/footer.html:32 templates/base.html:131 templates/new-base.html:93
 #, fuzzy
 msgid "Contact"
 msgstr "Liên hệ với chúng tôi"
 
-#: templates/footer.html:37 templates/new-base.html:97 templates/base.html:136
+#: templates/footer.html:37 templates/base.html:136 templates/new-base.html:98
 msgid "Browse"
 msgstr ""
 
-#: templates/footer.html:38 templates/new-base.html:98 templates/base.html:137
+#: templates/footer.html:38 templates/base.html:137 templates/new-base.html:99
 #, fuzzy
 msgid "Featured"
 msgstr "Tính năng"
 
-#: templates/footer.html:41 templates/new-base.html:101
-#: templates/base.html:140
+#: templates/footer.html:41 templates/base.html:140
+#: templates/new-base.html:102
 msgid "More"
 msgstr ""
 
-#: templates/footer.html:50 templates/new-base.html:81 templates/base.html:149
+#: templates/footer.html:50 templates/base.html:149 templates/new-base.html:82
 msgid "Terms"
 msgstr ""
 
-#: templates/footer.html:51 templates/new-base.html:82 templates/base.html:150
+#: templates/footer.html:51 templates/base.html:150 templates/new-base.html:83
 #, fuzzy
 msgid "Privacy"
 msgstr "Riêng tư"
 
-#: templates/footer.html:52 templates/new-base.html:83 templates/base.html:151
+#: templates/footer.html:52 templates/base.html:151 templates/new-base.html:84
 msgid "Security"
 msgstr "Bảo mật"
 
@@ -5456,22 +5296,6 @@ msgid ""
 "    "
 msgstr ""
 
-#: templates/new-base.html:8 templates/hands_base.html:8
-#: templates/base.html:10
-msgid "Caption, translate, subtitle and transcribe video."
-msgstr "Thuyết minh, dịch thuật, làm phụ đề và chuyển thể phim."
-
-#: templates/new-base.html:108
-#, fuzzy
-#| msgid "Admin"
-msgid "Site Admin"
-msgstr "Quản trị viên"
-
-#: templates/new-base.html:111 templates/hands_base.html:100
-#: templates/base.html:169
-msgid "Impersonate"
-msgstr "Mạo danh người khác"
-
 #: templates/_sharing_widget.html:3 templates/teams/_context_team.html:89
 msgid "Share"
 msgstr "Chia sẻ"
@@ -5484,11 +5308,21 @@ msgstr "Đăng lên Facebook"
 msgid "Post to Twitter"
 msgstr "Đăng lên Twitter"
 
+#: templates/hands_base.html:8 templates/base.html:10
+#: templates/new-base.html:8
+msgid "Caption, translate, subtitle and transcribe video."
+msgstr "Thuyết minh, dịch thuật, làm phụ đề và chuyển thể phim."
+
 #: templates/hands_base.html:97 templates/base.html:166
 #, fuzzy
 #| msgid "Amara"
 msgid "Amara Logs"
 msgstr "Amara"
+
+#: templates/hands_base.html:100 templates/base.html:169
+#: templates/new-base.html:112
+msgid "Impersonate"
+msgstr "Mạo danh người khác"
 
 #: templates/base.html:66
 #, fuzzy
@@ -5513,6 +5347,12 @@ msgstr "Kết nối YouTube"
 #: templates/base.html:103
 msgid "No thanks"
 msgstr "Không, xin cảm ơn"
+
+#: templates/new-base.html:109
+#, fuzzy
+#| msgid "Admin"
+msgid "Site Admin"
+msgstr "Quản trị viên"
 
 #: templates/comments/_item.html:3 templates/messages/message.html:68
 #: templates/messages/sent.html:50 templates/messages/inbox.html:88
@@ -5828,6 +5668,10 @@ msgstr ""
 #: amara-enterprise/ondemand/templates/ondemand/edit-batch.html:17
 msgid "Cancel"
 msgstr "Hủy bỏ"
+
+#: templates/profiles/remove-third-party.html:24
+msgid "Remove account"
+msgstr "Xóa tài khoản"
 
 #: templates/profiles/view.html:26
 msgid "doesn't have any activity yet."
@@ -9107,6 +8951,11 @@ msgid ""
 "them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr ""
 
+#: templates/editor/header.html:17
+#, fuzzy
+msgid "Save Draft"
+msgstr "bản thảo mới đây nhất"
+
 #: templates/editor/workflow-errors-review.html:7
 #: templates/editor/workflow-errors-typing.html:7
 #, fuzzy
@@ -10712,17 +10561,6 @@ msgstr "%(count)s tin nhắn đã được gửi"
 msgid "%(count)s total videos"
 msgstr "Những thay đổi về phim của tôi"
 
-#: templates/new-teams/videos.html:98
-#, fuzzy
-msgid "1 videos selected"
-msgstr "Đã được chấp thuận"
-
-#: templates/new-teams/videos.html:98
-#, fuzzy, python-format
-#| msgid "%(count)s messages sent"
-msgid "%(count)s videos selected"
-msgstr "%(count)s tin nhắn đã được gửi"
-
 #: templates/new-teams/videos.html:100
 #, fuzzy
 #| msgid "Edit"
@@ -11212,15 +11050,49 @@ msgstr ""
 msgid "Primary Audio Language: %(language)s"
 msgstr "Ngôn ngữ Phim"
 
-#: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:3
+#: amara-enterprise/collab/templates/collab/_completed-languages.html:17
 #, fuzzy
-msgid "1 collaboration selected"
+#| msgid "language choices"
+msgid "No languages complete"
+msgstr "chọn lựa ngôn ngữ của bạn"
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:73
+#, fuzzy, python-format
+msgid "Assign %(role)s to Collaboration"
 msgstr "Ngôn ngữ hiện tại là"
 
-#: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:3
-#, fuzzy, python-format
-msgid "%(count)s collaborations selected"
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:74
+#, fuzzy
+msgid "Remove User from Collaboration"
 msgstr "Ngôn ngữ hiện tại là"
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:103
+#: amara-enterprise/providers/templates/providers/user-queue.html:42
+#: amara-enterprise/providers/templates/providers/user-queue.html:83
+#, fuzzy, python-format
+#| msgid "language"
+msgid "%(language)s Audio"
+msgstr "ngôn ngữ"
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:118
+#, fuzzy
+msgid "Manage Collaboration"
+msgstr "Ngôn ngữ hiện tại là"
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:133
+#, fuzzy, python-format
+msgid "%(count)s matching collaborations"
+msgstr "Ngôn ngữ hiện tại là"
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:135
+#, fuzzy, python-format
+msgid "%(count)s total collaborations"
+msgstr "Ngôn ngữ hiện tại là"
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:139
+#, fuzzy
+msgid "No collaborations Found"
+msgstr "Theo dõi phim này"
 
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:50
 #, fuzzy
@@ -11283,50 +11155,6 @@ msgstr ""
 #| msgid "Unassigned"
 msgid "Unassign"
 msgstr "Chưa được phân công"
-
-#: amara-enterprise/collab/templates/collab/_completed-languages.html:17
-#, fuzzy
-#| msgid "language choices"
-msgid "No languages complete"
-msgstr "chọn lựa ngôn ngữ của bạn"
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:73
-#, fuzzy, python-format
-msgid "Assign %(role)s to Collaboration"
-msgstr "Ngôn ngữ hiện tại là"
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:74
-#, fuzzy
-msgid "Remove User from Collaboration"
-msgstr "Ngôn ngữ hiện tại là"
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:103
-#: amara-enterprise/providers/templates/providers/user-queue.html:42
-#: amara-enterprise/providers/templates/providers/user-queue.html:83
-#, fuzzy, python-format
-#| msgid "language"
-msgid "%(language)s Audio"
-msgstr "ngôn ngữ"
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:118
-#, fuzzy
-msgid "Manage Collaboration"
-msgstr "Ngôn ngữ hiện tại là"
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:133
-#, fuzzy, python-format
-msgid "%(count)s matching collaborations"
-msgstr "Ngôn ngữ hiện tại là"
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:135
-#, fuzzy, python-format
-msgid "%(count)s total collaborations"
-msgstr "Ngôn ngữ hiện tại là"
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:139
-#, fuzzy
-msgid "No collaborations Found"
-msgstr "Theo dõi phim này"
 
 #: amara-enterprise/collab/templates/collab/email/new-editor-note.html:6
 #, python-format

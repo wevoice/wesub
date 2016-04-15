@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-15 09:26-0500\n"
+"POT-Creation-Date: 2016-04-15 13:19-0500\n"
 "PO-Revision-Date: 2014-03-22 17:23+0000\n"
 "Last-Translator: vijayasankar <sankar.animation@gmail.com>\n"
 "Language-Team: Tamil (http://www.transifex.com/projects/p/universalsubtitles/"
@@ -50,7 +50,7 @@ msgstr ""
 
 #: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/messages/rpc.py:27
 #: apps/messages/rpc.py:44 apps/messages/rpc.py:59 apps/messages/rpc.py:67
-#: apps/messages/rpc.py:75 apps/videos/rpc.py:37
+#: apps/messages/rpc.py:75
 msgid "You should be authenticated."
 msgstr ""
 
@@ -164,8 +164,8 @@ msgid "Video In"
 msgstr ""
 
 #: apps/teams/permissions_const.py:44 apps/teams/forms.py:1158
-#: apps/teams/models.py:1326 templates/new-base.html:107
-#: templates/hands_base.html:94 templates/base.html:163
+#: apps/teams/models.py:1326 templates/hands_base.html:94
+#: templates/base.html:163 templates/new-base.html:108
 msgid "Admin"
 msgstr "நிர்வாகம்"
 
@@ -295,47 +295,6 @@ msgstr "பயனர்"
 #, python-format
 msgid "%(username)s is not a member of the team"
 msgstr ""
-
-#: apps/teams/subtitle_actions.py:29
-#: apps/teams/workflows/old/subtitleworkflows.py:76
-#: amara-enterprise/collab/models.py:370
-msgid "Complete"
-msgstr ""
-
-#: apps/teams/subtitle_actions.py:30
-#: apps/teams/workflows/old/subtitleworkflows.py:77
-#: apps/subtitles/workflows.py:710 apps/subtitles/workflows.py:728
-#: apps/subtitles/workflows.py:735 apps/subtitles/workflows.py:748
-msgid "Saving"
-msgstr ""
-
-#: apps/teams/subtitle_actions.py:69
-#: apps/teams/workflows/old/subtitleworkflows.py:96
-#: apps/teams/workflows/old/subtitleworkflows.py:178
-#: amara-enterprise/collab/subtitle_workflow.py:296
-#: amara-enterprise/collab/forms/dashboard.py:102
-#: amara-enterprise/vimeo/workflows.py:83 templates/teams/applications.html:62
-#: templates/teams/tasks.html:78
-msgid "Approve"
-msgstr ""
-
-#: apps/teams/subtitle_actions.py:70
-#: apps/teams/workflows/old/subtitleworkflows.py:97
-msgid "Approving"
-msgstr ""
-
-#: apps/teams/subtitle_actions.py:80
-#: apps/teams/workflows/old/subtitleworkflows.py:109
-#, fuzzy
-msgid "Send Back"
-msgstr "கருத்தை அனுப்பவும்"
-
-#: apps/teams/subtitle_actions.py:81
-#: apps/teams/workflows/old/subtitleworkflows.py:110
-#: amara-enterprise/collab/subtitle_workflow.py:126
-#, fuzzy
-msgid "Sending back"
-msgstr "கருத்தை அனுப்பவும்"
 
 #: apps/teams/forms.py:78 apps/teams/forms.py:200 apps/teams/forms.py:980
 #: apps/teams/forms.py:1252 apps/teams/forms.py:1361 apps/teams/forms.py:1411
@@ -624,9 +583,8 @@ msgstr ""
 msgid "Any language"
 msgstr "மொழி"
 
-#: apps/teams/forms.py:1088 templates/footer.html:36
-#: templates/new-base.html:96 templates/base.html:135
-#: templates/search/_search_form.html:32
+#: apps/teams/forms.py:1088 templates/footer.html:36 templates/base.html:135
+#: templates/new-base.html:97 templates/search/_search_form.html:32
 #: amara-enterprise/collab/templates/collab/_collab-search-form.html:27
 #: amara-enterprise/collab/templates/collab/_video-search-form.html:11
 msgid "Search"
@@ -790,7 +748,7 @@ msgstr ""
 
 #: apps/teams/new_views.py:362 amara-enterprise/collab/views.py:114
 #: templates/footer.html:35 templates/new-user-menu.html:14
-#: templates/new-base.html:95 templates/base.html:134
+#: templates/base.html:134 templates/new-base.html:96
 #: templates/profiles/_tabs.html:12 templates/profiles/_user_menu.html:22
 #: templates/teams/_tabs_projects.html:7
 #: templates/teams/_subnav_activity.html:6 templates/teams/_tabs.html:17
@@ -1459,6 +1417,13 @@ msgstr ""
 msgid "%(user)s added a note while editing %(title)s"
 msgstr ""
 
+#: apps/teams/workflows/old/subtitleworkflows.py:178
+#: amara-enterprise/collab/subtitle_workflow.py:296
+#: amara-enterprise/collab/forms/dashboard.py:102
+#: templates/teams/applications.html:62 templates/teams/tasks.html:78
+msgid "Approve"
+msgstr ""
+
 #: apps/teams/workflows/old/subtitleworkflows.py:180
 #: amara-enterprise/collab/subtitle_workflow.py:294
 #: amara-enterprise/collab/forms/dashboard.py:99
@@ -1603,22 +1568,6 @@ msgstr ""
 
 #: apps/subtitles/models.py:1346
 msgid "Through web editor"
-msgstr ""
-
-#: apps/subtitles/workflows.py:709
-msgid "Publish"
-msgstr ""
-
-#: apps/subtitles/workflows.py:727
-msgid "Unpublish"
-msgstr ""
-
-#: apps/subtitles/workflows.py:734 templates/editor/header.html:17
-msgid "Save Draft"
-msgstr ""
-
-#: apps/subtitles/workflows.py:747
-msgid "API Complete"
 msgstr ""
 
 #: apps/subtitles/workflows.py:779
@@ -1931,14 +1880,6 @@ msgstr ""
 
 #: apps/messages/models.py:174
 msgid "You should enter subject or message."
-msgstr ""
-
-#: apps/videos/metadata.py:57
-msgid "Speaker Name"
-msgstr ""
-
-#: apps/videos/metadata.py:58
-msgid "Location"
 msgstr ""
 
 #: apps/videos/rpc.py:48 apps/videos/rpc.py:62
@@ -2431,7 +2372,7 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: apps/externalsites/credit.py:34 apps/externalsites/syncing/youtube.py:40
+#: apps/externalsites/credit.py:34
 msgid "Help us caption & translate this video!"
 msgstr ""
 
@@ -2439,30 +2380,6 @@ msgstr ""
 #, fuzzy
 msgid "Resyncing subtitles"
 msgstr "துணைத் தலைப்பிடலை திருத்தவும்"
-
-#: apps/externalsites/forms.py:103
-msgid "Import all new videos"
-msgstr ""
-
-#: apps/externalsites/forms.py:104
-msgid "Import videos with tags:"
-msgstr ""
-
-#: apps/externalsites/forms.py:107 apps/externalsites/models.py:241
-msgid "Publisher ID"
-msgstr ""
-
-#: apps/externalsites/forms.py:109
-msgid "Sync subtitles with this write token"
-msgstr ""
-
-#: apps/externalsites/forms.py:112
-msgid "Import Videos From Feed"
-msgstr ""
-
-#: apps/externalsites/forms.py:114
-msgid "Player ID"
-msgstr ""
 
 #: apps/externalsites/forms.py:148
 msgid "Must specify a player id to import from a feed"
@@ -2474,15 +2391,6 @@ msgstr ""
 
 #: apps/externalsites/forms.py:156
 msgid "Must specify tags to import"
-msgstr ""
-
-#: apps/externalsites/forms.py:188
-msgid "Add YouTube account"
-msgstr ""
-
-#: apps/externalsites/forms.py:212
-#: templates/profiles/remove-third-party.html:24
-msgid "Remove account"
 msgstr ""
 
 #: apps/externalsites/forms.py:251
@@ -2515,6 +2423,10 @@ msgstr ""
 #: apps/externalsites/models.py:219
 #, python-format
 msgid "partner id %(partner_id)s"
+msgstr ""
+
+#: apps/externalsites/models.py:241
+msgid "Publisher ID"
 msgstr ""
 
 #: apps/externalsites/models.py:247
@@ -2593,10 +2505,6 @@ msgstr ""
 #: apps/externalsites/views.py:306
 #, python-format
 msgid "That youtube account has already been linked to the %(team)s team."
-msgstr ""
-
-#: apps/externalsites/syncing/youtube.py:38
-msgid "Subtitles by the Amara.org community"
 msgstr ""
 
 #: apps/amaradotorg/behaviors.py:38
@@ -2694,6 +2602,10 @@ msgstr ""
 msgid "Being approved"
 msgstr ""
 
+#: amara-enterprise/collab/models.py:370
+msgid "Complete"
+msgstr ""
+
 #: amara-enterprise/collab/models.py:545
 #: amara-enterprise/collab/models.py:1225
 #, python-format
@@ -2775,7 +2687,6 @@ msgid "Endorsement"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:1169
-#: amara-enterprise/collab/subtitle_workflow.py:125
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:121
 #, fuzzy
 msgid "Send back"
@@ -2954,23 +2865,12 @@ msgstr ""
 msgid "%(user)s unassigned provider %(other_user)s"
 msgstr ""
 
-#: amara-enterprise/collab/team_workflow.py:23
-#: amara-enterprise/collab/forms/search.py:189
-#: amara-enterprise/collab/templates/collab/_collab-search-form.html:5
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:9
-msgid "Collaboration"
-msgstr ""
-
 #: amara-enterprise/collab/team_workflow.py:35
 #: amara-enterprise/collab/views.py:116 amara-enterprise/collab/views.py:353
 #: amara-enterprise/collab/views.py:387 amara-enterprise/collab/views.py:398
 #: amara-enterprise/collab/templates/collab/collaborations.html:7
 #: amara-enterprise/ondemand/templates/ondemand/dashboard.html:26
 msgid "Collaborations"
-msgstr ""
-
-#: amara-enterprise/collab/team_workflow.py:97
-msgid "Customer"
 msgstr ""
 
 #: amara-enterprise/collab/views.py:50 amara-enterprise/collab/views.py:68
@@ -3006,16 +2906,6 @@ msgstr ""
 msgid "Activity for %(language)s"
 msgstr ""
 
-#: amara-enterprise/collab/subtitle_workflow.py:51
-#: amara-enterprise/collab/subtitle_workflow.py:69
-msgid "Endorse"
-msgstr ""
-
-#: amara-enterprise/collab/subtitle_workflow.py:52
-#: amara-enterprise/collab/subtitle_workflow.py:70
-msgid "Endorsing"
-msgstr ""
-
 #: amara-enterprise/collab/subtitle_workflow.py:155
 #, python-format
 msgid "%(user)s has sent back subtitles for additional work."
@@ -3030,16 +2920,6 @@ msgstr ""
 #, fuzzy
 msgid "Open subtitle editor"
 msgstr "துணைத் தலைப்பிடலை திருத்தவும்"
-
-#: amara-enterprise/collab/subtitle_workflow.py:180
-#, fuzzy
-#| msgid "Upload Subtitles"
-msgid "Update Subtitles"
-msgstr "துணைத் தலைப்பிடலை தரவேற்றவும்"
-
-#: amara-enterprise/collab/subtitle_workflow.py:181
-msgid "Updating"
-msgstr ""
 
 #: amara-enterprise/collab/subtitle_workflow.py:257
 #, python-format
@@ -3190,13 +3070,6 @@ msgstr ""
 msgid "Never"
 msgstr ""
 
-#: amara-enterprise/collab/forms/workflow.py:40
-#, python-format
-msgid "After %(number)s day"
-msgid_plural "After %(number)s days"
-msgstr[0] ""
-msgstr[1] ""
-
 #: amara-enterprise/collab/forms/workflow.py:51
 msgid "Peer-review needed"
 msgstr ""
@@ -3272,6 +3145,12 @@ msgstr "மொழி"
 #, fuzzy
 msgid "Any Video Language"
 msgstr "மொழி"
+
+#: amara-enterprise/collab/forms/search.py:189
+#: amara-enterprise/collab/templates/collab/_collab-search-form.html:5
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:9
+msgid "Collaboration"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:195
 msgid "Assigned user"
@@ -3569,37 +3448,9 @@ msgstr ""
 msgid "Invalid format"
 msgstr "தவறான கடவுச்சொல்"
 
-#: amara-enterprise/providers/types/vocapia.py:27
-msgid "Vocapia"
-msgstr ""
-
 #: amara-enterprise/providers/types/queue.py:17
 #: amara-enterprise/providers/templates/providers/user-queue.html:7
 msgid "Provider Queue"
-msgstr ""
-
-#: amara-enterprise/providers/types/cielo.py:39
-msgid "Cielo"
-msgstr ""
-
-#: amara-enterprise/providers/types/dummy.py:19
-msgid "Dummy"
-msgstr ""
-
-#: amara-enterprise/providers/types/threeplay.py:23
-msgid "ThreePlay - Standard"
-msgstr ""
-
-#: amara-enterprise/providers/types/threeplay.py:168
-msgid "ThreePlay - Expedited"
-msgstr ""
-
-#: amara-enterprise/providers/types/threeplay.py:175
-msgid "ThreePlay - Same Day"
-msgstr ""
-
-#: amara-enterprise/providers/types/threeplay.py:182
-msgid "ThreePlay - Rush"
 msgstr ""
 
 #: amara-enterprise/reports/views.py:17
@@ -3611,8 +3462,8 @@ msgid "Current Collaborations"
 msgstr ""
 
 #: amara-enterprise/reports/startup.py:7 amara-enterprise/billing/startup.py:9
-#: templates/new-base.html:112 templates/hands_base.html:103
-#: templates/base.html:172
+#: templates/hands_base.html:103 templates/base.html:172
+#: templates/new-base.html:113
 msgid "Billing"
 msgstr ""
 
@@ -3653,10 +3504,6 @@ msgstr ""
 #, fuzzy
 msgid "Approve subtitles"
 msgstr "துணைத் தலைப்பிடல்"
-
-#: amara-enterprise/vimeo/workflows.py:175
-msgid "Vimeo"
-msgstr ""
 
 #: amara-enterprise/vimeoeditor/views.py:113
 msgid "powered by amara"
@@ -4660,42 +4507,42 @@ msgstr ""
 msgid "Amara is a project of the"
 msgstr ""
 
-#: templates/footer.html:30 templates/new-base.html:90 templates/base.html:129
+#: templates/footer.html:30 templates/base.html:129 templates/new-base.html:91
 msgid "Blog"
 msgstr ""
 
-#: templates/footer.html:31 templates/new-base.html:91 templates/base.html:130
+#: templates/footer.html:31 templates/base.html:130 templates/new-base.html:92
 msgid "Help"
 msgstr ""
 
-#: templates/footer.html:32 templates/new-base.html:92 templates/base.html:131
+#: templates/footer.html:32 templates/base.html:131 templates/new-base.html:93
 #, fuzzy
 msgid "Contact"
 msgstr "எங்களை தொடர்பு கொள்ள"
 
-#: templates/footer.html:37 templates/new-base.html:97 templates/base.html:136
+#: templates/footer.html:37 templates/base.html:136 templates/new-base.html:98
 msgid "Browse"
 msgstr ""
 
-#: templates/footer.html:38 templates/new-base.html:98 templates/base.html:137
+#: templates/footer.html:38 templates/base.html:137 templates/new-base.html:99
 msgid "Featured"
 msgstr ""
 
-#: templates/footer.html:41 templates/new-base.html:101
-#: templates/base.html:140
+#: templates/footer.html:41 templates/base.html:140
+#: templates/new-base.html:102
 msgid "More"
 msgstr ""
 
-#: templates/footer.html:50 templates/new-base.html:81 templates/base.html:149
+#: templates/footer.html:50 templates/base.html:149 templates/new-base.html:82
 msgid "Terms"
 msgstr ""
 
-#: templates/footer.html:51 templates/new-base.html:82 templates/base.html:150
+#: templates/footer.html:51 templates/base.html:150 templates/new-base.html:83
 #, fuzzy
 msgid "Privacy"
 msgstr "தனியுரிமை கொள்கை"
 
-#: templates/footer.html:52 templates/new-base.html:83 templates/base.html:151
+#: templates/footer.html:52 templates/base.html:151 templates/new-base.html:84
 msgid "Security"
 msgstr ""
 
@@ -4737,22 +4584,6 @@ msgid ""
 "    "
 msgstr ""
 
-#: templates/new-base.html:8 templates/hands_base.html:8
-#: templates/base.html:10
-msgid "Caption, translate, subtitle and transcribe video."
-msgstr ""
-
-#: templates/new-base.html:108
-#, fuzzy
-#| msgid "Admin"
-msgid "Site Admin"
-msgstr "நிர்வாகம்"
-
-#: templates/new-base.html:111 templates/hands_base.html:100
-#: templates/base.html:169
-msgid "Impersonate"
-msgstr ""
-
 #: templates/_sharing_widget.html:3 templates/teams/_context_team.html:89
 msgid "Share"
 msgstr ""
@@ -4765,8 +4596,18 @@ msgstr "முகநூலுக்கு அஞ்சல் செய்ய"
 msgid "Post to Twitter"
 msgstr "டிவிட்டர்க்கு அஞ்சல் செய்ய"
 
+#: templates/hands_base.html:8 templates/base.html:10
+#: templates/new-base.html:8
+msgid "Caption, translate, subtitle and transcribe video."
+msgstr ""
+
 #: templates/hands_base.html:97 templates/base.html:166
 msgid "Amara Logs"
+msgstr ""
+
+#: templates/hands_base.html:100 templates/base.html:169
+#: templates/new-base.html:112
+msgid "Impersonate"
 msgstr ""
 
 #: templates/base.html:66
@@ -4789,6 +4630,12 @@ msgstr ""
 #: templates/base.html:103
 msgid "No thanks"
 msgstr ""
+
+#: templates/new-base.html:109
+#, fuzzy
+#| msgid "Admin"
+msgid "Site Admin"
+msgstr "நிர்வாகம்"
 
 #: templates/comments/_item.html:3 templates/messages/message.html:68
 #: templates/messages/sent.html:50 templates/messages/inbox.html:88
@@ -5081,6 +4928,10 @@ msgstr ""
 #: amara-enterprise/ondemand/templates/ondemand/bulk-create-collabs.html:14
 #: amara-enterprise/ondemand/templates/ondemand/edit-batch.html:17
 msgid "Cancel"
+msgstr ""
+
+#: templates/profiles/remove-third-party.html:24
+msgid "Remove account"
 msgstr ""
 
 #: templates/profiles/view.html:26
@@ -8122,6 +7973,10 @@ msgid ""
 "them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr ""
 
+#: templates/editor/header.html:17
+msgid "Save Draft"
+msgstr ""
+
 #: templates/editor/workflow-errors-review.html:7
 #: templates/editor/workflow-errors-typing.html:7
 msgid "Subtitles can not be blank"
@@ -9531,15 +9386,6 @@ msgstr ""
 msgid "%(count)s total videos"
 msgstr ""
 
-#: templates/new-teams/videos.html:98
-msgid "1 videos selected"
-msgstr ""
-
-#: templates/new-teams/videos.html:98
-#, python-format
-msgid "%(count)s videos selected"
-msgstr ""
-
 #: templates/new-teams/videos.html:100
 msgid "Bulk Edit"
 msgstr ""
@@ -9984,13 +9830,42 @@ msgstr ""
 msgid "Primary Audio Language: %(language)s"
 msgstr ""
 
-#: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:3
-msgid "1 collaboration selected"
+#: amara-enterprise/collab/templates/collab/_completed-languages.html:17
+msgid "No languages complete"
 msgstr ""
 
-#: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:3
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:73
 #, python-format
-msgid "%(count)s collaborations selected"
+msgid "Assign %(role)s to Collaboration"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:74
+msgid "Remove User from Collaboration"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:103
+#: amara-enterprise/providers/templates/providers/user-queue.html:42
+#: amara-enterprise/providers/templates/providers/user-queue.html:83
+#, python-format
+msgid "%(language)s Audio"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:118
+msgid "Manage Collaboration"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:133
+#, python-format
+msgid "%(count)s matching collaborations"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:135
+#, python-format
+msgid "%(count)s total collaborations"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:139
+msgid "No collaborations Found"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:50
@@ -10046,44 +9921,6 @@ msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:138
 msgid "Unassign"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/_completed-languages.html:17
-msgid "No languages complete"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:73
-#, python-format
-msgid "Assign %(role)s to Collaboration"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:74
-msgid "Remove User from Collaboration"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:103
-#: amara-enterprise/providers/templates/providers/user-queue.html:42
-#: amara-enterprise/providers/templates/providers/user-queue.html:83
-#, python-format
-msgid "%(language)s Audio"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:118
-msgid "Manage Collaboration"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:133
-#, python-format
-msgid "%(count)s matching collaborations"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:135
-#, python-format
-msgid "%(count)s total collaborations"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:139
-msgid "No collaborations Found"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/email/new-editor-note.html:6

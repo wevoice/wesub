@@ -18,16 +18,19 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: media/src/js/site/team-videos.js:51
+#, fuzzy
+#| msgid "1 video selected"
+#| msgid_plural "%(count)s video seleccionado"
 msgid "1 video selected"
 msgid_plural "%(count)s videos selected"
 msgstr[0] "1 video selected"
-msgstr[1] "%(count)s videos selected"
+msgstr[1] "%(count)s videos seleccionado"
 
 #: amara-enterprise/media/js/site/collab.js:53
 #, fuzzy
 #| msgid "1 video selected"
-#| msgid_plural "%(count)s videos selected"
+#| msgid_plural "%(count)s video seleccionado"
 msgid "1 collaboration selected"
 msgid_plural "%(count)s collaborations selected"
 msgstr[0] "1 video selected"
-msgstr[1] "%(count)s videos selected"
+msgstr[1] "%(count)s videos seleccionado"
