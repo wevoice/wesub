@@ -110,6 +110,16 @@ class DjangoTranslationDomain(TranslationDomain):
                 '-d', 'django', '-L', 'Python',
                 '-D', self.tempdir, '-D', settings.PROJECT_ROOT,
                 '--from-code=UTF-8',
+                '--keyword=gettext_noop',
+                '--keyword=gettext_lazy',
+                '--keyword=ngettext_lazy:1,2',
+                '--keyword=ugettext_noop',
+                '--keyword=ugettext_lazy',
+                '--keyword=ungettext_lazy:1,2',
+                '--keyword=pgettext:1c,2',
+                '--keyword=npgettext:1c,2,3',
+                '--keyword=pgettext_lazy:1c,2',
+                '--keyword=npgettext_lazy:1c,2,3',
                 '-o', self.pot_path(),
             ]
             cmdline.extend(self.find_python_files())
@@ -166,6 +176,11 @@ class DjangoJSTranslationDomain(TranslationDomain):
             '-d', 'djangojs', '-L', 'Javascript',
             '-D', settings.PROJECT_ROOT,
             '--from-code=UTF-8',
+            '--keyword=gettext_noop',
+            '--keyword=gettext_lazy',
+            '--keyword=ngettext_lazy:1,2',
+            '--keyword=pgettext:1c,2',
+            '--keyword=npgettext:1c,2,3',
             '-o', self.pot_path(),
         ]
         cmdline.extend(self.find_javascript_files())
