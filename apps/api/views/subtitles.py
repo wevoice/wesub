@@ -18,6 +18,7 @@
 from __future__ import absolute_import
 
 import json
+import logging
 
 from django.db import IntegrityError
 from django.http import Http404
@@ -50,6 +51,8 @@ import babelsubs
 from babelsubs.storage import SubtitleSet
 from utils.subtitles import load_subtitles
 import videos.tasks
+
+logger = logging.getLogger(__name__)
 
 class MiniSubtitleVersionSerializer(serializers.Serializer):
     """Serialize a subtitle version for SubtitleLanguageSerializer """
@@ -388,7 +391,10 @@ class SubtitlesField(serializers.CharField):
             return load_subtitles(
                 self.context['language_code'], value,
                 self.context['sub_format'])
-        except babelsubs.SubtitleParserError:
+        except babelsubs.SubtitleParserError, e:
+            logger.warn("Error parsing subtitles ({}/{})".format(
+                self.context['video'].video_id,
+                self.context['language_code']), exc_info=True)
             raise serializers.ValidationError("Invalid subtitle data")
 
 class SubFormatField(serializers.ChoiceField):
