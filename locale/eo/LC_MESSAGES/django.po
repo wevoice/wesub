@@ -1,29 +1,30 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
-# Aaron <aaron_irvdel@yahoo.fr>, 2011
+# Aaron Irvine <aaron_irvdel@yahoo.fr>, 2011
 # Alex Escomu <>, 2012
+# bendk <ben@pculture.org>, 2016
 # Chuck Smith <chuck@chucksmith.de>, 2011
 # Diego Souza <diegosouza.br@gmail.com>, 2012
 # Fernando Inocencio <faigos@gmail.com>, 2011
-# pool <pool@panlex.org>, 2013
-# kircxo <kircxo@gmail.com>, 2014
-# Pierre Soubourou <pierre.soubourou@gmail.com>, 2012
+# Jonathan Pool <pool@panlex.org>, 2013
+# kircxo <kircxo@gmail.com>, 2014-2015
+# Ŝtonĉjo <pierre.soubourou@gmail.com>, 2012
+# Robin van der Vliet <info@robinvandervliet.nl>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-15 15:08-0500\n"
-"PO-Revision-Date: 2014-03-21 23:01+0000\n"
-"Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
-"Language-Team: Esperanto (http://www.transifex.com/projects/p/"
-"universalsubtitles/language/eo/)\n"
-"Language: eo\n"
+"POT-Creation-Date: 2016-04-18 11:11-0500\n"
+"PO-Revision-Date: 2016-04-18 16:18+0000\n"
+"Last-Translator: bendk <ben@pculture.org>\n"
+"Language-Team: Esperanto (http://www.transifex.com/universalsubtitles/universalsubtitles/language/eo/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: eo\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: apps/caching/debug_toolbar_panels.py:110
@@ -48,7 +49,7 @@ msgstr ""
 
 #: apps/widget/rpc.py:1025 apps/widget/rpc.py:1062
 msgid "\n"
-msgstr ""
+msgstr "\n"
 
 #: apps/widget/views.py:151
 msgid "That task has already been completed."
@@ -86,16 +87,12 @@ msgid "Must specify current password"
 msgstr ""
 
 #: apps/profiles/forms.py:174
-#, fuzzy
-#| msgid "Invalid password."
 msgid "Invalid password"
-msgstr "Malvalida pasvorto!"
+msgstr ""
 
 #: apps/profiles/forms.py:181
-#, fuzzy
-#| msgid "The two passwords did not match."
 msgid "Passwords don't match"
-msgstr "La du pasvortoj ne identis!"
+msgstr ""
 
 #: apps/profiles/views.py:89 apps/profiles/views.py:185
 msgid "Your profile has been updated."
@@ -114,14 +111,12 @@ msgid "Your photo has been removed."
 msgstr ""
 
 #: apps/profiles/views.py:324
-#, fuzzy
 msgid "Twitter account"
-msgstr "Krei Konton"
+msgstr ""
 
 #: apps/profiles/views.py:329
-#, fuzzy
 msgid "Facebook account"
-msgstr "Krei Konton"
+msgstr ""
 
 #: apps/profiles/views.py:343
 msgid "Account deleted."
@@ -133,7 +128,7 @@ msgstr "Ĉiuj lingvoj"
 
 #: apps/search/forms.py:47
 msgid "Relevance"
-msgstr ""
+msgstr "Aferkoncerneco"
 
 #: apps/search/forms.py:48
 msgid "Most languages"
@@ -173,13 +168,13 @@ msgstr ""
 
 #: apps/teams/permissions_const.py:44 apps/teams/forms.py:1158
 #: apps/teams/models.py:1326 templates/hands_base.html:94
-#: templates/new-base.html:108 templates/base.html:163
+#: templates/base.html:163 templates/new-base.html:108
 msgid "Admin"
 msgstr "Administro"
 
 #: apps/teams/permissions_const.py:45 apps/teams/models.py:1324
 msgid "Owner"
-msgstr ""
+msgstr "Posedanto"
 
 #: apps/teams/permissions_const.py:46 apps/teams/forms.py:1157
 #: apps/teams/models.py:1325
@@ -193,11 +188,11 @@ msgstr "Kontribuanto"
 
 #: apps/teams/rpc.py:40
 msgid "Team does not exist"
-msgstr "Skipo ne ekzistas."
+msgstr "Teamo ne ekzistas."
 
 #: apps/teams/rpc.py:44
 msgid "You are already a member of this team."
-msgstr "Vi estas jam membro de ĉi tiu skipo."
+msgstr "Vi estas jam membro de ĉi tiu teamo."
 
 #: apps/teams/rpc.py:50
 msgid "You are now a member of this team."
@@ -231,11 +226,11 @@ msgstr ""
 
 #: apps/teams/rpc.py:78
 msgid "You can't join this team by application."
-msgstr "Vi ne rajtas aliĝi tiun ĉi skipon per formularo."
+msgstr "Vi ne rajtas aliĝi tiun ĉi teamon per formularo."
 
 #: apps/teams/rpc.py:84
 msgid "Team does not exist."
-msgstr "Skipo ne ekzistas."
+msgstr "Teamo ne ekzistas."
 
 #: apps/teams/rpc.py:87
 msgid "You are not manager of this team."
@@ -280,18 +275,18 @@ msgstr "Sendi mesaĝon"
 
 #: apps/teams/admin.py:76
 msgid "Feature teams"
-msgstr "Reliefigi skipojn."
+msgstr "Reliefigi teamojn."
 
 #: apps/teams/admin.py:80
 msgid "Unfeature teams"
-msgstr "Malreliefigi skipojn."
+msgstr "Malreliefigi teamojn."
 
 #: apps/teams/admin.py:130 apps/teams/admin.py:147 apps/teams/admin.py:263
 #: apps/teams/models.py:293 apps/externalsites/models.py:98
 #: templates/teams/_subnav_activity.html:9
 #: templates/new-teams/_activity-tabs.html:8
 msgid "Team"
-msgstr "Skipo"
+msgstr "Teamo"
 
 #: apps/teams/admin.py:136 apps/teams/admin.py:269
 #: apps/externalsites/models.py:97 templates/new-teams/admin-list.html:11
@@ -300,10 +295,9 @@ msgid "User"
 msgstr "Uzanto"
 
 #: apps/teams/fields.py:44
-#, fuzzy, python-format
-#| msgid "You are now a member of this team."
+#, python-format
 msgid "%(username)s is not a member of the team"
-msgstr "Vi nun estas teamano."
+msgstr ""
 
 #: apps/teams/subtitle_actions.py:29
 #: apps/teams/workflows/old/subtitleworkflows.py:76
@@ -315,10 +309,8 @@ msgstr ""
 #: apps/teams/workflows/old/subtitleworkflows.py:77
 #: apps/subtitles/workflows.py:710 apps/subtitles/workflows.py:728
 #: apps/subtitles/workflows.py:735 apps/subtitles/workflows.py:748
-#, fuzzy
-#| msgid "Saving..."
 msgid "Saving"
-msgstr "Registrante..."
+msgstr ""
 
 #: apps/teams/subtitle_actions.py:69
 #: apps/teams/workflows/old/subtitleworkflows.py:96
@@ -332,23 +324,19 @@ msgstr "Aprobi"
 
 #: apps/teams/subtitle_actions.py:70
 #: apps/teams/workflows/old/subtitleworkflows.py:97
-#, fuzzy
-#| msgid "Approve"
 msgid "Approving"
-msgstr "Aprobi"
+msgstr ""
 
 #: apps/teams/subtitle_actions.py:80
 #: apps/teams/workflows/old/subtitleworkflows.py:109
-#, fuzzy
 msgid "Send Back"
-msgstr "Sendi sugeston"
+msgstr ""
 
 #: apps/teams/subtitle_actions.py:81
 #: apps/teams/workflows/old/subtitleworkflows.py:110
 #: amara-enterprise/collab/subtitle_workflow.py:126
-#, fuzzy
 msgid "Sending back"
-msgstr "Sendi sugeston"
+msgstr ""
 
 #: apps/teams/forms.py:78 apps/teams/forms.py:200 apps/teams/forms.py:980
 #: apps/teams/forms.py:1252 apps/teams/forms.py:1361 apps/teams/forms.py:1411
@@ -356,12 +344,10 @@ msgstr "Sendi sugeston"
 #: amara-enterprise/collab/forms/search.py:193
 #: templates/teams/approvals.html:91
 #: templates/new-teams/video-durations.html:11
-#, fuzzy
-#| msgid "Project"
 msgid "Project"
 msgid_plural "Projects"
-msgstr[0] "Projekto"
-msgstr[1] "Projekto"
+msgstr[0] ""
+msgstr[1] ""
 
 #: apps/teams/forms.py:82 apps/teams/forms.py:204
 msgid "Let's keep things tidy, shall we?"
@@ -369,15 +355,13 @@ msgstr ""
 
 #: apps/teams/forms.py:171 templates/videos/language-sync-history-tab.html:13
 msgid "Video URL"
-msgstr "Retadreso de video"
+msgstr "Ligilo de video"
 
 #: apps/teams/forms.py:172
 msgid ""
-"Enter the URL of any compatible video or any video on our site. You can also "
-"browse the site and use the 'Add Video to Team' menu."
-msgstr ""
-"Tajpu retadreson de kongrua video aŭ de iu ajn video sur nia retejo.  Vi "
-"povas foliumi la retejon kaj uzi menuon \"Aldoni videon al skipo\"."
+"Enter the URL of any compatible video or any video on our site. You can also"
+" browse the site and use the 'Add Video to Team' menu."
+msgstr "Tajpu la ligilon de kongrua video aŭ de iu ajn video sur nia retejo.  Vi povas foliumi la retejon kaj uzi menuon \"Aldoni videon al teamo\"."
 
 #: apps/teams/forms.py:195 amara-enterprise/providers/forms.py:163
 msgid "Video language"
@@ -394,7 +378,7 @@ msgstr ""
 
 #: apps/teams/forms.py:262
 msgid "This video already belongs to a team."
-msgstr ""
+msgstr "Tiu filmo jam apartenas al teamo."
 
 #: apps/teams/forms.py:268
 msgid "Set original language for this video."
@@ -402,19 +386,18 @@ msgstr "Agordi originalan lingvon por tiu video"
 
 #: apps/teams/forms.py:310
 msgid "Team intro video URL"
-msgstr "Retadreso de video de teama enkonduko."
+msgstr "Ligilo de video de teama enkonduko."
 
 #: apps/teams/forms.py:312
 msgid ""
 "You can put an optional video\n"
-"on your team homepage that explains what your team is about, to attract "
-"volunteers.\n"
+"on your team homepage that explains what your team is about, to attract volunteers.\n"
 "Enter a link to any compatible video, or to any video page on our site."
 msgstr ""
 
 #: apps/teams/forms.py:316
 msgid "Team URL: http://universalsubtitles.org/teams/"
-msgstr "Teama retadreso: http://universalsubtitles.org/teams/"
+msgstr "Teama ligilo: http://universalsubtitles.org/teams/"
 
 #: apps/teams/forms.py:361
 msgid "This video has already been transcribed."
@@ -470,9 +453,8 @@ msgid "When a member applies to join the team"
 msgstr ""
 
 #: apps/teams/forms.py:516 templates/teams/settings-messages.html:63
-#, fuzzy
 msgid "When a member joins the team"
-msgstr "Vi nun estas teamano."
+msgstr ""
 
 #: apps/teams/forms.py:518 templates/teams/settings-messages.html:55
 msgid "When a member is given the Manager role"
@@ -483,20 +465,16 @@ msgid "When a member is given the Admin role"
 msgstr ""
 
 #: apps/teams/forms.py:533
-#, fuzzy
-#| msgid "Delete Language"
 msgid "New message language"
-msgstr "Forigi lingvon"
+msgstr ""
 
 #: apps/teams/forms.py:537
-#, fuzzy
 msgid "When a member speaking that language joins the team"
-msgstr "Vi nun estas teamano."
+msgstr ""
 
 #: apps/teams/forms.py:542
-#, fuzzy
 msgid "When a member joins the team, message in "
-msgstr "Vi nun estas teamano."
+msgstr ""
 
 #: apps/teams/forms.py:552 templates/teams/settings.html:55
 msgid "Max 940 x 235"
@@ -523,16 +501,12 @@ msgid "You cannot blacklist a preferred language."
 msgstr ""
 
 #: apps/teams/forms.py:613
-#, fuzzy
-#| msgid "You are already a member of this team."
 msgid "User is already a member of this team"
-msgstr "Vi estas jam membro de ĉi tiu skipo."
+msgstr ""
 
 #: apps/teams/forms.py:617
-#, fuzzy
-#| msgid "Message sent."
 msgid "Message to user"
-msgstr "Mesaĝo senditas."
+msgstr ""
 
 #: apps/teams/forms.py:620 templates/teams/invite_members.html:38
 msgid "Assign a role"
@@ -555,7 +529,7 @@ msgstr ""
 
 #: apps/teams/forms.py:794
 msgid "Are you sure?"
-msgstr ""
+msgstr "Ĉu vi certas?"
 
 #: apps/teams/forms.py:800
 msgid "Yes I want to delete this language"
@@ -597,34 +571,24 @@ msgid ""
 msgstr ""
 
 #: apps/teams/forms.py:979
-#, fuzzy
-#| msgid "Description"
 msgid "Title/Description"
-msgstr "Priskribo"
+msgstr ""
 
 #: apps/teams/forms.py:983
-#, fuzzy
-#| msgid "Completed Languages"
 msgid "Has completed language"
-msgstr "Finfaritaj lingvoj"
+msgstr ""
 
 #: apps/teams/forms.py:986
-#, fuzzy
-#| msgid "Completed Languages"
 msgid "Missing completed language"
-msgstr "Finfaritaj lingvoj"
+msgstr ""
 
 #: apps/teams/forms.py:989
-#, fuzzy
-#| msgid "name, a-z"
 msgid "Name, a-z"
-msgstr "nomo, a-z"
+msgstr ""
 
 #: apps/teams/forms.py:990
-#, fuzzy
-#| msgid "name, z-a"
 msgid "Name, z-a"
-msgstr "nomo, z-a"
+msgstr ""
 
 #: apps/teams/forms.py:991
 msgid "Time, oldest"
@@ -635,69 +599,52 @@ msgid "Time, newest"
 msgstr ""
 
 #: apps/teams/forms.py:993
-#, fuzzy
-#| msgid "Completed Languages"
 msgid "Most completed languages"
-msgstr "Finfaritaj lingvoj"
+msgstr ""
 
 #: apps/teams/forms.py:994
-#, fuzzy
-#| msgid "Completed Languages"
 msgid "Least complete languages"
-msgstr "Finfaritaj lingvoj"
+msgstr ""
 
 #: apps/teams/forms.py:1018
 msgid "Any"
 msgstr ""
 
 #: apps/teams/forms.py:1019 apps/teams/forms.py:1375
-#, fuzzy
-#| msgid "Project"
 msgid "No Project"
-msgstr "Projekto"
+msgstr ""
 
 #: apps/teams/forms.py:1085
-#, fuzzy
 msgid "Any language"
-msgstr "Ĉiuj lingvoj"
+msgstr ""
 
-#: apps/teams/forms.py:1088 templates/footer.html:36
-#: templates/new-base.html:97 templates/base.html:135
-#: templates/search/_search_form.html:32
+#: apps/teams/forms.py:1088 templates/footer.html:36 templates/base.html:135
+#: templates/new-base.html:97 templates/search/_search_form.html:32
 #: amara-enterprise/collab/templates/collab/_collab-search-form.html:27
 #: amara-enterprise/collab/templates/collab/_video-search-form.html:11
 msgid "Search"
 msgstr "Serĉi"
 
 #: apps/teams/forms.py:1091
-#, fuzzy
 msgid "All roles"
-msgstr "Ĉiuj lingvoj"
+msgstr ""
 
 #: apps/teams/forms.py:1092
-#, fuzzy
-#| msgid "Admin"
 msgid "Admins"
-msgstr "Administro"
+msgstr ""
 
 #: apps/teams/forms.py:1093 templates/new-teams/language-page.html:11
 #: templates/new-teams/project-page.html:16
-#, fuzzy
-#| msgid "Manager"
 msgid "Managers"
-msgstr "Mastrumanto"
+msgstr ""
 
 #: apps/teams/forms.py:1094
-#, fuzzy
-#| msgid "Contributor"
 msgid "Contributors"
-msgstr "Kontribuanto"
+msgstr ""
 
 #: apps/teams/forms.py:1097
-#, fuzzy
-#| msgid "Language skill"
 msgid "Language spoken"
-msgstr "Lingva scio"
+msgstr ""
 
 #: apps/teams/forms.py:1100
 msgid "Date joined, most recent"
@@ -708,10 +655,8 @@ msgid "Date joined, oldest"
 msgstr ""
 
 #: apps/teams/forms.py:1159
-#, fuzzy
-#| msgid "Members"
 msgid "Member Role"
-msgstr "Membroj"
+msgstr ""
 
 #: apps/teams/forms.py:1235
 #, python-format
@@ -719,10 +664,8 @@ msgid "Include all %(count)s videos"
 msgstr ""
 
 #: apps/teams/forms.py:1251
-#, fuzzy
-#| msgid "New Text"
 msgid "New Team"
-msgstr "Nova Teksto"
+msgstr ""
 
 #: apps/teams/forms.py:1267 apps/teams/forms.py:1269 apps/teams/forms.py:1421
 #: apps/teams/forms.py:1454 amara-enterprise/collab/models.py:48
@@ -733,10 +676,8 @@ msgid "None"
 msgstr ""
 
 #: apps/teams/forms.py:1302
-#, fuzzy
-#| msgid "project"
 msgid "Invalid project"
-msgstr "projekto"
+msgstr ""
 
 #: apps/teams/forms.py:1305
 msgid "Project is not part of team"
@@ -771,30 +712,25 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: apps/teams/forms.py:1363 apps/teams/forms.py:1432
-#, fuzzy
-#| msgid "change title"
 msgid "Change thumbnail"
-msgstr "ŝanĝi titolo"
+msgstr ""
 
 #: apps/teams/forms.py:1405
-#, fuzzy, python-format
-#| msgid "Video has been updated."
+#, python-format
 msgid "Video updated"
 msgid_plural "%(count)s videos updated"
-msgstr[0] "Video ĝisdatigita."
-msgstr[1] "Video ĝisdatigita."
+msgstr[0] ""
+msgstr[1] ""
 
 #: apps/teams/forms.py:1488
-#, fuzzy
-#| msgid "Video has been updated."
 msgid "Video updated."
-msgstr "Video ĝisdatigita."
+msgstr ""
 
 #: apps/teams/forms.py:1509
 #, python-format
 msgid ""
-"Tell us a little bit about yourself and why you're interested in translating "
-"with %(team)s.  This should be 3-5 sentences, no longer!"
+"Tell us a little bit about yourself and why you're interested in translating"
+" with %(team)s.  This should be 3-5 sentences, no longer!"
 msgstr ""
 
 #: apps/teams/forms.py:1547
@@ -808,20 +744,16 @@ msgid "Video is already part of a team: %(url)s"
 msgstr ""
 
 #: apps/teams/forms.py:1566
-#, fuzzy
-#| msgid "A new video URL for"
 msgid "no video URL provided"
-msgstr "Nova ligilo al filmo por"
+msgstr ""
 
 #: apps/teams/forms.py:1571
 msgid "CSV file"
 msgstr ""
 
 #: apps/teams/new_views.py:113
-#, fuzzy
-#| msgid "You are not allowed to perform this task."
 msgid "You are not authorized to see this page"
-msgstr "Vi ne rajtas plunumi tiun taskon."
+msgstr ""
 
 #: apps/teams/new_views.py:134 apps/teams/views.py:136 apps/teams/views.py:425
 msgid "You do not have permission to edit this team."
@@ -842,7 +774,7 @@ msgstr ""
 
 #: apps/teams/new_views.py:362 amara-enterprise/collab/views.py:114
 #: templates/footer.html:35 templates/new-user-menu.html:14
-#: templates/new-base.html:96 templates/base.html:134
+#: templates/base.html:134 templates/new-base.html:96
 #: templates/profiles/_tabs.html:12 templates/profiles/_user_menu.html:22
 #: templates/teams/_tabs_projects.html:7
 #: templates/teams/_subnav_activity.html:6 templates/teams/_tabs.html:17
@@ -882,7 +814,7 @@ msgstr ""
 #: amara-enterprise/providers/templates/providers/queue.html:24
 #: amara-enterprise/providers/templates/providers/queue.html:42
 msgid "Languages"
-msgstr ""
+msgstr "Lingvoj"
 
 #: apps/teams/new_views.py:578
 msgid "You cannot invite people to this team."
@@ -898,22 +830,19 @@ msgid "%(username)s (%(full_name)s)"
 msgstr ""
 
 #: apps/teams/new_views.py:649
-#, fuzzy, python-format
-#| msgid "You are already a member of this team."
+#, python-format
 msgid "You are already a member of %(team)s."
-msgstr "Vi estas jam membro de ĉi tiu skipo."
+msgstr ""
 
 #: apps/teams/new_views.py:655
-#, fuzzy, python-format
-#| msgid "You are now a member of this team."
+#, python-format
 msgid "You are now a member of %(team)s."
-msgstr "Vi nun estas teamano."
+msgstr ""
 
 #: apps/teams/new_views.py:662
-#, fuzzy, python-format
-#| msgid "You cannot view this team's tasks."
+#, python-format
 msgid "You cannot join %(team)s."
-msgstr "Vi ne rajtas vidi taskojn de tiu skipo."
+msgstr ""
 
 #: apps/teams/new_views.py:743 apps/teams/new_views.py:776
 #: templates/profiles/_tabs.html:7 templates/teams/_tabs.html:28
@@ -958,56 +887,45 @@ msgid "Messages"
 msgstr "Mesaĝoj"
 
 #: apps/teams/new_views.py:913 apps/teams/views.py:317
-#, fuzzy
-#| msgid "No subtitles for this language."
 msgid "No message for that language."
-msgstr "Neniuj subtekstoj por ĉi tiu lingvo."
+msgstr ""
 
 #: apps/teams/new_views.py:923 apps/teams/views.py:327
 msgid "There is already a message for that language."
 msgstr ""
 
 #: apps/teams/new_views.py:926 apps/teams/views.py:330
-#, fuzzy
-#| msgid "Please go to the following page and choose a new password:"
 msgid "Please set the language and the message."
-msgstr "Bonvole iru al la jena paĝo kaj ŝanĝu pasvorton:"
+msgstr ""
 
 #: apps/teams/new_views.py:939
 msgid "Language-specific Messages"
 msgstr ""
 
 #: apps/teams/new_views.py:952
-#, fuzzy
 msgid "Importing videos now"
-msgstr "Donacu nun"
+msgstr ""
 
 #: apps/teams/new_views.py:957
-#, fuzzy
-#| msgid "Project deleted."
 msgid "Feed deleted"
-msgstr "Projekto forigita."
+msgstr ""
 
 #: apps/teams/new_views.py:965
-#, fuzzy
 msgid "Video Feed Added"
-msgstr "Videoj"
+msgstr ""
 
 #: apps/teams/new_views.py:977 templates/teams/videos-list.html:54
 #: templates/new-teams/base.html:62
-#, fuzzy
 msgid "Video Feeds"
-msgstr "Videoj"
+msgstr ""
 
 #: apps/teams/new_views.py:995 apps/teams/views.py:1936
 msgid "Project added."
-msgstr ""
+msgstr "Projekto aldonita."
 
 #: apps/teams/new_views.py:1007
-#, fuzzy
-#| msgid "Project deleted."
 msgid "Project updated."
-msgstr "Projekto forigita."
+msgstr ""
 
 #: apps/teams/new_views.py:1021 apps/teams/views.py:1964
 msgid "Project deleted."
@@ -1053,10 +971,8 @@ msgid "Invalid transcript file or language code for video %(url)s\n"
 msgstr ""
 
 #: apps/teams/tasks.py:252
-#, fuzzy
-#| msgid "You are not allowed to perform this task."
 msgid "You are not authorized to perform such action\n"
-msgstr "Vi ne rajtas plunumi tiun taskon."
+msgstr ""
 
 #: apps/teams/tasks.py:253
 #, python-format
@@ -1084,22 +1000,17 @@ msgstr "Plej multaj anoj"
 msgid ""
 "Your team has been created. Here are some next steps:\n"
 "                <ul>\n"
-"                    <li><a href=\"%(edit)s\">Edit team members' permissions</"
-"a></li>\n"
-"                    <li><a href=\"%(activate)s\">Activate and customize "
-"workflows for your team</a></li>\n"
-"                    <li><a href=\"%(create)s\">Create and customize "
-"projects</a></li>\n"
-"                    <li><a href=\"%(lang)s\">Edit language preferences</a></"
-"li>\n"
-"                    <li><a href=\"%(custom)s\">Customize instructions to "
-"caption makers and translators</a></li>\n"
+"                    <li><a href=\"%(edit)s\">Edit team members' permissions</a></li>\n"
+"                    <li><a href=\"%(activate)s\">Activate and customize workflows for your team</a></li>\n"
+"                    <li><a href=\"%(create)s\">Create and customize projects</a></li>\n"
+"                    <li><a href=\"%(lang)s\">Edit language preferences</a></li>\n"
+"                    <li><a href=\"%(custom)s\">Customize instructions to caption makers and translators</a></li>\n"
 "                </ul>"
 msgstr ""
 
 #: apps/teams/views.py:226
 msgid "You do not have permission to delete this team."
-msgstr "Vi ne rajtas forigi tiun skipon."
+msgstr "Vi ne rajtas forigi tiun teamon."
 
 #: apps/teams/views.py:792
 msgid "You can't add that video to this team/project."
@@ -1154,9 +1065,8 @@ msgid "You don't have permission to remove this member from the team."
 msgstr ""
 
 #: apps/teams/views.py:1086
-#, fuzzy
 msgid "Invalid task to approve"
-msgstr "Malvalida pasvorto!"
+msgstr ""
 
 #: apps/teams/views.py:1139 apps/teams/views.py:1182
 msgid "You can't approve applications."
@@ -1175,14 +1085,12 @@ msgid "Application already processed."
 msgstr ""
 
 #: apps/teams/views.py:1153
-#, fuzzy
 msgid "Applications approved."
-msgstr "Peto aprobita."
+msgstr ""
 
 #: apps/teams/views.py:1155
-#, fuzzy
 msgid "Applications denied."
-msgstr "Peto malaprobita."
+msgstr ""
 
 #: apps/teams/views.py:1185
 msgid "Application approved."
@@ -1198,7 +1106,7 @@ msgstr ""
 
 #: apps/teams/views.py:1269
 msgid "You have left this team."
-msgstr "Vi forlasis tiun ĉi skipon."
+msgstr "Vi forlasis tiun ĉi teamon."
 
 #: apps/teams/views.py:1325
 msgid "Member saved."
@@ -1206,7 +1114,7 @@ msgstr ""
 
 #: apps/teams/views.py:1547
 msgid "You cannot view this team's tasks."
-msgstr "Vi ne rajtas vidi taskojn de tiu skipo."
+msgstr "Vi ne rajtas vidi taskojn de tiu teamo."
 
 #: apps/teams/views.py:1711 apps/teams/views.py:1714
 msgid "You are not allowed to perform this task."
@@ -1230,7 +1138,7 @@ msgstr "Tasko atribuigita."
 
 #: apps/teams/views.py:1820
 msgid "You cannot assign this task."
-msgstr ""
+msgstr "Vi ne rajtas atribui tiun taskon."
 
 #: apps/teams/views.py:1862
 msgid "Draft uploaded successfully."
@@ -1246,32 +1154,16 @@ msgstr ""
 
 #: apps/teams/views.py:1982
 msgid "Project saved."
-msgstr ""
+msgstr "Projekto konservita."
 
 #: apps/teams/views.py:2264
 #, python-format
-msgid "Someone else is currently editing %(language)s. Please try again later."
+msgid ""
+"Someone else is currently editing %(language)s. Please try again later."
 msgstr ""
 
 #: apps/teams/views.py:2300
 msgid "Successfully deleted language."
-msgstr ""
-
-#: apps/teams/permissions.py:743
-#, python-format
-msgid ""
-"These subtitles are moderated. See the %s team page for information on how "
-"to contribute."
-msgstr ""
-
-#: apps/teams/permissions.py:745
-msgid "Sorry, these subtitles are privately moderated."
-msgstr ""
-
-#: apps/teams/permissions.py:775
-msgid ""
-"Sorry, you do not have the permission to edit these subtitles. If you "
-"believe that they need correction, please contact the team administrator."
 msgstr ""
 
 #: apps/teams/models.py:171
@@ -1371,7 +1263,7 @@ msgstr ""
 
 #: apps/teams/models.py:236
 msgid "HTML that appears at the top of the teams page."
-msgstr "HTML, kiu aperas supre de la skipa paĝo."
+msgstr "HTML, kiu aperas supre de la teama paĝo."
 
 #: apps/teams/models.py:242
 msgid "authentication provider code"
@@ -1408,7 +1300,7 @@ msgstr ""
 #: apps/teams/models.py:294 templates/profiles/_teams_list.html:3
 #: templates/teams/teams-list.html:7
 msgid "Teams"
-msgstr "Skipoj"
+msgstr "Teamoj"
 
 #: apps/teams/models.py:742
 msgid "> 1000"
@@ -1418,9 +1310,7 @@ msgstr ""
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
-msgstr ""
-"Uzu tiun spacon por klarigi kial vi aŭ via skipo bezonas skribi en la filmo "
-"aŭ aldoni subtitolojn. Aldonante noton pli instigas volontulojn helpi!"
+msgstr "Uzu tiun spacon por klarigi kial vi aŭ via teamo bezonas skribi en la filmo aŭ aldoni subtitolojn. Aldonante noton pli instigas volontulojn helpi!"
 
 #: apps/teams/models.py:978
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
@@ -1440,10 +1330,9 @@ msgid "You already have a pending application to %(team)s."
 msgstr ""
 
 #: apps/teams/models.py:1588
-#, fuzzy, python-format
-#| msgid "Video has been deleted from Amara."
+#, python-format
 msgid "You have been removed from %(team)s."
-msgstr "Video forigita de Amara."
+msgstr ""
 
 #: apps/teams/models.py:2555
 msgid "Resume"
@@ -1458,6 +1347,23 @@ msgstr ""
 msgid "Help %(team)s reach a world audience"
 msgstr ""
 
+#: apps/teams/permissions.py:743
+#, python-format
+msgid ""
+"These subtitles are moderated. See the %s team page for information on how "
+"to contribute."
+msgstr ""
+
+#: apps/teams/permissions.py:745
+msgid "Sorry, these subtitles are privately moderated."
+msgstr ""
+
+#: apps/teams/permissions.py:775
+msgid ""
+"Sorry, you do not have the permission to edit these subtitles. If you "
+"believe that they need correction, please contact the team administrator."
+msgstr ""
+
 #: apps/teams/templatetags/teams_tags.py:169
 #: amara-enterprise/collab/forms/search.py:191 templates/teams/tasks.html:155
 #: templates/teams/tasks.html:256 templates/teams/approvals.html:90
@@ -1468,14 +1374,14 @@ msgstr ""
 #: amara-enterprise/collab/templates/collab/_collaborations-list.html:14
 msgid "Video"
 msgid_plural "Videos"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Filmo"
+msgstr[1] "Filmoj"
 
 #: apps/teams/templatetags/teams_tags.py:172
 msgid "Member"
 msgid_plural "Members"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Membro"
+msgstr[1] "Membroj"
 
 #: apps/teams/templatetags/teams_tags.py:178
 msgid "Task"
@@ -1489,19 +1395,16 @@ msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "Ĉu iu povus helpi al mi traduki ĉi tiujn filmojn? %(url)s"
 
 #: apps/teams/workflows/notes.py:33
-#, fuzzy
 msgid "Team Notes"
-msgstr "Skipoj"
+msgstr ""
 
 #: apps/teams/workflows/simple.py:39
 msgid "Simple"
 msgstr ""
 
 #: apps/teams/workflows/simple.py:52
-#, fuzzy
-#| msgid "Your email was updated."
 msgid "Workflow updated"
-msgstr "Viaj retpoŝtaj agordoj estis ĝisdatigitaj"
+msgstr ""
 
 #: apps/teams/workflows/simple.py:65 templates/teams/create.html:55
 #: templates/teams/settings-workflows.html:98 templates/new-teams/base.html:54
@@ -1606,9 +1509,9 @@ msgid ""
 msgstr ""
 
 #: apps/subtitles/forms.py:169
-#, fuzzy, python-format
+#, python-format
 msgid "File size must be less than %(size)s kb."
-msgstr "Dosiergrandeco devas esti malpli granda ol {0} kb"
+msgstr ""
 
 #: apps/subtitles/forms.py:177
 #, python-format
@@ -1641,16 +1544,16 @@ msgstr ""
 #: apps/subtitles/models.py:1339
 #: templates/videos/language-revisions-tab.html:42
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: apps/subtitles/models.py:1340
 #: templates/videos/language-revisions-tab.html:46
 msgid "Subtitle Editor"
-msgstr ""
+msgstr "Subteksta radaktilo"
 
 #: apps/subtitles/models.py:1341
 msgid "Imported"
-msgstr ""
+msgstr "Enportita"
 
 #: apps/subtitles/models.py:1342
 msgid "Rollback"
@@ -1671,6 +1574,37 @@ msgstr ""
 
 #: apps/subtitles/models.py:1346
 msgid "Through web editor"
+msgstr "Per reta redaktilo"
+
+#: apps/subtitles/views.py:135 apps/auth/admin.py:96
+#: templates/admin/base_site.html:4 templates/admin/base_site.html:7
+msgid "Amara"
+msgstr "Amara"
+
+#: apps/subtitles/views.py:158
+msgid ""
+"Sorry, you cannot edit these subtitles now because they are being edited by "
+"another user. Please check back later."
+msgstr ""
+
+#: apps/subtitles/views.py:170 templates/profiles/account.html:213
+#: templates/teams/dashboard.html:88 templates/videos/create.html:24
+#: templates/videos/video-urls-tab.html:48
+msgid "Learn more"
+msgstr "Lernu pli"
+
+#: apps/subtitles/views.py:173
+#, python-format
+msgid ""
+"Sorry, you do not have permission to edit these subtitles. "
+"(%(learn_more_link)s)"
+msgstr ""
+
+#: apps/subtitles/views.py:299
+#, python-format
+msgid ""
+"Another user is currently performing the %(task_type)s task for these "
+"subtitles"
 msgstr ""
 
 #: apps/subtitles/workflows.py:709
@@ -1686,57 +1620,23 @@ msgid "Save Draft"
 msgstr ""
 
 #: apps/subtitles/workflows.py:747
-#, fuzzy
-#| msgid "Password reset complete"
 msgid "API Complete"
-msgstr "Pasvorta novigado kompletas"
+msgstr ""
 
 #: apps/subtitles/workflows.py:779
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:65
 msgid "Notes"
 msgstr ""
 
-#: apps/subtitles/views.py:135 apps/auth/admin.py:96
-#: templates/admin/base_site.html:4 templates/admin/base_site.html:7
-msgid "Amara"
-msgstr ""
-
-#: apps/subtitles/views.py:158
-msgid ""
-"Sorry, you cannot edit these subtitles now because they are being edited by "
-"another user. Please check back later."
-msgstr ""
-
-#: apps/subtitles/views.py:170 templates/profiles/account.html:213
-#: templates/teams/dashboard.html:88 templates/videos/create.html:24
-#: templates/videos/video-urls-tab.html:48
-msgid "Learn more"
-msgstr "Lernu pli"
-
-#: apps/subtitles/views.py:173
-#, fuzzy, python-format
-#| msgid "You do not have permission to delete this team."
-msgid ""
-"Sorry, you do not have permission to edit these subtitles. "
-"(%(learn_more_link)s)"
-msgstr "Vi ne rajtas forigi tiun skipon."
-
-#: apps/subtitles/views.py:299
-#, python-format
-msgid ""
-"Another user is currently performing the %(task_type)s task for these "
-"subtitles"
-msgstr ""
-
 #: apps/subtitles/templatetags/new_subtitles_tags.py:39
 #: amara-enterprise/collab/models.py:67
 msgid "Public"
-msgstr ""
+msgstr "Publika"
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:40
 #: amara-enterprise/collab/models.py:68 templates/teams/teams-list.html:68
 msgid "Private"
-msgstr ""
+msgstr "Privata"
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:41
 msgid "Deleted"
@@ -1748,10 +1648,8 @@ msgid "Not Synced"
 msgstr "Ne sinkronigita"
 
 #: apps/auth/admin.py:48
-#, fuzzy
-#| msgid "Password"
 msgid "Raw Password"
-msgstr "Pasvorto"
+msgstr ""
 
 #: apps/auth/admin.py:53 amara-enterprise/apiv2/forms.py:188
 msgid "Password"
@@ -1762,16 +1660,12 @@ msgid "Password confirmation"
 msgstr "Konfirmo de pasvorto"
 
 #: apps/auth/admin.py:92
-#, fuzzy
-#| msgid "Personal Info"
 msgid "Personal info"
-msgstr "Personaj informoj"
+msgstr ""
 
 #: apps/auth/admin.py:93
-#, fuzzy
-#| msgid "Our Mission"
 msgid "Permissions"
-msgstr "Nia misio"
+msgstr ""
 
 #: apps/auth/admin.py:95
 msgid "Important dates"
@@ -1790,7 +1684,7 @@ msgstr "Kaŝi"
 
 #: apps/auth/models.py:142
 msgid "Retired user"
-msgstr ""
+msgstr "Emerita uzanto"
 
 #: apps/auth/models.py:458
 msgid "Add comment"
@@ -1832,9 +1726,7 @@ msgstr "sekvi petojn je lingvo"
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
-msgstr ""
-"Ĉi tiu dato estas kiam komenci montri anoncon. Kaj nur la fina estos "
-"montrita. "
+msgstr "Ĉi tiu dato estas kiam komenci montri anoncon. Kaj nur la fina estos montrita. "
 
 #: apps/auth/models.py:644
 msgid "e-mail confirmation"
@@ -1845,10 +1737,8 @@ msgid "e-mail confirmations"
 msgstr "retpoŝtaj konfirmoj"
 
 #: apps/auth/forms.py:61 apps/auth/forms.py:81
-#, fuzzy
-#| msgid "Email"
 msgid "E-mail"
-msgstr "Retpoŝto"
+msgstr ""
 
 #: apps/auth/forms.py:76
 msgid ""
@@ -1883,10 +1773,8 @@ msgid "Your account was deleted."
 msgstr "Via konto estis forigita. "
 
 #: apps/auth/views.py:167
-#, fuzzy
-#| msgid "Change Password"
 msgid "Incorrect Password"
-msgstr "Ŝanĝi pasvorton"
+msgstr ""
 
 #: apps/auth/templatetags/auth_tags.py:42
 msgid "Fill email field, please."
@@ -1927,12 +1815,12 @@ msgstr "Mesaĝo senditas."
 #: apps/messages/tasks.py:97
 #, python-format
 msgid "New message from %(author)s on Amara: %(subject)s"
-msgstr ""
+msgstr "Nova mesaĝo de %(author)s ĉe Amara: %(subject)s"
 
 #: apps/messages/tasks.py:99
 #, python-format
 msgid "New message on Amara: %(subject)s"
-msgstr ""
+msgstr "Nova mesaĝo ĉe Amara: %(subject)s"
 
 #: apps/messages/tasks.py:141
 #, python-format
@@ -1955,9 +1843,9 @@ msgid "%(team)s team has a new member"
 msgstr ""
 
 #: apps/messages/tasks.py:298
-#, fuzzy, python-format
+#, python-format
 msgid "You've joined the %(team)s team!"
-msgstr "Vi forlasis la %s skipon!"
+msgstr ""
 
 #: apps/messages/tasks.py:326
 #, python-format
@@ -1965,9 +1853,9 @@ msgid "%(user)s has left the %(team)s team"
 msgstr ""
 
 #: apps/messages/tasks.py:352
-#, fuzzy, python-format
+#, python-format
 msgid "You've left the %(team)s team!"
-msgstr "Vi forlasis la %s skipon!"
+msgstr ""
 
 #: apps/messages/tasks.py:418
 msgid "You have a new task assignment on Amara!"
@@ -1979,7 +1867,7 @@ msgstr ""
 
 #: apps/messages/tasks.py:478
 msgid " and published"
-msgstr ""
+msgstr "kaj publikita"
 
 #: apps/messages/tasks.py:575
 msgid "Your subtitles have been approved and published!"
@@ -2008,13 +1896,11 @@ msgstr "Vi devus enigi titolon aŭ mesaĝon."
 
 #: apps/videos/metadata.py:57
 msgid "Speaker Name"
-msgstr ""
+msgstr "Parolanta Nomo"
 
 #: apps/videos/metadata.py:58
-#, fuzzy
-#| msgid "Application"
 msgid "Location"
-msgstr "Formularo"
+msgstr "Loko"
 
 #: apps/videos/rpc.py:48 apps/videos/rpc.py:62
 msgid "You have not permission"
@@ -2090,7 +1976,7 @@ msgstr ""
 
 #: apps/videos/forms.py:51
 msgid "--Select language--"
-msgstr ""
+msgstr "--Elektu lingvon--"
 
 #: apps/videos/forms.py:77
 #, python-format
@@ -2107,7 +1993,7 @@ msgstr ""
 
 #: apps/videos/forms.py:91
 msgid "You have not permission add video URL for this video"
-msgstr "Vi ne rajtas aldoni filman URL-ligilon por tiu filmo."
+msgstr "Vi ne rajtas aldoni filman ligilon por ĉi tiu filmo."
 
 #: apps/videos/forms.py:142 apps/videos/types/forms.py:17
 #, python-format
@@ -2115,29 +2001,24 @@ msgid "<a href=\"mailto:%(email)s\">Contact us</a>"
 msgstr ""
 
 #: apps/videos/forms.py:147 apps/videos/types/forms.py:22
-#, fuzzy, python-format
+#, python-format
 msgid ""
-"Please try again with a link to a video page.  %(contact_link)s if there's a "
-"problem."
+"Please try again with a link to a video page.  %(contact_link)s if there's a"
+" problem."
 msgstr ""
-"Bonvolu reprovi per ligilo al filma paĝo <a href=\"mailto:%s\">Kontaktu nin</"
-"a> se vi spertas problemon."
 
 #: apps/videos/forms.py:152 apps/videos/types/forms.py:27
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
-"a video file that works with HTML5 browsers. For example: http://mysite.com/"
-"myvideo.ogg or http://mysite.com/myipadvideo.m4v %(contact_link)s if there's "
-"a problem"
+"a video file that works with HTML5 browsers. For example: "
+"http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v "
+"%(contact_link)s if there's a problem"
 msgstr ""
-"Vi devas ligi al filmo de konforma retejo (ekz \"YouTube\") aŭ senpere al "
-"filma dosiero konforma al HTML5-navigiloj. Ekzemple: http://mysite.com/"
-"myvideo.ogg aŭ http://mysite.com/myipadvideo.m4v <a href=\"mailto:%s"
-"\">Kontaktu nin</a> se vi spertas problemon."
 
 #: apps/videos/forms.py:176
-msgid "We support: rss 2.0 media feeds including Vimeo, Dailymotion, and more."
+msgid ""
+"We support: rss 2.0 media feeds including Vimeo, Dailymotion, and more."
 msgstr ""
 
 #: apps/videos/forms.py:199
@@ -2158,8 +2039,8 @@ msgstr ""
 
 #: apps/videos/forms.py:212
 msgid ""
-"The videos are being added in the background. If you are logged in, you will "
-"receive a message when it's done"
+"The videos are being added in the background. If you are logged in, you will"
+" receive a message when it's done"
 msgstr ""
 
 #: apps/videos/forms.py:227
@@ -2168,7 +2049,7 @@ msgstr ""
 
 #: apps/videos/forms.py:297 apps/videos/forms.py:369
 msgid "Subtitle into:"
-msgstr ""
+msgstr "Subtekstigi en"
 
 #: apps/videos/forms.py:299
 msgid "This video is in:"
@@ -2181,14 +2062,12 @@ msgid ""
 msgstr ""
 
 #: apps/videos/forms.py:385
-#, fuzzy
-#| msgid "Select your Languages"
 msgid "Your Languages"
-msgstr "Elektu viajn Lingvojn"
+msgstr ""
 
 #: apps/videos/views.py:141
 msgid "original"
-msgstr ""
+msgstr "originala"
 
 #: apps/videos/views.py:146
 msgid "incomplete"
@@ -2209,8 +2088,7 @@ msgstr ""
 #: apps/videos/views.py:206
 msgid ""
 "Here is the subtitle workspace for your video.\n"
-"        You can share the video with friends, or get an embed code for your "
-"site. To start\n"
+"        You can share the video with friends, or get an embed code for your site. To start\n"
 "        new subtitles, click \"Add a new language!\" in the sidebar."
 msgstr ""
 
@@ -2242,7 +2120,7 @@ msgstr ""
 
 #: apps/videos/views.py:753
 msgid "You have not permission change this URL"
-msgstr "Vi ne rajtas aliigi tiun URL-n"
+msgstr "Vi ne rajtas aliigi ĉi tiun ligilon"
 
 #: apps/videos/views.py:758 apps/videos/views.py:782
 msgid "Object does not exist"
@@ -2250,7 +2128,7 @@ msgstr "Objekto ne ekzistas"
 
 #: apps/videos/views.py:773
 msgid "You have not permission delete this URL"
-msgstr "Vi ne rajtas nuligi tiun URL-n"
+msgstr "Vi ne rajtas nuligi ĉi tiun ligilon"
 
 #: apps/videos/views.py:898
 #, python-format
@@ -2266,10 +2144,8 @@ msgid "Views"
 msgstr ""
 
 #: apps/videos/models.py:595
-#, fuzzy
-#| msgid "Video URL"
 msgid "No Video URL"
-msgstr "Retadreso de video"
+msgstr ""
 
 #: apps/videos/models.py:1576
 #, python-format
@@ -2313,8 +2189,7 @@ msgstr "forigis videon: \"%(title)s\""
 
 #: apps/videos/models.py:1607
 #, python-format
-msgid ""
-"added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
+msgid "added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
 msgstr ""
 
 #: apps/videos/models.py:1609
@@ -2335,15 +2210,15 @@ msgstr ""
 #: apps/videos/models.py:1631
 #, python-format
 msgid ""
-"commented on <a href=\"%(comments_url)s\">%(new_language)s subtitles</a> for "
-"<a href=\"%(video_url)s\">%(video_name)s</a>"
+"commented on <a href=\"%(comments_url)s\">%(new_language)s subtitles</a> for"
+" <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
 #: apps/videos/models.py:1633
 #, python-format
 msgid ""
-"Comment added for <a href=\"%(comments_url)s\">%(new_language)s subtitles</"
-"a> for <a href=\"%(video_url)s\">%(video_name)s</a>"
+"Comment added for <a href=\"%(comments_url)s\">%(new_language)s "
+"subtitles</a> for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
 #: apps/videos/models.py:1636
@@ -2400,9 +2275,9 @@ msgid "joined the %(team)s team as a %(role)s"
 msgstr ""
 
 #: apps/videos/models.py:1675
-#, fuzzy, python-format
+#, python-format
 msgid "left the %(team)s team"
-msgstr "La %(site_name)s skipo"
+msgstr ""
 
 #: apps/videos/models.py:1687
 #, python-format
@@ -2438,7 +2313,7 @@ msgstr "aldoni tradukon"
 
 #: apps/videos/models.py:1743
 msgid "add video url"
-msgstr "aldoni videan URL-n"
+msgstr "aldoni videan ligilon"
 
 #: apps/videos/models.py:1744
 msgid "request subtitles"
@@ -2454,7 +2329,7 @@ msgstr "aldoni kontribuanton"
 
 #: apps/videos/models.py:1747
 msgid "remove contributor"
-msgstr ""
+msgstr "forigu kontribuanton"
 
 #: apps/videos/models.py:1748
 msgid "reject version"
@@ -2466,7 +2341,7 @@ msgstr ""
 
 #: apps/videos/models.py:1750
 msgid "accept version"
-msgstr ""
+msgstr "akcepti version"
 
 #: apps/videos/models.py:1751
 msgid "decline version"
@@ -2478,17 +2353,15 @@ msgstr "forigi videon"
 
 #: apps/videos/models.py:1753
 msgid "edit url"
-msgstr ""
+msgstr "redakti ligilon"
 
 #: apps/videos/models.py:1754
 msgid "delete url"
-msgstr "forigi URL-n"
+msgstr "forigi ligilon"
 
 #: apps/videos/models.py:2017
-#, fuzzy
-#| msgid "Video has been deleted from Amara."
 msgid "Video already exist on Amara"
-msgstr "Video forigita de Amara."
+msgstr ""
 
 #: apps/videos/models.py:2032
 msgid "Unknown video type"
@@ -2499,14 +2372,11 @@ msgstr ""
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
 "system. You can't add it as a secondary URL."
-msgstr ""
-"La URL jam <a href=\"%(url)s\">ekzistas</a> kiel propra filmo en la sistemo. "
-"Ne eblas aldoni duan URL-n."
+msgstr "La URL jam <a href=\"%(url)s\">ekzistas</a> kiel propra filmo en la sistemo. Ne eblas aldoni duan URL-n."
 
 #: apps/videos/models.py:2084
-#, fuzzy
 msgid "Can't remove the primary video URL"
-msgstr "Vidu la originalan ligilon al la filmo"
+msgstr ""
 
 #: apps/videos/feed_parser/parser.py:108
 msgid "Feed is unavailable now."
@@ -2519,22 +2389,19 @@ msgstr ""
 
 #: apps/externalsites/credit.py:34 apps/externalsites/syncing/youtube.py:40
 msgid "Help us caption & translate this video!"
-msgstr ""
+msgstr "Helpu nin subtekstigi kaj traduki ĉi tiun filmon!"
 
 #: apps/externalsites/admin.py:110
-#, fuzzy
 msgid "Resyncing subtitles"
-msgstr " subtekstoj"
+msgstr ""
 
 #: apps/externalsites/forms.py:103
-#, fuzzy
 msgid "Import all new videos"
-msgstr "Donacu nun"
+msgstr ""
 
 #: apps/externalsites/forms.py:104
-#, fuzzy
 msgid "Import videos with tags:"
-msgstr "Donacu nun"
+msgstr ""
 
 #: apps/externalsites/forms.py:107 apps/externalsites/models.py:241
 msgid "Publisher ID"
@@ -2545,9 +2412,8 @@ msgid "Sync subtitles with this write token"
 msgstr ""
 
 #: apps/externalsites/forms.py:112
-#, fuzzy
 msgid "Import Videos From Feed"
-msgstr "Donacu nun"
+msgstr ""
 
 #: apps/externalsites/forms.py:114
 msgid "Player ID"
@@ -2566,15 +2432,13 @@ msgid "Must specify tags to import"
 msgstr ""
 
 #: apps/externalsites/forms.py:188
-#, fuzzy
-#| msgid "Create Account"
 msgid "Add YouTube account"
-msgstr "Krei Konton"
+msgstr ""
 
 #: apps/externalsites/forms.py:212
 #: templates/profiles/remove-third-party.html:24
 msgid "Remove account"
-msgstr ""
+msgstr "Forigi konton"
 
 #: apps/externalsites/forms.py:251
 #, python-format
@@ -2591,7 +2455,7 @@ msgstr ""
 
 #: apps/externalsites/models.py:205
 msgid "Secret"
-msgstr ""
+msgstr "Sekreto"
 
 #: apps/externalsites/models.py:206
 msgid ""
@@ -2601,7 +2465,7 @@ msgstr ""
 
 #: apps/externalsites/models.py:210
 msgid "Kaltura account"
-msgstr ""
+msgstr "Kaltura-konto"
 
 #: apps/externalsites/models.py:219
 #, python-format
@@ -2609,9 +2473,8 @@ msgid "partner id %(partner_id)s"
 msgstr ""
 
 #: apps/externalsites/models.py:247
-#, fuzzy
 msgid "Brightcove account"
-msgstr "Krei Konton"
+msgstr ""
 
 #: apps/externalsites/models.py:256
 #, python-format
@@ -2623,14 +2486,12 @@ msgid "YouTube account"
 msgstr ""
 
 #: apps/externalsites/models.py:439
-#, fuzzy
 msgid "No username"
-msgstr "Salutnomo"
+msgstr ""
 
 #: apps/externalsites/models.py:528
-#, fuzzy
 msgid "deleted account"
-msgstr "Forigi Vian Konton"
+msgstr ""
 
 #: apps/externalsites/models.py:759
 msgid "Success"
@@ -2639,7 +2500,7 @@ msgstr ""
 #: apps/externalsites/models.py:760
 #: templates/externalsites/_sync-errors-form.html:14
 msgid "Error"
-msgstr ""
+msgstr "Eraro"
 
 #: apps/externalsites/models.py:779
 msgid "Sync history"
@@ -2679,8 +2540,8 @@ msgstr ""
 #: apps/externalsites/views.py:300
 #, python-format
 msgid ""
-"That youtube account has already been linked to the %(team)s team (<a href="
-"\"%(link)s\">view settings page</a>)."
+"That youtube account has already been linked to the %(team)s team (<a "
+"href=\"%(link)s\">view settings page</a>)."
 msgstr ""
 
 #: apps/externalsites/views.py:306
@@ -2729,10 +2590,8 @@ msgid "Private until the collaboration is complete"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:76
-#, fuzzy
-#| msgid "Follow all languages"
 msgid "Show collabs for all Languages"
-msgstr "Sekvi ĉiujn lingvojn"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:77
 msgid "Show collabs for user's languages"
@@ -2756,14 +2615,12 @@ msgid "Long (> 30 minutes)"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:362
-#, fuzzy
 msgid "Needs subtitler"
-msgstr "peti subtekstojn"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:363
-#, fuzzy
 msgid "Being subtitled"
-msgstr " subtekstoj"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:364
 msgid "In provider queue"
@@ -2778,51 +2635,44 @@ msgid "Needs reviewer"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:367
-#, fuzzy
 msgid "Being reviewed"
-msgstr "Provlegita"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:368
 msgid "Needs approver"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:369
-#, fuzzy
 msgid "Being approved"
-msgstr "Aprobita"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:545
 #: amara-enterprise/collab/models.py:1225
-#, fuzzy, python-format
-#| msgid "Language selection"
+#, python-format
 msgid "%(language)s captions"
-msgstr "Lingva elekto"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:547
 #: amara-enterprise/collab/models.py:1227
-#, fuzzy, python-format
-#| msgid "add translation"
+#, python-format
 msgid "%(language)s translation"
-msgstr "aldoni tradukon"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:562
 msgid "Now"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:908 amara-enterprise/collab/models.py:966
-#, fuzzy
 msgid "Subtitler"
-msgstr "Subteksto"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:910 amara-enterprise/collab/models.py:967
-#, fuzzy
 msgid "Reviewer"
-msgstr "Provlegita"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:912 amara-enterprise/collab/models.py:968
-#, fuzzy
 msgid "Approver"
-msgstr "Aprobi"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:918 templates/profiles/dashboard.html:54
 #: templates/teams/_perform_task_link.html:11
@@ -2831,15 +2681,14 @@ msgid "Create %(language)s subtitles"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:920
-#, fuzzy, python-format
-#| msgid "request subtitles"
+#, python-format
 msgid "Review %(language)s subtitles"
-msgstr "peti subtekstojn"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:922
-#, fuzzy, python-format
+#, python-format
 msgid "Approve %(language)s subtitles"
-msgstr " subtekstoj"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1164
 #: templates/messages/email/team-you-have-been-invited.html:15
@@ -2849,9 +2698,8 @@ msgstr "Aniĝi"
 
 #: amara-enterprise/collab/models.py:1165
 #: amara-enterprise/collab/templates/collab/leave-collaboration.html:14
-#, fuzzy
 msgid "Leave"
-msgstr "Lasi skipon"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1166 templates/teams/tasks.html:507
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:25
@@ -2870,7 +2718,7 @@ msgstr ""
 #: templates/new-teams/videos-forms/remove.html:27
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:44
 msgid "Remove"
-msgstr ""
+msgstr "Forigi"
 
 #: amara-enterprise/collab/models.py:1168
 msgid "Endorsement"
@@ -2879,15 +2727,12 @@ msgstr ""
 #: amara-enterprise/collab/models.py:1169
 #: amara-enterprise/collab/subtitle_workflow.py:125
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:121
-#, fuzzy
 msgid "Send back"
-msgstr "Sendi sugeston"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1170
-#, fuzzy
-#| msgid "Password reset complete"
 msgid "Mark complete"
-msgstr "Pasvorta novigado kompletas"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1171 templates/new-teams/videos.html:103
 #: templates/new-teams/videos-forms/move.html:32
@@ -2910,10 +2755,8 @@ msgid "Provider Submit"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:1175
-#, fuzzy
-#| msgid "Unassigned"
 msgid "Unassign Provider"
-msgstr "Neatribuita"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1199
 #: amara-enterprise/collab/templates/collab/video-collaborations-rows.html:26
@@ -2921,15 +2764,12 @@ msgid "join"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:1200
-#, fuzzy
 msgid "leave"
-msgstr "Lasi skipon"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1201
-#, fuzzy
-#| msgid "Unassigned"
 msgid "assign"
-msgstr "Neatribuita"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1202
 msgid "remove"
@@ -2940,15 +2780,12 @@ msgid "endorsement"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:1204
-#, fuzzy
 msgid "send back"
-msgstr "Sendi sugeston"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1205
-#, fuzzy
-#| msgid "Password reset complete"
 msgid "mark complete"
-msgstr "Pasvorta novigado kompletas"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1206
 msgid "move"
@@ -2959,19 +2796,16 @@ msgid "delete collaboration"
 msgstr ""
 
 #: amara-enterprise/collab/models.py:1213
-#, fuzzy
 msgid "subtitler"
-msgstr "Subteksto"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1214
-#, fuzzy
 msgid "reviewer"
-msgstr "Provlegita"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1215
-#, fuzzy
 msgid "approver"
-msgstr "Aprobi"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1247
 #, python-format
@@ -3009,10 +2843,8 @@ msgstr ""
 #: amara-enterprise/collab/models.py:1272
 #: amara-enterprise/collab/models.py:1275
 #: amara-enterprise/collab/models.py:1318
-#, fuzzy
-#| msgid "delete subtitles"
 msgid "Provider submitted subtitles"
-msgstr "forigi subtekstojn"
+msgstr ""
 
 #: amara-enterprise/collab/models.py:1277
 #, python-format
@@ -3101,10 +2933,8 @@ msgid "Dashboard updated"
 msgstr ""
 
 #: amara-enterprise/collab/views.py:302
-#, fuzzy
-#| msgid "Language"
 msgid "Languages updated"
-msgstr "Lingvo"
+msgstr ""
 
 #: amara-enterprise/collab/views.py:426
 #, python-format
@@ -3112,10 +2942,9 @@ msgid "Activity for %(project)s"
 msgstr ""
 
 #: amara-enterprise/collab/views.py:443
-#, fuzzy, python-format
-#| msgid "Select your Languages"
+#, python-format
 msgid "Activity for %(language)s"
-msgstr "Elektu viajn Lingvojn"
+msgstr ""
 
 #: amara-enterprise/collab/subtitle_workflow.py:51
 #: amara-enterprise/collab/subtitle_workflow.py:69
@@ -3138,33 +2967,28 @@ msgid "The subtitles for %(video)s were sent back to you for additional work."
 msgstr ""
 
 #: amara-enterprise/collab/subtitle_workflow.py:169
-#, fuzzy
 msgid "Open subtitle editor"
-msgstr " subtekstoj"
+msgstr ""
 
 #: amara-enterprise/collab/subtitle_workflow.py:180
-#, fuzzy
-#| msgid "Upload Subtitles"
 msgid "Update Subtitles"
-msgstr "Alŝuti subtekstojn"
+msgstr ""
 
 #: amara-enterprise/collab/subtitle_workflow.py:181
-#, fuzzy
-#| msgid "Get Updates!"
 msgid "Updating"
-msgstr "Akiri ĝisdatigojn!"
+msgstr ""
 
 #: amara-enterprise/collab/subtitle_workflow.py:257
 #, python-format
 msgid ""
-"<a class=\"icon\" href=\"%(url)s\"><img src=\"%(img_src)s\"></a>View <a href="
-"\"%(url)s\">collaborations for this video</a>."
+"<a class=\"icon\" href=\"%(url)s\"><img src=\"%(img_src)s\"></a>View <a "
+"href=\"%(url)s\">collaborations for this video</a>."
 msgstr ""
 
 #: amara-enterprise/collab/subtitle_workflow.py:287
 msgid ""
-"Watch the video and verify that the subtitles are correct. Click Endorse/"
-"Send back when done, or Save Draft to finish later"
+"Watch the video and verify that the subtitles are correct. Click "
+"Endorse/Send back when done, or Save Draft to finish later"
 msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:27
@@ -3172,15 +2996,14 @@ msgid "Include collaborations on other pages"
 msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:98
-#, fuzzy
 msgid "Invalid team choice"
-msgstr "Malvalida pasvorto!"
+msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:119
 #, python-format
 msgid ""
-"%(count)s collaborations moved to %(team_link)s<br>%(error_count)s could not "
-"be moved because they were already started"
+"%(count)s collaborations moved to %(team_link)s<br>%(error_count)s could not"
+" be moved because they were already started"
 msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:128
@@ -3193,10 +3016,8 @@ msgid "Collaborations deleted"
 msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:161
-#, fuzzy
-#| msgid "Password reset complete"
 msgid "Collaborations set to complete"
-msgstr "Pasvorta novigado kompletas"
+msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:199
 msgid "User not a team member"
@@ -3211,15 +3032,12 @@ msgid "Select user to remove"
 msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:220
-#, fuzzy
 msgid "No user selected."
-msgstr "Aprobita"
+msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:231
-#, fuzzy
-#| msgid "Unassigned"
 msgid "User not assigned"
-msgstr "Neatribuita"
+msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:240
 #, python-format
@@ -3248,74 +3066,56 @@ msgstr "Lingvo"
 
 #: amara-enterprise/collab/forms/dashboard.py:20
 #: amara-enterprise/collab/forms/dashboard.py:26
-#, fuzzy
-#| msgid "Select at least one language."
 msgid "You must select at least one language"
-msgstr "Elektu almenaŭ unu lingvon."
+msgstr ""
 
 #: amara-enterprise/collab/forms/dashboard.py:57
-#, fuzzy
-#| msgid "Add Project"
 msgid "Any Project"
-msgstr "Aldoni Projekton"
+msgstr ""
 
 #: amara-enterprise/collab/forms/dashboard.py:58
-#, fuzzy
-#| msgid "project"
 msgid "No project"
-msgstr "projekto"
+msgstr ""
 
 #: amara-enterprise/collab/forms/dashboard.py:81
-#, fuzzy
-#| msgid "all languages"
 msgid "All languages"
-msgstr "ĉiuj lingvoj"
+msgstr ""
 
 #: amara-enterprise/collab/forms/dashboard.py:98
-#, fuzzy
-#| msgid "Subtitle a Video"
 msgid "Subtitle creation"
-msgstr "Subtekstigi videon"
+msgstr ""
 
 #: amara-enterprise/collab/forms/workflow.py:22
-#, fuzzy
 msgid "1 Reviewer"
-msgstr "Provlegita"
+msgstr ""
 
 #: amara-enterprise/collab/forms/workflow.py:23
-#, fuzzy
 msgid "2 Reviewers"
-msgstr "Provlegita"
+msgstr ""
 
 #: amara-enterprise/collab/forms/workflow.py:24
-#, fuzzy
 msgid "3 Reviewers"
-msgstr "Provlegita"
+msgstr ""
 
 #: amara-enterprise/collab/forms/workflow.py:25
-#, fuzzy
 msgid "4 Reviewers"
-msgstr "Provlegita"
+msgstr ""
 
 #: amara-enterprise/collab/forms/workflow.py:30
-#, fuzzy
 msgid "1 Approver"
-msgstr "Aprobi"
+msgstr ""
 
 #: amara-enterprise/collab/forms/workflow.py:31
-#, fuzzy
 msgid "2 Approvers"
-msgstr "Aprobi"
+msgstr ""
 
 #: amara-enterprise/collab/forms/workflow.py:32
-#, fuzzy
 msgid "3 Approvers"
-msgstr "Aprobi"
+msgstr ""
 
 #: amara-enterprise/collab/forms/workflow.py:33
-#, fuzzy
 msgid "4 Approvers"
-msgstr "Aprobi"
+msgstr ""
 
 #: amara-enterprise/collab/forms/workflow.py:37
 msgid "Never"
@@ -3349,33 +3149,28 @@ msgid "Auto-create collaborations to translate videos into these languages:"
 msgstr ""
 
 #: amara-enterprise/collab/forms/workflow.py:65
-#, fuzzy
 msgid "Subtitle Visibility"
-msgstr "Subtekstoj en"
+msgstr ""
 
 #: amara-enterprise/collab/forms/workflow.py:69
 msgid "Dashboard default config"
 msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:26
-#, fuzzy
 msgid "All States"
-msgstr "Ĉiuj lingvoj"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:27
 msgid "Incomplete"
 msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:28
-#, fuzzy
 msgid "Needs User"
-msgstr "peti subtekstojn"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:45
-#, fuzzy
-#| msgid "project"
 msgid "project slug"
-msgstr "projekto"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:58
 msgid "Oldest"
@@ -3386,56 +3181,43 @@ msgid "Earliest due"
 msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:72
-#, fuzzy
 msgid "Latest due"
-msgstr "Versio"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:96 templates/teams/activity.html:49
 #: templates/teams/activity.html:60 templates/new-teams/activity.html:40
 #: templates/new-teams/activity.html:52
-#, fuzzy
 msgid "Any Language"
-msgstr "Ĉiuj lingvoj"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:97
 #: amara-enterprise/collab/forms/search.py:101
-#, fuzzy
 msgid "My Languages"
-msgstr "Ĉiuj lingvoj"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:100
-#, fuzzy
-#| msgid "Video Language"
 msgid "Any Video Language"
-msgstr "Lingvo de la filmo"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:195
-#, fuzzy
-#| msgid "Assigned to"
 msgid "Assigned user"
-msgstr "Atribuita je"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:197
 #: amara-enterprise/collab/templates/collab/_collab-search-form.html:23
 #: amara-enterprise/collab/templates/collab/_collaborations-list.html:39
-#, fuzzy
-#| msgid "Sort by"
 msgid "Sort"
-msgstr "Vicigi laŭ"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:199
 #: amara-enterprise/collab/templates/collab/collaboration-state-line.html:35
 #: amara-enterprise/collab/templates/collab/_collaborations-list.html:28
-#, fuzzy
-#| msgid "video"
 msgid "Provider"
-msgstr "video"
+msgstr ""
 
 #: amara-enterprise/collab/forms/search.py:201
-#, fuzzy
-#| msgid "Create team"
 msgid "Work team"
-msgstr "Krei skipon"
+msgstr ""
 
 #: amara-enterprise/ensemble/workflow.py:15
 msgid "Ensemble"
@@ -3443,30 +3225,24 @@ msgstr ""
 
 #: amara-enterprise/prorequests/signalhandlers.py:19
 #: amara-enterprise/prorequests/templates/new-teams/videos-forms/create-pro-requests.html:22
-#, fuzzy
-#| msgid "Create Account"
 msgid "Create Pro-Requests"
-msgstr "Krei Konton"
+msgstr ""
 
 #: amara-enterprise/prorequests/admin.py:26
 msgid "team"
 msgstr ""
 
 #: amara-enterprise/prorequests/admin.py:76
-#, fuzzy
-#| msgid "Counter-Notification"
 msgid "Resend Notification"
-msgstr "Kontraŭ-indiko"
+msgstr ""
 
 #: amara-enterprise/prorequests/models.py:88
 msgid "Basic"
 msgstr ""
 
 #: amara-enterprise/prorequests/models.py:89
-#, fuzzy
-#| msgid "lines"
 msgid "Business"
-msgstr "linioj"
+msgstr ""
 
 #: amara-enterprise/prorequests/models.py:90
 msgid "Film/TV"
@@ -3502,25 +3278,20 @@ msgid "Captions"
 msgstr ""
 
 #: amara-enterprise/prorequests/models.py:480
-#, fuzzy
-#| msgid "Translate"
 msgid "Translation"
-msgstr "Tradukti"
+msgstr ""
 
 #: amara-enterprise/prorequests/models.py:663
 msgid "Audio Garbled"
 msgstr ""
 
 #: amara-enterprise/prorequests/models.py:664
-#, fuzzy
-#| msgid "Language selection"
 msgid "Language Misidentified"
-msgstr "Lingva elekto"
+msgstr ""
 
 #: amara-enterprise/prorequests/models.py:665
-#, fuzzy
 msgid "Multiple Languages"
-msgstr "Subtekstoj en"
+msgstr ""
 
 #: amara-enterprise/prorequests/models.py:666
 msgid "Very Difficult Accent"
@@ -3531,10 +3302,8 @@ msgid "Glossary Needed"
 msgstr ""
 
 #: amara-enterprise/prorequests/models.py:668
-#, fuzzy
-#| msgid "Videos"
 msgid "Video Issue"
-msgstr "Videoj"
+msgstr ""
 
 #: amara-enterprise/prorequests/models.py:669
 msgid "Too Many Caption Edits"
@@ -3546,16 +3315,12 @@ msgid "Other"
 msgstr ""
 
 #: amara-enterprise/prorequests/forms.py:40
-#, fuzzy
-#| msgid "request subtitles"
 msgid "Request type"
-msgstr "peti subtekstojn"
+msgstr ""
 
 #: amara-enterprise/prorequests/forms.py:43
-#, fuzzy
-#| msgid "Delete Language"
 msgid "Request Language(s)"
-msgstr "Forigi lingvon"
+msgstr ""
 
 #: amara-enterprise/prorequests/forms.py:44
 msgid "Enter any number of language codes separated by spaces"
@@ -3618,22 +3383,18 @@ msgid "Amara On-Demand"
 msgstr ""
 
 #: amara-enterprise/prorequests/startup.py:10
-#, fuzzy
-#| msgid "request subtitles"
 msgid "Pro-Request rules"
-msgstr "peti subtekstojn"
+msgstr ""
 
 #: amara-enterprise/prorequests/views.py:86
-#, fuzzy, python-format
-#| msgid "Create team"
+#, python-format
 msgid "Created %(title)s"
-msgstr "Krei skipon"
+msgstr ""
 
 #: amara-enterprise/prorequests/views.py:104
-#, fuzzy, python-format
-#| msgid "  deleted a video: \"%(title)s\""
+#, python-format
 msgid "Deleted: %(title)s"
-msgstr "forigis videon: \"%(title)s\""
+msgstr ""
 
 #: amara-enterprise/prorequests/views.py:115
 #, python-format
@@ -3649,10 +3410,8 @@ msgid "Provider Queue Account Created"
 msgstr ""
 
 #: amara-enterprise/providers/forms.py:97
-#, fuzzy
-#| msgid "Account deleted."
 msgid "Provider Queue Account Deleted"
-msgstr "Konto forigita."
+msgstr ""
 
 #: amara-enterprise/providers/forms.py:99
 msgid "Provider Queue Account Updated"
@@ -3683,15 +3442,12 @@ msgid "Long"
 msgstr ""
 
 #: amara-enterprise/providers/forms.py:211
-#, fuzzy
 msgid "Invalid subtitles file"
-msgstr "Alŝuti subtekstojn"
+msgstr ""
 
 #: amara-enterprise/providers/forms.py:213
-#, fuzzy
-#| msgid "Edit Subtitles"
 msgid "Empty Subtitles"
-msgstr "Redakti subtekstojn"
+msgstr ""
 
 #: amara-enterprise/providers/forms.py:215
 msgid "Not all subtitles have timings"
@@ -3709,10 +3465,8 @@ msgid "Provider Queue Created"
 msgstr ""
 
 #: amara-enterprise/providers/views.py:221
-#, fuzzy
-#| msgid "Subtitles into"
 msgid "Subtitles submitted"
-msgstr "Subtekstoj en"
+msgstr ""
 
 #: amara-enterprise/providers/views.py:254
 #: amara-enterprise/providers/views.py:261
@@ -3724,10 +3478,8 @@ msgid "Queue item assigned"
 msgstr ""
 
 #: amara-enterprise/providers/views.py:284
-#, fuzzy
-#| msgid "Invalid password."
 msgid "Invalid format"
-msgstr "Malvalida pasvorto!"
+msgstr ""
 
 #: amara-enterprise/providers/types/vocapia.py:27
 msgid "Vocapia"
@@ -3771,16 +3523,14 @@ msgid "Current Collaborations"
 msgstr ""
 
 #: amara-enterprise/reports/startup.py:7 amara-enterprise/billing/startup.py:9
-#: templates/hands_base.html:103 templates/new-base.html:113
-#: templates/base.html:172
+#: templates/hands_base.html:103 templates/base.html:172
+#: templates/new-base.html:113
 msgid "Billing"
 msgstr ""
 
 #: amara-enterprise/reports/startup.py:7
-#, fuzzy
-#| msgid "Old Text"
 msgid "Old Reports"
-msgstr "Malnova Teksto"
+msgstr ""
 
 #: amara-enterprise/services/models.py:41
 #: amara-enterprise/services/models.py:65
@@ -3812,9 +3562,8 @@ msgid "Could not authorize with TED."
 msgstr ""
 
 #: amara-enterprise/vimeo/workflows.py:110
-#, fuzzy
 msgid "Approve subtitles"
-msgstr " subtekstoj"
+msgstr ""
 
 #: amara-enterprise/vimeo/workflows.py:175
 msgid "Vimeo"
@@ -3842,9 +3591,8 @@ msgid "Dashboard"
 msgstr ""
 
 #: amara-enterprise/ondemand/forms.py:15
-#, fuzzy
 msgid "Client Team"
-msgstr "Krei skipon"
+msgstr ""
 
 #: amara-enterprise/ondemand/forms.py:39
 msgid "Project slug not found"
@@ -3852,10 +3600,8 @@ msgstr ""
 
 #: amara-enterprise/ondemand/forms.py:46
 #: amara-enterprise/collab/templates/collab/_collaborations-list.html:34
-#, fuzzy
-#| msgid "Team"
 msgid "Work Team"
-msgstr "Skipo"
+msgstr ""
 
 #: amara-enterprise/ondemand/forms.py:48
 msgid "Language codes (separated by spaces)"
@@ -3875,10 +3621,8 @@ msgstr ""
 
 #: amara-enterprise/ondemand/views.py:44
 #: amara-enterprise/ondemand/templates/ondemand/edit-batch.html:21
-#, fuzzy
-#| msgid "Create team"
 msgid "Create Batch"
-msgstr "Krei skipon"
+msgstr ""
 
 #: amara-enterprise/ondemand/views.py:68
 msgid "Edit Batch"
@@ -3923,11 +3667,9 @@ msgstr "Averton: tiuj videoj ne estas enkorpigeblaj ĉar riskas onte rompi"
 
 #: templates/_testing_widget.html:15
 msgid ""
-"Warning #2: These subtitles are non-permanent and should not be relied on -- "
-"someone could change them."
-msgstr ""
-"Averton: tiuj subtekstoj ne estas konstantaj.  Ne fidu ilin, iu povus ilin "
-"ŝanĝi."
+"Warning #2: These subtitles are non-permanent and should not be relied on --"
+" someone could change them."
+msgstr "Averton: tiuj subtekstoj ne estas konstantaj.  Ne fidu ilin, iu povus ilin ŝanĝi."
 
 #: templates/_testing_widget.html:16
 msgid "This alpha site is for purely testing purposes."
@@ -3953,19 +3695,14 @@ msgstr "Renkontaj Celoj"
 msgid ""
 "<strong>Connect</strong> major stakeholders from projects, organizations, "
 "and movements that have open subtitling needs or focus."
-msgstr ""
-"<strong>Konektigi</strong> ĉefajn koncernatojn de projektoj, organizoj, "
-"movadoj, kiuj havas bezonojn/fokusojn pri malfermita subtekstigado."
+msgstr "<strong>Konektigi</strong> ĉefajn koncernatojn de projektoj, organizoj, movadoj, kiuj havas bezonojn/fokusojn pri malfermita subtekstigado."
 
 #: templates/opensubtitles2010.html:41
 msgid ""
 "<strong>Identify ways</strong> to solve stakeholder subtitling needs and be "
 "aware of existing technology that can be leveraged. Find logical places for "
 "collaboration/cooperation."
-msgstr ""
-"<strong>Identigi manierojn</strong> solvi la subtekstajn bezonojn de "
-"koncernatoj kaj esti konscia pri uzinda teknologio. Trovi bonajn "
-"kunlaborejojn."
+msgstr "<strong>Identigi manierojn</strong> solvi la subtekstajn bezonojn de koncernatoj kaj esti konscia pri uzinda teknologio. Trovi bonajn kunlaborejojn."
 
 #: templates/opensubtitles2010.html:44
 msgid ""
@@ -3984,19 +3721,13 @@ msgid ""
 "accessibility advocates, open source developers, educational leaders, and "
 "other individuals and organizations with a stake in the subtitling world. "
 "We'll make a roster available when the event draws closer."
-msgstr ""
-"Inter la partoprenantoj estos: videaj kreantoj, uzantoj, gastigantoj, "
-"normistoj, alireblistoj, malfermaj programistoj, edukestroj, kaj aliaj "
-"individuoj kaj organizoj kun intereso pri subtekstigado.  Pli da detaloj "
-"kiam la evento baldaŭas."
+msgstr "Inter la partoprenantoj estos: videaj kreantoj, uzantoj, gastigantoj, normistoj, alireblistoj, malfermaj programistoj, edukestroj, kaj aliaj individuoj kaj organizoj kun intereso pri subtekstigado.  Pli da detaloj kiam la evento baldaŭas."
 
 #: templates/opensubtitles2010.html:57
 msgid ""
 "Attendees are selected by invitation; however, if you or your organization "
 "would like to participate, please contact:"
-msgstr ""
-"Partoprenantoj estos laŭ invito, tamen se vi aŭ via organizo interesiĝas, "
-"bonvole kontakti al:"
+msgstr "Partoprenantoj estos laŭ invito, tamen se vi aŭ via organizo interesiĝas, bonvole kontakti al:"
 
 #: templates/opensubtitles2010.html:62
 msgid "When"
@@ -4012,20 +3743,10 @@ msgstr "Kie"
 
 #: templates/opensubtitles2010.html:68
 msgid ""
-"The summit will be held at the beautiful Open Plans penthouse in Soho, which "
-"is located at 148 Lafayette St, Floor 12, New York City. (<a href=\"http://"
-"maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor"
-"+12,+New+York"
-"+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette"
-"+St,+New+York,"
-"+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
-msgstr ""
-"La kunveno estos en la bela Open Plans Penthouse en Soho, 148 Lafayette St, "
-"Floor 12, New York City. (<a href=\"http://maps.google.com/maps?"
-"f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York"
-"+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette"
-"+St,+New+York,"
-"+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">mapo</a>)"
+"The summit will be held at the beautiful Open Plans penthouse in Soho, which"
+" is located at 148 Lafayette St, Floor 12, New York City. (<a "
+"href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
+msgstr "La kunveno estos en la bela Open Plans Penthouse en Soho, 148 Lafayette St, Floor 12, New York City. (<a href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">mapo</a>)"
 
 #: templates/opensubtitles2010.html:73
 msgid "Why"
@@ -4034,34 +3755,15 @@ msgstr "Kial"
 #: templates/opensubtitles2010.html:75
 msgid ""
 "\n"
-"            The focus of this summit is increased availability and better "
-"usability for captions and subtitles, \n"
+"            The focus of this summit is increased availability and better usability for captions and subtitles, \n"
 "            which are both sorely needed. It comes at a critical time, \n"
-"            as internet video usage is skyrocketing&mdash;people who rely on "
-"captions are threatened to be left behind. \n"
+"            as internet video usage is skyrocketing&mdash;people who rely on captions are threatened to be left behind. \n"
 "            New users from every culture are coming online en masse; \n"
-"            standardizing and ubiquitizing the technology can make potential "
-"audiences exponentially larger and messages can cross cultural boundaries "
-"more easily. \n"
-"            More captions will also make it simpler for computers to "
-"process, index, \n"
+"            standardizing and ubiquitizing the technology can make potential audiences exponentially larger and messages can cross cultural boundaries more easily. \n"
+"            More captions will also make it simpler for computers to process, index, \n"
 "            and make sense of the ever growing sea of online video.\n"
 "           "
-msgstr ""
-"\n"
-"            La fokuso de la pintkunveno estos pliigi haveblecon kaj "
-"alireblecon de subtekstoj, \n"
-"            nuntempe vere mankantaj. Temas pri grava tempo nun ĉar \n"
-"            en la interreto oni multege pli kaj pli uzas videojn &mdash; "
-"riskas ke homoj kiuj dependas de subtekstoj postlasiĝos. \n"
-"            Novaj uzantoj de ĉiuj kulturoj, multe da ili, komencas uzi la "
-"interreton; \n"
-"            normigo kaj ĉieigado de la teknologio grandegigos la "
-"multkulturan uzantaron. \n"
-"            Pli da subtekstoj faciligos aŭtomatan komprenon de interrataj "
-"informoj. \n"
-"            \n"
-"           "
+msgstr "\n            La fokuso de la pintkunveno estos pliigi haveblecon kaj alireblecon de subtekstoj, \n            nuntempe vere mankantaj. Temas pri grava tempo nun ĉar \n            en la interreto oni multege pli kaj pli uzas videojn &mdash; riskas ke homoj kiuj dependas de subtekstoj postlasiĝos. \n            Novaj uzantoj de ĉiuj kulturoj, multe da ili, komencas uzi la interreton; \n            normigo kaj ĉieigado de la teknologio grandegigos la multkulturan uzantaron. \n            Pli da subtekstoj faciligos aŭtomatan komprenon de interrataj informoj. \n            \n           "
 
 #: templates/opensubtitles2010.html:91
 msgid "Organizers, Facilitators, Sponsors"
@@ -4074,8 +3776,8 @@ msgstr "Organizantoj"
 #: templates/opensubtitles2010.html:95
 msgid ""
 "The <a href=\"http://www.participatoryculture.org/\">Participatory Culture "
-"Foundation</a> is organizing the summit. Their most recent project, <a href="
-"\"http://universalsubtitles.org/\">Amara</a>, makes open source and "
+"Foundation</a> is organizing the summit. Their most recent project, <a "
+"href=\"http://universalsubtitles.org/\">Amara</a>, makes open source and "
 "collaborative subtitling and translation easy."
 msgstr ""
 
@@ -4086,14 +3788,10 @@ msgstr "Helpgvidantoj"
 #: templates/opensubtitles2010.html:100
 msgid ""
 "<a href=\"http://www.aspirationtech.org/\">Aspiration</a> is providing "
-"facilitation and agenda design. Aspiration believes that face-to-face events "
-"are the most powerful way to facilitate interaction, build networks, and "
+"facilitation and agenda design. Aspiration believes that face-to-face events"
+" are the most powerful way to facilitate interaction, build networks, and "
 "collaborate."
-msgstr ""
-"<a href=\"http://www.aspirationtech.org/\">Aspiration</a> provizas "
-"efektivigon kaj tagordan dizajnon. Aspiration kredas ke vizaĝalvizaĝaj "
-"eventoj estas la plej potenca metodo por faciligi interrilat(ad)on, "
-"konstruadi retojn, kaj kunlabori."
+msgstr "<a href=\"http://www.aspirationtech.org/\">Aspiration</a> provizas efektivigon kaj tagordan dizajnon. Aspiration kredas ke vizaĝalvizaĝaj eventoj estas la plej potenca metodo por faciligi interrilat(ad)on, konstruadi retojn, kaj kunlabori."
 
 #: templates/opensubtitles2010.html:103
 msgid "Sponsors"
@@ -4101,19 +3799,15 @@ msgstr "Sponsoroj"
 
 #: templates/opensubtitles2010.html:104
 msgid ""
-"The summit has been generously funded by the <a href=\"http://www.soros.org/"
-"\">Open Society Institute</a>."
-msgstr ""
-"La pintokunveno estas malavare financita de la <a href=\"http://www.soros."
-"org/\">Open Society Institute</a>."
+"The summit has been generously funded by the <a "
+"href=\"http://www.soros.org/\">Open Society Institute</a>."
+msgstr "La pintokunveno estas malavare financita de la <a href=\"http://www.soros.org/\">Open Society Institute</a>."
 
 #: templates/opensubtitles2010.html:113
 msgid ""
 "Special thanks to <a href=\"http://openplans.org/\">Open Plans</a> for "
 "providing meeting space!"
-msgstr ""
-"Dankegon al  <a href=\"http://openplans.org/\">Open Plans</a> por la "
-"renkontejo!"
+msgstr "Dankegon al  <a href=\"http://openplans.org/\">Open Plans</a> por la renkontejo!"
 
 #: templates/embed_page.html:24
 msgid "Add collaborative subtitling to every video on your site"
@@ -4126,9 +3820,7 @@ msgstr ""
 #: templates/embed_page.html:32
 msgid ""
 "\n"
-"            You can add it just before the <code>&lt;/head&gt;</code> or "
-"<code>&lt;/body&gt;</code> tag (<a href=\"https://github.com/pculture/"
-"unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n"
+"            You can add it just before the <code>&lt;/head&gt;</code> or <code>&lt;/body&gt;</code> tag (<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n"
 "        "
 msgstr ""
 
@@ -4167,8 +3859,7 @@ msgstr ""
 #: templates/embed_page.html:66
 msgid ""
 "\n"
-"        A \"subtitle me\" or \"choose language\" button will appear across "
-"all compatible videos. \n"
+"        A \"subtitle me\" or \"choose language\" button will appear across all compatible videos. \n"
 "        Users can click to activate (or create) subtitles.\n"
 "        "
 msgstr ""
@@ -4179,7 +3870,7 @@ msgstr ""
 
 #: templates/embed_page.html:78
 msgid "let us know"
-msgstr ""
+msgstr "sciigu nin"
 
 #: templates/faq.html:9
 msgid "Frequently Asked Questions"
@@ -4187,11 +3878,11 @@ msgstr "Oftdemandaro"
 
 #: templates/faq.html:12 templates/faq.html:36
 msgid "What is Amara?"
-msgstr ""
+msgstr "Kio estas Amara?"
 
 #: templates/faq.html:13 templates/faq.html:47
 msgid "How can I use Amara?"
-msgstr ""
+msgstr "Kiel uzi Amara?"
 
 #: templates/faq.html:14 templates/faq.html:56
 msgid "What are the benefits of subtitles?"
@@ -4244,8 +3935,8 @@ msgstr "Kie mi povas deŝuti .SRT kaj aliajn specojn?"
 
 #: templates/faq.html:26 templates/faq.html:140
 msgid ""
-"It says \"Someone else is currently editing these subtitles\" and I can't do "
-"anything.  How long will this last for?  Why does it happen?"
+"It says \"Someone else is currently editing these subtitles\" and I can't do"
+" anything.  How long will this last for?  Why does it happen?"
 msgstr ""
 
 #: templates/faq.html:27 templates/faq.html:150
@@ -4254,11 +3945,9 @@ msgstr "Kial mi ne povas retempigi tradukatajn subtekstojn?"
 
 #: templates/faq.html:28 templates/faq.html:161
 msgid ""
-"How do old revisions work? What if somebody makes a change to my work that I "
-"don't approve of?"
-msgstr ""
-"Kie estas la antaŭaj versioj? Kio okazos se iu ŝanĝas mian laboron iel, tiel "
-"neaprobitan de mi?"
+"How do old revisions work? What if somebody makes a change to my work that I"
+" don't approve of?"
+msgstr "Kie estas la antaŭaj versioj? Kio okazos se iu ŝanĝas mian laboron iel, tiel neaprobitan de mi?"
 
 #: templates/faq.html:29 templates/faq.html:177
 msgid "How do I add the Amara &quot;embed all videos&quot; code to my site?"
@@ -4272,20 +3961,16 @@ msgstr "Nu! vi ne listigis mian lingvon!"
 msgid ""
 "\n"
 "      \t\tAmara is an easy way for anyone to add subtitles, captions, \n"
-"\t\t\tor translate nearly any video on the web. It works in a "
-"collaborative \n"
-"\t\t\tWikipedia-like fashion. The software is free and open source and can "
-"be used and \n"
-"\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center"
-"\">improved by anyone</a>.\n"
+"\t\t\tor translate nearly any video on the web. It works in a collaborative \n"
+"\t\t\tWikipedia-like fashion. The software is free and open source and can be used and \n"
+"\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center\">improved by anyone</a>.\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:49
 msgid ""
 "\n"
-"\t\t\tYou can <a href=\"http://universalsubtitles.org/videos/create\">begin "
-"subtitling</a>\n"
+"\t\t\tYou can <a href=\"http://universalsubtitles.org/videos/create\">begin subtitling</a>\n"
 "\t\t\ta video you have already posted on the web.\t\n"
 "\t\t"
 msgstr ""
@@ -4301,10 +3986,9 @@ msgstr "Apudskribaĵoj alireblas vidantoj surdaj aŭ malbon-aŭdantaj"
 
 #: templates/faq.html:60
 msgid ""
-"Translations make it possible for all of us to watch video in languages that "
-"we don't speak"
-msgstr ""
-"Tradukoj ebligas ĉiujn spekti filmojn en aliaj lingvoj kiuj ni ne scipovas"
+"Translations make it possible for all of us to watch video in languages that"
+" we don't speak"
+msgstr "Tradukoj ebligas ĉiujn spekti filmojn en aliaj lingvoj kiuj ni ne scipovas"
 
 #: templates/faq.html:61
 msgid ""
@@ -4315,8 +3999,8 @@ msgstr ""
 
 #: templates/faq.html:66
 msgid ""
-"he Participatory Culture Foundation is a 501c3 non-profit organization whose "
-"mission is to build a fairer, more open, and more democratic media space. "
+"he Participatory Culture Foundation is a 501c3 non-profit organization whose"
+" mission is to build a fairer, more open, and more democratic media space. "
 "PCF saw a gap in the marketplace for more open and collaborative subtitling "
 "&mdash; Amara is helping to fill that need."
 msgstr ""
@@ -4325,9 +4009,7 @@ msgstr ""
 msgid ""
 "Yes, we are working on a solution for making closed captions [including "
 "information about sounds and music], as well as subtitles/translations."
-msgstr ""
-"Jes, ni laboras pri solvo fari subtekstojn (inkluzive de informoj pri sonoj "
-"kaj muziko)."
+msgstr "Jes, ni laboras pri solvo fari subtekstojn (inkluzive de informoj pri sonoj kaj muziko)."
 
 #: templates/faq.html:74
 msgid ""
@@ -4337,12 +4019,9 @@ msgstr "Ni laboros subteni la plej multajn lingvojn/literarojn."
 #: templates/faq.html:79
 msgid ""
 "\n"
-"      \tThe site and tools are available in a number of languages (set your "
-"language \n"
-"\t\tin your browser preferences and we’ll take care of the rest). We’re "
-"always looking for \n"
-"\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-"
-"translateable-looking-for-translators/\">volunteer translators</a> \n"
+"      \tThe site and tools are available in a number of languages (set your language \n"
+"\t\tin your browser preferences and we’ll take care of the rest). We’re always looking for \n"
+"\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-translateable-looking-for-translators/\">volunteer translators</a> \n"
 "\t\tto help improve and add more languages.\n"
 "\t  "
 msgstr ""
@@ -4350,21 +4029,17 @@ msgstr ""
 #: templates/faq.html:90
 msgid ""
 "\n"
-"\t      For a single video, use our site. For multiple videos on your "
-"website, use \n"
-"\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">this code</a> "
-"in your \n"
+"\t      For a single video, use our site. For multiple videos on your website, use \n"
+"\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">this code</a> in your \n"
 "\t\t  website’s template inside the &lt;head&gt; tags.\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:99
 msgid ""
-"For our subtitling widget and community website, we're using the <a href="
-"\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
-msgstr ""
-"Por niaj subtekstigilo kaj komunuma retejo, ni uzas <a href=\"http://en."
-"wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
+"For our subtitling widget and community website, we're using the <a "
+"href=\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
+msgstr "Por niaj subtekstigilo kaj komunuma retejo, ni uzas <a href=\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
 
 #: templates/faq.html:103
 msgid ""
@@ -4377,42 +4052,35 @@ msgstr ""
 msgid ""
 "\n"
 "\t\tIf you're interested in general involvement, please see our \n"
-"\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla "
-"Drumbeat page</a>. \n"
+"\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla Drumbeat page</a>. \n"
 "\t\tIf you have a specific idea, please get in touch: \n"
-"\t\t<a href=\"mailto:universalsubtitles@pculture.org"
-"\">universalsubtitles@pculture.org</a> \n"
-"\t\tAnd as a 501c3 non-profit org, we do accept donations (see the next "
-"question for details).\n"
+"\t\t<a href=\"mailto:universalsubtitles@pculture.org\">universalsubtitles@pculture.org</a> \n"
+"\t\tAnd as a 501c3 non-profit org, we do accept donations (see the next question for details).\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:119
 msgid ""
 "\n"
-"      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/"
-"contribute/universalsubtitles\">donate here</a> (through the Mozilla "
-"Drumbeat project).\n"
+"      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/contribute/universalsubtitles\">donate here</a> (through the Mozilla Drumbeat project).\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:126
 msgid ""
 "The Mozilla Foundation has provided Amara with seed funding, community "
-"support, and fundraising support through <a href=\"http://www.drumbeat.org/"
-"about\">Drumbeat</a>. Drumbeat is a movement to keep the web open for the "
-"next 100 years, and Amara is a featured project!"
+"support, and fundraising support through <a "
+"href=\"http://www.drumbeat.org/about\">Drumbeat</a>. Drumbeat is a movement "
+"to keep the web open for the next 100 years, and Amara is a featured "
+"project!"
 msgstr ""
 
 #: templates/faq.html:131
 msgid ""
 "\n"
-"     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, ."
-"TXT, and DFXP.\n"
-"     \t formats on the page for that language (<a href=\"http://"
-"universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
-"\t\t Click \"Download Subtitles\" button in the lower right to the left from "
-"\"Edit Subtitles\" \n"
+"     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, .TXT, and DFXP.\n"
+"     \t formats on the page for that language (<a href=\"http://universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
+"\t\t Click \"Download Subtitles\" button in the lower right to the left from \"Edit Subtitles\" \n"
 "\t\t button and choose the desired file format from the drop-down list.\n"
 "       "
 msgstr ""
@@ -4420,10 +4088,8 @@ msgstr ""
 #: templates/faq.html:142
 msgid ""
 "\n"
-"        The system currently only allows one user to edit subtitles for any "
-"given video \n"
-"        at a time. So, if someone else is already editing subtitles for the "
-"video when \n"
+"        The system currently only allows one user to edit subtitles for any given video \n"
+"        at a time. So, if someone else is already editing subtitles for the video when \n"
 "        you try to edit the subtitles, you'll get this message.\n"
 "        "
 msgstr ""
@@ -4431,12 +4097,9 @@ msgstr ""
 #: templates/faq.html:152
 msgid ""
 "\n"
-"        You can. Go to the translation editor and click “Change subtitle "
-"timing”. \n"
-"\t\tOnly do this if the timing on the original language really cannot "
-"match \n"
-"\t\tthe language you’re translating into. Otherwise, improvements in the "
-"original \n"
+"        You can. Go to the translation editor and click “Change subtitle timing”. \n"
+"\t\tOnly do this if the timing on the original language really cannot match \n"
+"\t\tthe language you’re translating into. Otherwise, improvements in the original \n"
 "\t\twill automatically cascade.\n"
 "        "
 msgstr ""
@@ -4445,17 +4108,13 @@ msgstr ""
 msgid ""
 "\n"
 "        Each set of subtitles or translation has a full revision history. \n"
-"\t\tJust click on the tab on the subtitle page in you will see a list of "
-"revisions. \n"
-"\t\tYou can use the checkboxes on the left and the \"compare revisions\" "
-"button \n"
-"\t\tto see the difference between two revisions. Or you can click on any one "
-"revision, \n"
+"\t\tJust click on the tab on the subtitle page in you will see a list of revisions. \n"
+"\t\tYou can use the checkboxes on the left and the \"compare revisions\" button \n"
+"\t\tto see the difference between two revisions. Or you can click on any one revision, \n"
 "\t\tand edit based on that revision or roll back to that revision.\n"
 "        <br/><br/>\n"
 "        If the current version is blank, but there are older revisions, \n"
-"\t\tit make sense to check those older revisions before starting from "
-"scratch, \n"
+"\t\tit make sense to check those older revisions before starting from scratch, \n"
 "\t\tbecause there could be useful work in an older revision.\n"
 "        "
 msgstr ""
@@ -4463,14 +4122,11 @@ msgstr ""
 #: templates/faq.html:179
 msgid ""
 "\n"
-"          Go to <a href=\"http://universalsubtitles.org/get-code/\">this "
-"page</a> \n"
+"          Go to <a href=\"http://universalsubtitles.org/get-code/\">this page</a> \n"
 "\t\t  and double click on the code in the white box to select it all.  \n"
-"\t\t  Go to Edit > Copy in your browser's menu to copy the code to your "
-"clipboard.  \n"
+"\t\t  Go to Edit > Copy in your browser's menu to copy the code to your clipboard.  \n"
 "\t\t  Then start editing the headers in your site or blog theme, \n"
-"\t\t  and paste the script somewhere between the &lt;head&gt; and &lt;/"
-"head&gt; \n"
+"\t\t  and paste the script somewhere between the &lt;head&gt; and &lt;/head&gt; \n"
 "\t\t  tags in your blog theme.  \n"
 "        "
 msgstr ""
@@ -4486,9 +4142,7 @@ msgstr ""
 msgid ""
 "Thanks for getting in touch! We love hearing your ideas, bugs, feedback, "
 "opinions and such."
-msgstr ""
-"Dankon pro nin kontakti!  Plaĉegas al ni viajn ideojn, cim-raportojn, "
-"opiniojn, ktp."
+msgstr "Dankon pro nin kontakti!  Plaĉegas al ni viajn ideojn, cim-raportojn, opiniojn, ktp."
 
 #: templates/feedback_response.html:6
 msgid "Stay tuned as the project evolves!"
@@ -4506,9 +4160,7 @@ msgstr "Plej bona"
 msgid ""
 "PS. We do our best to respond to all questions, but please be patient -- we "
 "get a lot of email"
-msgstr ""
-"Postskribe, ni plejeble klopodas respondi ĉiujn demandojn, sed bonvole "
-"paciencu, ni ricevas multajn retpoŝtojn."
+msgstr "Postskribe, ni plejeble klopodas respondi ĉiujn demandojn, sed bonvole paciencu, ni ricevas multajn retpoŝtojn."
 
 #: templates/dmca.html:6
 msgid "Copyright Infringement Notification"
@@ -4517,87 +4169,44 @@ msgstr "Indiko pri kopirajta malobeo"
 #: templates/dmca.html:9
 msgid ""
 "\n"
-"To file a copyright infringement notification with us, you will need to send "
-"a\n"
-"written communication that includes substantially the following (please "
-"consult\n"
+"To file a copyright infringement notification with us, you will need to send a\n"
+"written communication that includes substantially the following (please consult\n"
 "your legal counsel or see Section 512(c)(3) of the Copyright Act to confirm\n"
 "these requirements):\n"
-msgstr ""
-"\n"
-"Por registri indikilon pri kopirajta malobeo ĉe ni, vi sendu skribitan "
-"komunikon kiu inkludas samsubstance la sekvonta (bonvolu demandu al via leĝa "
-"konsilisto aŭ vidu sekcion 512(c)(3) de la Kopirajta Akto por konfirmi tiun "
-"necesaĵojn):\n"
+msgstr "\nPor registri indikilon pri kopirajta malobeo ĉe ni, vi sendu skribitan komunikon kiu inkludas samsubstance la sekvonta (bonvolu demandu al via leĝa konsilisto aŭ vidu sekcion 512(c)(3) de la Kopirajta Akto por konfirmi tiun necesaĵojn):\n"
 
 #: templates/dmca.html:18
 msgid ""
 "\n"
-"A physical or electronic signature of a person authorized to act on behalf "
-"of\n"
+"A physical or electronic signature of a person authorized to act on behalf of\n"
 "the owner of an exclusive right that is allegedly infringed.\n"
-"Identification of the copyrighted work claimed to have been infringed, or, "
-"if\n"
+"Identification of the copyrighted work claimed to have been infringed, or, if\n"
 "multiple copyrighted works at a single online site are covered by a single\n"
 "notification, a representative list of such works at that site.\n"
-"Identification of the material that is claimed to be infringing or to be "
-"the\n"
-"subject of infringing activity and that is to be removed or access to which "
-"is\n"
+"Identification of the material that is claimed to be infringing or to be the\n"
+"subject of infringing activity and that is to be removed or access to which is\n"
 "to be disabled, and information reasonably sufficient to permit the service\n"
-"provider to locate the material. Providing URLs in the body of an email is "
-"the\n"
+"provider to locate the material. Providing URLs in the body of an email is the\n"
 "best way to help us locate content quickly.\n"
-"Information reasonably sufficient to permit the service provider to contact "
-"the\n"
-"complaining party, such as an address, telephone number, and, if available, "
-"an\n"
+"Information reasonably sufficient to permit the service provider to contact the\n"
+"complaining party, such as an address, telephone number, and, if available, an\n"
 "electronic mail address at which the complaining party may be contacted.\n"
-"A statement that the complaining party has a good faith belief that use of "
-"the\n"
-"material in the manner complained of is not authorized by the copyright "
-"owner,\n"
+"A statement that the complaining party has a good faith belief that use of the\n"
+"material in the manner complained of is not authorized by the copyright owner,\n"
 "its agent, or the law.\n"
 "A statement that the information in the notification is accurate, and under\n"
-"penalty of perjury, that the complaining party is authorized to act on "
-"behalf\n"
+"penalty of perjury, that the complaining party is authorized to act on behalf\n"
 "of the owner of an exclusive right that is allegedly infringed.\n"
 "Such written notice should be sent to our designated agent as follows:\n"
-msgstr ""
-"\n"
-"Fizikan aŭ ciferan subskribon de persono rajtigita por agi anstataŭ la "
-"posedanto de ekskluziva rajto, kiu estas nerespektita.\n"
-"Identigon de la kopirajtaĵo reklamaciita kiel nerespektita, aŭ, se estas "
-"pluraj kopirajtaĵoj ĉe ununura retejo inkluzivotaj en unu indikilo, identigo "
-"de reprezentiva listo de tiuj verkoj en la retejo.\n"
-"Identigon de la rimedoj reklamaciitaj kiel nerespektitaj aŭ de la subjekto "
-"de malrespekta aktivado, kiu estu forlasota aŭ kies alirebleco estu "
-"malpermesota, kaj informoj racie sufiĉa por ke la oferanto de la servo povos "
-"situigi la rimedon. Doni la ligil-adreson en la korpo de la mesaĝo estas la "
-"plej bona maniero helpi nin rapide situigi tiun rimedon.\n"
-"Informon racie sufiĉa por ke la oferanto de la servo povu kontakti la "
-"plendantan partion, ekzemple adreso, telefon-numero kaj - se disponeblas - "
-"retmesaĝ-adreso, por kontakti la plendantan partion.\n"
-"Aserton ke la plendanta partio havas fidindan kredon ke uzo de la rimedo, "
-"uzita tiamaniere kiel ĝi plendas, ne estas permesita laŭ la kopirajto de la "
-"posedanto, de ĝia peranto aŭ de la leĝo.\n"
-"Aserton ke la informo en la indikilo estas ĝusta kaj - kontraŭ akuzo de "
-"ĵurrompo - ke la plendanta partio rajtas agi anstataŭ la posedanto de "
-"eksluzivaj rajtoj, kiuj estas laŭesprime nerespektitaj.\n"
-"Tia skribita indikilo estu sendita al nia nomigita peranto, kiel sekvas:\n"
+msgstr "\nFizikan aŭ ciferan subskribon de persono rajtigita por agi anstataŭ la posedanto de ekskluziva rajto, kiu estas nerespektita.\nIdentigon de la kopirajtaĵo reklamaciita kiel nerespektita, aŭ, se estas pluraj kopirajtaĵoj ĉe ununura retejo inkluzivotaj en unu indikilo, identigo de reprezentiva listo de tiuj verkoj en la retejo.\nIdentigon de la rimedoj reklamaciitaj kiel nerespektitaj aŭ de la subjekto de malrespekta aktivado, kiu estu forlasota aŭ kies alirebleco estu malpermesota, kaj informoj racie sufiĉa por ke la oferanto de la servo povos situigi la rimedon. Doni la ligil-adreson en la korpo de la mesaĝo estas la plej bona maniero helpi nin rapide situigi tiun rimedon.\nInformon racie sufiĉa por ke la oferanto de la servo povu kontakti la plendantan partion, ekzemple adreso, telefon-numero kaj - se disponeblas - retmesaĝ-adreso, por kontakti la plendantan partion.\nAserton ke la plendanta partio havas fidindan kredon ke uzo de la rimedo, uzita tiamaniere kiel ĝi plendas, ne estas permesita laŭ la kopirajto de la posedanto, de ĝia peranto aŭ de la leĝo.\nAserton ke la informo en la indikilo estas ĝusta kaj - kontraŭ akuzo de ĵurrompo - ke la plendanta partio rajtas agi anstataŭ la posedanto de eksluzivaj rajtoj, kiuj estas laŭesprime nerespektitaj.\nTia skribita indikilo estu sendita al nia nomigita peranto, kiel sekvas:\n"
 
 #: templates/dmca.html:55
 msgid ""
 "\n"
-"Please also note that under Section 512(f) any person who knowingly "
-"materially\n"
+"Please also note that under Section 512(f) any person who knowingly materially\n"
 "misrepresents that material or activity is infringing may be subject to\n"
 "liability.\n"
-msgstr ""
-"\n"
-"Bonvolu ankaŭ noti ke, laŭ Sekcio 512(f), iu kiu konscie kaj konkrete "
-"misreprezentas tiun rimedon aŭ aktivadon, malrespektas kaj sekve "
-"kompensdevos.\n"
+msgstr "\nBonvolu ankaŭ noti ke, laŭ Sekcio 512(f), iu kiu konscie kaj konkrete misreprezentas tiun rimedon aŭ aktivadon, malrespektas kaj sekve kompensdevos.\n"
 
 #: templates/dmca.html:63
 msgid "Counter-Notification"
@@ -4608,10 +4217,8 @@ msgid ""
 "\n"
 "Please note that under Section 512(f) of the Copyright Act, any person who\n"
 "knowingly materially misrepresents that material or activity was removed or\n"
-"disabled by mistake or misidentification may be subject to liability. "
-"Please\n"
-"also be advised that we enforce a policy that provides for the termination "
-"in\n"
+"disabled by mistake or misidentification may be subject to liability. Please\n"
+"also be advised that we enforce a policy that provides for the termination in\n"
 "appropriate circumstances of subscribers who are repeat infringers.\n"
 msgstr ""
 
@@ -4623,8 +4230,7 @@ msgstr "Kiel registri kontraŭ-indikon al DCMA?"
 msgid ""
 "\n"
 "The process for counter-notifications is governed by Section 512(g) of the\n"
-"Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca."
-"pdf\n"
+"Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca.pdf\n"
 msgstr ""
 
 #: templates/dmca.html:82
@@ -4639,10 +4245,8 @@ msgid ""
 "\n"
 "Please note that under Section 512(f) of the Copyright Act, any person who\n"
 "knowingly materially misrepresents that material or activity was removed or\n"
-"disabled by mistake or misidentification may be subject to liability. "
-"Please\n"
-"also be advised that we enforce a policy that provides for the termination "
-"in\n"
+"disabled by mistake or misidentification may be subject to liability. Please\n"
+"also be advised that we enforce a policy that provides for the termination in\n"
 "appropriate circumstances of subscribers who are repeat infringers.\n"
 "Accordingly, if you are not sure whether certain material infringes the\n"
 "copyrights of others, we suggest that you first contact an attorney.\n"
@@ -4656,35 +4260,26 @@ msgstr "Elementoj por kontraŭ-indikon"
 msgid ""
 "\n"
 "A sample counter notification may be found at:\n"
-"http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability "
-"to\n"
-"process your counter notification, please use the following format "
-"(including\n"
+"http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability to\n"
+"process your counter notification, please use the following format (including\n"
 "section numbers):\n"
 msgstr ""
 
 #: templates/dmca.html:109
 msgid ""
 "\n"
-"Identify the specific URLs of material that Miro Guide has removed or to "
-"which\n"
+"Identify the specific URLs of material that Miro Guide has removed or to which\n"
 "Miro Guide has disabled access.\n"
-"Provide your full name, address, telephone number, and email address, and "
-"the\n"
+"Provide your full name, address, telephone number, and email address, and the\n"
 "username of your Miro Guide account.\n"
-"Provide a statement that you consent to the jurisdiction of Federal "
-"District\n"
+"Provide a statement that you consent to the jurisdiction of Federal District\n"
 "Court for the judicial district in which your address is located (or San\n"
-"Francisco County, California if your address is outside of the United "
-"States),\n"
+"Francisco County, California if your address is outside of the United States),\n"
 "and that you will accept service of process from the person who provided\n"
 "notification under subsection (c)(1)(C) or an agent of such person.\n"
-"Include the following statement: \"I swear, under penalty of perjury, that "
-"I\n"
-"have a good faith belief that the material was removed or disabled as a "
-"result\n"
-"of a mistake or misidentification of the material to be removed or disabled."
-"\"\n"
+"Include the following statement: \"I swear, under penalty of perjury, that I\n"
+"have a good faith belief that the material was removed or disabled as a result\n"
+"of a mistake or misidentification of the material to be removed or disabled.\"\n"
 "Sign the notice. If you are providing notice by e-mail, a scanned physical\n"
 "signature or a valid electronic signature will be accepted.\n"
 "Send the written communication to the following address:\n"
@@ -4697,28 +4292,21 @@ msgstr "Kio sekve okazas?"
 #: templates/dmca.html:143
 msgid ""
 "\n"
-"After we receive your counter-notification, we will forward it to the party "
-"who\n"
-"submitted the original claim of copyright infringement. Please note that "
-"when\n"
-"we forward the counter-notification, it includes your personal information. "
-"By\n"
+"After we receive your counter-notification, we will forward it to the party who\n"
+"submitted the original claim of copyright infringement. Please note that when\n"
+"we forward the counter-notification, it includes your personal information. By\n"
 "submitting a counter-notification, you consent to having your information\n"
-"revealed in this way. We will not forward the counter-notification to any "
-"party\n"
+"revealed in this way. We will not forward the counter-notification to any party\n"
 "other than the original claimant.\n"
 msgstr ""
 
 #: templates/dmca.html:153
 msgid ""
 "\n"
-"After we send out the counter-notification, the claimant must then notify "
-"us\n"
+"After we send out the counter-notification, the claimant must then notify us\n"
 "within 10 days that he or she has filed an action seeking a court order to\n"
-"restrain you from engaging in infringing activity relating to the material "
-"on\n"
-"the Miro Guide. If we receive such notification we will be unable to "
-"restore\n"
+"restrain you from engaging in infringing activity relating to the material on\n"
+"the Miro Guide. If we receive such notification we will be unable to restore\n"
 "the material. If we do not receive such notification, we may reinstate the\n"
 "material.\n"
 msgstr ""
@@ -4726,10 +4314,8 @@ msgstr ""
 #: templates/dmca.html:163
 msgid ""
 "\n"
-"DISCLAIMER: WE ARE NOT YOUR ATTORNEYS, AND THE INFORMATION WE PRESENT HERE "
-"IS\n"
-"NOT LEGAL ADVICE. WE PRESENT THIS INFORMATION FOR INFORMATIONAL PURPOSES "
-"ONLY.\n"
+"DISCLAIMER: WE ARE NOT YOUR ATTORNEYS, AND THE INFORMATION WE PRESENT HERE IS\n"
+"NOT LEGAL ADVICE. WE PRESENT THIS INFORMATION FOR INFORMATIONAL PURPOSES ONLY.\n"
 msgstr ""
 
 #: templates/about.html:9
@@ -4737,72 +4323,47 @@ msgid ""
 "\n"
 "            <h2>About Amara</h2>\n"
 "            <p>\n"
-"                Amara gives individuals, communities, and larger "
-"organizations the power \n"
-"                to overcome accessibility and language barriers for online "
-"video. The tools are free \n"
-"                and open source and make the work of subtitling and "
-"translating video simpler, more \n"
+"                Amara gives individuals, communities, and larger organizations the power \n"
+"                to overcome accessibility and language barriers for online video. The tools are free \n"
+"                and open source and make the work of subtitling and translating video simpler, more \n"
 "                appealing, and, most of all, more collaborative.\n"
 "            </p>\n"
 "            <p>\n"
 "                The benefits of captioning and subtitling are immense:\n"
 "                <ul>\n"
-"                    <li>Captions make videos accessible for viewers who are "
-"deaf or hard of hearing</li>\n"
-"                    <li>Translations make it possible for all of us to watch "
-"video in languages that we don't speak</li>\n"
-"                    <li>Video creators get: better SEO, more views, access "
-"to a far bigger (potentially multilingual and global) audience, "
-"accessibility for deaf and hard of hearing viewers, and more</li>\n"
+"                    <li>Captions make videos accessible for viewers who are deaf or hard of hearing</li>\n"
+"                    <li>Translations make it possible for all of us to watch video in languages that we don't speak</li>\n"
+"                    <li>Video creators get: better SEO, more views, access to a far bigger (potentially multilingual and global) audience, accessibility for deaf and hard of hearing viewers, and more</li>\n"
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
 "                Amara is composed of three main parts:\n"
 "                <ul>\n"
-"                    <li>A subtitle creation and viewing tool (aka the "
-"widget)</li>\n"
+"                    <li>A subtitle creation and viewing tool (aka the widget)</li>\n"
 "                    <li>A collaborative subtitling website</li>\n"
 "                    <li>An open protocol for subtitle search/delivery</li>\n"
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
-"                Everything we do is available under the open source <a href="
-"\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a> license.\n"
+"                Everything we do is available under the open source <a href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a> license.\n"
 "            </p>\n"
 "            <h2>Our Organization</h2>\n"
 "            <p>\n"
-"                <a href=\"http://www.pculture.org/\">Participatory Culture "
-"Foundation</a> \n"
-"                is a non-profit organization building free and open tools "
-"for more a democratic and \n"
-"                decentralized media. Other projects of ours include <a href="
-"\"http://www.getmiro.com/\">Miro</a>, \n"
-"                <a href=\"http://www.mirovideoconverter.com/\">Miro Video "
-"Converter</a>, \n"
-"                <a href=\"http://www.mirocommunity.org/\">Miro Community</"
-"a>, and \n"
-"                <a href=\"http://www.openvideoalliance.org/\">Open Video "
-"Alliance</a>.\n"
+"                <a href=\"http://www.pculture.org/\">Participatory Culture Foundation</a> \n"
+"                is a non-profit organization building free and open tools for more a democratic and \n"
+"                decentralized media. Other projects of ours include <a href=\"http://www.getmiro.com/\">Miro</a>, \n"
+"                <a href=\"http://www.mirovideoconverter.com/\">Miro Video Converter</a>, \n"
+"                <a href=\"http://www.mirocommunity.org/\">Miro Community</a>, and \n"
+"                <a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.\n"
 "            </p>\n"
 "            <p>\n"
-"                Amara is a featured project of <a href=\"http://www.drumbeat."
-"org/\">Mozilla Drumbeat</a>, \n"
-"                and the Mozilla Foundation has provided development "
-"support.  \n"
-"                Open Society Institute and the MacArthur Foundation are also "
-"financial supporters.\n"
+"                Amara is a featured project of <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \n"
+"                and the Mozilla Foundation has provided development support.  \n"
+"                Open Society Institute and the MacArthur Foundation are also financial supporters.\n"
 "            </p>\n"
 "            <h2>Publisher and Enterprise Services</h2>\n"
 "            <p>\n"
-"                Amara offers a set of professional tools and services that "
-"enable publishers and video platforms to create and manage high quality "
-"subtitles.  With Amara, you can build a community of volunteers to subtitle "
-"your content, integrate with professional services, and use a powerful "
-"quality control system to ensure world-class quality.  To learn more, see "
-"our <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise "
-"services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org"
-"\">dean@pculture.org</a>.\n"
+"                Amara offers a set of professional tools and services that enable publishers and video platforms to create and manage high quality subtitles.  With Amara, you can build a community of volunteers to subtitle your content, integrate with professional services, and use a powerful quality control system to ensure world-class quality.  To learn more, see our <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
 "            </p>\n"
 "        "
 msgstr ""
@@ -4843,14 +4404,13 @@ msgstr "Subtekstigi videon"
 
 #: templates/hands_main.html:67 templates/header.html:21
 #: templates/new-header.html:15 templates/base.html:74
-#, fuzzy
 msgid "Community"
-msgstr "Komunuma retejo"
+msgstr ""
 
 #: templates/hands_main.html:68
 msgid ""
-"Help make video accessible around the globe by volunteering for a caption or "
-"translation team. Amara is easy to learn and fun!"
+"Help make video accessible around the globe by volunteering for a caption or"
+" translation team. Amara is easy to learn and fun!"
 msgstr ""
 
 #: templates/hands_main.html:72 templates/community.html:21
@@ -4886,9 +4446,8 @@ msgstr "Sekvanta"
 
 #: templates/header.html:18 templates/new-header.html:12
 #: templates/base.html:73
-#, fuzzy
 msgid "Subtitle Video"
-msgstr "Subtekstigi videon"
+msgstr ""
 
 #: templates/footer.html:7
 msgid "The Amara Difference"
@@ -4906,62 +4465,59 @@ msgstr ""
 msgid "Amara is a project of the"
 msgstr ""
 
-#: templates/footer.html:30 templates/new-base.html:91 templates/base.html:129
+#: templates/footer.html:30 templates/base.html:129 templates/new-base.html:91
 msgid "Blog"
 msgstr ""
 
-#: templates/footer.html:31 templates/new-base.html:92 templates/base.html:130
+#: templates/footer.html:31 templates/base.html:130 templates/new-base.html:92
 msgid "Help"
 msgstr "Helpo"
 
-#: templates/footer.html:32 templates/new-base.html:93 templates/base.html:131
-#, fuzzy
+#: templates/footer.html:32 templates/base.html:131 templates/new-base.html:93
 msgid "Contact"
-msgstr "Kontakti nin"
+msgstr ""
 
-#: templates/footer.html:37 templates/new-base.html:98 templates/base.html:136
+#: templates/footer.html:37 templates/base.html:136 templates/new-base.html:98
 msgid "Browse"
 msgstr ""
 
-#: templates/footer.html:38 templates/new-base.html:99 templates/base.html:137
-#, fuzzy
+#: templates/footer.html:38 templates/base.html:137 templates/new-base.html:99
 msgid "Featured"
-msgstr "Reliefigi videon"
+msgstr ""
 
-#: templates/footer.html:41 templates/new-base.html:102
-#: templates/base.html:140
+#: templates/footer.html:41 templates/base.html:140
+#: templates/new-base.html:102
 msgid "More"
 msgstr ""
 
-#: templates/footer.html:50 templates/new-base.html:82 templates/base.html:149
+#: templates/footer.html:50 templates/base.html:149 templates/new-base.html:82
 msgid "Terms"
 msgstr ""
 
-#: templates/footer.html:51 templates/new-base.html:83 templates/base.html:150
-#, fuzzy
+#: templates/footer.html:51 templates/base.html:150 templates/new-base.html:83
 msgid "Privacy"
-msgstr "Privateca politiko"
-
-#: templates/footer.html:52 templates/new-base.html:84 templates/base.html:151
-msgid "Security"
 msgstr ""
+
+#: templates/footer.html:52 templates/base.html:151 templates/new-base.html:84
+msgid "Security"
+msgstr "Sekureco"
 
 #: templates/community.html:22
 msgid ""
-"Amara is home to dozens of volunteer teams that make video accessible around "
-"the globe. Look below to find a topic or organization that interests you, "
+"Amara is home to dozens of volunteer teams that make video accessible around"
+" the globe. Look below to find a topic or organization that interests you, "
 "then join the team to get involved!"
 msgstr ""
 
 #: templates/new-user-menu.html:11 templates/profiles/_user_menu.html:18
 msgid "Profile"
-msgstr ""
+msgstr "Profilo"
 
 #: templates/new-user-menu.html:26 templates/profiles/_tabs.html:23
 #: templates/profiles/_user_menu.html:35
 #: templates/videos/language-sync-history-tab.html:50
 msgid "Account"
-msgstr ""
+msgstr "Konto"
 
 #: templates/new-user-menu.html:30 templates/profiles/_user_menu.html:39
 msgid "Logout"
@@ -4970,7 +4526,7 @@ msgstr "Elsaluti"
 #: templates/new-user-menu.html:34 templates/profiles/_user_menu.html:45
 #: templates/teams/teams-list.html:7 templates/teams/teams-list.html:30
 msgid "Your Teams"
-msgstr ""
+msgstr "Viaj teamoj"
 
 #: templates/new-user-menu.html:45 templates/profiles/_user_menu.html:61
 msgid "Sign in / Sign up"
@@ -4986,7 +4542,7 @@ msgstr ""
 
 #: templates/_sharing_widget.html:3 templates/teams/_context_team.html:89
 msgid "Share"
-msgstr ""
+msgstr "Konigi"
 
 #: templates/_sharing_widget.html:6 templates/teams/_context_team.html:91
 msgid "Post to Facebook"
@@ -4996,8 +4552,8 @@ msgstr "Poŝti al Facebook"
 msgid "Post to Twitter"
 msgstr "Poŝti al Twitter"
 
-#: templates/hands_base.html:8 templates/new-base.html:8
-#: templates/base.html:10
+#: templates/hands_base.html:8 templates/base.html:10
+#: templates/new-base.html:8
 msgid "Caption, translate, subtitle and transcribe video."
 msgstr ""
 
@@ -5005,21 +4561,14 @@ msgstr ""
 msgid "Amara Logs"
 msgstr ""
 
-#: templates/hands_base.html:100 templates/new-base.html:112
-#: templates/base.html:169
+#: templates/hands_base.html:100 templates/base.html:169
+#: templates/new-base.html:112
 msgid "Impersonate"
 msgstr ""
 
-#: templates/new-base.html:109
-#, fuzzy
-#| msgid "Admin"
-msgid "Site Admin"
-msgstr "Administro"
-
 #: templates/base.html:66
-#, fuzzy
 msgid "Get Help"
-msgstr "Helpo"
+msgstr ""
 
 #: templates/base.html:99
 msgid "Got a YouTube account?"
@@ -5027,7 +4576,8 @@ msgstr ""
 
 #: templates/base.html:100
 msgid ""
-"New: enable viewer-created translations and captions on your YouTube channel!"
+"New: enable viewer-created translations and captions on your YouTube "
+"channel!"
 msgstr ""
 
 #: templates/base.html:102
@@ -5036,6 +4586,10 @@ msgstr ""
 
 #: templates/base.html:103
 msgid "No thanks"
+msgstr ""
+
+#: templates/new-base.html:109
+msgid "Site Admin"
 msgstr ""
 
 #: templates/comments/_item.html:3 templates/messages/message.html:68
@@ -5071,9 +4625,7 @@ msgstr "Pasvorta novigado sukcesis"
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr ""
-"Ni retpoŝtis al vi klarigojn pri agordo de pasvorto.  Vi devus ricevi ĝin "
-"baldaŭ."
+msgstr "Ni retpoŝtis al vi klarigojn pri agordo de pasvorto.  Vi devus ricevi ĝin baldaŭ."
 
 #: templates/registration/password_reset_complete.html:7
 #: templates/registration/password_reset_complete.html:13
@@ -5133,9 +4685,7 @@ msgstr "Pasvorta novigado malsukcesis"
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr ""
-"Ligilo por pasvorta novigado ne validas, eble ĉar jam uzita.  Bonvole petu "
-"denove pasvortan novigadon."
+msgstr "Ligilo por pasvorta novigado ne validas, eble ĉar jam uzita.  Bonvole petu denove pasvortan novigadon."
 
 #: templates/registration/password_reset_email.html:3
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -5150,8 +4700,8 @@ msgstr "por via uzula konto ĉe %(site_name)s"
 msgid ""
 "This account currently uses an external login mechanism. If you proceed and "
 "reset your password, it will be converted into a regular Amara account, and "
-"you will have to authenticate with your username and newly created password. "
-"Your existing videos, teams and subtiles will not be affected in any ways."
+"you will have to authenticate with your username and newly created password."
+" Your existing videos, teams and subtiles will not be affected in any ways."
 msgstr ""
 
 #: templates/registration/password_reset_email.html:10
@@ -5160,7 +4710,7 @@ msgstr "Bonvole iru al la jena paĝo kaj ŝanĝu pasvorton:"
 
 #: templates/registration/password_reset_email.html:18
 msgid "Your username, in case you've forgotten:"
-msgstr "Via salutnomo (eble vi ĝin forgesis):"
+msgstr "Via uzantnomo, se vi eble forgesis ĝin:"
 
 #: templates/registration/password_reset_email.html:20
 msgid "Thanks for using our site!"
@@ -5169,7 +4719,7 @@ msgstr "Dankon pro uzo de nia retejo!"
 #: templates/registration/password_reset_email.html:22
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "La %(site_name)s skipo"
+msgstr "La %(site_name)s teamo"
 
 #: templates/registration/password_reset_form.html:13
 #: templates/openid_consumer/signin.html:15
@@ -5187,9 +4737,7 @@ msgstr ""
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr ""
-"Forgesis vian pasvorton?  Enigu vian retpoŝtadreson, kaj ni retpoŝtos al vi "
-"klarigojn pri pasvorta ŝanĝo."
+msgstr "Forgesis vian pasvorton?  Enigu vian retpoŝtadreson, kaj ni retpoŝtos al vi klarigojn pri pasvorta ŝanĝo."
 
 #: templates/registration/password_reset_form.html:23
 msgid "E-mail address:"
@@ -5212,9 +4760,7 @@ msgstr "Agado mankas"
 msgid ""
 "It looks like you logged in without submitting an email. We need an email "
 "address to notify you (for example, when others edit your work)."
-msgstr ""
-"Ŝajnas ke vi ensalutis sen registri retmesaĝadreson. Ni bezonas adreson por "
-"indiki vin (ekzemple kiam aliaj redaktas vian laboron)."
+msgstr "Ŝajnas ke vi ensalutis sen registri retmesaĝadreson. Ni bezonas adreson por indiki vin (ekzemple kiam aliaj redaktas vian laboron)."
 
 #: templates/profiles/_require_email_dialog.html:8
 msgid "Please enter a valid e-mail address"
@@ -5239,7 +4785,7 @@ msgstr ""
 #: templates/profiles/_video_detail.html:8
 #: templates/teams/members-list.html:108 templates/teams/_context_team.html:70
 msgid "language"
-msgstr ""
+msgstr "lingvo"
 
 #: templates/profiles/_video_detail.html:10
 msgid "No subtitles yet"
@@ -5251,7 +4797,7 @@ msgstr "Personaj informoj"
 
 #: templates/profiles/dashboard.html:29
 msgid "You have "
-msgstr ""
+msgstr "Vi havas"
 
 #: templates/profiles/dashboard.html:30
 msgid "Go to your inbox"
@@ -5367,7 +4913,7 @@ msgstr ""
 
 #: templates/profiles/view.html:57
 msgid "Edit user"
-msgstr ""
+msgstr "Redakti uzanton"
 
 #: templates/profiles/_select_language_dialog.html:5
 #: templates/search/search.html:147 templates/videos/featured_videos.html:55
@@ -5401,28 +4947,27 @@ msgstr "Sendi!"
 
 #: templates/profiles/edit.html:6
 msgid "Edit Profile"
-msgstr ""
+msgstr "Redakti profilon"
 
 #: templates/profiles/edit.html:18
 msgid "Languages you can caption or translate"
 msgstr ""
 
 #: templates/profiles/edit.html:21
-#, fuzzy
 msgid "Specify or update your languages"
-msgstr "Elektu viajn Lingvojn"
+msgstr ""
 
 #: templates/profiles/edit.html:41 templates/teams/_application_form.html:32
 msgid "About you"
-msgstr ""
+msgstr "Pri vi"
 
 #: templates/profiles/edit.html:55
 msgid "Photo"
-msgstr ""
+msgstr "Foto"
 
 #: templates/profiles/edit.html:59
 msgid "Remove current photo"
-msgstr ""
+msgstr "Forigi nunan foton"
 
 #: templates/profiles/edit.html:106 templates/videos/video-urls-tab.html:81
 msgid "Saving..."
@@ -5448,8 +4993,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                                        <strong>link is active</strong> for "
-"%(username)s\n"
+"                                        <strong>link is active</strong> for %(username)s\n"
 "                                    "
 msgstr ""
 
@@ -5465,7 +5009,7 @@ msgstr ""
 
 #: templates/profiles/account.html:72
 msgid "Other Accounts"
-msgstr ""
+msgstr "Aliaj kontoj"
 
 #: templates/profiles/account.html:74
 msgid "Sign in to Amara with Twitter, Facebook, and other accounts"
@@ -5473,11 +5017,11 @@ msgstr ""
 
 #: templates/profiles/account.html:75
 msgid "Add an account"
-msgstr ""
+msgstr "Aldoni konton"
 
 #: templates/profiles/account.html:104
 msgid "Notifications"
-msgstr ""
+msgstr "Sciigoj"
 
 #: templates/profiles/account.html:106
 msgid "Send notifications to my amara.org inbox"
@@ -5533,25 +5077,21 @@ msgstr ""
 #: templates/profiles/account.html:183
 msgid ""
 "\n"
-"                                        We automatically <strong>add your "
-"public and unlisted YouTube videos to Amara</strong> (and import their "
-"subtitles).\n"
+"                                        We automatically <strong>add your public and unlisted YouTube videos to Amara</strong> (and import their subtitles).\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:188
 msgid ""
 "\n"
-"                                        We <strong>invite your viewers to "
-"subtitle</strong> by adding a link to your video descriptions.\n"
+"                                        We <strong>invite your viewers to subtitle</strong> by adding a link to your video descriptions.\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:193
 msgid ""
 "\n"
-"                                        We <strong>send subtitles to "
-"YouTube</strong> whenever they're completed on Amara.\n"
+"                                        We <strong>send subtitles to YouTube</strong> whenever they're completed on Amara.\n"
 "                                    "
 msgstr ""
 
@@ -5562,17 +5102,14 @@ msgstr ""
 #: templates/profiles/account.html:202
 msgid ""
 "\n"
-"                                        The link is <strong>one-way only</"
-"strong>. Changes made on YouTube won't be reflected on Amara and may be "
-"overwritten. Use Amara to edit subtitles.\n"
+"                                        The link is <strong>one-way only</strong>. Changes made on YouTube won't be reflected on Amara and may be overwritten. Use Amara to edit subtitles.\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:207
 msgid ""
 "\n"
-"                                        Amara will <strong>append a credit</"
-"strong> to the subtitles if space allows.\n"
+"                                        Amara will <strong>append a credit</strong> to the subtitles if space allows.\n"
 "                                    "
 msgstr ""
 
@@ -5611,11 +5148,11 @@ msgstr ""
 
 #: templates/profiles/base.html:13
 msgid "Send "
-msgstr ""
+msgstr "Sendi"
 
 #: templates/profiles/base.html:13
 msgid " a Message"
-msgstr ""
+msgstr "mesaĝon"
 
 #: templates/profiles/base.html:16
 msgid "About"
@@ -5636,14 +5173,8 @@ msgid_plural ""
 "\n"
 "              %(number)s languages\n"
 "          "
-msgstr[0] ""
-"\n"
-"              %(number)s lingvo\n"
-"          "
-msgstr[1] ""
-"\n"
-"              %(number)s lingvoj\n"
-"          "
+msgstr[0] "\n              %(number)s lingvo\n          "
+msgstr[1] "\n              %(number)s lingvoj\n          "
 
 #: templates/search/_video_item.html:24
 msgid "lines"
@@ -5655,7 +5186,7 @@ msgstr "Serĉi videojn"
 
 #: templates/search/_search_form.html:25
 msgid "Videos In"
-msgstr ""
+msgstr "Videos en"
 
 #: templates/search/_search_form.html:29 templates/teams/tasks.html:239
 msgid "Subtitles into"
@@ -5680,7 +5211,7 @@ msgstr ""
 
 #: templates/search/search.html:142 templates/videos/featured_videos.html:50
 msgid "of"
-msgstr ""
+msgstr "de"
 
 #: templates/teams/_application_form.html:4
 msgid "Apply to Join"
@@ -5700,19 +5231,14 @@ msgstr "Lingva scio"
 #, python-format
 msgid ""
 "\n"
-"                                No formal language training is required to "
-"translate for %(team)s. But we do ask that all translators are confident in "
-"their translation abilities. Please make sure your language selections are "
-"accurate (click \"Select your Languages\" in the blue bar on any page).\n"
+"                                No formal language training is required to translate for %(team)s. But we do ask that all translators are confident in their translation abilities. Please make sure your language selections are accurate (click \"Select your Languages\" in the blue bar on any page).\n"
 "                            "
 msgstr ""
 
 #: templates/teams/_application_form.html:28
 msgid ""
 "\n"
-"                                We request that each new applicant does at "
-"least one full set of subtitles within the first week of joining. Aside from "
-"that, it’s up to you!\n"
+"                                We request that each new applicant does at least one full set of subtitles within the first week of joining. Aside from that, it’s up to you!\n"
 "                            "
 msgstr ""
 
@@ -5720,9 +5246,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        Tell us a little bit about yourself and why you’re "
-"interested in translating with %(team)s. This should be 3-5 sentences, no "
-"longer!\n"
+"                        Tell us a little bit about yourself and why you’re interested in translating with %(team)s. This should be 3-5 sentences, no longer!\n"
 "                        "
 msgstr ""
 
@@ -5752,7 +5276,7 @@ msgstr ""
 
 #: templates/teams/delete-language.html:14
 msgid "WARNING!"
-msgstr ""
+msgstr "AVERTO!"
 
 #: templates/teams/delete-language.html:16
 msgid "All subtitles for this language will be deleted"
@@ -5780,31 +5304,25 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"            %(team_name)s needs your help subtitling and translating the "
-"following new videos:\n"
+"            %(team_name)s needs your help subtitling and translating the following new videos:\n"
 "        "
-msgstr ""
-"\n"
-"%(team_name)s bezonas vian helpon por subtitoligi kaj traduki la sekvontajn "
-"novajn filmojn:"
+msgstr "\n%(team_name)s bezonas vian helpon por subtitoligi kaj traduki la sekvontajn novajn filmojn:"
 
 #: templates/teams/email_new_video.html:13
 msgid "Or you can visit the team page to see the latest work"
-msgstr "Aŭ vi povas viziti la skipan paĝon por vidi la ĵusan laboron"
+msgstr "Aŭ vi povas viziti la teaman paĝon por vidi la ĵusan laboron"
 
 #: templates/teams/email_new_video.html:17
 msgid "Stop receiving new notifications when a new video is added."
 msgstr "Ne plu ricevi novajn indikojn kiam nova filmo estas aldonita."
 
 #: templates/teams/feed.html:24
-#, fuzzy
 msgid "Import Now"
-msgstr "Donacu nun"
+msgstr ""
 
 #: templates/teams/feed.html:27
-#, fuzzy
 msgid "Delete Feed"
-msgstr "Forigita"
+msgstr ""
 
 #: templates/teams/feed.html:29
 #, python-format
@@ -5824,18 +5342,16 @@ msgid "No import attempts"
 msgstr ""
 
 #: templates/teams/feed.html:43
-#, fuzzy
 msgid "Videos:"
-msgstr "Videoj"
+msgstr ""
 
 #: templates/teams/feed.html:56
 msgid "No videos imported yet."
 msgstr ""
 
 #: templates/teams/feed.html:64
-#, fuzzy
 msgid "Are you sure you want to delete the feed?"
-msgstr "Ĉu vi vere volas forigi vian foton?"
+msgstr ""
 
 #: templates/teams/feed.html:66 templates/teams/tasks.html:515
 #: templates/auth/delete_user.html:17
@@ -5862,8 +5378,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"            The <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</"
-"a> \n"
+"            The <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n"
 "            team has added new videos, and they need your help:\n"
 "        "
 msgstr ""
@@ -5886,7 +5401,7 @@ msgstr ""
 
 #: templates/teams/add_video.html:6 templates/teams/add_videos.html:6
 msgid "Team video"
-msgstr "Skipa filmo"
+msgstr "Teama filmo"
 
 #: templates/teams/add_video.html:16
 msgid "Add video"
@@ -5910,14 +5425,12 @@ msgstr ""
 
 #: templates/teams/add-video-to-team.html:4
 #: templates/teams/add-video-to-team.html:8
-#, fuzzy
 msgid "Add Video to Team"
-msgstr "Aldoni novan skipon"
+msgstr ""
 
 #: templates/teams/add-video-to-team.html:14
-#, fuzzy
 msgid "Set Team"
-msgstr "Krei skipon"
+msgstr ""
 
 #: templates/teams/settings-languages.html:27
 msgid "Preferred Languages"
@@ -5956,8 +5469,8 @@ msgstr ""
 
 #: templates/teams/_team_move_video_select.html:33
 msgid ""
-"You are about to move this video to a new team.<br /><strong>If you proceed, "
-"all open tasks will be deleted.</strong>"
+"You are about to move this video to a new team.<br /><strong>If you proceed,"
+" all open tasks will be deleted.</strong>"
 msgstr ""
 
 #: templates/teams/_team_select.html:7
@@ -5966,12 +5479,11 @@ msgstr "Mastrumi"
 
 #: templates/teams/_team_select.html:16
 msgid "Add new team"
-msgstr "Aldoni novan skipon"
+msgstr "Aldoni novan teamon"
 
 #: templates/teams/applications.html:7
-#, fuzzy
 msgid "Team Applications"
-msgstr "Formularo"
+msgstr ""
 
 #: templates/teams/applications.html:33 templates/teams/applications.html:74
 #: templates/teams/approvals.html:83 templates/teams/approvals.html:125
@@ -5987,13 +5499,12 @@ msgstr ""
 
 #: templates/teams/applications.html:35 templates/teams/applications.html:76
 #: templates/teams/approvals.html:84 templates/teams/approvals.html:126
-#, fuzzy
 msgid "Approve selected"
-msgstr "Aprobita"
+msgstr ""
 
 #: templates/teams/applications.html:43
 msgid "Send a message"
-msgstr ""
+msgstr "Sendi mesaĝon"
 
 #: templates/teams/applications.html:65
 msgid "Deny"
@@ -6005,11 +5516,11 @@ msgstr ""
 
 #: templates/teams/create.html:7
 msgid "Create team"
-msgstr "Krei skipon"
+msgstr "Krei teamon"
 
 #: templates/teams/create.html:23 templates/teams/create.html:69
 msgid "Create a team"
-msgstr ""
+msgstr "Krei teamon"
 
 #: templates/teams/create.html:28 templates/teams/teams-list.html:24
 msgid "All Teams"
@@ -6017,7 +5528,7 @@ msgstr ""
 
 #: templates/teams/create.html:33
 msgid "My Teams"
-msgstr "Miaj Skipoj"
+msgstr "Miaj teamoj"
 
 #: templates/teams/create.html:43 templates/teams/_subnav_settings.html:6
 #: templates/new-teams/settings.html:12
@@ -6030,7 +5541,7 @@ msgstr ""
 
 #: templates/teams/create.html:61
 msgid "Create Team"
-msgstr "Krei skipon"
+msgstr "Krei teamon"
 
 #: templates/teams/create.html:73
 msgid "Back to teams"
@@ -6100,9 +5611,8 @@ msgstr ""
 
 #: templates/teams/feeds.html:21 templates/new-teams/settings-feeds.html:36
 #: templates/new-teams/settings-feeds.html:41
-#, fuzzy
 msgid "Add Video Feed"
-msgstr "Aldoni videon"
+msgstr ""
 
 #: templates/teams/feeds.html:31
 #, python-format
@@ -6229,7 +5739,7 @@ msgstr "ĉiuj lingvoj"
 
 #: templates/teams/tasks.html:98
 msgid "my languages"
-msgstr ""
+msgstr "miaj lingvo"
 
 #: templates/teams/tasks.html:106
 msgid "assigned to"
@@ -6332,9 +5842,8 @@ msgid "Subtitles"
 msgstr "Subtekstoj"
 
 #: templates/teams/tasks.html:251
-#, fuzzy
 msgid "Original Language"
-msgstr "Ĉiuj lingvoj"
+msgstr ""
 
 #: templates/teams/tasks.html:272
 msgid "latest draft"
@@ -6399,13 +5908,13 @@ msgstr ""
 #: templates/teams/tasks.html:399
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
-"\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title "
-"and video description in the onsite editor and to submit the final version."
+"\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title"
+" and video description in the onsite editor and to submit the final version."
 msgstr ""
 
 #: templates/teams/tasks.html:414
 msgid "File:"
-msgstr ""
+msgstr "Dosiero:"
 
 #: templates/teams/tasks.html:420
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for DFXP)"
@@ -6462,14 +5971,12 @@ msgid "Any type"
 msgstr ""
 
 #: templates/teams/activity.html:46 templates/new-teams/activity.html:37
-#, fuzzy
 msgid "Subtitles Language"
-msgstr "Subtekstoj en"
+msgstr ""
 
 #: templates/teams/activity.html:71 templates/new-teams/activity.html:62
-#, fuzzy
 msgid "Sorted by"
-msgstr "Vicigi laŭ"
+msgstr ""
 
 #: templates/teams/_activity-list.html:14
 #: templates/videos/language-revisions-tab.html:63
@@ -6484,15 +5991,13 @@ msgstr ""
 
 #: templates/teams/_subnav_activity.html:12
 #: templates/new-teams/_activity-tabs.html:11
-#, fuzzy
 msgid "Videos Statistics"
-msgstr "Filma statistiko"
+msgstr ""
 
 #: templates/teams/_subnav_activity.html:16
 #: templates/new-teams/_activity-tabs.html:15
-#, fuzzy
 msgid "Team Statistics"
-msgstr "Ĝenerala statistiko"
+msgstr ""
 
 #: templates/teams/add_videos.html:16
 msgid "Add multiple videos"
@@ -6510,7 +6015,7 @@ msgstr ""
 
 #: templates/teams/settings-workflows.html:39
 msgid "Who can transcribe subtitles?"
-msgstr ""
+msgstr "Kiu rajtas transskribi subtekstigojn?"
 
 #: templates/teams/settings-workflows.html:40
 msgid "i.e. transcribe from video and perform time-alignment"
@@ -6643,8 +6148,7 @@ msgstr ""
 #: templates/teams/dashboard.html:84
 msgid ""
 "\n"
-"                            Just find a video that interests you and click "
-"the button below it to get started!\n"
+"                            Just find a video that interests you and click the button below it to get started!\n"
 "                        "
 msgstr ""
 
@@ -6654,7 +6158,7 @@ msgstr ""
 
 #: templates/teams/dashboard.html:93
 msgid "Welcome!"
-msgstr ""
+msgstr "Bonvenon!"
 
 #: templates/teams/dashboard.html:98
 msgid ""
@@ -6717,7 +6221,7 @@ msgstr ""
 
 #: templates/teams/invite_members.html:18
 msgid "Recipient"
-msgstr ""
+msgstr "Ricevonto"
 
 #: templates/teams/invite_members.html:24
 msgid "Begin typing to search."
@@ -6761,7 +6265,7 @@ msgstr ""
 
 #: templates/teams/members-list.html:53
 msgid "contributor"
-msgstr ""
+msgstr "kontribuanto"
 
 #: templates/teams/members-list.html:57
 msgid "speaking"
@@ -6810,15 +6314,15 @@ msgstr ""
 
 #: templates/teams/team_video.html:7
 msgid "Edit team video"
-msgstr "Redakti skipan filmon"
+msgstr "Redakti teaman filmon"
 
 #: templates/teams/team_video.html:28 templates/videos/video-page.html:115
 msgid "Edit video"
-msgstr ""
+msgstr "Redakti videon"
 
 #: templates/teams/teams-list.html:19
 msgid "Team Directory"
-msgstr "Skipejo"
+msgstr "Teamejo"
 
 #: templates/teams/teams-list.html:42
 msgid "Sort by"
@@ -6826,7 +6330,7 @@ msgstr "Vicigi laŭ"
 
 #: templates/teams/teams-list.html:65
 msgid "Your team"
-msgstr ""
+msgstr "Via teamo"
 
 #: templates/teams/teams-list.html:79
 msgid "Role:"
@@ -6834,11 +6338,11 @@ msgstr "Rolo:"
 
 #: templates/teams/teams-list.html:83 templates/teams/_context_team.html:83
 msgid "Do you really wish to leave this team?"
-msgstr "Ĉu vi vere volas lasi tiun skipon?"
+msgstr "Ĉu vi vere volas lasi tiun teamon?"
 
 #: templates/teams/teams-list.html:83
 msgid "leave team"
-msgstr "Lasi skipon"
+msgstr "forlasi teamon"
 
 #: templates/teams/teams-list.html:91 templates/teams/teams-list.html:97
 #, python-format
@@ -6850,8 +6354,8 @@ msgid_plural ""
 "\n"
 "                                        %(count)s members\n"
 "                                    "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                                        %(count)s membro\n                                    "
+msgstr[1] "\n                                        %(count)s membroj\n                                    "
 
 #: templates/teams/teams-list.html:106
 #, python-format
@@ -6863,8 +6367,8 @@ msgid_plural ""
 "\n"
 "                                %(count)s videos\n"
 "                            "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                                %(count)s video\n                            "
+msgstr[1] "\n                                %(count)s videoj\n                            "
 
 #: templates/teams/teams-list.html:116
 msgid "Sorry, no teams found."
@@ -6876,13 +6380,12 @@ msgstr ""
 
 #: templates/teams/teams-list.html:129
 msgid "Start a Team"
-msgstr "Komencu Skipon"
+msgstr "Krei teamon"
 
 #: templates/teams/teams-list.html:133
 msgid ""
 "\n"
-"                Want to create your own subtitling team? Contact <a href="
-"\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n"
+"                Want to create your own subtitling team? Contact <a href=\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n"
 "            "
 msgstr ""
 
@@ -6914,10 +6417,8 @@ msgstr ""
 
 #: templates/teams/settings-lang-messages.html:39
 #: templates/new-teams/settings-lang-messages.html:24
-#, fuzzy
-#| msgid "Send message"
 msgid "Edit messages"
-msgstr "Sendi mesaĝon"
+msgstr ""
 
 #: templates/teams/settings-messages.html:27
 #: templates/new-teams/settings-messages.html:11
@@ -6932,8 +6433,8 @@ msgstr ""
 #: templates/teams/settings-messages.html:42
 #: templates/new-teams/settings-messages.html:24
 msgid ""
-"Customize the messages sent to your users. The text you enter will accompany "
-"the default system message."
+"Customize the messages sent to your users. The text you enter will accompany"
+" the default system message."
 msgstr ""
 
 #: templates/teams/settings-messages.html:45
@@ -6960,7 +6461,7 @@ msgstr ""
 
 #: templates/teams/base.html:41 templates/new-teams/base.html:97
 msgid "Edit team"
-msgstr ""
+msgstr "Redakti teamon"
 
 #: templates/teams/_context_team.html:13 templates/teams/_context_team.html:41
 #: templates/teams/_context_team.html:109
@@ -6992,7 +6493,7 @@ msgstr ""
 
 #: templates/teams/_context_team.html:83
 msgid "Leave team"
-msgstr "Lasi skipon"
+msgstr "Lasi teamon"
 
 #: templates/teams/_context_team.html:115
 msgid "Want to create your own subtitling team? Contact "
@@ -7043,8 +6544,8 @@ msgid_plural ""
 "\n"
 "                        %(num)s languages\n"
 "                    "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                        %(num)s lingvo\n                    "
+msgstr[1] "\n                        %(num)s lingvoj\n                    "
 
 #: templates/teams/approvals.html:7
 msgid "Team Approvals"
@@ -7057,7 +6558,7 @@ msgstr "Filtrilo"
 #: templates/teams/approvals.html:53 templates/teams/move_videos.html:60
 #: templates/teams/videos-list.html:70
 msgid "Project:"
-msgstr ""
+msgstr "Projekto:"
 
 #: templates/teams/approvals.html:55 templates/teams/approvals.html:64
 #: templates/teams/move_videos.html:62 templates/teams/move_videos.html:75
@@ -7069,7 +6570,7 @@ msgstr ""
 #: templates/teams/approvals.html:62 templates/teams/move_videos.html:69
 #: templates/teams/videos-list.html:79
 msgid "Language:"
-msgstr ""
+msgstr "Lingvo:"
 
 #: templates/teams/approvals.html:77
 msgid "Bulk Accept Unassigned Approval Tasks"
@@ -7087,31 +6588,29 @@ msgstr ""
 #: templates/videos/language-subtitles-tab.html:70
 #: templates/videos/diffing.html:129 templates/videos/diffing.html:175
 msgid "Title:"
-msgstr ""
+msgstr "Titolo:"
 
 #: templates/teams/approvals.html:105
 #: templates/videos/language-subtitles-tab.html:74
 #: templates/videos/diffing.html:133 templates/videos/diffing.html:179
 msgid "Description:"
-msgstr ""
+msgstr "Priskribo:"
 
 #: templates/teams/approvals.html:130
-#, fuzzy
 msgid "There are no approvals right now"
-msgstr "Estas neniuj agadoj."
+msgstr ""
 
 #: templates/teams/move_videos.html:50
-#, fuzzy
 msgid "Move videos"
-msgstr "filmoj"
+msgstr ""
 
 #: templates/teams/move_videos.html:71 templates/teams/videos-list.html:81
 msgid "has"
-msgstr ""
+msgstr "havas"
 
 #: templates/teams/move_videos.html:72 templates/teams/videos-list.html:82
 msgid "doesn't have"
-msgstr ""
+msgstr "ne havas"
 
 #: templates/teams/move_videos.html:87 templates/teams/videos-list.html:97
 msgid "Sort:"
@@ -7142,14 +6641,12 @@ msgid "least completed languages"
 msgstr ""
 
 #: templates/teams/move_videos.html:111
-#, fuzzy
 msgid "Primary audio language:"
-msgstr "Videa lingvo"
+msgstr ""
 
 #: templates/teams/move_videos.html:114
-#, fuzzy
 msgid "set"
-msgstr "Sugesto"
+msgstr ""
 
 #: templates/teams/move_videos.html:115
 #: templates/videos/set-original-language.html:36
@@ -7170,7 +6667,7 @@ msgstr ""
 
 #: templates/teams/move_videos.html:172 templates/teams/videos-list.html:146
 msgid "Remove video"
-msgstr ""
+msgstr "Forigi videon"
 
 #: templates/teams/move_videos.html:179 templates/teams/videos-list.html:153
 #, python-format
@@ -7181,10 +6678,7 @@ msgstr ""
 #, python-format
 msgid ""
 "You are removing this video from the %(team)s team.<br /><br />\n"
-"                                It will remain on Amara but will no longer "
-"be subject to the team's permissions and worfklows. Any outstanding tasks "
-"will be deleted. Private videos will become available for viewing and "
-"editing to the general public. Are you sure you want to proceed?"
+"                                It will remain on Amara but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted. Private videos will become available for viewing and editing to the general public. Are you sure you want to proceed?"
 msgstr ""
 
 #: templates/teams/move_videos.html:183 templates/teams/videos-list.html:157
@@ -7210,20 +6704,18 @@ msgid "Delete the video entirely."
 msgstr ""
 
 #: templates/teams/videos-list.html:47
-#, fuzzy
 msgid "Move Videos"
-msgstr "Videoj"
+msgstr ""
 
 #: templates/teams/videos-list.html:50
 msgid "Add Video"
-msgstr ""
+msgstr "Aldoni videon"
 
 #: templates/teams/email_videos_added.html:7
 #, python-format
 msgid ""
 "\n"
-"            The list of videos for team <a href=\"http://%(domain)s"
-"%(team_url)s\">%(team_name)s</a> \n"
+"            The list of videos for team <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n"
 "            was processed completely. Here is a summary.\n"
 "        "
 msgstr ""
@@ -7249,7 +6741,7 @@ msgstr ""
 
 #: templates/auth/_email_confirmation_notification.html:12
 msgid "Resend confirmation email"
-msgstr ""
+msgstr "Resendi konfirman retpoŝton"
 
 #: templates/auth/_new_user_notification.html:11
 msgid ""
@@ -7263,26 +6755,20 @@ msgid "Alternatively, you can"
 msgstr ""
 
 #: templates/auth/_new_user_notification.html:13
-#, fuzzy
-#| msgid "Reset my password"
 msgid "reset your password"
-msgstr "Novigi mian pasvorton"
+msgstr ""
 
 #: templates/auth/delete_user.html:10
 msgid "Are you sure that you want to permanently delete your profile?"
 msgstr ""
 
 #: templates/auth/delete_user.html:12
-#, fuzzy
-#| msgid "Title can't be empty"
 msgid "This can't be undone!"
-msgstr "Titolo ne povas esti malplena"
+msgstr ""
 
 #: templates/auth/delete_user.html:13
-#, fuzzy
-#| msgid "Please enter your email address."
 msgid "Please enter your login password to confirm"
-msgstr "Bonvole enigu vian retpoŝtadreson."
+msgstr ""
 
 #: templates/auth/login.html:17
 msgid "Use an existing identity"
@@ -7297,9 +6783,8 @@ msgid "Forgot your password?"
 msgstr "Forgesis vian pasvorton?"
 
 #: templates/auth/login.html:45
-#, fuzzy
 msgid "Create an Account"
-msgstr "Krei Konton"
+msgstr ""
 
 #: templates/auth/login.html:46
 msgid "It's free!"
@@ -7310,10 +6795,8 @@ msgid "Create Account"
 msgstr "Krei Konton"
 
 #: templates/auth/login_create.html:16
-#, fuzzy
-#| msgid "Sign in"
 msgid "Sign Up"
-msgstr "Ensaluti"
+msgstr ""
 
 #: templates/auth/login_create.html:17
 msgid ""
@@ -7348,13 +6831,13 @@ msgstr "Sendi"
 #: templates/messages/task-team-editor-note.html:1
 #, python-format
 msgid ""
-"%(note_user)s added a note to subtitles on which you are collaborating. View "
-"tasks for <a href=\"%(tasks_url)s\">%(video)s / %(language)s</a>."
+"%(note_user)s added a note to subtitles on which you are collaborating. View"
+" tasks for <a href=\"%(tasks_url)s\">%(video)s / %(language)s</a>."
 msgstr ""
 
 #: templates/messages/new.html:9
 msgid "Messages - New"
-msgstr ""
+msgstr "Mesaĝoj - Nova"
 
 #: templates/messages/new-comment.html:1
 #, python-format
@@ -7368,11 +6851,11 @@ msgstr ""
 
 #: templates/messages/base.html:11
 msgid "New message"
-msgstr ""
+msgstr "Nova mesaĝo"
 
 #: templates/messages/base.html:16
 msgid "Inbox"
-msgstr ""
+msgstr "Enirkesto"
 
 #: templates/messages/base.html:21
 msgid "Sent"
@@ -7380,7 +6863,7 @@ msgstr ""
 
 #: templates/messages/message.html:7 templates/messages/inbox.html:7
 msgid "Messages - Inbox"
-msgstr ""
+msgstr "Mesaĝoj - Enirkesto"
 
 #: templates/messages/message.html:20 templates/messages/sent.html:17
 #: templates/messages/inbox.html:20
@@ -7389,10 +6872,8 @@ msgstr ""
 
 #: templates/messages/message.html:21 templates/messages/sent.html:18
 #: templates/messages/inbox.html:21
-#, fuzzy
-#| msgid "Do you really wish to leave this team?"
 msgid "Do you really wish to delete these messages?"
-msgstr "Ĉu vi vere volas lasi tiun skipon?"
+msgstr ""
 
 #: templates/messages/message.html:22 templates/messages/inbox.html:22
 msgid "The message has been successfully sent."
@@ -7400,9 +6881,8 @@ msgstr ""
 
 #: templates/messages/message.html:31 templates/messages/sent.html:27
 #: templates/messages/inbox.html:31
-#, fuzzy
 msgid "Delete selected"
-msgstr "Forigita"
+msgstr ""
 
 #: templates/messages/message.html:33
 msgid "Hide message thread"
@@ -7441,31 +6921,24 @@ msgid "Type:"
 msgstr ""
 
 #: templates/messages/inbox.html:49
-#, fuzzy
-#| msgid "Send Message"
 msgid "Regular Message"
-msgstr "Sendi Mesaĝon"
+msgstr ""
 
 #: templates/messages/inbox.html:50
-#, fuzzy
-#| msgid "Counter-Notification"
 msgid "System Notification"
-msgstr "Kontraŭ-indiko"
+msgstr ""
 
 #: templates/messages/inbox.html:92
 msgid "Mark Read"
 msgstr ""
 
 #: templates/messages/_messages.html:10
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "                  You have %(msg_count)s new messages.\n"
 "              "
 msgstr ""
-"\n"
-"              %(number)s lingvo\n"
-"          "
 
 #: templates/messages/email/message_received.html:7
 #, python-format
@@ -7482,9 +6955,7 @@ msgstr "Respondi al tiu mesaĝo"
 #, python-format
 msgid ""
 "\n"
-"        %(note_user)s added a note to subtitles on which you are "
-"collaborating. View tasks for <a href=\"%(tasks_url)s\">%(video)s / "
-"%(language)s</a>.\n"
+"        %(note_user)s added a note to subtitles on which you are collaborating. View tasks for <a href=\"%(tasks_url)s\">%(video)s / %(language)s</a>.\n"
 "        "
 msgstr ""
 
@@ -7495,15 +6966,11 @@ msgid ""
 "\n"
 "Thanks for joining Amara!<br/>\n"
 "\n"
-"<p>If you created the \"%(user)s\" user account on universalsubtitles.org, "
-"please click the following link to confirm your email address (%(email)s):"
-"<br/></p>\n"
+"<p>If you created the \"%(user)s\" user account on universalsubtitles.org, please click the following link to confirm your email address (%(email)s):<br/></p>\n"
 "\n"
 "<p><a href=\"%(activate_url)s\">confirm email</a></p>\n"
 "\n"
-"<p>If you believe you've received this message in error, we apologize—feel "
-"free to ignore it. If you have any concerns, please contact us at "
-"feedback@universalsubtitles.org.</p>\n"
+"<p>If you believe you've received this message in error, we apologize—feel free to ignore it. If you have any concerns, please contact us at feedback@universalsubtitles.org.</p>\n"
 "\n"
 "Thanks, <br/>\n"
 "The Amara team\n"
@@ -7527,17 +6994,16 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: templates/messages/email/videos-imported.html:9
-#, fuzzy, python-format
-#| msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
+#, python-format
 msgid ""
 "To see them, you can go to <a href=\"%(my_videos_url)s\">your user page</a>"
-msgstr "komentis ĉe <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
 
 #: templates/messages/email/videos-imported.html:11
 msgid ""
-"If you believe you've received this message in error, we apologize—feel free "
-"to ignore it. If you have any concerns, please contact us at feedback@amara."
-"org."
+"If you believe you've received this message in error, we apologize—feel free"
+" to ignore it. If you have any concerns, please contact us at "
+"feedback@amara.org."
 msgstr ""
 
 #: templates/messages/email/videos-imported.html:13
@@ -7584,8 +7050,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"            Editing %(language)s subtitles for &ldquo;%(video)s&rdquo; - "
-"Amara\n"
+"            Editing %(language)s subtitles for &ldquo;%(video)s&rdquo; - Amara\n"
 "        "
 msgstr ""
 
@@ -7610,9 +7075,8 @@ msgid "Please go away."
 msgstr ""
 
 #: templates/editor/tutorial.html:11
-#, fuzzy
 msgid "1. Play the video"
-msgstr "Privata filmo"
+msgstr ""
 
 #: templates/editor/tutorial.html:12
 msgid "Use the tab key to play and pause the video."
@@ -7679,9 +7143,8 @@ msgid "They include tips for improving subtitles."
 msgstr ""
 
 #: templates/editor/tutorial.html:43
-#, fuzzy
 msgid "2. Check the timing"
-msgstr "Ek al la subtekstigilo"
+msgstr ""
 
 #: templates/editor/tutorial.html:44
 msgid "Drag the edges or slide the bubble to adjust the times."
@@ -7696,9 +7159,8 @@ msgid "Or choose Save Draft (above) to finish later."
 msgstr ""
 
 #: templates/editor/tutorial.html:51
-#, fuzzy
 msgid "1. Select a reference language"
-msgstr "Elektu almenaŭ unu lingvon."
+msgstr ""
 
 #: templates/editor/tutorial.html:52
 msgid "If you change the reference language, use "
@@ -7713,33 +7175,28 @@ msgid "to  update the translation timing."
 msgstr ""
 
 #: templates/editor/tutorial.html:56
-#, fuzzy
 msgid "2. Type the translation"
-msgstr "Redakti tradukaĵojn"
+msgstr ""
 
 #: templates/editor/tutorial.html:57
 msgid "Don't leave any blanks."
 msgstr ""
 
 #: templates/editor/tutorial.html:60
-#, fuzzy
 msgid "3. Done translating?"
-msgstr "aldoni tradukon"
+msgstr ""
 
 #: templates/editor/tutorial.html:61
 msgid "Click to adjust the timing."
 msgstr ""
 
 #: templates/editor/working-subtitles.html:4
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "        Editing %(language)s&hellip;\n"
 "        "
 msgstr ""
-"\n"
-"              %(number)s lingvo\n"
-"          "
 
 #: templates/editor/working-subtitles.html:12
 msgid "Copy Timing"
@@ -7767,9 +7224,8 @@ msgid "Revert to last saved version"
 msgstr ""
 
 #: templates/editor/working-subtitles.html:21
-#, fuzzy
 msgid "Upload subtitles"
-msgstr "Alŝuti subtekstojn"
+msgstr ""
 
 #: templates/editor/working-subtitles.html:25
 msgid "Warnings"
@@ -7791,8 +7247,8 @@ msgstr ""
 
 #: templates/editor/working-subtitles.html:75
 msgid ""
-"Reading rate shouldn't exceed 21 characters / sec; lengthen duration, reduce "
-"text or split the subtitle."
+"Reading rate shouldn't exceed 21 characters / sec; lengthen duration, reduce"
+" text or split the subtitle."
 msgstr ""
 
 #: templates/editor/working-subtitles.html:76
@@ -7846,7 +7302,7 @@ msgstr ""
 
 #: templates/editor/dialogs.html:29
 msgid "Sounds"
-msgstr ""
+msgstr "Sonoj"
 
 #: templates/editor/dialogs.html:30
 msgid "Describe meaningful sounds that are relevant to the plot."
@@ -7858,7 +7314,7 @@ msgstr ""
 
 #: templates/editor/dialogs.html:34
 msgid "Music"
-msgstr ""
+msgstr "Muziko"
 
 #: templates/editor/dialogs.html:35
 msgid "Describe relevant music which does not have relevant lyrics."
@@ -7866,7 +7322,7 @@ msgstr ""
 
 #: templates/editor/dialogs.html:36
 msgid "ex: ♪ (jazz music) ♪"
-msgstr ""
+msgstr "ekz.: ♪ (ĵaza muziko) ♪"
 
 #: templates/editor/dialogs.html:39
 msgid "Speaker Identification"
@@ -7878,7 +7334,7 @@ msgstr ""
 
 #: templates/editor/dialogs.html:41 templates/editor/dialogs.html:79
 msgid "ex: (Michael) Wait for me!"
-msgstr ""
+msgstr "ekz.: (Adamo) Atendu min!"
 
 #: templates/editor/dialogs.html:44
 msgid "Show Advanced Guidelines"
@@ -7957,7 +7413,7 @@ msgstr ""
 
 #: templates/editor/dialogs.html:83
 msgid "Foreign language"
-msgstr ""
+msgstr "Fremda lingvo"
 
 #: templates/editor/dialogs.html:84
 msgid "Identify relevant speech in foreign language. "
@@ -7965,7 +7421,7 @@ msgstr ""
 
 #: templates/editor/dialogs.html:85
 msgid "ex: (Russian): Thank you."
-msgstr ""
+msgstr "ekz.: (rusa): Dankon."
 
 #: templates/editor/dialogs.html:89
 msgid "Simultaneous dialogue"
@@ -8024,17 +7480,17 @@ msgstr ""
 #: templates/editor/dialogs.html:250
 #: templates/videos/language-sync-history-tab.html:51
 msgid "Action"
-msgstr ""
+msgstr "Ago"
 
 #: templates/editor/dialogs.html:133 templates/editor/dialogs.html:213
 #: templates/editor/dialogs.html:251
 msgid "Windows / Linux"
-msgstr ""
+msgstr "Windows / Linux"
 
 #: templates/editor/dialogs.html:134 templates/editor/dialogs.html:214
 #: templates/editor/dialogs.html:252
 msgid "OS X"
-msgstr ""
+msgstr "OS X"
 
 #: templates/editor/dialogs.html:139
 msgid "Play / Pause video"
@@ -8348,8 +7804,8 @@ msgstr ""
 
 #: templates/editor/dialogs.html:361
 msgid ""
-"There was an error saving your subtitles.  Copy the subtitles above and save "
-"them to your computer as subtitle_backup.dfxp. You can upload them later."
+"There was an error saving your subtitles.  Copy the subtitles above and save"
+" them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr ""
 
 #: templates/editor/dialogs.html:366 templates/editor/dialogs.html:423
@@ -8368,19 +7824,14 @@ msgstr "Alŝuti subtekstojn"
 #: templates/editor/dialogs.html:374
 msgid ""
 "\n"
-"        Uploading subtitles saves a new (incomplete) version that you can "
-"edit and save or complete when finished. Uploaded subtitles keep their "
-"existing timecodes. You can use the Copy timing option from the Tools menu "
-"if you want to apply timing from a reference language.\n"
+"        Uploading subtitles saves a new (incomplete) version that you can edit and save or complete when finished. Uploaded subtitles keep their existing timecodes. You can use the Copy timing option from the Tools menu if you want to apply timing from a reference language.\n"
 "        "
 msgstr ""
 
 #: templates/editor/dialogs.html:379
 msgid ""
 "\n"
-"        Supported formats are: SRT, SSA, SBV, DFXP, TXT, and VTT. Only files "
-"ending with the correct extension, .srt, .ssa, .sbv, .txt, .vtt, .dfxp or ."
-"xml (for dfxp) are accepted.\n"
+"        Supported formats are: SRT, SSA, SBV, DFXP, TXT, and VTT. Only files ending with the correct extension, .srt, .ssa, .sbv, .txt, .vtt, .dfxp or .xml (for dfxp) are accepted.\n"
 "        "
 msgstr ""
 
@@ -8391,9 +7842,8 @@ msgid ""
 msgstr ""
 
 #: templates/editor/dialogs.html:399
-#, fuzzy
 msgid "Uploading..."
-msgstr "Ŝargante..."
+msgstr ""
 
 #: templates/editor/dialogs.html:402
 #: templates/videos/_upload_subtitles.html:55
@@ -8415,21 +7865,18 @@ msgstr ""
 
 #: templates/editor/dialogs.html:418
 msgid ""
-"There was an error resuming your session.  Copy the subtitles above and save "
-"them to your computer as subtitle_backup.dfxp. You can upload them later."
+"There was an error resuming your session.  Copy the subtitles above and save"
+" them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr ""
 
 #: templates/editor/workflow-errors-review.html:7
 #: templates/editor/workflow-errors-typing.html:7
-#, fuzzy
-#| msgid "Subtitles does not exist."
 msgid "Subtitles can not be blank"
-msgstr "Subtekstoj ne ekzistas."
+msgstr ""
 
 #: templates/editor/workflow-errors-review.html:14
-#, fuzzy
 msgid "Timing error in subtitle"
-msgstr " subtekstoj"
+msgstr ""
 
 #: templates/editor/workflow-normal.html:4
 msgid "Type what you hear"
@@ -8456,15 +7903,12 @@ msgid "Sync Timing"
 msgstr ""
 
 #: templates/editor/workflow-normal.html:18
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "            synced subtitles: %(count)s / %(total)s\n"
 "            "
 msgstr ""
-"\n"
-"              %(number)s lingvo\n"
-"          "
 
 #: templates/editor/workflow-normal.html:24
 msgid "Start review"
@@ -8476,14 +7920,14 @@ msgstr ""
 
 #: templates/editor/workflow-normal.html:30
 msgid ""
-"Watch the video again and verify that the subtitles are complete and correct."
+"Watch the video again and verify that the subtitles are complete and "
+"correct."
 msgstr ""
 
 #: templates/editor/workflow-normal.html:31
 #: templates/editor/workflow-review.html:7
-#, fuzzy
 msgid "Edit title and description."
-msgstr "Redakti tradukaĵojn"
+msgstr ""
 
 #: templates/videos/actions_list.html:21
 msgid "There are no activities."
@@ -8516,8 +7960,7 @@ msgstr "la videa paĝo"
 #: templates/videos/email_title_changed.html:20
 msgid ""
 "\n"
-"    and click 'edit title' to update it. If you're unable to edit the title, "
-"click 'Help' in the main menu to submit a support request.\n"
+"    and click 'edit title' to update it. If you're unable to edit the title, click 'Help' in the main menu to submit a support request.\n"
 "    "
 msgstr ""
 
@@ -8525,12 +7968,12 @@ msgstr ""
 #: templates/videos/_multi-video-create-subtitles-form.html:6
 #: templates/videos/video-page.html:76
 msgid "Add a new language!"
-msgstr ""
+msgstr "Aldoni novan lingvon!"
 
 #: templates/videos/_create-subtitles-modal.html:12
 #, python-format
 msgid "This video is in %(language)s"
-msgstr ""
+msgstr "Ĉi tiu video estas en la %(language)s"
 
 #: templates/videos/_create-subtitles-modal.html:19
 #: templates/videos/_multi-video-create-subtitles-form.html:13
@@ -8570,7 +8013,7 @@ msgstr ""
 
 #: templates/videos/email_video_url_add.html:7
 msgid "A new video URL for"
-msgstr "Nova ligilo al filmo por"
+msgstr "Nova videa ligilo por"
 
 #: templates/videos/email_video_url_add.html:9
 msgid "was submitted by"
@@ -8584,9 +8027,7 @@ msgstr "Sennoma"
 msgid ""
 "Please check to make sure the new URL features the exact same video, and "
 "that subtitle timing is correct:"
-msgstr ""
-"Bonvolu kontroli, ke la nova ligilo ligas la tutsaman filmon kaj ke la "
-"tempumo ĝustas:"
+msgstr "Bonvolu kontroli, ke la nova ligilo ligas la tutsaman filmon kaj ke la tempumo ĝustas:"
 
 #: templates/videos/email_video_url_add.html:21
 msgid "View the new video URL"
@@ -8604,19 +8045,16 @@ msgstr "Kara"
 #, python-format
 msgid ""
 "\n"
-"    Great news! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> has "
-"just started a %(language)s \n"
+"    Great news! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> has just started a %(language)s \n"
 "    translation of your video <a href=\"%(video_url)s\">%(video)s</a>\n"
 "\t"
 msgstr ""
 
 #: templates/videos/email_start_notification.html:13
 msgid ""
-"You can review the translation and thank them for their contribution on this "
-"page:"
-msgstr ""
-"Vi rajtas revizii la tradukaĵon kaj danki ilin pro ilia kontribuaĵo sur la "
-"jena paĝo:"
+"You can review the translation and thank them for their contribution on this"
+" page:"
+msgstr "Vi rajtas revizii la tradukaĵon kaj danki ilin pro ilia kontribuaĵo sur la jena paĝo:"
 
 #: templates/videos/email_start_notification.html:14
 msgid "Translation homepage"
@@ -8632,14 +8070,15 @@ msgstr "Sincere"
 
 #: templates/videos/email_start_notification.html:20
 msgid "The Amara Community"
-msgstr ""
+msgstr "La Amara-komunumo"
 
 #: templates/videos/_get_counter.html:3
 msgid "Get counter code:"
 msgstr ""
 
 #: templates/videos/_error_feedback_form.html:8
-msgid "Please let us know what you were doing when you encountered this error."
+msgid ""
+"Please let us know what you were doing when you encountered this error."
 msgstr "Kion vi faris kiam ĉi tiu eraro okazis?"
 
 #: templates/videos/_error_feedback_form.html:10
@@ -8651,15 +8090,15 @@ msgid "How are you using Amara?  What would make it better?"
 msgstr ""
 
 #: templates/videos/_feedback_form.html:9
-msgid "Please let us know if you have any comments, questions, or suggestions!"
+msgid ""
+"Please let us know if you have any comments, questions, or suggestions!"
 msgstr "Bonvole sendi komentojn, demandojn, proponojn!"
 
 #: templates/videos/_feedback_form.html:10
 msgid ""
-"Note: we read/speak English best, but try to read/respond to anything we can."
-msgstr ""
-"Notu: ni plej bone scipovas la anglan, tamen ni provas legi kaj respondi al "
-"ĉion, kion ni ricevas."
+"Note: we read/speak English best, but try to read/respond to anything we "
+"can."
+msgstr "Notu: ni plej bone scipovas la anglan, tamen ni provas legi kaj respondi al ĉion, kion ni ricevas."
 
 #: templates/videos/_feedback_form.html:14
 msgid "Your email:"
@@ -8741,9 +8180,7 @@ msgstr ""
 msgid ""
 " subtitles for this video are edited. You can choose to follow again at any "
 "time."
-msgstr ""
-"Subtitoloj de tiu filmo estas redaktataj. Vi povas elekti denove sekvi iam "
-"ajn."
+msgstr "Subtitoloj de tiu filmo estas redaktataj. Vi povas elekti denove sekvi iam ajn."
 
 #: templates/videos/_follow_video_button.html:111
 msgid "Stop following "
@@ -8764,8 +8201,7 @@ msgstr "Vi ne plu recevi novajn indikojn kiam ui redaktas"
 
 #: templates/videos/_follow_video_button.html:164
 msgid " subtitles for this video. You can stop these emails at any time."
-msgstr ""
-"subtekstoj por ĉi tiu video. Vi povas halti ĉi tiuj retpoŝt-mesaĝoj iam ajn."
+msgstr "subtekstoj por ĉi tiu video. Vi povas halti ĉi tiuj retpoŝt-mesaĝoj iam ajn."
 
 #: templates/videos/_follow_video_button.html:165
 msgid "Follow "
@@ -8800,10 +8236,8 @@ msgstr ""
 #: templates/videos/_upload_subtitles.html:16
 msgid ""
 "\n"
-"                    Our site accepts SRT, SSA, SBV, DFXP, TXT, and VTT "
-"format.\n"
-"                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt, .vtt "
-"or .xml \n"
+"                    Our site accepts SRT, SSA, SBV, DFXP, TXT, and VTT format.\n"
+"                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt, .vtt or .xml \n"
 "                    (for dfxp) are accepted.\n"
 "                "
 msgstr ""
@@ -8823,11 +8257,9 @@ msgstr "Ensaluti por alŝuti subtekstojn"
 
 #: templates/videos/_upload_subtitles.html:69
 msgid ""
-"If you believe your subtitle file is compatible, <a href='mailto:"
-"feedback@universalsubtitles.org'>send it to us</a>"
-msgstr ""
-"Se vi opinias vian subtekstan dosieron kongrua, <a href='mailto:"
-"feedback@universalsubtitles.org'>retpoŝtu nin</a>"
+"If you believe your subtitle file is compatible, <a "
+"href='mailto:feedback@universalsubtitles.org'>send it to us</a>"
+msgstr "Se vi opinias vian subtekstan dosieron kongrua, <a href='mailto:feedback@universalsubtitles.org'>retpoŝtu nin</a>"
 
 #: templates/videos/_upload_subtitles.html:71
 msgid "Processing, please be patient..."
@@ -8836,11 +8268,7 @@ msgstr ""
 #: templates/videos/create.html:15
 msgid ""
 "\n"
-"              \"Sorry, we couldn't identify the video at the link you sent. "
-"Perhaps it's a link we don't recognize, or perhaps you've linked to a page "
-"that has multiple videos. Try entering a different link to the video you "
-"want to submit. If you think there's been some mistake, <a href=\"mailto:"
-"feedback@universalsubtitles.org\">contact us</a>!\"\n"
+"              \"Sorry, we couldn't identify the video at the link you sent. Perhaps it's a link we don't recognize, or perhaps you've linked to a page that has multiple videos. Try entering a different link to the video you want to submit. If you think there's been some mistake, <a href=\"mailto:feedback@universalsubtitles.org\">contact us</a>!\"\n"
 "            "
 msgstr ""
 
@@ -8863,14 +8291,12 @@ msgid "for example"
 msgstr "ekzemple"
 
 #: templates/videos/create.html:58
-#, fuzzy
 msgid "Learn the Amara subtitle editor (videos)"
-msgstr "Kiel mi povas aldoni subtekstojn al mia video?"
+msgstr ""
 
 #: templates/videos/create.html:61
-#, fuzzy
 msgid "Use your completed subtitles"
-msgstr "forigi subtekstojn"
+msgstr ""
 
 #: templates/videos/create.html:64
 msgid "Invite friends and fans to help caption &amp; translate"
@@ -8884,14 +8310,10 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                you contributed to <b><a href=\"http://%(domain)s"
-"%(video_url)s\">%(v)s</a></b> \n"
-"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">"
-"%(u)s</a></b>. \n"
-"                These changes went live immediately.  %(text_change)s of the "
-"text and\n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. \n"
+"                These changes went live immediately.  %(text_change)s of the text and\n"
 "                %(time_change)s of the timing was changed.\n"
 "                "
 msgstr ""
@@ -8900,12 +8322,9 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                you contributed to <b><a href=\"http://%(domain)s"
-"%(video_url)s\">%(v)s</a></b> \n"
-"                were changed. These changes went live immediately. "
-"%(text_change)s of the text and \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
+"                were changed. These changes went live immediately. %(text_change)s of the text and \n"
 "                %(time_change)s of the timing was changed.\n"
 "                "
 msgstr ""
@@ -8956,13 +8375,9 @@ msgstr "Ŝanĝu Subtitolan Tekston"
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                to video <b><a href=\"http://%(domain)s%(video_url)s\">"
-"%(v)s</a></b>\n"
-"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">"
-"%(u)s</a></b>. These changes went live immediately. %(time_change)s of the "
-"timing was changed.  \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. These changes went live immediately. %(time_change)s of the timing was changed.  \n"
 "                "
 msgstr ""
 
@@ -8970,12 +8385,9 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                to video <b><a href=\"http://%(domain)s%(video_url)s\">"
-"%(v)s</a></b>\n"
-"                were changed. These changes went live immediately. "
-"%(time_change)s of the timing was changed.             \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
+"                were changed. These changes went live immediately. %(time_change)s of the timing was changed.             \n"
 "                "
 msgstr ""
 
@@ -8993,11 +8405,11 @@ msgstr ""
 
 #: templates/videos/set-original-language.html:29
 msgid "Choose a language"
-msgstr ""
+msgstr "Elektu lingvon"
 
 #: templates/videos/set-original-language.html:31
 msgid "Current language is"
-msgstr ""
+msgstr "Nuna lingvo estas"
 
 #: templates/videos/video-activity-tab.html:6
 msgid "View all activity"
@@ -9047,8 +8459,8 @@ msgid_plural ""
 "\n"
 "            %(count)s Languages\n"
 "        "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n            %(count)s lingvo\n        "
+msgstr[1] "\n            %(count)s lingvoj\n        "
 
 #: templates/videos/language-subtitles-tab.html:6
 msgid "Delete Subtitle Language"
@@ -9070,12 +8482,11 @@ msgstr ""
 
 #: templates/videos/language-subtitles-tab.html:38
 msgid "Download"
-msgstr ""
+msgstr "Elŝuti"
 
 #: templates/videos/language-subtitles-tab.html:45
-#, fuzzy
 msgid "DFXP All Languages"
-msgstr "Ĉiuj lingvoj"
+msgstr ""
 
 #: templates/videos/language-subtitles-tab.html:54
 msgid "Draft only"
@@ -9093,17 +8504,14 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                Showing <strong>Revision %(version_number)s</strong> created "
-"<strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title="
-"\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n"
+"                Showing <strong>Revision %(version_number)s</strong> created <strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n"
 "                "
 msgstr ""
 
 #: templates/videos/language-subtitles-tab.html:90
 msgid ""
 "\n"
-"                    The most recent revision for this language is blank, but "
-"there are older\n"
+"                    The most recent revision for this language is blank, but there are older\n"
 "                    revisions that contain subtitles.\n"
 "                    "
 msgstr ""
@@ -9131,16 +8539,14 @@ msgstr "Kreu iom!"
 #: templates/videos/language-subtitles-tab.html:111
 msgid ""
 "\n"
-"                    This language contains subtitles that are still waiting "
-"to be moderated.  Check back later.\n"
+"                    This language contains subtitles that are still waiting to be moderated.  Check back later.\n"
 "                "
 msgstr ""
 
 #: templates/videos/language-subtitles-tab.html:117
 msgid ""
 "\n"
-"                    Sorry, this language has been removed by Amara staff "
-"members or authorized users.\n"
+"                    Sorry, this language has been removed by Amara staff members or authorized users.\n"
 "                "
 msgstr ""
 
@@ -9165,7 +8571,7 @@ msgstr " subtekstoj"
 
 #: templates/videos/language-page.html:58 templates/videos/video-page.html:55
 msgid "Follower"
-msgstr ""
+msgstr "Sekvanto"
 
 #: templates/videos/language-page.html:64
 msgid "Line"
@@ -9200,11 +8606,11 @@ msgstr ""
 #: templates/videos/language-sync-history-tab.html:14
 #: templates/videos/language-sync-history-tab.html:52
 msgid "Version"
-msgstr ""
+msgstr "Versio"
 
 #: templates/videos/language-sync-history-tab.html:15
 msgid "Actions"
-msgstr ""
+msgstr "Agoj"
 
 #: templates/videos/language-sync-history-tab.html:27
 msgid "Syncing not configured"
@@ -9246,10 +8652,8 @@ msgid "Primary"
 msgstr ""
 
 #: templates/videos/video-urls-tab.html:23
-#, fuzzy
-#| msgid "Not Synced"
 msgid "Synced"
-msgstr "Ne sinkronigita"
+msgstr ""
 
 #: templates/videos/video-urls-tab.html:36
 msgid "Make primary"
@@ -9259,28 +8663,20 @@ msgstr ""
 msgid ""
 "Multiple video URLs let you link multiple videos to a single set of "
 "subtitles. Some example uses:"
-msgstr ""
-"Ligilo al multaj filmoj lasas vin ligi plurajn filmojn al ununura aro da "
-"subtitoloj. Jen ekzemploj pri uzo:"
+msgstr "Ligilo al multaj filmoj lasas vin ligi plurajn filmojn al ununura aro da subtitoloj. Jen ekzemploj pri uzo:"
 
 #: templates/videos/video-urls-tab.html:52
 msgid ""
 "Two versions of the same video exist on Youtube.  You do not want subtitle "
-"volunteers to duplicate their work, so you add both versions to the multiple "
-"URLs pane."
+"volunteers to duplicate their work, so you add both versions to the multiple"
+" URLs pane."
 msgstr ""
 
 #: templates/videos/video-urls-tab.html:53
-#, fuzzy
-#| msgid ""
-#| "You put your video on Youtube, Vimeo, Blip, and Dailymotion and you want "
-#| "the subtitles you make to work on all of those versions."
 msgid ""
 "You put your video on Youtube, Vimeo and Dailymotion and you want the "
 "subtitles you make to work on all of those versions."
 msgstr ""
-"Vi alŝutas filmojn en \"YouTube\", \"Vimeo\", \"Blip\" kaj \"Dailymotion\", "
-"kaj vi deziras ke tiuj subtitoloj funkciu en ĉiuj tiuj versioj."
 
 #: templates/videos/video-urls-tab.html:54
 msgid ""
@@ -9330,9 +8726,7 @@ msgstr "Vi estas ensalutita"
 msgid ""
 "Delete this URL?  Warning: this cannot be undone. Only delete URLs for non-"
 "matching videos or videos where subtitles fail to display correctly."
-msgstr ""
-"Forigu tiun ligilon? Atentu: tio ne estas malfarebla. Nur forigu ligilojn al "
-"filmoj ne taŭgaj aŭ en kiuj subtitoloj ne bone aperas."
+msgstr "Forigu ĉi tiun ligilon? Averto: ĉi tio ne estas malfarebla. Nur forigu ligilojn al filmoj ne taŭgaj aŭ en kiuj subtitoloj ne bone aperas."
 
 #: templates/videos/diffing.html:39
 msgid "Subtitles will be rolled back to a previous version"
@@ -9355,9 +8749,8 @@ msgid "Roll back to version"
 msgstr "Ŝanĝomalfari al versio"
 
 #: templates/videos/diffing.html:107 templates/videos/diffing.html:151
-#, fuzzy
 msgid "Latest Revision"
-msgstr "Versio"
+msgstr ""
 
 #: templates/videos/_video.html:24
 msgid "Added"
@@ -9373,8 +8766,8 @@ msgid_plural ""
 "\n"
 "                    %(number)s Languages\n"
 "                "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                    %(number)s lingvo\n                "
+msgstr[1] "\n                    %(number)s lingvoj\n                "
 
 #: templates/videos/email_base.html:95
 msgid "Don't send any more emails about this particular video."
@@ -9404,8 +8797,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                    <span class=\"team-link\">This video is part of the <a "
-"href=\"%(url)s\">%(team)s</a> team.</span>\n"
+"                    <span class=\"team-link\">This video is part of the <a href=\"%(url)s\">%(team)s</a> team.</span>\n"
 "                    "
 msgstr ""
 
@@ -9415,7 +8807,7 @@ msgstr ""
 
 #: templates/videos/video-page.html:98
 msgid "URLs"
-msgstr ""
+msgstr "Ligiloj"
 
 #: templates/videos/_embed_link.html:2
 msgid "Get Embed Code"
@@ -9426,19 +8818,16 @@ msgid "Resync"
 msgstr ""
 
 #: templates/externalsites/_sync-errors-form.html:11
-#, fuzzy
-#| msgid "Account deleted."
 msgid "Account Type"
-msgstr "Konto forigita."
+msgstr ""
 
 #: templates/externalsites/_sync-errors-form.html:31
 msgid "Resync selected items"
 msgstr ""
 
 #: templates/externalsites/new-team-settings-tab.html:9
-#, fuzzy
 msgid "Team Settings - Integrations"
-msgstr "Ĝenerala statistiko"
+msgstr ""
 
 #: templates/externalsites/new-team-settings-tab.html:20
 #: templates/externalsites/team-settings-tab.html:28
@@ -9446,15 +8835,12 @@ msgid "YouTube"
 msgstr ""
 
 #: templates/externalsites/new-team-settings-tab.html:26
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "        Linked Account: %(account_name)s\n"
 "        "
 msgstr ""
-"\n"
-"              %(number)s lingvo\n"
-"          "
 
 #: templates/externalsites/new-team-settings-tab.html:31
 #: templates/externalsites/team-settings-tab.html:39
@@ -9469,7 +8855,7 @@ msgstr ""
 #: templates/externalsites/new-team-settings-tab.html:43
 #: templates/externalsites/team-settings-tab.html:51
 msgid "Kaltura"
-msgstr ""
+msgstr "Kaltura"
 
 #: templates/externalsites/new-team-settings-tab.html:53
 #: templates/externalsites/team-settings-tab.html:61
@@ -9502,24 +8888,22 @@ msgid ""
 msgstr ""
 
 #: templates/new-teams/settings.html:7 templates/new-teams/base.html:48
-#, fuzzy
-#| msgid "Settings"
 msgid "Team Settings"
-msgstr "Agordoj"
+msgstr ""
 
 #: templates/new-teams/settings.html:24
 msgid "Assets"
 msgstr ""
 
 #: templates/new-teams/statistics.html:12
-#, fuzzy, python-format
+#, python-format
 msgid "Video Statistics for %(team)s"
-msgstr "Filma statistiko"
+msgstr ""
 
 #: templates/new-teams/statistics.html:14
-#, fuzzy, python-format
+#, python-format
 msgid "Team Statistics for %(team)s"
-msgstr "Ĝenerala statistiko"
+msgstr ""
 
 #: templates/new-teams/settings-simple-workflow.html:7
 msgid "Team Settings - Workflow"
@@ -9536,35 +8920,30 @@ msgid "Team Activity for %(team)s"
 msgstr ""
 
 #: templates/new-teams/admin-list.html:7
-#, fuzzy, python-format
+#, python-format
 msgid "Admins for %(team)s Team"
-msgstr "La %(site_name)s skipo"
+msgstr ""
 
 #: templates/new-teams/admin-list.html:12
 msgid "Email"
 msgstr "Retpoŝto"
 
 #: templates/new-teams/all-languages-page.html:7
-#, fuzzy, python-format
+#, python-format
 msgid "%(team)s: Languages"
-msgstr "Subtekstoj en"
+msgstr ""
 
 #: templates/new-teams/all-languages-page.html:13
-#, fuzzy
-#| msgid "Upload Subtitles"
 msgid "Completed Subtitles"
-msgstr "Alŝuti subtekstojn"
+msgstr ""
 
 #: templates/new-teams/invite.html:8
-#, fuzzy
-#| msgid "Most Members"
 msgid "Invite members"
-msgstr "Plej multaj anoj"
+msgstr ""
 
 #: templates/new-teams/landing-page.html:27 templates/new-teams/videos.html:91
-#, fuzzy
 msgid "No Videos found"
-msgstr "Videoj"
+msgstr ""
 
 #: templates/new-teams/settings-feeds.html:7
 msgid "Team Settings - Video Feeds"
@@ -9579,38 +8958,30 @@ msgid "Last import attempt"
 msgstr ""
 
 #: templates/new-teams/settings-feeds.html:25
-#, fuzzy
 msgid "import now"
-msgstr "Donacu nun"
+msgstr ""
 
 #: templates/new-teams/settings-feeds.html:27
-#, fuzzy
 msgid "Are you sure you want to delete this feed?"
-msgstr "Ĉu vi vere volas forigi vian foton?"
+msgstr ""
 
 #: templates/new-teams/settings-feeds.html:27
 #: templates/new-teams/settings-projects.html:16
-#, fuzzy
-#| msgid "Delete"
 msgid "delete"
-msgstr "Forigu"
+msgstr ""
 
 #: templates/new-teams/settings-feeds.html:33
-#, fuzzy
-#| msgid "This URL does not contain video id."
 msgid "This team does not have any video feeds yet"
-msgstr "Tiu retadreso ne havas videan identigilon."
+msgstr ""
 
 #: templates/new-teams/settings-projects.html:7
-#, fuzzy
 msgid "Team Settings - Projects"
-msgstr "Ĝenerala statistiko"
+msgstr ""
 
 #: templates/new-teams/settings-projects.html:15
-#, fuzzy, python-format
-#| msgid "Edit Project"
+#, python-format
 msgid "Edit project: %(name)s"
-msgstr "Redakti projekton"
+msgstr ""
 
 #: templates/new-teams/settings-projects.html:15
 #: templates/new-teams/videos.html:73
@@ -9627,9 +8998,8 @@ msgstr ""
 #: templates/new-teams/settings-projects.html:37
 #: amara-enterprise/collab/templates/collab/video-collaborations.html:63
 #: amara-enterprise/providers/templates/providers/queue-list.html:38
-#, fuzzy
 msgid "Create"
-msgstr "Krei skipon"
+msgstr ""
 
 #: templates/new-teams/settings-projects.html:53
 #: templates/new-teams/members.html:95
@@ -9639,10 +9009,8 @@ msgstr "Krei skipon"
 #: amara-enterprise/providers/templates/providers/queue.html:96
 #: amara-enterprise/providers/templates/providers/queue.html:125
 #: amara-enterprise/billing/templates/billing/index.html:27
-#, fuzzy
-#| msgid "Get Updates!"
 msgid "Update"
-msgstr "Akiri ĝisdatigojn!"
+msgstr ""
 
 #: templates/new-teams/welcome.html:21 templates/new-teams/welcome.html:38
 msgid "Join the team"
@@ -9665,33 +9033,27 @@ msgid ""
 msgstr ""
 
 #: templates/new-teams/welcome.html:31
-#, fuzzy
-#| msgid "Share your subtitles"
 msgid "Share your work"
-msgstr "Disdoni viajn subtitolojn"
+msgstr ""
 
 #: templates/new-teams/welcome.html:32
 msgid ""
-"Completed captions will be synced back to the video host and viewable across "
-"the world"
+"Completed captions will be synced back to the video host and viewable across"
+" the world"
 msgstr ""
 
 #: templates/new-teams/welcome.html:40
-#, fuzzy
-#| msgid "Do you really wish to join this team?"
 msgid "Apply to join the team"
-msgstr "Ĉu vi vere volas aniĝi je tiu skipo?"
+msgstr ""
 
 #: templates/new-teams/welcome.html:44
-#, fuzzy
 msgid "Login to join the team"
-msgstr "Vi nun estas teamano."
+msgstr ""
 
 #: templates/new-teams/language-page.html:7
-#, fuzzy, python-format
-#| msgid "all languages"
+#, python-format
 msgid "%(team)s: %(language)s"
-msgstr "ĉiuj lingvoj"
+msgstr ""
 
 #: templates/new-teams/language-page.html:17
 #, python-format
@@ -9700,37 +9062,30 @@ msgstr ""
 
 #: templates/new-teams/language-page.html:19
 #: templates/new-teams/project-page.html:24
-#, fuzzy, python-format
-#| msgid "Send message"
+#, python-format
 msgid "Send %(user)s a message"
-msgstr "Sendi mesaĝon"
+msgstr ""
 
 #: templates/new-teams/language-page.html:24
 #: templates/new-teams/project-page.html:29
-#, fuzzy
-#| msgid "Manager"
 msgid "No managers"
-msgstr "Mastrumanto"
+msgstr ""
 
 #: templates/new-teams/language-page.html:27
 #: templates/new-teams/language-page.html:46
 #: templates/new-teams/project-page.html:32
 #: templates/new-teams/project-page.html:51
-#, fuzzy
-#| msgid "Manager"
 msgid "Add Manager"
-msgstr "Mastrumanto"
+msgstr ""
 
 #: templates/new-teams/language-page.html:39
-#, fuzzy
 msgid "Add Language Manager"
-msgstr "Ĉiuj lingvoj"
+msgstr ""
 
 #: templates/new-teams/language-page.html:56
 #: templates/new-teams/project-page.html:61
-#, fuzzy
 msgid "Are you sure you want to remove this manager?"
-msgstr "Ĉu vi vere volas lasi tiun skipon?"
+msgstr ""
 
 #: templates/new-teams/project-page.html:7
 #, python-format
@@ -9743,49 +9098,39 @@ msgid "Remove Project Manager: %(manager)s"
 msgstr ""
 
 #: templates/new-teams/project-page.html:44
-#, fuzzy
-#| msgid "Add Project"
 msgid "Add Project Manager"
-msgstr "Aldoni Projekton"
+msgstr ""
 
 #: templates/new-teams/application.html:13
 #, python-format
 msgid ""
 "\n"
-"  No formal language training is required to translate for %(team)s. But we "
-"do ask that all translators are confident in their translation abilities.\n"
+"  No formal language training is required to translate for %(team)s. But we do ask that all translators are confident in their translation abilities.\n"
 "  "
 msgstr ""
 
 #: templates/new-teams/application.html:20
 msgid ""
 "\n"
-"  We request that each new applicant does at least one full set of subtitles "
-"within the first week of joining. Aside from that, it’s up to you!\n"
+"  We request that each new applicant does at least one full set of subtitles within the first week of joining. Aside from that, it’s up to you!\n"
 "  "
 msgstr ""
 
 #: templates/new-teams/application.html:30
-#, fuzzy
-#| msgid "About"
 msgid "About You"
-msgstr "Pri"
+msgstr ""
 
 #: templates/new-teams/application.html:50
-#, fuzzy
-#| msgid "Application"
 msgid "Submit application"
-msgstr "Formularo"
+msgstr ""
 
 #: templates/new-teams/settings-lang-messages.html:5
 msgid "Team Settings - Language-specific Messages"
 msgstr ""
 
 #: templates/new-teams/settings-messages.html:6
-#, fuzzy
-#| msgid "Send Message"
 msgid "Team Settings - Messages"
-msgstr "Sendi Mesaĝon"
+msgstr ""
 
 #: templates/new-teams/video-durations.html:6
 #, python-format
@@ -9793,10 +9138,8 @@ msgid "Video Durations for %(team)s"
 msgstr ""
 
 #: templates/new-teams/video-durations.html:12
-#, fuzzy
-#| msgid "Count"
 msgid "Video Count"
-msgstr "Nombro"
+msgstr ""
 
 #: templates/new-teams/video-durations.html:13
 msgid "Total Duration"
@@ -9818,9 +9161,8 @@ msgid "Members for %(team)s"
 msgstr ""
 
 #: templates/new-teams/members.html:29
-#, fuzzy
 msgid "Invite Member"
-msgstr "Membroj"
+msgstr ""
 
 #: templates/new-teams/members.html:39
 #, python-format
@@ -9828,56 +9170,45 @@ msgid "%(user)s avatar"
 msgstr ""
 
 #: templates/new-teams/members.html:42
-#, fuzzy
-#| msgid "Role:"
 msgid "Role"
-msgstr "Rolo:"
+msgstr ""
 
 #: templates/new-teams/members.html:47
-#, fuzzy
-#| msgid "Manager"
 msgid "Manager for"
-msgstr "Mastrumanto"
+msgstr ""
 
 #: templates/new-teams/members.html:66
 msgid "None set"
 msgstr ""
 
 #: templates/new-teams/members.html:74
-#, fuzzy
-#| msgid "membership policy"
 msgid "Edit membership"
-msgstr "politiko pri membreco"
+msgstr ""
 
 #: templates/new-teams/members.html:82
 msgid "No members found"
 msgstr ""
 
 #: templates/new-teams/members.html:88
-#, fuzzy
 msgid "Edit Team Membership"
-msgstr "Membroj"
+msgstr ""
 
 #: templates/new-teams/members.html:97
-#, fuzzy
 msgid "Remove member"
-msgstr "Membroj"
+msgstr ""
 
 #: templates/new-teams/videos.html:9
-#, fuzzy, python-format
+#, python-format
 msgid "Videos for %(team)s"
-msgstr "Aldoni novan skipon"
+msgstr ""
 
 #: templates/new-teams/videos.html:31 templates/new-teams/videos.html:117
-#, fuzzy
-#| msgid "Add video"
 msgid "Add Videos"
-msgstr "Aldoni videon"
+msgstr ""
 
 #: templates/new-teams/videos.html:36 templates/new-teams/videos.html:140
-#, fuzzy
 msgid "Add Videos from CSV"
-msgstr "Aldoni novan skipon"
+msgstr ""
 
 #: templates/new-teams/videos.html:47
 msgid "Clear filters"
@@ -9889,10 +9220,9 @@ msgid "Select all"
 msgstr ""
 
 #: templates/new-teams/videos.html:85
-#, fuzzy, python-format
-#| msgid "%(count)s messages sent"
+#, python-format
 msgid "%(count)s matching videos"
-msgstr "%(count)s senditaj mesaĝoj"
+msgstr ""
 
 #: templates/new-teams/videos.html:87
 #, python-format
@@ -9900,10 +9230,8 @@ msgid "%(count)s total videos"
 msgstr ""
 
 #: templates/new-teams/videos.html:100
-#, fuzzy
-#| msgid "Edit"
 msgid "Bulk Edit"
-msgstr "Ŝanĝi"
+msgstr ""
 
 #: templates/new-teams/videos.html:111
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:11
@@ -9926,8 +9254,8 @@ msgstr ""
 
 #: templates/new-teams/videos.html:143
 msgid ""
-"A CSV file can be created with a text editor or using the export function of "
-"a spreadsheet editor."
+"A CSV file can be created with a text editor or using the export function of"
+" a spreadsheet editor."
 msgstr ""
 
 #: templates/new-teams/videos.html:144
@@ -9977,7 +9305,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: templates/new-teams/videos-forms/remove.html:15
-#, fuzzy
 msgid ""
 "\n"
 "      Are you sure you want to remove the video from your team?\n"
@@ -9986,8 +9313,8 @@ msgid_plural ""
 "\n"
 "      Are you sure you want to remove the videos from your team?\n"
 "      "
-msgstr[0] "Ĉu vi vere volas lasi tiun skipon?"
-msgstr[1] "Ĉu vi vere volas lasi tiun skipon?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: apps/caching/templates/caching/_debug_toolbar_panel.html:2
 msgid "Summary"
@@ -10002,9 +9329,8 @@ msgid "Total time"
 msgstr ""
 
 #: apps/caching/templates/caching/_debug_toolbar_panel.html:17
-#, fuzzy
 msgid "Commands"
-msgstr "Komentoj"
+msgstr ""
 
 #: apps/caching/templates/caching/_debug_toolbar_panel.html:35
 msgid "Calls"
@@ -10035,22 +9361,16 @@ msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_collab-search-form.html:19
 #: amara-enterprise/collab/templates/collab/_collaborations-list.html:23
-#, fuzzy
-#| msgid "Assigned to"
 msgid "Assigned Users"
-msgstr "Atribuita je"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_recent-activity.html:3
-#, fuzzy
-#| msgid "No Activity"
 msgid "Recent activity"
-msgstr "Agado mankas"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_recent-activity.html:19
-#, fuzzy
-#| msgid "No Activity"
 msgid "No activity yet"
-msgstr "Agado mankas"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_sidebar-search.html:3
 #: amara-enterprise/collab/templates/collab/language-page.html:9
@@ -10058,10 +9378,8 @@ msgid "Collaboration Search"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_sidebar-search.html:4
-#, fuzzy
-#| msgid "Search"
 msgid "Video Search"
-msgstr "Serĉi"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/assignments-list.html:25
 #, python-format
@@ -10069,15 +9387,14 @@ msgid "Review %(language)s Subtitles"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/assignments-list.html:27
-#, fuzzy, python-format
+#, python-format
 msgid "Approve %(language)s Subtitles"
-msgstr " subtekstoj"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/assignments-list.html:47
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:25
-#, fuzzy
 msgid "Open Editor"
-msgstr "Ŝanĝi"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/assignments-list.html:49
 msgid "collaboration details"
@@ -10101,10 +9418,8 @@ msgid ""
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/dashboard-set-languages.html:33
-#, fuzzy
-#| msgid "Select your Languages"
 msgid "Select Your Languages"
-msgstr "Elektu viajn Lingvojn"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/dashboard-set-languages.html:34
 msgid ""
@@ -10113,10 +9428,8 @@ msgid ""
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/dashboard-set-languages.html:45
-#, fuzzy
-#| msgid "Delete Language"
 msgid "Set Languages"
-msgstr "Forigi lingvon"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/language-page.html:21
 #, python-format
@@ -10133,15 +9446,13 @@ msgid "%(video_title)s / %(language)s"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/leave-collaboration.html:10
-#, fuzzy
 msgid "Are you sure you want to leave this collaboration?"
-msgstr "Ĉu vi vere volas lasi tiun skipon?"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/project-page.html:19
-#, fuzzy, python-format
-#| msgid "Search Videos"
+#, python-format
 msgid "Search Videos in %(project)s"
-msgstr "Serĉi Videojn"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/project-page.html:24
 #, python-format
@@ -10162,39 +9473,32 @@ msgid "Waiting for you"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_dashboard.html:12
-#, fuzzy
 msgid "Sent back"
-msgstr "Sendi sugeston"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_dashboard.html:17
 msgid "Endorsed"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_dashboard.html:27
-#, fuzzy
-#| msgid "Confirm password:"
 msgid "configure dashboard"
-msgstr "Konfirmu pasvorton:"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_dashboard.html:30
 msgid "Collaborations to Join"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_dashboard.html:34
-#, fuzzy
 msgid "Subtitles Needed"
-msgstr "Subtekstigi videon"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_dashboard.html:39
-#, fuzzy
-#| msgid "Reviewed"
 msgid "Review Needed"
-msgstr "Provlegita"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_dashboard.html:44
-#, fuzzy
 msgid "Approval Needed"
-msgstr "Aprobita"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_dashboard.html:50
 msgid ""
@@ -10207,37 +9511,28 @@ msgid "None found."
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/dashboard.html:37
-#, fuzzy
-#| msgid "All Languages"
 msgid "All Languages&hellip;"
-msgstr "Ĉiuj lingvoj"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/dashboard.html:57
 msgid "Search Collaborations"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/dashboard.html:62
-#, fuzzy
-#| msgid "Confirm password:"
 msgid "Configure Dashboard"
-msgstr "Konfirmu pasvorton:"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/dashboard.html:68
-#, fuzzy
 msgid "Subtitle Language"
-msgstr "Subtekstoj en"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/dashboard.html:77
-#, fuzzy
-#| msgid "Assigned to"
 msgid "Assignment type"
-msgstr "Atribuita je"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/workflow-settings.html:21
-#, fuzzy
-#| msgid "Find subtitles created by others"
 msgid "Initial subtitles created by:"
-msgstr "Trovi subtekstojn kreitaj de aliuloj"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/workflow-settings.html:32
 msgid "Auto-create Collaborations"
@@ -10249,10 +9544,8 @@ msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_collaboration-manage-dropdown.html:4
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:4
-#, fuzzy
-#| msgid "Assigned to"
 msgid "Assign User"
-msgstr "Atribuita je"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_collaboration-manage-dropdown.html:7
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:5
@@ -10266,22 +9559,18 @@ msgid "Mark Complete"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_collaboration-manage-dropdown.html:19
-#, fuzzy
 msgid "Send back to provider"
-msgstr "Malvalida pasvorto!"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_collaboration-manage-dropdown.html:22
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:129
-#, fuzzy
-#| msgid "Unassigned"
 msgid "Unassign provider"
-msgstr "Neatribuita"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:13
-#, fuzzy, python-format
-#| msgid "request subtitles"
+#, python-format
 msgid "%(language)s subtitles"
-msgstr "peti subtekstojn"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:28
 msgid "Leave Collaboration"
@@ -10293,15 +9582,12 @@ msgid "%(language)s Collaboration %(state)s"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:40
-#, fuzzy
 msgid "Subtitle Provider"
-msgstr "Subtekstigi videon"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:45
-#, fuzzy
-#| msgid "User"
 msgid "Users"
-msgstr "Uzanto"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:61
 msgid "No collaborators yet"
@@ -10335,9 +9621,8 @@ msgid "State"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/video-collaborations-rows.html:24
-#, fuzzy
 msgid "editor"
-msgstr "Ŝanĝi"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/video-collaborations.html:16
 #: amara-enterprise/collab/templates/collab/video-collaborations.html:49
@@ -10353,24 +9638,22 @@ msgid "Collaborators"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/video-collaborations.html:33
-#, fuzzy, python-format
+#, python-format
 msgid "Team: %(team)s"
-msgstr "Skipoj"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/video-collaborations.html:39
 msgid "No Collaborations Yet"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/video-collaborations.html:57
-#, fuzzy, python-format
+#, python-format
 msgid "Primary Audio Language: %(language)s"
-msgstr "Videa lingvo"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_completed-languages.html:17
-#, fuzzy
-#| msgid "language choices"
 msgid "No languages complete"
-msgstr "Lingvaj elektoj"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_collaborations-list.html:73
 #, python-format
@@ -10439,7 +9722,8 @@ msgid "All endorsement history will be deleted."
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:95
-msgid "Any subtitles created by collaborators will not be removed or modified."
+msgid ""
+"Any subtitles created by collaborators will not be removed or modified."
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:112
@@ -10458,26 +9742,22 @@ msgid ""
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:138
-#, fuzzy
-#| msgid "Unassigned"
 msgid "Unassign"
-msgstr "Neatribuita"
+msgstr ""
 
 #: amara-enterprise/collab/templates/collab/email/new-editor-note.html:6
 #, python-format
 msgid ""
 "\n"
-"        %(note_user)s added a note to subtitles on which you are "
-"collaborating. View collaborations for <a href=\"%(collaborations_url)s\">"
-"%(video)s / %(language)s</a>.\n"
+"        %(note_user)s added a note to subtitles on which you are collaborating. View collaborations for <a href=\"%(collaborations_url)s\">%(video)s / %(language)s</a>.\n"
 "        "
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/messages/new-editor-note.html:1
 #, python-format
 msgid ""
-"%(note_user)s added a note to subtitles on which you are collaborating. View "
-"collaborations for <a href=\"%(collaborations_url)s\">%(video)s / "
+"%(note_user)s added a note to subtitles on which you are collaborating. View"
+" collaborations for <a href=\"%(collaborations_url)s\">%(video)s / "
 "%(language)s</a>."
 msgstr ""
 
@@ -10494,10 +9774,8 @@ msgid "$/minute"
 msgstr ""
 
 #: amara-enterprise/prorequests/templates/prorequests/rules-table-header.html:17
-#, fuzzy
-#| msgid "Translation homepage"
 msgid "Native translation surcharge"
-msgstr "Traduka hejmpaĝo"
+msgstr ""
 
 #: amara-enterprise/prorequests/templates/prorequests/rules.html:5
 msgid "Pro-Request Rule Admin"
@@ -10526,17 +9804,13 @@ msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue-list.html:12
 #: amara-enterprise/providers/templates/providers/queue.html:48
-#, fuzzy
-#| msgid "Unassigned"
 msgid "Unassigned Jobs"
-msgstr "Neatribuita"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue-list.html:13
 #: amara-enterprise/providers/templates/providers/queue.html:49
-#, fuzzy
-#| msgid "Assigned to"
 msgid "Assigned Jobs"
-msgstr "Atribuita je"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue-list.html:24
 msgid "No queues created"
@@ -10561,17 +9835,13 @@ msgstr ""
 
 #: amara-enterprise/providers/templates/providers/user-queue.html:48
 #: amara-enterprise/providers/templates/providers/user-queue.html:89
-#, fuzzy
-#| msgid "Download this catalog"
 msgid "Download transcript"
-msgstr "Elŝuti ĉi tiun katalogon"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/user-queue.html:60
 #: amara-enterprise/providers/templates/providers/user-queue.html:124
-#, fuzzy
-#| msgid "delete subtitles"
 msgid "Deliver Subtitles"
-msgstr "forigi subtekstojn"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/user-queue.html:69
 msgid "Available Jobs"
@@ -10582,27 +9852,20 @@ msgid "Accept Job"
 msgstr ""
 
 #: amara-enterprise/providers/templates/providers/user-queue.html:112
-#, fuzzy
-#| msgid "Video is unavailable"
 msgid "No jobs available"
-msgstr "Video ne disponeblas"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue.html:12
-#, fuzzy
-#| msgid "Add comment"
 msgid "Add Account"
-msgstr "Aldoni komenton"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue.html:13
-#, fuzzy
 msgid "Add Language"
-msgstr "Ĉiuj lingvoj"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue.html:19
-#, fuzzy
-#| msgid "Create Account"
 msgid "Accounts"
-msgstr "Krei Konton"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue.html:25
 msgid "Current Jobs"
@@ -10614,15 +9877,12 @@ msgid "Edit Queue Account for %(user)s"
 msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue.html:38
-#, fuzzy
 msgid "No accounts"
-msgstr "Krei Konton"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue.html:47
-#, fuzzy
-#| msgid "Unassigned"
 msgid "Users Assigned"
-msgstr "Neatribuita"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue.html:58
 #, python-format
@@ -10630,22 +9890,16 @@ msgid "Edit Queue Language for %(language)s"
 msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue.html:63
-#, fuzzy
-#| msgid "Most languages"
 msgid "No languages"
-msgstr "Plej multaj lingvoj"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue.html:74
-#, fuzzy
-#| msgid "Create Account"
 msgid "Add Queue Account"
-msgstr "Krei Konton"
+msgstr ""
 
 #: amara-enterprise/providers/templates/providers/queue.html:103
-#, fuzzy
-#| msgid "Video Language"
 msgid "Add Queue Language"
-msgstr "Lingvo de la filmo"
+msgstr ""
 
 #: amara-enterprise/reports/templates/reports/base.html:20
 #, python-format
@@ -10665,13 +9919,12 @@ msgid "Configure Reports"
 msgstr ""
 
 #: amara-enterprise/reports/templates/reports/monthly-billing.html:7
-#, fuzzy
 msgid "Month:"
-msgstr "Monato"
+msgstr ""
 
 #: amara-enterprise/services/templates/services/translation_request_list.html:5
 msgid "From"
-msgstr ""
+msgstr "De"
 
 #: amara-enterprise/services/templates/services/translation_request_list.html:15
 msgid "Not finished"
@@ -10704,10 +9957,8 @@ msgid "Bulk Create Collaborations %(batch)s"
 msgstr ""
 
 #: amara-enterprise/ondemand/templates/ondemand/bulk-create-collabs.html:15
-#, fuzzy
-#| msgid "Create a Task"
 msgid "Create Collabs"
-msgstr "Krei Taskon"
+msgstr ""
 
 #: amara-enterprise/ondemand/templates/ondemand/dashboard.html:7
 msgid "Amara On-Demand Dashboard"
@@ -10753,10 +10004,8 @@ msgid "Create new On-Demand batch"
 msgstr ""
 
 #: amara-enterprise/ondemand/templates/ondemand/edit-batch.html:19
-#, fuzzy
-#| msgid "Delete task"
 msgid "Delete batch"
-msgstr "Forigi taskon"
+msgstr ""
 
 #: amara-enterprise/ondemand/templates/ondemand/edit-batch.html:21
 msgid "Update Batch"

@@ -14,11 +14,12 @@ Here's our basic strategy:
     This stores all translatable strings in the app for that domain.
 
   - For each locale/domain pair we create a .po file which is basically a copy
-    of the .pot file with localized strings filled in in that language.  To do
-    this we merge the new .pot file with the existing .po file.
+    of the .pot file with localized strings filled in in that language.  We
+    normally get the .po files from transifex, but you can also update them
+    in-place with a .po file editor.
 
-  - Outside of this command we use the transifex client to pull in new
-    localized strings and update the .po files.
+  - Outside of this command we use the transifex client to push the .pot file
+    and pull in the .po files.
 
 One tricky part is the template files.  gettext can't handle these natively,
 we need to run them through Django's templatize() function.  To allow gettext
@@ -31,6 +32,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+from optparse import make_option
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -265,6 +267,13 @@ def all_locales():
     return rv
 
 class Command(BaseCommand):
+    option_list = BaseCommand.option_list + (
+        make_option('--merge',
+            action='store_true',
+            default=False,
+            help='Merge .pot file with our .po files'),
+        )
+
     def handle(self, *args, **kwargs):
         os.chdir(settings.PROJECT_ROOT)
 
@@ -275,8 +284,9 @@ class Command(BaseCommand):
             self.stdout.write("building {}\n".format(domain.pot_path()))
             domain.build_pot_file()
 
-        for domain in domains:
-            for locale in locales:
-                self.stdout.write(
-                    "building {}\n".format(domain.po_path(locale.name)))
-                locale.build_po_file(domain)
+        if kwargs['merge']:
+            for domain in domains:
+                for locale in locales:
+                    self.stdout.write(
+                        "building {}\n".format(domain.po_path(locale.name)))
+                    locale.build_po_file(domain)
