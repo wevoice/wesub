@@ -48,7 +48,7 @@ def static_url():
     return utils.static_url()
 
 @register.simple_tag(takes_context=True)
-def js_18n_catalog(context):
+def js_i18n_catalog(context):
     if settings.STATIC_MEDIA_USES_S3:
         locale = to_locale(context['LANGUAGE_CODE'])
         src = utils.static_url() + 'jsi18catalog/{}.js'.format(locale)
