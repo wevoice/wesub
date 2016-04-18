@@ -372,7 +372,8 @@ class TeamMemberViewSet(TeamSubview):
         return member
 
     def perform_create(self, serializer):
-        if not team_permissions.can_add_member(self.team, self.request.user):
+        if not team_permissions.can_add_member(
+            self.team, self.request.user, serializer.validated_data['role']):
             raise PermissionDenied()
         serializer.save()
 
@@ -677,8 +678,8 @@ class TaskUpdateSerializer(TaskSerializer):
                               read_only=True)
     type = MappedChoiceField(Task.TYPE_CHOICES, required=False,
                              read_only=True)
-    complete = serializers.BooleanField(required=False)
-    send_back = serializers.BooleanField(required=False)
+    complete = serializers.BooleanField(required=False, source='')
+    send_back = serializers.BooleanField(required=False, source='')
 
     class Meta(TaskSerializer.Meta):
         fields = TaskSerializer.Meta.fields + (
@@ -797,7 +798,7 @@ class TaskViewSet(TeamSubview):
     def get_queryset(self):
         if not self.team.user_is_member(self.request.user):
             raise PermissionDenied()
-        return (self.order_queryset(self.team.task_set.all())
+        return (self.order_queryset(self.team.task_set.not_deleted())
                 .select_related('team_video__video', 'assignee'))
 
     def order_queryset(self, qs):
@@ -871,7 +872,8 @@ class TaskViewSet(TeamSubview):
             self.team, self.request.user, instance.team_video.project,
             instance.language):
             raise PermissionDenied()
-        instance.delete()
+        instance.deleted = True
+        instance.save()
 
     def _post_save(self, task):
         if task.assignee and not self.task_was_assigned:

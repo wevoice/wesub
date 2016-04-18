@@ -561,7 +561,7 @@ class VideoURLSerializer(serializers.Serializer):
             added_by=self.context['user'],
         )
         if validated_data.get('primary'):
-            new_url.make_primary()
+            new_url.make_primary(self.context['user'])
         return new_url
 
     def update(self, video_url, validated_data):
@@ -571,7 +571,7 @@ class VideoURLSerializer(serializers.Serializer):
             video_url.save()
 
         if validated_data.get('primary'):
-            video_url.make_primary()
+            video_url.make_primary(self.context['user'])
 
         return video_url
 
@@ -666,10 +666,29 @@ class VideoURLViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.video.videourl_set.all().select_related('video')
 
+    def check_view_permissions(self):
+        workflow = self.video.get_workflow()
+        if not workflow.user_can_view_video(self.request.user):
+            raise PermissionDenied()
+
+    def check_edit_permissions(self):
+        workflow = self.video.get_workflow()
+        if not workflow.user_can_edit_video(self.request.user):
+            raise PermissionDenied()
+
+    def perform_create(self, serializer):
+        self.check_edit_permissions()
+        return serializer.save()
+
+    def perform_update(self, serializer):
+        self.check_edit_permissions()
+        return serializer.save()
+
     def perform_destroy(self, instance):
+        self.check_edit_permissions()
         if instance.primary:
             raise serializers.ValidationError("Can't delete the primary URL")
-        instance.delete()
+        instance.remove(self.request.user)
 
     def get_serializer_context(self):
         return {
