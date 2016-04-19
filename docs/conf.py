@@ -16,7 +16,7 @@ import sphinx_rtd_theme
 
 # HACK: something weird happens to six.moves in the process of starting up
 # django.  I'm not sure if it's our old django version, or some of our old
-# modules like raven, but somehow six.moves gets replaced with a version that
+# modules like haystack, but somehow six.moves gets replaced with a version that
 # doesn't have any of the moved modules in it.  Then we fail with something
 # like "cannot import range".  So we save the six.moves psuedo-module here and
 # restore it after startup() is called.
@@ -28,7 +28,11 @@ old_moves = six.moves
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
-sys.path.insert(0, os.path.abspath('../'))
+root_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(0, root_dir)
+sys.path.insert(0, os.path.join(root_dir, 'apps'))
+sys.path.insert(0, os.path.join(root_dir, 'libs'))
+print sys.path
 import startup
 startup.startup()
 

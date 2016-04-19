@@ -1,0 +1,43 @@
+#!/bin/bash
+ACTION=$1
+
+if [ "$ACTION" = "app" ]; then
+    echo "Running app..."
+    exec /usr/local/bin/run
+elif [ "$ACTION" = "build_media" ]; then
+    echo "Building media..."
+    exec /usr/local/bin/build_media
+elif [ "$ACTION" = "migrate" ]; then
+    echo "Running migrations..."
+    exec /usr/local/bin/run_migrations
+elif [ "$ACTION" = "master_worker" ]; then
+    echo "Running master worker..."
+    exec /usr/local/bin/master-worker
+elif [ "$ACTION" = "feed_worker" ]; then
+    echo "Running feed worker..."
+    exec /usr/local/bin/feed-worker
+elif [ "$ACTION" = "worker" ]; then
+    echo "Running worker..."
+    exec /usr/local/bin/worker
+elif [ "$ACTION" = "update_translations" ]; then
+    echo "Updating translations..."
+    exec /usr/local/bin/update_translations $2
+elif [ "$ACTION" = "setup_preview_site" ]; then
+    echo "Setting up preview site to... $2"
+    exec /usr/local/bin/setup_preview_site $2
+elif [ "$ACTION" = "reset_db" ]; then
+    echo "Reseting database"
+    exec /usr/local/bin/reset-db
+elif [ "$ACTION" = "manage" ]; then
+    source /usr/local/bin/config_env
+    shift
+    manage "$@"
+elif [ "$ACTION" = "shell" ]; then
+    echo "Running shell..."
+    echo "Use the manage alias to run django management commands"
+    echo "source /usr/local/bin/config_env" >> ~/.bash_profile
+    exec /bin/bash -l
+else
+    echo "Unknown action: $ACTION"
+    exit 1
+fi

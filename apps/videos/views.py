@@ -26,7 +26,6 @@ from babelsubs.storage import diff as diff_subs
 from babelsubs.generators.html import HTMLGenerator
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
@@ -58,6 +57,7 @@ from subtitles.permissions import (user_can_view_private_subtitles,
 from subtitles.forms import SubtitlesUploadForm
 from subtitles.pipeline import rollback_to
 from teams.models import Task
+from utils.decorators import staff_member_required
 from videos import permissions
 from videos.decorators import (get_video_revision, get_video_from_code,
                                get_cached_video_from_code)
@@ -409,8 +409,6 @@ def upload_subtitles(request):
     except Exception, e:
         import traceback
         traceback.print_exc()
-        from raven.contrib.django.models import client
-        client.create_from_exception()
         output['errors'] = {'__all__': [force_unicode(e)]}
 
     return HttpResponse(json.dumps(output))

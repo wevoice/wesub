@@ -21,6 +21,7 @@
 import collections
 import itertools
 import json
+import logging
 from datetime import datetime, date, timedelta
 
 from django.core.exceptions import ValidationError
@@ -46,6 +47,8 @@ from utils import translation
 from videos.behaviors import make_video_title
 
 WRITELOCK_EXPIRATION = 30 # 30 seconds
+
+logger = logging.getLogger(__name__)
 
 # Utility functions -----------------------------------------------------------
 def mapcat(fn, iterable):
@@ -389,11 +392,12 @@ class SubtitleLanguage(models.Model):
         unique_together = [('video', 'language_code')]
 
     @classmethod
-    def calc_completed_languages(cls, video_list, names=False):
+    def calc_completed_languages(cls, video_list, prioritize=None, names=False):
         """Calculate completed languages for a list of videos.
 
         Arguments:
             video_list: list of Videos or PKs
+            prioritize: list of languages to put at the top of the list
             names: return language names instead of codes
 
         Returns:
@@ -404,9 +408,19 @@ class SubtitleLanguage(models.Model):
               .values_list('video_id', 'language_code'))
         completed_languages = collections.defaultdict(list)
         for video_id, language in qs:
-            if names:
-                language = translation.get_language_label(language)
             completed_languages[video_id].append(language)
+        if prioritize:
+            for language_list in completed_languages.values():
+                list_size = len(language_list)
+                language_list.sort(
+                    key=(lambda lc: prioritize.index(lc) if lc in prioritize
+                         else list_size))
+        if names:
+            for language_list in completed_languages.values():
+                language_list[:] = [
+                    translation.get_language_label(lc)
+                    for lc in language_list
+                ]
         return completed_languages
 
     def __init__(self, *args, **kwargs):
@@ -510,10 +524,9 @@ class SubtitleLanguage(models.Model):
             signal.send(self, **kwargs)
 
     def mark_complete(self):
-        if self.subtitles_complete:
-            return
-        self.subtitles_complete = True
-        self.save()
+        if not self.subtitles_complete:
+            self.subtitles_complete = True
+            self.save()
         self.send_signal(signals.subtitles_completed)
 
     def mark_incomplete(self):
@@ -1983,10 +1996,7 @@ class SubtitleNoteBase(models.Model):
         abstract = True
 
     def get_username(self):
-        if self.user:
-            return self.user.username
-        else:
-            return ugettext('None')
+        return unicode(self.user)
 
 class SubtitleNote(SubtitleNoteBase):
     pass

@@ -31,7 +31,6 @@ from collections import namedtuple, OrderedDict
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.cache import cache
@@ -49,6 +48,7 @@ from . import permissions
 from . import signals
 from . import tasks
 from .behaviors import get_main_project
+from .bulk_actions import add_videos_from_csv
 from .exceptions import ApplicationInvalidException
 from .models import (Invite, Setting, Team, Project, TeamVideo,
                      TeamLanguagePreference, TeamMember, Application)
@@ -58,6 +58,7 @@ from messages import tasks as messages_tasks
 from subtitles.models import SubtitleLanguage
 from teams.workflows import TeamWorkflow
 from utils.breadcrumbs import BreadCrumb
+from utils.decorators import staff_member_required
 from utils.pagination import AmaraPaginator
 from utils.forms import autocomplete_user_view, FormRouter
 from utils.text import fmt
@@ -205,7 +206,8 @@ class VideoPageForms(object):
         - Allowing other apps to extend which forms appear in the bottom sheet
     """
     form_classes = {
-        'add': forms.NewAddTeamVideoForm,
+        'add_form': forms.NewAddTeamVideoDataForm,
+        'add_csv': forms.TeamVideoCSVForm,
         'edit': forms.NewEditTeamVideoForm,
         'bulk-edit': forms.BulkEditTeamVideosForm,
         'move': forms.MoveTeamVideosForm,
@@ -217,8 +219,10 @@ class VideoPageForms(object):
         self.user = user
         self.team_videos_qs = team_videos_qs
         self.enabled = set()
+        if permissions.can_add_videos_bulk(user):
+            self.enabled.add('add_csv')
         if permissions.can_add_video(team, user):
-            self.enabled.add('add')
+            self.enabled.add('add_form')
         if permissions.can_edit_videos(team, user):
             self.enabled.update(['edit', 'bulk-edit'])
         if len(permissions.can_move_videos_to(team, user)) > 0:
@@ -244,7 +248,7 @@ class VideoPageForms(object):
             return FormClass(self.team, self.user, self.team_videos_qs,
                              selection, all_selected, filters_form)
 
-    def build_add_form(self, request, filters_form):
+    def build_add_multiple_forms(self, request, filters_form):
         if filters_form.selected_project:
             # use the selected project by default on the add video form
             initial = {
@@ -252,13 +256,13 @@ class VideoPageForms(object):
             }
         else:
             initial = None
-        if request.method == 'POST':
-            return forms.NewAddTeamVideoForm(self.team, self.user,
-                                             initial=initial,
-                                             data=request.POST)
+        if request.method == 'POST' and 'form' in request.POST and request.POST['form'] == 'add':
+            logger.error(request)
+            return (forms.NewAddTeamVideoDataForm(self.team, request.POST, files=request.FILES),
+                    forms.TeamVideoURLFormSet(request.POST))
         else:
-            return forms.NewAddTeamVideoForm(self.team, self.user,
-                                             initial=initial)
+            return (forms.NewAddTeamVideoDataForm(self.team),
+                    forms.TeamVideoURLFormSet())
 
     def add_extension_form(self, extension_form):
         """Add an extra form to appear on the video page
@@ -308,14 +312,38 @@ def videos(request, team):
     page_forms = VideoPageForms(team, request.user, team_videos)
     error_form = error_form_name = None
 
-    add_form = page_forms.build_add_form(request, filters_form)
-    if add_form.is_bound and add_form.is_valid():
-        add_form.save()
-        messages.success(request, add_form.message())
+    add_form, add_formset = page_forms.build_add_multiple_forms(request, filters_form)
+    if add_form.is_bound and add_form.is_valid() and add_formset.is_bound and add_formset.is_valid():
+        errors = ""
+        added = 0
+        project = add_form.cleaned_data['project']
+        thumbnail = add_form.cleaned_data['thumbnail']
+        language = add_form.cleaned_data['language']
+        for form in add_formset:
+            created, error = form.save(team, request.user, project=project, thumbnail=thumbnail, language=language)
+            if len(error) > 0:
+                errors += error + "<br/>"
+            if created:
+                added += 1
+        message = fmt(_(u"%(added)i videos added<br/>%(errors)s"), added=added, errors=errors)
+        messages.success(request, message)
         return HttpResponseRedirect(request.build_absolute_uri())
-
     paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
     page = paginator.get_page(request)
+
+    if request.method == 'POST':
+        csv_form = forms.TeamVideoCSVForm(data=request.POST, files=request.FILES)
+        if csv_form.is_bound and csv_form.is_valid():
+            csv_file = csv_form.cleaned_data['csv_file']
+            if csv_file is not None:
+                try:
+                    add_videos_from_csv(team, request.user, csv_file)
+                    message = fmt(_(u"File successfully uploaded, you should receive the summary shortly."))
+                except:
+                    message = fmt(_(u"File was not successfully parsed."))
+                messages.success(request, message)
+    else:
+        csv_form = forms.TeamVideoCSVForm()
 
     return render(request, 'new-teams/videos.html', {
         'team': team,
@@ -324,6 +352,8 @@ def videos(request, team):
         'filters_form': filters_form,
         'forms': page_forms,
         'add_form': add_form,
+        'add_formset': add_formset,
+        'add_csv_form': csv_form,
         'error_form': error_form,
         'error_form_name': error_form_name,
         'bulk_mode_enabled': page and page_forms.has_bulk_form,

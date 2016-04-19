@@ -3848,7 +3848,7 @@
 
     function onFirstPause() {
       removeYouTubeEvent( "pause", onFirstPause );
-      if ( player.getCurrentTime() > 0 ) {
+      if ( player.getCurrentTime() > 0.2 ) {
         setTimeout( onFirstPause, 0 );
         return;
       }

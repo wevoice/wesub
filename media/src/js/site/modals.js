@@ -60,7 +60,7 @@ $.fn.openModal = function(openEvent, setupData) {
             } else {
                 modal.removeClass('shown');
             }
-            $('body div.modal-overlay').remove();
+            removeModalOverlay();
             closeButton.unbind('click.modal');
             $document.unbind('click.modal');
             $document.unbind('keydown.modal');
@@ -101,18 +101,18 @@ $.fn.openModal = function(openEvent, setupData) {
     }
 }
 
+function removeModalOverlay() {
+    $('body div.modal-overlay').remove();
+}
+
 window.ajaxOpenModal = function(url, params, setupData) {
     var setupData = $.extend({}, setupData, {removeOnClose: true});
     var loadingHTML = $('<div class="modal-overlay"><div class="loading"><span class="fa fa-spinner fa-pulse"></span></div></div>');
 
     $('body').append(loadingHTML);
 
-    $.get(url, params)
-    .done(function(data, textStatus, xhr) {
-        loadingHTML.remove();
-        var modal = $(data)
+    function setupAjaxModal(modal) {
         modal.updateBehaviors();
-        modal.appendTo(document.body).openModal(null, setupData);
         $('form', modal).ajaxForm({
             url: url + '?' + $.param(params),
             beforeSubmit: function(data, form, options) {
@@ -128,12 +128,22 @@ window.ajaxOpenModal = function(url, params, setupData) {
                 if(xhr.getResponseHeader('X-Form-Success')) {
                     window.location.reload();
                 } else {
+                    removeModalOverlay();
                     var newModal = $(responseText);
                     modal.replaceWith(newModal);
                     newModal.openModal();
+                    setupAjaxModal(newModal);
                 }
             }
         });
+    }
+
+    $.get(url, params)
+    .done(function(data, textStatus, xhr) {
+        loadingHTML.remove();
+        var modal = $(data);
+        modal.appendTo(document.body).openModal(null, setupData);
+        setupAjaxModal(modal);
     })
     .fail(function(xhr, textStatus, errorThrown) {
         console.log("error loading modal from " + url + "(" + textStatus + ")");

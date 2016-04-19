@@ -734,6 +734,10 @@ class TasksAPITest(TeamAPITestBase):
             'open': 1,
         })
 
+    def test_deleted_tasks(self):
+        task = self.task_factory(language='es', deleted=True)
+        self.check_list_results([])
+
     def check_list_order(self, order_param):
         task_qs = self.team.task_set.all().order_by(order_param)
         response = self.client.get(self.list_url, {'order_by': order_param})
@@ -914,7 +918,10 @@ class TasksAPITest(TeamAPITestBase):
         task = self.task_factory(language='es', assignee=self.member)
         response = self.client.delete(self.detail_url(task))
         assert_equal(response.status_code, status.HTTP_204_NO_CONTENT)
-        assert_equal(self.team_video.task_set.all().count(), 0)
+        # deleting should flag the task as deleted, but keep the object around
+        # in the DB
+        assert_equal(self.team_video.task_set.not_deleted().count(), 0)
+        assert_equal(test_utils.obj_exists(task))
 
     def test_create_fields(self):
         response = self.client.options(self.list_url)

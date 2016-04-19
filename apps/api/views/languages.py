@@ -15,21 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
-"""
-Languages Resource
-^^^^^^^^^^^^^^^^^^
-
-Represents a listing of all available languages on the Amara
-platform.
-
-Listing available languages:
-
-.. http:get:: /api/languages/
-
-   :<json languages: maps language codes to language names
-
-"""
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -37,6 +22,16 @@ from utils import translation
 
 @api_view(['GET'])
 def languages(request):
+    """
+    API endpoint that lists all available languages on the Amara platform.
+
+    ## `GET /api/languages/`
+    List available languages
+
+    - **languages:** maps language codes to language names
+
+    """
+
     return Response({
         'languages': dict(translation.SUPPORTED_LANGUAGE_CHOICES)
     })

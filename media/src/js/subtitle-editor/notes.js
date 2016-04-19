@@ -46,7 +46,7 @@ var angular = angular || null;
         $scope.postNote = function() {
             SubtitleStorage.postNote($scope.newNoteText);
             $scope.notes.push({
-                user: EditorData.username,
+                user: EditorData.user_fullname,
                 created: 'Just now',
                 body: convertBody($scope.newNoteText)
             });

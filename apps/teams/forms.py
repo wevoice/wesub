@@ -28,6 +28,7 @@ from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.db import transaction
+from django.forms.formsets import formset_factory
 from django.forms.util import ErrorDict
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
@@ -57,6 +58,7 @@ from videos.models import (
         VideoMetadata, VIDEO_META_TYPE_IDS, Video, VideoFeed,
 )
 from videos.tasks import import_videos_from_feed
+from videos.types import video_type_registrar, VideoTypeError
 from utils.forms import (ErrorableModelForm, get_label_for_value,
                          UserAutocompleteField)
 from utils.forms.unisub_video_form import UniSubBoundVideoField
@@ -346,8 +348,8 @@ class TaskCreateForm(ErrorableModelForm):
         # TODO: This is bad for teams with 10k members.
         team_user_ids = team.members.values_list('user', flat=True)
 
-        langs = [l for l in get_language_choices(with_empty=True)
-                 if l[0] in team.get_writable_langs()]
+        langs = get_language_choices(with_empty=True,
+                                     limit_to=team.get_writable_langs())
         self.fields['language'].choices = langs
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
@@ -594,8 +596,8 @@ class LanguagesForm(forms.Form):
         super(LanguagesForm, self).__init__(*args, **kwargs)
 
         self.team = team
-        self.fields['preferred'].choices = get_language_choices()
-        self.fields['blacklisted'].choices = get_language_choices()
+        self.fields['preferred'].choices = get_language_choices(flat=True)
+        self.fields['blacklisted'].choices = get_language_choices(flat=True)
 
     def clean(self):
         preferred = set(self.cleaned_data['preferred'])
@@ -1154,7 +1156,7 @@ class EditMembershipForm(forms.Form):
         (TeamMember.ROLE_CONTRIBUTOR, _('Contributor')),
         (TeamMember.ROLE_MANAGER, _('Manager')),
         (TeamMember.ROLE_ADMIN, _('Admin')),
-    ], initial=TeamMember.ROLE_CONTRIBUTOR)
+    ], initial=TeamMember.ROLE_CONTRIBUTOR, label=_('Member Role'))
     language_narrowings = forms.MultipleChoiceField(required=False)
     project_narrowings = forms.MultipleChoiceField(required=False)
 
@@ -1405,14 +1407,16 @@ class BulkEditTeamVideosForm(BulkTeamVideoForm):
                         self.count)
         return fmt(msg, count=self.count)
 
-class NewAddTeamVideoForm(VideoForm):
+class NewAddTeamVideoDataForm(forms.Form):
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
+    language = forms.ChoiceField(choices=(), required=False)
     thumbnail = forms.ImageField(required=False)
 
-    def __init__(self, team, user, *args, **kwargs):
-        super(NewAddTeamVideoForm, self).__init__(user, *args, **kwargs)
+    def __init__(self, team, *args, **kwargs):
+        super(NewAddTeamVideoDataForm, self).__init__(*args, **kwargs)
         self.team = team
+        self.fields['language'].choices = get_language_choices(with_empty=True)
         self.fields['project'].choices = [
             ('', _('None')),
         ] + [
@@ -1420,45 +1424,6 @@ class NewAddTeamVideoForm(VideoForm):
         ]
         if not self.fields['project'].choices:
             del self.fields['project']
-
-    def clean(self):
-        if not self._errors:
-            video, created = Video.get_or_create_for_url(
-                self.cleaned_data['video_url'], self._video_type, self.user,
-                set_values={'is_public': self.team.is_visible},
-            )
-            if not created and video.get_team_video() is not None:
-                self._errors['video_url'] = self.error_class([
-                    _(u'Video is already part of a team')
-                ])
-                return
-            if not created:
-                video.is_public = self.team.is_visible
-                video.save()
-            self.video = video
-            self.created = created
-        return self.cleaned_data
-
-    def save(self):
-        if 'project' in self.fields:
-            project_id = self.cleaned_data['project']
-            if not project_id:
-                project_id = None
-        else:
-            project_id = None
-        team_video = TeamVideo.objects.create(
-            video=self.video, team=self.team, project_id=project_id,
-        )
-        if self.cleaned_data['thumbnail']:
-            thumb = self.cleaned_data['thumbnail']
-            self.video.s3_thumbnail.save(thumb.name, thumb)
-        return team_video
-
-    def message(self):
-        if self.created:
-            return _('Video added to team.')
-        else:
-            return _('Existing video added to team.')
 
 class NewEditTeamVideoForm(forms.Form):
     primary_audio_language = forms.ChoiceField(required=False, choices=[])
@@ -1566,3 +1531,41 @@ class ApplicationForm(forms.Form):
             if value:
                 languages.append({"language": value, "priority": i})
         self.application.user.set_languages(languages)
+
+class TeamVideoURLForm(forms.Form):
+    video_url = forms.URLField()
+    def save(self, team, user, project=None, thumbnail=None, language=None):
+        errors = ""
+        from videos.models import Video
+        if 'video_url' not in self.cleaned_data:
+            return (False, "")
+        video_url = self.cleaned_data['video_url']
+        if video_url:
+            try:
+                video_type = video_type_registrar.video_type_for_url(video_url)
+            except VideoTypeError, e:
+                return (False, fmt(_(u"Unknown video type: %(url)s"), url=video_url))
+            video_url = video_type.convert_to_video_url()
+            set_values={'is_public': team.is_visible}
+            if language is not None:
+                set_values['primary_audio_language_code'] = language
+            video, created = Video.get_or_create_for_url(video_url, video_type, user, set_values=set_values)
+            if not created and video.get_team_video() is not None:
+                return (False, fmt(_(u"Video is already part of a team: %(url)s"), url=video_url))
+            if not created:
+                video.is_public = self.team.is_visible
+                video.save()
+            if project:
+                project_id = project
+            else:
+                project_id = None
+            team_video = TeamVideo.objects.create(video=video, team=team, project_id=project_id)
+            if thumbnail is not None:
+                video.s3_thumbnail.save(thumbnail.name, thumbnail)
+        else:
+            return (False, _(u"no video URL provided"))
+        return (True, "")
+TeamVideoURLFormSet = formset_factory(TeamVideoURLForm)
+
+class TeamVideoCSVForm(forms.Form):
+    csv_file = forms.FileField(label=_(u"CSV file"), required=True, allow_empty_file=False)

@@ -32,11 +32,6 @@ from videos.views import LanguageList
 from videos.types import video_type_registrar, VideoTypeError
 from videos import permissions, share_utils, video_size
 
-@register.inclusion_tag('videos/_feature_video.html', takes_context=True)
-def feature_video(context, video):
-    context['video'] = video
-    return context
-
 @register.filter
 def is_follower(obj, user):
     # obj is Video or SubtitleLanguage

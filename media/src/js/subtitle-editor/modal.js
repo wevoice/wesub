@@ -53,7 +53,7 @@
         $scope.onClose = function($event) {
             $scope.dialogManager.close();
             $event.preventDefault();
-            $scope.exitToVideoPage();
+            $scope.exitEditor();
         }
     }])
 

@@ -20,6 +20,8 @@
 """
 from __future__ import absolute_import
 import os
+import shutil
+import tempfile
 
 from django.dispatch import Signal
 from django.conf import settings
@@ -59,10 +61,12 @@ class UnisubsTestPlugin(Plugin):
     def begin(self):
         before_tests.send(self)
         self.patcher.patch_functions()
+        settings.MEDIA_ROOT = tempfile.mkdtemp(prefix='amara-test-media-root')
 
     def finalize(self, result):
         self.patcher.unpatch_functions()
         xvfb.stop_xvfb()
+        shutil.rmtree(settings.MEDIA_ROOT)
 
     def afterTest(self, test):
         self.patcher.reset_mocks()
@@ -72,6 +76,9 @@ class UnisubsTestPlugin(Plugin):
         if dirname in self.directories_to_skip:
             return False
         if not self.include_webdriver_tests and 'webdriver' in dirname:
+            return False
+        if os.path.basename(dirname) in ('api', 'vimeoapi', 'enterpriseapi'):
+            # Need to exclude these for now until we upgrade django
             return False
         if dirname == os.path.join(settings.PROJECT_ROOT, 'apps'):
             # force the tests from the apps directory to be loaded, even

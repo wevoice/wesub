@@ -1,9 +1,10 @@
+from functools import wraps
 import logging
 suspicious_logger = logging.getLogger("suspicious")
 
 from django.http import  HttpResponseForbidden
 from django.conf import settings
-from django.utils.functional import wraps
+from django.contrib.auth.views import redirect_to_login
 
 def never_in_prod(view):
     """
@@ -26,3 +27,17 @@ def never_in_prod(view):
             return HttpResponseForbidden(not_allwed_msg)
         return view(request, *args, **kwargs)
     return wraps(view)(wrapper)
+
+
+def staff_member_required(view_func):
+    """
+    Decorator for views that checks that the user is logged in and is a staff
+    member, displaying the login page if necessary.
+    """
+    @wraps(view_func)
+    def _checklogin(request, *args, **kwargs):
+        if request.user.is_active and request.user.is_staff:
+            # The user is valid. Continue to the admin page.
+            return view_func(request, *args, **kwargs)
+        return redirect_to_login(request.path)
+    return _checklogin

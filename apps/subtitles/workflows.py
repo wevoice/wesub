@@ -52,7 +52,7 @@ Workflow Classes
 ----------------
 
 .. autoclass:: VideoWorkflow
-    :members: user_can_view_video, get_add_language_mode, extra_tabs, get_default_language_workflow
+    :members: user_can_view_video, user_can_edit_view, get_add_language_mode, extra_tabs, get_default_language_workflow
 
 .. autoclass:: LanguageWorkflow
     :members: get_work_mode, get_actions, action_for_add_subtitles, get_editor_notes, user_can_edit_subtitles, user_can_view_private_subtitles
@@ -93,6 +93,7 @@ them.
 
 from collections import namedtuple
 from datetime import datetime, timedelta
+import logging
 
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext as _
@@ -101,6 +102,8 @@ from subtitles import signals
 from subtitles.exceptions import ActionError
 from subtitles.models import SubtitleNote
 from utils.behaviors import behavior
+
+logger = logging.getLogger(__name__)
 
 class Workflow(object):
     """
@@ -243,6 +246,14 @@ class Workflow(object):
         """
         raise NotImplementedError()
 
+    def user_can_edit_video(self, user):
+        """Check if a user can edit the video
+
+        Returns:
+            True/False
+        """
+        raise NotImplementedError()
+
     def user_can_edit_subtitles(self, user, language_code):
         """Check if a user can edit subtitles
 
@@ -283,6 +294,14 @@ class VideoWorkflow(object):
         self.language_workflow_cache = {}
 
     def user_can_view_video(self, user):
+        """Check if a user can view the video
+
+        Returns:
+            True/False
+        """
+        raise NotImplementedError()
+
+    def user_can_edit_video(self, user):
         """Check if a user can view the video
 
         Returns:
@@ -812,11 +831,17 @@ class DefaultWorkflow(Workflow):
     def user_can_view_video(self, user):
         return True
 
+    def user_can_edit_video(self, user):
+        return True
+
     def user_can_edit_subtitles(self, user, language_code):
         return True
 
 class DefaultVideoWorkflow(VideoWorkflow):
     def user_can_view_video(self, user):
+        return True
+
+    def user_can_edit_video(self, user):
         return True
 
     def get_default_language_workflow(self, language_code):

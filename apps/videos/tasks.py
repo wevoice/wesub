@@ -19,13 +19,11 @@ from datetime import datetime, timedelta
 import logging
 
 from celery.schedules import crontab, timedelta
-from celery.signals import task_failure
 from celery.task import task
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.files.base import ContentFile
 from django.db.models import ObjectDoesNotExist
-from raven.contrib.django.models import client
 import requests
 
 from babelsubs.storage import diff as diff_subtitles
@@ -43,26 +41,6 @@ from videos.types import UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
 from videos.types import VideoTypeError
 
 celery_logger = logging.getLogger('celery.task')
-
-def process_failure_signal(exception, traceback, sender, task_id,
-                           signal, args, kwargs, einfo, **kw):
-    exc_info = (type(exception), exception, traceback)
-    try:
-        celery_logger.error(
-            'Celery job exception: %s(%s)' % (exception.__class__.__name__, exception),
-            exc_info=exc_info,
-            extra={
-                'data': {
-                    'task_id': task_id,
-                    'sender': sender,
-                    'args': args,
-                    'kwargs': kwargs,
-                }
-            }
-        )
-    except:
-        pass
-task_failure.connect(process_failure_signal)
 
 @task
 def cleanup():
@@ -107,8 +85,9 @@ def update_video_feed(video_feed_id):
         video_feed = VideoFeed.objects.get(pk=video_feed_id)
         video_feed.update()
     except VideoFeed:
-        msg = '**update_video_feed**. VideoFeed does not exist. ID: %s' % video_feed_id
-        client.captureMessage(msg)
+        logging.warn(
+            '**update_video_feed**. VideoFeed does not exist. ID: %s',
+            video_feed_id)
 
 @task(rate_limit='500/m')
 def update_video_feed_with_rate_limit(video_feed_id):
@@ -128,13 +107,6 @@ def test_task(n):
     for i in xrange(n):
         print '.',
         sleep(0.5)
-
-@task
-def raise_exception(msg, **kwargs):
-    print "TEST TASK FOR CELERY. RAISE EXCEPTION WITH MESSAGE: %s" % msg
-    logger = raise_exception.get_logger()
-    logger.error('Test error logging to Sentry from Celery')
-    raise TypeError(msg)
 
 @task()
 def video_changed_tasks(video_pk, new_version_id=None):

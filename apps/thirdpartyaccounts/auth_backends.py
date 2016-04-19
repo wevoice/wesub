@@ -35,7 +35,7 @@ FACEBOOK_REST_SERVER = getattr(settings, 'FACEBOOK_REST_SERVER',
 class TwitterAuthBackend(object):
     @staticmethod
     def _generate_email(twitter_username):
-        return '%s@twitteruser.%s.com' % (twitter_username, settings.SITE_NAME)
+        return None
 
     @staticmethod
     def _get_existing_user(data):
@@ -150,7 +150,7 @@ class FacebookAuthBackend(object):
 
     @staticmethod
     def _generate_email(first_name):
-        return '%s@facebookuser.%s.com' % (first_name, settings.SITE_NAME)
+        return None
 
     def _create_user(self, data, email):
         username = self._find_available_username(data)

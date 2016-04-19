@@ -32,6 +32,10 @@ DEFAULT_PROTOCOL  = 'http'
 def rel(*x):
     return os.path.join(PROJECT_ROOT, *x)
 
+def env_flag_set(name):
+    value = os.environ.get(name)
+    return bool(value and value != '0')
+
 # Rebuild the language dicts to support more languages.
 
 # We use a custom format for our language labels:
@@ -55,9 +59,6 @@ METADATA_LANGUAGES = (
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-
-PISTON_EMAIL_ERRORS = True
-PISTON_DISPLAY_ERRORS = False
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -122,6 +123,8 @@ TEMPLATE_LOADERS = (
 
 
 MIDDLEWARE_CLASSES = (
+    'middleware.AmaraSecurityMiddleware',
+    'middleware.LogRequest',
     'middleware.StripGoogleAnalyticsCookieMiddleware',
     'utils.ajaxmiddleware.AjaxErrorMiddleware',
     'localeurl.middleware.LocaleURLMiddleware',
@@ -175,7 +178,6 @@ INSTALLED_APPS = (
     'django.contrib.webdesign',
     # third party apps
     'djcelery',
-    'raven.contrib.django.raven_compat',
     'south',
     'rest_framework',
     'tastypie',
@@ -194,6 +196,7 @@ INSTALLED_APPS = (
     'messages',
     'profiles',
     'search',
+    'staff',
     'staticmedia',
     'teams',
     'testhelpers',
@@ -203,6 +206,7 @@ INSTALLED_APPS = (
     'videos',
     'widget',
     'subtitles',
+    'captcha',
 )
 
 STARTUP_MODULES = [
@@ -221,21 +225,22 @@ STARTUP_MODULES = [
 CELERY_IGNORE_RESULT = True
 CELERY_SEND_EVENTS = False
 CELERY_SEND_TASK_ERROR_EMAILS = True
+CELERYD_HIJACK_ROOT_LOGGER = False
 BROKER_POOL_LIMIT = 10
 
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
-        'rest_framework.parsers.YAMLParser',
-        'rest_framework.parsers.XMLParser',
+        'rest_framework_yaml.parsers.YAMLParser',
+        'rest_framework_xml.parsers.XMLParser',
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.YAMLRenderer',
+        'rest_framework_yaml.renderers.YAMLRenderer',
         'api.renderers.AmaraBrowsableAPIRenderer',
-        'rest_framework.renderers.XMLRenderer',
+        'rest_framework_xml.renderers.XMLRenderer',
     ),
     'URL_FORMAT_OVERRIDE': 'format',
     'DEFAULT_CONTENT_NEGOTIATION_CLASS':
@@ -247,8 +252,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_PAGINATION_SERIALIZER_CLASS':
-        'api.pagination.AmaraPaginationSerializer',
+    'DEFAULT_PAGINATION_CLASS': 'api.pagination.AmaraPagination',
     'ORDERING_PARAM': 'order_by',
     'VIEW_NAME_FUNCTION': 'api.viewdocs.amara_get_view_name',
     'VIEW_DESCRIPTION_FUNCTION': 'api.viewdocs.amara_get_view_description',
@@ -480,6 +484,7 @@ MEDIA_BUNDLES = {
             'src/js/third-party/jquery-2.1.3.js',
             'src/js/third-party/jquery-ui-1.11.4.custom.js',
             'src/js/third-party/jquery.form.js',
+            'src/js/third-party/jquery.formset.js',
             'src/js/third-party/behaviors.js',
             'src/js/site/menus.js',
             'src/js/site/modals.js',
@@ -491,8 +496,10 @@ MEDIA_BUNDLES = {
             'src/js/site/bottom-sheet.js',
             'src/js/site/team-videos.js',
             'src/js/site/team-bulk-move.js',
+            'src/js/site/team-members.js',
             'src/js/site/team-integration-settings.js',
             'src/js/site/dates.js',
+            'src/js/site/formsets.js',
         ],
     },
     "api.js": {
@@ -632,16 +639,30 @@ EMAIL_NOTIFICATION_RECEIVERS = ("arthur@stimuli.com.br", "steve@stevelosh.com", 
 # settings_local.py
 RUN_LOCALLY = False
 
+def log_handler_info():
+    rv = {
+        'formatter': 'standard' ,
+    }
+    if env_flag_set('DB_LOGGING'):
+        rv['level'] = 'DEBUG'
+    else:
+        rv['level'] = 'INFO'
+    if env_flag_set('JSON_LOGGING'):
+        rv['class'] = 'utils.jsonlogging.JSONHandler'
+    else:
+        rv['class'] = 'logging.StreamHandler'
+    return rv
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'root': {
-        'level': 'WARNING',
-        'handlers': ['console', 'sentry'],
+        'level': 'INFO',
+        'handlers': ['main'],
     },
     'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        'standard': {
+            'format': '%(levelname)s %(asctime)s %(name)s %(message)s'
         },
     },
     'handlers': {
@@ -649,58 +670,25 @@ LOGGING = {
             'level':'DEBUG',
             'class':'django.utils.log.NullHandler',
         },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        },
-        'sentry': {
-            'level': 'WARN',
-            'class': 'raven.contrib.django.handlers.SentryHandler',
-        },
+        'main': log_handler_info(),
     },
     'loggers': {
-        'django.db.backends': {
-            'level': 'ERROR',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'raven': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'sentry.errors': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'bleach': {
-            'level': 'ERROR',
-            'handlers': ['null'],
-            'propagate': False,
-        },
-        'api': {
-            'level': 'INFO',
-            'handlers': ['sentry', 'console'],
-            'propagate': False
-        },
-        'utils.youtube': {
-            'level': 'INFO',
-            'handlers': ['sentry', 'console'],
-            'propagate': False
-        },
-        'timing': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False
+        'celery': {
+            'level': 'WARNING',
         },
     },
 }
+if env_flag_set('DB_LOGGING'):
+    LOGGING['loggers']['django.db'] = { 'level': 'DEBUG' }
 
 TMP_FOLDER = "/tmp/"
 
+SOUTH_MIGRATION_MODULES = {
+    'captcha': 'captcha.south_migrations',
+}
+
 from task_settings import *
+
 
 if DEBUG:
     try:

@@ -15,74 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
-"""
-Activity Resource
-^^^^^^^^^^^^^^^^^
-
-This resource is read-only.
-
-List activity items:
-
-.. http:get:: /api/activity/
-
-    ``paginated``
-
-    :query slug team: Show only items related to a given team
-    :query team-activity: If team is given, we normally return activity on the
-       team's videos.  If you want to see activity for the team itself (members
-       joining/leaving and team video deletions, then add team-activity=1)
-    :query video-id video: Show only items related to a given video
-    :query integer type: Show only items with a given activity type (see
-        below for values)
-    :query language-code language: Show only items with a given language
-    :query integer before: A unix timestamp in seconds
-    :query integer after: A unix timestamp in seconds
-
-    :>jsonarr type: activity type as an integer
-    :>jsonarr created: date/time of the activity
-    :>jsonarr video: ID of the video
-    :>jsonarr video_uri: API URI for the video
-    :>jsonarr language: language for the activity
-    :>jsonarr language_url: API URI for the video language
-    :>jsonarr resource_uri: API URI for the activity
-    :>jsonarr user: username of the user user associated with the activity,
-        or null
-    :>jsonarr comment: comment body for comment activity, null for other types
-    :>jsonarr new_video_title: new title for the title-change activity, null
-        for other types
-    :>jsonarr id: object id **(deprecated use resource_uri if you need to get
-        details on a particular activity)**
-
-.. note::
-
-    If both team and video are given as GET params, then team will be used and
-    video will be ignored.
-
-Activity types:
-
-1.  Add video
-2.  Change title
-3.  Comment
-4.  Add version
-5.  Add video URL
-6.  Add translation
-7.  Subtitle request
-8.  Approve version
-9.  Member joined
-10. Reject version
-11. Member left
-12. Review version
-13. Accept version
-14. Decline version
-15. Delete video
-
-Activity item detail:
-
-.. http:get:: /api/activity/[activity-id]/
-
-    Returns the same data as one entry from the listing.
-"""
-
 from __future__ import absolute_import
 
 from datetime import datetime
@@ -92,9 +24,7 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.reverse import reverse
 
-from .apiswitcher import APISwitcherMixin
 from api.fields import TimezoneAwareDateTimeField
-from api.pagination import AmaraPaginationMixin
 from subtitles.models import SubtitleLanguage
 from teams.models import Team
 from videos.models import Action, Video
@@ -133,7 +63,70 @@ class ActivitySerializer(serializers.ModelSerializer):
             'resource_uri'
         )
 
-class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
+class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint for activity.
+
+    # Listing/Details #
+
+    ## `GET /api/activity/`
+    List activity items (paginated)
+
+    ### Filter query params:
+
+    - **slug team:** Show only items related to a given team
+    - **team-activity:** If team is given, we normally return activity on the
+       team's videos.  If you want to see activity for the team itself (members
+       joining/leaving and team video deletions, then add team-activity=1)
+    - **video:** Show only items related to a given video
+    - **type:** Show only items with a given activity type (see
+        below for values)
+    - **language:** Show only items with a given language code
+    - **before:** A unix timestamp in seconds
+    - **after:** A unix timestamp in seconds
+
+    **Note:** If both team and video are given as GET params, then team will
+    be used and video will be ignored.
+
+    ## `GET /api/activity/[activity-id]/`
+    Get details on a single activity item
+
+    ### Fields:
+
+    - **type:** activity type as an integer.  Possible values:
+
+        1.  Add video
+        2.  Change title
+        3.  Comment
+        4.  Add version
+        5.  Add video URL
+        6.  Add translation
+        7.  Subtitle request
+        8.  Approve version
+        9.  Member joined
+        10. Reject version
+        11. Member left
+        12. Review version
+        13. Accept version
+        14. Decline version
+        15. Delete video
+
+    - **created:** date/time of the activity
+    - **video:** ID of the video
+    - **video_uri:** API URI for the video
+    - **language:** language for the activity
+    - **language_url:** API URI for the video language
+    - **resource_uri:** API URI for the activity
+    - **user:** username of the user user associated with the activity,
+        or null
+    - **comment:** comment body for comment activity, null for other types
+    - **new_video_title:** new title for the title-change activity, null
+        for other types
+    - **id:** object id **(deprecated use resource_uri if you need to get
+        details on a particular activity)**
+
+    """
+
     lookup_field = 'id'
     serializer_class = ActivitySerializer
     paginate_by = 20
@@ -191,11 +184,3 @@ class ActivityViewSet(AmaraPaginationMixin, viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(
                 created__gte=datetime.fromtimestamp(int(params['after'])))
         return queryset
-
-
-class ActivityViewSetSwitcher(APISwitcherMixin, ActivityViewSet):
-    switchover_date = 20150824
-
-    class Deprecated(ActivityViewSet):
-        class serializer_class(ActivitySerializer):
-            created = serializers.DateTimeField(read_only=True)

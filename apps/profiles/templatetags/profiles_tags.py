@@ -86,12 +86,20 @@ def user_videos_activity(context, user=None):
         context['users_actions'] = Action.objects.none()
     return context
 
-
 @register.inclusion_tag('profiles/_user_avatar.html', takes_context=True)
 def user_avatar(context, user_obj):
     return {
         'user': context['user'],
         'user_obj':user_obj
+    }
+
+@register.inclusion_tag('profiles/_teams_list.html', takes_context=True)
+def profile_teams_list(context):
+    viewing_user = context['user']
+    profile_user = context['user_info']
+    team_qs = profile_user.teams.for_user(viewing_user, exclude_private=True)
+    return {
+        'teams': team_qs,
     }
 
 @register.filter

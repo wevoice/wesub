@@ -20,9 +20,11 @@
 from django import dispatch
 
 language_deleted = dispatch.Signal()
-# Called when we have a working subtitle set
-#   - Most of the time this is when subtitles_complete is set to True
+# Called when when subtitles are "completed".
+#   - Most of the time this the publish action occurs.
 #   - For tasks, this is when all tasks are complete
+#   - Note that this signal may can multiple times for a single
+#     SubtitleLanguage
 subtitles_completed = dispatch.Signal()
 # Called when we have a new public/complete version
 subtitles_published = dispatch.Signal(providing_args=['version'])
