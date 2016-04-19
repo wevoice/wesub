@@ -477,6 +477,10 @@ class SubtitlesSerializer(serializers.Serializer):
         # copy a fields to deprecated names
         data['video'] = data['video_title']
         data['version_no'] = data['version_number']
+        if self.context['allow_language_extra']:
+            extra.video_language.add_data(self.context['request'], data,
+                                          video=self.context['video'],
+                                          language=version.subtitle_language)
         return data
 
     def to_internal_value(self, data):
@@ -617,6 +621,11 @@ class SubtitlesView(generics.CreateAPIView):
             'request': self.request,
             'sub_format': self.request.query_params.get('sub_format', 'json'),
             'version_number': None,
+            # Allow users to use the extra params from the language endpoint,
+            # but only if they're requesting the current public version.
+            'allow_language_extra': (
+                'version' not in self.request.query_params and
+                'version_number' not in self.request.query_params),
         }
 
     def get(self, request, *args, **kwargs):
