@@ -606,8 +606,7 @@ class Video(models.Model):
 
     @classmethod
     def get_or_create_for_url(cls, video_url=None, vt=None, user=None,
-                              timestamp=None, fetch_subs_async=True,
-                              set_values=None, in_task=False):
+                              timestamp=None, set_values=None, in_task=False):
         """
         If used withing a backgound task in which one wants to
         modify the video afterwards, then in_task must be set 
@@ -639,10 +638,7 @@ class Video(models.Model):
         if not video:
             obj = Video()
             # video types can can fecth subtitles might do it async:
-            kwargs = {}
-            if vt.CAN_IMPORT_SUBTITLES:
-                kwargs['fetch_subs_async'] = fetch_subs_async
-            vt.set_values(obj, **kwargs)
+            vt.set_values(obj)
             if set_values:
                 for name, value in set_values.items():
                     if name == 'metadata':
