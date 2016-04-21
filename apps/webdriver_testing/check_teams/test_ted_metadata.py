@@ -93,8 +93,8 @@ class TestCaseTranscribe(WebdriverTestCase):
             tasks._parse_entry(cls.transcribe_team, entry, 
                                cls.team_member, cls.transcribe_project)
 
-        cls.video, _ = Video.get_or_create_for_url(
-                       'http://unisubs.example.com/video1800.mp4')
+        cls.video, _ = Video.add('http://unisubs.example.com/video1800.mp4',
+                                 self.user)
         cls.video_pg.open_video_page(cls.video.video_id)
         cls.video_pg.log_in(cls.admin.username, 'password')
 
@@ -115,14 +115,13 @@ class TestCaseTranscribe(WebdriverTestCase):
                         self.video.title))
 
     def test_speakername_admin_edit(self):
-        v, _ = Video.get_or_create_for_url(
-                       'http://unisubs.example.com/video1801.mp4')
+        v, _ = Video.add('http://unisubs.example.com/video1801.mp4', self.user)
         self.admin_video_pg.log_in(self.superuser.username, 'password')
         self.admin_video_pg.open_edit_video_page(v.id)
         self.admin_video_pg.add_speaker_name('Jerry Garcia')
         v.clear_language_cache()
-        v, _ = Video.get_or_create_for_url(
-                       'http://unisubs.example.com/video1801.mp4')
+        v, _ = Video.add('http://unisubs.example.com/video1801.mp4',
+                         self.user)
 
         self.assertEquals({u'speaker-name': u'Jerry Garcia'}, v.get_metadata())
 
@@ -211,10 +210,10 @@ class TestCaseTED(WebdriverTestCase):
                                cls.team_member, cls.ted_project)
 
 
-        cls.speaker_video, _ = Video.get_or_create_for_url(
-                            'http://unisubs.example.com/video1806.mp4')
-        cls.nospeaker_video, _ = Video.get_or_create_for_url(
-                            'http://unisubs.example.com/video1801.mp4')
+        cls.speaker_video, _ = Video.add(
+            'http://unisubs.example.com/video1806.mp4', cls.user
+        cls.nospeaker_video, _ = Video.add(
+            'http://unisubs.example.com/video1801.mp4', cls.user)
 
         #Add approved 'en' subs speaker name
         speaker_data =  { 'speaker-name': 'Santa' } 

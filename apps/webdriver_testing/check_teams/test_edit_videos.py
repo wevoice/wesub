@@ -54,7 +54,7 @@ class TestCaseEdit(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.add_video(url=test_url)
         self.videos_tab.open_videos_tab(self.team.slug)
-        video, _ = Video.get_or_create_for_url(test_url)
+        video, _ = Video.add(test_url, self.user)
         self.assertTrue(self.videos_tab.video_present(video.title))
 
     def test_add_duplicate(self):
