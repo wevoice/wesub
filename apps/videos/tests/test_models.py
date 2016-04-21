@@ -17,8 +17,10 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import functools
+
 from django.db import IntegrityError
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from nose.tools import *
 import babelsubs
 import mock
@@ -27,7 +29,7 @@ from auth.models import CustomUser as User
 from subtitles import pipeline
 from subtitles.models import SubtitleLanguage
 from videos import signals
-from videos.models import Action, Video, VideoTypeUrlPattern
+from videos.models import Action, Video, VideoUrl, VideoTypeUrlPattern
 from videos.tasks import video_changed_tasks
 from videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version, make_rollback_to
@@ -467,3 +469,190 @@ class TestTypeUrlPatterns(TestCase):
         for p in patterns:
             self.assertEquals(p.type, self.type)
             self.assertEquals(p.url_pattern, self.url)
+
+class MockVideoType(mock.Mock):
+    """Mock VideoType object."""
+    abbreviation = 'T'
+
+    def __init__(self, url, **values_to_set):
+        super(MockVideoType, self).__init__(
+            owner_username=mock.Mock(return_value=None),
+            convert_to_video_url=mock.Mock(return_value=url),
+            set_values=mock.Mock(
+                side_effect=lambda video: video.__dict__.update(values_to_set)
+            ),
+        )
+        self.url = url
+        self.video_id = 'test-video-id'
+
+class AddVideoTest(TestCase):
+    def setUp(self):
+        self.url = 'http://example.com/video.mp4'
+        self.user = UserFactory()
+
+    def test_add_video(self):
+        # test the simple case of creating a new video
+        video, video_url = Video.add(MockVideoType(self.url), self.user)
+        assert_equal(video.get_video_url(), self.url)
+        assert_equal(video_url.primary, True)
+        assert_equal(video_url.added_by, self.user)
+        assert_equal(video_url.type, MockVideoType.abbreviation)
+        assert_equal(video.user, self.user)
+
+
+    @test_utils.patch_for_test('videos.types.video_type_registrar'
+                               '.video_type_for_url')
+    def test_string_url(self, mock_video_type_for_url):
+        mock_video_type_for_url.return_value = MockVideoType(self.url)
+        video, video_url = Video.add(self.url, self.user)
+        assert_equal(mock_video_type_for_url.call_args,
+                     mock.call(self.url))
+        assert_equal(video_url.type, MockVideoType.abbreviation)
+
+    def test_attributes_from_video_url(self):
+        # Video.add() should set attributes on the video from the VideoType
+        mock_video_type = MockVideoType(self.url, title='vurl title',
+                                        duration=100)
+        mock_video_type.owner_username.return_value = 'test-user'
+        video, video_url = Video.add(mock_video_type, self.user)
+        assert_equal(video.title, 'vurl title')
+        assert_equal(video.duration, 100)
+        assert_equal(video_url.videoid, mock_video_type.video_id)
+        assert_equal(video_url.owner_username, 'test-user')
+
+    def test_null_videoid(self):
+        # Test VideoType.video_id being None
+        mock_video_type = MockVideoType(self.url)
+        mock_video_type.video_id = None
+        video, video_url = Video.add(mock_video_type, self.user)
+        assert_equal(video_url.videoid, '')
+
+    def test_setup_callback(self):
+        # Test the setup_callback param
+        def setup_callback(video, video_url):
+            video.title = 'setup_callback title'
+        video, video_url = Video.add(MockVideoType(self.url), self.user,
+                                     setup_callback)
+        assert_equal(video.title, 'setup_callback title')
+        # check that we saved the data to the DB
+        assert_equal(test_utils.reload_obj(video).title,
+                     'setup_callback title')
+
+    def test_convert_video_url(self):
+        # We should allow the VideoType to alter the URL using the
+        # convert_to_video_url() method.
+        new_url = 'http://example.com/new_url.mp4'
+        video, video_url = Video.add(MockVideoType(new_url), self.user)
+        assert_equal(video_url.url, new_url)
+
+    def test_title_from_url(self):
+        # As a fallback, we should use the video URL to set the title
+        video, video_url = Video.add(MockVideoType(self.url), self.user)
+        assert_equal(video.title, 'example.com/.../video.mp4')
+        # but not if title is set manually
+        video.delete()
+        def setup_callback(video, video_url):
+            video.title = 'test title'
+        video, video_url = Video.add(MockVideoType(self.url), self.user,
+                                     setup_callback)
+        assert_equal(video.title, 'test title')
+
+    @test_utils.mock_handler(signals.video_added)
+    @test_utils.mock_handler(signals.video_url_added)
+    def test_signals(self, on_video_url_added, on_video_added):
+        def setup_callback(video, video_url):
+            assert_equal(on_video_added.call_count, 0)
+            assert_equal(on_video_url_added.call_count, 0)
+        video, video_url = Video.add(MockVideoType(self.url), self.user,
+                                     setup_callback)
+        assert_equal(on_video_added.call_count, 1)
+        assert_equal(on_video_added.call_args,
+                     mock.call(signal=signals.video_added,
+                               sender=video, video_url=video_url))
+        assert_equal(on_video_url_added.call_count, 1)
+        assert_equal(on_video_url_added.call_args,
+                     mock.call(signal=signals.video_url_added,
+                               sender=video_url, video=video))
+
+class AddVideoTestWithTransactions(TransactionTestCase):
+    # These tests is split off from the others because it needs to be inside a
+    # TransactionTestCase.  TransactionTestCase is not needed for the other
+    # tests and it slows things down a lot.
+
+    def test_video_already_added(self):
+        url = 'http://example.com/video.mp4'
+        # test calling Video.add() with a URL already in the system
+        video = VideoFactory(video_url__url=url)
+        num_videos_before_call = Video.objects.count()
+        with assert_raises(Video.UrlAlreadyAdded) as cm:
+            v, vurl = Video.add(url, UserFactory())
+        assert_equal(cm.exception.video, video)
+        assert_equal(cm.exception.video_url, video.get_primary_videourl_obj())
+        # test that we didn't create any extra videos as a result of the call
+        assert_equal(Video.objects.count(), num_videos_before_call)
+
+    def test_exception_in_setup_callback(self):
+        # If setup_callback throws an exception, we shouldn't create any
+        # video/video_url objects
+        num_videos_before_call = Video.objects.count()
+        num_video_urls_before_call = VideoUrl.objects.count()
+        url = 'http://example.com/video.mp4'
+        with assert_raises(ValueError):
+            Video.add(MockVideoType(url), UserFactory(),
+                      mock.Mock(side_effect=ValueError()))
+
+        assert_equal(Video.objects.count(), num_videos_before_call)
+        assert_equal(VideoUrl.objects.count(), num_video_urls_before_call)
+
+class AddVideoUrlTest(TestCase):
+    def setUp(self):
+        self.url = 'http://example.com/video.mp4'
+        self.new_url = 'http://example.com/video2.mp4'
+        self.video = VideoFactory(video_url__url=self.url)
+        self.video_url = self.video.get_primary_videourl_obj()
+        self.user = UserFactory()
+
+    def test_add_url(self):
+        video_url = self.video.add_url(MockVideoType(self.new_url), self.user)
+        assert_equal(video_url.url, self.new_url)
+        assert_equal(video_url.video, self.video)
+        assert_equal(video_url.primary, False)
+
+    @test_utils.patch_for_test('videos.types.video_type_registrar'
+                               '.video_type_for_url')
+    def test_string_url(self, mock_video_type_for_url):
+        mock_video_type_for_url.return_value = MockVideoType(self.new_url)
+        video_url = self.video.add_url(self.new_url, self.user)
+        assert_equal(mock_video_type_for_url.call_args,
+                     mock.call(self.new_url))
+        assert_equal(video_url.type, MockVideoType.abbreviation)
+
+    def test_already_added(self):
+        video_url = self.video.add_url(MockVideoType(self.new_url), self.user)
+        num_video_urls_before_call = VideoUrl.objects.count()
+        with assert_raises(Video.UrlAlreadyAdded) as cm:
+            video_url = self.video.add_url(MockVideoType(self.new_url),
+                                           self.user)
+        assert_equal(cm.exception.video, self.video)
+        assert_equal(cm.exception.video_url, video_url)
+        assert_equal(VideoUrl.objects.count(), num_video_urls_before_call)
+
+    def test_convert_video_url(self):
+        converted_url = 'http://example.com/video2-converted.mp4'
+        video_url = self.video.add_url(MockVideoType(converted_url), self.user)
+        assert_equal(video_url.url, converted_url)
+
+    def test_set_values_not_called(self):
+        # since this is not the first VideoURL being added, we don't want to
+        # call VideoType.set_values() and override the video attributes.
+        video_url = self.video.add_url(
+            MockVideoType(self.new_url, title='new title'), self.user)
+        assert_not_equal(self.video.title, 'new title')
+
+    @test_utils.mock_handler(signals.video_url_added)
+    def test_signal(self, on_video_url_added):
+        video_url = self.video.add_url(MockVideoType(self.new_url), self.user)
+        assert_equal(on_video_url_added.call_count, 1)
+        assert_equal(on_video_url_added.call_args, mock.call(
+            signal=signals.video_url_added, sender=video_url,
+            video=self.video))
