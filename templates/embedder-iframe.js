@@ -1,3 +1,6 @@
+if (window.amaraEmbedderLoaded == undefined) {
+window.amaraEmbedderLoaded = true;
+
 {% load media_bundle %}
 // This must be done when the js file is first loaded
 var scriptFiles = document.getElementsByTagName("script");
@@ -142,4 +145,5 @@ if(window.attachEvent) {
     } else {
         window.onload = window.initIframeController;
     }
+}
 }
