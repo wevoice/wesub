@@ -73,7 +73,7 @@
                             {{ team.description|truncatewords:20|urlize }}
                         </p>
                     {% endif %}
-                    {% if my_teams %}
+                    {% if my_teams and team.user_is_member %}
                         <p>
                             <strong>
                                 {% trans "Role:" %}
