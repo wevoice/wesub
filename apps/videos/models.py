@@ -746,6 +746,8 @@ class Video(models.Model):
             if not video.title:
                 video.title = make_title_from_url(video_url.url)
             video.save()
+            if user and user.notify_by_message:
+                video.followers.add(user)
         # Run post-creation code
         Action.create_video_handler(video, user)
         video_cache.invalidate_cache(video.video_id)

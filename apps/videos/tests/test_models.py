@@ -70,19 +70,6 @@ class TestVideo(TestCase):
         self.youtube_video = 'http://www.youtube.com/watch?v=pQ9qX8lcaBQ'
         self.html5_video = 'http://mirrorblender.top-ix.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_stereo.ogg'
 
-    def test_get_or_create_for_url(self):
-        def _assert_create_and_get(video_url):
-            video, created = Video.get_or_create_for_url(video_url)
-            self.assertIsNotNone(video)
-            self.assertTrue(created)
-
-            video2, created = Video.get_or_create_for_url(video_url)
-            self.assertEqual(video.pk, video2.pk)
-            self.assertFalse(created)
-
-        _assert_create_and_get(self.youtube_video)
-        _assert_create_and_get(self.html5_video)
-
     def test_url_cache(self):
         test_utils.invalidate_widget_video_cache.run_original_for_test()
         video = get_video(1)
@@ -107,18 +94,6 @@ class TestVideo(TestCase):
         # record) and the cache should have been updated properly.
         self.assertNotEqual(cache_id_1, cache_id_2)
         self.assertTrue(Video.objects.filter(video_id=cache_id_2).exists())
-
-        # Now try to create a new video with the same URL.  This should return
-        # the existing video.
-        video2, created = Video.get_or_create_for_url(video_url)
-        self.assertFalse(created)
-
-        video2_url = video2.get_video_url()
-
-        # The cache should still have the correct ID, of course.
-        cache_id_3 = video_cache.get_video_id(video2_url)
-        self.assertEqual(cache_id_2, cache_id_3)
-        self.assertEqual(Video.objects.count(), 1)
 
     def test_video_title(self):
         video = get_video(url='http://www.youtube.com/watch?v=pQ9qX8lcaBQ')
@@ -570,6 +545,16 @@ class AddVideoTest(TestCase):
         video, video_url = Video.add(MockVideoType(self.url), self.user)
         assert_false(Action.objects.filter(action_type=Action.ADD_VIDEO_URL,
                                            video=video).exists())
+
+    def test_notify_by_message(self):
+        self.user.notify_by_message = True
+        video, video_url = Video.add(MockVideoType(self.url), self.user)
+        assert_true(video.followers.filter(id=self.user.id).exists())
+
+    def test_notify_by_message_false(self):
+        self.user.notify_by_message = False
+        video, video_url = Video.add(MockVideoType(self.url), self.user)
+        assert_false(video.followers.filter(id=self.user.id).exists())
 
     @test_utils.mock_handler(signals.video_added)
     @test_utils.mock_handler(signals.video_url_added)
