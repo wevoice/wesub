@@ -748,8 +748,11 @@ class Video(models.Model):
             video.save()
         # Run post-creation code
         Action.create_video_handler(video, user)
+        video_cache.invalidate_cache(video.video_id)
+        video.cache.invalidate()
         signals.video_added.send(sender=video, video_url=video_url)
         signals.video_url_added.send(sender=video_url, video=video)
+
         return (video, video_url)
 
     def add_url(self, url, user):
@@ -767,7 +770,12 @@ class Video(models.Model):
             Video.UrlAlreadyAdded: The URL was already added to a different video
         """
         vt, video_url = self._add_video_url(url, user, False)
+
+        Action.create_video_url_handler(self, video_url)
+        video_cache.invalidate_cache(self.video_id)
+        self.cache.invalidate()
         signals.video_url_added.send(sender=video_url, video=self)
+
         return video_url
 
     def _add_video_url(self, url, user, primary):
@@ -2005,13 +2013,13 @@ class Action(models.Model):
         action.save()
 
     @classmethod
-    def create_video_url_handler(cls, sender, instance, created, **kwargs):
-        if created and instance.video_id and sender.objects.filter(video=instance.video).count() > 1:
-            obj = cls(video=instance.video)
-            obj.user = instance.added_by
-            obj.action_type = cls.ADD_VIDEO_URL
-            obj.created = instance.created
-            obj.save()
+    def create_video_url_handler(cls, video, video_url):
+        cls.objects.create(
+            action_type=cls.ADD_VIDEO_URL,
+            video=video,
+            user=video_url.added_by,
+            created=video_url.created,
+        )
 
     @classmethod
     def create_approved_video_handler(cls, version, moderator,  **kwargs):
@@ -2250,8 +2258,6 @@ def video_url_remove_handler(sender, instance, **kwargs):
 
 models.signals.pre_save.connect(create_video_id, sender=Video)
 models.signals.pre_delete.connect(video_delete_handler, sender=Video)
-post_save.connect(Action.create_video_url_handler, VideoUrl)
-post_save.connect(video_cache.on_video_url_save, VideoUrl)
 pre_delete.connect(video_cache.on_video_url_delete, VideoUrl)
 
 

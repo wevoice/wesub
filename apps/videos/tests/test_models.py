@@ -557,6 +557,20 @@ class AddVideoTest(TestCase):
                                      setup_callback)
         assert_equal(video.title, 'test title')
 
+    def test_create_add_video_action(self):
+        video, video_url = Video.add(MockVideoType(self.url), self.user)
+        assert_true(Action.objects.filter(action_type=Action.ADD_VIDEO,
+                                          video=video,
+                                          user=self.user,
+                                          created=video.created).exists())
+
+    def test_create_add_video_url_action_not_created(self):
+        # We don't want to create an ADD_VIDEO_URL action, since it's
+        # redundant with the ADD_VIDEO action
+        video, video_url = Video.add(MockVideoType(self.url), self.user)
+        assert_false(Action.objects.filter(action_type=Action.ADD_VIDEO_URL,
+                                           video=video).exists())
+
     @test_utils.mock_handler(signals.video_added)
     @test_utils.mock_handler(signals.video_url_added)
     def test_signals(self, on_video_url_added, on_video_added):
@@ -656,3 +670,10 @@ class AddVideoUrlTest(TestCase):
         assert_equal(on_video_url_added.call_args, mock.call(
             signal=signals.video_url_added, sender=video_url,
             video=self.video))
+
+    def test_create_add_video_url_action(self):
+        video_url = self.video.add_url(MockVideoType(self.new_url), self.user)
+        assert_true(Action.objects.filter(action_type=Action.ADD_VIDEO_URL,
+                                          video=self.video,
+                                          user=self.user,
+                                          created=video_url.created).exists())

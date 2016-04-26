@@ -25,6 +25,7 @@ from externalsites import tasks
 from externalsites.credit import (add_credit_to_video_url,
                                          should_add_credit_to_video_url)
 from subtitles import pipeline
+from videos.models import Video
 from videos.templatetags.videos_tags import shortlink_for_video
 from utils import test_utils
 from utils.factories import *
@@ -72,7 +73,8 @@ class AddCreditTest(BaseCreditTest):
         self.mock_get_new_access_token = mock_get_new_access_token
         self.mock_get_new_access_token.return_value = 'test-access-token'
         self.user = UserFactory()
-        self.video = YouTubeVideoFactory(user=self.user)
+        self.video = YouTubeVideoFactory(user=self.user,
+                                         channel_id='test-channel-id')
         self.video_url = self.video.get_primary_videourl_obj()
         self.account = YouTubeAccountFactory(
             user=self.user, channel_id=self.video_url.owner_username)
@@ -135,9 +137,9 @@ class AddCreditScheduleTest(BaseCreditTest):
                                              channel_id=self.channel_id)
 
     def test_add_credit_on_new_video(self):
-        video = YouTubeVideoFactory(user=self.user)
-        self.mock_add_amara_credit.delay.assert_called_with(
-            video.get_primary_videourl_obj().id)
+        video, video_url = Video.add('http://youtube.com/watch?v=abcdef',
+                                     self.user)
+        self.mock_add_amara_credit.delay.assert_called_with(video_url.id)
 
     def test_add_credit_on_new_public_tip(self):
         video = YouTubeVideoFactory(user=self.user)

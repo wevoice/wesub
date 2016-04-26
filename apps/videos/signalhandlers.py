@@ -24,7 +24,6 @@ from videos.models import Video, VideoUrl, Action
 from videos import signals
 from videos import tasks
 
-@receiver(post_save, sender=VideoUrl)
 @receiver(post_save, sender=SubtitleLanguage)
 @receiver(post_save, sender=SubtitleVersion)
 @receiver(post_save, sender=Action)

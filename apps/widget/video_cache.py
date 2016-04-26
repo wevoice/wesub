@@ -116,10 +116,6 @@ def invalidate_video_moderation(video_id):
 def invalidate_video_visibility(video_id):
     cache.delete(_video_visibility_policy_key(video_id))
 
-def on_video_url_save(sender, instance, **kwargs):
-    if instance.video_id:
-        invalidate_cache(instance.video.video_id)
-
 def on_video_url_delete(sender, instance, **kwargs):
     if instance.video and instance.video.video_id:
         invalidate_cache(instance.video.video_id)
