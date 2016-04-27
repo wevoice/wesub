@@ -84,12 +84,12 @@ class TestVideo(TestCase):
 
         # Remove the video (and make sure it's gone).
         video.delete()
-        self.assertFalse(Video.objects.exists())
+        self.assertFalse(Video.objects.filter(videourl__url=video_url).exists())
 
         # Trying to get the video ID out of the cache now actually *creates* the
         # video!
         cache_id_2 = video_cache.get_video_id(video_url)
-        self.assertTrue(Video.objects.exists())
+        self.assertTrue(Video.objects.filter(videourl__url=video_url).exists())
 
         # The video_id will be different than before (since this is a new Video
         # record) and the cache should have been updated properly.

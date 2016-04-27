@@ -43,12 +43,9 @@ def get_video_id(video_url, public_only=False, referer=None):
     else:
         from videos.models import Video
         try:
-            video, create = Video.get_or_create_for_url(video_url)
-        except VideoTypeError:
-            raise
-
-        if not video:
-            return None
+            video, _ = Video.add(video_url, None)
+        except Video.UrlAlreadyAdded, e:
+            video = e.video
 
         video_id = video.video_id
 
