@@ -492,10 +492,12 @@ class YouTubeAccount(ExternalAccount):
                 break
             video_url = 'http://youtube.com/watch?v={}'.format(video_id)
             if self.type == ExternalAccount.TYPE_USER:
-                Video.get_or_create_for_url(video_url, user=self.user)
+                Video.add(video_url, self.user)
             elif self.import_team:
-                video, created = Video.get_or_create_for_url(video_url)
-                TeamVideo.objects.create(video=video, team=self.import_team)
+                def add_to_team(video, video_url):
+                    TeamVideo.objects.create(video=video,
+                                             team=self.import_team)
+                Video.add(video_url, None, add_to_team)
 
         self.last_import_video_id = video_ids[0]
         self.save()

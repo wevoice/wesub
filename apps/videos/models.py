@@ -2284,7 +2284,7 @@ class VideoFeed(models.Model):
         return urlparse.urlparse(self.url).netloc
 
     def update(self):
-        importer = VideoImporter(self.url, self.user)
+        importer = VideoImporter(self.url, self.user, self.team)
         new_videos = importer.import_videos(
             import_next=self.last_update is None)
 

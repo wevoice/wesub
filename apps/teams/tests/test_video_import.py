@@ -27,7 +27,7 @@ from videos.signals import feed_imported
 from utils.factories import *
 
 class TeamVideoImportTestCase(TestCase):
-    def test_create_team_videos_for_team_feed(self):
+    def test_call_teamvideo_new_for_feed_import(self):
         api_teamvideo_new_handler = mock.Mock()
         api_teamvideo_new.connect(api_teamvideo_new_handler, weak=False)
         self.addCleanup(api_teamvideo_new.disconnect,
@@ -35,14 +35,9 @@ class TeamVideoImportTestCase(TestCase):
 
         team = TeamFactory()
         user = TeamMemberFactory(team=team).user
-        videos = [VideoFactory() for i in xrange(5)]
+        videos = [TeamVideoFactory(team=team).video for i in xrange(5)]
         feed = mock.Mock(team=team, user=user)
         feed_imported.send(sender=feed, new_videos=videos)
-        for video in videos:
-            team_video = video.get_team_video()
-            self.assertNotEquals(team_video, None)
-            self.assertEquals(team_video.team, team)
-            self.assertEquals(team_video.added_by, user)
 
         correct_api_calls = [
             mock.call(signal=api_teamvideo_new, sender=video.get_team_video())
