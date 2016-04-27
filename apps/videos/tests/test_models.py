@@ -38,6 +38,7 @@ from widget import video_cache
 from utils.subtitles import dfxp_merge
 from utils import test_utils
 from utils.factories import *
+from utils.test_utils import MockVideoType
 
 def refresh(m):
     return m.__class__._default_manager.get(pk=m.pk)
@@ -445,21 +446,6 @@ class TestTypeUrlPatterns(TestCase):
             self.assertEquals(p.type, self.type)
             self.assertEquals(p.url_pattern, self.url)
 
-class MockVideoType(mock.Mock):
-    """Mock VideoType object."""
-    abbreviation = 'T'
-
-    def __init__(self, url, **values_to_set):
-        super(MockVideoType, self).__init__(
-            owner_username=mock.Mock(return_value=None),
-            convert_to_video_url=mock.Mock(return_value=url),
-            set_values=mock.Mock(
-                side_effect=lambda video: video.__dict__.update(values_to_set)
-            ),
-        )
-        self.url = url
-        self.video_id = 'test-video-id'
-
 class AddVideoTest(TestCase):
     def setUp(self):
         self.url = 'http://example.com/video.mp4'
@@ -474,13 +460,10 @@ class AddVideoTest(TestCase):
         assert_equal(video_url.type, MockVideoType.abbreviation)
         assert_equal(video.user, self.user)
 
-
-    @test_utils.patch_for_test('videos.types.video_type_registrar'
-                               '.video_type_for_url')
-    def test_string_url(self, mock_video_type_for_url):
-        mock_video_type_for_url.return_value = MockVideoType(self.url)
+    @test_utils.with_mock_video_type_registrar
+    def test_string_url(self, mock_registrar):
         video, video_url = Video.add(self.url, self.user)
-        assert_equal(mock_video_type_for_url.call_args,
+        assert_equal(mock_registrar.video_type_for_url.call_args,
                      mock.call(self.url))
         assert_equal(video_url.type, MockVideoType.abbreviation)
 
@@ -617,12 +600,10 @@ class AddVideoUrlTest(TestCase):
         assert_equal(video_url.video, self.video)
         assert_equal(video_url.primary, False)
 
-    @test_utils.patch_for_test('videos.types.video_type_registrar'
-                               '.video_type_for_url')
-    def test_string_url(self, mock_video_type_for_url):
-        mock_video_type_for_url.return_value = MockVideoType(self.new_url)
+    @test_utils.with_mock_video_type_registrar
+    def test_string_url(self, mock_registrar):
         video_url = self.video.add_url(self.new_url, self.user)
-        assert_equal(mock_video_type_for_url.call_args,
+        assert_equal(mock_registrar.video_type_for_url.call_args,
                      mock.call(self.new_url))
         assert_equal(video_url.type, MockVideoType.abbreviation)
 
