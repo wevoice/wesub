@@ -47,7 +47,8 @@ from caching import ModelCacheManager
 from videos import behaviors
 from videos import metadata
 from videos import signals
-from videos.types import video_type_registrar, video_type_choices
+from videos.types import (video_type_registrar, video_type_choices,
+                          VideoTypeError)
 from videos.feed_parser import VideoImporter
 from comments.models import Comment
 from widget import video_cache
@@ -784,6 +785,8 @@ class Video(models.Model):
         # Low-level video URL adding code for add() and add_url()
         if isinstance(url, basestring):
             vt = video_type_registrar.video_type_for_url(url)
+            if vt is None:
+                raise VideoTypeError(url)
         else:
             vt = url
         video_url, created = VideoUrl.objects.get_or_create(
