@@ -10,7 +10,7 @@ This gets sent to the rest of the team, notifying about the new member
 Hi {{ user }},<br/>
 
 <p>Congratulations! You are now a member of the {{ team.name }} team.</p>
-{% if custom_message %}<p>{{ custom_message }}</p>{% endif %}
+{% if custom_message %}<p>{{ custom_message|linebreaks }}</p>{% endif %}
 <p>Check out the  <a href="{{url_base}}{% url "teams:dashboard" slug=team.slug %}">team dashboard</a></p>
 
 Happy subtitling!<br/>

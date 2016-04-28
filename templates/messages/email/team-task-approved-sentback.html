@@ -11,8 +11,8 @@ Hi {{ user }},
 		{{ reviewer}} included the following note:
 	</p>
 	<p>
-		{{ note }}
+		{{ note|linebreaks }}
 	</p>
 {% endif %}
 
-<a href="{{reviewer_message_url}}">Send {{ reviewer }} a message</a> 
+<a href="{{reviewer_message_url}}">Send {{ reviewer }} a message</a>

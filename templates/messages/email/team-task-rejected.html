@@ -12,7 +12,7 @@ Your {{ task_language }} subtitles for the video “{{ title }}” were not acce
 {% if note %}
 {{ reviewer}} included the following note:
 <p>
-{{ note }}
+{{ note|linebreaks }}
 </p>
 {% endif %}
 
