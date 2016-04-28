@@ -18,6 +18,7 @@
 from __future__ import absolute_import
 
 import json
+import logging
 
 from django.db import IntegrityError
 from django.http import Http404
@@ -50,6 +51,8 @@ import babelsubs
 from babelsubs.storage import SubtitleSet
 from utils.subtitles import load_subtitles
 import videos.tasks
+
+logger = logging.getLogger(__name__)
 
 class MiniSubtitleVersionSerializer(serializers.Serializer):
     """Serialize a subtitle version for SubtitleLanguageSerializer """
@@ -388,7 +391,10 @@ class SubtitlesField(serializers.CharField):
             return load_subtitles(
                 self.context['language_code'], value,
                 self.context['sub_format'])
-        except babelsubs.SubtitleParserError:
+        except babelsubs.SubtitleParserError, e:
+            logger.warn("Error parsing subtitles ({}/{})".format(
+                self.context['video'].video_id,
+                self.context['language_code']), exc_info=True)
             raise serializers.ValidationError("Invalid subtitle data")
 
 class SubFormatField(serializers.ChoiceField):
@@ -471,6 +477,10 @@ class SubtitlesSerializer(serializers.Serializer):
         # copy a fields to deprecated names
         data['video'] = data['video_title']
         data['version_no'] = data['version_number']
+        if self.context['allow_language_extra']:
+            extra.video_language.add_data(self.context['request'], data,
+                                          video=self.context['video'],
+                                          language=version.subtitle_language)
         return data
 
     def to_internal_value(self, data):
@@ -611,6 +621,11 @@ class SubtitlesView(generics.CreateAPIView):
             'request': self.request,
             'sub_format': self.request.query_params.get('sub_format', 'json'),
             'version_number': None,
+            # Allow users to use the extra params from the language endpoint,
+            # but only if they're requesting the current public version.
+            'allow_language_extra': (
+                'version' not in self.request.query_params and
+                'version_number' not in self.request.query_params),
         }
 
     def get(self, request, *args, **kwargs):

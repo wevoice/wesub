@@ -1,5 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
 from subtitles.models import SubtitleLanguage
+from subtitles.signals import subtitles_published
 from teams.signals import api_subtitles_approved
 from utils.csv_parser import UnicodeReader
 from videos.tasks import video_changed_tasks
@@ -9,7 +10,10 @@ def complete_approve_tasks(tasks):
     video_ids = set()
     for task in tasks:
         task.do_complete_approve(lang_ct=lang_ct)
-        api_subtitles_approved.send(task.get_subtitle_version())
+        version = task.get_subtitle_version()
+        api_subtitles_approved.send(version)
+        if version.is_public():
+            subtitles_published.send(version.subtitle_language, version=version)
         video_ids.add(task.team_video.video_id)
     for video_id in video_ids:
         video_changed_tasks.delay(video_id)

@@ -45,7 +45,7 @@ from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.templatetags.new_subtitles_tags import visibility
 from subtitles.forms import SubtitlesUploadForm
 from teams.models import Task
-from teams.permissions import can_assign_task
+from teams.permissions import can_perform_task
 from utils.text import fmt
 from videos.models import Video
 from videos.types import video_type_registrar
@@ -290,7 +290,7 @@ class SubtitleEditorBase(View):
         tasks = list(task_set[:1])
         if tasks:
             task = tasks[0]
-            if task.assignee is None and can_assign_task(task, self.user):
+            if task.assignee is None and can_perform_task(self.user, task):
                 task.assignee = self.user
                 task.set_expiration()
                 task.save()

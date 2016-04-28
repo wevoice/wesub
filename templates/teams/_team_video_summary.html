@@ -27,7 +27,7 @@
             {% endif %}
         {% endwith %}
         <h4>
-            <a href="{% url "videos:video" video_id=video.video_id %}" title="{{ video.title_display }}">{{ title_display.title|truncatewords:9 }}</a>
+            <a href="{% url "videos:video" video_id=video.video_id %}" title="{{ video.title_display }}">{{ video.title_display|truncatewords:9 }}</a>
         </h4>
     </div>
     <ul class="admin-controls">
