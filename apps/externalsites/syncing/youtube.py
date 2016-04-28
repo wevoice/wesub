@@ -53,18 +53,31 @@ def convert_language_code(lc):
 def _format_subs_for_youtube(subtitle_set):
     return babelsubs.to(subtitle_set, 'vtt').encode('utf-8')
 
-def find_existing_caption_id(access_token, video_id, language_code):
-    for caption_info in google.captions_list(access_token, video_id):
-        if (language_code.lower() == caption_info[1] and
-            caption_info[2] == ''):
-            return caption_info[0]
+def find_existing_caption_id(access_token, video_id, language_code,
+                             enable_language_mapping):
+
+    caption_id_map = {
+        caption_info[1].lower(): caption_info[0]
+        for caption_info in google.captions_list(access_token, video_id)
+    }
+
+    # regardless of enable_language_mapping, try the unmapped language first
+    try:
+        return caption_id_map[language_code.lower()]
+    except KeyError:
+        pass
+    if enable_language_mapping:
+        try:
+            return caption_id_map[convert_language_code(language_code).lower()]
+        except KeyError:
+            pass
     return None
 
-def update_subtitles(video_id, access_token, subtitle_version):
+def update_subtitles(video_id, access_token, subtitle_version,
+                     enable_language_mapping):
     """Push the subtitles for a language to YouTube """
 
-    language_code = convert_language_code(
-        subtitle_version.subtitle_language.language_code)
+    language_code = subtitle_version.language_code
 
     subs = subtitle_version.get_subtitles()
     if should_add_credit_to_subtitles(subtitle_version, subs):
@@ -72,20 +85,23 @@ def update_subtitles(video_id, access_token, subtitle_version):
     content = _format_subs_for_youtube(subs)
 
     caption_id = find_existing_caption_id(access_token, video_id,
-                                          language_code)
+                                          language_code,
+                                          enable_language_mapping)
     if caption_id:
         google.captions_update(access_token, caption_id, 'text/vtt', content)
     else:
+        if enable_language_mapping:
+            language_code = convert_language_code(language_code)
         google.captions_insert(access_token, video_id, language_code,
                                'text/vtt', content)
 
-def delete_subtitles(video_id, access_token, language_code):
+def delete_subtitles(video_id, access_token, language_code,
+                     enable_language_mapping):
     """Delete the subtitles for a language on YouTube """
 
-    language_code = convert_language_code(language_code)
-
     caption_id = find_existing_caption_id(access_token, video_id,
-                                          language_code)
+                                          language_code,
+                                          enable_language_mapping)
     if caption_id:
         google.captions_delete(access_token, caption_id)
 

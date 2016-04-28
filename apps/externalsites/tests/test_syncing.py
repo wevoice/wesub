@@ -914,3 +914,88 @@ class ResyncTest(TestCase):
         # deleted so there won't be a retry attempt.
         SyncHistory.objects.get_attempt_to_resync()
         assert_false(SyncHistory.objects.filter(retry=True).exists())
+
+class MockGoogleAPI(mock.Mock):
+    """Mocks out the google module for the language mapping tests."""
+
+    def __init__(self):
+        super(MockGoogleAPI, self).__init__()
+        self.languages = []
+
+    def caption_id(self, language_code):
+        return '{}-0'.format(language_code)
+
+    def captions_list(self, access_token, video_id):
+        return [
+            (self.caption_id(lc), lc, '')
+            for lc in self.languages
+        ]
+
+    def _get_child_mock(self, **kwargs):
+        return mock.Mock(**kwargs)
+
+class YouTubeLanguageMappingTest(TestCase):
+    # For youtube, we map certain language codes from amara to different ones
+    # for youtube.  For example we wap zh-cn to zh-hans.  However, there are a
+    # bunch of corner cases depending on which languages already exist on
+    # youtube
+
+    @patch_for_test('externalsites.syncing.youtube.google', MockGoogleAPI)
+    def setUp(self, mock_google):
+        self.mock_google = mock_google
+        self.video_id = 'test-video-id'
+        self.access_token = 'test-access-token'
+        self.video = VideoFactory()
+
+    def check_update_subtitles_choice(self, language_code,
+                                      correct_language_code):
+        version = pipeline.add_subtitles(self.video, language_code,
+                                         SubtitleSetFactory())
+
+        youtube.update_subtitles(self.video_id, self.access_token, version,
+                                 enable_language_mapping=True)
+        if correct_language_code in self.mock_google.languages:
+            assert_true(self.mock_google.captions_update.called)
+            assert_equal(self.mock_google.captions_update.call_args[0][1],
+                         self.mock_google.caption_id(correct_language_code))
+            assert_false(self.mock_google.captions_insert.called)
+        else:
+            assert_equal(self.mock_google.captions_insert.call_args[0][2],
+                         correct_language_code)
+    
+    def check_delete_subtitles_choice(self, language_code,
+                                      correct_language_code):
+        youtube.delete_subtitles(self.video_id, self.access_token,
+                                 language_code,
+                                 enable_language_mapping=True)
+        if correct_language_code:
+            assert_true(self.mock_google.captions_delete.called)
+            assert_equal(self.mock_google.captions_delete.call_args[0][1],
+                         self.mock_google.caption_id(correct_language_code))
+        else:
+            assert_false(self.mock_google.captions_delete.called)
+
+    def test_no_languages_on_youtube(self):
+        # The simplest case is no languages on youtube
+        self.check_update_subtitles_choice('zh-cn', 'zh-hans')
+        self.check_delete_subtitles_choice('zh-cn', None)
+
+    def test_mapped_language_on_youtube(self):
+        # Also simple is if the mapped language code exists on youtube
+        self.mock_google.languages.append('zh-hans')
+        self.check_update_subtitles_choice('zh-cn', 'zh-hans')
+        self.check_delete_subtitles_choice('zh-cn', 'zh-hans')
+
+    def test_unmapped_language_on_youtube(self):
+        # If the unmapped language code is on youtube, we should use that
+        # rather than create duplicate subtitles
+        self.mock_google.languages.append('zh-cn')
+        self.check_update_subtitles_choice('zh-cn', 'zh-cn')
+        self.check_delete_subtitles_choice('zh-cn', 'zh-cn')
+
+    def test_both_languages_on_youtube(self):
+        # If both language codes are on youtube, we should use the unmapped
+        # version.  
+        self.mock_google.languages.extend(['zh-cn', 'zh-hans'])
+        self.check_update_subtitles_choice('zh-cn', 'zh-cn')
+        self.check_delete_subtitles_choice('zh-cn', 'zh-cn')
