@@ -15,11 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import functools
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language
 from django import template
 
 register = template.Library()
@@ -31,6 +34,24 @@ from utils.basexconverter import base62
 from videos.views import LanguageList
 from videos.types import video_type_registrar, VideoTypeError
 from videos import permissions, share_utils, video_size
+
+def cached_by_video(cache_prefix):
+    """Wrapper function for tags that cache their content per-video.  """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(video, *args, **kwargs):
+            cache_key = '{}-{}'.format(cache_prefix, get_language())
+            cached = video.cache.get(cache_key)
+            if cached:
+                print 'cached: ', cache_key
+                print cached.encode('utf-8')
+                print
+                return cached
+            computed = func(video, *args, **kwargs)
+            video.cache.set(cache_key, computed)
+            return computed
+        return wrapper
+    return decorator
 
 @register.filter
 def is_follower(obj, user):
@@ -197,34 +218,26 @@ def multi_video_create_subtitles_data_attrs(video):
                               for (key, value) in attrs))
 
 @register.simple_tag(name='language-list')
+@cached_by_video('language-list')
 def language_list(video):
-    cached = video.cache.get('language-list')
-    if cached is not None:
-        return cached
     video.prefetch_languages(with_public_tips=True,
                              with_private_tips=True)
-    content = render_to_string('videos/_language-list.html', {
+    return render_to_string('videos/_language-list.html', {
         'video': video,
         'language_list': LanguageList(video),
         'STATIC_URL': utils.static_url(),
     })
-    video.cache.set('language-list', content)
-    return content
 
 @register.simple_tag(name='embedder-code')
+@cached_by_video('embedder-code')
 def embedder_code(video):
-    cached = video.cache.get('embedder_code')
-    if cached is not None:
-        return cached
     video.prefetch_languages(with_public_tips=True,
                              with_private_tips=True)
-    content = render_to_string('videos/_embed_link.html', {
+    return render_to_string('videos/_embed_link.html', {
         'video_url': video.get_video_url(),
         'height': video_size["large"]["height"],
         'width': video_size["large"]["width"],
     })
-    video.cache.set('embedder_code', content)
-    return content
 
 @register.simple_tag(name='video-metadata', takes_context=True)
 def video_metadata(context, video):
@@ -236,11 +249,8 @@ def video_metadata(context, video):
     )
 
 @register.simple_tag(name='sharing-widget-for-video')
+@cached_by_video('sharing-widget')
 def sharing_widget_for_video(video):
-    cached = video.cache.get('sharing-widget')
-    if cached is not None:
-        return cached
     context = share_utils.share_panel_context_for_video(video)
     content = render_to_string('_sharing_widget.html', context)
-    video.cache.set("sharing-widget", content)
     return content
