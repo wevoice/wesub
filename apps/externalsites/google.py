@@ -269,20 +269,35 @@ def get_uploads_playlist_id(channel_id):
     return content_details['relatedPlaylists']['uploads']
 
 def get_uploaded_video_ids(channel_id):
-    playlist_id = get_uploads_playlist_id(channel_id)
+    MAX_ITEMS = 1000
 
+    playlist_id = get_uploads_playlist_id(channel_id)
+    results, next_page_token = _get_uploaded_video_ids(playlist_id,
+                                                               None)
+    while next_page_token and len(results) < MAX_ITEMS:
+        more_results, next_page_token = _get_uploaded_video_ids(
+            playlist_id, next_page_token)
+        results.extend(more_results)
+    return results
+
+def _get_uploaded_video_ids(playlist_id, page_token):
+    """Fetches one page of results for get_uploaded_video_ids()."""
     params = {
         'part': 'snippet',
-        'playlistId': playlist_id
+        'playlistId': playlist_id,
+        'maxResults': 50,
     }
+    if page_token:
+        params['pageToken'] = page_token
     response = _make_youtube_api_request('get', None, 'playlistItems',
                                          params=params)
+    response_data = response.json()
     rv = []
-    for item in response.json()['items']:
+    for item in response_data['items']:
         resource_id = item['snippet']['resourceId']
         if resource_id['kind'] == 'youtube#video':
             rv.append(resource_id['videoId'])
-    return rv
+    return rv, response_data.get('nextPageToken')
 
 def captions_list(access_token, video_id):
     """Fetch info on all non-ASR captions for a video
