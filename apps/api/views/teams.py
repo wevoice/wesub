@@ -658,6 +658,7 @@ class TaskSerializer(serializers.ModelSerializer):
     video_id = TeamVideoField(source='team_video')
     assignee = TeamMemberField(required=False)
     type = MappedChoiceField(Task.TYPE_CHOICES)
+    created = TimezoneAwareDateTimeField(read_only=True)
     completed = TimezoneAwareDateTimeField(read_only=True)
     approved = MappedChoiceField(
         Task.APPROVED_CHOICES, required=False,
@@ -668,7 +669,7 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = (
             'id', 'video_id', 'language', 'type', 'assignee', 'priority',
-            'completed', 'approved', 'resource_uri',
+            'created', 'completed', 'approved', 'resource_uri',
         )
         read_only_fields = (
             'completed',
@@ -763,6 +764,7 @@ class TaskViewSet(TeamSubview):
          ``Review``, or ``Approve``
     - **assignee:** username of the task assignee (or null)
     - **priority:** Integer priority for the task
+    - **created:** Date/time when the task was created
     - **completed:** Date/time when the task was completed (or null)
     - **approved:** Approval status of the task.  One of ``In Progress``,
         ``Approved``, or ``Rejected``
