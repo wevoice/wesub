@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-28 10:04-0500\n"
-"PO-Revision-Date: 2016-04-18 15:31+0000\n"
+"POT-Creation-Date: 2016-04-29 08:46-0500\n"
+"PO-Revision-Date: 2016-04-29 13:46+0000\n"
 "Last-Translator: bendk <ben@pculture.org>\n"
 "Language-Team: Indonesian (http://www.transifex.com/universalsubtitles/universalsubtitles/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgid "%(cache_calls)d call in %(time).4fs"
 msgid_plural "%(cache_calls)d calls in %(time).4fs"
 msgstr[0] ""
 
-#: apps/api/views/subtitles.py:126
+#: apps/api/views/subtitles.py:129
 #, python-brace-format
 msgid "Language already created: {language_code}"
 msgstr ""
@@ -1449,80 +1449,6 @@ msgstr ""
 msgid "Setup needed"
 msgstr ""
 
-#: apps/subtitles/forms.py:90
-msgid ""
-"Sorry, we can't upload your subtitles because work on this language is "
-"already in progress."
-msgstr ""
-
-#: apps/subtitles/forms.py:105
-msgid "The language already exists and is not a translation."
-msgstr ""
-
-#: apps/subtitles/forms.py:111
-#, python-format
-msgid "The language already exists as a translation from %(source_lang)s."
-msgstr ""
-
-#: apps/subtitles/forms.py:129
-msgid ""
-"Sorry, we can't upload your subtitles because another user is already "
-"assigned to this language."
-msgstr ""
-
-#: apps/subtitles/forms.py:136
-msgid ""
-"Sorry, we can't upload your subtitles because you do not have permission to "
-"claim this language."
-msgstr ""
-
-#: apps/subtitles/forms.py:147
-msgid ""
-"Sorry, we can't upload your subtitles because a draft for this language is "
-"already in moderation."
-msgstr ""
-
-#: apps/subtitles/forms.py:157
-#, python-format
-msgid ""
-"Sorry, we couldn't upload your file because the number of lines in your "
-"translation (%(translation_lines)s) doesn't match the original "
-"(%(source_lines)s)."
-msgstr ""
-
-#: apps/subtitles/forms.py:169
-#, python-format
-msgid "File size must be less than %(size)s kb."
-msgstr ""
-
-#: apps/subtitles/forms.py:177
-#, python-format
-msgid "Unsupported format. Please upload one of the following: %(formats)s"
-msgstr ""
-
-#: apps/subtitles/forms.py:185
-msgid "Can not detect file encoding"
-msgstr ""
-
-#: apps/subtitles/forms.py:211
-msgid "Somebody is subtitling this video right now. Try later."
-msgstr ""
-
-#: apps/subtitles/forms.py:223
-#, python-format
-msgid "Invalid from language: %(language)s"
-msgstr ""
-
-#: apps/subtitles/forms.py:228
-#, python-format
-msgid "%(language)s has no public versions"
-msgstr ""
-
-#: apps/subtitles/forms.py:260
-msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated."
-msgstr ""
-
 #: apps/subtitles/workflows.py:709
 msgid "Publish"
 msgstr ""
@@ -1608,6 +1534,80 @@ msgstr ""
 msgid ""
 "Another user is currently performing the %(task_type)s task for these "
 "subtitles"
+msgstr ""
+
+#: apps/subtitles/forms.py:90
+msgid ""
+"Sorry, we can't upload your subtitles because work on this language is "
+"already in progress."
+msgstr ""
+
+#: apps/subtitles/forms.py:105
+msgid "The language already exists and is not a translation."
+msgstr ""
+
+#: apps/subtitles/forms.py:111
+#, python-format
+msgid "The language already exists as a translation from %(source_lang)s."
+msgstr ""
+
+#: apps/subtitles/forms.py:129
+msgid ""
+"Sorry, we can't upload your subtitles because another user is already "
+"assigned to this language."
+msgstr ""
+
+#: apps/subtitles/forms.py:136
+msgid ""
+"Sorry, we can't upload your subtitles because you do not have permission to "
+"claim this language."
+msgstr ""
+
+#: apps/subtitles/forms.py:147
+msgid ""
+"Sorry, we can't upload your subtitles because a draft for this language is "
+"already in moderation."
+msgstr ""
+
+#: apps/subtitles/forms.py:157
+#, python-format
+msgid ""
+"Sorry, we couldn't upload your file because the number of lines in your "
+"translation (%(translation_lines)s) doesn't match the original "
+"(%(source_lines)s)."
+msgstr ""
+
+#: apps/subtitles/forms.py:169
+#, python-format
+msgid "File size must be less than %(size)s kb."
+msgstr ""
+
+#: apps/subtitles/forms.py:177
+#, python-format
+msgid "Unsupported format. Please upload one of the following: %(formats)s"
+msgstr ""
+
+#: apps/subtitles/forms.py:185
+msgid "Can not detect file encoding"
+msgstr ""
+
+#: apps/subtitles/forms.py:211
+msgid "Somebody is subtitling this video right now. Try later."
+msgstr ""
+
+#: apps/subtitles/forms.py:223
+#, python-format
+msgid "Invalid from language: %(language)s"
+msgstr ""
+
+#: apps/subtitles/forms.py:228
+#, python-format
+msgid "%(language)s has no public versions"
+msgstr ""
+
+#: apps/subtitles/forms.py:260
+msgid ""
+"Sorry, we can't upload your subtitles because this language is moderated."
 msgstr ""
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:39
@@ -2369,10 +2369,6 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: apps/externalsites/admin.py:110
-msgid "Resyncing subtitles"
-msgstr ""
-
 #: apps/externalsites/credit.py:34 apps/externalsites/syncing/youtube.py:40
 msgid "Help us caption & translate this video!"
 msgstr "Bantu kami menerjemahkan video ini!"
@@ -2474,6 +2470,10 @@ msgstr ""
 msgid "That youtube account has already been linked to the %(team)s team."
 msgstr ""
 
+#: apps/externalsites/admin.py:110
+msgid "Resyncing subtitles"
+msgstr ""
+
 #: apps/externalsites/models.py:203
 msgid "Partner ID"
 msgstr ""
@@ -2538,6 +2538,43 @@ msgstr "Terjemahan oleh komunitas Amara.org"
 #: apps/amaradotorg/behaviors.py:38
 #, python-format
 msgid "%(speaker_name)s: %(title)s"
+msgstr ""
+
+#: amara-enterprise/request_issues.py:28
+msgid "Audio Garbled"
+msgstr ""
+
+#: amara-enterprise/request_issues.py:29
+msgid "Language Misidentified"
+msgstr ""
+
+#: amara-enterprise/request_issues.py:30
+msgid "Multiple Languages"
+msgstr ""
+
+#: amara-enterprise/request_issues.py:31
+msgid "Very Difficult Accent"
+msgstr ""
+
+#: amara-enterprise/request_issues.py:32
+msgid "Glossary Needed"
+msgstr ""
+
+#: amara-enterprise/request_issues.py:33
+msgid "Video Issue"
+msgstr ""
+
+#: amara-enterprise/request_issues.py:34
+msgid "Too Many Caption Edits"
+msgstr ""
+
+#: amara-enterprise/request_issues.py:35
+msgid "No Speech In Video"
+msgstr ""
+
+#: amara-enterprise/request_issues.py:36
+#: amara-enterprise/prorequests/models.py:661
+msgid "Other"
 msgstr ""
 
 #: amara-enterprise/apiv2/forms.py:185 templates/teams/invite_members.html:20
@@ -3242,141 +3279,108 @@ msgstr ""
 msgid "%(title)s updated"
 msgstr ""
 
-#: amara-enterprise/prorequests/forms.py:40
+#: amara-enterprise/prorequests/forms.py:41
 msgid "Request type"
 msgstr ""
 
-#: amara-enterprise/prorequests/forms.py:43
+#: amara-enterprise/prorequests/forms.py:44
 msgid "Request Language(s)"
 msgstr ""
 
-#: amara-enterprise/prorequests/forms.py:44
+#: amara-enterprise/prorequests/forms.py:45
 msgid "Enter any number of language codes separated by spaces"
 msgstr ""
 
-#: amara-enterprise/prorequests/forms.py:47
+#: amara-enterprise/prorequests/forms.py:48
 msgid "Native language translation surcharge"
 msgstr ""
 
-#: amara-enterprise/prorequests/forms.py:72
+#: amara-enterprise/prorequests/forms.py:73
 msgid "Not valid"
 msgstr ""
 
-#: amara-enterprise/prorequests/forms.py:95
+#: amara-enterprise/prorequests/forms.py:96
 #, python-format
 msgid "Already a %(type)s request for %(languages)s"
 msgstr ""
 
-#: amara-enterprise/prorequests/forms.py:101
+#: amara-enterprise/prorequests/forms.py:102
 msgid "Enabled"
 msgstr ""
 
-#: amara-enterprise/prorequests/forms.py:108
+#: amara-enterprise/prorequests/forms.py:109
 msgid "Cost per minute"
 msgstr ""
 
-#: amara-enterprise/prorequests/forms.py:215
+#: amara-enterprise/prorequests/forms.py:216
 msgid "Quality"
 msgstr ""
 
-#: amara-enterprise/prorequests/forms.py:218
+#: amara-enterprise/prorequests/forms.py:219
 msgid "Turnaround time"
 msgstr ""
 
-#: amara-enterprise/prorequests/forms.py:244
+#: amara-enterprise/prorequests/forms.py:245
 #, python-format
 msgid "1 professional service request created."
 msgid_plural "%(count)s professional service requests created."
 msgstr[0] ""
 
-#: amara-enterprise/prorequests/forms.py:251
+#: amara-enterprise/prorequests/forms.py:252
 #, python-format
 msgid "1 professional service request already existed."
 msgid_plural "%(count)s professional service requests already existed."
 msgstr[0] ""
 
-#: amara-enterprise/prorequests/forms.py:257
+#: amara-enterprise/prorequests/forms.py:258
 #, python-format
 msgid "1 professional service request were invalid."
 msgid_plural "%(count)s professional service requests were invalid."
 msgstr[0] ""
 
-#: amara-enterprise/prorequests/models.py:88
+#: amara-enterprise/prorequests/models.py:89
 msgid "Basic"
 msgstr ""
 
-#: amara-enterprise/prorequests/models.py:89
+#: amara-enterprise/prorequests/models.py:90
 msgid "Business"
 msgstr ""
 
-#: amara-enterprise/prorequests/models.py:90
+#: amara-enterprise/prorequests/models.py:91
 msgid "Film/TV"
 msgstr ""
 
-#: amara-enterprise/prorequests/models.py:94
+#: amara-enterprise/prorequests/models.py:95
 #: amara-enterprise/prorequests/templates/prorequests/edit-rule-table.html:26
 msgid "2 hours"
 msgstr ""
 
-#: amara-enterprise/prorequests/models.py:95
+#: amara-enterprise/prorequests/models.py:96
 #: amara-enterprise/prorequests/templates/prorequests/edit-rule-table.html:32
 msgid "8-10 hours"
 msgstr ""
 
-#: amara-enterprise/prorequests/models.py:96
+#: amara-enterprise/prorequests/models.py:97
 #: amara-enterprise/prorequests/templates/prorequests/edit-rule-table.html:38
 msgid "24 hours"
 msgstr ""
 
-#: amara-enterprise/prorequests/models.py:97
+#: amara-enterprise/prorequests/models.py:98
 #: amara-enterprise/prorequests/templates/prorequests/edit-rule-table.html:44
 msgid "48 hours"
 msgstr ""
 
-#: amara-enterprise/prorequests/models.py:98
+#: amara-enterprise/prorequests/models.py:99
 #: amara-enterprise/prorequests/templates/prorequests/edit-rule-table.html:50
 msgid "4 days"
 msgstr ""
 
-#: amara-enterprise/prorequests/models.py:479
+#: amara-enterprise/prorequests/models.py:480
 msgid "Captions"
 msgstr ""
 
-#: amara-enterprise/prorequests/models.py:480
+#: amara-enterprise/prorequests/models.py:481
 msgid "Translation"
-msgstr ""
-
-#: amara-enterprise/prorequests/models.py:663
-msgid "Audio Garbled"
-msgstr ""
-
-#: amara-enterprise/prorequests/models.py:664
-msgid "Language Misidentified"
-msgstr ""
-
-#: amara-enterprise/prorequests/models.py:665
-msgid "Multiple Languages"
-msgstr ""
-
-#: amara-enterprise/prorequests/models.py:666
-msgid "Very Difficult Accent"
-msgstr ""
-
-#: amara-enterprise/prorequests/models.py:667
-msgid "Glossary Needed"
-msgstr ""
-
-#: amara-enterprise/prorequests/models.py:668
-msgid "Video Issue"
-msgstr ""
-
-#: amara-enterprise/prorequests/models.py:669
-msgid "Too Many Caption Edits"
-msgstr ""
-
-#: amara-enterprise/prorequests/models.py:670
-#: amara-enterprise/prorequests/models.py:691
-msgid "Other"
 msgstr ""
 
 #: amara-enterprise/providers/forms.py:52
