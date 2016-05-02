@@ -45,7 +45,7 @@ def inc_month(dt):
         return dt.replace(year=dt.year+1, month=1)
 
 def dec_month(dt):
-    if dt.month > 0:
+    if dt.month > 1:
         return dt.replace(month=dt.month-1)
     else:
         return dt.replace(year=dt.year-1, month=12)
