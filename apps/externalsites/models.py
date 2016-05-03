@@ -734,7 +734,7 @@ class SyncHistoryManager(models.Manager):
         except SyncHistory.DoesNotExist:
             return None
         if team is not None:
-            if sh.video_url.video.get_team_video() and sh.video_url.video.get_team_video().team == team:
+            if sh.get_account().team == team:
                 sh.retry = True
                 sh.save()
         elif user is not None:
