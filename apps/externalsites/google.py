@@ -52,7 +52,7 @@ VideoInfo = namedtuple('VideoInfo',
 OpenIDProfile = namedtuple('OpenIDProfile',
                            'sub email full_name first_name last_name')
 
-logger = logging.getLogger('utils.youtube')
+logger = logging.getLogger(__name__)
 
 def youtube_scopes():
     return [
