@@ -103,15 +103,15 @@ var angular = angular || null;
                     return action.name == 'save-draft';
                 });
             },
-            allowAction: function(action) {
+            forbidAction: function(action) {
                 if ((action.name == "publish") &&
                     $scope.translating() &&
                     (($scope.workingSubtitles.title == "") ||
                      ($scope.workingSubtitles.description == "")) &&
                     EditorData.teamAttributes &&
                     (EditorData.teamAttributes.features.indexOf('require_translated_metadata') > -1))
-                    return false;
-		return true;
+                    return {'forbid': true, 'tooltip': 'Title and description must be translated'};
+		return {'forbid': false};
 	    },
             saveDraft: function() {
                 var msg = $sce.trustAsHtml('Saving&hellip;');
@@ -136,8 +136,13 @@ var angular = angular || null;
             var sessionAction = {
                 label: action.label,
                 class: action.class,
+                tooltip: function() {
+                    var forbid = $scope.session.forbidAction(action);
+                    if (forbid.forbid) return forbid.tooltip;
+                    return "";
+                },
                 canPerform: function() {
-                    if (!$scope.session.allowAction(action)) return false;
+                    if ($scope.session.forbidAction(action).forbid) return false;
                     if(action.complete === true) {
                         return $scope.sessionBackend.subtitlesComplete();
                     } else {
