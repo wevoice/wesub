@@ -103,6 +103,16 @@ var angular = angular || null;
                     return action.name == 'save-draft';
                 });
             },
+            allowAction: function(action) {
+                if ((action.name == "publish") &&
+                    $scope.translating() &&
+                    (($scope.workingSubtitles.title == "") ||
+                     ($scope.workingSubtitles.description == "")) &&
+                    EditorData.teamAttributes &&
+                    (EditorData.teamAttributes.features.indexOf('require_translated_metadata') > -1))
+                    return false;
+		return true;
+	    },
             saveDraft: function() {
                 var msg = $sce.trustAsHtml('Saving&hellip;');
                 $scope.dialogManager.showFreezeBox(msg);
@@ -127,6 +137,7 @@ var angular = angular || null;
                 label: action.label,
                 class: action.class,
                 canPerform: function() {
+                    if (!$scope.session.allowAction(action)) return false;
                     if(action.complete === true) {
                         return $scope.sessionBackend.subtitlesComplete();
                     } else {
