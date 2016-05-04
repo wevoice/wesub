@@ -19,6 +19,8 @@
 import logging
 
 from django import template
+from django.utils.translation import get_language
+
 from auth.models import AnonymousUserCacheGroup
 
 register = template.Library()
@@ -35,6 +37,7 @@ def cache_by_tag(parser, token, CacheNodeClass):
             tag_name)
         raise template.TemplateSyntaxError(msg)
     parser.delete_first_token()
+    key += '-{}'.format(get_language())
     return CacheNodeClass(key, nodelist)
 
 @register.tag('cache-by-user')
