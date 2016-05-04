@@ -43,9 +43,6 @@ def cached_by_video(cache_prefix):
             cache_key = '{}-{}'.format(cache_prefix, get_language())
             cached = video.cache.get(cache_key)
             if cached:
-                print 'cached: ', cache_key
-                print cached.encode('utf-8')
-                print
                 return cached
             computed = func(video, *args, **kwargs)
             video.cache.set(cache_key, computed)
