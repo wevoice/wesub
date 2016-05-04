@@ -9,6 +9,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from .autocomplete import AutocompleteTextInput
+from .dates import MonthChoiceField
 from .formrouter import FormRouter
 from .languages import MultipleLanguageChoiceField
 from .recapcha import ReCaptchaField
