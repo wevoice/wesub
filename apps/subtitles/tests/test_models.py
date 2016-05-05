@@ -2105,9 +2105,9 @@ class TestTeamInteractions(TestCase):
         self.video_public = make_video_3()
 
         TeamVideoFactory(video=self.video1, team=self.team1,
-                         added_by=User.get_anonymous())
+                         added_by=User.get_amara_anonymous())
         TeamVideoFactory(video=self.video2, team=self.team2,
-                         added_by=User.get_anonymous())
+                         added_by=User.get_amara_anonymous())
 
         self.en1 = make_sl(self.video1, 'en')
         self.en2 = make_sl(self.video2, 'en')

@@ -1327,13 +1327,13 @@ class SubtitleVersion(models.Model):
     """
     user -> The legacy data model allowed null users. We do not allow it anymore, but
     for those cases, we've replaced it with the user created on the syncdb commit (see
-    apps.auth.CustomUser.get_anonymous.
+    apps.auth.CustomUser.get_amara_anonymous.
 
     """
     language = models.ForeignKey(SubtitleLanguage)
     version_no = models.PositiveIntegerField(default=0)
     datetime_started = models.DateTimeField(editable=False)
-    user = models.ForeignKey(User, default=User.get_anonymous)
+    user = models.ForeignKey(User, default=User.get_amara_anonymous)
     note = models.CharField(max_length=512, blank=True)
     time_change = models.FloatField(null=True, blank=True, editable=False)
     text_change = models.FloatField(null=True, blank=True, editable=False)

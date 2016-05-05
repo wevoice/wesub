@@ -81,7 +81,7 @@ def user_videos_activity(context, user=None):
         context['users_actions'] = Action.objects.select_related('video', 'language', 'language__video', 'user') \
             .filter(video__customuser=user) \
             .exclude(user=user) \
-            .exclude(user=User.get_anonymous())[:ACTIONS_ON_PAGE]
+            .exclude(user=User.get_amara_anonymous())[:ACTIONS_ON_PAGE]
     else:
         context['users_actions'] = Action.objects.none()
     return context
