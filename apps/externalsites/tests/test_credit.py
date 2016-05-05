@@ -124,6 +124,24 @@ class AddCreditTest(BaseCreditTest):
         self.assertEqual(self.mock_get_video_info.call_count, 1)
         self.assertEqual(self.mock_update_video_description.call_count, 0)
 
+    def test_concurency(self):
+        # simulate add_credit_to_video_url() being called by a second thread
+        # while it's still running in the first
+        self.first_call = True
+        def get_video_info(video_id):
+            # this gets called inside add_credit_to_video_url().  Try queing
+            # up a second call to add_credit_to_video_url()
+            if self.first_call:
+                self.first_call = False
+                add_credit_to_video_url(self.video_url, self.account)
+            return self.mock_get_video_info.return_value
+
+        self.mock_get_video_info.side_effect = get_video_info
+        add_credit_to_video_url(self.video_url, self.account)
+
+        self.assertEqual(self.mock_update_video_description.call_count, 1)
+
+
 class AddCreditScheduleTest(BaseCreditTest):
     # Test that we schedule add_credit_to_video_url to be called after certain
     # events
