@@ -104,10 +104,12 @@ var angular = angular || null;
                 });
             },
             forbidAction: function(action) {
-                if ((action.name == "publish") &&
+                if ((action.complete === true) &&
                     $scope.translating() &&
                     (($scope.workingSubtitles.title == "") ||
-                     ($scope.workingSubtitles.description == "")) &&
+                     ($scope.workingSubtitles.description == "") ||
+                     (("speaker-name" in $scope.referenceSubtitles.metadata) &&
+                      ($scope.workingSubtitles.metadata["speaker-name"].trim() == ""))) &&
                     EditorData.teamAttributes &&
                     (EditorData.teamAttributes.features.indexOf('require_translated_metadata') > -1))
                     return {'forbid': true, 'tooltip': 'Title and description must be translated'};
