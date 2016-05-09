@@ -714,9 +714,13 @@ class Team(models.Model):
         # only create 1 object while select_related() will create 1 per task.
         # Re-using the same object means better caching.
         qs = qs.filter(new_subtitle_version__subtitle_language__subtitles_complete=True)
-        # Title and description are required
-        qs = qs.exclude(new_subtitle_version__title="")
-        qs = qs.exclude(new_subtitle_version__description="")
+        for f in self.settings.features():
+            logger.error(f.key_name)
+            if f.key_name == "enable_require_translated_metadata":
+                # Title and description are required
+                qs = qs.exclude(new_subtitle_version__title="")
+                qs = qs.exclude(new_subtitle_version__description="")
+                break
         qs = qs.prefetch_related('team_video__video', 'team_video__project')
         if sort is not None:
             qs = qs.order_by(sort)
