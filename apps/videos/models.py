@@ -295,6 +295,41 @@ class VideoCacheManager(ModelCacheManager):
         self._video_id_to_pk[video_id] = pk
         return pk
 
+class VideoFieldMonitor(object):
+    """Monitor model fields for the Video model"""
+
+    # map field names to signals
+    field_map = {
+        'title': signals.title_changed,
+        'duration': signals.duration_changed,
+        'primary_audio_language_code': signals.language_changed,
+    }
+
+    def __init__(self, video):
+        self.data = {
+            name: getattr(video, name, None)
+            for name in self.field_map
+        }
+
+    def on_save(self, video, created):
+        """Call this in the save() method.  If any of the fields have changed,
+        then we will emit the corresponding signal.
+        """
+        for name in self.field_map:
+            new_value = getattr(video, name, None)
+            old_value = self.data[name]
+            if new_value != old_value:
+                self.data[name] = new_value
+                if not created:
+                    self.send_signal(video, name, old_value)
+
+    def send_signal(self, video, name, old_value):
+        signal = self.field_map[name]
+        kwargs = {
+            'old_{}'.format(name): old_value
+        }
+        signal.send(sender=video, **kwargs)
+
 class Video(models.Model):
     """Central object in the system"""
 
@@ -375,8 +410,7 @@ class Video(models.Model):
     def __init__(self, *args, **kwargs):
         super(Video, self).__init__(*args, **kwargs)
         self._language_fetcher = SubtitleLanguageFetcher()
-        self.orig_title = self.title
-        self.orig_duration = self.duration
+        self.monitor = VideoFieldMonitor(self)
 
     def __unicode__(self):
         title = self.title_display()
@@ -385,16 +419,9 @@ class Video(models.Model):
         return title
 
     def save(self, *args, **kwargs):
+        created = self.id is None
         super(Video, self).save(*args, **kwargs)
-        if self.title != self.orig_title:
-            old_title = self.orig_title
-            self.orig_title = self.title
-            signals.title_changed.send(sender=self, old_title=old_title)
-        if self.duration != self.orig_duration:
-            old_duration = self.orig_duration
-            self.orig_duration = self.duration
-            signals.duration_changed.send(sender=self,
-                                          old_duration=old_duration)
+        self.monitor.on_save(self, created)
 
     def update_search_index(self):
         """Update this video's search index text."""
@@ -672,7 +699,6 @@ class Video(models.Model):
             if user and user.notify_by_message:
                 video.followers.add(user)
         # Run post-creation code
-        Action.create_video_handler(video, user)
         video_cache.invalidate_cache(video.video_id)
         video.cache.invalidate()
         signals.video_added.send(sender=video, video_url=video_url)

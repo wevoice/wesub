@@ -18,6 +18,7 @@
 
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 
 from auth.models import CustomUser as User
@@ -278,6 +279,25 @@ activity_choices = [
     VersionDeclined, VideoDeleted, VideoURLEdited, VideoURLDeleted,
 ]
 
+class ActivityManager(models.Manager):
+    def create(self, type, **attrs):
+        return super(ActivityManager, self).create(type=type, **attrs)
+
+    def create_for_video(self, type, video, **attrs):
+        team_video = video.get_team_video()
+        team_id = team_video.team_id if team_video else None
+        return self.create(
+            type=type, video=video, team_id=team_id,
+            video_language_code=video.primary_audio_language_code, **attrs)
+
+    def create_for_video_added(self, video):
+        return self.create_for_video('video-added', video,
+                                     user=video.user, created=video.created)
+
+    def move_video_records_to_team(self, video, team):
+        for record in self.filter(video=video, copied_from=None):
+            record.move_to_team(team)
+
 class ActivityRecord(models.Model):
     type = CodeField(choices=activity_choices)
     # User activity stream for this record.  Almost always this is the user
@@ -312,6 +332,8 @@ class ActivityRecord(models.Model):
     # team.
     copied_from = models.ForeignKey('self', blank=True, null=True)
 
+    objects = ActivityManager()
+
     class Meta:
         # If we were using a newer version of django we would have this:
         #index_together = [
@@ -332,6 +354,28 @@ class ActivityRecord(models.Model):
 
     def __unicode__(self):
         return u'ActivityRecord: {}'.format(self.type)
+
+    def move_to_team(self, new_team):
+        with transaction.commit_on_success():
+            # Make a copy of the record for our current team
+            if self.team is not None:
+                self.make_copy()
+            # Move to the new team
+            self.team = new_team
+            self.save()
+            # Delete any old copies on the new team
+            if new_team is not None:
+                ActivityRecord.objects.filter(copied_from=self,
+                                              team_id=new_team.id).delete()
+
+    def make_copy(self):
+        copy = ActivityRecord(copied_from=self)
+        fields = ['type', 'user_id', 'team_id', 'video_id', 'language_code',
+                  'related_obj_id', ]
+        for name in fields:
+            setattr(copy, name, getattr(self, name))
+        copy.save()
+        return copy
 
     def get_language_code_display(self):
         if self.language_code:

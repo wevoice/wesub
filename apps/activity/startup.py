@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2013 Participatory Culture Foundation
+# Copyright (C) 2016 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,12 +16,5 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django import dispatch
-
-feed_imported = dispatch.Signal(providing_args=['new_videos'])
-title_changed = dispatch.Signal(providing_args=['old_title'])
-duration_changed = dispatch.Signal(providing_args=['old_duration'])
-language_changed = dispatch.Signal(
-    providing_args=['old_primary_audio_language_code'])
-video_added = dispatch.Signal(providing_args=['video_url'])
-video_url_added = dispatch.Signal(providing_args=['video'])
+# import some modules to make sure their code runs
+import activity.signalhandlers
