@@ -232,7 +232,6 @@ class VideosApiClass(object):
                     video.title = title
                     video.slug = slugify(video.title)
                     video.save()
-                    Action.change_title_handler(video, user)
                     send_change_title_email.delay(video.id, user and user.id, old_title.encode('utf8'), video.title.encode('utf8'))
             else:
                 return Error(_(u'Title can\'t be changed for this video'))

@@ -84,8 +84,3 @@ class VideoCacheInvalidationTest(TestCase):
         self.video.followers.add(user)
         with assert_invalidates_model_cache(self.video):
             self.video.followers.remove(user)
-
-    def test_add_action(self):
-        user = UserFactory()
-        with assert_invalidates_model_cache(self.video):
-            Action.change_title_handler(self.video, user)
