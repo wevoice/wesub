@@ -359,7 +359,6 @@ class SubtitlesUploadForm(forms.Form):
         team_video = self.video.get_team_video()
         if team_video:
             for f in team_video.team.settings.features():
-                logger.error(f.key_name)
                 if f.key_name == "enable_require_translated_metadata":
                     get_title_description_metadata = False
                     break
