@@ -21,6 +21,7 @@
 $(document).ready(function() {
     $('html#team-videos .bottom-sheet button[data-modal-url]').click(onBottomButtonClick);
     $('html#team-videos button.open-edit-modal').click(onEditModalClick);
+    $('html#team-videos ul.thumb-list.bulk-mode').on('selectionChange', onSelectionChange);
 });
 
 function onBottomButtonClick(evt) {
@@ -43,6 +44,12 @@ function onAjaxOpenModalClick(evt, selection, button) {
     evt.preventDefault();
     params.selection = selection.join('-');
     ajaxOpenModal(url, params);
+}
+
+function onSelectionChange(evt, selection) {
+    bottomSheet.setHeading(interpolate(
+            ngettext('1 video selected', '%(count)s videos selected', selection.length),
+            { count: selection.length }, true));
 }
 
 
