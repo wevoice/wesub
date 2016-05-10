@@ -67,11 +67,12 @@ $.fn.autocompleteTextbox = function(options) {
             $.each(responseData, function(i, item) {
                 var link = $('<a href="#">');
                 link.text(item.label);
-                link.mousedown(function() {
+                var li = $('<li>').append(link);
+                li.mousedown(function() {
                     field.val(item.value);
                     hideAutocompleteList();
                 });
-                autocompleteList.append($('<li>').append(link));
+                autocompleteList.append(li);
             });
         }
 
