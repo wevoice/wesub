@@ -6,9 +6,9 @@ by {{ reviewer }} from the {{ team.name }} team and they are now published!</p>
 </p>
 {% if note %}
 {{ reviewer}} included the following note:
-<p>
-{{ note }}
-</p>
+
+{{ note|linebreaks }}
+
 {% endif %}
 
 
