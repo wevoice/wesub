@@ -294,6 +294,12 @@ class ActivityManager(models.Manager):
         return self.create_for_video('video-added', video,
                                      user=video.user, created=video.created)
 
+    def create_for_comment(self, video, comment, language_code=''):
+        return self.create_for_video(
+            'comment-added', video, user=comment.user,
+            created=comment.submit_date, related_obj_id=comment.id,
+            language_code=language_code)
+
     def move_video_records_to_team(self, video, team):
         for record in self.filter(video=video, copied_from=None):
             record.move_to_team(team)

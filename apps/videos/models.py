@@ -613,6 +613,12 @@ class Video(models.Model):
 
     get_absolute_url = _get_absolute_url
 
+    def get_language_url(self, language_code):
+        return reverse('videos:translation_history_legacy', kwargs={
+            'video_id': self.video_id,
+            'lang': language_code,
+        })
+
     def get_primary_videourl_obj(self):
         """Return the primary video URL for this video if one exists, otherwise None.
 
@@ -2032,10 +2038,6 @@ class Action(models.Model):
 
             instance.action = obj
             instance.save()
-
-
-post_save.connect(Action.create_comment_handler, Comment)
-
 
 # UserTestResult
 class UserTestResult(models.Model):

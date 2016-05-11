@@ -20,8 +20,11 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
 
 from activity.models import ActivityRecord
+from comments.models import Comment
+from subtitles.models import SubtitleLanguage
 from teams.models import TeamVideo
 from teams.signals import video_moved_from_team_to_team
+from videos.models import Video
 import videos.signals
 
 @receiver(videos.signals.video_added)
@@ -32,6 +35,18 @@ def on_video_added(sender, **kwargs):
 def on_language_changed(sender, **wargs):
     ActivityRecord.objects.filter(video=sender).update(
         video_language_code=sender.primary_audio_language_code)
+
+@receiver(post_save, sender=Comment)
+def on_comment_save(instance, created, **kwargs):
+    if not created:
+        return
+    if isinstance(instance.content_object, Video):
+        ActivityRecord.objects.create_for_comment(instance.content_object,
+                                                  instance)
+    elif isinstance(instance.content_object, SubtitleLanguage):
+        ActivityRecord.objects.create_for_comment(instance.content_object.video,
+                                          instance,
+                                          instance.content_object.language_code)
 
 @receiver(post_save, sender=TeamVideo)
 def on_team_video_save(instance, created, **kwargs):

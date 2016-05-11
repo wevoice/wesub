@@ -19,6 +19,8 @@
 from django.test import TestCase
 
 from activity.models import ActivityRecord
+from comments.models import Comment
+from subtitles import pipeline
 from utils.factories import *
 from utils.test_utils import *
 import videos.signals
@@ -37,6 +39,32 @@ class ActivityCreationTest(TestCase):
         assert_equals(record.video, video)
         assert_equals(record.user, video.user)
         assert_equals(record.created, video.created)
+
+    def test_comment_added(self):
+        video = VideoFactory()
+        user = UserFactory()
+        comment = Comment.objects.create(content_object=video, user=user,
+                                         content='Foo')
+        record = ActivityRecord.objects.get(type='comment-added')
+        assert_equals(record.video, video)
+        assert_equals(record.user, user)
+        assert_equals(record.created, comment.submit_date)
+        assert_equals(record.get_related_obj(), comment)
+        assert_equals(record.language_code, '')
+
+    def test_comment_added_to_subtitles(self):
+        version = pipeline.add_subtitles(VideoFactory(), 'en',
+                                         SubtitleSetFactory())
+        language = version.subtitle_language
+        user = UserFactory()
+        comment = Comment.objects.create(content_object=language, user=user,
+                                         content='Foo')
+        record = ActivityRecord.objects.get(type='comment-added')
+        assert_equals(record.video, language.video)
+        assert_equals(record.user, user)
+        assert_equals(record.created, comment.submit_date)
+        assert_equals(record.get_related_obj(), comment)
+        assert_equals(record.language_code, 'en')
 
 class ActivityVideoLanguageTest(TestCase):
     def test_initial_video_language(self):
