@@ -29,6 +29,11 @@ def clear_activity():
     ActivityRecord.objects.all().delete()
 
 class ActivityCreationTest(TestCase):
+    def check_save_doesnt_create_new_record(self, instance):
+        pre_count = ActivityRecord.objects.count()
+        instance.save()
+        assert_equal(ActivityRecord.objects.count(), pre_count)
+
     def test_video_added(self):
         video = VideoFactory()
         clear_activity()
@@ -65,6 +70,16 @@ class ActivityCreationTest(TestCase):
         assert_equals(record.created, comment.submit_date)
         assert_equals(record.get_related_obj(), comment)
         assert_equals(record.language_code, 'en')
+
+    def test_version_added(self):
+        version = pipeline.add_subtitles(VideoFactory(), 'en',
+                                         SubtitleSetFactory())
+        record = ActivityRecord.objects.get(type='version-added')
+        assert_equal(record.user, version.author)
+        assert_equal(record.video, version.video)
+        assert_equal(record.language_code, version.language_code)
+        assert_equal(record.created, version.created)
+        self.check_save_doesnt_create_new_record(version)
 
 class ActivityVideoLanguageTest(TestCase):
     def test_initial_video_language(self):

@@ -1591,8 +1591,6 @@ class SubtitleVersion(models.Model):
         assert self.visibility in ('public', 'private',), \
             "Version visibility must be either 'public' or 'private'!"
 
-        Action.create_caption_handler(self, self.created)
-
         super(SubtitleVersion, self).save(*args, **kwargs)
 
         if self.is_public() and self.is_for_primary_audio_language():

@@ -21,7 +21,7 @@ from django.db.models.signals import post_save, pre_delete
 
 from activity.models import ActivityRecord
 from comments.models import Comment
-from subtitles.models import SubtitleLanguage
+from subtitles.models import SubtitleLanguage, SubtitleVersion
 from teams.models import TeamVideo
 from teams.signals import video_moved_from_team_to_team
 from videos.models import Video
@@ -47,6 +47,11 @@ def on_comment_save(instance, created, **kwargs):
         ActivityRecord.objects.create_for_comment(instance.content_object.video,
                                           instance,
                                           instance.content_object.language_code)
+
+@receiver(post_save, sender=SubtitleVersion)
+def on_subtitle_version_save(instance, created, **kwargs):
+    if created:
+        ActivityRecord.objects.create_for_subtitle_version(instance)
 
 @receiver(post_save, sender=TeamVideo)
 def on_team_video_save(instance, created, **kwargs):

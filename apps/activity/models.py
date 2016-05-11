@@ -300,6 +300,12 @@ class ActivityManager(models.Manager):
             created=comment.submit_date, related_obj_id=comment.id,
             language_code=language_code)
 
+    def create_for_subtitle_version(self, version):
+        return self.create_for_video(
+            'version-added', version.video,
+            language_code=version.language_code, user=version.author,
+            created=version.created)
+
     def move_video_records_to_team(self, video, team):
         for record in self.filter(video=video, copied_from=None):
             record.move_to_team(team)
