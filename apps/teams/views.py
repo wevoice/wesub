@@ -1256,11 +1256,9 @@ def leave_team(request, slug):
         member = TeamMember.objects.get(team=team, user=user)
         tm_user_pk = member.user.pk
         team_pk = member.team.pk
-        member.delete()
+        member.leave_team()
         [application.on_member_leave(request.user, "web UI") for application in \
          member.team.applications.filter(status=Application.STATUS_APPROVED)]
-
-        notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))
     return redirect(request.META.get('HTTP_REFERER') or team)

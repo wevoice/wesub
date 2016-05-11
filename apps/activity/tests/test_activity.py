@@ -21,8 +21,11 @@ from django.test import TestCase
 from activity.models import ActivityRecord
 from comments.models import Comment
 from subtitles import pipeline
+from teams.permissions_const import *
+from utils import dates
 from utils.factories import *
 from utils.test_utils import *
+import teams.signals
 import videos.signals
 
 def clear_activity():
@@ -107,6 +110,30 @@ class ActivityCreationTest(TestCase):
                                             new_video=True)
         assert_false(
             ActivityRecord.objects.filter(type='video-url-added').exists())
+
+    def test_member_joined(self):
+        member = TeamMemberFactory(role=ROLE_MANAGER)
+        record = ActivityRecord.objects.get(type='member-joined')
+        assert_equal(record.user, member.user)
+        assert_equal(record.video, None)
+        assert_equal(record.team, member.team)
+        assert_equal(record.language_code, '')
+        assert_equal(record.created, member.created)
+        assert_equal(record.get_related_obj(), ROLE_MANAGER)
+        # After deleting the team member, get_related_obj() should still work
+        member.delete()
+        assert_equal(reload_obj(record).get_related_obj(), ROLE_MANAGER)
+
+    def test_member_left(self):
+        member = TeamMemberFactory()
+        now = dates.now.current
+        teams.signals.member_leave.send(sender=member)
+        record = ActivityRecord.objects.get(type='member-left')
+        assert_equal(record.user, member.user)
+        assert_equal(record.video, None)
+        assert_equal(record.team, member.team)
+        assert_equal(record.language_code, '')
+        assert_equal(record.created, now)
 
 class ActivityVideoLanguageTest(TestCase):
     def test_initial_video_language(self):

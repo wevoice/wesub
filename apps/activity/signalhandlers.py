@@ -22,9 +22,9 @@ from django.db.models.signals import post_save, pre_delete
 from activity.models import ActivityRecord
 from comments.models import Comment
 from subtitles.models import SubtitleLanguage, SubtitleVersion
-from teams.models import TeamVideo
-from teams.signals import video_moved_from_team_to_team
+from teams.models import TeamVideo, TeamMember
 from videos.models import Video
+import teams.signals
 import videos.signals
 
 @receiver(videos.signals.video_added)
@@ -68,6 +68,15 @@ def on_team_video_save(instance, created, **kwargs):
 def on_team_video_delete(instance, **kwargs):
     ActivityRecord.objects.move_video_records_to_team(instance.video, None)
 
-@receiver(video_moved_from_team_to_team)
+@receiver(post_save, sender=TeamMember)
+def on_team_member_save(instance, created, **kwargs):
+    if created:
+        ActivityRecord.objects.create_for_new_member(instance)
+
+@receiver(teams.signals.member_leave)
+def on_team_member_deleted(sender, **kwargs):
+    ActivityRecord.objects.create_for_member_deleted(sender)
+
+@receiver(teams.signals.video_moved_from_team_to_team)
 def on_video_moved_from_team_to_team(destination_team, video, **kwargs):
     ActivityRecord.objects.move_video_records_to_team(video, destination_team)

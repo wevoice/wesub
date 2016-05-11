@@ -174,15 +174,6 @@ class MessageTest(TestCase):
         self.assertEqual(contributor_messge_count_1 , contributor_messge_count_2)
         self.assertEqual(contributor_email_count_1 , contributor_email_count_2)
 
-
-        # now, this has to show up on everybody activitis fed
-        action = Action.objects.get(team=team, user=tm.user, action_type=Action.MEMBER_JOINED)
-        self.assertTrue(Action.objects.for_user(tm.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(owner.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(manager.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(contributor.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(admin.user).filter(pk=action.pk).exists())
-
     def test_member_leave(self):
         return # fix me now
         def _get_counts(member):

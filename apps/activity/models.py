@@ -58,6 +58,13 @@ class ActivityType(Code):
     def format_message(self, record, msg, **data):
         return msg % ActivityMessageDict(record, data)
 
+    def get_related_obj(self, related_obj_id):
+        ModelClass = self.related_model
+        if ModelClass is None or related_obj_id is None:
+            return None
+        else:
+            return ModelClass.objects.get(id=related_obj_id)
+
 class ActivityMessageDict(object):
     """Helper class to format our messages.
 
@@ -338,6 +345,16 @@ class ActivityManager(models.Manager):
                                      language_code=version.language_code,
                                      created=dates.now())
 
+    def create_for_new_member(self, member):
+        role_code = MemberJoined.role_to_code[member.role]
+        return self.create('member-joined', team=member.team,
+                           user=member.user, created=member.created,
+                           related_obj_id=role_code)
+
+    def create_for_member_deleted(self, member):
+        return self.create('member-left', team=member.team,
+                           user=member.user, created=dates.now())
+
     def move_video_records_to_team(self, video, team):
         for record in self.filter(video=video, copied_from=None):
             record.move_to_team(team)
@@ -450,12 +467,6 @@ class ActivityRecord(models.Model):
 
     def get_related_obj(self):
         if not hasattr(self, '_related_obj_cache'):
-            self._related_obj_cache = self._get_related_obj()
+            self._related_obj_cache = self.type_obj.get_related_obj(
+                self.related_obj_id)
         return self._related_obj_cache
-
-    def _get_related_obj(self):
-        ModelClass = self.type_obj.related_model
-        if ModelClass is None or self.related_obj_id is None:
-            return None
-        else:
-            return ModelClass.objects.get(id=self.related_obj_id)

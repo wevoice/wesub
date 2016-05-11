@@ -233,12 +233,10 @@ def team_member_new(member_pk):
     member = TeamMember.objects.get(pk=member_pk)
     if not team_sends_notification(member.team,'block_team_member_new_message'):
         return False
-    from videos.models import Action
     from teams.models import TeamMember
     # the feed item should appear on the timeline for all team members
     # as a team might have thousands of members, this one item has
     # to show up on all of them
-    Action.create_new_member_handler(member)
     # notify  admins and owners through messages
     notifiable = TeamMember.objects.filter(team=member.team, user__is_active=True,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER]).exclude(pk=member.pk)
@@ -314,11 +312,9 @@ def team_member_leave(team_pk, user_pk):
     team = Team.objects.get(pk=team_pk)
     if not team_sends_notification(team,'block_team_member_leave_message') or not user.is_active:
         return False
-    from videos.models import Action
     # the feed item should appear on the timeline for all team members
     # as a team might have thousands of members, this one item has
     # to show up on all of them
-    Action.create_member_left_handler(team, user)
     # notify  admins and owners through messages
     notifiable = TeamMember.objects.filter(team=team, user__is_active=True,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
