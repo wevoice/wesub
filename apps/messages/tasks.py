@@ -20,7 +20,7 @@ Centralizes notification sending throught the website.
 Currently we support:
     - email messages
     - site inbox (messages.models.Message)
-    - activity feed (videos.models.Action)
+    - activity feed (activity.models.ActivityRecord)
 
 Messages models will trigger an email to be sent if
 the user has allowed email notifications
@@ -448,7 +448,7 @@ def team_task_assigned(task_pk):
 
 def _reviewed_notification(task_pk, status):
     from teams.models import Task
-    from videos.models import Action
+    from activity.models import ActivityRecord
     from messages.models import Message
     try:
         task = Task.objects.select_related(
@@ -528,13 +528,15 @@ def _reviewed_notification(task_pk, status):
 
     if status == REVIEWED_AND_SENT_BACK:
         if task.type == Task.TYPE_IDS['Review']:
-            Action.create_declined_video_handler(version, reviewer)
+            ActivityRecord.objects.create_for_version_declined(version,
+                                                               reviewer)
         else:
-            Action.create_rejected_video_handler(version, reviewer)
+            ActivityRecord.objects.create_for_version_rejected(version,
+                                                               reviewer)
     elif status == REVIEWED_AND_PUBLISHED:
-        Action.create_approved_video_handler(version, reviewer)
+        ActivityRecord.objects.create_for_version_approved(version, reviewer)
     elif status == REVIEWED_AND_PENDING_APPROVAL:
-        Action.create_accepted_video_handler(version, reviewer)
+        ActivityRecord.objects.create_for_version_accepted(version, reviewer)
 
     return msg, email_res
 
@@ -557,7 +559,7 @@ def approved_notification(task_pk, published=False):
     approved and published
     """
     from teams.models import Task
-    from videos.models import Action
+    from activity.models import ActivityRecord
     from messages.models import Message
     from teams.models import TeamNotificationSetting
     try:
@@ -629,14 +631,14 @@ def approved_notification(task_pk, published=False):
 
     template_name = template_html
     email_res =  send_templated_email(user, subject, template_name, context)
-    Action.create_approved_video_handler(version, reviewer)
+    ActivityRecord.objects.create_for_version_approved(version, reviewer)
     return msg, email_res
 
 @task
 def send_reject_notification(task_pk, sent_back):
     raise NotImplementedError()
     from teams.models import Task
-    from videos.models import Action
+    from activity.models import ActivityRecord
     from messages.models import Message
     try:
         task = Task.objects.select_related(
@@ -691,7 +693,7 @@ def send_reject_notification(task_pk, sent_back):
 
     template_name = "messages/email/team-task-rejected.html"
     email_res =  send_templated_email(user, subject, template_name, context)
-    Action.create_rejected_video_handler(version, reviewer)
+    ActivityRecord.objects.create_for_version_rejected(version, reviewer)
     return msg, email_res
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)

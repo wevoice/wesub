@@ -314,6 +314,30 @@ class ActivityManager(models.Manager):
                                          created=video_url.created,
                                          related_obj_id=url_edit.id)
 
+    def create_for_version_approved(self, version, user):
+        return self.create_for_video('version-approved', version.video,
+                                     user=user,
+                                     language_code=version.language_code,
+                                     created=dates.now())
+
+    def create_for_version_accepted(self, version, user):
+        return self.create_for_video('version-accepted', version.video,
+                                     user=user,
+                                     language_code=version.language_code,
+                                     created=dates.now())
+
+    def create_for_version_rejected(self, version, user):
+        return self.create_for_video('version-rejected', version.video,
+                                     user=user,
+                                     language_code=version.language_code,
+                                     created=dates.now())
+
+    def create_for_version_declined(self, version, user):
+        return self.create_for_video('version-declined', version.video,
+                                     user=user,
+                                     language_code=version.language_code,
+                                     created=dates.now())
+
     def move_video_records_to_team(self, video, team):
         for record in self.filter(video=video, copied_from=None):
             record.move_to_team(team)
