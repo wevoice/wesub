@@ -24,4 +24,4 @@ duration_changed = dispatch.Signal(providing_args=['old_duration'])
 language_changed = dispatch.Signal(
     providing_args=['old_primary_audio_language_code'])
 video_added = dispatch.Signal(providing_args=['video_url'])
-video_url_added = dispatch.Signal(providing_args=['video'])
+video_url_added = dispatch.Signal(providing_args=['video', 'new_video'])

@@ -81,6 +81,33 @@ class ActivityCreationTest(TestCase):
         assert_equal(record.created, version.created)
         self.check_save_doesnt_create_new_record(version)
 
+    def test_video_url_added(self):
+        video = VideoFactory()
+        video_url = VideoURLFactory(video=video)
+        clear_activity()
+        videos.signals.video_url_added.send(sender=video_url, video=video,
+                                            new_video=False)
+        record = ActivityRecord.objects.get(type='video-url-added')
+        assert_equal(record.user, video_url.added_by)
+        assert_equal(record.video, video)
+        assert_equal(record.language_code, '')
+        assert_equal(record.created, video_url.created)
+        # We don't currently use it, but we store the new URL in the related
+        # object
+        url_edit = record.get_related_obj()
+        assert_equal(url_edit.new_url, video_url.url)
+
+    def test_video_url_added_with_new_video(self):
+        # In this case, we shouldn't create an video-url-added record, since
+        # we already created the video-added record
+        video = VideoFactory()
+        video_url = VideoURLFactory(video=video)
+        clear_activity()
+        videos.signals.video_url_added.send(sender=video_url, video=video,
+                                            new_video=True)
+        assert_false(
+            ActivityRecord.objects.filter(type='video-url-added').exists())
+
 class ActivityVideoLanguageTest(TestCase):
     def test_initial_video_language(self):
         video = VideoFactory(primary_audio_language_code='en')

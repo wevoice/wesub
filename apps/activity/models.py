@@ -306,6 +306,14 @@ class ActivityManager(models.Manager):
             language_code=version.language_code, user=version.author,
             created=version.created)
 
+    def create_for_video_url_added(self, video_url):
+        with transaction.commit_on_success():
+            url_edit = URLEdit.objects.create(new_url=video_url.url)
+            return self.create_for_video('video-url-added', video_url.video,
+                                         user=video_url.added_by,
+                                         created=video_url.created,
+                                         related_obj_id=url_edit.id)
+
     def move_video_records_to_team(self, video, team):
         for record in self.filter(video=video, copied_from=None):
             record.move_to_team(team)

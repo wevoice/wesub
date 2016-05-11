@@ -708,7 +708,8 @@ class Video(models.Model):
         video_cache.invalidate_cache(video.video_id)
         video.cache.invalidate()
         signals.video_added.send(sender=video, video_url=video_url)
-        signals.video_url_added.send(sender=video_url, video=video)
+        signals.video_url_added.send(sender=video_url, video=video,
+                                     new_video=True)
 
         return (video, video_url)
 
@@ -728,10 +729,10 @@ class Video(models.Model):
         """
         vt, video_url = self._add_video_url(url, user, False)
 
-        Action.create_video_url_handler(self, video_url)
         video_cache.invalidate_cache(self.video_id)
         self.cache.invalidate()
-        signals.video_url_added.send(sender=video_url, video=self)
+        signals.video_url_added.send(sender=video_url, video=self,
+                                     new_video=False)
 
         return video_url
 

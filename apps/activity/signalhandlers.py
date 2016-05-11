@@ -36,6 +36,11 @@ def on_language_changed(sender, **wargs):
     ActivityRecord.objects.filter(video=sender).update(
         video_language_code=sender.primary_audio_language_code)
 
+@receiver(videos.signals.video_url_added)
+def on_video_url_added(sender, new_video, **kwargs):
+    if not new_video:
+        ActivityRecord.objects.create_for_video_url_added(sender)
+
 @receiver(post_save, sender=Comment)
 def on_comment_save(instance, created, **kwargs):
     if not created:

@@ -580,7 +580,7 @@ class AddVideoTest(TestCase):
         assert_equal(on_video_url_added.call_count, 1)
         assert_equal(on_video_url_added.call_args,
                      mock.call(signal=signals.video_url_added,
-                               sender=video_url, video=video))
+                               sender=video_url, video=video, new_video=True))
 
 class AddVideoTestWithTransactions(TransactionTestCase):
     # These tests is split off from the others because it needs to be inside a
@@ -661,7 +661,7 @@ class AddVideoUrlTest(TestCase):
         assert_equal(on_video_url_added.call_count, 1)
         assert_equal(on_video_url_added.call_args, mock.call(
             signal=signals.video_url_added, sender=video_url,
-            video=self.video))
+            video=self.video, new_video=False))
 
     def test_create_add_video_url_action(self):
         video_url = self.video.add_url(MockVideoType(self.new_url), self.user)
