@@ -704,28 +704,6 @@ class Team(models.Model):
             qs = qs.order_by(sort)
         return qs
 
-    def unassigned_tasks_for_approval(self, sort=None):
-        qs = Task.objects.filter(team=self, deleted=False, completed=None, assignee=None, type=Task.TYPE_IDS['Approve'])
-
-        # Use prefetch_related to fetch the video for each task.  This dramically
-        # reduces the number of queries in order to print out the video title.
-        # prefetch_related() is better than select_related() in this case because
-        # if multiple tasks are for the same Video object, prefetch_related() will
-        # only create 1 object while select_related() will create 1 per task.
-        # Re-using the same object means better caching.
-        qs = qs.filter(new_subtitle_version__subtitle_language__subtitles_complete=True)
-        for f in self.settings.features():
-            logger.error(f.key_name)
-            if f.key_name == "enable_require_translated_metadata":
-                # Title and description are required
-                qs = qs.exclude(new_subtitle_version__title="")
-                qs = qs.exclude(new_subtitle_version__description="")
-                break
-        qs = qs.prefetch_related('team_video__video', 'team_video__project')
-        if sort is not None:
-            qs = qs.order_by(sort)
-        return qs
-
     def get_task(self, task_pk):
         return Task.objects.get(pk=task_pk)
 
