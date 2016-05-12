@@ -21,8 +21,9 @@ from django.db.models.signals import post_save, post_delete, m2m_changed
 
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from videos.models import Video, VideoUrl, Action
+from videos import signals
+from videos import tasks
 
-@receiver(post_save, sender=VideoUrl)
 @receiver(post_save, sender=SubtitleLanguage)
 @receiver(post_save, sender=SubtitleVersion)
 @receiver(post_save, sender=Action)
@@ -44,3 +45,7 @@ def on_video_followers_changed(instance, reverse, **kwargs):
     else:
         for video in instance.followed_videos.all():
             video.cache.invalidate()
+
+@receiver(signals.video_added)
+def on_video_added(sender, video_url, **kwargs):
+    tasks.save_thumbnail_in_s3.delay(sender.pk)

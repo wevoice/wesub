@@ -198,12 +198,7 @@ def create(request):
         'initial_url': request.GET.get('initial_url'),
     }
     if video_form.is_valid():
-        try:
-            video = video_form.save()
-        except (VidscraperError, RequestError):
-            context['vidscraper_error'] = True
-            return render_to_response('videos/create.html', context,
-                          context_instance=RequestContext(request))
+        video = video_form.video
         messages.info(request, message=_(u'''Here is the subtitle workspace for your video.
         You can share the video with friends, or get an embed code for your site. To start
         new subtitles, click \"Add a new language!\" in the sidebar.'''))

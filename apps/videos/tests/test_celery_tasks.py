@@ -72,15 +72,19 @@ class SendChangeTitleTaskTest(TestCase):
 
 class TestVideoChangedEmailNotification(TestCase):
     def setUp(self):
-        self.user_1 = User.objects.create(username='user_1')
-        self.user_2 = User.objects.create(username='user_2')
+        self.user_1 = User.objects.create(username='user_1',
+                                          notify_by_email=False)
+        self.user_2 = User.objects.create(username='user_2',
+                                          notify_by_email=False)
 
-        self.video = video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
-        video.primary_audio_language_code = 'en'
-        video.user = self.user_1
-        video.save()
+        def setup_video(video, video_url):
+            video.primary_audio_language_code = 'en'
+
+        self.video = video = Video.add("http://www.example.com/video.mp4",
+                                       self.user_1)[0]
         mail.outbox = []
-        self.original_language = SubtitleLanguage.objects.create(video=video, language_code='en')
+        self.original_language = SubtitleLanguage.objects.create(
+            video=video, language_code='en')
         subs = SubtitleSet.from_list('en',[
             (1000, 2000, "1"),
             (2000, 3000, "2"),
@@ -137,7 +141,8 @@ class TestVideoChangedEmailNotification(TestCase):
         user2.valid_email = True
         user2.save()
         # version is indentical to previous one
-        video = Video.get_or_create_for_url("http://wwww.example.com/video-diff.mp4")[0]
+        video, video_url = Video.add(
+            "http://wwww.example.com/video-diff.mp4", None)
         video.followers.add(author)
         video.followers.add(user2)
 

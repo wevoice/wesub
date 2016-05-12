@@ -132,16 +132,6 @@ class TestViews(WebUseTest):
         self.assertEqual(response['Location'], 'http://testserver' +
                                                video.get_absolute_url())
 
-        len_before = Video.objects.count()
-        data = {
-            'video_url': 'http://www.youtube.com/watch?v=osexbB_hX4g'
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len_before, Video.objects.count())
-        self.assertEqual(response['Location'], 'http://testserver' +
-                                               video.get_absolute_url())
-
     def test_video_url_create(self):
         self._login()
         v = VideoFactory()

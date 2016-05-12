@@ -47,9 +47,12 @@ DATABASES = {
         'USER': "amara",
         'PASSWORD': "amara",
         'HOST': 'db',
-        'PORT': 3306
-        }
+        'PORT': 3306,
+        'OPTIONS': {
+            'init_command': 'SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED',
+        },
     }
+}
 
 CACHES = {
     'default': {
