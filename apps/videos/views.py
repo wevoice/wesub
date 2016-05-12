@@ -80,7 +80,8 @@ from utils.decorators import never_in_prod
 from utils.objectlist import object_list
 from utils.rpc import RpcRouter
 from utils.text import fmt
-from utils.translation import get_user_languages_from_request
+from utils.translation import (get_user_languages_from_request,
+                               get_language_label)
 
 from teams.permissions import can_edit_video, can_add_version, can_resync
 from . import video_size
@@ -110,7 +111,7 @@ class LanguageList(object):
             if public_tip is None or public_tip.subtitle_count == 0:
                 # no versions in this language yet
                 continue
-            language_name = lang.get_language_code_display()
+            language_name = get_language_label(lang.language_code)
             status = self._calc_status(lang)
             tags = self._calc_tags(lang)
             url = lang.get_absolute_url()

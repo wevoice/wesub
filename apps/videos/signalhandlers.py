@@ -28,6 +28,8 @@ from videos import tasks
 @receiver(post_save, sender=SubtitleVersion)
 @receiver(post_save, sender=Action)
 @receiver(post_delete, sender=VideoUrl)
+@receiver(post_delete, sender=SubtitleLanguage)
+@receiver(post_delete, sender=SubtitleVersion)
 def on_video_related_change(sender, instance, **kwargs):
     if instance.video_id is not None:
         Video.cache.invalidate_by_pk(instance.video_id)
