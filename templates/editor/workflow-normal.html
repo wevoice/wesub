@@ -31,7 +31,7 @@
         <a class="edit-metadata" href="#" ng-click="onEditTitleClicked($event)">{% trans "Edit title and description." %}</a>
         </p>
 	{% include "editor/workflow-errors-review.html" %}
-        <button ng-repeat="action in actions" ng-class="action.class;{disabled:!action.canPerform()}" ng-click="action.canPerform() && action.perform()"
+        <button ng-repeat="action in actions" ng-class="{'disabled':!action.canPerform()}" class="[[ action.class ]]" ng-click="action.canPerform() && action.perform()"
 	 title="[[ action.tooltip() ]]">
             [[ action.label ]]
         </button>

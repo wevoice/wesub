@@ -8,7 +8,7 @@
     </p>
     {% include "editor/workflow-errors-review.html" %}
     <div class="actions">
-        <button ng-repeat="action in actions" ng-disabled="!action.canPerform()" ng-class="action.class;{disabled:!action.canPerform()}" ng-click="action.perform()" title="[[ action.tooltip() ]]">
+        <button ng-repeat="action in actions" ng-disabled="!action.canPerform()" ng-class="{disabled: !action.canPerform()}" class="[[ action.class ]]" ng-click="action.perform()" title="[[ action.tooltip() ]]">
             [[ action.label ]]
         </button>
     </div>
