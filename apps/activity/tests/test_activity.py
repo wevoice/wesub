@@ -135,6 +135,61 @@ class ActivityCreationTest(TestCase):
         assert_equal(record.language_code, '')
         assert_equal(record.created, now)
 
+    def test_video_deleted(self):
+        title = 'test-title'
+        url = 'http://example.com/test.mp4'
+        video = VideoFactory(title=title, video_url__url=url)
+        user = UserFactory()
+        now = dates.now.current
+        videos.signals.video_deleted.send(sender=video, user=user)
+        record = ActivityRecord.objects.get(type='video-deleted')
+        assert_equal(record.user, user)
+        # video should be none since the video is going to be deleted, so
+        # having a foreign key pointing to it is no good
+        assert_equal(record.video, None)
+        assert_equal(record.language_code, '')
+        assert_equal(record.created, now)
+        video_deletion = record.get_related_obj()
+        assert_equal(video_deletion.title, title)
+        assert_equal(video_deletion.url, url)
+
+    def test_make_url_primary(self):
+        url1 = 'http://example.com/test1.mp4'
+        url2 = 'http://example.com/test2.mp4'
+        video = VideoFactory(video_url__url=url1)
+        video_url = video.get_primary_videourl_obj()
+        video_url2 = VideoURLFactory(video=video, url=url2)
+        user = UserFactory()
+        now = dates.now.current
+        videos.signals.video_url_made_primary.send(
+            sender=video_url2, old_url=video_url, user=user)
+        record = ActivityRecord.objects.get(type='video-url-edited')
+        assert_equal(record.user, user)
+        assert_equal(record.video, video)
+        assert_equal(record.language_code, '')
+        assert_equal(record.created, now)
+        url_edit = record.get_related_obj()
+        assert_equal(url_edit.old_url, url1)
+        assert_equal(url_edit.new_url, url2)
+
+    def test_make_url_delete(self):
+        url1 = 'http://example.com/test1.mp4'
+        url2 = 'http://example.com/test2.mp4'
+        video = VideoFactory(video_url__url=url1)
+        video_url = video.get_primary_videourl_obj()
+        video_url2 = VideoURLFactory(video=video, url=url2)
+        user = UserFactory()
+        now = dates.now.current
+        videos.signals.video_url_deleted.send(sender=video_url2, user=user)
+        record = ActivityRecord.objects.get(type='video-url-deleted')
+        assert_equal(record.user, user)
+        assert_equal(record.video, video)
+        assert_equal(record.language_code, '')
+        assert_equal(record.created, now)
+        url_edit = record.get_related_obj()
+        assert_equal(url_edit.old_url, url2)
+        assert_equal(url_edit.new_url, '')
+
 class ActivityVideoLanguageTest(TestCase):
     def test_initial_video_language(self):
         video = VideoFactory(primary_audio_language_code='en')

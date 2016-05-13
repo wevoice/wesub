@@ -423,6 +423,10 @@ class Video(models.Model):
         super(Video, self).save(*args, **kwargs)
         self.monitor.on_save(self, created)
 
+    def delete(self, user=None):
+        signals.video_deleted.send(sender=self, user=user)
+        super(Video, self).delete()
+
     def update_search_index(self):
         """Update this video's search index text."""
 
@@ -2115,23 +2119,15 @@ class VideoUrl(models.Model):
 
     def make_primary(self, user=None):
         # create activity item
-        obj = Action(video=self.video)
-        urls = VideoUrl.objects.filter(video=self.video)
-        obj.action_type = Action.EDIT_URL
-        data = {
-            'old_url': urls.filter(primary=True)[0].url,
-            'new_url': self.url,
-        }
-        obj.new_video_title = json.dumps(data)
-        obj.created = datetime.now()
-        obj.user = user
-        obj.save()
+        old_url = self.video.get_primary_videourl_obj()
         # reset existing urls to non-primary
         VideoUrl.objects.filter(video=self.video).exclude(pk=self.pk).update(
             primary=False)
         # set this one to primary
         self.primary = True
         self.save(updates_timestamp=False)
+        signals.video_url_made_primary.send(sender=self, old_url=old_url,
+                                            user=user)
 
     def remove(self, user):
         """Remove this URL from our video.
@@ -2150,11 +2146,7 @@ class VideoUrl(models.Model):
             msg = ugettext("Can't remove the primary video URL")
             raise IntegrityError(msg)
 
-        action = Action(video=self.video, action_type=Action.DELETE_URL)
-        action.new_video_title = self.url
-        action.created = datetime.now()
-        action.user = user
-        action.save()
+        signals.video_url_deleted.send(sender=self, user=user)
         self.delete()
 
     def fix_owner_username(self):

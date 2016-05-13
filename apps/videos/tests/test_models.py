@@ -29,7 +29,7 @@ from auth.models import CustomUser as User
 from subtitles import pipeline
 from subtitles.models import SubtitleLanguage
 from videos import signals
-from videos.models import Action, Video, VideoUrl, VideoTypeUrlPattern
+from videos.models import Video, VideoUrl, VideoTypeUrlPattern
 from videos.tasks import video_changed_tasks
 from videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version, make_rollback_to
@@ -53,13 +53,6 @@ class TestVideoUrl(TestCase):
     def test_remove(self):
         self.url.remove(self.user)
         assert_equal(self.video.videourl_set.count(), 1)
-
-    def test_remove_creates_action(self):
-        self.url.remove(self.user)
-        action = self.video.action_set.get(action_type=Action.DELETE_URL)
-        assert_equal(action.user, self.user)
-        # we use new_video_title to store the removed uRL
-        assert_equal(action.new_video_title, self.url.url)
 
     def test_remove_primary(self):
         with assert_raises(IntegrityError):
@@ -548,13 +541,6 @@ class AddVideoTest(TestCase):
                                      setup_callback)
         assert_equal(video.title, 'test title')
 
-    def test_create_add_video_url_action_not_created(self):
-        # We don't want to create an ADD_VIDEO_URL action, since it's
-        # redundant with the ADD_VIDEO action
-        video, video_url = Video.add(MockVideoType(self.url), self.user)
-        assert_false(Action.objects.filter(action_type=Action.ADD_VIDEO_URL,
-                                           video=video).exists())
-
     def test_notify_by_message(self):
         self.user.notify_by_message = True
         video, video_url = Video.add(MockVideoType(self.url), self.user)
@@ -662,10 +648,3 @@ class AddVideoUrlTest(TestCase):
         assert_equal(on_video_url_added.call_args, mock.call(
             signal=signals.video_url_added, sender=video_url,
             video=self.video, new_video=False))
-
-    def test_create_add_video_url_action(self):
-        video_url = self.video.add_url(MockVideoType(self.new_url), self.user)
-        assert_true(Action.objects.filter(action_type=Action.ADD_VIDEO_URL,
-                                          video=self.video,
-                                          user=self.user,
-                                          created=video_url.created).exists())

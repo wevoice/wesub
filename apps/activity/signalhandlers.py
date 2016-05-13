@@ -41,6 +41,19 @@ def on_video_url_added(sender, new_video, **kwargs):
     if not new_video:
         ActivityRecord.objects.create_for_video_url_added(sender)
 
+@receiver(videos.signals.video_deleted)
+def on_video_deleted(sender, user, **kwargs):
+    ActivityRecord.objects.create_for_video_deleted(sender, user)
+
+@receiver(videos.signals.video_url_made_primary)
+def on_video_url_made_primary(sender, old_url, user, **kwargs):
+    ActivityRecord.objects.create_for_video_url_made_primary(sender, old_url,
+                                                             user)
+
+@receiver(videos.signals.video_url_deleted)
+def on_video_url_deleted(sender, user, **kwargs):
+    ActivityRecord.objects.create_for_video_url_deleted(sender, user)
+
 @receiver(post_save, sender=Comment)
 def on_comment_save(instance, created, **kwargs):
     if not created:

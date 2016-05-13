@@ -355,6 +355,31 @@ class ActivityManager(models.Manager):
         return self.create('member-left', team=member.team,
                            user=member.user, created=dates.now())
 
+    def create_for_video_deleted(self, video, user):
+        with transaction.commit_on_success():
+            url = video.get_video_url()
+            video_deletion = VideoDeletion.objects.create(
+                title=video.title_display(),
+                url=url if url is not None else '')
+            return self.create('video-deleted', user=user,
+                               created=dates.now(),
+                               related_obj_id=video_deletion.id)
+
+    def create_for_video_url_made_primary(self, video_url, old_url, user):
+        with transaction.commit_on_success():
+            url_edit = URLEdit.objects.create(old_url=old_url.url,
+                                              new_url=video_url.url)
+            return self.create_for_video('video-url-edited', video_url.video,
+                                         user=user, created=dates.now(),
+                                         related_obj_id=url_edit.id)
+
+    def create_for_video_url_deleted(self, video_url, user):
+        with transaction.commit_on_success():
+            url_edit = URLEdit.objects.create(old_url=video_url.url)
+            return self.create_for_video('video-url-deleted', video_url.video,
+                                         user=user, created=dates.now(),
+                                         related_obj_id=url_edit.id)
+
     def move_video_records_to_team(self, video, team):
         for record in self.filter(video=video, copied_from=None):
             record.move_to_team(team)
