@@ -45,7 +45,7 @@ class TestVideoForm(TestCase):
         for url in urls:
             form = VideoForm(data={"video_url":url})
             self.assertTrue(form.is_valid(), msg=form.errors.as_text())
-            video = form.save()
+            video = form.video
             video_type = video_type_registrar.video_type_for_url(url)
             # double check we never confuse video_id with video.id with videoid, sigh
             model_url = video.get_video_url()

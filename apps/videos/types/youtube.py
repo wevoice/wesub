@@ -75,7 +75,7 @@ class YoutubeVideoType(VideoType):
             self._video_info = google.get_video_info(self.video_id)
         return self._video_info
 
-    def set_values(self, video, fetch_subs_async=True):
+    def set_values(self, video):
         try:
             video_info = self.get_video_info()
         except google.APIError:

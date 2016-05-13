@@ -54,6 +54,16 @@ class YouTubeTestCase(TestCase):
             user_info = google.get_youtube_user_info('test-access-token')
         self.assertEqual(user_info, ('test-channel-id', 'test-username'))
 
+    def make_video_snippet(self, video_id):
+        return {
+            'snippet': {
+                'resourceId': {
+                    'kind': u'youtube#video',
+                    'videoId': video_id,
+                }
+            }
+        }
+
     def test_get_uploaded_video_ids(self):
         mocker = test_utils.RequestsMocker()
         mocker.expect_request(
@@ -76,26 +86,13 @@ class YouTubeTestCase(TestCase):
         mocker.expect_request(
             'get', 'https://www.googleapis.com/youtube/v3/playlistItems', params={
                 'part': 'snippet',
+                'maxResults': 50,
                 'playlistId': 'test-playlist-id',
                 'key': 'test-youtube-api-key',
             }, body=json.dumps({
                 'items': [
-                    {
-                        'snippet': {
-                            'resourceId': {
-                                'kind': u'youtube#video',
-                                'videoId': 'test-video-id1',
-                            }
-                        }
-                    },
-                    {
-                        'snippet': {
-                            'resourceId': {
-                                'kind': u'youtube#video',
-                                'videoId': 'test-video-id2',
-                            }
-                        }
-                    },
+                    self.make_video_snippet('test-video-id1'),
+                    self.make_video_snippet('test-video-id2'),
                     {
                         'snippet': {
                             'resourceId': {
@@ -110,6 +107,59 @@ class YouTubeTestCase(TestCase):
         with mocker:
             video_ids = google.get_uploaded_video_ids('test-channel-id')
         assert_equal(video_ids, [ 'test-video-id1', 'test-video-id2' ])
+
+    def test_get_uploaded_video_ids_multiple_pages(self):
+        mocker = test_utils.RequestsMocker()
+        mocker.expect_request(
+            'get', 'https://www.googleapis.com/youtube/v3/channels', params={
+                'part': 'contentDetails',
+                'id': 'test-channel-id',
+                'key': 'test-youtube-api-key',
+            }, body=json.dumps({
+                'items': [
+                    {
+                        'contentDetails': {
+                            'relatedPlaylists': {
+                                'uploads': 'test-playlist-id',
+                            },
+                        },
+                    },
+                ]
+            })
+        )
+        mocker.expect_request(
+            'get', 'https://www.googleapis.com/youtube/v3/playlistItems', params={
+                'part': 'snippet',
+                'maxResults': 50,
+                'playlistId': 'test-playlist-id',
+                'key': 'test-youtube-api-key',
+            }, body=json.dumps({
+                'items': [
+                    self.make_video_snippet('test-video-id{}'.format(i))
+                    for i in range(50)
+                ],
+                'nextPageToken': 'test-page-token',
+            })
+        )
+        mocker.expect_request(
+            'get', 'https://www.googleapis.com/youtube/v3/playlistItems', params={
+                'part': 'snippet',
+                'maxResults': 50,
+                'playlistId': 'test-playlist-id',
+                'key': 'test-youtube-api-key',
+                'pageToken': 'test-page-token',
+            }, body=json.dumps({
+                'items': [
+                    self.make_video_snippet('test-video-id{}'.format(i))
+                    for i in range(50, 75)
+                ],
+            })
+        )
+        google.get_uploaded_video_ids.run_original_for_test()
+        with mocker:
+            video_ids = google.get_uploaded_video_ids('test-channel-id')
+        assert_equal(video_ids,
+                     [ 'test-video-id{}'.format(i) for i in range(75)])
 
     def test_get_video_info(self):
         mocker = test_utils.RequestsMocker()

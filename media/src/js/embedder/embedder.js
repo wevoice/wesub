@@ -201,7 +201,7 @@
             initialize: function() {
 
                 var video = this;
-                var apiURL = '//' + _amaraConf.baseURL + '/api/videos/?video_url=';
+                var apiURL = '/api/videos/?video_url=';
                 this.subtitles = new that.Subtitles();
                 // Make a call to the Amara API to get attributes like available languages,
                 // internal ID, description, etc.

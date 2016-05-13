@@ -96,10 +96,12 @@ class TestCaseActivity(WebdriverTestCase):
                                cls.team_member, cls.ted_project)
 
 
-        cls.speaker_video, _ = Video.get_or_create_for_url(
-                            'http://unisubs.example.com/video1806.mp4')
-        cls.nospeaker_video, _ = Video.get_or_create_for_url(
-                            'http://unisubs.example.com/video1801.mp4')
+        cls.speaker_video, _ = Video.add(
+            'http://unisubs.example.com/video1806.mp4',
+            self.user
+        cls.nospeaker_video, _ = Video.add(
+            'http://unisubs.example.com/video1801.mp4',
+            self.user)
 
         #Add approved 'en' subs speaker name
         speaker_data =  { 'speaker-name': 'Santa' } 

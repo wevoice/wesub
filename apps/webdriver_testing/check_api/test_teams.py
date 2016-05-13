@@ -377,8 +377,7 @@ class TestCaseTeams(APILiveServerTestCase, WebdriverTestCase):
         self.assertEqual({}, r['metadata'])
 
         #Check database content 
-        video, created = Video.get_or_create_for_url(data['video_url'])
-        self.assertFalse(created) 
+        video = Video.get(videourl__url=data['video_url'])
         self.assertEqual(data['primary_audio_language_code'], video.primary_audio_language_code)
         self.assertEqual(data['title'], video.title)
         self.assertEqual(data['description'], video.description)
