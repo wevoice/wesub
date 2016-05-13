@@ -35,7 +35,7 @@ from subtitles import cache
 from subtitles import shims
 from auth.models import CustomUser as User
 from videos import metadata
-from videos.models import Video, Action
+from videos.models import Video
 from babelsubs.storage import SubtitleSet
 from babelsubs.storage import calc_changes
 from babelsubs.generators.html import HTMLGenerator

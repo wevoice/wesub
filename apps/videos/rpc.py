@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
 from subtitles.models import SubtitleLanguage
-from videos.models import Video, Action
+from videos.models import Video
 from videos.tasks import send_change_title_email
 from utils.multi_query_set import MultiQuerySet
 from utils.rpc import Error, Msg, RpcExceptionEvent, add_request_to_kwargs

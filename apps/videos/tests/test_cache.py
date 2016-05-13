@@ -22,7 +22,6 @@ from caching.tests.utils import assert_invalidates_model_cache
 from subtitles import pipeline
 from subtitles.models import SubtitleLanguage
 from utils.factories import *
-from videos.models import Action
 
 class VideoCacheInvalidationTest(TestCase):
     # test a bunch of actions that should invalidate the video cache
