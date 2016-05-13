@@ -475,20 +475,17 @@ class VideoViewSetTest(TestCase):
         self.viewset.kwargs = {}
 
     def test_listing_with_no_filters(self):
-        # Listing videos without a filter should return 0 videos
-        public_team = TeamFactory()
-        private_team = TeamFactory(is_visible=False)
-        user_team = TeamFactory(is_visible=False, member=self.user)
-
-        v1 = VideoFactory(title='public video')
-        v2 = VideoFactory(title='public team video')
-        v3 = VideoFactory(title='user team video')
-        v4 = VideoFactory(title='private team video')
-        TeamVideoFactory(video=v2, team=public_team)
-        TeamVideoFactory(video=v3, team=user_team)
-        TeamVideoFactory(video=v4, team=private_team)
-
-        assert_items_equal([], self.viewset.get_queryset())
+        # Listing videos without a filter should return the last 20 public videos
+        public_videos = [
+            VideoFactory(title='public', is_public=True)
+            for i in range(30)
+        ]
+        private_videos = [
+            VideoFactory(title='private', is_public=False)
+            for i in range(30)
+        ]
+        assert_equal(list(reversed([v.id for v in public_videos[-20:]])),
+                     [v.id for v in self.viewset.get_queryset()])
 
     @test_utils.patch_for_test('subtitles.workflows.get_workflow')
     def test_get_detail_checks_workflow_permissions(self, mock_get_workflow):
@@ -657,7 +654,7 @@ class VideoURLTestCase(TestCase):
     def test_list_urls(self):
         response = self.client.get(self.list_url)
         assert_equal(response.status_code, status.HTTP_200_OK)
-        assert_items_equal(response.data, [
+        assert_items_equal(response.data['objects'], [
             self.correct_data(self.primary_url),
             self.correct_data(self.other_url)
         ])

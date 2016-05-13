@@ -215,9 +215,9 @@ class VideoSerializer(serializers.Serializer):
 
     def to_internal_value(self, data):
         self.fixup_data(data)
-        data = super(VideoSerializer, self).to_internal_value(data)
-        # we have to wait until now because we can't fetch the project until
-        # we know the team
+        return super(VideoSerializer, self).to_internal_value(data)
+
+    def validate(self, data):
         if data.get('project'):
             if not data.get('team'):
                 self.fail('project-without-team')
@@ -456,7 +456,7 @@ class VideoViewSet(mixins.CreateModelMixin,
     def get_queryset(self):
         query_params = self.request.query_params
         if 'team' not in query_params and 'video_url' not in query_params:
-            return Video.objects.public()[:20]
+            return Video.objects.public().order_by('-id')[:20]
         if 'team' not in query_params:
             qs = self.get_videos_for_user()
         else:

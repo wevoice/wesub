@@ -61,7 +61,19 @@ class UnisubsTestPlugin(Plugin):
     def begin(self):
         before_tests.send(self)
         self.patcher.patch_functions()
+        self.patch_for_rest_framework()
         settings.MEDIA_ROOT = tempfile.mkdtemp(prefix='amara-test-media-root')
+
+    def patch_for_rest_framework(self):
+        # patch some of old django code to be compatible with the rest
+        # framework testing tools
+        # restframeworkcompat is the compat module from django-rest-framework
+        # 3.0.3
+        from utils.test_utils import restframeworkcompat
+        import django.test.client
+        import django.utils.encoding
+        django.test.client.RequestFactory = restframeworkcompat.RequestFactory
+        django.utils.encoding.force_bytes = restframeworkcompat.force_bytes_or_smart_bytes
 
     def finalize(self, result):
         self.patcher.unpatch_functions()

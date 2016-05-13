@@ -50,6 +50,7 @@ class SubtitleLanguageSerializerTest(TestCase):
             'video': self.video,
             'show_private_versions': self.show_private_versions,
             'request': APIRequestFactory().get("/mock-url/"),
+            'allow_extra': False,
         }
         self.serializer = SubtitleLanguageSerializer(
             context=self.serializer_context)
@@ -104,11 +105,17 @@ class SubtitleLanguageSerializerTest(TestCase):
         assert_equal(serializer_data['versions'], [
             {
                 'author': 'user2',
+                'author_uri': reverse('api:users-detail', kwargs={
+                    'username': 'user2',
+                }, request=APIRequestFactory().get("/")),
                 'published': False,
                 'version_no': 2,
             },
             {
                 'author': 'user1',
+                'author_uri': reverse('api:users-detail', kwargs={
+                    'username': 'user1',
+                }, request=APIRequestFactory().get("/")),
                 'published': True,
                 'version_no': 1,
             },
@@ -125,6 +132,9 @@ class SubtitleLanguageSerializerTest(TestCase):
         assert_equal(serializer_data['versions'], [
             {
                 'author': self.user.username,
+                'author_uri': reverse('api:users-detail', kwargs={
+                    'username': self.user.username,
+                }, request=APIRequestFactory().get("/")),
                 'published': True,
                 'version_no': 2,
             },
@@ -296,6 +306,7 @@ class SubtitleLanguageViewset(TestCase):
             ])
 
     def test_serializer_context(self):
+        self.viewset.action = 'retrieve'
         serializer_context = self.viewset.get_serializer_context()
         assert_equal(serializer_context['show_private_versions'],
                      self.viewset.show_private_versions)
@@ -317,6 +328,7 @@ class SubtitlesSerializerTest(TestCase):
             'request': None,
             'version_number': None,
             'sub_format': 'srt',
+            'allow_language_extra': False,
         }
         self.serializer = SubtitlesSerializer(context=self.context)
 
