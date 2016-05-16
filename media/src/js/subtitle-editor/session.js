@@ -107,7 +107,7 @@ var angular = angular || null;
                 if ((action.complete === true) &&
                     $scope.translating() &&
                     (($scope.workingSubtitles.title == "") ||
-                     ($scope.workingSubtitles.description == "") ||
+                     (($scope.referenceSubtitles.description.length > 0) && ($scope.workingSubtitles.description == "")) ||
                      (("speaker-name" in $scope.referenceSubtitles.metadata) &&
                       ($scope.workingSubtitles.metadata["speaker-name"].trim() == ""))) &&
                     EditorData.teamAttributes &&
