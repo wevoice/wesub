@@ -104,7 +104,7 @@ var angular = angular || null;
                 });
             },
             forbidAction: function(action) {
-                if ((action.complete === true) &&
+                if ((action.requires_translated_metadata_if_enabled === true) &&
                     $scope.translating() &&
                     (($scope.workingSubtitles.title == "") ||
                      (($scope.referenceSubtitles.description.length > 0) && ($scope.workingSubtitles.description == "")) ||

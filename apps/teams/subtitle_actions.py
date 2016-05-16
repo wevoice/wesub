@@ -30,6 +30,7 @@ class Complete(Action):
     in_progress_text = ugettext_lazy('Saving')
     visual_class = 'endorse'
     complete = True
+    requires_translated_metadata_if_enabled = True
 
     def handle(self, user, video, language_code, saved_version):
         if saved_version is not None:
@@ -70,6 +71,7 @@ class Approve(Action):
     in_progress_text = ugettext_lazy('Approving')
     visual_class = 'endorse'
     complete = True
+    requires_translated_metadata_if_enabled = True
 
     def handle(self, user, video, language_code, saved_version):
         _complete_task(user, video, language_code, saved_version,
@@ -81,6 +83,7 @@ class SendBack(Action):
     in_progress_text = ugettext_lazy('Sending back')
     visual_class = 'send-back'
     complete = False
+    requires_translated_metadata_if_enabled = False
 
     def handle(self, user, video, language_code, saved_version):
         _complete_task(user, video, language_code, saved_version,
