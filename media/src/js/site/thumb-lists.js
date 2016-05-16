@@ -79,15 +79,6 @@ function handleThumbListSelection() {
     function updateButtomSheet(checkCount) {
         if(checkCount > 0) {
             bottomSheet.show();
-            // FIXME: This code should use ngettext, but we don't have it set
-            // up in javascript
-            if(checkCount == 1) {
-                var title = $('.bottom-sheet').data('titleSingular');
-            } else {
-                var title = $('.bottom-sheet').data('titlePlural')
-                    .replace('COUNT_PLACEHOLDER', checkCount);
-            }
-            bottomSheet.setHeading(title);
         } else {
             bottomSheet.hide();
         }

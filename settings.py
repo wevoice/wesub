@@ -29,6 +29,10 @@ import optionalapps
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 DEFAULT_PROTOCOL  = 'http'
 
+LOCALE_PATHS = [
+    os.path.join(PROJECT_ROOT, 'locale')
+]
+
 def rel(*x):
     return os.path.join(PROJECT_ROOT, *x)
 

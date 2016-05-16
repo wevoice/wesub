@@ -10,9 +10,7 @@ Hi {{ user }},
 	<p>
 		{{ reviewer}} included the following note:
 	</p>
-	<p>
-		{{ note }}
-	</p>
+	{{ note|linebreaks }}
 {% endif %}
 
-<a href="{{reviewer_message_url}}">Send {{ reviewer }} a message</a> 
+<a href="{{reviewer_message_url}}">Send {{ reviewer }} a message</a>

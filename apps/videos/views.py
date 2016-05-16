@@ -80,7 +80,8 @@ from utils.decorators import never_in_prod
 from utils.objectlist import object_list
 from utils.rpc import RpcRouter
 from utils.text import fmt
-from utils.translation import get_user_languages_from_request
+from utils.translation import (get_user_languages_from_request,
+                               get_language_label)
 
 from teams.permissions import can_edit_video, can_add_version, can_resync
 from . import video_size
@@ -110,7 +111,7 @@ class LanguageList(object):
             if public_tip is None or public_tip.subtitle_count == 0:
                 # no versions in this language yet
                 continue
-            language_name = lang.get_language_code_display()
+            language_name = get_language_label(lang.language_code)
             status = self._calc_status(lang)
             tags = self._calc_tags(lang)
             url = lang.get_absolute_url()
@@ -197,12 +198,7 @@ def create(request):
         'initial_url': request.GET.get('initial_url'),
     }
     if video_form.is_valid():
-        try:
-            video = video_form.save()
-        except (VidscraperError, RequestError):
-            context['vidscraper_error'] = True
-            return render_to_response('videos/create.html', context,
-                          context_instance=RequestContext(request))
+        video = video_form.video
         messages.info(request, message=_(u'''Here is the subtitle workspace for your video.
         You can share the video with friends, or get an embed code for your site. To start
         new subtitles, click \"Add a new language!\" in the sidebar.'''))

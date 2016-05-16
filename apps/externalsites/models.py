@@ -495,10 +495,18 @@ class YouTubeAccount(ExternalAccount):
                 break
             video_url = 'http://youtube.com/watch?v={}'.format(video_id)
             if self.type == ExternalAccount.TYPE_USER:
-                Video.get_or_create_for_url(video_url, user=self.user)
+                try:
+                    Video.add(video_url, self.user)
+                except Video.UrlAlreadyAdded:
+                    continue
             elif self.import_team:
-                video, created = Video.get_or_create_for_url(video_url)
-                TeamVideo.objects.create(video=video, team=self.import_team)
+                def add_to_team(video, video_url):
+                    TeamVideo.objects.create(video=video,
+                                             team=self.import_team)
+                try:
+                    Video.add(video_url, None, add_to_team)
+                except Video.UrlAlreadyAdded:
+                    continue
 
         self.last_import_video_id = video_ids[0]
         self.save()
@@ -737,7 +745,7 @@ class SyncHistoryManager(models.Manager):
         except SyncHistory.DoesNotExist:
             return None
         if team is not None:
-            if sh.video_url.video.get_team_video() and sh.video_url.video.get_team_video().team == team:
+            if sh.get_account().team == team:
                 sh.retry = True
                 sh.save()
         elif user is not None:

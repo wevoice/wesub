@@ -18,6 +18,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import datetime
+import unittest
 
 from django.test import TestCase
 
@@ -60,17 +61,23 @@ class YoutubeVideoTypeTest(TestCase):
         self.shorter_url = "http://youtu.be/HaAVZ2yXDBo"
 
     @test_utils.patch_for_test('externalsites.google.get_video_info')
+    def test_video_id(self, mock_get_video_info):
+        video_info = google.VideoInfo('test-channel-id', 'title',
+                                      'description', 100,
+                                      'http://example.com/thumb.png')
+        mock_get_video_info.return_value = video_info
+        vt = YoutubeVideoType('http://www.youtube.com/watch?v=_ShmidkrcY0')
+        self.assertEqual(vt.video_id, '_ShmidkrcY0')
+
+    @test_utils.patch_for_test('externalsites.google.get_video_info')
     def test_set_values(self, mock_get_video_info):
         video_info = google.VideoInfo('test-channel-id', 'title',
                                       'description', 100,
                                       'http://example.com/thumb.png')
         mock_get_video_info.return_value = video_info
-
-        video, created = Video.get_or_create_for_url(
-            'http://www.youtube.com/watch?v=_ShmidkrcY0')
-        vu = video.videourl_set.all()[:1].get()
-
-        self.assertEqual(vu.videoid, '_ShmidkrcY0')
+        vt = YoutubeVideoType('http://www.youtube.com/watch?v=_ShmidkrcY0')
+        video = Video()
+        vt.set_values(video)
         self.assertEqual(video.title, video_info.title)
         self.assertEqual(video.description, video_info.description)
         self.assertEqual(video.duration, video_info.duration)
@@ -82,19 +89,18 @@ class YoutubeVideoTypeTest(TestCase):
                                       'description', 100,
                                       'http://example.com/thumb.png')
         mock_get_video_info.side_effect = google.APIError()
+        vt = YoutubeVideoType('http://www.youtube.com/watch?v=_ShmidkrcY0')
+        video = Video()
+        vt.set_values(video)
 
-        video, created = Video.get_or_create_for_url(
-            'http://www.youtube.com/watch?v=_ShmidkrcY0')
-        vu = video.videourl_set.all()[:1].get()
-
-        self.assertEqual(vu.videoid, '_ShmidkrcY0')
+        self.assertEqual(vt.video_id, '_ShmidkrcY0')
         self.assertEqual(video.description, '')
         self.assertEqual(video.duration, None)
         self.assertEqual(video.thumbnail, '')
         # since get_video_info failed, we don't know the channel id of our
         # video URL.  We should use a dummy value to make it easier to fix the
         # issue in the future
-        self.assertEqual(vu.owner_username, None)
+        self.assertEqual(vt.owner_username(), None)
 
     def test_matches_video_url(self):
         for item in self.data:
@@ -118,7 +124,7 @@ class HtmlFiveVideoTypeTest(TestCase):
     def setUp(self):
         self.vt = HtmlFiveVideoType
 
-    def test_type(self):
+    def test_matches_video_url(self):
         self.assertTrue(self.vt.matches_video_url(
             'http://someurl.com/video.ogv'))
         self.assertTrue(self.vt.matches_video_url(
@@ -139,7 +145,7 @@ class Mp3VideoTypeTest(TestCase):
     def setUp(self):
         self.vt = Mp3VideoType
 
-    def test_type(self):
+    def test_matches_video_url(self):
         self.assertTrue(self.vt.matches_video_url(
             'http://someurl.com/audio.mp3'))
         self.assertTrue(self.vt.matches_video_url(
@@ -148,30 +154,31 @@ class Mp3VideoTypeTest(TestCase):
             'http://someurl.com/mp3.audio'))
 
 class DailymotionVideoTypeTest(TestCase):
-    def setUp(self):
-        self.vt = DailymotionVideoType
+    def test_matches_video_url(self):
+        url = ('http://www.dailymotion.com/video/'
+               'x7u2ww_juliette-drums_lifestyle#hp-b-l')
 
-    def test_type(self):
-        url = 'http://www.dailymotion.com/video/x7u2ww_juliette-drums_lifestyle#hp-b-l'
+        self.assertTrue(DailymotionVideoType.matches_video_url(url))
+        self.assertFalse(DailymotionVideoType.matches_video_url(''))
+        self.assertFalse(DailymotionVideoType.matches_video_url(
+            'http://www.dailymotion.com'))
 
-        video, created = Video.get_or_create_for_url(url)
-        vu = video.videourl_set.all()[:1].get()
+    def test_video_id(self):
+        url = ('http://www.dailymotion.com/video/'
+               'x7u2ww_juliette-drums_lifestyle#hp-b-l')
+        vt = DailymotionVideoType(url)
+        self.assertEqual(vt.video_id, 'x7u2ww')
 
-        self.assertEqual(vu.videoid, 'x7u2ww')
-        self.assertTrue(video.title)
-        self.assertTrue(video.thumbnail)
-        self.assertEqual(vu.url, 'http://dailymotion.com/video/x7u2ww')
-
-        self.assertTrue(self.vt.matches_video_url(url))
-        self.assertFalse(self.vt.matches_video_url(''))
-        self.assertFalse(self.vt.matches_video_url('http://www.dailymotion.com'))
+    @unittest.skip('Need mock dailymotion API')
+    def test_set_values(self):
+        # TODO: implement this without doing a direct request to dailymotion
+        pass
 
 class FLVVideoTypeTest(TestCase):
     def setUp(self):
         self.vt = FLVVideoType
 
-    def test_type(self):
-
+    def test_matches_video_url(self):
         self.assertTrue(self.vt.matches_video_url(
             'http://someurl.com/video.flv'))
         self.assertFalse(self.vt.matches_video_url(
@@ -182,36 +189,27 @@ class FLVVideoTypeTest(TestCase):
             'http://someurl.com/flv.video'))
 
 class VimeoVideoTypeTest(TestCase):
-    def setUp(self):
-        self.vt = VimeoVideoType
+    def test_video_id(self):
+        vt = VimeoVideoType('http://vimeo.com/15786066?some_param=111')
+        self.assertEqual(vt.video_id, '15786066')
 
-    def test_type(self):
+    def test_matches_video_url(self):
         url = 'http://vimeo.com/15786066?some_param=111'
+        self.assertTrue(VimeoVideoType.matches_video_url(url))
+        self.assertFalse(VimeoVideoType.matches_video_url('http://vimeo.com'))
+        self.assertFalse(VimeoVideoType.matches_video_url(''))
 
-        video, created = Video.get_or_create_for_url(url)
-        vu = video.videourl_set.all()[:1].get()
-
-        self.assertEqual(vu.videoid, '15786066')
-
-        self.assertTrue(self.vt.matches_video_url(url))
-
-        self.assertFalse(self.vt.matches_video_url('http://vimeo.com'))
-        self.assertFalse(self.vt.matches_video_url(''))
-
-    def test1(self):
-        #For this video Vimeo API returns response with strance error
-        #But we can get data from this response. See vidscraper.sites.vimeo.get_shortmem
-        #So if this test is failed - maybe API was just fixed and other response is returned
-        # FIXME: restablish when vimeo api is back!
-        return
+    @unittest.skip('Need Mock Vimeo APi')
+    def test_set_values(self):
+        # We should re-empliment this one once we have a way to mock out the
+        # vimeo API.
         url = u'http://vimeo.com/22070806'
-        video, created = Video.get_or_create_for_url(url)
+        vt = VimeoVideoType(url)
+        video = Video()
+        vt.set_values(video)
 
         self.assertNotEqual(video.title, '')
         self.assertNotEqual(video.description, '')
-        vu = video.videourl_set.all()[:1].get()
-
-        self.assertEqual(vu.videoid, '22070806')
 
 class VideoTypeRegistrarTest(TestCase):
     def test_base(self):
@@ -282,11 +280,11 @@ class BrightcoveVideoTypeTest(TestCase):
         self.check_url('http://bcove.me/shortpath')
 
 class KalturaVideoTypeTest(TestCase):
-    def test_type(self):
-        url = 'http://cdnbakmi.kaltura.com/p/1492321/sp/149232100/serveFlavor/entryId/1_zr7niumr/flavorId/1_djpnqf7y/name/a.mp4'
+    def test_video_id(self):
+        url = ('http://cdnbakmi.kaltura.com/p/1492321/sp/149232100/serveFlavor/'
+               'entryId/1_zr7niumr/flavorId/1_djpnqf7y/name/a.mp4')
 
-        video, created = Video.get_or_create_for_url(url)
-        vu = video.videourl_set.get()
-        self.assertEquals(vu.type, 'K')
-        self.assertEquals(vu.kaltura_id(), '1_zr7niumr')
+        vt = KalturaVideoType(url)
+        self.assertEquals(vt.abbreviation, 'K')
+        self.assertEquals(vt.kaltura_id(), '1_zr7niumr')
 
