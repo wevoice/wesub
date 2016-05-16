@@ -37,7 +37,7 @@ from teams.models import Team, TeamVideo, Project
 from subtitles.models import SubtitleLanguage
 from videos import metadata
 from videos.models import Video
-from videos.types import video_type_registrar
+from videos.types import video_type_registrar, VideoTypeError
 import videos.tasks
 
 class VideoLanguageShortSerializer(serializers.Serializer):
@@ -248,21 +248,22 @@ class VideoSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        set_values = {}
-        for key in ('title', 'description', 'duration', 'thumbnail',
-                    'primary_audio_language_code', 'metadata'):
-            if key in validated_data:
-                set_values[key] = validated_data[key]
-        video, created = Video.get_or_create_for_url(
-            validated_data['video_url'], user=self.context['user'],
-            set_values=set_values,
-        )
-        if video is None:
+        def setup_video(video, video_url):
+            for key in ('title', 'description', 'duration', 'thumbnail',
+                        'primary_audio_language_code'):
+                if validated_data.get(key):
+                    setattr(video, key, validated_data[key])
+            if validated_data.get('metadata'):
+                video.update_metadata(validated_data['metadata'],
+                                      commit=False)
+            self._update_team(video, validated_data)
+        try:
+            return Video.add(validated_data['video_url'],
+                             self.context['user'], setup_video)[0]
+        except VideoTypeError:
             self.fail('invalid-url', url=validated_data['video_url'])
-        if not created:
+        except Video.UrlAlreadyAdded:
             self.fail('video-exists', url=validated_data['video_url'])
-        self._update_team(video, validated_data)
-        return video
 
     def update(self, video, validated_data):
         simple_fields = (

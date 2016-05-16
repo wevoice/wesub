@@ -26,13 +26,9 @@ from videos.signals import feed_imported
 
 @receiver(feed_imported)
 def on_feed_imported(signal, sender, new_videos, **kwargs):
-    if sender.team is None:
-        return
-    for video in new_videos:
-        tv = TeamVideo.objects.create(
-            video=video, team=sender.team, added_by=sender.user,
-            description=video.description)
-        api_teamvideo_new.send(tv)
+    if sender.team is not None:
+        for video in new_videos:
+            api_teamvideo_new.send(video.get_team_video())
 
 @receiver(post_save, sender=TeamMember)
 @receiver(post_delete, sender=TeamMember)

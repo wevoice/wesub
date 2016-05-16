@@ -21,3 +21,5 @@ from django import dispatch
 feed_imported = dispatch.Signal(providing_args=['new_videos'])
 title_changed = dispatch.Signal(providing_args=['old_title'])
 duration_changed = dispatch.Signal(providing_args=['old_duration'])
+video_added = dispatch.Signal(providing_args=['video_url'])
+video_url_added = dispatch.Signal(providing_args=['video'])

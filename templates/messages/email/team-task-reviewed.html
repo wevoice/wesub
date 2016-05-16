@@ -16,9 +16,9 @@ The subtitles passed review and have been published!
 </p>
 {% if note %}
 {{ reviewer}} included the following note:
-<p>
-{{ note }}
-</p>
+
+{{ note|linebreaks }}
+
 {% endif %}
 
 

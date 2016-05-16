@@ -21,6 +21,7 @@ import logging
 logger = logging.getLogger("test-fixture-loading")
 
 from utils.decorators import never_in_prod
+from utils.factories import *
 
 def _get_fixture_path(model_name):
     return os.path.join(settings.PROJECT_ROOT, "apps", "testhelpers", "fixtures", "%s-fixtures.json" % model_name)
@@ -95,16 +96,12 @@ def _create_videos(video_data, users):
 
     for x in video_data:
         shuffle(users)
-        video, created = Video.get_or_create_for_url(x['url'])
-        video.title =x['title']
-        video.save()
-        if len(users) > 0:
-            video.user = users[0]
-
+        def setup_video(video, video_url):
+            video.title = x.get('title')
+            video.is_subtitled = x['langs'] > 0
+        video, video_url = Video.add(x['url'], user[0] if users else None,
+                                     setup_video)
         _add_langs_to_video(video, x['langs'])
-        if len(x['langs']) > 0:
-            video.is_subtitled = True
-        video.save()
         videos.append(video)
 
     return videos

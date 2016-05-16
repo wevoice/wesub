@@ -29,8 +29,8 @@ from utils.factories import *
 
 class YoutubeImportTest(TestCase):
     @test_utils.patch_for_test("externalsites.google.get_uploaded_video_ids")
-    @test_utils.patch_for_test("videos.models.Video.get_or_create_for_url")
-    def setUp(self, mock_get_or_create_for_url, mock_get_uploaded_video_ids):
+    @test_utils.patch_for_test("videos.models.Video.add")
+    def setUp(self, mock_video_add, mock_get_uploaded_video_ids):
         self.user = UserFactory()
         self.team = TeamFactory()
         self.import_team = TeamFactory()
@@ -38,15 +38,17 @@ class YoutubeImportTest(TestCase):
         self.team_account = YouTubeAccountFactory(
             team=self.team, import_team=self.import_team)
         self.mock_get_uploaded_video_ids = mock_get_uploaded_video_ids
-        self.mock_get_or_create_for_url = mock_get_or_create_for_url
+        self.mock_video_add = mock_video_add
         self.mock_get_uploaded_video_ids.return_value = [
             'video-1', 'video-2', 'video-3',
         ]
-        def make_video(url, *args, **kwargs):
-            video = VideoFactory()
-            VideoURLFactory(video=video, url=url, primary=True)
-            return video, True
-        self.mock_get_or_create_for_url.side_effect = make_video
+        def make_video(url, user, setup_callback=None):
+            video = VideoFactory(video_url__url=url)
+            video_url = video.get_primary_videourl_obj()
+            if setup_callback:
+                setup_callback(video, video_url)
+            return video, video_url
+        self.mock_video_add.side_effect = make_video
 
     def test_accounts_to_import(self):
         # We should select:
@@ -63,19 +65,19 @@ class YoutubeImportTest(TestCase):
     def test_user_account_import(self):
         # we should import all videos and set added_by to the user
         self.user_account.import_videos()
-        assert_equals(self.mock_get_or_create_for_url.call_args_list, [
-            mock.call('http://youtube.com/watch?v=video-1', user=self.user),
-            mock.call('http://youtube.com/watch?v=video-2', user=self.user),
-            mock.call('http://youtube.com/watch?v=video-3', user=self.user),
+        assert_equals(self.mock_video_add.call_args_list, [
+            mock.call('http://youtube.com/watch?v=video-1', self.user),
+            mock.call('http://youtube.com/watch?v=video-2', self.user),
+            mock.call('http://youtube.com/watch?v=video-3', self.user),
         ])
 
     def test_team_account_import(self):
         # we should import all videos and add them to our team
         self.team_account.import_videos()
-        assert_equals(self.mock_get_or_create_for_url.call_args_list, [
-            mock.call('http://youtube.com/watch?v=video-1'),
-            mock.call('http://youtube.com/watch?v=video-2'),
-            mock.call('http://youtube.com/watch?v=video-3'),
+        assert_equals(self.mock_video_add.call_args_list, [
+            mock.call('http://youtube.com/watch?v=video-1', None, mock.ANY),
+            mock.call('http://youtube.com/watch?v=video-2', None, mock.ANY),
+            mock.call('http://youtube.com/watch?v=video-3', None, mock.ANY),
         ])
         for i in range(1, 4):
             url = 'http://youtube.com/watch?v=video-{}'.format(i)
@@ -94,6 +96,6 @@ class YoutubeImportTest(TestCase):
         self.user_account.last_import_video_id = 'video-2'
         self.user_account.import_videos()
         # we should only import videos added after video-2 in the playlist
-        assert_equals(self.mock_get_or_create_for_url.call_args_list, [
-            mock.call('http://youtube.com/watch?v=video-1', user=self.user)
+        assert_equals(self.mock_video_add.call_args_list, [
+            mock.call('http://youtube.com/watch?v=video-1', self.user),
         ])

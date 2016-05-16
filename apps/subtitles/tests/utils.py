@@ -17,10 +17,13 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from __future__ import absolute_import
+
 from babelsubs.storage import SubtitleSet
 
 from videos.models import Video
 from subtitles.models import SubtitleLanguage
+from utils.factories import *
 
 VIDEO_URL = 'http://youtu.be/heKK95DAKms'
 VIDEO_URL_2 = 'http://youtu.be/e4MSN6IImpI'
@@ -28,23 +31,18 @@ VIDEO_URL_3 = 'http://youtu.be/i_0DXxNeaQ0'
 
 
 def make_video():
-    video, _ = Video.get_or_create_for_url(VIDEO_URL)
-    return video
+    return VideoFactory(video_url__url=VIDEO_URL)
 
 def make_video_2():
-    video, _ = Video.get_or_create_for_url(VIDEO_URL_2)
-    return video
+    return VideoFactory(video_url__url=VIDEO_URL_2)
 
 def make_video_3():
-    video, _ = Video.get_or_create_for_url(VIDEO_URL_3)
-    return video
-
+    return VideoFactory(video_url__url=VIDEO_URL_3)
 
 def make_sl(video, language_code):
     sl = SubtitleLanguage(video=video, language_code=language_code)
     sl.save()
     return sl
-
 
 def refresh(m):
     return m.__class__.objects.get(id=m.id)
