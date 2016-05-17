@@ -100,7 +100,9 @@ class VideoAdded(ActivityType):
     label = _('Video Added')
 
     def get_message(self, record):
-        return _('Video added to amara')
+        return self.format_message(
+            record,
+            _('added a video: <a href="%(video_url)s">%(video)s</a>'))
 
 class VideoTitleChanged(ActivityType):
     slug = 'video-title-changed'
@@ -109,7 +111,7 @@ class VideoTitleChanged(ActivityType):
     active = False
 
     def get_message(self, record):
-        return _('Videos title was changed')
+        return _('edited a video title')
 
 class CommentAdded(ActivityType):
     slug = 'comment-added'
@@ -119,11 +121,11 @@ class CommentAdded(ActivityType):
     def get_message(self, record):
         if record.language_code:
             return self.format_message(record,
-                _(u'Commented on <a href="%(language_url)s">%(language)s '
+                _(u'commented on <a href="%(language_url)s">%(language)s '
                   'subtitles</a> for <a href="%(video_url)s">%(video)s</a>'))
         else:
             return self.format_message(record,
-                _(u'Commented on <a href="%(video_url)s">%(video)s</a>'))
+                _(u'commented on <a href="%(video_url)s">%(video)s</a>'))
 
 class VersionAdded(ActivityType):
     slug = 'version-added'
@@ -131,7 +133,7 @@ class VersionAdded(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _(u'Edited <a href="%(language_url)s">%(language)s '
+            _(u'edited <a href="%(language_url)s">%(language)s '
               'subtitles</a> for <a href="%(video_url)s">%(video)s</a>'))
 
 class VideoURLAdded(ActivityType):
@@ -142,7 +144,7 @@ class VideoURLAdded(ActivityType):
     def get_message(self, record):
         url_edit = self.get_related_obj()
         return self.format_message(record,
-            _(u'Added new URL for <a href="%(video_url)s">%(video)s</a>'))
+            _(u'added new URL for <a href="%(video_url)s">%(video)s</a>'))
 
 class TranslationAdded(ActivityType):
     slug = 'translation-added'
@@ -152,7 +154,7 @@ class TranslationAdded(ActivityType):
     active = False
 
     def get_message(self, record):
-        return _('Added a translation')
+        return _('added a translation')
 
 class SubtitleRequestCreated(ActivityType):
     slug = 'subtitle-request-created'
@@ -162,7 +164,7 @@ class SubtitleRequestCreated(ActivityType):
     active = False
 
     def get_message(self, record):
-        return _('Subtitle request created')
+        return _('created a subtitle request')
 
 class VersionApproved(ActivityType):
     slug = 'version-approved'
@@ -170,7 +172,7 @@ class VersionApproved(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _('Approved <a href="%(language_url)s">%(language)s</a> subtitles'
+            _('approved <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
 
 class MemberJoined(ActivityType):
@@ -208,7 +210,7 @@ class VersionRejected(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _('Rejected <a href="%(language_url)s">%(language)s</a> subtitles'
+            _('rejected <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
 
 class MemberLeft(ActivityType):
@@ -216,7 +218,7 @@ class MemberLeft(ActivityType):
     label = _('Member Left')
 
     def get_message(self, record):
-        return self.format_message(record, _("Left the %(team)s team"))
+        return self.format_message(record, _("left the %(team)s team"))
 
 class VersionReviewed(ActivityType):
     slug = 'version-reviewed'
@@ -227,7 +229,7 @@ class VersionReviewed(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _('Reviewed <a href="%(language_url)s">%(language)s</a> subtitles'
+            _('reviewed <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
 
 class VersionAccepted(ActivityType):
@@ -236,7 +238,7 @@ class VersionAccepted(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _('Accepted <a href="%(language_url)s">%(language)s</a> subtitles'
+            _('accepted <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
 
 class VersionDeclined(ActivityType):
@@ -245,7 +247,7 @@ class VersionDeclined(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _('Declined <a href="%(language_url)s">%(language)s</a> subtitles'
+            _('declined <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
 
 class VideoDeleted(ActivityType):
@@ -255,7 +257,7 @@ class VideoDeleted(ActivityType):
 
     def get_message(self, record):
         deletion = record.get_related_obj()
-        return self.format_message(record, _('Deleted a video: %(title)s'),
+        return self.format_message(record, _('deleted a video: %(title)s'),
                                    title=deletion.title)
 
 class VideoURLEdited(ActivityType):
@@ -265,7 +267,7 @@ class VideoURLEdited(ActivityType):
 
     def get_message(self, record):
         url_edit = record.get_related_obj()
-        msg = _('Changed primary url from '
+        msg = _('changed primary url from '
                 '<a href="%(old_url)s">%(old_url)s</a> to '
                 '<a href="%(new_url)s">%(new_url)s</a>')
         return self.format_message(record, msg, old_url=url_edit.old_url,
@@ -278,7 +280,7 @@ class VideoURLDeleted(ActivityType):
 
     def get_message(self, record):
         url_edit = record.get_related_obj()
-        msg = _('Deleted url <a href="%(url)s">%(url)s</a>')
+        msg = _('deleted url <a href="%(url)s">%(url)s</a>')
         return self.format_message(record, msg, url=url_edit.old_url)
 
 activity_choices = [

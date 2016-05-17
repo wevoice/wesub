@@ -89,7 +89,7 @@ from utils.translation import (
 from utils.chunkediter import chunkediter
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
-from videos.models import Action, VideoUrl, Video, VideoFeed
+from videos.models import VideoUrl, Video, VideoFeed
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params

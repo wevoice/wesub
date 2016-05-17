@@ -1,17 +1,23 @@
 {% load i18n media_bundle %}
 
-{% if activity_list %}
-<ul class="activity">
-  {% with 1 as medium_thumb %}
-  {% for item in activity_list %}
-  <li>{{ item.render }}</li>
+{% if page %}
+<ul class="activity listing">
+  {% for item in page %}
+  <li>
+    <span class="timestamp">{% blocktrans with time=item.created|timesince %}{{ time }} ago{% endblocktrans %}</span>
+
+    {% if item.user %}
+      <a href="{{ item.user.get_absolute_url }}">{{ item.user }}</a>
+    {% endif %}
+
+    {{ item.get_message|safe }}
+  </li>
   {% endfor %}
-  {% endwith %}
 </ul>
 
-{% if has_more %}
-<div class="show-more-pagination">
-  <a class="show-more" href="{{ request.path }}?{{ next_page_query}}"><span class="fa fa-chevron-circle-down"></span> {% trans "Show More" %}</a>
+{% if page.has_next %}
+<div class="pagination">
+  <a class="show-more" href="" data-page="{{ page.next_page_number }}">{% trans "Show More" %}</a>
   <img class="loading-icon" src="{% static_url %}images/ajax-loader.gif">
 </div>
 {% endif %}
