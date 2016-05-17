@@ -19,6 +19,8 @@
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db import transaction
+from django.db.models import Q
+from django.db.models import query
 from django.utils.translation import ugettext_lazy as _
 
 from auth.models import CustomUser as User
@@ -286,7 +288,43 @@ activity_choices = [
     VersionDeclined, VideoDeleted, VideoURLEdited, VideoURLDeleted,
 ]
 
+class ActivityQueryset(query.QuerySet):
+    def original(self):
+        return self.filter(copied_from__isnull=True)
+
+    # Split team activity into "team activity" and "team video activity".
+    # This is a holdover from the old activity system.  It would be nice to
+    # remove this, see #2559.
+    TEAM_ACTIVITY_TYPES = ['member-left', 'member-joined']
+    def team_activity(self):
+        return self.filter(type__in=self.TEAM_ACTIVITY_TYPES)
+
+    def team_video_activity(self):
+        return self.exclude(type__in=self.TEAM_ACTIVITY_TYPES)
+
 class ActivityManager(models.Manager):
+    use_for_related_fields = True
+
+    def get_query_set(self):
+        return ActivityQueryset(self.model, using=self._db)
+
+    def original(self):
+        return self.get_query_set().original()
+
+    def for_video(self, video):
+        return self.filter(video=video).original()
+
+    def for_user(self, user):
+        # Used for the default API listing.  It would be nice to simplify this
+        # see #2557
+        return (self
+                .filter(Q(user=user) | Q(team__in=user.teams.all()))
+                .original()
+                .distinct())
+
+    def for_team(self, team):
+        return self.filter(team=team)
+
     def create(self, type, **attrs):
         return super(ActivityManager, self).create(type=type, **attrs)
 
