@@ -22,8 +22,6 @@ from django.template.loader import render_to_string
 from auth.models import CustomUser as User
 from profiles.forms import SelectLanguageForm
 from utils.translation import get_user_languages_from_request, get_user_languages_from_cookie
-from videos.models import Action
-
 
 register = template.Library()
 
@@ -72,19 +70,6 @@ def _user_needs_languages(context):
         return not user.userlanguage_set.exists()
     else:
         return not bool(get_user_languages_from_cookie(context['request']))
-
-@register.inclusion_tag('profiles/_user_videos_activity.html', takes_context=True)
-def user_videos_activity(context, user=None):
-    user = user or context['user']
-
-    if user.is_authenticated():
-        context['users_actions'] = Action.objects.select_related('video', 'language', 'language__video', 'user') \
-            .filter(video__customuser=user) \
-            .exclude(user=user) \
-            .exclude(user=User.get_anonymous())[:ACTIONS_ON_PAGE]
-    else:
-        context['users_actions'] = Action.objects.none()
-    return context
 
 @register.inclusion_tag('profiles/_user_avatar.html', takes_context=True)
 def user_avatar(context, user_obj):

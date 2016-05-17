@@ -50,6 +50,7 @@ from vidscraper.errors import Error as VidscraperError
 
 import widget
 from widget import rpc as widget_rpc
+from activity.models import ActivityRecord
 from auth.models import CustomUser as User
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.permissions import (user_can_view_private_subtitles,
@@ -67,7 +68,7 @@ from videos.forms import (
     ChangeVideoOriginalLanguageForm, CreateSubtitlesForm,
 )
 from videos.models import (
-    Video, Action, VideoUrl, AlreadyEditingException
+    Video, VideoUrl, AlreadyEditingException
 )
 from videos.rpc import VideosApiClass
 from videos import share_utils
@@ -341,9 +342,9 @@ def _get_related_task(request):
             return
 
 
-def actions_list(request, video_id):
+def activity(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
-    qs = Action.objects.for_video(video)
+    qs = ActivityRecord.objects.for_video(video)
 
     extra_context = {
         'video': video
@@ -351,7 +352,7 @@ def actions_list(request, video_id):
 
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.ACTIVITIES_ONPAGE,
-                       template_name='videos/actions_list.html',
+                       template_name='videos/activity.html',
                        template_object_name='action',
                        extra_context=extra_context)
 

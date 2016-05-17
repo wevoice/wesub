@@ -82,8 +82,8 @@
             <h3>{% trans "Activity on your videos" %}</h3>
             {% if video_activity %}
                 <ul class="listing activity">
-                    {% for item in video_activity %}
-                        <li>{{ item.render }}</li>
+                    {% for record in video_activity %}
+                    <li>{% include "activity/record.html" %}</li>
                     {% endfor %}
                 </ul>
             {% else %}
@@ -108,8 +108,8 @@
             <h3>{% trans "Activity in your teams" %}</h3>
             {% if team_activity %}
                 <ul class="listing activity">
-                    {% for item in team_activity %}
-                        <li>{{ item.render }}</li>
+                    {% for record in team_activity %}
+                    <li>{% include "activity/record.html" %}</li>
                     {% endfor %}
                 </ul>
             {% else %}

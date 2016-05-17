@@ -142,7 +142,7 @@ class VideoURLAdded(ActivityType):
     related_model = URLEdit
 
     def get_message(self, record):
-        url_edit = self.get_related_obj()
+        url_edit = record.get_related_obj()
         return self.format_message(record,
             _(u'added new URL for <a href="%(video_url)s">%(video)s</a>'))
 
@@ -461,6 +461,7 @@ class ActivityRecord(models.Model):
     objects = ActivityManager()
 
     class Meta:
+        ordering = ['-created']
         # If we were using a newer version of django we would have this:
         #index_together = [
             ## Team activity stream.  There's often lots of activity per-team,
@@ -476,7 +477,6 @@ class ActivityRecord(models.Model):
         #]
         # Instead, these are handled by the setup_indexes code and a south
         # migration
-        pass
 
     def __unicode__(self):
         return u'ActivityRecord: {}'.format(self.type)

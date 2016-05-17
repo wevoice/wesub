@@ -2,16 +2,8 @@
 
 {% if page %}
 <ul class="activity listing">
-  {% for item in page %}
-  <li>
-    <span class="timestamp">{% blocktrans with time=item.created|timesince %}{{ time }} ago{% endblocktrans %}</span>
-
-    {% if item.user %}
-      <a href="{{ item.user.get_absolute_url }}">{{ item.user }}</a>
-    {% endif %}
-
-    {{ item.get_message|safe }}
-  </li>
+  {% for record in page %}
+  <li>{% include "activity/record.html" %}</li>
   {% endfor %}
 </ul>
 

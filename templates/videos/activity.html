@@ -11,7 +11,7 @@
         
         {% if is_paginated %}{% paginator %}{% endif %}
         
-        {% with action_list as events %}
+        {% with action_list as records %}
 			{% include "videos/_video_activity.html" %}
         {% endwith %}
             
