@@ -14,4 +14,9 @@
       {% trans "Timing error in subtitle" %}
     </a>
   </span>
+  <span ng-show="missingTranslationShown()">
+    <a class="invalid-subtitle-link" href="#" ng-click="onTitleClicked($event)">
+      {% trans "Title and description must be translated" %}
+    </a>
+  </span>
 </p>
