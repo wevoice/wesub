@@ -139,7 +139,7 @@ var angular = angular || null;
                     ($scope.workflow.subtitleList.firstInvalidTiming()));
         };
 	$scope.missingTranslationShown = function() {
-            action = {'complete': true};
+            action = {'requires_translated_metadata_if_enabled': true};
             return $scope.session.forbidAction(action).forbid;
         };
         $scope.warningsShown = true;
