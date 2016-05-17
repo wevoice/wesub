@@ -353,7 +353,20 @@ class SubtitlesUploadForm(forms.Form):
             if self.extension == 'txt':
                 complete = False
 
-        title, description, metadata = self._find_title_description_metadata(language_code)
+        # Only pre-populate those if team does not have
+        # the setting
+        get_title_description_metadata = True
+        team_video = self.video.get_team_video()
+        if team_video:
+            for f in team_video.team.settings.features():
+                if f.key_name == "enable_require_translated_metadata":
+                    get_title_description_metadata = False
+                    break
+        if get_title_description_metadata:
+            title, description, metadata = self._find_title_description_metadata(language_code)
+        else:
+            title, description, metadata = "", "", {}
+
         parents = self._find_parents(from_language_code)
 
         version = pipeline.add_subtitles(

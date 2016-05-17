@@ -630,6 +630,7 @@ class Action(object):
     in_progress_text = NotImplemented
     visual_class = None
     complete = None
+    requires_translated_metadata_if_enabled = False
     CLASS_ENDORSE = 'endorse'
     CLASS_SEND_BACK = 'send-back'
     subtitle_visibility = 'public'
@@ -698,6 +699,7 @@ class Action(object):
             'in_progress_text': unicode(self.in_progress_text),
             'class': self.visual_class,
             'complete': self.complete,
+            'requires_translated_metadata_if_enabled': self.requires_translated_metadata_if_enabled,
         }
 
 class Publish(Action):
@@ -710,6 +712,7 @@ class Publish(Action):
     in_progress_text = ugettext_lazy('Saving')
     visual_class = 'endorse'
     complete = True
+    requires_translated_metadata_if_enabled = True
 
     def perform(self, user, video, subtitle_language, saved_version):
         tip = subtitle_language.get_tip()
@@ -728,12 +731,14 @@ class Unpublish(Action):
     in_progress_text = ugettext_lazy('Saving')
     visual_class = 'send-back'
     complete = False
+    requires_translated_metadata_if_enabled = False
 
 class SaveDraft(Action):
     name = 'save-draft'
     label = ugettext_lazy('Save Draft')
     in_progress_text = ugettext_lazy('Saving')
     complete = None
+    requires_translated_metadata_if_enabled = False
 
 class APIComplete(Action):
     """Action that handles complete=True from the API
@@ -748,6 +753,7 @@ class APIComplete(Action):
     in_progress_text = ugettext_lazy('Saving')
     visual_class = 'endorse'
     complete = None
+    requires_translated_metadata_if_enabled = False
 
     def update_language(self, user, video, subtitle_language, saved_version):
         if saved_version.is_synced():
