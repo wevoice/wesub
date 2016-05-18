@@ -690,8 +690,8 @@ class TaskUpdateSerializer(TaskSerializer):
                               read_only=True)
     type = MappedChoiceField(Task.TYPE_CHOICES, required=False,
                              read_only=True)
-    complete = serializers.BooleanField(required=False, source='')
-    send_back = serializers.BooleanField(required=False, source='')
+    complete = serializers.BooleanField(required=False, write_only=True)
+    send_back = serializers.BooleanField(required=False, write_only=True)
 
     class Meta(TaskSerializer.Meta):
         fields = TaskSerializer.Meta.fields + (
