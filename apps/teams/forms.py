@@ -592,7 +592,7 @@ class LanguagesForm(forms.Form):
         return self.cleaned_data
 
 class AddMembersForm(forms.Form):
-    role = forms.ChoiceField(choices=TeamMember.ROLES[1:][::-1],
+    role = forms.ChoiceField(choices=TeamMember.ROLES[::-1],
                              initial='contributor',
                              label=_("Assign a role"))
     members = forms.CharField(required=False,
