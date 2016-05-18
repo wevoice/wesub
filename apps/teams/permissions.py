@@ -554,6 +554,10 @@ def can_invite(team, user):
 
     return role in _perms_equal_or_greater(role_required)
 
+def can_add_members(team, user):
+    """Return whether the given user can add members to the given team."""
+    return user.is_staff
+
 def can_change_video_settings(user, team_video):
     role = get_role_for_target(user, team_video.team, team_video.project, None)
     return role in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]

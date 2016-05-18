@@ -38,7 +38,7 @@ from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import (Http404, HttpResponse, HttpResponseRedirect,
-                         HttpResponseBadRequest)
+                         HttpResponseBadRequest, HttpResponseForbidden)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext as _
 
@@ -432,6 +432,7 @@ def members(request, team):
         'filters_form': filters_form,
         'edit_form': edit_form,
         'show_invite_link': permissions.can_invite(team, request.user),
+        'show_add_link': permissions.can_add_members(team, request.user),
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Members')),
@@ -571,6 +572,34 @@ def language_page(request, team, language_code):
     return team.new_workflow.render_language_page(
         request, team, language_code, data,
     )
+
+@team_view
+def add_members(request, team):
+    summary = None
+    if not permissions.can_add_members(team, request.user):
+        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
+    if request.POST:
+        form = forms.AddMembersForm(team, request.user, request.POST)
+        if form.is_valid():
+            summary = form.save()
+
+    form = forms.AddMembersForm(team, request.user)
+
+    if team.is_old_style():
+        template_name = 'teams/add_members.html'
+    else:
+        template_name = 'new-teams/add_members.html'
+
+    return render(request, template_name,  {
+        'team': team,
+        'form': form,
+        'summary': summary,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Members'), 'teams:members', team.slug),
+            BreadCrumb(_('Invite')),
+        ],
+    })
 
 @team_view
 def invite(request, team):
