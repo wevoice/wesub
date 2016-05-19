@@ -74,17 +74,6 @@ class TestFeedParser(FeedImportTest):
                     '/feeds/api/users/amaratestuser/uploads')
         self.check_video_types(feed_url, YoutubeVideoType)
 
-# FIXME: this test is failing, and it looks like it's because of the feed.
-#    def test_enclosure_parsing(self):
-#        feed_url = 'http://webcast.berkeley.edu/media/common/rss/Computer_Science_10__001_Spring_2011_Video__webcast.rss'
-#
-#        feed_parser = FeedParser(feed_url)
-#        vt, info, entry = feed_parser.items().next()
-#        self.assertTrue(isinstance(vt, HtmlFiveVideoType))
-#
-#        video, created = Video.get_or_create_for_url(vt=vt)
-#        self.assertTrue(video)
-
     def test_dailymotion_feed_parsing(self):
         self.set_feed_data(DAILY_MOTION_XML)
         feed_url = 'http://www.dailymotion.com/rss/ru/featured/channel/tech/1'

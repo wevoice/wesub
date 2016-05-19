@@ -1,0 +1,28 @@
+{% extends "new-teams/base.html" %}
+
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+
+<h2>{% trans "Add members" %}</h2>
+{% if summary %}
+<div class="summary">
+  <h3>Members successfully processed:</h3>
+  <ul>
+    <li>Members added: {{ summary.added }}</li>
+    <li>Unknown members: {{ summary.unknown|join:", " }}</li>
+    <li>Members already part of the team: {{ summary.already|join:", " }}</li>
+  </ul>
+</div>
+{% endif %}
+<form method="post" action="" class="team-invite">
+  {% csrf_token %}
+  {% include "_field.html" with field=form.members %}
+
+  <div class="actions">
+    <button class="submit">{% trans "Add" %}</button>
+  </div>
+</form>
+
+{% endblock %}

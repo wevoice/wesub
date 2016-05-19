@@ -25,3 +25,4 @@ from .monkeypatch import *
 from .requests import *
 from .tools import *
 from .xvfb import *
+from .video_types import *

@@ -305,10 +305,3 @@ def notify_for_version(version):
                              'videos/email_notification_non_editors.html',
                              context, fail_silently=not settings.DEBUG)
     return True
-
-def _save_video_feed(feed_url, user):
-    """ Creates or updates a videofeed given some url """
-    try:
-        return VideoFeed.objects.get(url=feed_url, user=user)
-    except VideoFeed.DoesNotExist:
-        return VideoFeed.objects.create(url=feed_url, user=user)

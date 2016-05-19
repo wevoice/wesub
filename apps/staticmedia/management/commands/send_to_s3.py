@@ -29,11 +29,14 @@ from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.translation import to_locale, activate
 
 from deploy.git_helpers import get_current_commit_hash
 from staticmedia import bundles
 from staticmedia import oldembedder
 from staticmedia import utils
+from staticmedia.jsi18ncompat import (get_javascript_catalog,
+                                      render_javascript_catalog)
 
 class Command(BaseCommand):
     help = """Upload static media to S3 """
@@ -56,6 +59,7 @@ class Command(BaseCommand):
         self.upload_static_dir('fonts')
         self.upload_static_dir('flowplayer')
         self.upload_app_static_media()
+        self.upload_js_catalogs()
         self.upload_old_embedder()
 
     def setup_s3_subdir(self):
@@ -136,6 +140,23 @@ class Command(BaseCommand):
         self.upload_string("embed.js", self.old_embedder_js_code,
                            self.no_cache_headers(),
                            store_in_s3_subdirectory=False)
+
+    def upload_js_catalogs(self):
+        headers = self.cache_forever_headers()
+        headers['Content-Type'] = 'application/javascript'
+        for locale in self.all_locales():
+            filename = "jsi18catalog/{}.js".format(locale)
+            activate(locale)
+            catalog, plural = get_javascript_catalog(locale, 'djangojs', [])
+            response = render_javascript_catalog(catalog, plural)
+            self.upload_string(filename, response.content, headers)
+
+    def all_locales(self):
+        locale_dir = os.path.join(settings.PROJECT_ROOT, 'locale')
+        for child in os.listdir(locale_dir):
+            if os.path.exists(os.path.join(
+                    locale_dir, child, 'LC_MESSAGES/djangojs.mo')):
+                yield child
 
     def upload_string(self, filename, content, headers,
                       store_in_s3_subdirectory=True):

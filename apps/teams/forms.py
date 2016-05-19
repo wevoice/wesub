@@ -53,7 +53,7 @@ from teams.permissions import (
 from teams.permissions_const import ROLE_NAMES
 from teams.workflows import TeamWorkflow
 from videos.forms import (AddFromFeedForm, VideoForm, CreateSubtitlesForm,
-                          MultiVideoCreateSubtitlesForm)
+                          MultiVideoCreateSubtitlesForm, VideoURLField)
 from videos.models import (
         VideoMetadata, VIDEO_META_TYPE_IDS, Video, VideoFeed,
 )
@@ -61,7 +61,6 @@ from videos.tasks import import_videos_from_feed
 from videos.types import video_type_registrar, VideoTypeError
 from utils.forms import (ErrorableModelForm, get_label_for_value,
                          UserAutocompleteField)
-from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.panslugify import pan_slugify
 from utils.translation import get_language_choices, get_language_label
 from utils.text import fmt
@@ -167,15 +166,6 @@ class MoveTeamVideoForm(forms.Form):
 
         return self.cleaned_data
 
-class BaseVideoBoundForm(forms.ModelForm):
-    video_url = UniSubBoundVideoField(label=_('Video URL'),
-        help_text=_("Enter the URL of any compatible video or any video on our site. You can also browse the site and use the 'Add Video to Team' menu."))
-
-    def __init__(self, *args, **kwargs):
-        super(BaseVideoBoundForm, self).__init__(*args, **kwargs)
-        if hasattr(self, 'user'):
-            self.fields['video_url'].user = self.user
-
 class AddVideoToTeamForm(forms.Form):
     """Used to add a non-team video to one of the user's managed teams."""
 
@@ -191,7 +181,7 @@ class AddVideoToTeamForm(forms.Form):
             if can_add_video_somewhere(team, user)
         ]
 
-class AddTeamVideoForm(BaseVideoBoundForm):
+class AddTeamVideoForm(forms.ModelForm):
     language = forms.ChoiceField(label=_(u'Video language'), choices=(),
                                  required=False,
                                  help_text=_(u'It will be saved only if video does not exist in our database.'))
@@ -203,6 +193,8 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         empty_label=None,
         help_text=_(u"Let's keep things tidy, shall we?")
     )
+    video_url = VideoURLField(label=_('Video URL'),
+        help_text=_("Enter the URL of any compatible video or any video on our site. You can also browse the site and use the 'Add Video to Team' menu."))
 
     class Meta:
         model = TeamVideo
@@ -212,7 +204,6 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.team = team
         self.user = user
         super(AddTeamVideoForm, self).__init__(*args, **kwargs)
-
 
         projects = self.team.project_set.all()
 
@@ -231,57 +222,58 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.fields['language'].choices = [c for c in get_language_choices(True)
                                            if c[0] in writable_langs]
 
-    def clean_video_url(self):
-        video_url = self.cleaned_data['video_url']
-        video = self.fields['video_url'].video
-        try:
-            tv = TeamVideo.objects.get(team=self.team, video=video)
-            raise forms.ValidationError(mark_safe(u'Team has this <a href="%s">video</a>' % tv.get_absolute_url()))
-        except TeamVideo.DoesNotExist:
-            pass
-
-        return video_url
-
     def clean(self):
-        language = self.cleaned_data.get('language')
-        video = self.fields['video_url'].video
+        if self._errors:
+            return self.cleaned_data
 
-        if video:
-            team_video = video.get_team_video()
-            if team_video and not team_video.team.deleted:
-                team = team_video.team
-                if team.user_can_view_videos(self.user):
-                    link = '<a href="{}">{}</a>'.format(
-                            team_video.team.get_absolute_url(),
-                            team_video.team.name)
-                    msg = mark_safe(
-                        fmt(_(u'This video already belongs to the '
-                              '%(team_link)s team.'),
-                            team_link=link))
-                else:
-                    msg = _(u'This video already belongs to a team.')
-                self._errors['video_url'] = self.error_class([msg])
+        self.project = self.cleaned_data.get('project')
+        if not self.project:
+            self.project = self.team.default_project
 
-            original_sl = video.subtitle_language()
-
-            if (original_sl and not original_sl.language_code) and not language:
-                msg = _(u'Set original language for this video.')
-                self._errors['language'] = self.error_class([msg])
-
+        # See if any error happen when we create our video
+        try:
+            Video.add(self.cleaned_data['video_url'], self.user,
+                      self.setup_video)
+        except Video.UrlAlreadyAdded, e:
+            self.setup_existing_video(e.video, e.video_url)
         return self.cleaned_data
 
+    def setup_video(self, video, video_url):
+        self.saved_team_video = TeamVideo.objects.create(
+            video=video, team=self.team, project=self.project,
+            added_by=self.user)
+        self._success_message = ugettext('Video successfully added to team.')
+
+    def setup_existing_video(self, video, video_url):
+        team_video, created = TeamVideo.objects.get_or_create(
+            video=video, defaults={
+                'team': self.team, 'project': self.project,
+                'added_by': self.user
+            })
+
+        if created:
+            self.saved_team_video = team_video
+            self._success_message = ugettext(
+                'Video successfully added to team from the community videos.'
+            )
+            return
+
+        if team_video.team.user_can_view_videos(self.user):
+            msg = mark_safe(fmt(
+                _(u'This video already belongs to the %(team)s team '
+                  '(<a href="%(link)s">view video</a>)'),
+                team=unicode(self.team),
+                link=team_video.video.get_absolute_url()))
+        else:
+            msg = _(u'This video already belongs to another team.')
+        self._errors['video_url'] = self.error_class([msg])
+
     def success_message(self):
-        return 'Video successfully added to team.'
+        return self._success_message
 
-    def save(self, commit=True):
-        video = self.fields['video_url'].video
-
-        obj = super(AddTeamVideoForm, self).save(False)
-
-        obj.video = video
-        obj.team = self.team
-        commit and obj.save()
-        return obj
+    def save(self):
+        # TeamVideo was already created in clean()
+        return self.team_video
 
 class AddTeamVideosFromFeedForm(AddFromFeedForm):
     def __init__(self, team, user, *args, **kwargs):
@@ -294,24 +286,19 @@ class AddTeamVideosFromFeedForm(AddFromFeedForm):
         return VideoFeed.objects.create(team=self.team, user=self.user,
                                         url=url)
 
-class CreateTeamForm(BaseVideoBoundForm):
+class CreateTeamForm(forms.ModelForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
     workflow_type = forms.ChoiceField(choices=(), initial="O")
 
     class Meta:
         model = Team
         fields = ('name', 'slug', 'description', 'logo', 'workflow_type',
-                  'is_visible', 'video_url')
+                  'is_visible')
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(CreateTeamForm, self).__init__(*args, **kwargs)
         self.fields['workflow_type'].choices = TeamWorkflow.get_choices()
-        self.fields['video_url'].label = _(u'Team intro video URL')
-        self.fields['video_url'].required = False
-        self.fields['video_url'].help_text = _(u'''You can put an optional video
-on your team homepage that explains what your team is about, to attract volunteers.
-Enter a link to any compatible video, or to any video page on our site.''')
         self.fields['is_visible'].widget.attrs['class'] = 'checkbox'
         self.fields['slug'].label = _(u'Team URL: http://universalsubtitles.org/teams/')
 
@@ -322,11 +309,7 @@ Enter a link to any compatible video, or to any video page on our site.''')
         return slug
 
     def save(self, user):
-        team = super(CreateTeamForm, self).save(False)
-        video = self.fields['video_url'].video
-        if video:
-            team.video = video
-        team.save()
+        team = super(CreateTeamForm, self).save()
         TeamMember.objects.create_first_member(team=team, user=user)
         return team
 
@@ -607,6 +590,33 @@ class LanguagesForm(forms.Form):
             raise forms.ValidationError(_(u'You cannot blacklist a preferred language.'))
 
         return self.cleaned_data
+
+class AddMembersForm(forms.Form):
+    members = forms.CharField(required=False,
+                              widget=forms.Textarea(attrs={'rows': 10}),
+                              label=_("Users to add to team"))
+    def __init__(self, team, user, *args, **kwargs):
+        super(AddMembersForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.user = user
+    def save(self):
+        summary = {
+            "added": 0,
+            "unknown": [],
+            "already": [],
+            }
+        for username in set(self.cleaned_data['members'].split()):
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                summary["unknown"].append(username)
+            else:
+                member, created = TeamMember.objects.get_or_create(team=self.team, user=user)
+                if created:
+                    summary["added"] += 1
+                else:
+                    summary["already"].append(username)
+        return summary
 
 class InviteForm(forms.Form):
     username = UserAutocompleteField(error_messages={
@@ -1533,38 +1543,43 @@ class ApplicationForm(forms.Form):
         self.application.user.set_languages(languages)
 
 class TeamVideoURLForm(forms.Form):
-    video_url = forms.URLField()
+    video_url = VideoURLField()
+
     def save(self, team, user, project=None, thumbnail=None, language=None):
         errors = ""
-        from videos.models import Video
-        if 'video_url' not in self.cleaned_data:
+        if not self.cleaned_data.get('video_url'):
             return (False, "")
-        video_url = self.cleaned_data['video_url']
-        if video_url:
-            try:
-                video_type = video_type_registrar.video_type_for_url(video_url)
-            except VideoTypeError, e:
-                return (False, fmt(_(u"Unknown video type: %(url)s"), url=video_url))
-            video_url = video_type.convert_to_video_url()
-            set_values={'is_public': team.is_visible}
+
+        video_type = self.cleaned_data['video_url']
+        def setup_video(video, video_url):
+            video.is_public = team.is_visible
             if language is not None:
-                set_values['primary_audio_language_code'] = language
-            video, created = Video.get_or_create_for_url(video_url, video_type, user, set_values=set_values)
-            if not created and video.get_team_video() is not None:
-                return (False, fmt(_(u"Video is already part of a team: %(url)s"), url=video_url))
-            if not created:
-                video.is_public = self.team.is_visible
-                video.save()
-            if project:
-                project_id = project
-            else:
-                project_id = None
-            team_video = TeamVideo.objects.create(video=video, team=team, project_id=project_id)
-            if thumbnail is not None:
+                video.primary_audio_language = language
+            if thumbnail:
                 video.s3_thumbnail.save(thumbnail.name, thumbnail)
-        else:
-            return (False, _(u"no video URL provided"))
+            team_video = TeamVideo.objects.create(video=video, team=team,
+                                                  project_id=project)
+
+        try:
+            Video.add(video_type, user, setup_video)
+        except Video.UrlAlreadyAdded, e:
+            if e.video.get_team_video() is not None:
+                return (False,
+                        self.video_in_team_msg(e.video, e.video_url, user))
+            else:
+                setup_video(e.video, e.video_url)
+                e.video.save()
         return (True, "")
+
+    def video_in_team_msg(self, video, video_url, user):
+        team = video.get_team_video().team
+        if team.user_can_view_videos(user):
+            return fmt(_(u"Video %(url)s already in the %(team)s Team"),
+                       url=video_url.url, team=team)
+        else:
+            return fmt(_(u"Video %(url)s already in another team"),
+                       url=video_url.url)
+
 TeamVideoURLFormSet = formset_factory(TeamVideoURLForm)
 
 class TeamVideoCSVForm(forms.Form):

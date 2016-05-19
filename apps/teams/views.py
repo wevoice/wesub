@@ -803,12 +803,8 @@ def add_video(request, slug):
     form = AddTeamVideoForm(team, request.user, request.POST or None, request.FILES or None, initial=initial)
 
     if form.is_valid():
-        obj = form.save(False)
-        obj.added_by = request.user
-        obj.save()
-
-        api_teamvideo_new.send(obj)
-        video_changed_tasks.delay(obj.video.pk)
+        api_teamvideo_new.send(form.saved_team_video)
+        video_changed_tasks.delay(form.saved_team_video.video.pk)
         messages.success(request, form.success_message())
         return redirect(team.get_absolute_url())
 

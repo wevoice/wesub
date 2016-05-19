@@ -37,7 +37,7 @@ from teams.models import Team, TeamVideo, Project
 from subtitles.models import SubtitleLanguage
 from videos import metadata
 from videos.models import Video
-from videos.types import video_type_registrar
+from videos.types import video_type_registrar, VideoTypeError
 import videos.tasks
 
 class VideoLanguageShortSerializer(serializers.Serializer):
@@ -215,9 +215,9 @@ class VideoSerializer(serializers.Serializer):
 
     def to_internal_value(self, data):
         self.fixup_data(data)
-        data = super(VideoSerializer, self).to_internal_value(data)
-        # we have to wait until now because we can't fetch the project until
-        # we know the team
+        return super(VideoSerializer, self).to_internal_value(data)
+
+    def validate(self, data):
         if data.get('project'):
             if not data.get('team'):
                 self.fail('project-without-team')
@@ -248,21 +248,22 @@ class VideoSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        set_values = {}
-        for key in ('title', 'description', 'duration', 'thumbnail',
-                    'primary_audio_language_code', 'metadata'):
-            if key in validated_data:
-                set_values[key] = validated_data[key]
-        video, created = Video.get_or_create_for_url(
-            validated_data['video_url'], user=self.context['user'],
-            set_values=set_values,
-        )
-        if video is None:
+        def setup_video(video, video_url):
+            for key in ('title', 'description', 'duration', 'thumbnail',
+                        'primary_audio_language_code'):
+                if validated_data.get(key):
+                    setattr(video, key, validated_data[key])
+            if validated_data.get('metadata'):
+                video.update_metadata(validated_data['metadata'],
+                                      commit=False)
+            self._update_team(video, validated_data)
+        try:
+            return Video.add(validated_data['video_url'],
+                             self.context['user'], setup_video)[0]
+        except VideoTypeError:
             self.fail('invalid-url', url=validated_data['video_url'])
-        if not created:
+        except Video.UrlAlreadyAdded:
             self.fail('video-exists', url=validated_data['video_url'])
-        self._update_team(video, validated_data)
-        return video
 
     def update(self, video, validated_data):
         simple_fields = (
@@ -455,7 +456,7 @@ class VideoViewSet(mixins.CreateModelMixin,
     def get_queryset(self):
         query_params = self.request.query_params
         if 'team' not in query_params and 'video_url' not in query_params:
-            return Video.objects.public()[:20]
+            return Video.objects.public().order_by('-id')[:20]
         if 'team' not in query_params:
             qs = self.get_videos_for_user()
         else:

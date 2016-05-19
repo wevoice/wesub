@@ -22,14 +22,16 @@ from .parser import FeedParser
 
 class VideoImporter(object):
     """Import videos from a feed URL."""
-    def __init__(self, url, user):
+    def __init__(self, url, user, team):
         """Create a VideoImporter
 
         :param url: feed url
-        :param user: User that creates videos for
+        :param user: User to creates videos for
+        :param team: Team to create videos for
         """
         self.url = url
         self.user = user
+        self.team = team
         self.checked_entries = 0
         self.last_link = ''
 
@@ -85,13 +87,19 @@ class VideoImporter(object):
 
     def _create_video(self, video_type, info, entry):
         from videos.models import Video
-        video, created = Video.get_or_create_for_url(
-            vt=video_type, user=self.user)
-        # created should always be True, since we filtered out existing items
-        # already, but check it anyways
-        if created:
-            if info:
-                for name, value in info.items():
-                    setattr(video, name, value)
-                video.save()
+        from teams.models import TeamVideo
+
+        def setup_video(video, video_url):
+            for name, value in info.items():
+                setattr(video, name, value)
+            if self.team:
+                tv = TeamVideo.objects.create(
+                    video=video, team=self.team, added_by=self.user,
+                    description=video.description)
+        try:
+            video, video_url = Video.add(video_type, self.user, setup_video)
             self._created_videos.append(video)
+        except Video.UrlAlreadyAdded, e:
+            # This shouldn't happen since we filtered out existing items
+            # already, but catch the exception anyways
+            pass

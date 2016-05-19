@@ -138,6 +138,10 @@ var angular = angular || null;
             return ((!$scope.currentEdit.inProgress()) &&
                     ($scope.workflow.subtitleList.firstInvalidTiming()));
         };
+	$scope.missingTranslationShown = function() {
+            action = {'requires_translated_metadata_if_enabled': true};
+            return $scope.session.forbidAction(action).forbid;
+        };
         $scope.warningsShown = true;
         $scope.timelineShown = $scope.workflow.stage != 'typing';
         $scope.toggleScrollingSynced = function() {

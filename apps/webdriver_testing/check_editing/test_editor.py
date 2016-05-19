@@ -33,8 +33,9 @@ class TestCaseEditing(WebdriverTestCase):
                  'title': 'Open Source Philosophy' }
         url_part = 'videos/'
         r = cls.data_utils.make_request(cls.user, 'post', url_part, **data)
-        cls.video, _  = Video.get_or_create_for_url(
-                    'http://www.youtube.com/watch?v=5CKwCfLUwj4')
+        cls.video, _  = Video.add(
+            'http://www.youtube.com/watch?v=5CKwCfLUwj4',
+            self.user)
         cls.data_utils.add_subs(video=cls.video) 
         langs = ['en', 'da', 'ar', 'tr', 'zh-cn', 'nl']
         for lc in langs:

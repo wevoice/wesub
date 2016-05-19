@@ -52,7 +52,7 @@ def get_url_base():
 
 def team_sends_notification(team, notification_setting_name):
     from teams.models import Setting
-    return not team.settings.filter( key=Setting.KEY_IDS[notification_setting_name]).exists()
+    return not team.settings.filter(key=Setting.KEY_IDS[notification_setting_name]).exists()
 
 @task()
 def cleanup():

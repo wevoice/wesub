@@ -52,6 +52,7 @@ $.fn.openModal = function(openEvent, setupData) {
                 onClose(evt);
             }
         });
+        modal.on('close', onClose);
 
         function onClose(evt) {
             evt.preventDefault();
@@ -106,6 +107,9 @@ function removeModalOverlay() {
 }
 
 window.ajaxOpenModal = function(url, params, setupData) {
+    if(params === undefined) {
+        params = {};
+    }
     var setupData = $.extend({}, setupData, {removeOnClose: true});
     var loadingHTML = $('<div class="modal-overlay"><div class="loading"><span class="fa fa-spinner fa-pulse"></span></div></div>');
 
@@ -126,7 +130,17 @@ window.ajaxOpenModal = function(url, params, setupData) {
             },
             success: function(responseText, textStatus, xhr) {
                 if(xhr.getResponseHeader('X-Form-Success')) {
-                    window.location.reload();
+                    removeModalOverlay();
+                    modal.trigger('close');
+                    if(xhr.getResponseHeader('X-Form-Redirect')) {
+                        window.location = xhr.getResponseHeader('X-Form-Redirect');
+                    } else if(setupData.reloadElt) {
+                        var newElt = $(responseText);
+                        $(setupData.reloadElt).replaceWith(newElt);
+                        newElt.updateBehaviors();
+                    } else {
+                        window.location.reload();
+                    }
                 } else {
                     removeModalOverlay();
                     var newModal = $(responseText);

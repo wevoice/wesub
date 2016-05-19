@@ -41,6 +41,7 @@ from babelsubs.storage import calc_changes
 from babelsubs.generators.html import HTMLGenerator
 from babelsubs import load_from
 from subtitles import signals
+from utils import dates
 from utils.compress import compress, decompress
 from utils.subtitles import create_new_subtitles
 from utils import translation
@@ -559,7 +560,7 @@ class SubtitleLanguage(models.Model):
         creating = not self.pk
 
         if creating and not self.created:
-            self.created = datetime.now()
+            self.created = dates.now()
 
         super(SubtitleLanguage, self).save(*args, **kwargs)
 
@@ -1575,7 +1576,7 @@ class SubtitleVersion(models.Model):
         metadata = kwargs.pop('metadata', None)
 
         if creating and not self.created:
-            self.created = datetime.now()
+            self.created = dates.now()
         if metadata is not None:
             self.update_metadata(metadata, commit=False)
             video_needs_save = True

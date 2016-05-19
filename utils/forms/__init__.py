@@ -13,6 +13,7 @@ from .dates import MonthChoiceField
 from .formrouter import FormRouter
 from .languages import MultipleLanguageChoiceField
 from .recapcha import ReCaptchaField
+from .teamautocomplete import TeamAutocompleteField, autocomplete_team_view
 from .userautocomplete import UserAutocompleteField, autocomplete_user_view
 from utils.translation import get_language_choices
 
