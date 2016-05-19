@@ -54,7 +54,7 @@ from teams.permissions import (
     can_resync as _can_resync,
 )
 from teams.permissions import (
-    can_invite, can_add_video_somewhere,
+    can_invite, can_add_video_somewhere, can_add_members,
     can_create_tasks, can_create_task_subtitle, can_create_task_translate,
     can_create_and_edit_subtitles, can_create_and_edit_translations
 )
@@ -72,6 +72,10 @@ logger = logging.getLogger(__name__)
 @register.filter
 def can_approve_application(team, user):
     return can_invite(team, user)
+
+@register.filter
+def can_add_members_to_team(team, user):
+    return can_add_members(team, user)
 
 @register.filter
 def can_invite_to_team(team, user):

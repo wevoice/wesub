@@ -78,6 +78,7 @@ class Complete(TaskAction):
     visual_class = 'endorse'
     subtitle_visibility = 'private'
     complete = True
+    requires_translated_metadata_if_enabled = True
 
     def perform(self, user, video, subtitle_language, saved_version):
         try:
@@ -98,6 +99,7 @@ class Approve(TaskAction):
     visual_class = 'endorse'
     subtitle_visibility = 'private'
     complete = True
+    requires_translated_metadata_if_enabled = True
 
     def perform(self, user, video, subtitle_language, saved_version):
         _complete_task(user, video, subtitle_language, saved_version,
@@ -111,6 +113,7 @@ class SendBack(TaskAction):
     visual_class = 'send-back'
     subtitle_visibility = 'private'
     complete = False
+    requires_translated_metadata_if_enabled = False
 
     def perform(self, user, video, subtitle_language, saved_version):
         _complete_task(user, video, subtitle_language, saved_version,

@@ -757,7 +757,13 @@ var angular = angular || null;
             this.language = this.SubtitleStorage.getLanguage(code);
         },
         getTitle: function() {
-            return this.title || this.video.title;
+            if(!this.language) {
+                return '';
+            } else if(this.language.isPrimaryAudioLanguage) {
+                return this.title || this.video.title;
+            } else {
+                return this.title;
+            }
         },
         getDescription: function() {
             if(!this.language) {

@@ -68,7 +68,7 @@ class TeamAPITest(TeamAPITestBase):
 
     def detail_url(self, team):
         return reverse('api:teams-detail', kwargs={
-            'slug': team.slug,
+            'team_slug': team.slug,
         }, request=APIRequestFactory().get('/'))
 
     def check_team_data(self, data, team):
@@ -161,11 +161,13 @@ class TeamAPITest(TeamAPITestBase):
         team = TeamFactory()
         response = self.client.put(self.detail_url(team), data={
             'name': 'New Name',
+            'slug': 'new-name',
         })
         assert_equal(response.status_code, status.HTTP_200_OK,
                      response.content)
         team = test_utils.reload_obj(team)
         assert_equal(team.name, 'New Name')
+        assert_equal(team.slug, 'new-name')
 
     def test_delete_team_not_allowed(self):
         team = TeamFactory()
@@ -187,6 +189,7 @@ class TeamAPITest(TeamAPITestBase):
         self.can_change_team_settings.return_value = False
         response = self.client.put(self.detail_url(team), data={
             'name': 'New Name',
+            'slug': 'new-name',
         })
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
         assert_equal(self.can_change_team_settings.call_args,
@@ -301,7 +304,8 @@ class TeamMemberAPITest(TeamAPITestBase):
         })
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
         assert_equal(self.can_add_member.call_args,
-                     mock.call(self.team, self.user))
+                     mock.call(self.team, self.user,
+                               TeamMember.ROLE_CONTRIBUTOR))
 
     def test_change_checks_permissions(self):
 #def can_assign_role(team, user, role, to_user):
@@ -429,9 +433,9 @@ class ProjectAPITest(TeamAPITestBase):
         project_slug_map = dict((p.slug, p) for p in projects)
         response = self.client.get(self.list_url)
         assert_equal(response.status_code, status.HTTP_200_OK)
-        assert_items_equal([p['slug'] for p in response.data],
+        assert_items_equal([p['slug'] for p in response.data['objects']],
                            project_slug_map.keys())
-        for project_data in response.data:
+        for project_data in response.data['objects']:
             self.check_project_data(project_data,
                                     project_slug_map[project_data['slug']])
 
@@ -921,7 +925,7 @@ class TasksAPITest(TeamAPITestBase):
         # deleting should flag the task as deleted, but keep the object around
         # in the DB
         assert_equal(self.team_video.task_set.not_deleted().count(), 0)
-        assert_equal(test_utils.obj_exists(task))
+        assert_true(test_utils.obj_exists(task))
 
     def test_create_fields(self):
         response = self.client.options(self.list_url)
@@ -971,6 +975,12 @@ class TasksAPITest(TeamAPITestBase):
                      response.content)
         assert_equal(self.can_delete_tasks.call_args, mock.call(
             self.team, self.user, self.team_video.project, task.language))
+
+    def test_get_doesnt_complete(self):
+        task = self.task_factory(language='en')
+        self.client.get(self.detail_url(task))
+        task = test_utils.reload_obj(task)
+        assert_equal(task.completed, None)
 
 class TeamApplicationAPITest(TeamAPITestBase):
     permissions_to_mock = [

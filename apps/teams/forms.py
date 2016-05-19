@@ -591,6 +591,33 @@ class LanguagesForm(forms.Form):
 
         return self.cleaned_data
 
+class AddMembersForm(forms.Form):
+    members = forms.CharField(required=False,
+                              widget=forms.Textarea(attrs={'rows': 10}),
+                              label=_("Users to add to team"))
+    def __init__(self, team, user, *args, **kwargs):
+        super(AddMembersForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.user = user
+    def save(self):
+        summary = {
+            "added": 0,
+            "unknown": [],
+            "already": [],
+            }
+        for username in set(self.cleaned_data['members'].split()):
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                summary["unknown"].append(username)
+            else:
+                member, created = TeamMember.objects.get_or_create(team=self.team, user=user)
+                if created:
+                    summary["added"] += 1
+                else:
+                    summary["already"].append(username)
+        return summary
+
 class InviteForm(forms.Form):
     username = UserAutocompleteField(error_messages={
         'invalid': _(u'User is already a member of this team'),

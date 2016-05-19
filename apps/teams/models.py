@@ -2701,6 +2701,9 @@ class SettingManager(models.Manager):
         })
         return messages
 
+    def features(self):
+        return self.get_query_set().filter(key__in=Setting.FEATURE_KEYS)
+
     def localized_messages(self):
         """Return a QS of settings related to team messages."""
         keys = [key for key, name in Setting.KEY_CHOICES
@@ -2733,6 +2736,8 @@ class Setting(models.Model):
         (311, 'block_new_collab_assignments_message'),
         # 400 is for text displayed on web pages
         (401, 'pagetext_welcome_heading'),
+        # 500 is to enable features
+        (501, 'enable_require_translated_metadata'),
     )
     KEY_NAMES = dict(KEY_CHOICES)
     KEY_IDS = dict([choice[::-1] for choice in KEY_CHOICES])
@@ -2749,6 +2754,10 @@ class Setting(models.Model):
     MESSAGE_DEFAULTS = {
         'pagetext_welcome_heading': _("Help %(team)s reach a world audience"),
     }
+    FEATURE_KEYS = [
+        key for key, name in KEY_CHOICES
+        if name.startswith('enable_')
+    ]
     key = models.PositiveIntegerField(choices=KEY_CHOICES)
     data = models.TextField(blank=True)
     team = models.ForeignKey(Team, related_name='settings')

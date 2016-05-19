@@ -117,3 +117,11 @@ ul.errorlist {
 hr.form-separator {
     margin: 20px 0;
 }
+
+div.summary {
+    border: 1px solid $light-gray;
+    background: $white;
+    margin: 20px 20px;
+    padding: 20px;
+    width: 500px;
+}
