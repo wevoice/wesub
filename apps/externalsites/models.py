@@ -384,7 +384,7 @@ class YouTubeAccount(ExternalAccount):
     oauth_refresh_token = models.CharField(max_length=255)
     last_import_video_id = models.CharField(max_length=100, blank=True,
                                             default='')
-    import_team = models.ForeignKey(Team, null=True)
+    import_team = models.ForeignKey(Team, null=True, blank=True)
     enable_language_mapping = models.BooleanField(default=True)
     sync_teams = models.ManyToManyField(
         Team, related_name='youtube_sync_accounts')
