@@ -31,6 +31,10 @@ from utils import translation
 from utils.text import fmt
 from videos.models import Video
 
+# Track progress on migrating the old activity records
+class ActivityMigrationProgress(models.Model):
+    last_migrated_id = models.IntegerField()
+
 # Couple of models that we use to track extra info related to activity records
 class VideoDeletion(models.Model):
     url = models.URLField(max_length=512, blank=True)
