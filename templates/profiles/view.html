@@ -18,7 +18,7 @@
         {% if action_list %}
             <ul class="listing activity">
                 {% for record in action_list %}
-                <li>{% include "activity/record.html" with skip_user=1 %}</li>
+                <li>{% include "activity/record.html" %}</li>
                 {% endfor %}
             </ul>
             {% if is_paginated %}{% paginator %}{% endif %}

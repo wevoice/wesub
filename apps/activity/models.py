@@ -316,13 +316,16 @@ class ActivityManager(models.Manager):
     def for_video(self, video):
         return self.filter(video=video).original()
 
-    def for_user(self, user):
+    def for_api_user(self, user):
         # Used for the default API listing.  It would be nice to simplify this
         # see #2557
         return (self
                 .filter(Q(user=user) | Q(team__in=user.teams.all()))
                 .original()
                 .distinct())
+
+    def for_user(self, user):
+        return self.filter(user=user).original()
 
     def for_team(self, team):
         return self.filter(team=team)
