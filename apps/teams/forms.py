@@ -1554,7 +1554,7 @@ class TeamVideoURLForm(forms.Form):
         def setup_video(video, video_url):
             video.is_public = team.is_visible
             if language is not None:
-                video.primary_audio_language = language
+                video.primary_audio_language_code = language
             if thumbnail:
                 video.s3_thumbnail.save(thumbnail.name, thumbnail)
             team_video = TeamVideo.objects.create(video=video, team=team,
