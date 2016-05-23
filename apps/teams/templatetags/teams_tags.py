@@ -57,7 +57,7 @@ from teams.permissions import (
     can_invite, can_add_video_somewhere, can_add_members,
     can_create_tasks, can_create_task_subtitle, can_create_task_translate,
     can_create_and_edit_subtitles, can_create_and_edit_translations,
-    can_create_team
+    can_create_team_ui
 )
 
 DEV_OR_STAGING = getattr(settings, 'DEV', False) or getattr(settings, 'STAGING', False)
@@ -104,7 +104,7 @@ def can_add_tasks(team, user):
 
 @register.filter
 def can_add_team(user):
-    return can_create_team(user)
+    return can_create_team_ui(user)
 
 @register.filter
 def is_team_manager(team, user):
