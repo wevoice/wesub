@@ -180,6 +180,21 @@ class BulkAddVideosTest(TestCase):
         assert_equal([i.text for i in subtitles.subtitle_items()],
                      ['first sub', 'second sub'])
 
+    def test_transcript_with_existing_video(self):
+        mocker = RequestsMocker()
+        video = VideoFactory(video_url__url=self.url)
+        mocker.expect_request('get', 'http://example.com/transcript.txt',
+                              body='first sub\n\nsecond sub')
+        with mocker:
+            self.run_add_team_videos([{
+                'url': self.url,
+                'language': 'en',
+                'transcript': 'http://example.com/transcript.txt'
+            }])
+        subtitles = video.subtitle_language('en').get_tip().get_subtitles()
+        assert_equal([i.text for i in subtitles.subtitle_items()],
+                     ['first sub', 'second sub'])
+
     def test_transcript_no_language(self):
         # we should ignore the transcript URL if no language is set
         mocker = RequestsMocker()

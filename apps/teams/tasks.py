@@ -227,6 +227,7 @@ def add_team_videos(team_pk, user_pk, videos):
                 else:
                     setup_video(e.video, e.video_url)
                     e.video.save()
+                    video = e.video
 
             if 'transcript' in video_item and len(video_item['transcript']) > 0 and video.primary_audio_language_code:
                 try:
