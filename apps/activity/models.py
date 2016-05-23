@@ -292,7 +292,11 @@ activity_choices = [
 
 class ActivityQueryset(query.QuerySet):
     def original(self):
-        return self.filter(copied_from__isnull=True)
+        # For some reason, using copied_from__isnull=True results in an extra
+        # join.  So we need a custom WHERE clause
+        return self.extra(where=[
+            'activity_activityrecord.copied_from_id IS NULL',
+        ])
 
     # Split team activity into "team activity" and "team video activity".
     # This is a holdover from the old activity system.  It would be nice to

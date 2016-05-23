@@ -19,6 +19,7 @@ from django import template
 from django.conf import settings
 from django.template.loader import render_to_string
 
+from activity.models import ActivityRecord
 from auth.models import CustomUser as User
 from profiles.forms import SelectLanguageForm
 from utils.translation import get_user_languages_from_request, get_user_languages_from_cookie
@@ -90,3 +91,21 @@ def profile_teams_list(context):
 @register.filter
 def custom_avatar(user, size):
     return user._get_avatar_by_size(size)
+
+@register.simple_tag(takes_context=True)
+def activity_list_hack(context):
+    """Used to iterate over the profile page activity records
+
+    MySQL should use the user_copied_created index for this query, but the
+    query profiler doesn't choose it by default.  We can persuade it to use
+    the index by selecting only the id column, which means that all values are
+    in the index.
+    """
+    qs = context.get('activity_list')
+    if qs is not None:
+        id_list = list(qs.values_list('id', flat=True))
+        context['activity_list'] = (
+            ActivityRecord.objects
+            .filter(id__in=id_list)
+            .order_by('-created')
+            .select_related('user', 'team', 'video'))

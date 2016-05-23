@@ -103,7 +103,7 @@ def profile(request, user_id):
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.ACTIVITIES_ONPAGE,
                        template_name='profiles/view.html',
-                       template_object_name='action',
+                       template_object_name='activity',
                        extra_context=extra_context)
 
 
@@ -114,9 +114,14 @@ def dashboard(request):
     tasks = user.open_tasks()
     since = datetime.now() - timedelta(days=30)
 
-    team_activity = (ActivityRecord.objects
-                     .filter(team__in=user.teams.all(), created__gt=since)
-                     .original())
+    # MySQL optimazies the team activity query very poorly if the user is not
+    # part of any teams
+    if user.teams.all().exists:
+        team_activity = (ActivityRecord.objects
+                         .filter(team__in=user.teams.all(), created__gt=since)
+                         .original())
+    else:
+        team_activity = ActivityRecord.objects.none()
     video_activity = (ActivityRecord.objects
                       .filter(video__in=user.videos.all(), created__gt=since)
                       .original())
