@@ -119,11 +119,13 @@ def dashboard(request):
     if user.teams.all().exists:
         team_activity = (ActivityRecord.objects
                          .filter(team__in=user.teams.all(), created__gt=since)
+                         .exclude(user=user)
                          .original())
     else:
         team_activity = ActivityRecord.objects.none()
     video_activity = (ActivityRecord.objects
                       .filter(video__in=user.videos.all(), created__gt=since)
+                      .exclude(user=user)
                       .original())
 
     context = {

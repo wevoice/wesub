@@ -109,3 +109,4 @@ def activity_list_hack(context):
             .filter(id__in=id_list)
             .order_by('-created')
             .select_related('user', 'team', 'video'))
+    return ''
