@@ -118,8 +118,12 @@ class CodeField(models.PositiveSmallIntegerField):
 
     def contribute_to_class(self, cls, name):
         super(CodeField, self).contribute_to_class(cls, name)
+        choices_attr_name = '{}_choices'.format(name)
         code_attr_name = '{}_code'.format(name)
         obj_attr_name = '{}_obj'.format(name)
+        @staticmethod
+        def get_code_choices():
+            return self.choices
         @property
         def get_code_value(instance):
             slug = getattr(instance, self.get_attname(), None)
@@ -133,6 +137,7 @@ class CodeField(models.PositiveSmallIntegerField):
             if slug is None:
                 return None
             return self.value_to_code[self.slug_to_value[slug]]
+        setattr(cls, choices_attr_name, get_code_choices)
         setattr(cls, code_attr_name, get_code_value)
         setattr(cls, obj_attr_name, get_code_obj)
 
@@ -149,10 +154,13 @@ class CodeField(models.PositiveSmallIntegerField):
     def get_prep_value(self, value):
         if value is None:
             return None
+        # If we get a type code, just return it
+        if isinstance(value, (int, long)):
+            return value
         try:
             return self.slug_to_value[value]
         except KeyError:
-            raise KeyError("Unknown code: {}".format(value))
+            raise KeyError("Unknown code: {!r}".format(value))
 
 add_introspection_rules([], [
     "^codefield\.CodeField$",

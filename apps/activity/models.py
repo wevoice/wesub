@@ -18,6 +18,9 @@
 
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db import transaction
+from django.db.models import Q
+from django.db.models import query
 from django.utils.translation import ugettext_lazy as _
 
 from auth.models import CustomUser as User
@@ -57,6 +60,13 @@ class ActivityType(Code):
     def format_message(self, record, msg, **data):
         return msg % ActivityMessageDict(record, data)
 
+    def get_related_obj(self, related_obj_id):
+        ModelClass = self.related_model
+        if ModelClass is None or related_obj_id is None:
+            return None
+        else:
+            return ModelClass.objects.get(id=related_obj_id)
+
 class ActivityMessageDict(object):
     """Helper class to format our messages.
 
@@ -90,7 +100,9 @@ class VideoAdded(ActivityType):
     label = _('Video Added')
 
     def get_message(self, record):
-        return _('Video added to amara')
+        return self.format_message(
+            record,
+            _('added a video: <a href="%(video_url)s">%(video)s</a>'))
 
 class VideoTitleChanged(ActivityType):
     slug = 'video-title-changed'
@@ -99,7 +111,7 @@ class VideoTitleChanged(ActivityType):
     active = False
 
     def get_message(self, record):
-        return _('Videos title was changed')
+        return _('edited a video title')
 
 class CommentAdded(ActivityType):
     slug = 'comment-added'
@@ -109,11 +121,11 @@ class CommentAdded(ActivityType):
     def get_message(self, record):
         if record.language_code:
             return self.format_message(record,
-                _(u'Commented on <a href="%(language_url)s">%(language)s '
+                _(u'commented on <a href="%(language_url)s">%(language)s '
                   'subtitles</a> for <a href="%(video_url)s">%(video)s</a>'))
         else:
             return self.format_message(record,
-                _(u'Commented on <a href="%(video_url)s">%(video)s</a>'))
+                _(u'commented on <a href="%(video_url)s">%(video)s</a>'))
 
 class VersionAdded(ActivityType):
     slug = 'version-added'
@@ -121,7 +133,7 @@ class VersionAdded(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _(u'Edited <a href="%(language_url)s">%(language)s '
+            _(u'edited <a href="%(language_url)s">%(language)s '
               'subtitles</a> for <a href="%(video_url)s">%(video)s</a>'))
 
 class VideoURLAdded(ActivityType):
@@ -130,9 +142,9 @@ class VideoURLAdded(ActivityType):
     related_model = URLEdit
 
     def get_message(self, record):
-        url_edit = self.get_related_obj()
+        url_edit = record.get_related_obj()
         return self.format_message(record,
-            _(u'Added new URL for <a href="%(video_url)s">%(video)s</a>'))
+            _(u'added new URL for <a href="%(video_url)s">%(video)s</a>'))
 
 class TranslationAdded(ActivityType):
     slug = 'translation-added'
@@ -142,7 +154,7 @@ class TranslationAdded(ActivityType):
     active = False
 
     def get_message(self, record):
-        return _('Added a translation')
+        return _('added a translation')
 
 class SubtitleRequestCreated(ActivityType):
     slug = 'subtitle-request-created'
@@ -152,7 +164,7 @@ class SubtitleRequestCreated(ActivityType):
     active = False
 
     def get_message(self, record):
-        return _('Subtitle request created')
+        return _('created a subtitle request')
 
 class VersionApproved(ActivityType):
     slug = 'version-approved'
@@ -160,7 +172,7 @@ class VersionApproved(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _('Approved <a href="%(language_url)s">%(language)s</a> subtitles'
+            _('approved <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
 
 class MemberJoined(ActivityType):
@@ -198,7 +210,7 @@ class VersionRejected(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _('Rejected <a href="%(language_url)s">%(language)s</a> subtitles'
+            _('rejected <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
 
 class MemberLeft(ActivityType):
@@ -206,7 +218,7 @@ class MemberLeft(ActivityType):
     label = _('Member Left')
 
     def get_message(self, record):
-        return self.format_message(record, _("Left the %(team)s team"))
+        return self.format_message(record, _("left the %(team)s team"))
 
 class VersionReviewed(ActivityType):
     slug = 'version-reviewed'
@@ -217,7 +229,7 @@ class VersionReviewed(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _('Reviewed <a href="%(language_url)s">%(language)s</a> subtitles'
+            _('reviewed <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
 
 class VersionAccepted(ActivityType):
@@ -226,7 +238,7 @@ class VersionAccepted(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _('Accepted <a href="%(language_url)s">%(language)s</a> subtitles'
+            _('accepted <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
 
 class VersionDeclined(ActivityType):
@@ -235,7 +247,7 @@ class VersionDeclined(ActivityType):
 
     def get_message(self, record):
         return self.format_message(record,
-            _('Declined <a href="%(language_url)s">%(language)s</a> subtitles'
+            _('declined <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
 
 class VideoDeleted(ActivityType):
@@ -245,7 +257,7 @@ class VideoDeleted(ActivityType):
 
     def get_message(self, record):
         deletion = record.get_related_obj()
-        return self.format_message(record, _('Deleted a video: %(title)s'),
+        return self.format_message(record, _('deleted a video: %(title)s'),
                                    title=deletion.title)
 
 class VideoURLEdited(ActivityType):
@@ -255,7 +267,7 @@ class VideoURLEdited(ActivityType):
 
     def get_message(self, record):
         url_edit = record.get_related_obj()
-        msg = _('Changed primary url from '
+        msg = _('changed primary url from '
                 '<a href="%(old_url)s">%(old_url)s</a> to '
                 '<a href="%(new_url)s">%(new_url)s</a>')
         return self.format_message(record, msg, old_url=url_edit.old_url,
@@ -268,7 +280,7 @@ class VideoURLDeleted(ActivityType):
 
     def get_message(self, record):
         url_edit = record.get_related_obj()
-        msg = _('Deleted url <a href="%(url)s">%(url)s</a>')
+        msg = _('deleted url <a href="%(url)s">%(url)s</a>')
         return self.format_message(record, msg, url=url_edit.old_url)
 
 activity_choices = [
@@ -277,6 +289,147 @@ activity_choices = [
     VersionRejected, MemberLeft, VersionReviewed, VersionAccepted,
     VersionDeclined, VideoDeleted, VideoURLEdited, VideoURLDeleted,
 ]
+
+class ActivityQueryset(query.QuerySet):
+    def original(self):
+        # For some reason, using copied_from__isnull=True results in an extra
+        # join.  So we need a custom WHERE clause
+        return self.extra(where=[
+            'activity_activityrecord.copied_from_id IS NULL',
+        ])
+
+    # Split team activity into "team activity" and "team video activity".
+    # This is a holdover from the old activity system.  It would be nice to
+    # remove this, see #2559.
+    TEAM_ACTIVITY_TYPES = ['member-left', 'member-joined']
+    def team_activity(self):
+        return self.filter(type__in=self.TEAM_ACTIVITY_TYPES)
+
+    def team_video_activity(self):
+        return self.exclude(type__in=self.TEAM_ACTIVITY_TYPES)
+
+class ActivityManager(models.Manager):
+    use_for_related_fields = True
+
+    def get_query_set(self):
+        return ActivityQueryset(self.model, using=self._db)
+
+    def original(self):
+        return self.get_query_set().original()
+
+    def for_video(self, video):
+        return self.filter(video=video).original()
+
+    def for_api_user(self, user):
+        # Used for the default API listing.  It would be nice to simplify this
+        # see #2557
+        return (self
+                .filter(Q(user=user) | Q(team__in=user.teams.all()))
+                .original()
+                .distinct())
+
+    def for_user(self, user):
+        return self.filter(user=user).original()
+
+    def for_team(self, team):
+        return self.filter(team=team)
+
+    def create(self, type, **attrs):
+        return super(ActivityManager, self).create(type=type, **attrs)
+
+    def create_for_video(self, type, video, **attrs):
+        team_video = video.get_team_video()
+        team_id = team_video.team_id if team_video else None
+        return self.create(
+            type=type, video=video, team_id=team_id,
+            video_language_code=video.primary_audio_language_code, **attrs)
+
+    def create_for_video_added(self, video):
+        return self.create_for_video('video-added', video,
+                                     user=video.user, created=video.created)
+
+    def create_for_comment(self, video, comment, language_code=''):
+        return self.create_for_video(
+            'comment-added', video, user=comment.user,
+            created=comment.submit_date, related_obj_id=comment.id,
+            language_code=language_code)
+
+    def create_for_subtitle_version(self, version):
+        return self.create_for_video(
+            'version-added', version.video,
+            language_code=version.language_code, user=version.author,
+            created=version.created)
+
+    def create_for_video_url_added(self, video_url):
+        with transaction.commit_on_success():
+            url_edit = URLEdit.objects.create(new_url=video_url.url)
+            return self.create_for_video('video-url-added', video_url.video,
+                                         user=video_url.added_by,
+                                         created=video_url.created,
+                                         related_obj_id=url_edit.id)
+
+    def create_for_version_approved(self, version, user):
+        return self.create_for_video('version-approved', version.video,
+                                     user=user,
+                                     language_code=version.language_code,
+                                     created=dates.now())
+
+    def create_for_version_accepted(self, version, user):
+        return self.create_for_video('version-accepted', version.video,
+                                     user=user,
+                                     language_code=version.language_code,
+                                     created=dates.now())
+
+    def create_for_version_rejected(self, version, user):
+        return self.create_for_video('version-rejected', version.video,
+                                     user=user,
+                                     language_code=version.language_code,
+                                     created=dates.now())
+
+    def create_for_version_declined(self, version, user):
+        return self.create_for_video('version-declined', version.video,
+                                     user=user,
+                                     language_code=version.language_code,
+                                     created=dates.now())
+
+    def create_for_new_member(self, member):
+        role_code = MemberJoined.role_to_code[member.role]
+        return self.create('member-joined', team=member.team,
+                           user=member.user, created=member.created,
+                           related_obj_id=role_code)
+
+    def create_for_member_deleted(self, member):
+        return self.create('member-left', team=member.team,
+                           user=member.user, created=dates.now())
+
+    def create_for_video_deleted(self, video, user):
+        with transaction.commit_on_success():
+            url = video.get_video_url()
+            video_deletion = VideoDeletion.objects.create(
+                title=video.title_display(),
+                url=url if url is not None else '')
+            return self.create('video-deleted', user=user,
+                               created=dates.now(),
+                               related_obj_id=video_deletion.id)
+
+    def create_for_video_url_made_primary(self, video_url, old_url, user):
+        with transaction.commit_on_success():
+            url_edit = URLEdit.objects.create(old_url=old_url.url,
+                                              new_url=video_url.url)
+            return self.create_for_video('video-url-edited', video_url.video,
+                                         user=user, created=dates.now(),
+                                         related_obj_id=url_edit.id)
+
+    def create_for_video_url_deleted(self, video_url, user):
+        with transaction.commit_on_success():
+            url_edit = URLEdit.objects.create(old_url=video_url.url)
+            return self.create_for_video('video-url-deleted', video_url.video,
+                                         user=user, created=dates.now(),
+                                         related_obj_id=url_edit.id)
+
+    def move_video_records_to_team(self, video, team):
+        for record in self.filter(video=video, copied_from=None):
+            record.move_to_team(team)
 
 class ActivityRecord(models.Model):
     type = CodeField(choices=activity_choices)
@@ -312,7 +465,10 @@ class ActivityRecord(models.Model):
     # team.
     copied_from = models.ForeignKey('self', blank=True, null=True)
 
+    objects = ActivityManager()
+
     class Meta:
+        ordering = ['-created']
         # If we were using a newer version of django we would have this:
         #index_together = [
             ## Team activity stream.  There's often lots of activity per-team,
@@ -328,10 +484,31 @@ class ActivityRecord(models.Model):
         #]
         # Instead, these are handled by the setup_indexes code and a south
         # migration
-        pass
 
     def __unicode__(self):
         return u'ActivityRecord: {}'.format(self.type)
+
+    def move_to_team(self, new_team):
+        with transaction.commit_on_success():
+            # Make a copy of the record for our current team
+            if self.team is not None:
+                self.make_copy()
+            # Move to the new team
+            self.team = new_team
+            self.save()
+            # Delete any old copies on the new team
+            if new_team is not None:
+                ActivityRecord.objects.filter(copied_from=self,
+                                              team_id=new_team.id).delete()
+
+    def make_copy(self):
+        copy = ActivityRecord(copied_from=self)
+        fields = ['type', 'user_id', 'team_id', 'video_id', 'language_code',
+                  'related_obj_id', ]
+        for name in fields:
+            setattr(copy, name, getattr(self, name))
+        copy.save()
+        return copy
 
     def get_language_code_display(self):
         if self.language_code:
@@ -362,12 +539,6 @@ class ActivityRecord(models.Model):
 
     def get_related_obj(self):
         if not hasattr(self, '_related_obj_cache'):
-            self._related_obj_cache = self._get_related_obj()
+            self._related_obj_cache = self.type_obj.get_related_obj(
+                self.related_obj_id)
         return self._related_obj_cache
-
-    def _get_related_obj(self):
-        ModelClass = self.type_obj.related_model
-        if ModelClass is None or self.related_obj_id is None:
-            return None
-        else:
-            return ModelClass.objects.get(id=self.related_obj_id)

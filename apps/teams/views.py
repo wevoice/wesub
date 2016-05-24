@@ -89,7 +89,7 @@ from utils.translation import (
 from utils.chunkediter import chunkediter
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
-from videos.models import Action, VideoUrl, Video, VideoFeed
+from videos.models import VideoUrl, Video, VideoFeed
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
@@ -909,10 +909,7 @@ def remove_video(request, team_video_pk):
     video = team_video.video
 
     if wants_delete:
-        # create the action handler before deleting the video, so that
-        # it can grab the video's title
-        Action.delete_video_handler(video, team_video.team, request.user)
-        video.delete()
+        video.delete(request.user)
         msg = _(u'Video has been deleted from Amara.')
     else:
         team_video.delete()
@@ -1256,11 +1253,9 @@ def leave_team(request, slug):
         member = TeamMember.objects.get(team=team, user=user)
         tm_user_pk = member.user.pk
         team_pk = member.team.pk
-        member.delete()
+        member.leave_team()
         [application.on_member_leave(request.user, "web UI") for application in \
          member.team.applications.filter(status=Application.STATUS_APPROVED)]
-
-        notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))
     return redirect(request.META.get('HTTP_REFERER') or team)

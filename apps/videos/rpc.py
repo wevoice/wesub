@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
 from subtitles.models import SubtitleLanguage
-from videos.models import Video, Action
+from videos.models import Video
 from videos.tasks import send_change_title_email
 from utils.multi_query_set import MultiQuerySet
 from utils.rpc import Error, Msg, RpcExceptionEvent, add_request_to_kwargs
@@ -232,7 +232,6 @@ class VideosApiClass(object):
                     video.title = title
                     video.slug = slugify(video.title)
                     video.save()
-                    Action.change_title_handler(video, user)
                     send_change_title_email.delay(video.id, user and user.id, old_title.encode('utf8'), video.title.encode('utf8'))
             else:
                 return Error(_(u'Title can\'t be changed for this video'))

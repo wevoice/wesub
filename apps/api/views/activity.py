@@ -24,15 +24,18 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.reverse import reverse
 
+from activity.models import ActivityRecord
 from api.fields import TimezoneAwareDateTimeField
 from subtitles.models import SubtitleLanguage
 from teams.models import Team
-from videos.models import Action, Video
+from videos.models import Video
 
 class ActivitySerializer(serializers.ModelSerializer):
-    type = serializers.IntegerField(source='action_type')
+    type = serializers.IntegerField(source='type_code')
+    type_name = serializers.SlugField(source='type')
     user = serializers.CharField(source='user.username')
-    comment = serializers.CharField(source='comment.content')
+    comment = serializers.SerializerMethodField()
+    new_video_title = serializers.SerializerMethodField()
     created = TimezoneAwareDateTimeField(read_only=True)
     video = serializers.CharField(source='video.video_id')
     video_uri = serializers.HyperlinkedRelatedField(
@@ -40,26 +43,41 @@ class ActivitySerializer(serializers.ModelSerializer):
         view_name='api:video-detail',
         lookup_field='video_id',
         read_only=True)
-    language = serializers.CharField(source='new_language.language_code')
+    language = serializers.SerializerMethodField()
     language_url = serializers.SerializerMethodField()
     resource_uri = serializers.HyperlinkedIdentityField(
         view_name='api:activity-detail',
         lookup_field='id',
     )
 
-    def get_language_url(self, action):
-        if not action.new_language:
+    def get_language(self, record):
+        return record.language_code or None
+
+    def get_comment(self, record):
+        if record.type == 'comment-added':
+            return record.get_related_obj().content
+        else:
+            return None
+
+    def get_new_video_title(self, record):
+        if record.type == 'video-title-changed':
+            return record.get_related_obj().new_title
+        else:
+            return None
+
+    def get_language_url(self, record):
+        if not (record.language_code and record.video):
             return None
         return reverse('api:subtitle-language-detail', kwargs={
-            'video_id': action.new_language.video.video_id,
-            'language_code': action.new_language.language_code,
+            'video_id': record.video.video_id,
+            'language_code': record.language_code,
         }, request=self.context['request'])
 
     class Meta:
-        model = Action
+        model = ActivityRecord
         fields = (
-            'id', 'type', 'created', 'video', 'video_uri', 'language',
-            'language_url', 'user', 'comment', 'new_video_title',
+            'id', 'type', 'type_name', 'created', 'video', 'video_uri',
+            'language', 'language_url', 'user', 'comment', 'new_video_title',
             'resource_uri'
         )
 
@@ -132,51 +150,45 @@ class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
     paginate_by = 20
 
     def get_queryset(self):
-        self.applied_language_filter = False
         params = self.request.query_params
         if 'team' in params:
             try:
                 team = Team.objects.get(slug=params['team'])
             except Team.DoesNotExist:
-                return Action.objects.none()
+                return ActivityRecord.objects.none()
             if not team.user_is_member(self.request.user):
                 raise PermissionDenied()
+            qs = ActivityRecord.objects.for_team(team)
             if 'team-activity' in params:
-                qs = Action.objects.filter(team=team)
-            elif 'language' in params:
-                language_qs = (
-                    SubtitleLanguage.objects
-                    .filter(language_code=params['language'],
-                            video__teamvideo__team_id=team.id)
-                    .values_list('id')
-                )
-                qs = Action.objects.filter(new_language_id__in=language_qs)
-                self.applied_language_filter = True
+                qs = qs.team_activity()
             else:
-                qs = team.fetch_video_actions()
+                qs = qs.team_video_activity()
         elif 'video' in params:
             try:
                 video = Video.objects.get(video_id=params['video'])
             except Video.DoesNotExist:
-                return Action.objects.none()
+                return ActivityRecord.objects.none()
             team_video = video.get_team_video()
             if (team_video and not
                 team_video.team.user_is_member(self.request.user)):
                 raise PermissionDenied()
-            qs = Action.objects.for_video(video)
+            qs = video.activity.original()
         else:
-            qs = Action.objects.for_user(self.request.user)
+            qs = ActivityRecord.objects.for_api_user(self.request.user)
         return qs.select_related(
                 'video', 'user', 'language', 'language__video')
 
     def filter_queryset(self, queryset):
         params = self.request.query_params
         if 'type' in params:
-            queryset = queryset.filter(action_type=params['type'])
-        if 'language' in params and not self.applied_language_filter:
-            queryset = queryset.filter(
-                new_language__language_code=params['language'])
-            self.applied_language_filter = True
+            try:
+                type_filter = int(params['type'])
+            except ValueError:
+                queryset = ActivityRecord.objects.none()
+            else:
+                queryset = queryset.filter(type=type_filter)
+        if 'language' in params:
+            queryset = queryset.filter(language_code=params['language'])
         if 'before' in params:
             queryset = queryset.filter(
                 created__lt=datetime.fromtimestamp(int(params['before'])))

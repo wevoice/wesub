@@ -53,14 +53,14 @@ from teams import tasks
 from teams import workflows
 from teams.exceptions import ApplicationInvalidException
 from teams.notifications import BaseNotification
-from teams.signals import api_subtitles_approved, api_subtitles_rejected
+from teams.signals import (member_leave, api_subtitles_approved,
+                           api_subtitles_rejected)
 from utils import DEFAULT_PROTOCOL
 from utils import translation
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.text import fmt
-from videos.models import (Video, VideoUrl, SubtitleVersion, SubtitleLanguage,
-                           Action)
+from videos.models import Video, VideoUrl, SubtitleVersion, SubtitleLanguage
 from videos.tasks import video_changed_tasks
 from subtitles.models import (
     SubtitleVersion as NewSubtitleVersion,
@@ -584,19 +584,6 @@ class Team(models.Model):
         if not user.is_authenticated():
             return False
         return self.is_member(user)
-
-    def fetch_video_actions(self, video_language=None):
-        """Fetch the Action objects for this team's videos
-
-        Args:
-            video_language: only actions for videos with this
-                            primary_audio_language_code
-        """
-        video_q = TeamVideo.objects.filter(team=self).values_list('video_id')
-        if video_language is not None:
-            video_q = video_q.filter(
-                video__primary_audio_language_code=video_language)
-        return Action.objects.filter(video_id__in=video_q)
 
     def projects_with_video_stats(self):
         """Fetch all projects for this team and stats about their videos
@@ -1351,6 +1338,10 @@ class TeamMember(models.Model):
     def delete(self):
         super(TeamMember, self).delete()
         Team.cache.invalidate_by_pk(self.team_id)
+
+    def leave_team(self):
+        member_leave.send(sender=self)
+        notifier.team_member_leave(self.team_id, self.user_id)
 
     def project_narrowings(self):
         """Return any project narrowings applied to this member."""
