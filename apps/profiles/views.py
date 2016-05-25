@@ -116,17 +116,21 @@ def dashboard(request):
 
     # MySQL optimazies the team activity query very poorly if the user is not
     # part of any teams
-    if user.teams.all().exists:
+    if user.teams.all().exists():
         team_activity = (ActivityRecord.objects
                          .filter(team__in=user.teams.all(), created__gt=since)
                          .exclude(user=user)
                          .original())
     else:
         team_activity = ActivityRecord.objects.none()
-    video_activity = (ActivityRecord.objects
-                      .filter(video__in=user.videos.all(), created__gt=since)
-                      .exclude(user=user)
-                      .original())
+    # Ditto for video activity
+    if user.videos.all().exists():
+        video_activity = (ActivityRecord.objects
+                          .filter(video__in=user.videos.all(), created__gt=since)
+                          .exclude(user=user)
+                          .original())
+    else:
+        video_activity = ActivityRecord.objects.none()
 
     context = {
         'user_info': user,
