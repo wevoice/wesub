@@ -25,14 +25,16 @@
 	{% endif %}
 	<form method="post" action="" class="invite-members">
 	  {% csrf_token %}
+	  <fieldset>
 	  {{ form.errors.role }}
           <label for="id_role">{% trans 'Assign to role' %}</label>
           {{ form.role }}
-	  <br />
-	  {% include "_field.html" with field=form.members %}	  
+	  <p>{% trans 'Important: Only new members being added to the team will be assigned this role. The members that are already in the team will not change their roles.' %}</p>
+	  {% include "_field.html" with field=form.members %}
 	  <div class="actions">
 	    <button class="submit">{% trans "Add" %}</button>
 	  </div>
+	  </fieldset>
 	</form>
     </div>
 
