@@ -171,8 +171,7 @@ class TestViews(WebUseTest):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.video.videourl_set.count(), 1)
-        delete_actions = self.video.action_set.filter(
-            action_type=Action.DELETE_URL)
+        delete_actions = self.video.activity.filter(type='video-url-deleted')
         self.assertEqual(delete_actions.count(), 1)
         # assert cache is invalidated
         cached_video_urls = video_cache.get_video_urls(self.video.video_id)

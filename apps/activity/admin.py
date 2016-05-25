@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2013 Participatory Culture Foundation
+# Copyright (C) 2016 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,32 +16,18 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from datetime import date
-
-from django import template
-from django.conf import settings
-from django.utils.dateformat import format as date_format
+from django.contrib import admin
 
 from activity.models import ActivityRecord
 
-register = template.Library()
+class ActivityRecordAdmin(admin.ModelAdmin):
+    list_display = ('type', 'user', 'team', 'video', 'language_code',
+                    'message',)
 
-LIMIT = settings.RECENT_ACTIVITIES_ONPAGE
+    def message(self, record):
+        return record.get_message()
 
-@register.inclusion_tag('videos/_recent_activity.html')
-def recent_activity(user):
-    qs = ActivityRecord.objects.for_user(user)
+    class Meta:
+        model = ActivityRecord
 
-    return {
-        'records': qs[:LIMIT],
-        'user_info': user
-    }
-
-@register.inclusion_tag('videos/_video_activity.html')
-def video_activity(video):
-    qs = ActivityRecord.objects.for_video(video)
-
-    return {
-        'records': qs[:LIMIT],
-        'video': video
-    }
+admin.site.register(ActivityRecord, ActivityRecordAdmin)

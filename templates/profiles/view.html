@@ -1,6 +1,6 @@
 {% extends "profiles/base.html" %}
 
-{% load i18n messages_tags recent_activity paginator %}
+{% load i18n messages_tags profiles_tags recent_activity paginator %}
 {% load url from future %}
 
 {% block title %}{{ user_info }} | Amara{% endblock %}
@@ -11,14 +11,15 @@
 {% endblock %}
 
 {% block view_content %}
+    {% activity_list_hack %}
     {% with 'activity' as current %}
         {% include 'profiles/_tabs.html' %}
     {% endwith %}
     {% if user_info.is_active %}
-        {% if action_list %}
+        {% if activity_list %}
             <ul class="listing activity">
-                {% for item in action_list %}
-                    <li>{{ item.render }}</li>
+                {% for record in activity_list %}
+                <li>{% include "activity/record.html" %}</li>
                 {% endfor %}
             </ul>
             {% if is_paginated %}{% paginator %}{% endif %}

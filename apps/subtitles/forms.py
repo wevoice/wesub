@@ -288,15 +288,16 @@ class SubtitlesUploadForm(forms.Form):
         subtitle_language = self.video.subtitle_language(language_code)
         title, description = self.video.title, self.video.description
         metadata = self.video.get_metadata()
-
+        from_previous_version = False
         if subtitle_language:
             previous_version = subtitle_language.get_tip()
             if previous_version:
+                from_previous_version = True
                 title = previous_version.title
                 description = previous_version.description
                 metadata = previous_version.get_metadata()
 
-        return title, description, metadata
+        return title, description, metadata, from_previous_version
 
     def _find_parents(self, from_language_code):
         """Find the parents that should be used for this upload.
@@ -362,9 +363,9 @@ class SubtitlesUploadForm(forms.Form):
                 if f.key_name == "enable_require_translated_metadata":
                     get_title_description_metadata = False
                     break
-        if get_title_description_metadata:
-            title, description, metadata = self._find_title_description_metadata(language_code)
-        else:
+
+        title, description, metadata, previous_version = self._find_title_description_metadata(language_code)
+        if not (get_title_description_metadata or previous_version):
             title, description, metadata = "", "", {}
 
         parents = self._find_parents(from_language_code)

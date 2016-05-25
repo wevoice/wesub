@@ -31,6 +31,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_unicode
 from tastypie.models import ApiKey
 
+from activity.models import ActivityRecord
 from auth.models import CustomUser as User
 from profiles.forms import (EditUserForm, EditAccountForm, SendMessageForm,
                             EditAvatarForm, AdminProfileForm, EditNotificationsForm)
@@ -43,7 +44,7 @@ from utils.text import fmt
 from teams.models import Task
 from subtitles.models import SubtitleLanguage
 from videos.models import (
-    Action, VideoUrl, Video, VIDEO_TYPE_YOUTUBE, VideoFeed
+    VideoUrl, Video, VIDEO_TYPE_YOUTUBE, VideoFeed
 )
 
 logger = logging.getLogger(__name__)
@@ -92,11 +93,7 @@ def profile(request, user_id):
             form = AdminProfileForm(instance=user)
     else:
         form = None
-    qs = (Action.objects
-          .filter(user=user)
-          .select_related('new_language', 'new_language__video', 'video',
-                          'user')
-         )
+    qs = ActivityRecord.objects.for_user(user)
 
     extra_context = {
         'user_info': user,
@@ -106,7 +103,7 @@ def profile(request, user_id):
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.ACTIVITIES_ONPAGE,
                        template_name='profiles/view.html',
-                       template_object_name='action',
+                       template_object_name='activity',
                        extra_context=extra_context)
 
 
@@ -117,17 +114,19 @@ def dashboard(request):
     tasks = user.open_tasks()
     since = datetime.now() - timedelta(days=30)
 
-    team_activity = (Action.objects
-                     .for_user_team_activity(user)
-                     .filter(created__gt=since)
-                     .select_related('team', 'member', 'user')
-                    )
-    video_activity = (Action.objects
-                      .for_user_video_activity(user)
-                      .filter(created__gt=since)
-                      .select_related('video', 'new_language',
-                                      'new_language__video', 'user')
-                     )
+    # MySQL optimazies the team activity query very poorly if the user is not
+    # part of any teams
+    if user.teams.all().exists:
+        team_activity = (ActivityRecord.objects
+                         .filter(team__in=user.teams.all(), created__gt=since)
+                         .exclude(user=user)
+                         .original())
+    else:
+        team_activity = ActivityRecord.objects.none()
+    video_activity = (ActivityRecord.objects
+                      .filter(video__in=user.videos.all(), created__gt=since)
+                      .exclude(user=user)
+                      .original())
 
     context = {
         'user_info': user,

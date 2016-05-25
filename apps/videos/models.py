@@ -295,6 +295,41 @@ class VideoCacheManager(ModelCacheManager):
         self._video_id_to_pk[video_id] = pk
         return pk
 
+class VideoFieldMonitor(object):
+    """Monitor model fields for the Video model"""
+
+    # map field names to signals
+    field_map = {
+        'title': signals.title_changed,
+        'duration': signals.duration_changed,
+        'primary_audio_language_code': signals.language_changed,
+    }
+
+    def __init__(self, video):
+        self.data = {
+            name: getattr(video, name, None)
+            for name in self.field_map
+        }
+
+    def on_save(self, video, created):
+        """Call this in the save() method.  If any of the fields have changed,
+        then we will emit the corresponding signal.
+        """
+        for name in self.field_map:
+            new_value = getattr(video, name, None)
+            old_value = self.data[name]
+            if new_value != old_value:
+                self.data[name] = new_value
+                if not created:
+                    self.send_signal(video, name, old_value)
+
+    def send_signal(self, video, name, old_value):
+        signal = self.field_map[name]
+        kwargs = {
+            'old_{}'.format(name): old_value
+        }
+        signal.send(sender=video, **kwargs)
+
 class Video(models.Model):
     """Central object in the system"""
 
@@ -375,8 +410,7 @@ class Video(models.Model):
     def __init__(self, *args, **kwargs):
         super(Video, self).__init__(*args, **kwargs)
         self._language_fetcher = SubtitleLanguageFetcher()
-        self.orig_title = self.title
-        self.orig_duration = self.duration
+        self.monitor = VideoFieldMonitor(self)
 
     def __unicode__(self):
         title = self.title_display()
@@ -385,16 +419,13 @@ class Video(models.Model):
         return title
 
     def save(self, *args, **kwargs):
+        created = self.id is None
         super(Video, self).save(*args, **kwargs)
-        if self.title != self.orig_title:
-            old_title = self.orig_title
-            self.orig_title = self.title
-            signals.title_changed.send(sender=self, old_title=old_title)
-        if self.duration != self.orig_duration:
-            old_duration = self.orig_duration
-            self.orig_duration = self.duration
-            signals.duration_changed.send(sender=self,
-                                          old_duration=old_duration)
+        self.monitor.on_save(self, created)
+
+    def delete(self, user=None):
+        signals.video_deleted.send(sender=self, user=user)
+        super(Video, self).delete()
 
     def update_search_index(self):
         """Update this video's search index text."""
@@ -586,6 +617,12 @@ class Video(models.Model):
 
     get_absolute_url = _get_absolute_url
 
+    def get_language_url(self, language_code):
+        return reverse('videos:translation_history_legacy', kwargs={
+            'video_id': self.video_id,
+            'lang': language_code,
+        })
+
     def get_primary_videourl_obj(self):
         """Return the primary video URL for this video if one exists, otherwise None.
 
@@ -672,11 +709,11 @@ class Video(models.Model):
             if user and user.notify_by_message:
                 video.followers.add(user)
         # Run post-creation code
-        Action.create_video_handler(video, user)
         video_cache.invalidate_cache(video.video_id)
         video.cache.invalidate()
         signals.video_added.send(sender=video, video_url=video_url)
-        signals.video_url_added.send(sender=video_url, video=video)
+        signals.video_url_added.send(sender=video_url, video=video,
+                                     new_video=True)
 
         return (video, video_url)
 
@@ -696,10 +733,10 @@ class Video(models.Model):
         """
         vt, video_url = self._add_video_url(url, user, False)
 
-        Action.create_video_url_handler(self, video_url)
         video_cache.invalidate_cache(self.video_id)
         self.cache.invalidate()
-        signals.video_url_added.send(sender=video_url, video=self)
+        signals.video_url_added.send(sender=video_url, video=self,
+                                     new_video=False)
 
         return video_url
 
@@ -2007,10 +2044,6 @@ class Action(models.Model):
             instance.action = obj
             instance.save()
 
-
-post_save.connect(Action.create_comment_handler, Comment)
-
-
 # UserTestResult
 class UserTestResult(models.Model):
     email = models.EmailField()
@@ -2086,23 +2119,15 @@ class VideoUrl(models.Model):
 
     def make_primary(self, user=None):
         # create activity item
-        obj = Action(video=self.video)
-        urls = VideoUrl.objects.filter(video=self.video)
-        obj.action_type = Action.EDIT_URL
-        data = {
-            'old_url': urls.filter(primary=True)[0].url,
-            'new_url': self.url,
-        }
-        obj.new_video_title = json.dumps(data)
-        obj.created = datetime.now()
-        obj.user = user
-        obj.save()
+        old_url = self.video.get_primary_videourl_obj()
         # reset existing urls to non-primary
         VideoUrl.objects.filter(video=self.video).exclude(pk=self.pk).update(
             primary=False)
         # set this one to primary
         self.primary = True
         self.save(updates_timestamp=False)
+        signals.video_url_made_primary.send(sender=self, old_url=old_url,
+                                            user=user)
 
     def remove(self, user):
         """Remove this URL from our video.
@@ -2121,11 +2146,7 @@ class VideoUrl(models.Model):
             msg = ugettext("Can't remove the primary video URL")
             raise IntegrityError(msg)
 
-        action = Action(video=self.video, action_type=Action.DELETE_URL)
-        action.new_video_title = self.url
-        action.created = datetime.now()
-        action.user = user
-        action.save()
+        signals.video_url_deleted.send(sender=self, user=user)
         self.delete()
 
     def fix_owner_username(self):

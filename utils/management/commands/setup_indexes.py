@@ -9,6 +9,7 @@ class Command(BaseCommand):
         cursor = connection.cursor()
         self.setup_videourl_index(cursor)
         self.setup_video_fulltext_index(cursor)
+        self.setup_activity_indexdes(cursor)
         optionalapps.exec_repository_scripts('setup_indexes.py',
                                              globals(), locals())
 
@@ -37,3 +38,22 @@ class Command(BaseCommand):
         cursor.execute('ALTER TABLE videos_videoindex '
                        'MODIFY text LONGTEXT '
                        'CHARACTER SET utf8 COLLATE utf8_unicode_ci')
+
+    def setup_activity_indexdes(self, cursor):
+        cursor.execute('ALTER TABLE activity_activityrecord '
+                       'ADD INDEX team_created (team_id, created)')
+        cursor.execute('ALTER TABLE activity_activityrecord '
+                       'ADD INDEX team_type_created '
+                       '(team_id, type, created)')
+        cursor.execute('ALTER TABLE activity_activityrecord '
+                       'ADD INDEX team_language_created '
+                       '(team_id, language_code, created)')
+        cursor.execute('ALTER TABLE activity_activityrecord '
+                       'ADD INDEX team_videolanguage_created '
+                       '(team_id, type, video_language_code, created)')
+        cursor.execute('ALTER TABLE activity_activityrecord '
+                       'ADD INDEX video_copied_created '
+                       '(video_id, copied_from_id, created)')
+        cursor.execute('ALTER TABLE activity_activityrecord '
+                       'ADD INDEX user_copied_created '
+                       '(user_id, copied_from_id, created)')
