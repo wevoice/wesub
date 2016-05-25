@@ -14,6 +14,72 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
+"""
+Activity
+--------
+
+Activity Resource
+*****************
+
+List activity
+^^^^^^^^^^^^^
+
+.. http:get:: /api/activity/
+
+    :queryparam slug team: Show only items related to a given team
+    :queryparam boolean team-activity: If team is given, we normally return
+        activity on the team's videos.  If you want to see activity for the
+        team itself (members joining/leaving and team video deletions, then
+        add team-activity=1)
+    :queryparam video-id video: Show only items related to a given video
+    :queryparam integer type: Show only items with a given activity type.
+        Possible values:
+
+        1.  Add video
+        2.  Change title
+        3.  Comment
+        4.  Add version
+        5.  Add video URL
+        6.  Add translation
+        7.  Subtitle request
+        8.  Approve version
+        9.  Member joined
+        10. Reject version
+        11. Member left
+        12. Review version
+        13. Accept version
+        14. Decline version
+        15. Delete video
+
+    :queryparam bcp-47 language: Show only items with a given language code
+    :queryparam timestamp before: Only include items before this time
+    :queryparam timestamp after: Only include items after this time
+
+.. note::
+    If both team and video are given as GET params, then team will be used and
+    video will be ignored.
+
+Get details on one activity item
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. http:get:: /api/activity/[activity-id]/
+
+    :>json integer type: activity type.  The values are listed above
+    :>json datetime created: date/time of the activity
+    :>json video-id video: ID of the video
+    :>json uri video_uri: Video Resource
+    :>json bcp-47 language: language for the activity
+    :>json uri language_url: Subtile Language Resource
+    :>json uri resource_uri: Activity Resource
+    :>json username user: username of the user user associated with the
+        activity, or null
+    :>json string comment: comment body for comment activity, null for other
+        types
+    :>json string new_video_title: new title for the title-change activity, null
+        for other types
+    :>json integer id: object id **(deprecated use resource_uri if you need to
+        get details on a particular activity)**
+"""
 
 from __future__ import absolute_import
 
@@ -82,69 +148,6 @@ class ActivitySerializer(serializers.ModelSerializer):
         )
 
 class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API endpoint for activity.
-
-    # Listing/Details #
-
-    ## `GET /api/activity/`
-    List activity items (paginated)
-
-    ### Filter query params:
-
-    - **slug team:** Show only items related to a given team
-    - **team-activity:** If team is given, we normally return activity on the
-       team's videos.  If you want to see activity for the team itself (members
-       joining/leaving and team video deletions, then add team-activity=1)
-    - **video:** Show only items related to a given video
-    - **type:** Show only items with a given activity type (see
-        below for values)
-    - **language:** Show only items with a given language code
-    - **before:** A unix timestamp in seconds
-    - **after:** A unix timestamp in seconds
-
-    **Note:** If both team and video are given as GET params, then team will
-    be used and video will be ignored.
-
-    ## `GET /api/activity/[activity-id]/`
-    Get details on a single activity item
-
-    ### Fields:
-
-    - **type:** activity type as an integer.  Possible values:
-
-        1.  Add video
-        2.  Change title
-        3.  Comment
-        4.  Add version
-        5.  Add video URL
-        6.  Add translation
-        7.  Subtitle request
-        8.  Approve version
-        9.  Member joined
-        10. Reject version
-        11. Member left
-        12. Review version
-        13. Accept version
-        14. Decline version
-        15. Delete video
-
-    - **created:** date/time of the activity
-    - **video:** ID of the video
-    - **video_uri:** API URI for the video
-    - **language:** language for the activity
-    - **language_url:** API URI for the video language
-    - **resource_uri:** API URI for the activity
-    - **user:** username of the user user associated with the activity,
-        or null
-    - **comment:** comment body for comment activity, null for other types
-    - **new_video_title:** new title for the title-change activity, null
-        for other types
-    - **id:** object id **(deprecated use resource_uri if you need to get
-        details on a particular activity)**
-
-    """
-
     lookup_field = 'id'
     serializer_class = ActivitySerializer
     paginate_by = 20

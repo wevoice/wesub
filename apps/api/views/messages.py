@@ -14,6 +14,24 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
+"""
+Messages
+--------
+
+Message Resource
+****************
+
+.. http:post:: /api/message/
+
+    Send a message to a user/team
+
+    :>json username user: Recipient User's username
+    :>json slug team: Recipient Team's slug
+    :>json string subject: Subject of the message
+    :>json string content: Content of the message
+
+.. note:: You can only send either ``user`` or ``team``, not both.
+"""
 
 from __future__ import absolute_import
 
@@ -82,19 +100,6 @@ class MessagesSerializer(serializers.Serializer):
         Message.objects.bulk_create(messages)
 
 class Messages(views.APIView):
-    """
-    The message resource allows you to send messages to user and teams.
-
-    ## `POST /api/message/`
-
-    - **user:** Recipient User's username
-    - **team:** Recipient Team's slug
-    - **subject:** Subject of the message
-    - **content:** Content of the message
-
-    **note:** You can only send either ``user`` or ``team``, not both.
-    """
-
     def get_serializer(self):
         return MessagesSerializer()
 
