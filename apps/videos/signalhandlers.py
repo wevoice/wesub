@@ -19,14 +19,15 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete, m2m_changed
 
+from activity.models import ActivityRecord
 from subtitles.models import SubtitleLanguage, SubtitleVersion
-from videos.models import Video, VideoUrl, Action
+from videos.models import Video, VideoUrl
 from videos import signals
 from videos import tasks
 
 @receiver(post_save, sender=SubtitleLanguage)
 @receiver(post_save, sender=SubtitleVersion)
-@receiver(post_save, sender=Action)
+@receiver(post_save, sender=ActivityRecord)
 @receiver(post_delete, sender=VideoUrl)
 @receiver(post_delete, sender=SubtitleLanguage)
 @receiver(post_delete, sender=SubtitleVersion)

@@ -1,17 +1,15 @@
 {% load i18n media_bundle %}
 
-{% if activity_list %}
+{% if page %}
 <ul class="activity listing">
-  {% with 1 as medium_thumb %}
-  {% for item in activity_list %}
-  <li>{{ item.render }}</li>
+  {% for record in page %}
+  <li>{% include "activity/record.html" %}</li>
   {% endfor %}
-  {% endwith %}
 </ul>
 
-{% if has_more %}
+{% if page.has_next %}
 <div class="pagination">
-  <a class="show-more" href="" data-page="{{ next_page }}">{% trans "Show More" %}</a>
+  <a class="show-more" href="" data-page="{{ page.next_page_number }}">{% trans "Show More" %}</a>
   <img class="loading-icon" src="{% static_url %}images/ajax-loader.gif">
 </div>
 {% endif %}

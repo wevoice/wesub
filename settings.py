@@ -191,10 +191,12 @@ INSTALLED_APPS = (
     'socialauth',
     # our apps
     'accountlinker',
+    'activity',
     'amaradotorg',
     'amaracelery',
     'api',
     'caching',
+    'codefield',
     'comments',
     'externalsites',
     'messages',

@@ -35,7 +35,7 @@ from subtitles import cache
 from subtitles import shims
 from auth.models import CustomUser as User
 from videos import metadata
-from videos.models import Video, Action
+from videos.models import Video
 from babelsubs.storage import SubtitleSet
 from babelsubs.storage import calc_changes
 from babelsubs.generators.html import HTMLGenerator
@@ -1590,8 +1590,6 @@ class SubtitleVersion(models.Model):
 
         assert self.visibility in ('public', 'private',), \
             "Version visibility must be either 'public' or 'private'!"
-
-        Action.create_caption_handler(self, self.created)
 
         super(SubtitleVersion, self).save(*args, **kwargs)
 

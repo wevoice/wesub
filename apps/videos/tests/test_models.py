@@ -29,7 +29,7 @@ from auth.models import CustomUser as User
 from subtitles import pipeline
 from subtitles.models import SubtitleLanguage
 from videos import signals
-from videos.models import Action, Video, VideoUrl, VideoTypeUrlPattern
+from videos.models import Video, VideoUrl, VideoTypeUrlPattern
 from videos.tasks import video_changed_tasks
 from videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version, make_rollback_to
@@ -53,13 +53,6 @@ class TestVideoUrl(TestCase):
     def test_remove(self):
         self.url.remove(self.user)
         assert_equal(self.video.videourl_set.count(), 1)
-
-    def test_remove_creates_action(self):
-        self.url.remove(self.user)
-        action = self.video.action_set.get(action_type=Action.DELETE_URL)
-        assert_equal(action.user, self.user)
-        # we use new_video_title to store the removed uRL
-        assert_equal(action.new_video_title, self.url.url)
 
     def test_remove_primary(self):
         with assert_raises(IntegrityError):
@@ -133,6 +126,7 @@ class TestVideo(TestCase):
         make_rollback_to(sl_en, 1)
         _assert_title("New Title")
 
+class TestChangedSignals(TestCase):
     def test_title_changed_signal(self):
         video = VideoFactory(title='old_title')
         with test_utils.mock_handler(signals.title_changed) as mock_handler:
@@ -166,6 +160,38 @@ class TestVideo(TestCase):
             # test that 1 more save doesn't cause a second signal
             video.save()
             assert_equal(mock_handler.call_count, 1)
+
+    def test_language_changed_signal(self):
+        video = VideoFactory(primary_audio_language_code='')
+        with test_utils.mock_handler(signals.language_changed) as mock_handler:
+            # normal saves shouldn't cause the signal to emit
+            video.save()
+            assert_equal(mock_handler.call_count, 0)
+            # saves that change the language should
+            video.primary_audio_language_code = 'en'
+            video.save()
+            assert_equal(mock_handler.call_count, 1)
+            assert_equal(mock_handler.call_args,
+                         mock.call(signal=signals.language_changed,
+                                   sender=video,
+                                   old_primary_audio_language_code=''))
+            # test that 1 more save doesn't cause a second signal
+            video.save()
+            assert_equal(mock_handler.call_count, 1)
+
+    def test_no_changed_signals_on_initial_created(self):
+        cm1 = test_utils.mock_handler(signals.title_changed)
+        cm2 = test_utils.mock_handler(signals.duration_changed)
+        cm3 = test_utils.mock_handler(signals.language_changed)
+        with cm1 as handler1, cm2 as handler2, cm3 as handler3:
+            video = Video()
+            video.primary_audio_language_code = 'en'
+            video.title = 'foo'
+            video.duration = 123
+            video.save()
+        assert_equal(handler1.call_count, 0)
+        assert_equal(handler2.call_count, 0)
+        assert_equal(handler3.call_count, 0)
 
 class TestModelsSaving(TestCase):
     # TODO: These tests may be more at home in the celery_tasks test file...
@@ -515,20 +541,6 @@ class AddVideoTest(TestCase):
                                      setup_callback)
         assert_equal(video.title, 'test title')
 
-    def test_create_add_video_action(self):
-        video, video_url = Video.add(MockVideoType(self.url), self.user)
-        assert_true(Action.objects.filter(action_type=Action.ADD_VIDEO,
-                                          video=video,
-                                          user=self.user,
-                                          created=video.created).exists())
-
-    def test_create_add_video_url_action_not_created(self):
-        # We don't want to create an ADD_VIDEO_URL action, since it's
-        # redundant with the ADD_VIDEO action
-        video, video_url = Video.add(MockVideoType(self.url), self.user)
-        assert_false(Action.objects.filter(action_type=Action.ADD_VIDEO_URL,
-                                           video=video).exists())
-
     def test_notify_by_message(self):
         self.user.notify_by_message = True
         video, video_url = Video.add(MockVideoType(self.url), self.user)
@@ -554,7 +566,7 @@ class AddVideoTest(TestCase):
         assert_equal(on_video_url_added.call_count, 1)
         assert_equal(on_video_url_added.call_args,
                      mock.call(signal=signals.video_url_added,
-                               sender=video_url, video=video))
+                               sender=video_url, video=video, new_video=True))
 
 class AddVideoTestWithTransactions(TransactionTestCase):
     # These tests is split off from the others because it needs to be inside a
@@ -635,11 +647,4 @@ class AddVideoUrlTest(TestCase):
         assert_equal(on_video_url_added.call_count, 1)
         assert_equal(on_video_url_added.call_args, mock.call(
             signal=signals.video_url_added, sender=video_url,
-            video=self.video))
-
-    def test_create_add_video_url_action(self):
-        video_url = self.video.add_url(MockVideoType(self.new_url), self.user)
-        assert_true(Action.objects.filter(action_type=Action.ADD_VIDEO_URL,
-                                          video=self.video,
-                                          user=self.user,
-                                          created=video_url.created).exists())
+            video=self.video, new_video=False))

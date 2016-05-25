@@ -19,11 +19,10 @@ from django import template
 from django.conf import settings
 from django.template.loader import render_to_string
 
+from activity.models import ActivityRecord
 from auth.models import CustomUser as User
 from profiles.forms import SelectLanguageForm
 from utils.translation import get_user_languages_from_request, get_user_languages_from_cookie
-from videos.models import Action
-
 
 register = template.Library()
 
@@ -73,19 +72,6 @@ def _user_needs_languages(context):
     else:
         return not bool(get_user_languages_from_cookie(context['request']))
 
-@register.inclusion_tag('profiles/_user_videos_activity.html', takes_context=True)
-def user_videos_activity(context, user=None):
-    user = user or context['user']
-
-    if user.is_authenticated():
-        context['users_actions'] = Action.objects.select_related('video', 'language', 'language__video', 'user') \
-            .filter(video__customuser=user) \
-            .exclude(user=user) \
-            .exclude(user=User.get_anonymous())[:ACTIONS_ON_PAGE]
-    else:
-        context['users_actions'] = Action.objects.none()
-    return context
-
 @register.inclusion_tag('profiles/_user_avatar.html', takes_context=True)
 def user_avatar(context, user_obj):
     return {
@@ -105,3 +91,22 @@ def profile_teams_list(context):
 @register.filter
 def custom_avatar(user, size):
     return user._get_avatar_by_size(size)
+
+@register.simple_tag(takes_context=True)
+def activity_list_hack(context):
+    """Used to iterate over the profile page activity records
+
+    MySQL should use the user_copied_created index for this query, but the
+    query profiler doesn't choose it by default.  We can persuade it to use
+    the index by selecting only the id column, which means that all values are
+    in the index.
+    """
+    qs = context.get('activity_list')
+    if qs is not None:
+        id_list = list(qs.values_list('id', flat=True))
+        context['activity_list'] = (
+            ActivityRecord.objects
+            .filter(id__in=id_list)
+            .order_by('-created')
+            .select_related('user', 'team', 'video'))
+    return ''
