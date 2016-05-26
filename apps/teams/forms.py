@@ -593,6 +593,9 @@ class LanguagesForm(forms.Form):
         return self.cleaned_data
 
 class AddMembersForm(forms.Form):
+    role = forms.ChoiceField(choices=TeamMember.ROLES[::-1],
+                             initial='contributor',
+                             label=_("Assign a role"))
     members = forms.CharField(required=False,
                               widget=forms.Textarea(attrs={'rows': 10}),
                               label=_("Users to add to team"))
@@ -606,6 +609,7 @@ class AddMembersForm(forms.Form):
             "unknown": [],
             "already": [],
             }
+        member_role = self.cleaned_data['role']
         for username in set(self.cleaned_data['members'].split()):
             try:
                 user = User.objects.get(username=username)
@@ -615,6 +619,9 @@ class AddMembersForm(forms.Form):
                 member, created = TeamMember.objects.get_or_create(team=self.team, user=user)
                 if created:
                     summary["added"] += 1
+                    if member.role != member_role:
+                        member.role = member_role
+                        member.save()
                 else:
                     summary["already"].append(username)
         return summary
