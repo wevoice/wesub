@@ -191,8 +191,7 @@ def index(request, my_teams=False):
 @staff_member_required
 def create(request):
     user = request.user
-
-    if not DEV and not (user.is_superuser and user.is_active):
+    if not DEV and not (user.has_perm('teams.add_team') and user.is_active):
         raise Http404
 
     if request.method == 'POST':

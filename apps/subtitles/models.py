@@ -1395,7 +1395,7 @@ class SubtitleVersion(models.Model):
 
     version_number = models.PositiveIntegerField(default=1)
 
-    author = models.ForeignKey(User, default=User.get_anonymous,
+    author = models.ForeignKey(User, default=User.get_amara_anonymous,
                                related_name='newsubtitleversion_set')
 
     title = models.CharField(max_length=2048, blank=True)

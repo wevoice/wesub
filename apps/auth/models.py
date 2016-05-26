@@ -386,14 +386,14 @@ class CustomUser(BaseUser):
         return hashlib.sha224(settings.SECRET_KEY+str(self.pk)+video_id).hexdigest()
 
     @classmethod
-    def get_anonymous(cls):
+    def get_amara_anonymous(cls):
         user, created = cls.objects.get_or_create(
             pk=settings.ANONYMOUS_USER_ID,
             defaults={'username': 'anonymous'})
         return user
 
     @property
-    def is_anonymous(self):
+    def is_amara_anonymous(self):
         return self.pk == settings.ANONYMOUS_USER_ID
 
     @property

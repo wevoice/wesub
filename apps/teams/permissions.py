@@ -1019,4 +1019,9 @@ def can_delete_project(user, team, project):
     return can_edit_project(team, user, project)
 
 def can_create_team(user):
-    return user.is_partner
+    # via API
+    return user.has_perm('teams.add_team') or user.is_partner
+
+def can_create_team_ui(user):
+    # via website
+    return user.has_perm('teams.add_team') and user.is_active
