@@ -454,6 +454,17 @@ class Team(models.Model):
                               Site.objects.get_current().domain,
                               self.get_absolute_url())
 
+    def get_project_video_counts(self):
+        counts = self.cache.get('project_video_counts')
+        if counts is None:
+            counts = self.calc_project_videos_count()
+            self.cache.set('project_video_counts', counts)
+        return counts
+
+    def calc_project_videos_count(self):
+        return dict(self.teamvideo_set.order_by()
+                    .values_list('project')
+                    .annotate(Count('project')))
 
     # Membership and roles
     def get_member(self, user):
@@ -921,6 +932,13 @@ class Project(models.Model):
             setattr(self, '_videos_count', TeamVideo.objects.filter(project=self).count())
         return self._videos_count
 
+    def clear_videos_count_cache(self):
+        if hasattr(self, '_videos_count'):
+            del self._videos_count
+
+    def set_videos_count_cache(self, count):
+        self._videos_count = count
+
     def _count_tasks(self):
         qs = tasks.filter(team_video__project = self)
         # quick, check, are there more than 1000 tasks, if so return 1001, and
@@ -1015,6 +1033,7 @@ class TeamVideo(models.Model):
             self.created = datetime.datetime.now()
         self.video.cache.invalidate()
         self.video.clear_team_video_cache()
+        Team.cache.invalidate_by_pk(self.team_id)
         super(TeamVideo, self).save(*args, **kwargs)
 
     def is_checked_out(self, ignore_user=None):

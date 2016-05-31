@@ -54,7 +54,6 @@
     {% endif %}
     <ul class="thumb-list{% if bulk_mode_enabled %} bulk-mode{% endif %}">
       {% for video in page %}
-      {% with team_video=video.get_team_video %}
       <li>
         <div class="thumb">
           <img src="{{ video.get_wide_thumbnail }}" alt="{{ video.title_display }}">
@@ -74,7 +73,6 @@
         {% else %}
         <div class="four-lines">{{ description }}</div>
         {% endif %}
-        {% endwith %}
       </li>
       {% endwith %}
       {% endfor %}
