@@ -488,6 +488,11 @@ class ActivityRecord(models.Model):
     def __unicode__(self):
         return u'ActivityRecord: {}'.format(self.type)
 
+    @classmethod
+    def active_type_choices(cls):
+        code_list = cls._meta.get_field('type').code_list
+        return [ (code.slug, code.label) for code in code_list if code.active ]
+
     def move_to_team(self, new_team):
         with transaction.commit_on_success():
             # Make a copy of the record for our current team

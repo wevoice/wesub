@@ -1123,7 +1123,7 @@ class ActivityFiltersForm(forms.Form):
         self.team = team
         self.fields['type'].choices = [
             ('', _('Any type')),
-        ] + ActivityRecord.type_choices()
+        ] + ActivityRecord.active_type_choices()
         language_choices = [
             ('', ('Any language')),
         ]
