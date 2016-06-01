@@ -384,7 +384,8 @@ class YouTubeAccount(ExternalAccount):
     oauth_refresh_token = models.CharField(max_length=255)
     last_import_video_id = models.CharField(max_length=100, blank=True,
                                             default='')
-    import_team = models.ForeignKey(Team, null=True)
+    import_team = models.ForeignKey(Team, null=True, blank=True)
+    enable_language_mapping = models.BooleanField(default=True)
     sync_teams = models.ManyToManyField(
         Team, related_name='youtube_sync_accounts')
 
@@ -466,12 +467,14 @@ class YouTubeAccount(ExternalAccount):
         """
         access_token = google.get_new_access_token(self.oauth_refresh_token)
         syncing.youtube.update_subtitles(video_url.videoid, access_token,
-                                         version)
+                                         version,
+                                         self.enable_language_mapping)
 
     def do_delete_subtitles(self, video_url, language):
         access_token = google.get_new_access_token(self.oauth_refresh_token)
         syncing.youtube.delete_subtitles(video_url.videoid, access_token,
-                                         language.language_code)
+                                         language.language_code,
+                                         self.enable_language_mapping)
 
     def delete(self):
         google.revoke_auth_token(self.oauth_refresh_token)

@@ -227,7 +227,6 @@ class VideoPageForms(object):
         else:
             initial = None
         if request.method == 'POST' and 'form' in request.POST and request.POST['form'] == 'add':
-            logger.error(request)
             return (forms.NewAddTeamVideoDataForm(self.team, request.POST, files=request.FILES),
                     forms.TeamVideoURLFormSet(request.POST))
         else:

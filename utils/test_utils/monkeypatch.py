@@ -180,7 +180,7 @@ class MonkeyPatcher(object):
             mock_obj.side_effect = side_effect
         mock_now.reset()
 
-def patch_for_test(spec):
+def patch_for_test(spec, MockClass=None):
     """Use mock to patch a function for the test case.
 
     Use this to decorate a TestCase test or setUp method.  It will call
@@ -195,10 +195,12 @@ def patch_for_test(spec):
         def setUp(self, mock_foo):
             ...
     """
+    if MockClass is None:
+        MockClass = mock.Mock
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            mock_obj = mock.Mock()
+            mock_obj = MockClass()
             patcher = mock.patch(spec, mock_obj)
             patcher.start()
             self.addCleanup(patcher.stop)
