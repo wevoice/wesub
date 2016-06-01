@@ -93,7 +93,8 @@ def profile(request, user_id):
             form = AdminProfileForm(instance=user)
     else:
         form = None
-    qs = ActivityRecord.objects.for_user(user)
+    qs = (ActivityRecord.objects.for_user(user)
+          .select_related('video', 'team', 'user'))
 
     extra_context = {
         'user_info': user,

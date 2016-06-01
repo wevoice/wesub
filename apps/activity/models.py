@@ -20,12 +20,12 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db import transaction
 from django.db.models import Q
-from django.db.models import query
 from django.utils.translation import ugettext_lazy as _
 
 from auth.models import CustomUser as User
 from codefield import CodeField, Code
 from comments.models import Comment
+from mysqltweaks import query
 from teams.models import Team
 from teams.permissions_const import (ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
                                      ROLE_CONTRIBUTOR, ROLE_NAMES)
@@ -329,7 +329,8 @@ class ActivityManager(models.Manager):
                 .distinct())
 
     def for_user(self, user):
-        return self.filter(user=user).original()
+        return (self.filter(user=user).original()
+                .force_index('user_copied_created'))
 
     def for_team(self, team):
         return self.filter(team=team)

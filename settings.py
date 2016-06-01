@@ -200,6 +200,7 @@ INSTALLED_APPS = (
     'comments',
     'externalsites',
     'messages',
+    'mysqltweaks',
     'profiles',
     'search',
     'staff',
