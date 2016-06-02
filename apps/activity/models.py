@@ -308,6 +308,13 @@ class ActivityQueryset(query.QuerySet):
     def team_video_activity(self):
         return self.exclude(type__in=self.TEAM_ACTIVITY_TYPES)
 
+    def viewable_by_user(self, user):
+        if user.is_superuser:
+            return self
+        return self.filter(Q(team__isnull=True)|
+                           Q(team__in=user.teams.all())|
+                           Q(team__is_visible=True))
+
 class ActivityManager(models.Manager):
     use_for_related_fields = True
 
