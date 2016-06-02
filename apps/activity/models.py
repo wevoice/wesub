@@ -496,6 +496,12 @@ class ActivityRecord(models.Model):
     def __unicode__(self):
         return u'ActivityRecord: {}'.format(self.type)
 
+    def delete(self):
+        # Django doesn't seem to handle CASCADE correctly with a foreign key
+        # to self (see #637)
+        self.copied_from_set.delete()
+        super(ActivityRecord, self).delete()
+
     @classmethod
     def active_type_choices(cls):
         code_list = cls._meta.get_field('type').code_list

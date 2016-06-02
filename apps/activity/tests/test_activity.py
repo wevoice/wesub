@@ -232,8 +232,8 @@ class TeamVideoActivityTest(TestCase):
         team = TeamFactory()
         TeamVideoFactory(team=team, video=video)
         self.check_copies(record, team, [])
-        
-    def move_to_team(self):
+
+    def test_move_to_team(self):
         # same thing if we move from 1 team to another
         video = VideoFactory()
         team_video = TeamVideoFactory(video=video)
