@@ -379,6 +379,18 @@ ROSETTA_EXCLUDED_APPLICATIONS = (
 
 INSTALLED_APPS += optionalapps.get_apps()
 
+# List of modules to extract docstrings from for the update_docs management
+# command.
+API_DOCS_MODULES = [
+    'api.views.languages',
+    'api.views.videos',
+    'api.views.subtitles',
+    'api.views.users',
+    'api.views.activity',
+    'api.views.messages',
+    'api.views.teams',
+]
+
 MEDIA_BUNDLES = {
     "base.css": {
         "files": (

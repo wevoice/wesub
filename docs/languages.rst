@@ -1,3 +1,5 @@
+.. _languages:
+
 Supported languages
 ===================
 
