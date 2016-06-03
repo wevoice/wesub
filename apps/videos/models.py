@@ -53,6 +53,7 @@ from videos.feed_parser import VideoImporter
 from comments.models import Comment
 from widget import video_cache
 from utils import codes
+from utils import dates
 from utils import translation
 from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
@@ -355,7 +356,7 @@ class Video(models.Model):
             (288,162),
             (120,90),))
     edited = models.DateTimeField(null=True, editable=False)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField()
     user = models.ForeignKey(User, null=True, blank=True)
     followers = models.ManyToManyField(User, blank=True, related_name='followed_videos', editable=False)
     complete_date = models.DateTimeField(null=True, blank=True, editable=False)
@@ -419,9 +420,11 @@ class Video(models.Model):
         return title
 
     def save(self, *args, **kwargs):
-        created = self.id is None
+        creating = self.id is None
+        if creating:
+            self.created = dates.now()
         super(Video, self).save(*args, **kwargs)
-        self.monitor.on_save(self, created)
+        self.monitor.on_save(self, creating)
 
     def delete(self, user=None):
         signals.video_deleted.send(sender=self, user=user)

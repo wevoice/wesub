@@ -46,6 +46,7 @@ Get a list of teams
         - ``Managers and admins``
         - ``Admins only``
 
+    :>json uri activity_uri: Team activity resource
     :>json uri members_uri: Team member list resource
     :>json uri safe_members_uri: "Safe" team members list resource
     :>json uri projects_uri: Team projects resource
@@ -401,6 +402,10 @@ class TeamSerializer(serializers.ModelSerializer):
         VIDEO_POLICY_CHOICES, required=False,
         default=Team._meta.get_field('video_policy').get_default())
 
+    activity_uri = serializers.HyperlinkedIdentityField(
+        view_name='api:team-activity',
+        lookup_field='slug',
+    )
     members_uri = serializers.SerializerMethodField()
     safe_members_uri = serializers.SerializerMethodField()
     projects_uri = serializers.SerializerMethodField()
@@ -453,7 +458,7 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ('name', 'slug', 'description', 'is_visible',
-                  'membership_policy', 'video_policy',
+                  'membership_policy', 'video_policy', 'activity_uri',
                   'members_uri', 'safe_members_uri', 'projects_uri',
                   'applications_uri', 'languages_uri', 'tasks_uri',
                   'resource_uri')

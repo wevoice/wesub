@@ -31,7 +31,179 @@ from subtitles import pipeline
 from utils.factories import *
 from activity.models import ActivityRecord
 
-class ActivityTestCase(TestCase):
+class ActivityTest(TestCase):
+    def setUp(self):
+        self.user = UserFactory(username='test-user')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def clear_records(self):
+        ActivityRecord.objects.all().delete()
+
+    def check_list(self, url, *records):
+        response = self.client.get(url)
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_equal(len(response.data['objects']), len(records))
+        for data, record in zip(response.data['objects'], records):
+            self.check_data(data, record)
+
+    def check_data(self, activity_data, record):
+        assert_equal(activity_data['type'], record.type)
+        assert_equal(activity_data['date'],
+                     format_datetime_field(record.created))
+        if record.video:
+            assert_equal(activity_data['video'], record.video.video_id)
+            assert_equal(activity_data['video_uri'], reverse(
+                'api:video-detail', kwargs={
+                         'video_id': record.video.video_id,
+                }, request=APIRequestFactory().get('/'))
+            )
+        else:
+            assert_equal(activity_data['video'], None)
+            assert_equal(activity_data['video_uri'], None)
+        if record.language_code:
+            assert_equal(activity_data['language'], record.language_code)
+            assert_equal(activity_data['language_uri'], reverse(
+                'api:subtitle-language-detail', kwargs={
+                    'video_id': record.video.video_id,
+                    'language_code': record.language_code,
+                }, request=APIRequestFactory().get('/'))
+            )
+        else:
+            assert_equal(activity_data['language'], None)
+            assert_equal(activity_data['language_uri'], None)
+        if record.user:
+            assert_equal(activity_data['user'], record.user.username)
+            assert_equal(activity_data['user_uri'], reverse(
+                'api:users-detail', kwargs={
+                    'username': record.user.username,
+                }, request=APIRequestFactory().get('/'))
+            )
+        else:
+            assert_equal(activity_data['user'], None)
+            assert_equal(activity_data['user_uri'], None)
+
+    def test_video(self):
+        video = VideoFactory(user=self.user)
+        other_video = VideoFactory()
+        v1 = pipeline.add_subtitles(video, 'en', SubtitleSetFactory())
+        v2 = pipeline.add_subtitles(video, 'fr', SubtitleSetFactory(),
+                                    author=self.user)
+        self.clear_records()
+        record1 = ActivityRecord.objects.create_for_video_added(video)
+        record2 = ActivityRecord.objects.create_for_subtitle_version(v1)
+        record3 = ActivityRecord.objects.create_for_subtitle_version(v2)
+        # this record should never be listed in the endpoint
+        ActivityRecord.objects.create_for_video_added(other_video)
+        url = reverse('api:video-activity', args=(video.video_id,))
+
+        self.check_list(url, record3, record2, record1)
+        self.check_list(url + '?type=video-added', record1)
+        self.check_list(url + '?user=test-user', record3, record1)
+        self.check_list(url + '?language=en', record2)
+        self.check_list(
+            url + '?before=' + format_datetime_field(record2.created),
+            record1)
+        self.check_list(
+            url + '?after=' + format_datetime_field(record2.created),
+            record3, record2)
+        self.check_list(url + '?user=test-user&language=fr', record3)
+
+    def test_user(self):
+        video1 = VideoFactory(user=self.user, video_id='video1',
+                              primary_audio_language_code='fr')
+        video2 = VideoFactory(user=self.user, video_id='video2',
+                              team=TeamFactory(slug='team'))
+        other_video = VideoFactory()
+        v1 = pipeline.add_subtitles(video1, 'en', SubtitleSetFactory(),
+                                    author=self.user)
+        self.clear_records()
+        record1 = ActivityRecord.objects.create_for_video_added(video1)
+        record2 = ActivityRecord.objects.create_for_video_added(video2)
+        record3 = ActivityRecord.objects.create_for_subtitle_version(v1)
+        # this record should never be listed in the endpoint
+        ActivityRecord.objects.create_for_video_added(other_video)
+        url = reverse('api:user-activity', args=(self.user.username,))
+        self.check_list(url, record3, record2, record1)
+        self.check_list(url + '?video=video1', record3, record1)
+        self.check_list(url + '?team=team', record2)
+        self.check_list(url + '?video_language=fr', record3, record1)
+        self.check_list(url + '?type=video-added', record2, record1)
+        self.check_list(url + '?language=en', record3)
+        self.check_list(
+            url + '?before=' + format_datetime_field(record2.created),
+            record1)
+        self.check_list(
+            url + '?after=' + format_datetime_field(record2.created),
+            record3, record2)
+
+    def test_team(self):
+        team = TeamFactory(slug='team')
+        video1 = VideoFactory(video_id='video1',
+                              primary_audio_language_code='fr', team=team)
+        video2 = VideoFactory(video_id='video2', team=team)
+        other_video = VideoFactory()
+        v1 = pipeline.add_subtitles(video1, 'en', SubtitleSetFactory(),
+                                    author=self.user)
+        self.clear_records()
+        record1 = ActivityRecord.objects.create_for_video_added(video1)
+        record2 = ActivityRecord.objects.create_for_video_added(video2)
+        record3 = ActivityRecord.objects.create_for_subtitle_version(v1)
+        # this record should never be listed in the endpoint
+        ActivityRecord.objects.create_for_video_added(other_video)
+        url = reverse('api:team-activity', args=(team.slug,))
+        self.check_list(url, record3, record2, record1)
+        self.check_list(url + '?video=video1', record3, record1)
+        self.check_list(url + '?user=test-user', record3)
+        self.check_list(url + '?video_language=fr', record3, record1)
+        self.check_list(url + '?type=video-added', record2, record1)
+        self.check_list(url + '?language=en', record3)
+        self.check_list(
+            url + '?before=' + format_datetime_field(record2.created),
+            record1)
+        self.check_list(
+            url + '?after=' + format_datetime_field(record2.created),
+            record3, record2)
+
+    def check_extra_field(self, activity_type, **extra_fields):
+        # We should be able to get just the record we care about by using our
+        # user stream and filtering by activity type
+        url = reverse('api:user-activity', args=(self.user.username,))
+        response = self.client.get(url + '?type={}'.format(activity_type))
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_equal(len(response.data['objects']), 1)
+        data = response.data['objects'][0]
+
+        for name, value in extra_fields.items():
+            assert_equal(data[name], value)
+
+    def test_video_url_added(self):
+        video = VideoFactory()
+        vurl = VideoURLFactory(video=video, added_by=self.user)
+        ActivityRecord.objects.create_for_video_url_added(vurl)
+        self.check_extra_field('video-url-added', url=vurl.url)
+
+    def test_video_url_edited(self):
+        video = VideoFactory()
+        old_vurl = video.get_primary_videourl_obj()
+        new_vurl = VideoURLFactory(video=video)
+        ActivityRecord.objects.create_for_video_url_made_primary(
+            new_vurl, old_vurl, self.user)
+        self.check_extra_field('video-url-edited', new_url=new_vurl.url,
+                               old_url=old_vurl.url)
+
+    def test_video_url_deleted(self):
+        video = VideoFactory()
+        vurl = VideoURLFactory(video=video)
+        ActivityRecord.objects.create_for_video_url_deleted(vurl, self.user)
+        self.check_extra_field('video-url-deleted', url=vurl.url)
+
+    def test_video_deleted(self):
+        video = VideoFactory()
+        ActivityRecord.objects.create_for_video_deleted(video, self.user)
+        self.check_extra_field('video-deleted', title=video.title_display())
+
+class LegacyActivityTestCase(TestCase):
     def setUp(self):
         self.user = UserFactory()
         self.client = APIClient()

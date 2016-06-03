@@ -67,6 +67,7 @@ Get info on a specific video
     :>json char video_type: Video type identifier
     :>json list all_urls: List of URLs for the video (the first one is the
       primary video URL)
+    :>json uri activity_uri: Video Activity Resource
     :>json url urls_uri: Video URL Resource
     :>json uri subtitle_languages_uri: Subtitle languages Resource
     :>json uri resource_uri: Video Resource
@@ -343,6 +344,10 @@ class VideoSerializer(serializers.Serializer):
     metadata = VideoMetadataSerializer(required=False)
     languages = VideoLanguageShortSerializer(source='all_subtitle_languages',
                                              many=True, read_only=True)
+    activity_uri = serializers.HyperlinkedIdentityField(
+        view_name='api:video-activity',
+        lookup_field='video_id',
+    )
     urls_uri = serializers.HyperlinkedIdentityField(
         view_name='api:video-url-list',
         lookup_field='video_id',
