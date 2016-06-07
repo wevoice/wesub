@@ -27,6 +27,12 @@ from videos.models import Video
 import teams.signals
 import videos.signals
 
+@receiver(pre_delete, sender=ActivityRecord)
+def on_activity_record_delete(sender, instance, **kwargs):
+    # Django doesn't seem to handle CASCADE correctly with a foreign key
+    # to self (see #637)
+    instance.copies.all().delete()
+
 @receiver(videos.signals.video_added)
 def on_video_added(sender, **kwargs):
     ActivityRecord.objects.create_for_video_added(sender)

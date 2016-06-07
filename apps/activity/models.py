@@ -471,7 +471,8 @@ class ActivityRecord(models.Model):
     # When a video moves from team to team, we create copies of each record.
     # The original gets moved to the new team and the copy stays with the old
     # team.
-    copied_from = models.ForeignKey('self', blank=True, null=True)
+    copied_from = models.ForeignKey('self', blank=True, null=True,
+                                    related_name='copies')
 
     objects = ActivityManager()
 
@@ -495,12 +496,6 @@ class ActivityRecord(models.Model):
 
     def __unicode__(self):
         return u'ActivityRecord: {}'.format(self.type)
-
-    def delete(self):
-        # Django doesn't seem to handle CASCADE correctly with a foreign key
-        # to self (see #637)
-        self.copied_from_set.delete()
-        super(ActivityRecord, self).delete()
 
     @classmethod
     def active_type_choices(cls):
