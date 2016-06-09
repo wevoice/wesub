@@ -518,11 +518,11 @@ class Team(models.Model):
 
     def user_is_admin(self, user):
         member = self.get_member(user)
-        return member and member.is_admin()
+        return bool(member and member.is_admin())
 
     def user_is_manager(self, user):
         member = self.get_member(user)
-        return member and member.is_manager()
+        return bool(member and member.is_manager())
 
     def invitable_users(self):
         pending_invites = (Invite.objects
