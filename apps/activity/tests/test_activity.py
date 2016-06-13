@@ -264,7 +264,7 @@ class TeamVideoActivityTest(TestCase):
         first_team = team_video.team
         clear_activity()
         record = ActivityRecord.objects.create_for_video_added(video)
-        team_video.delete()
+        team_video.remove(UserFactory())
         self.check_copies(record, None, [first_team])
 
 class TestViewableByUser(TestCase):

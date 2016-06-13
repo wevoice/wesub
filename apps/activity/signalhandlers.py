@@ -83,9 +83,9 @@ def on_team_video_save(instance, created, **kwargs):
         ActivityRecord.objects.move_video_records_to_team(instance.video,
                                                           instance.team)
 
-@receiver(pre_delete, sender=TeamVideo)
-def on_team_video_delete(instance, **kwargs):
-    ActivityRecord.objects.move_video_records_to_team(instance.video, None)
+@receiver(teams.signals.video_removed_from_team)
+def on_team_video_delete(sender, user, **kwargs):
+    ActivityRecord.objects.move_video_records_to_team(sender, None)
 
 @receiver(post_save, sender=TeamMember)
 def on_team_member_save(instance, created, **kwargs):

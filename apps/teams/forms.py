@@ -1428,7 +1428,8 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
 
 class RemoveTeamVideosForm(BulkTeamVideoForm):
     def perform_save(self, qs):
-        qs.delete()
+        for team_video in qs:
+            team_video.remove(self.user)
 
     def message(self):
         msg = ungettext('Video removed from project',

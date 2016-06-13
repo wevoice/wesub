@@ -911,7 +911,7 @@ def remove_video(request, team_video_pk):
         video.delete(request.user)
         msg = _(u'Video has been deleted from Amara.')
     else:
-        team_video.delete()
+        team_video.remove(request.user)
         msg = _(u'Video has been removed from the team.')
 
     if request.is_ajax():
