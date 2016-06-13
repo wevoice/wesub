@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save
 
 from activity.models import ActivityRecord
 from comments.models import Comment
@@ -26,12 +26,6 @@ from teams.models import TeamVideo, TeamMember
 from videos.models import Video
 import teams.signals
 import videos.signals
-
-@receiver(pre_delete, sender=ActivityRecord)
-def on_activity_record_delete(sender, instance, **kwargs):
-    # Django doesn't seem to handle CASCADE correctly with a foreign key
-    # to self (see #637)
-    instance.copies.all().delete()
 
 @receiver(videos.signals.video_added)
 def on_video_added(sender, **kwargs):
