@@ -516,6 +516,14 @@ class Team(models.Model):
         except KeyError:
             pass
 
+    def user_is_admin(self, user):
+        member = self.get_member(user)
+        return bool(member and member.is_admin())
+
+    def user_is_manager(self, user):
+        member = self.get_member(user)
+        return bool(member and member.is_manager())
+
     def invitable_users(self):
         pending_invites = (Invite.objects
                            .pending_for(team=self)

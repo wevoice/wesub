@@ -18,7 +18,6 @@
 Activity
 --------
 
-
 Video Activity Resource
 ***********************
 

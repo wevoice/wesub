@@ -62,7 +62,6 @@ Get info on a specific video
     :>json char video_type: Video type identifier
     :>json list all_urls: List of URLs for the video (the first one is the
       primary video URL)
-    :>json uri activity_uri: Video Activity Resource
     :>json url urls_uri: Video URL Resource
     :>json uri subtitle_languages_uri: Subtitle languages Resource
     :>json uri resource_uri: Video Resource
@@ -462,7 +461,6 @@ Fetching user data
     :>json list languages: List of language codes for languages the user
         speaks.
     :>json url avatar: URL to the user's avatar image
-    :>json uri activity_uri: User Activity resource
     :>json uri resource_uri: User resource
     :>json string full_name: Full name of the user.
 
@@ -517,122 +515,8 @@ Updating user accounts
 Activity
 --------
 
-
-Video Activity Resource
-***********************
-
-.. http:get:: /api/videos/(video-id)/activity/
-
-    :queryparam string type: Filter by activity type (:ref:`activity_types`)
-    :queryparam string user: Filter by user who performed the action
-    :queryparam bcp-47 language: Filter by the subtitle language
-    :queryparam iso-8601 before: Only include activity before this date/time
-    :queryparam iso-8601 after: Only include activity after
-
-    :>json string type: Activity type (:ref:`activity_types`)
-    :>json iso-8601 date: Date/time of the activity
-    :>json username user: User who performed the activity
-    :>json video-id video: Video related to the activity (or null)
-    :>json bcp-47 language: Language of the subtitles related to the activity
-        (or null)
-    :>json uri user_uri: Link to the user resource endpoint
-    :>json uri video_uri: Link to the video resource endpoint
-    :>json uri language_uri: Link to the subtitle language resource endpoint
-
-    Depending on the activity type, extra fields may be present in the
-    response data (:ref:`activity_types`).
-
-Team Activity Resource
-**********************
-
-.. http:get:: /api/teams/(slug)/activity/
-
-    :queryparam string type: Filter by activity type (:ref:`activity_types`)
-    :queryparam string user: Filter by user who performed the action
-    :queryparam video-id video: Filter by video
-    :queryparam bcp-47 video_language: Filter by video language
-    :queryparam bcp-47 language: Filter by the subtitle language
-    :queryparam iso-8601 before: Only include activity before this date/time
-    :queryparam iso-8601 after: Only include activity after
-
-    Response data is the same as the video activity resource.
-
-User Activity Resource
-**********************
-
-.. http:get:: /api/users/(username)/activity/
-
-    :queryparam string type: Filter by activity type (:ref:`activity_types`)
-    :queryparam video-id video: Filter by video
-    :queryparam bcp-47 video_language: Filter by video language
-    :queryparam bcp-47 language: Filter by the subtitle language
-    :queryparam slug team: Filter by team
-    :queryparam iso-8601 before: Only include activity before this date/time
-    :queryparam iso-8601 after: Only include activity after
-
-    Response data is the same as the video activity resource.
-
-.. _activity_types:
-
-Activity Types
-**************
-
-An activity type classifies the activity.  Some types have extra data that is
-associated with them
-
-+----------------------+----------------------------+------------------------+
-| Type                 | Created When              | Notes/Extra Fields      |
-+======================+===========================+=========================+
-| video-added          | Video added to amara      |                         |
-+----------------------+---------------------------+-------------------------+
-| comment-added        | Comment posted            | ``language`` will be    |
-|                      |                           | null for video comments |
-|                      |                           | and set for subtitle    |
-|                      |                           | comments                |
-+----------------------+---------------------------+-------------------------+
-| version-added        | Subtitle version added    |                         |
-+----------------------+---------------------------+-------------------------+
-| video-url-added      | URL added to video        | ``url`` will contain    |
-|                      |                           | the new URL             |
-+----------------------+---------------------------+-------------------------+
-| video-url-edited     | Primary video URL change  | ``old_url``/``new_url`` |
-|                      |                           | will contain the        |
-|                      |                           | old/new primary URL     |
-+----------------------+---------------------------+-------------------------+
-| video-url-deleted    | URL removed from video    | ``url`` will contain    |
-|                      |                           | the deleted URL         |
-+----------------------+---------------------------+-------------------------+
-| video-deleted        | Video deleted from amara  | ``title`` will contain  |
-|                      |                           | the deleted video's     |
-|                      |                           | title                   |
-+----------------------+---------------------------+-------------------------+
-| **Team Related Activity**                                                  |
-+----------------------+---------------------------+-------------------------+
-| member-joined        | User joined team          |                         |
-+----------------------+---------------------------+-------------------------+
-| member-left          | User left team            |                         |
-+----------------------+---------------------------+-------------------------+
-| **Task Related Activity**                                                  |
-+----------------------+---------------------------+-------------------------+
-| version-approved     | Subtitles approved        |                         |
-+----------------------+---------------------------+-------------------------+
-| version-rejected     | Subtitles sent back by    |                         |
-|                      | approver                  |                         |
-+----------------------+---------------------------+-------------------------+
-| version-accepted     | Subtitles approved by     |                         |
-|                      | reviewer                  |                         |
-+----------------------+---------------------------+-------------------------+
-| version-declined     | Subtitles sent back by    |                         |
-|                      | reviewer                  |                         |
-+----------------------+---------------------------+-------------------------+
-
-
-Legacy Activity Resource
-************************
-
-Deprecated API endpoint that lists contains all amara activity.  You should
-use the team/video/user query param to find the activity you want.  New code
-should use the Video, Team, or User, resources (see above).
+Activity Resource
+*****************
 
 List activity
 ^^^^^^^^^^^^^
@@ -678,7 +562,7 @@ Get details on one activity item
 .. http:get:: /api/activity/[activity-id]/
 
     :>json integer type: activity type.  The values are listed above
-    :>json datetime date: date/time of the activity
+    :>json datetime created: date/time of the activity
     :>json video-id video: ID of the video
     :>json uri video_uri: Video Resource
     :>json bcp-47 language: language for the activity
@@ -741,7 +625,6 @@ Get a list of teams
         - ``Managers and admins``
         - ``Admins only``
 
-    :>json uri activity_uri: Team activity resource
     :>json uri members_uri: Team member list resource
     :>json uri safe_members_uri: "Safe" team members list resource
     :>json uri projects_uri: Team projects resource
@@ -1022,3 +905,165 @@ Subtitles for blacklisted languages will not be allowed.
 .. http:put:: /api/teams/(team-slug)/languages/blacklisted/
 
     Send a list of language codes as data.
+
+Subtitle Request Resource
+-------------------------
+
+This API endpoint is used for subtitle requests for teams new team that use
+the collaboration model.  At this point it's only used by a limited number of
+teams, but we hope to make it available to everyone in the near future.
+
+Listing Requests
+****************
+
+.. http:get:: /api/teams/(team-slug)/subtitle-requests/
+
+    :queryparam string state: Filter by state.  This can be any valid state
+        value (see below), or:
+
+        - ``incomplete`` (any state except complete) **(default)**
+        - ``any``
+
+    :queryparam video-id video: Filter by video
+    :queryparam bcp-47 video_language: Filter by video request language
+    :queryparam bc4-47 language: Filter by subtitle request language
+    :queryparam slug project: Filter by project
+    :queryparam username assignee: Filter by username
+
+    :>json job-id job_id: ID for the request
+    :>json slug team: Team handling the request (note that this can be a
+        different team that the one the video is part of)
+    :>json video-id video: Video for the request
+    :>json bcp-47 language: Language code of the subtitle request
+    :>json string state: current state of the request.  One of:
+
+        - ``needs-subtitler``
+        - ``being-subtitled``
+        - ``needs-reviewer``
+        - ``being-reviewed``
+        - ``needs-approver``
+        - ``being-approved``
+        - ``complete``
+
+    :>json datetime created: when the request was created
+    :>json datetime completed: when the request was completed, or null
+    :>json uri resource_uri: Subtitle Request Resource
+
+.. note:
+   Depending on the team settings, there may or may not be a reviewer/approver
+   working for the request.
+
+Request Details
+***************
+
+.. http:get:: /api/teams/(team-slug)/subtitle-requests/(job-id)/
+
+    :>json job-id job_id: ID for the request
+    :>json video-id video: Video for the request
+    :>json bcp-47 language: Language code of the subtitle request
+    :>json string state: current state of the request.  One of:
+
+        - needs-subtitler
+        - being-subtitled
+        - needs-reviewer
+        - being-reviewed
+        - needs-approver
+        - being-approved
+        - complete
+    :>json datetime created: when the request was created
+    :>json datetime completed: when the request was completed, or null
+    :>json username subtitler: user creating the subtitles
+    :>json username reviewer: user reviewing the subtitles
+    :>json username approver: user approving the subtitles
+    :>json uri video_uri: Video API resource
+    :>json uri subtitler_uri: User resource for the subtitler
+    :>json uri reviewer_uri: User resource for the reviewer
+    :>json uri approver_uri: User resource for the approver
+    :>json uri subtitles_uri: Subtitles Resource
+    :>json uri actions_uri: Subtitle actions Resource
+    :>json uri resource_uri: Subtitle Request Resource
+
+Creating Requests
+*****************
+
+.. http:post:: /api/teams/(team-slug)/subtitle-requests/
+
+    :<json video-id video: Video ID.  This video must be part of the team
+        specified by ``team-slug``.
+    :<json bcp-47 language: language code for the subtitles
+    :<json slug team: Team to work on the subtitles.  This can be any team
+        you are an admin of.  **(optional, defaults to the team the video is a
+        part of.)**
+
+
+.. note:
+   If you specify a different team for the request, then the subtitle request
+   will show up in that team's listing.  If you have a video in team foo, then
+   make a subtitle request with team=bar, then the request will show up in
+   ``/api/teams/bar/subtitle-requests/``.
+
+
+Updating Requests
+*****************
+
+.. http:PUT:: /api/teams/(team-slug)/subtitle-requests/(job-id)/
+
+    :<json username subtitler: Username to assign as the subtitler, or null to
+        unassign the current subtitler
+    :<json username reviewer: Username to assign as the reviewer, or null to
+        unassign the current reviewer
+    :<json username approver: Username to assign as the approver, or null to
+        unassign the current approver
+    :<json slug team: Change the team working on the subtitle request.  This
+        is only possible if work has not been started.
+    :<json string state: Change the state of the subtitler request.  The only
+        valid value is "complete" which marks the subtitle request complete.
+
+**Assigning a user:**
+
+
+.. sourcecode:: http
+
+    PUT /api/teams/my-team/subtitle-requests/abc123/
+
+    {
+        "subtitler": "alice"
+    }
+
+**Unassigning a user:**
+
+.. sourcecode:: http
+
+    PUT /api/teams/my-team/subtitle-requests/abc123/
+
+    {
+        "subtitler": null
+    }
+
+**Marking a subtitle request complete**
+
+.. sourcecode:: http
+
+    PUT /api/teams/my-team/subtitle-requests/abc123/
+
+    {
+        "state": "complete"
+    }
+
+**Moving a subtitle request to another team**
+
+.. sourcecode:: http
+
+    PUT /api/teams/my-team/subtitle-requests/abc123/
+
+    {
+        "team": "other-team-slug"
+    }
+
+Endorsing Subtitles
+*******************
+
+If you have an assignment, you can use the :ref:`subtitles_resource` to submit
+subtitles.  Use the ``endorse`` action to endorse them, moving the request to
+the next stage.  You can also use the :ref:`subtitle_actions_resource` to
+endorse the subtitles without submiting any changes.

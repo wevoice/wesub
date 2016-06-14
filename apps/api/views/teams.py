@@ -350,9 +350,10 @@ from api.fields import TimezoneAwareDateTimeField
 from auth.models import CustomUser as User
 from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
                           Application, TeamLanguagePreference)
-import messages.tasks
-import teams.permissions as team_permissions
 from utils.translation import ALL_LANGUAGE_CODES
+import messages.tasks
+import subtitles.signals
+import teams.permissions as team_permissions
 import videos.tasks
 
 def timestamp_to_datetime(timestamp):
@@ -838,6 +839,12 @@ class TaskUpdateSerializer(TaskSerializer):
         if task.assignee is None:
             task.assignee = self.context['user']
         task.complete()
+        version = task.get_subtitle_version()
+        if version and version.is_public():
+            subtitles.signals.subtitles_completed.send(
+                version.subtitle_language)
+            subtitles.signals.subtitles_published.send(
+                version.subtitle_language, version=version)
 
 class TaskViewSet(TeamSubview):
     lookup_field = 'id'
