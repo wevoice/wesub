@@ -705,6 +705,7 @@ class Video(models.Model):
                 setup_callback(video, video_url)
             if not video.title:
                 video.title = make_title_from_url(video_url.url)
+            video.update_search_index()
             video.save()
             if user and user.notify_by_message:
                 video.followers.add(user)
