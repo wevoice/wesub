@@ -518,7 +518,7 @@ class ActivityRecord(models.Model):
     def make_copy(self):
         copy = ActivityRecord(copied_from=self)
         fields = ['type', 'user_id', 'team_id', 'video_id', 'language_code',
-                  'related_obj_id', ]
+                  'related_obj_id', 'created', ]
         for name in fields:
             setattr(copy, name, getattr(self, name))
         copy.save()

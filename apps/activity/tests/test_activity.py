@@ -215,6 +215,8 @@ class TeamVideoActivityTest(TestCase):
         assert_equal(reload_obj(record).team, current_team)
         qs = ActivityRecord.objects.filter(copied_from=record)
         assert_items_equal([a.team for a in qs], old_teams)
+        for copied in qs:
+            assert_equal(copied.created, record.created)
 
     def test_team_video_activity(self):
         # Test activity on a team video
