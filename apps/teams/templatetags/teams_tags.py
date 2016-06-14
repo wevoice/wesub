@@ -322,7 +322,11 @@ def team_projects(context, team, varname):
     {% endfor %}
 
     """
-    context[varname] = Project.objects.for_team(team)
+    projects = Project.objects.for_team(team).select_related('team')
+    project_video_counts = team.get_project_video_counts()
+    for p in projects:
+        p.set_videos_count_cache(project_video_counts.get(p.id, 0))
+    context[varname] = projects
     return ""
 
 @tag(register, [Variable(), Constant("as"), Name()])
