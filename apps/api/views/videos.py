@@ -473,9 +473,8 @@ class VideoSerializer(serializers.Serializer):
                     setattr(video, field_name, validated_data[field_name])
         if validated_data.get('metadata'):
             video.update_metadata(validated_data['metadata'], commit=True)
-        else:
-            video.save()
         self._update_team(video, validated_data)
+        video.save()
         return video
 
     def _update_team(self, video, validated_data):
@@ -487,6 +486,7 @@ class VideoSerializer(serializers.Serializer):
         if team is None:
             if team_video:
                 team_video.delete()
+            video.is_public = True
         else:
             if project is None:
                 project = team.default_project
@@ -495,6 +495,8 @@ class VideoSerializer(serializers.Serializer):
             else:
                 TeamVideo.objects.create(video=video, team=team,
                                          project=project)
+                video.is_public = team.is_visible
+
         video.clear_team_video_cache()
 
 class VideoViewSet(mixins.CreateModelMixin,
