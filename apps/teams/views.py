@@ -463,7 +463,7 @@ def _default_project_for_team(team):
 def _get_videos_for_detail_page(team, user, query, project, language_code,
                                 language_mode, sort):
     if not team.is_member(user) and not team.is_visible:
-        return Videos.objects.none()
+        return Video.objects.none()
 
     qs = Video.objects.filter(teamvideo__team=team)
     # add a couple of completed values that we use in the template code
