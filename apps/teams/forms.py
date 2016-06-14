@@ -1123,7 +1123,7 @@ class ActivityFiltersForm(forms.Form):
         self.team = team
         self.fields['type'].choices = [
             ('', _('Any type')),
-        ] + ActivityRecord.type_choices()
+        ] + ActivityRecord.active_type_choices()
         language_choices = [
             ('', ('Any language')),
         ]
@@ -1428,7 +1428,8 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
 
 class RemoveTeamVideosForm(BulkTeamVideoForm):
     def perform_save(self, qs):
-        qs.delete()
+        for team_video in qs:
+            team_video.remove(self.user)
 
     def message(self):
         msg = ungettext('Video removed from project',

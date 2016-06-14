@@ -215,6 +215,8 @@ class TeamVideoActivityTest(TestCase):
         assert_equal(reload_obj(record).team, current_team)
         qs = ActivityRecord.objects.filter(copied_from=record)
         assert_items_equal([a.team for a in qs], old_teams)
+        for copied in qs:
+            assert_equal(copied.created, record.created)
 
     def test_team_video_activity(self):
         # Test activity on a team video
@@ -232,8 +234,8 @@ class TeamVideoActivityTest(TestCase):
         team = TeamFactory()
         TeamVideoFactory(team=team, video=video)
         self.check_copies(record, team, [])
-        
-    def move_to_team(self):
+
+    def test_move_to_team(self):
         # same thing if we move from 1 team to another
         video = VideoFactory()
         team_video = TeamVideoFactory(video=video)
@@ -264,5 +266,42 @@ class TeamVideoActivityTest(TestCase):
         first_team = team_video.team
         clear_activity()
         record = ActivityRecord.objects.create_for_video_added(video)
-        team_video.delete()
+        team_video.remove(UserFactory())
         self.check_copies(record, None, [first_team])
+
+class TestViewableByUser(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.video = VideoFactory()
+        self.public_team_video = VideoFactory(
+            team=TeamFactory(is_visible=True))
+        self.private_team_video = VideoFactory(
+            team=TeamFactory(is_visible=False))
+        self.my_team_video = VideoFactory(
+            team=TeamFactory(member=self.user, is_visible=False))
+        self.team_video = VideoFactory()
+        ActivityRecord.objects.create_for_video_added(self.video)
+        ActivityRecord.objects.create_for_video_added(self.public_team_video)
+        ActivityRecord.objects.create_for_video_added(self.private_team_video)
+        ActivityRecord.objects.create_for_video_added(self.my_team_video)
+
+    def check_viewable_by_user(self, videos):
+        qs = (ActivityRecord.objects
+              .filter(type='video-added').viewable_by_user(self.user))
+        assert_items_equal([a.video for a in qs], videos)
+
+    def test_viewable_by_user(self):
+        self.check_viewable_by_user([
+            self.video,
+            self.public_team_video,
+            self.my_team_video,
+        ])
+
+    def test_superusers_see_all(self):
+        self.user.is_superuser = True
+        self.check_viewable_by_user([
+            self.video,
+            self.public_team_video,
+            self.private_team_video,
+            self.my_team_video,
+        ])

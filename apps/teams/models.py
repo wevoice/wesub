@@ -54,7 +54,7 @@ from teams import workflows
 from teams.exceptions import ApplicationInvalidException
 from teams.notifications import BaseNotification
 from teams.signals import (member_leave, api_subtitles_approved,
-                           api_subtitles_rejected)
+                           api_subtitles_rejected, video_removed_from_team)
 from utils import DEFAULT_PROTOCOL
 from utils import translation
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
@@ -1087,6 +1087,12 @@ class TeamVideo(models.Model):
     def get_workflow(self):
         """Return the appropriate Workflow for this TeamVideo."""
         return Workflow.get_for_team_video(self)
+
+    def remove(self, user):
+        team = self.team
+        video = self.video
+        self.delete()
+        video_removed_from_team.send(sender=video, team=team, user=user)
 
     def move_to(self, new_team, project=None):
         """

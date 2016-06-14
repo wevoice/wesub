@@ -31,7 +31,6 @@ startup process.  Right after the django settings are set up is a good time.
 import os
 import sys
 
-from localeurl import patch_reverse
 import optionalapps
 
 def setup_ca():
@@ -39,8 +38,11 @@ def setup_ca():
     # up-to-date.  In particular, they work with the google HTTPS
     os.environ['REQUESTS_CA_BUNDLE'] = "/etc/ssl/certs/ca-certificates.crt"
 
-def setup_patch_reverse():
+def setup_monkeypatches():
+    from localeurl import patch_reverse
+    import mysqltweaks
     patch_reverse()
+    mysqltweaks.monkeypatch()
 
 def setup_celery_loader():
     os.environ.setdefault("CELERY_LOADER",
@@ -63,6 +65,6 @@ def startup():
     """
     optionalapps.setup_path()
     setup_ca()
-    setup_patch_reverse()
+    setup_monkeypatches()
     setup_celery_loader()
     run_startup_modules()

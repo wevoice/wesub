@@ -20,12 +20,12 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db import transaction
 from django.db.models import Q
-from django.db.models import query
 from django.utils.translation import ugettext_lazy as _
 
 from auth.models import CustomUser as User
 from codefield import CodeField, Code
 from comments.models import Comment
+from mysqltweaks import query
 from teams.models import Team
 from teams.permissions_const import (ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
                                      ROLE_CONTRIBUTOR, ROLE_NAMES)
@@ -308,6 +308,13 @@ class ActivityQueryset(query.QuerySet):
     def team_video_activity(self):
         return self.exclude(type__in=self.TEAM_ACTIVITY_TYPES)
 
+    def viewable_by_user(self, user):
+        if user.is_superuser:
+            return self
+        return self.filter(Q(team__isnull=True)|
+                           Q(team__in=user.teams.all())|
+                           Q(team__is_visible=True))
+
 class ActivityManager(models.Manager):
     use_for_related_fields = True
 
@@ -329,7 +336,8 @@ class ActivityManager(models.Manager):
                 .distinct())
 
     def for_user(self, user):
-        return self.filter(user=user).original()
+        return (self.filter(user=user).original()
+                .force_index('user_copied_created'))
 
     def for_team(self, team):
         return self.filter(team=team)
@@ -463,7 +471,8 @@ class ActivityRecord(models.Model):
     # When a video moves from team to team, we create copies of each record.
     # The original gets moved to the new team and the copy stays with the old
     # team.
-    copied_from = models.ForeignKey('self', blank=True, null=True)
+    copied_from = models.ForeignKey('self', blank=True, null=True,
+                                    related_name='copies')
 
     objects = ActivityManager()
 
@@ -488,6 +497,11 @@ class ActivityRecord(models.Model):
     def __unicode__(self):
         return u'ActivityRecord: {}'.format(self.type)
 
+    @classmethod
+    def active_type_choices(cls):
+        code_list = cls._meta.get_field('type').code_list
+        return [ (code.slug, code.label) for code in code_list if code.active ]
+
     def move_to_team(self, new_team):
         with transaction.commit_on_success():
             # Make a copy of the record for our current team
@@ -504,7 +518,7 @@ class ActivityRecord(models.Model):
     def make_copy(self):
         copy = ActivityRecord(copied_from=self)
         fields = ['type', 'user_id', 'team_id', 'video_id', 'language_code',
-                  'related_obj_id', ]
+                  'related_obj_id', 'created', ]
         for name in fields:
             setattr(copy, name, getattr(self, name))
         copy.save()

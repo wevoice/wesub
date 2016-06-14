@@ -24,6 +24,11 @@ from django import dispatch
 logger = logging.getLogger(__name__)
 
 member_leave = dispatch.Signal()
+video_removed_from_team = dispatch.Signal(providing_args=["team", "user"])
+video_moved_from_team_to_team = dispatch.Signal(
+        providing_args=["destination_team", "video"])
+build_video_page_forms = dispatch.Signal(
+    providing_args=['team', 'user', 'team_videos_qs'])
 
 # Notification-related signals
 
@@ -159,10 +164,6 @@ api_video_edited = dispatch.Signal(providing_args=["video"])
 api_language_new = dispatch.Signal(providing_args=["language"])
 api_teamvideo_new = dispatch.Signal(providing_args=["video"])
 api_application_new = dispatch.Signal(providing_args=["application"])
-video_moved_from_team_to_team = dispatch.Signal(
-        providing_args=["destination_team", "video"])
-build_video_page_forms = dispatch.Signal(
-    providing_args=['team', 'user', 'team_videos_qs'])
 # connect handlers
 api_subtitles_edited.connect(api_on_subtitles_edited)
 api_subtitles_approved.connect(api_on_subtitles_approved)

@@ -35,6 +35,7 @@ Fetching user data
     :>json list languages: List of language codes for languages the user
         speaks.
     :>json url avatar: URL to the user's avatar image
+    :>json uri activity_uri: User Activity resource
     :>json uri resource_uri: User resource
     :>json string full_name: Full name of the user.
 
@@ -106,6 +107,8 @@ class UserSerializer(serializers.ModelSerializer):
     languages = serializers.ListField(
         child=serializers.CharField(),
         source='get_languages', read_only=True)
+    activity_uri = serializers.HyperlinkedIdentityField(
+        view_name='api:user-activity', lookup_field='username')
     resource_uri = serializers.HyperlinkedIdentityField(
         view_name='api:users-detail', lookup_field='username')
     created_by = serializers.CharField(source='created_by.username',
@@ -116,8 +119,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'username', 'full_name', 'first_name', 'last_name', 'biography',
-            'homepage', 'avatar', 'languages', 'num_videos', 'resource_uri',
-            'created_by', 'is_partner',
+            'homepage', 'avatar', 'languages', 'num_videos', 'activity_uri',
+            'resource_uri', 'created_by', 'is_partner',
         )
 
     default_error_messages = {

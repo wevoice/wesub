@@ -47,6 +47,8 @@ router.register(r'activity', views.activity.ActivityViewSet,
 
 urlpatterns = router.urls + patterns('',
     url(r'^$', views.index.index, name='index'),
+    url(r'videos/(?P<video_id>[\w\d]+)/activity/$',
+        views.activity.VideoActivityView.as_view(), name='video-activity'),
     url(r'^videos/(?P<video_id>[\w\d]+)'
         '/languages/(?P<language_code>[\w-]+)/subtitles/$',
         views.subtitles.SubtitlesView.as_view(), name='subtitles'),
@@ -66,4 +68,8 @@ urlpatterns = router.urls + patterns('',
          name='team-languages-blacklisted'),
     url(r'^languages/$', views.languages.languages, name='languages'),
     url(r'^message/$', views.messages.Messages.as_view(), name='messages'),
+    url(r'users/(?P<username>[\w\-@\.\+\s]+)/activity/$',
+        views.activity.UserActivityView.as_view(), name='user-activity'),
+    url(r'teams/(?P<slug>[\w\d-]+)/activity/$',
+        views.activity.TeamActivityView.as_view(), name='team-activity'),
 )

@@ -18,8 +18,121 @@
 Activity
 --------
 
-Activity Resource
-*****************
+Video Activity Resource
+***********************
+
+.. http:get:: /api/videos/(video-id)/activity/
+
+    :queryparam string type: Filter by activity type (:ref:`activity_types`)
+    :queryparam string user: Filter by user who performed the action
+    :queryparam bcp-47 language: Filter by the subtitle language
+    :queryparam iso-8601 before: Only include activity before this date/time
+    :queryparam iso-8601 after: Only include activity after
+
+    :>json string type: Activity type (:ref:`activity_types`)
+    :>json iso-8601 date: Date/time of the activity
+    :>json username user: User who performed the activity
+    :>json video-id video: Video related to the activity (or null)
+    :>json bcp-47 language: Language of the subtitles related to the activity
+        (or null)
+    :>json uri user_uri: Link to the user resource endpoint
+    :>json uri video_uri: Link to the video resource endpoint
+    :>json uri language_uri: Link to the subtitle language resource endpoint
+
+    Depending on the activity type, extra fields may be present in the
+    response data (:ref:`activity_types`).
+
+Team Activity Resource
+**********************
+
+.. http:get:: /api/teams/(slug)/activity/
+
+    :queryparam string type: Filter by activity type (:ref:`activity_types`)
+    :queryparam string user: Filter by user who performed the action
+    :queryparam video-id video: Filter by video
+    :queryparam bcp-47 video_language: Filter by video language
+    :queryparam bcp-47 language: Filter by the subtitle language
+    :queryparam iso-8601 before: Only include activity before this date/time
+    :queryparam iso-8601 after: Only include activity after
+
+    Response data is the same as the video activity resource.
+
+User Activity Resource
+**********************
+
+.. http:get:: /api/users/(username)/activity/
+
+    :queryparam string type: Filter by activity type (:ref:`activity_types`)
+    :queryparam video-id video: Filter by video
+    :queryparam bcp-47 video_language: Filter by video language
+    :queryparam bcp-47 language: Filter by the subtitle language
+    :queryparam slug team: Filter by team
+    :queryparam iso-8601 before: Only include activity before this date/time
+    :queryparam iso-8601 after: Only include activity after
+
+    Response data is the same as the video activity resource.
+
+.. _activity_types:
+
+Activity Types
+**************
+
+An activity type classifies the activity.  Some types have extra data that is
+associated with them
+
++----------------------+----------------------------+------------------------+
+| Type                 | Created When              | Notes/Extra Fields      |
++======================+===========================+=========================+
+| video-added          | Video added to amara      |                         |
++----------------------+---------------------------+-------------------------+
+| comment-added        | Comment posted            | ``language`` will be    |
+|                      |                           | null for video comments |
+|                      |                           | and set for subtitle    |
+|                      |                           | comments                |
++----------------------+---------------------------+-------------------------+
+| version-added        | Subtitle version added    |                         |
++----------------------+---------------------------+-------------------------+
+| video-url-added      | URL added to video        | ``url`` will contain    |
+|                      |                           | the new URL             |
++----------------------+---------------------------+-------------------------+
+| video-url-edited     | Primary video URL change  | ``old_url``/``new_url`` |
+|                      |                           | will contain the        |
+|                      |                           | old/new primary URL     |
++----------------------+---------------------------+-------------------------+
+| video-url-deleted    | URL removed from video    | ``url`` will contain    |
+|                      |                           | the deleted URL         |
++----------------------+---------------------------+-------------------------+
+| video-deleted        | Video deleted from amara  | ``title`` will contain  |
+|                      |                           | the deleted video's     |
+|                      |                           | title                   |
++----------------------+---------------------------+-------------------------+
+| **Team Related Activity**                                                  |
++----------------------+---------------------------+-------------------------+
+| member-joined        | User joined team          |                         |
++----------------------+---------------------------+-------------------------+
+| member-left          | User left team            |                         |
++----------------------+---------------------------+-------------------------+
+| **Task Related Activity**                                                  |
++----------------------+---------------------------+-------------------------+
+| version-approved     | Subtitles approved        |                         |
++----------------------+---------------------------+-------------------------+
+| version-rejected     | Subtitles sent back by    |                         |
+|                      | approver                  |                         |
++----------------------+---------------------------+-------------------------+
+| version-accepted     | Subtitles approved by     |                         |
+|                      | reviewer                  |                         |
++----------------------+---------------------------+-------------------------+
+| version-declined     | Subtitles sent back by    |                         |
+|                      | reviewer                  |                         |
++----------------------+---------------------------+-------------------------+
+
+
+Legacy Activity Resource
+************************
+
+Deprecated API endpoint that lists contains all amara activity.  You should
+use the team/video/user query param to find the activity you want.  New code
+should use the Video, Team, or User, resources (see above).
 
 List activity
 ^^^^^^^^^^^^^
@@ -65,7 +178,7 @@ Get details on one activity item
 .. http:get:: /api/activity/[activity-id]/
 
     :>json integer type: activity type.  The values are listed above
-    :>json datetime created: date/time of the activity
+    :>json datetime date: date/time of the activity
     :>json video-id video: ID of the video
     :>json uri video_uri: Video Resource
     :>json bcp-47 language: language for the activity
@@ -86,17 +199,156 @@ from __future__ import absolute_import
 from datetime import datetime
 
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from rest_framework import filters
+from rest_framework import generics
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.reverse import reverse
+import dateutil.parser
+import pytz
 
 from activity.models import ActivityRecord
 from api.fields import TimezoneAwareDateTimeField
 from subtitles.models import SubtitleLanguage
+from auth.models import CustomUser as User
 from teams.models import Team
 from videos.models import Video
 
 class ActivitySerializer(serializers.ModelSerializer):
+    type = serializers.SlugField()
+    user = serializers.CharField(source='user.username')
+    date = TimezoneAwareDateTimeField(source='created')
+    video = serializers.CharField(source='video.video_id')
+    language = serializers.SerializerMethodField()
+    user_uri = serializers.HyperlinkedRelatedField(
+        source='user',
+        view_name='api:users-detail',
+        lookup_field='username',
+        read_only=True)
+    video_uri = serializers.HyperlinkedRelatedField(
+        source='video',
+        view_name='api:video-detail',
+        lookup_field='video_id',
+        read_only=True)
+    language_uri = serializers.SerializerMethodField()
+
+    def get_language(self, record):
+        return record.language_code or None
+
+    def get_language_uri(self, record):
+        if not (record.language_code and record.video):
+            return None
+        return reverse('api:subtitle-language-detail', kwargs={
+            'video_id': record.video.video_id,
+            'language_code': record.language_code,
+        }, request=self.context['request'])
+
+    def to_representation(self, record):
+        data = super(ActivitySerializer, self).to_representation(record)
+        extra_data_method_name = 'get_{}_extra'.format(
+            record.type.replace('-', '_'))
+        extra_field_method = getattr(self, extra_data_method_name, None)
+        if extra_field_method:
+            data.update(extra_field_method(record))
+        return data
+
+    def get_video_url_added_extra(self, record):
+        url_edit = record.get_related_obj()
+        return {
+            'url': url_edit.new_url,
+        }
+
+    def get_video_url_edited_extra(self, record):
+        url_edit = record.get_related_obj()
+        return {
+            'old_url': url_edit.old_url,
+            'new_url': url_edit.new_url,
+        }
+
+    def get_video_url_deleted_extra(self, record):
+        url_edit = record.get_related_obj()
+        return {
+            'url': url_edit.old_url,
+        }
+
+    def get_video_deleted_extra(self, record):
+        video_deletion = record.get_related_obj()
+        return {
+            'title': video_deletion.title,
+        }
+
+    class Meta:
+        model = ActivityRecord
+        fields = (
+            'type', 'date', 'user', 'video', 'language', 'user_uri',
+            'video_uri', 'language_uri',
+        )
+
+class ActivityFilterBackend(filters.BaseFilterBackend):
+    # map filter query params to the model field to filter on
+    filter_map = {
+        'type': 'type',
+        'user': 'user__username',
+        'team': 'team__slug',
+        'language': 'language_code',
+        'video': 'video__video_id',
+        'video_language': 'video_language_code',
+        'before': 'created__lt',
+        'after': 'created__gte',
+    }
+
+    def filter_queryset(self, request, queryset, view):
+        for name in request.GET:
+            if name in self.filter_map and name in view.enabled_filters:
+                try:
+                    value = self.parse_value(name, request.GET[name])
+                    queryset = queryset.filter(**{
+                        self.filter_map[name]: value
+                    })
+                except ValueError, KeyError:
+                    # This happens if you specify an invalid type, date, etc.
+                    return queryset.none()
+        return queryset
+
+    def parse_value(self, name, value):
+        if name in ('before', 'after'):
+            return timezone.make_naive(dateutil.parser.parse(value),
+                                       timezone.get_default_timezone())
+        else:
+            return value
+
+class VideoActivityView(generics.ListAPIView):
+    serializer_class = ActivitySerializer
+    filter_backends = (ActivityFilterBackend,)
+    enabled_filters = ['type', 'user', 'language', 'before', 'after']
+
+    def get_queryset(self):
+        video = get_object_or_404(Video, video_id=self.kwargs['video_id'])
+        return ActivityRecord.objects.for_video(video)
+
+class TeamActivityView(generics.ListAPIView):
+    serializer_class = ActivitySerializer
+    filter_backends = (ActivityFilterBackend,)
+    enabled_filters = ['video', 'video_language', 'type', 'user',
+                       'language', 'before', 'after']
+
+    def get_queryset(self):
+        team = get_object_or_404(Team, slug=self.kwargs['slug'])
+        return ActivityRecord.objects.for_team(team)
+
+class UserActivityView(generics.ListAPIView):
+    serializer_class = ActivitySerializer
+    filter_backends = (ActivityFilterBackend,)
+    enabled_filters = ['video', 'team', 'video_language', 'type', 
+                       'language', 'before', 'after']
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs['username'])
+        return ActivityRecord.objects.for_user(user)
+
+class LegacyActivitySerializer(serializers.ModelSerializer):
     type = serializers.IntegerField(source='type_code')
     type_name = serializers.SlugField(source='type')
     user = serializers.CharField(source='user.username')
@@ -149,7 +401,7 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'id'
-    serializer_class = ActivitySerializer
+    serializer_class = LegacyActivitySerializer
     paginate_by = 20
 
     def get_queryset(self):

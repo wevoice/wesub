@@ -68,6 +68,7 @@ class CodeField(models.PositiveSmallIntegerField):
         self.value_to_code = {} # map DB values to Code instances
         self.slug_to_value = {} # map slugs to DB values
         self.current_ext_ids = set()
+        self.code_list = []
         if choices is not None:
             self._check_choices(choices)
             self._add_choices(0, choices)
@@ -105,6 +106,7 @@ class CodeField(models.PositiveSmallIntegerField):
             self.value_to_code[code_value] = code
             self.slug_to_value[code.slug] = code_value
             self._choices.append((code.slug, code.label))
+            self.code_list.append(code)
 
     def _check_ext_id(self, ext_id):
         if not 1 <= ext_id <= 64:

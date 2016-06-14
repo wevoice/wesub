@@ -39,6 +39,7 @@ import teams.models
 import videos.models
 from externalsites import google
 from subtitles import pipeline
+from utils import dates
 from utils import translation
 
 class VideoURLFactory(DjangoModelFactory):
@@ -77,7 +78,8 @@ class VideoFactory(DjangoModelFactory):
     @factory.post_generation
     def team(video, create, extracted, **attrs):
         if extracted:
-            TeamVideoFactory(team=extracted, video=video)
+            TeamVideoFactory(team=extracted, video=video,
+                             added_by=video.user)
 
     @factory.post_generation
     def with_many_visibility_combinations(video, create, extracted, **kwargs):
