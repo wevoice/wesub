@@ -240,6 +240,7 @@ class AddTeamVideoForm(forms.ModelForm):
         return self.cleaned_data
 
     def setup_video(self, video, video_url):
+        video.is_public = self.team.is_visible
         self.saved_team_video = TeamVideo.objects.create(
             video=video, team=self.team, project=self.project,
             added_by=self.user)
