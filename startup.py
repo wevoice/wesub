@@ -40,9 +40,7 @@ def setup_ca():
 
 def setup_monkeypatches():
     from localeurl import patch_reverse
-    import mysqltweaks
     patch_reverse()
-    mysqltweaks.monkeypatch()
 
 def setup_celery_loader():
     os.environ.setdefault("CELERY_LOADER",
