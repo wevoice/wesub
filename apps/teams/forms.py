@@ -264,7 +264,7 @@ class AddTeamVideoForm(forms.ModelForm):
             msg = mark_safe(fmt(
                 _(u'This video already belongs to the %(team)s team '
                   '(<a href="%(link)s">view video</a>)'),
-                team=unicode(self.team),
+                team=unicode(team_video.team),
                 link=team_video.video.get_absolute_url()))
         else:
             msg = _(u'This video already belongs to another team.')
