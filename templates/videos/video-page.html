@@ -46,22 +46,14 @@
             <li>
                 <div>
                     <span class="count">
-                      {% blocktrans count count=video.languages_count %}
-                      {{ count }} Language
-                      {% plural %}
-                      {{ count }} Languages
-                      {% endblocktrans %}
+                      {% blocktrans count count=video.languages_count %}{{ count }} Language{% plural %}{{ count }} Languages{% endblocktrans %}
                     </span>
                 </div>
             </li>
             <li>
                 <div>
                     <span class="count">
-                      {% blocktrans count count=video.followers.count %}
-                      {{ count }} Follower
-                      {% plural %}
-                      {{ count }} Followers
-                      {% endblocktrans %}
+                      {% blocktrans count count=video.followers.count %}{{ count }} Follower{% plural %}{{ count }} Followers{% endblocktrans %}
                     </span>
                 </div>
             </li>
