@@ -45,14 +45,24 @@
         <ul class="metrics">
             <li>
                 <div>
-                    <span class="count">{{ video.languages_count }}</span>
-                    {% trans "Language" %}{{ video.languages_count|pluralize }}
+                    <span class="count">
+                      {% blocktrans count count=video.languages_count %}
+                      {{ count }} Language
+                      {% plural %}
+                      {{ count }} Languages
+                      {% endblocktrans %}
+                    </span>
                 </div>
             </li>
             <li>
                 <div>
-                    <span class="count">{{ video.followers.count }}</span>
-                    {% trans "Follower" %}{{ video.followers.count|pluralize }}
+                    <span class="count">
+                      {% blocktrans count count=video.followers.count %}
+                      {{ count }} Follower
+                      {% plural %}
+                      {{ count }} Followers
+                      {% endblocktrans %}
+                    </span>
                 </div>
             </li>
         </ul>
