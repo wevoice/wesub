@@ -56,8 +56,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-27 09:00-0500\n"
-"PO-Revision-Date: 2016-06-27 14:01+0000\n"
+"POT-Creation-Date: 2016-06-27 09:44-0500\n"
+"PO-Revision-Date: 2016-06-27 14:44+0000\n"
 "Last-Translator: bendk <ben@pculture.org>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/universalsubtitles/universalsubtitles/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
@@ -510,7 +510,7 @@ msgstr "No puedes unirte a %(team)s."
 
 #: apps/teams/new_views.py:727 apps/teams/new_views.py:760
 #: templates/profiles/_tabs.html:7 templates/teams/_tabs.html:28
-#: templates/videos/video-page.html:107 templates/new-teams/base.html:29
+#: templates/videos/video-page.html:99 templates/new-teams/base.html:29
 msgid "Activity"
 msgstr "Actividad"
 
@@ -1435,7 +1435,7 @@ msgstr ""
 #: templates/teams/approvals.html:90 templates/teams/tasks.html:155
 #: templates/teams/tasks.html:256
 #: templates/videos/set-original-language.html:14
-#: templates/videos/video-page.html:105
+#: templates/videos/video-page.html:97
 #: templates/externalsites/_sync-errors-form.html:12
 #: amara-enterprise/collab/templates/collab/_collab-search-form.html:10
 #: amara-enterprise/collab/templates/collab/_collaborations-list.html:14
@@ -6938,7 +6938,7 @@ msgstr "Lo sentimos, no hay tareas aquí."
 msgid "Edit team video"
 msgstr "Modificar vídeo del equipo"
 
-#: templates/teams/team_video.html:28 templates/videos/video-page.html:125
+#: templates/teams/team_video.html:28 templates/videos/video-page.html:117
 msgid "Edit video"
 msgstr "Modificar vídeo"
 
@@ -7409,7 +7409,7 @@ msgstr "Rechazar"
 
 #: templates/videos/_create-subtitles-modal.html:5
 #: templates/videos/_multi-video-create-subtitles-form.html:6
-#: templates/videos/video-page.html:86
+#: templates/videos/video-page.html:78
 msgid "Add a new language!"
 msgstr "Añadir un nuevo idioma"
 
@@ -7911,7 +7911,7 @@ msgstr "Deja un comentario"
 #: templates/videos/language-comments-tab.html:5
 #: templates/videos/language-page.html:91
 #: templates/videos/video-comments-tab.html:6
-#: templates/videos/video-page.html:106
+#: templates/videos/video-page.html:98
 msgid "Comments"
 msgstr "Comentarios"
 
@@ -8294,35 +8294,23 @@ msgstr "¡Los subtítulos se han guardado correctamente! Puedes compartir el ví
 
 #: templates/videos/video-page.html:49
 #, python-format
-msgid ""
-"\n"
-"                      %(count)s Language\n"
-"                      "
-msgid_plural ""
-"\n"
-"                      %(count)s Languages\n"
-"                      "
+msgid "%(count)s Language"
+msgid_plural "%(count)s Languages"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/videos/video-page.html:60
+#: templates/videos/video-page.html:56
 #, python-format
-msgid ""
-"\n"
-"                      %(count)s Follower\n"
-"                      "
-msgid_plural ""
-"\n"
-"                      %(count)s Followers\n"
-"                      "
+msgid "%(count)s Follower"
+msgid_plural "%(count)s Followers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/videos/video-page.html:71
+#: templates/videos/video-page.html:63
 msgid "Contribute"
 msgstr "Contribuir"
 
-#: templates/videos/video-page.html:79
+#: templates/videos/video-page.html:71
 #, python-format
 msgid ""
 "\n"
@@ -8330,11 +8318,11 @@ msgid ""
 "                    "
 msgstr "\n                    <span class=\"team-link\">Este vídeo es parte del equipo <a href=\"%(url)s\">%(team)s</a>.</span>\n                    "
 
-#: templates/videos/video-page.html:97
+#: templates/videos/video-page.html:89
 msgid "Add this video to one of your teams"
 msgstr "Añadir este vídeo a uno de tus equipos"
 
-#: templates/videos/video-page.html:108
+#: templates/videos/video-page.html:100
 msgid "URLs"
 msgstr "URLs"
 
@@ -9479,8 +9467,8 @@ msgstr ""
 
 #: templates/new-teams/settings-projects.html:53
 #: templates/new-teams/members.html:98
-#: templates/new-teams/videos-forms/bulk-edit.html:16
 #: templates/new-teams/videos-forms/edit.html:17
+#: templates/new-teams/videos-forms/bulk-edit.html:18
 #: amara-enterprise/collab/templates/collab/dashboard.html:89
 #: amara-enterprise/providers/templates/providers/queue.html:96
 #: amara-enterprise/providers/templates/providers/queue.html:125
@@ -9689,14 +9677,6 @@ msgstr ""
 msgid "Upon completion, you will receive a summary by email."
 msgstr ""
 
-#: templates/new-teams/videos-forms/bulk-edit.html:4
-#, python-format
-msgid ""
-"\n"
-"    Edit %(count)s Videos\n"
-"    "
-msgstr ""
-
 #: templates/new-teams/videos-forms/edit.html:4
 #, python-format
 msgid ""
@@ -9709,7 +9689,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"    Move %(video_title)s\n"
+"    Move Video\n"
 "    "
 msgid_plural ""
 "\n"
@@ -9722,7 +9702,7 @@ msgstr[1] ""
 #, python-format
 msgid ""
 "\n"
-"    Remove %(video_title)s\n"
+"    Remove Video\n"
 "    "
 msgid_plural ""
 "\n"
@@ -9740,6 +9720,19 @@ msgid_plural ""
 "\n"
 "      Are you sure you want to remove the videos from your team?\n"
 "      "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/new-teams/videos-forms/bulk-edit.html:4
+#, python-format
+msgid ""
+"\n"
+"    Edit Video\n"
+"    "
+msgid_plural ""
+"\n"
+"    Edit %(count)s Videos\n"
+"    "
 msgstr[0] ""
 msgstr[1] ""
 
