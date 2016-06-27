@@ -214,6 +214,9 @@ class UserAPITest(TestCase):
             'create_login_token': True,
         })
         token = LoginToken.objects.get(user=user)
+        self.check_login_token(response, token)
+
+    def check_login_token(self, response, token):
         assert_equal(response.data['auto_login_url'],
                      'http://testserver' + reverse("auth:token-login",
                                                    args=(token.token,)))
@@ -227,6 +230,7 @@ class UserAPITest(TestCase):
         self.check_user_data(user, data, orig_user_data)
         assert_equals(user.created_by, None)
         self.assert_response_data_correct(response, user, get=False)
+        return response
 
     def test_update_user(self):
         self.check_put({
@@ -240,6 +244,20 @@ class UserAPITest(TestCase):
         self.check_put({
             'email': 'new-email@example.com',
         })
+
+    def test_update_with_create_login_token(self):
+        response = self.check_put({
+            'create_login_token': True,
+        })
+        token = LoginToken.objects.get(user=self.user)
+        self.check_login_token(response, token)
+        # test a second update, we should create a new token
+        response = self.check_put({
+            'create_login_token': True,
+        })
+        token2 = LoginToken.objects.get(user=self.user)
+        assert_not_equal(token.token, token2.token)
+        self.check_login_token(response, token2)
 
     def test_cant_change_other_user(self):
         other_user = UserFactory()
