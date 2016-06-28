@@ -449,6 +449,13 @@ def get_direct_url_to_audio(video_id):
     """
     return pafy.new(video_id).getbestaudio().url
 
+def get_direct_url_to_video(video_id):
+    """
+    It does a request to google to retrieve the URL
+    So that should be done in a backgound task
+    """
+    return pafy.new(video_id).getbest(preftype="mp4").url
+
 def update_video_description(video_id, access_token, description):
     # get the current snippet for the video
     response = video_get(access_token, video_id, ['snippet'])
