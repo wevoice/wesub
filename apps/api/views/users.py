@@ -206,11 +206,11 @@ class UserCreateSerializer(UserSerializer):
 class UserUpdateSerializer(UserSerializer):
     username = serializers.CharField(read_only=True)
     password = PasswordField(required=False, write_only=True)
-    api_key = serializers.CharField(source='api_key.key', read_only=True)
 
     def __init__(self, *args, **kwargs):
         super(UserUpdateSerializer, self).__init__(*args, **kwargs)
-        if not can_modify_user(self.context['request'].user, kwargs['instance']):
+        if 'instance' in kwargs and \
+           not can_modify_user(self.context['request'].user, kwargs['instance']):
             self.fields.pop('email')
 
     def update(self, user, validated_data):
@@ -221,7 +221,7 @@ class UserUpdateSerializer(UserSerializer):
     class Meta:
         model = User
         fields = UserSerializer.Meta.fields + (
-            'email', 'api_key', 'password',
+            'email', 'password',
         )
 
 class UserViewSet(mixins.RetrieveModelMixin,
