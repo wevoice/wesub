@@ -43,6 +43,12 @@ class Code(object):
     slug = NotImplemented
     label = NotImplemented
 
+class SimpleCode(object):
+    """Code consisting of simply a slug and a label."""
+    def __init__(self, slug, label):
+        self.slug = slug
+        self.label = label
+
 class CodeField(models.PositiveSmallIntegerField):
     """
     Store codes in a database field.
@@ -100,6 +106,9 @@ class CodeField(models.PositiveSmallIntegerField):
             if isinstance(code, type):
                 # If we get passed in a class, create an instance from it
                 code = code()
+            elif isinstance(code, tuple):
+                # If we get passed in a 2-tuple, create a SimpleCode from it
+                code = SimpleCode(*code)
             assert code.slug is not NotImplemented
             assert code.label is not NotImplemented
             code_value = (ext_id * 1000) + i + 1

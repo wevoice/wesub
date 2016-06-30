@@ -337,6 +337,8 @@ NEEDS_ROOT = [
     'update_docs',
     'update_translations',
     'compile_translations',
+    'schemamigration',
+    'datamigration',
 ]
 def run_manage(args, **kwargs):
     if args[0] in NEEDS_ROOT:
