@@ -55,7 +55,7 @@ Creating Users
 
     :<json username username: 30 chars or fewer alphanumeric chars,
         @, _ and are accepted.
-    :<json emali email: A valid email address
+    :<json email email: A valid email address
     :<json string password: any number of chars, all chars allowed.
     :<json string first_name: Any chars, max 30 chars. **(optional)**
     :<json string last_name: Any chars, max 30 chars. **(optional)**
@@ -100,6 +100,10 @@ from rest_framework import viewsets
 from rest_framework.reverse import reverse
 
 from auth.models import CustomUser as User, LoginToken
+
+def can_modify_user(request_user, object_user):
+    return request_user == object_user or \
+        request_user.is_staff
 
 class UserSerializer(serializers.ModelSerializer):
     num_videos = serializers.IntegerField(source='videos.count',
@@ -204,8 +208,13 @@ class UserUpdateSerializer(UserSerializer):
     password = PasswordField(required=False, write_only=True)
     api_key = serializers.CharField(source='api_key.key', read_only=True)
 
+    def __init__(self, *args, **kwargs):
+        super(UserUpdateSerializer, self).__init__(*args, **kwargs)
+        if not can_modify_user(self.context['request'].user, kwargs['instance']):
+            self.fields.pop('email')
+
     def update(self, user, validated_data):
-        if user != self.context['request'].user:
+        if not can_modify_user(user, self.context['request'].user):
             raise PermissionDenied()
         return super(UserSerializer, self).update(user, validated_data)
 
