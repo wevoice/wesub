@@ -311,9 +311,11 @@ class ActivityQueryset(query.QuerySet):
     def viewable_by_user(self, user):
         if user.is_superuser:
             return self
-        return self.filter(Q(team__isnull=True)|
-                           Q(team__in=user.teams.all())|
-                           Q(team__is_visible=True))
+        q = Q(team__isnull=True) | Q(team__is_visible=True)
+        if user.is_authenticated():
+            q |= Q(team__in=user.teams.all())
+
+        return self.filter(q)
 
 class ActivityManager(models.Manager):
     use_for_related_fields = True
