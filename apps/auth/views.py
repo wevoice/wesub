@@ -225,22 +225,25 @@ def token_login(request, token):
     """
     # we return 403 even from not found tokens, just being a bit more
     # strict about not leaking valid tokens
+    success = False
     try:
         lt = LoginToken.objects.get(token=token)
-        user = lt.user
-        # be paranoid, these users should never be login / staff members
-        if  (user.is_staff is False ) and (user.is_superuser is False):
+        if lt.is_valid():
+            user = lt.user
             # this will only work if user has the CustoUser backend
             # not a third party provider
             backend = get_backends()[0]
             user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
             stock_login(request, user)
             next_url = make_redirect_to(request, reverse("profiles:edit"))
-            return HttpResponseRedirect(next_url)
-
+            success = True
+        lt.delete()
     except LoginToken.DoesNotExist:
         pass
-    return HttpResponseForbidden("Invalid user token")
+    if success:
+        return HttpResponseRedirect(next_url)
+    else:
+        return HttpResponseForbidden("Invalid user token")
 
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',

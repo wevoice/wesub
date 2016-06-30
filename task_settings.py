@@ -33,6 +33,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'teams.tasks.expire_tasks',
         'schedule': crontab(minute=0, hour=7),
     },
+    'expire-login-tokens': {
+        'task': 'auth.tasks.expire_login_tokens',
+        'schedule': crontab(minute=10, hour=23),
+    },
     'add_videos_notification_daily': {
         'task': 'teams.tasks.add_videos_notification_daily',
         'schedule': crontab(minute=0, hour=23),
