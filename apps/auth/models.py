@@ -694,7 +694,7 @@ class LoginToken(models.Model):
         return self.created + LoginToken.EXPIRES_IN <  datetime.now()
 
     def is_valid(self):
-        if self.is_expired():
+        if self.is_expired:
             return False
         # be paranoid, these users should never be login / staff members
         if self.user.is_staff or self.user.is_superuser:
