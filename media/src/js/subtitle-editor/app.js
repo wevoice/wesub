@@ -595,8 +595,28 @@ var angular = angular || null;
 			$scope.currentEdit.storedSubtitle());
             } else if (isDel(evt.keyCode) && isAltPressed(evt)) {
                 // Alt+del, remove current subtitle
-		if($scope.currentEdit.storedSubtitle())
-		    $scope.workingSubtitles.subtitleList.removeSubtitle($scope.currentEdit.storedSubtitle());
+		if($scope.currentEdit.storedSubtitle()){
+                    var subtitleList = $scope.workingSubtitles.subtitleList;
+                    var currentSubtitle = $scope.currentEdit.storedSubtitle();
+                    var nextSubtitle = subtitleList.nextSubtitle(currentSubtitle);
+                    var prevSubtitle = subtitleList.prevSubtitle(currentSubtitle);
+                    var replacement = nextSubtitle || prevSubtitle;
+
+                    subtitleList.removeSubtitle(currentSubtitle);
+
+                    // After removing current subtitle, move cursor and open text-area of adjacent subtitle
+                    if (replacement){
+                        // Tell the root scope that we're no longer editing, now.
+                        if($scope.currentEdit.finish(commitChanges = true, subtitleList = subtitleList)) {
+                            $scope.$root.$emit('work-done');
+                        }
+
+                        $scope.currentEdit.start(replacement);
+                        $scope.$root.$emit('scroll-to-subtitle', replacement);
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                   }
+                }
             } else if (isAltPressed(evt) && ((evt.keyCode === 38) || (evt.keyCode === 40))) {
 		var nextSubtitle;
 		var subtitle = $scope.currentEdit.storedSubtitle();
