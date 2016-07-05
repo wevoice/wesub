@@ -31,6 +31,7 @@ var angular = angular || null;
                 return SubtitleStorage.saveSubtitles(
                     $scope.workingSubtitles.subtitleList.toXMLString(),
                     $scope.workingSubtitles.title,
+                    Math.floor($scope.timeline.duration / 1000),
                     $scope.workingSubtitles.description,
                     $scope.workingSubtitles.metadata,
                     null, action).then(this.afterSaveSubtitles);

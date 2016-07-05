@@ -593,6 +593,7 @@ class SubtitlesSerializer(serializers.Serializer):
                    "amara editor."))
     language = LanguageForSubtitlesSerializer(source='*', read_only=True)
     title = serializers.CharField(required=False, allow_blank=True)
+    duration = serializers.IntegerField(required=False)
     description = serializers.CharField(required=False, allow_blank=True)
     metadata = VideoMetadataSerializer(required=False)
     video_title = serializers.CharField(source='video.title_display',
@@ -671,13 +672,13 @@ class SubtitlesSerializer(serializers.Serializer):
             action = validated_data.get("action")
         elif 'is_complete' in validated_data:
             complete = validated_data['is_complete']
-
         return pipeline.add_subtitles(
             self.context['video'], self.context['language_code'],
             validated_data['subtitles'],
             action=action, complete=complete,
             title=validated_data.get('title'),
             description=validated_data.get('description'),
+            duration=validated_data.get('duration'),
             metadata=validated_data.get('metadata'),
             author=self.context['user'],
             committer=self.context['user'],
