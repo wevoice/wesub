@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 
 from activity.models import ActivityRecord
@@ -304,4 +305,11 @@ class TestViewableByUser(TestCase):
             self.public_team_video,
             self.private_team_video,
             self.my_team_video,
+        ])
+
+    def test_anonymous_user(self):
+        self.user = AnonymousUser()
+        self.check_viewable_by_user([
+            self.video,
+            self.public_team_video,
         ])
