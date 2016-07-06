@@ -603,7 +603,7 @@ var Site = function(Site) {
             if ($('div.note').length) {
                 $('.note .hide-announcement').click(function() {
                     var $this = $(this);
-                    $this.parents('#announce-banner').hide();
+                    $this.parents('.announce-banner').hide();
                     var d = new Date();
                     d.setTime(d.getTime() + 60*60*24*365*1000);
                     document.cookie = window.COOKIE + d.toUTCString();
@@ -651,7 +651,6 @@ var Site = function(Site) {
                 return DIFFING_URL.replace(/<<first_pk>>/, first_pk).replace(/<<second_pk>>/, second_pk);
             }
             function setupRevisions() {
-                $('.version_checkbox:first', '.revisions').attr('checked', 'checked');
                 $('.version_checkbox', '.revisions').change( function() {
                     var $this = $(this);
                     var checked_length = $('.version_checkbox:checked').length;
@@ -1042,7 +1041,9 @@ var Site = function(Site) {
             });
             $.urlParam = function(name){
                 var results = new RegExp('[\\?&amp;]' + name + '=([^&amp;#]*)').exec(window.location.href);
-                return results[1] || 0;
+                if (results)
+                    return results[1];
+                return 0;
             }
             if($.urlParam('prompt') == 'true') {
                 $('a[href="#youtube-modal"]').click();

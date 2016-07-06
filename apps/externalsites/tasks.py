@@ -138,9 +138,7 @@ def fetch_subs(video_url_id):
 def retry_failed_sync():
     sh = SyncHistory.objects.get_attempt_to_resync()
     if sh is None:
-        logging.info("retry_failed_sync: nothing to resync")
         return
-    logging.info("retry_failed_sync: resyncing %s", sh)
     account = sh.get_account()
     account.update_subtitles(sh.video_url, sh.language)
 

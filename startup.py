@@ -31,15 +31,14 @@ startup process.  Right after the django settings are set up is a good time.
 import os
 import sys
 
-def setup_path():
-    root_dir = os.path.abspath(os.path.dirname(__file__))
-    sys.path.insert(0, os.path.join(root_dir, 'apps'))
-    sys.path.insert(0, os.path.join(root_dir, 'libs'))
-    # add paths from optional repositories
-    import optionalapps
-    sys.path.extend(optionalapps.get_repository_paths())
+import optionalapps
 
-def setup_patch_reverse():
+def setup_ca():
+    # This lets the requests library use the system CA certs, which are more
+    # up-to-date.  In particular, they work with the google HTTPS
+    os.environ['REQUESTS_CA_BUNDLE'] = "/etc/ssl/certs/ca-certificates.crt"
+
+def setup_monkeypatches():
     from localeurl import patch_reverse
     patch_reverse()
 
@@ -62,7 +61,8 @@ def startup():
     """Set up the amara environment.  This should be called before running any
     other code.
     """
-    setup_path()
-    setup_patch_reverse()
+    optionalapps.setup_path()
+    setup_ca()
+    setup_monkeypatches()
     setup_celery_loader()
     run_startup_modules()

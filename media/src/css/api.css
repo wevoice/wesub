@@ -11,3 +11,17 @@ input.enable-field[type=checkbox] {
 .api-description .nav-tabs > li {
     float: left;
 }
+
+
+ul {
+    padding-left: 30px;
+
+    p {
+        margin: 0;
+        padding: 0;
+    }
+}
+
+td, th {
+    padding: 0 15px;
+}

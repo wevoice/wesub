@@ -19,21 +19,19 @@ from datetime import datetime, timedelta
 import logging
 
 from celery.schedules import crontab, timedelta
-from celery.signals import task_failure
 from celery.task import task
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.files.base import ContentFile
 from django.db.models import ObjectDoesNotExist
-from haystack import site
-from raven.contrib.django.models import client
 import requests
 
 from babelsubs.storage import diff as diff_subtitles
 from messages.models import Message
 from messages import tasks
 from utils import send_templated_email, DEFAULT_PROTOCOL
-from videos.models import VideoFeed, Video, VIDEO_TYPE_YOUTUBE, VideoUrl
+from videos.models import (VideoFeed, Video, VIDEO_TYPE_YOUTUBE, VideoUrl,
+                           VideoIndex)
 from subtitles.models import (
     SubtitleLanguage, SubtitleVersion
 )
@@ -43,26 +41,6 @@ from videos.types import UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
 from videos.types import VideoTypeError
 
 celery_logger = logging.getLogger('celery.task')
-
-def process_failure_signal(exception, traceback, sender, task_id,
-                           signal, args, kwargs, einfo, **kw):
-    exc_info = (type(exception), exception, traceback)
-    try:
-        celery_logger.error(
-            'Celery job exception: %s(%s)' % (exception.__class__.__name__, exception),
-            exc_info=exc_info,
-            extra={
-                'data': {
-                    'task_id': task_id,
-                    'sender': sender,
-                    'args': args,
-                    'kwargs': kwargs,
-                }
-            }
-        )
-    except:
-        pass
-task_failure.connect(process_failure_signal)
 
 @task
 def cleanup():
@@ -107,8 +85,9 @@ def update_video_feed(video_feed_id):
         video_feed = VideoFeed.objects.get(pk=video_feed_id)
         video_feed.update()
     except VideoFeed:
-        msg = '**update_video_feed**. VideoFeed does not exist. ID: %s' % video_feed_id
-        client.captureMessage(msg)
+        logging.warn(
+            '**update_video_feed**. VideoFeed does not exist. ID: %s',
+            video_feed_id)
 
 @task(rate_limit='500/m')
 def update_video_feed_with_rate_limit(video_feed_id):
@@ -129,19 +108,12 @@ def test_task(n):
         print '.',
         sleep(0.5)
 
-@task
-def raise_exception(msg, **kwargs):
-    print "TEST TASK FOR CELERY. RAISE EXCEPTION WITH MESSAGE: %s" % msg
-    logger = raise_exception.get_logger()
-    logger.error('Test error logging to Sentry from Celery')
-    raise TypeError(msg)
-
 @task()
 def video_changed_tasks(video_pk, new_version_id=None):
     from videos import metadata_manager
     from videos.models import Video
-
     from teams.models import TeamVideo, BillingRecord
+
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
         send_new_version_notification(new_version_id)
@@ -154,13 +126,6 @@ def video_changed_tasks(video_pk, new_version_id=None):
                 "exception": str(e)})
 
     video = Video.objects.get(pk=video_pk)
-
-    tv = video.get_team_video()
-
-    if tv:
-        tv_search_index = site.get_index(TeamVideo)
-        tv_search_index.backend.update(tv_search_index, [tv])
-
     video.update_search_index()
 
 @task
@@ -340,10 +305,3 @@ def notify_for_version(version):
                              'videos/email_notification_non_editors.html',
                              context, fail_silently=not settings.DEBUG)
     return True
-
-def _save_video_feed(feed_url, user):
-    """ Creates or updates a videofeed given some url """
-    try:
-        return VideoFeed.objects.get(url=feed_url, user=user)
-    except VideoFeed.DoesNotExist:
-        return VideoFeed.objects.create(url=feed_url, user=user)

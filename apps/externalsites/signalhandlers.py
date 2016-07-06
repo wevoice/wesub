@@ -30,6 +30,7 @@ from subtitles.models import (SubtitleLanguage, SubtitleVersion,
                               ORIGIN_IMPORTED)
 from videos.models import Video, VideoUrl
 import subtitles.signals
+import videos.signals
 
 def _update_subtitles_for_language(language):
     for account, video_url in get_sync_accounts(language.video):
@@ -57,12 +58,11 @@ def on_language_deleted(signal, sender, **kwargs):
 def on_account_save(signal, sender, instance, **kwargs):
     tasks.update_all_subtitles.delay(instance.account_type, instance.id)
 
-@receiver(post_save, sender=VideoUrl)
-def on_videourl_save(signal, sender, instance, created, **kwargs):
-    video_url = instance
-    if created:
-        account = get_sync_account(instance.video, instance)
-        if credit.should_add_credit_to_video_url(video_url, account):
-            tasks.add_amara_credit.delay(instance.id)
-        if subfetch.should_fetch_subs(video_url):
-            tasks.fetch_subs.delay(video_url.pk)
+@receiver(videos.signals.video_url_added)
+def on_video_url_added(sender, video, **kwargs):
+    video_url = sender
+    account = get_sync_account(video, video_url)
+    if credit.should_add_credit_to_video_url(video_url, account):
+        tasks.add_amara_credit.delay(video_url.pk)
+    if subfetch.should_fetch_subs(video_url):
+        tasks.fetch_subs.delay(video_url.pk)

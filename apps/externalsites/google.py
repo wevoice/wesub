@@ -52,7 +52,7 @@ VideoInfo = namedtuple('VideoInfo',
 OpenIDProfile = namedtuple('OpenIDProfile',
                            'sub email full_name first_name last_name')
 
-logger = logging.getLogger('utils.youtube')
+logger = logging.getLogger(__name__)
 
 def youtube_scopes():
     return [
@@ -103,7 +103,7 @@ def _oauth_token_post(**params):
     response = requests.post("https://accounts.google.com/o/oauth2/token",
                              data=params, headers={
         "Content-Type": "application/x-www-form-urlencoded"
-    })
+                             })
 
     if response.status_code != 200:
         logger.error("Error requesting Youtube OAuth token", extra={
@@ -114,14 +114,15 @@ def _oauth_token_post(**params):
                 })
         raise OAuthError('Authentication error')
 
-    if response.json.get('error', None):
+    response_data = response.json()
+    if response_data.get('error', None):
         logger.error("Error on requesting Youtube OAuth token", extra={
                     "data": {
                         "sent_data": params,
                         "response": response.content
                     },
                 })
-        raise OAuthError(response.json['error'])
+        raise OAuthError(response_data['error'])
 
     return response
 
@@ -154,10 +155,11 @@ def handle_callback(request, redirect_uri):
                                  redirect_uri=redirect_uri)
     # decode the id_token.  We can skip verification since we used HTTPS to
     # connect to google
-    token_data = jwt.decode(response.json['id_token'], verify=False)
+    response_data = response.json()
+    token_data = jwt.decode(response_data['id_token'], verify=False)
     return OAuthCallbackData(
-        response.json.get('refresh_token'),
-        response.json['access_token'],
+        response_data.get('refresh_token'),
+        response_data['access_token'],
         token_data['openid_id'],
         token_data['sub'],
         state,
@@ -166,7 +168,7 @@ def handle_callback(request, redirect_uri):
 def get_new_access_token(refresh_token):
     response = _oauth_token_post(grant_type='refresh_token',
                                  refresh_token=refresh_token)
-    return response.json['access_token']
+    return response.json()['access_token']
 
 def revoke_auth_token(refresh_token):
     requests.get('https://accounts.google.com/o/oauth2/revoke',
@@ -229,7 +231,7 @@ def _make_api_request(method, access_token, url, **kwargs):
         expected_status_code = 200
     if response.status_code != expected_status_code:
         try:
-            errors = response.json['error']['errors']
+            errors = response.json()['error']['errors']
             message = ' '.join(e['reason'] for e in errors)
         except StandardError, e:
             logger.error("%s parsing youtube response (%s): %s" % (
@@ -263,24 +265,39 @@ def video_get(access_token, video_id, part):
 
 def get_uploads_playlist_id(channel_id):
     response = channel_get(None, ['contentDetails'], channel_id)
-    content_details = response.json['items'][0]['contentDetails']
+    content_details = response.json()['items'][0]['contentDetails']
     return content_details['relatedPlaylists']['uploads']
 
 def get_uploaded_video_ids(channel_id):
-    playlist_id = get_uploads_playlist_id(channel_id)
+    MAX_ITEMS = 1000
 
+    playlist_id = get_uploads_playlist_id(channel_id)
+    results, next_page_token = _get_uploaded_video_ids(playlist_id,
+                                                               None)
+    while next_page_token and len(results) < MAX_ITEMS:
+        more_results, next_page_token = _get_uploaded_video_ids(
+            playlist_id, next_page_token)
+        results.extend(more_results)
+    return results
+
+def _get_uploaded_video_ids(playlist_id, page_token):
+    """Fetches one page of results for get_uploaded_video_ids()."""
     params = {
         'part': 'snippet',
-        'playlistId': playlist_id
+        'playlistId': playlist_id,
+        'maxResults': 50,
     }
+    if page_token:
+        params['pageToken'] = page_token
     response = _make_youtube_api_request('get', None, 'playlistItems',
                                          params=params)
+    response_data = response.json()
     rv = []
-    for item in response.json['items']:
+    for item in response_data['items']:
         resource_id = item['snippet']['resourceId']
         if resource_id['kind'] == 'youtube#video':
             rv.append(resource_id['videoId'])
-    return rv
+    return rv, response_data.get('nextPageToken')
 
 def captions_list(access_token, video_id):
     """Fetch info on all non-ASR captions for a video
@@ -296,7 +313,7 @@ def captions_list(access_token, video_id):
     return [
         (caption['id'], caption['snippet']['language'],
          caption['snippet']['name'])
-        for caption in response.json['items']
+        for caption in response.json()['items']
         if caption['snippet']['trackKind'] != 'ASR'
     ]
 
@@ -377,7 +394,7 @@ def get_youtube_user_info(access_token):
     :returns: (channel_id, display_name) tuple
     """
     response = channel_get(access_token, part=['id','snippet'])
-    channel = response.json['items'][0]
+    channel = response.json()['items'][0]
     return YoutubeUserInfo(channel['id'], channel['snippet']['title'])
 
 def get_openid_profile(access_token):
@@ -387,12 +404,13 @@ def get_openid_profile(access_token):
     """
     url = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect'
     response = _make_api_request('get', access_token, url)
+    response_data = response.json()
     return OpenIDProfile(
-        response.json['sub'],
-        response.json['email'],
-        response.json.get('name', ''),
-        response.json.get('given_name', ''),
-        response.json.get('family_name', ''),
+        response_data['sub'],
+        response_data['email'],
+        response_data.get('name', ''),
+        response_data.get('given_name', ''),
+        response_data.get('family_name', ''),
     )
 
 def get_video_info(video_id):
@@ -412,8 +430,9 @@ def get_video_info(video_id):
 def _get_video_info(video_id):
     response = video_get(None, video_id, ['snippet', 'contentDetails'])
     try:
-        snippet = response.json['items'][0]['snippet']
-        content_details = response.json['items'][0]['contentDetails']
+        response_data = response.json()
+        snippet = response_data['items'][0]['snippet']
+        content_details = response_data['items'][0]['contentDetails']
         return VideoInfo(snippet['channelId'],
                          snippet['title'],
                          snippet['description'],
@@ -433,7 +452,7 @@ def get_direct_url_to_audio(video_id):
 def update_video_description(video_id, access_token, description):
     # get the current snippet for the video
     response = video_get(access_token, video_id, ['snippet'])
-    snippet = response.json['items'][0]['snippet']
+    snippet = response.json()['items'][0]['snippet']
     # send back the snippet with the new description
     snippet['description'] = description
     video_put(access_token, video_id, snippet=snippet)

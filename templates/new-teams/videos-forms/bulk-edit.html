@@ -1,7 +1,9 @@
 {% load i18n %}
 <aside class="modal" id="bulk-edit-form">
   <h3>
-    {% blocktrans with count=video_count %}
+    {% blocktrans count count=video_count %}
+    Edit Video
+    {% plural %}
     Edit {{ count }} Videos
     {% endblocktrans %}
   </h3>

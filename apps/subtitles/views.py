@@ -45,7 +45,7 @@ from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.templatetags.new_subtitles_tags import visibility
 from subtitles.forms import SubtitlesUploadForm
 from teams.models import Task
-from teams.permissions import can_assign_task
+from teams.permissions import can_perform_task
 from utils.text import fmt
 from videos.models import Video
 from videos.types import video_type_registrar
@@ -186,6 +186,7 @@ class SubtitleEditorBase(View):
                 'x-apikey': self.request.user.get_api_key()
             },
             'username': self.request.user.username,
+            'user_fullname': unicode(self.request.user),
             'video': {
                 'id': self.video.video_id,
                 'title': self.video.title,
@@ -269,11 +270,13 @@ class SubtitleEditorBase(View):
     def get_team_editor_data(self):
         if self.team_video:
             team = self.team_video.team
-            return dict([('teamName', team.name), ('type', team.workflow_type), ('guidelines', dict(
-                [(s.key_name.split('_', 1)[-1],
-                  linebreaks(urlize(force_escape(s.data))))
-                 for s in team.settings.guidelines()
-                 if s.data.strip()]))])
+            return dict([('teamName', team.name), ('type', team.workflow_type),
+                         ('features', [f.key_name.split('_', 1)[-1] for f in team.settings.features()]),
+                         ('guidelines', dict(
+                             [(s.key_name.split('_', 1)[-1],
+                               linebreaks(urlize(force_escape(s.data))))
+                              for s in team.settings.guidelines()
+                              if s.data.strip()]))])
         else:
             return None
 
@@ -289,7 +292,7 @@ class SubtitleEditorBase(View):
         tasks = list(task_set[:1])
         if tasks:
             task = tasks[0]
-            if task.assignee is None and can_assign_task(task, self.user):
+            if task.assignee is None and can_perform_task(self.user, task):
                 task.assignee = self.user
                 task.set_expiration()
                 task.save()

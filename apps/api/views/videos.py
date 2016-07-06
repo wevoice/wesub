@@ -14,181 +14,201 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
-
 """
+Videos
+------
+
 Videos Resource
-^^^^^^^^^^^^^^^
+***************
 
-Get info for a specific video
-+++++++++++++++++++++++++++++
+List/Search/Lookup videos on Amara
 
-.. http:get:: /api/videos/[video-id]/
-
-    :>json id: Amara video id
-    :>json primary_audio_language_code: language code for the audio language
-    :>json title: Video title
-    :>json description: Video description
-    :>json duration: Video duration in seconds (or null if not known)
-    :>json thumbnail: URL to the video thumbnail
-    :>json created: Video creation date/time
-    :>json team: Slug of the Video's team (or null)
-    :>json metadata: Dict mapping metadata names to values
-    :>json languages: List of languages that have subtitles started (see below)
-    :>json video_type: Video type identifier
-    :>json all_urls: List of URLs for the video (the first one is the primary
-     video URL)
-    :>json resource_uri: API uri for the video
-    :>json original_language: contains a copy of the primary_audio_language_code
-      data **(deprecated)**
-
-    **Language data:**
-
-    :>json code: Language code
-    :>json name: Human readable label for the language
-    :>json visibile: Are the subtitles publicly viewable?
-    :>json dir: Language direction ("ltr" or "rtl")
-    :>json subtitles_uri: API URI for the subtitles
-    :>json resource_uri: API URI for the video language
-
-Listing videos
-++++++++++++++
+Listing Videos
+^^^^^^^^^^^^^^
 
 .. http:get:: /api/videos/
 
-    ``paginated``
+    List videos.  You probably want to specify a query filter parameter to
+    limit the results
 
-    :query video_url:  list only videos with the given URL, useful for finding out information about a video already on Amara.
-    :query team:       Only show videos that belong to a team identified by ``slug``.
-    :query project:    Only show videos that belong to a project with the given slug.
-        Passing in ``null`` will return only videos that don't belong to a project.
-    :query order_by:   Applies sorting to the video list. Possible values:
+    List results are paginated.
 
-        * `title`: ascending
-        * `-title`: descending
-        * `created`: older videos first
-        * `-created` : newer videos
+    :queryparam url video_url: Filter by video URL
+    :queryparam slug team: Filter by team
+    :queryparam slug project: Filter by team project.  Passing in `null` will
+        return only videos that don't belong to a project
+    :queryparam string order_by: Change the list ordering.  Possible values:
 
-Creating Videos
-+++++++++++++++
+        - `title`: ascending
+        - `-title`: descending
+        - `created`: older videos first
+        - `-created`: newer videos
+
+.. note::
+    - If no query parameter is given, the last 10 public videos are listed.
+    - If you pass in the project filter, you need to pass in a team
+
+Get info on a specific video
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. http:get:: /api/videos/(video-id)/
+
+    :>json video-id id: Amara video id
+    :>json bcp-47 primary_audio_language_code: Audio language code
+    :>json string title: Video title
+    :>json string description: Video description
+    :>json integer duration: Video duration in seconds (or null if not known)
+    :>json url thumbnail: URL to the video thumbnail
+    :>json iso-8601 created: Video creation date/time
+    :>json slug team: Slug of the Video's team (or null)
+    :>json dict metadata: Dict mapping metadata names to values
+    :>json list languages: List of languages that have subtitles started.  See
+        below for a a description.
+    :>json char video_type: Video type identifier
+    :>json list all_urls: List of URLs for the video (the first one is the
+      primary video URL)
+    :>json uri activity_uri: Video Activity Resource
+    :>json url urls_uri: Video URL Resource
+    :>json uri subtitle_languages_uri: Subtitle languages Resource
+    :>json uri resource_uri: Video Resource
+    :>json string original_language: contains a copy of
+      primary_audio_language_code **(deprecated)**
+
+    **Language data**:
+
+    :>json string code: Language code
+    :>json string name: Human readable label for the language
+    :>json boolean visibile: Are the subtitles publicly viewable?
+    :>json string dir: Language direction ("ltr" or "rtl")
+    :>json url subtitles_uri: Subtitles Resource
+    :>json url resource_uri: Subtitles Language Resource
+
+Adding a video
+^^^^^^^^^^^^^^
 
 .. http:post:: /api/videos/
 
-    :<json video_url: The url for the video. Any url that Amara accepts will 
-        work here. You can send the URL for a file (e.g.
-        http:///www.example.com/my-video.ogv), or a link to one of our
-        accepted providers (youtube, vimeo, dailymotion)
-    :<json title: title of the video
-    :<json description: About this video
-    :<json duration: Duration in seconds, in case it can not be retrieved automatically by Amara
-    :<json primary_audio_language_code: language code for the main
-        language spoken in the video.
-    :<json thumbnail: URL to the video thumbnail
-    :<json metadata: Dictionary of metadata key/value pairs.  These handle
+    :<json url video_url: The url for the video. Any url that Amara accepts
+      will work here. You can send the URL for a file (e.g.
+      http:///www.example.com/my-video.ogv), or a link to one of our accepted
+      providers (youtube, vimeo, dailymotion)
+    :<json string title: title of the video
+    :<json string description: About this video
+    :<json integer duration: Duration in seconds, in case it can not be
+      retrieved automatically by Amara
+    :<json string primary_audio_language_code: language code for the main
+      language spoken in the video.
+    :<json url thumbnail: URL to the video thumbnail
+    :<json dict metadata: Dictionary of metadata key/value pairs.  These handle
         extra information about the video.  Right now the type keys supported
-        are "speaker-name" and "location".  Values can be any string.
-    :<json team: team slug for the video or null to remove it from its team.
-    :<json project: project slug for the video or null to put it in the
+        are `speaker-name` and `location`.  Values can be any string.
+    :<json string team: team slug for the video or null to remove it from its
+      team.
+    :<json string project: project slug for the video or null to put it in the
         default project.
 
 .. note::
-    **Deprecated:** For all fields, if you pass an empty string, we will treat
-    it as if the field was not present in the input.
 
-    **Deprecated:** For slug and project, You can use the string "null" as a
-    synonym for the null object.
+    - When submitting URLs of external providers (i.e. youtube, vimeo), the
+      metadata (title, description, duration) can be fetched from them. If
+      you're submitting a link to a file (mp4, flv) then you can make sure
+      those attributes are set with these parameters. Note that these
+      parameters (except the video duration) override any information from the
+      original provider or the file header.
+    - For all fields, if you pass an empty string, we will treat it as if the
+      field was not present in the input (**deprecated**).
+    - For slug and project, You can use the string "null" as a synonym for the
+      null object (**deprecated**).
 
-When submitting URLs of external providers (i.e. youtube, vimeo), the metadata
-(title, description, duration) can be fetched from them. If you're submitting
-a link to a file (mp4, flv) then you can make sure those attributes are set
-with these parameters. Note that these parameters (except the video duration)
-override any information from the original provider or the file header.
+Update an existing video
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-Updating a video object
-+++++++++++++++++++++++
+.. http:put:: /api/videos/(video-id)/
 
-.. http:put:: /api/videos/[video-id]/
+    This uses the same fields as video creation, excluding `video_url`.
 
-With the same parameters for creation, excluding video_url. Note that through
-out our system, a video cannot have its URLs changed. So you can change other
-video attributes (title, description) but the URL sent must be the same
-original one. As with creating video, an update can not override the duration
-received from the provider or specified in the file header.
+    As with creating video, an update can not override the duration received
+    from the provider or specified in the file header.
+
 
 Moving videos between teams and projects
-++++++++++++++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To move a video from one team to another, you can make a put request with a
-``team`` value.  Similarly, you can move a video to a different project using
-the ``project`` field.  The user making the change must have permission to
-remove a video from the originating team and permission to add a video to the
-target team.
-
-.. note::
-    To move a video to a different project, the team must be specified in the
-    payload even if it doesn't change.
+- To move a video from one team to another, you can make a put request with a
+  ``team`` value.
+- Similarly, you can move a video to a different project using the
+  ``project`` field.  `team` must also be given in this case.
+- The user making the change must have permission to remove a video from
+  the originating team and permission to add a video to the target team.
 
 Video URL Resource
-^^^^^^^^^^^^^^^^^^
+******************
 
-Listing video urls
-++++++++++++++++++
+Each video has at least 1 URL associated with it, but some can have more.
+This allows you to associate subtitles with the video on multiple video
+providers (e.g. a youtube version, a vimeo version, etc).
 
-.. http:get:: /api/videos/[video-id]/urls/
+One video URL is flagged the `primary URL`.  This is what will gets
+used in the embedder and editor.
 
-  ``paginated``
 
-  :param video-id: Amara video ID
-  :>json created: creation date/time
-  :>json url: URL string
-  :>json primary: is this the primary URL for the video?
-  :>json original: was this the URL that was created with the video?
-  :>json resource_uri: API URL for the video URL
-  :>json id: Internal ID for the object **(deprecated, use resource_uri
-       instead to create URLs for the object)**
+List URLs for a video
+^^^^^^^^^^^^^^^^^^^^^
 
-Adding a video url
-+++++++++++++++++++
+.. http:get:: /api/videos/(video-id)/urls/
 
-.. http:post:: /api/videos/[video-id]/urls/
+    List results are paginated.
 
-    :param video-id: Amara Video ID
+    :>json string video-id: Amara video ID
+    :>json iso-8601 created: creation date/time
+    :>json url url: URL string
+    :>json boolean primary: is this the primary URL for the video?
+    :>json boolean original: was this the URL that was created with the video?
+    :>json uri resource_uri: Video URL Resource
+    :>json integer id: Internal ID for the object **(deprecated, use
+      resource_uri rather than trying to construct API URLs yourself)**.
 
-    :<json url: Video URL.  This can be any URL that works in the add video
-        form for the site (mp4 files, youtube, vimeo, etc).  Note: The URL
-        cannot be in use by another video.
-    :<json primary: If True, this URL will be made the primary URL
-    :<json original: Is this is the first url for the video?
+Get details on a specific URL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Get details on a single URL
-+++++++++++++++++++++++++++
-
-.. http:get:: [url-resource-uri]
-
-    :param url-resource-url: resource_uri returned from the video URLs listing
+.. http:get:: (video-url-endpoint)
 
     The response fields are the same as for the list endpoint
 
-Make a URL the primary URL for a video
-++++++++++++++++++++++++++++++++++++++
+    Use the `resource_uri` from the listing to find the video URL endpoint
 
-.. http:put:: [url-resource-uri]
+Add a URL for a video
+^^^^^^^^^^^^^^^^^^^^^
+.. http:post:: /api/videos/(video-id)/urls/
 
-    :param url-resource-url: resource_uri returned from the video URLs listing
-    :<json primary: True to make the URL the primary URL.  This will unset the
-                    primary flag for all other URLs.
-    :<json original: Is this is the first url for the video?
+    :<json url url: Video URL.  This can be any URL that works in the add video
+      form for the site (mp4 files, youtube, vimeo, etc).  Note: The URL
+      cannot be in use by another video.
+    :<json boolean primary: If True, this URL will be made the primary URL
+    :<json boolean original: Is this is the first url for the video?
 
-Deleting URLs
-+++++++++++++
+Making a URL the primary URL for a video
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. http:delete:: [url-resource-uri]
+.. http:put:: (video-url-endpoint)
 
-    :param url-resource-url: resource_uri returned from the video URLs listing
+    :<json primary: Pass in true to make a video URL the primary for a video
+
+    Use the `resource_uri` from the listing to find the video URL endpoint
+
+Deleting Video URLs
+^^^^^^^^^^^^^^^^^^^
+
+.. http:delete:: (video-url-endpoint)
+
+    Remove a video URL from a video
+
+    Use the `resource_uri` from the listing to find the video URL endpoint
 
 .. note:
 
-    A video must have a primary URL.  If this the primary URL for a video, the
-    request will fail with a 400 code.
+    **A video must have a primary URL**.  If this the primary URL for a video,
+    the request will fail with a 400 code.
 """
 
 from __future__ import absolute_import
@@ -206,15 +226,13 @@ from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 import json
 
-from .apiswitcher import APISwitcherMixin
 from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
-from api.pagination import AmaraPaginationMixin
 from teams import permissions as team_perms
 from teams.models import Team, TeamVideo, Project
 from subtitles.models import SubtitleLanguage
 from videos import metadata
 from videos.models import Video
-from videos.types import video_type_registrar
+from videos.types import video_type_registrar, VideoTypeError
 import videos.tasks
 
 class VideoLanguageShortSerializer(serializers.Serializer):
@@ -326,6 +344,18 @@ class VideoSerializer(serializers.Serializer):
     metadata = VideoMetadataSerializer(required=False)
     languages = VideoLanguageShortSerializer(source='all_subtitle_languages',
                                              many=True, read_only=True)
+    activity_uri = serializers.HyperlinkedIdentityField(
+        view_name='api:video-activity',
+        lookup_field='video_id',
+    )
+    urls_uri = serializers.HyperlinkedIdentityField(
+        view_name='api:video-url-list',
+        lookup_field='video_id',
+    )
+    subtitle_languages_uri = serializers.HyperlinkedIdentityField(
+        view_name='api:subtitle-language-list',
+        lookup_field='video_id',
+    )
     resource_uri = serializers.HyperlinkedIdentityField(
         view_name='api:video-detail',
         lookup_field='video_id')
@@ -361,11 +391,9 @@ class VideoSerializer(serializers.Serializer):
     def get_video_type(self, video):
         types = set()
         for url in video.get_video_urls():
-            video_type = video_type_registrar.video_type_for_url(url.url)
-            if video_type is not None:
-                types.add(video_type)
+            types.add(url.type)
         if len(types) == 1:
-            return types.pop().abbreviation
+            return types.pop()
         return ""
 
     def will_add_video_to_team(self):
@@ -385,10 +413,10 @@ class VideoSerializer(serializers.Serializer):
         return self.team_video.team != self.validated_data['team']
 
     def to_internal_value(self, data):
-        data = self.fixup_data(data)
-        data = super(VideoSerializer, self).to_internal_value(data)
-        # we have to wait until now because we can't fetch the project until
-        # we know the team
+        self.fixup_data(data)
+        return super(VideoSerializer, self).to_internal_value(data)
+
+    def validate(self, data):
         if data.get('project'):
             if not data.get('team'):
                 self.fail('project-without-team')
@@ -401,19 +429,14 @@ class VideoSerializer(serializers.Serializer):
 
     def fixup_data(self, data):
         """Alter incoming data to support deprecated behavior."""
-        # iterate over data to build a new dictionary.  This is required
-        # because data is a MergeDict, which has issues with deletion.
-        new_data = {}
         for name, value in data.items():
-            # Remove any field has the empty string as its value
-            # This is deprecated behavior form the old API.
             if value == '':
-                continue
-            # Replace "null" with None for team/project
-            if name in ('team', 'project') and value == 'null':
-                value = None
-            new_data[name] = value
-        return new_data
+                # Remove any field has the empty string as its value
+                # This is deprecated behavior form the old API.
+                del data[name]
+            elif name in ('team', 'project') and value == 'null':
+                # Replace "null" with None for team/project
+                data[name] = None
 
     def to_representation(self, video):
         data = super(VideoSerializer, self).to_representation(video)
@@ -424,21 +447,22 @@ class VideoSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        set_values = {}
-        for key in ('title', 'description', 'duration', 'thumbnail',
-                    'primary_audio_language_code', 'metadata'):
-            if key in validated_data:
-                set_values[key] = validated_data[key]
-        video, created = Video.get_or_create_for_url(
-            validated_data['video_url'], user=self.context['user'],
-            set_values=set_values,
-        )
-        if video is None:
+        def setup_video(video, video_url):
+            for key in ('title', 'description', 'duration', 'thumbnail',
+                        'primary_audio_language_code'):
+                if validated_data.get(key):
+                    setattr(video, key, validated_data[key])
+            if validated_data.get('metadata'):
+                video.update_metadata(validated_data['metadata'],
+                                      commit=False)
+            self._update_team(video, validated_data)
+        try:
+            return Video.add(validated_data['video_url'],
+                             self.context['user'], setup_video)[0]
+        except VideoTypeError:
             self.fail('invalid-url', url=validated_data['video_url'])
-        if not created:
+        except Video.UrlAlreadyAdded:
             self.fail('video-exists', url=validated_data['video_url'])
-        self._update_team(video, validated_data)
-        return video
 
     def update(self, video, validated_data):
         simple_fields = (
@@ -454,9 +478,8 @@ class VideoSerializer(serializers.Serializer):
                     setattr(video, field_name, validated_data[field_name])
         if validated_data.get('metadata'):
             video.update_metadata(validated_data['metadata'], commit=True)
-        else:
-            video.save()
         self._update_team(video, validated_data)
+        video.save()
         return video
 
     def _update_team(self, video, validated_data):
@@ -468,6 +491,7 @@ class VideoSerializer(serializers.Serializer):
         if team is None:
             if team_video:
                 team_video.delete()
+            video.is_public = True
         else:
             if project is None:
                 project = team.default_project
@@ -476,10 +500,11 @@ class VideoSerializer(serializers.Serializer):
             else:
                 TeamVideo.objects.create(video=video, team=team,
                                          project=project)
+                video.is_public = team.is_visible
+
         video.clear_team_video_cache()
 
-class VideoViewSet(AmaraPaginationMixin,
-                   mixins.CreateModelMixin,
+class VideoViewSet(mixins.CreateModelMixin,
                    mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
                    mixins.ListModelMixin,
@@ -502,6 +527,8 @@ class VideoViewSet(AmaraPaginationMixin,
 
     def get_queryset(self):
         query_params = self.request.query_params
+        if 'team' not in query_params and 'video_url' not in query_params:
+            return Video.objects.public().order_by('-id')[:20]
         if 'team' not in query_params:
             qs = self.get_videos_for_user()
         else:
@@ -607,7 +634,7 @@ class VideoURLSerializer(serializers.Serializer):
             added_by=self.context['user'],
         )
         if validated_data.get('primary'):
-            new_url.make_primary()
+            new_url.make_primary(self.context['user'])
         return new_url
 
     def update(self, video_url, validated_data):
@@ -617,14 +644,14 @@ class VideoURLSerializer(serializers.Serializer):
             video_url.save()
 
         if validated_data.get('primary'):
-            video_url.make_primary()
+            video_url.make_primary(self.context['user'])
 
         return video_url
 
 class VideoURLUpdateSerializer(VideoURLSerializer):
     url = serializers.CharField(read_only=True)
 
-class VideoURLViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
+class VideoURLViewSet(viewsets.ModelViewSet):
     serializer_class = VideoURLSerializer
     update_serializer_class = VideoURLUpdateSerializer
 
@@ -643,10 +670,29 @@ class VideoURLViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         return self.video.videourl_set.all().select_related('video')
 
+    def check_view_permissions(self):
+        workflow = self.video.get_workflow()
+        if not workflow.user_can_view_video(self.request.user):
+            raise PermissionDenied()
+
+    def check_edit_permissions(self):
+        workflow = self.video.get_workflow()
+        if not workflow.user_can_edit_video(self.request.user):
+            raise PermissionDenied()
+
+    def perform_create(self, serializer):
+        self.check_edit_permissions()
+        return serializer.save()
+
+    def perform_update(self, serializer):
+        self.check_edit_permissions()
+        return serializer.save()
+
     def perform_destroy(self, instance):
+        self.check_edit_permissions()
         if instance.primary:
             raise serializers.ValidationError("Can't delete the primary URL")
-        instance.delete()
+        instance.remove(self.request.user)
 
     def get_serializer_context(self):
         return {
@@ -654,20 +700,3 @@ class VideoURLViewSet(AmaraPaginationMixin, viewsets.ModelViewSet):
             'user': self.request.user,
             'request': self.request,
         }
-
-class VideoViewSetSwitcher(APISwitcherMixin, VideoViewSet):
-    switchover_date = 20150716
-
-    class Deprecated(VideoViewSet):
-        class serializer_class(VideoSerializer):
-            created = serializers.DateTimeField(read_only=True)
-
-class VideoURLViewSetSwitcher(APISwitcherMixin, VideoURLViewSet):
-    switchover_date = 20150716
-
-    class Deprecated(VideoURLViewSet):
-        class serializer_class(VideoURLSerializer):
-            created = serializers.DateTimeField(read_only=True)
-
-        class update_serializer_class(VideoURLUpdateSerializer):
-            created = serializers.DateTimeField()

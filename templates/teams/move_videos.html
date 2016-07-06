@@ -73,8 +73,12 @@
                     </select>
                     <select name="lang" id="lang">
                         <option value="any"{% if language_code == None %}selected="selected"{% endif %}>{% trans 'any' %}</option>
-                        {% for code, name in language_choices %}
+                        {% for label, choices in language_choices %}
+                        <optgroup label="{{ label }}">
+                          {% for code, name in choices %}
                             <option {% if language_code == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
+                          {% endfor %}
+                        </optgroup>
                         {% endfor %}
                     </select>
                 </div>
@@ -109,8 +113,12 @@
                 <option value="any"{% if primary_audio_language_filter == 'any' %} selected="selected"{% endif %}>{% trans "any" %}</option>
                 <option value="+"{% if primary_audio_language_filter == '+' %} selected="selected"{% endif %}>{% trans "set" %}</option>
                 <option value="-"{% if primary_audio_language_filter == '-' %} selected="selected"{% endif %}>{% trans "not set" %}</option>
-                {% for code, name in language_choices %}
-                <option {% if primary_audio_language_filter == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
+                {% for label, choices in language_choices %}
+                <optgroup label="{{ label }}">
+                  {% for code, name in choices %}
+                  <option {% if primary_audio_language_code == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
+                  {% endfor %}
+                </optgroup>
                 {% endfor %}
               </select>
             </div>

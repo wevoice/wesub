@@ -28,7 +28,7 @@ from django.utils.translation import ugettext_lazy
 
 from localeurl.utils import universal_url
 from messages.models import Message
-from subtitles.signals import subtitles_published
+from subtitles.signals import subtitles_published, subtitles_completed
 from teams.models import Task, BillingRecord
 from teams.permissions import can_add_version, can_assign_task
 from teams.workflows.notes import TeamEditorNotes
@@ -42,6 +42,7 @@ import subtitles.workflows
 def _publish_subtitles_if_needed(subtitle_language, version):
     public_tip = subtitle_language.get_tip(public=True)
     if public_tip:
+        subtitles_completed.send(subtitle_language)
         subtitles_published.send(subtitle_language, version=version)
         BillingRecord.objects.insert_record(public_tip)
 
@@ -64,7 +65,12 @@ def _complete_task(user, video, subtitle_language, saved_version, approved):
             version_id = saved_version.id
             video_changed_tasks.delay(team_video.video_id, version_id)
 
-class Complete(subtitles.workflows.Action):
+class TaskAction(subtitles.workflows.Action):
+    def update_language(self, user, video, subtitle_language, saved_version):
+        subtitle_language.subtitles_complete = self.complete
+        subtitle_language.save()
+
+class Complete(TaskAction):
     """Used when the initial transcriber/translator completes their work """
     name = 'complete'
     label = ugettext_lazy('Complete')
@@ -72,6 +78,7 @@ class Complete(subtitles.workflows.Action):
     visual_class = 'endorse'
     subtitle_visibility = 'private'
     complete = True
+    requires_translated_metadata_if_enabled = True
 
     def perform(self, user, video, subtitle_language, saved_version):
         try:
@@ -85,26 +92,28 @@ class Complete(subtitles.workflows.Action):
             task.complete()
         _publish_subtitles_if_needed(subtitle_language, saved_version)
 
-class Approve(subtitles.workflows.Action):
+class Approve(TaskAction):
     name = 'approve'
     label = ugettext_lazy('Approve')
     in_progress_text = ugettext_lazy('Approving')
     visual_class = 'endorse'
     subtitle_visibility = 'private'
     complete = True
+    requires_translated_metadata_if_enabled = True
 
     def perform(self, user, video, subtitle_language, saved_version):
         _complete_task(user, video, subtitle_language, saved_version,
                        Task.APPROVED_IDS['Approved'])
         _publish_subtitles_if_needed(subtitle_language, saved_version)
 
-class SendBack(subtitles.workflows.Action):
+class SendBack(TaskAction):
     name = 'send-back'
     label = ugettext_lazy('Send Back')
     in_progress_text = ugettext_lazy('Sending back')
     visual_class = 'send-back'
     subtitle_visibility = 'private'
     complete = False
+    requires_translated_metadata_if_enabled = False
 
     def perform(self, user, video, subtitle_language, saved_version):
         _complete_task(user, video, subtitle_language, saved_version,
@@ -142,7 +151,7 @@ class TaskTeamEditorNotes(TeamEditorNotes):
         tasks_url = universal_url('teams:team_tasks', kwargs={
             'slug': self.team.slug,
         })
-        filter_query = '?team_video={0}&assignee=anyone&language_code={1}'
+        filter_query = '?team_video={0}&assignee=anyone&lang={1}'
         filter_query = filter_query.format(self.team_video.pk,
                                            self.language_code)
         data = {

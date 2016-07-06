@@ -30,8 +30,6 @@ if INSTALLATION == DEV:
     SITE_NAME = 'unisubsdev'
     REDIS_DB = "3"
     EMAIL_SUBJECT_PREFIX = '[usubs-dev]'
-    SENTRY_TESTING = True
-    SOLR_ROOT = '/usr/share/'
     CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 elif INSTALLATION == STAGING:
     SITE_ID = 17
@@ -52,7 +50,6 @@ elif INSTALLATION == PRODUCTION:
 elif INSTALLATION == DEMO:
     DEBUG = True
     REDIS_DB = "4"
-    SENTRY_TESTING = True
 elif INSTALLATION == LOCAL:
     SITE_ID = 14
     SITE_NAME = 'unisubsstaging'
@@ -60,7 +57,6 @@ elif INSTALLATION == LOCAL:
 if INSTALLATION == STAGING or INSTALLATION == PRODUCTION or INSTALLATION == LOCAL:
     AWS_STORAGE_BUCKET_NAME = DEFAULT_BUCKET
     COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-    SOLR_ROOT = '/usr/share/'
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -81,9 +77,12 @@ DATABASES = {
         'USER': DATABASE_USER,
         'PASSWORD': DATABASE_PASSWORD,
         'HOST': DATABASE_HOST,
-        'PORT': '3306'
-        }
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': 'SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED',
+        },
     }
+}
 
 USE_AMAZON_S3 = AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and DEFAULT_BUCKET
 

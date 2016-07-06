@@ -29,6 +29,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_unicode, DjangoUnicodeDecodeError
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext
 
 from videos.feed_parser import FeedParser
 from videos.models import Video, VideoFeed, UserTestResult, VideoUrl
@@ -53,36 +54,50 @@ def language_choices_with_empty():
     choices.extend(get_language_choices())
     return choices
 
-class CreateVideoUrlForm(forms.ModelForm):
+class VideoURLField(forms.URLField):
+    """Field for inputting URLs for videos.
 
-    def __init__(self, user, *args, **kwargs):
-        self.user = user
-        super(CreateVideoUrlForm, self).__init__(*args, **kwargs)
-        self.fields['video'].widget = forms.HiddenInput()
-
-    class Meta:
-        model = VideoUrl
-        fields = ('url', 'video')
-
-    def clean_url(self):
-        url = self.cleaned_data['url']
+    This field checks that we can lookup a VideoType for the URL.  If
+    successful, we return the VideoType as the cleaned data.
+    """
+    def clean(self, video_url):
+        if not video_url:
+            return None
 
         try:
-            video_type = video_type_registrar.video_type_for_url(url)
+            video_type = video_type_registrar.video_type_for_url(video_url)
         except VideoTypeError, e:
             raise forms.ValidationError(e)
-
         if not video_type:
             contact_link = fmt(
-                _('<a href="mailto:%(email)s">contact us</a>'),
+                _('<a href="mailto:%(email)s">Contact us</a>'),
                 email=settings.FEEDBACK_EMAIL)
+            for d in video_type_registrar.domains:
+                if d in video_url:
+                    raise forms.ValidationError(mark_safe(fmt(
+                        _(u"Please try again with a link to a video page.  "
+                          "%(contact_link)s if there's a problem."),
+                        contact_link=contact_link)))
+
             raise forms.ValidationError(mark_safe(fmt(
-                _(u"""Amara does not support that website or video format.
-If you'd like to us to add support for a new site or format, or if you
-think there's been some mistake, %(contact_link)s!"""),
+                _(u"You must link to a video on a compatible site "
+                  "(like YouTube) or directly to a video file that works "
+                  "with HTML5 browsers. For example: "
+                  "http://mysite.com/myvideo.ogg or "
+                  "http://mysite.com/myipadvideo.m4v "
+                  "%(contact_link)s if there's a problem"),
                 contact_link=contact_link)))
-        self._video_type = video_type
-        return video_type.convert_to_video_url()
+
+        return video_type
+
+class CreateVideoUrlForm(forms.Form):
+    url = VideoURLField()
+    video = forms.ModelChoiceField(queryset=Video.objects.all(),
+                                   widget=forms.HiddenInput)
+
+    def __init__(self, user, *args, **kwargs):
+        super(CreateVideoUrlForm, self).__init__(*args, **kwargs)
+        self.user = user
 
     def clean(self):
         data = super(CreateVideoUrlForm, self).clean()
@@ -90,15 +105,38 @@ think there's been some mistake, %(contact_link)s!"""),
         if video and not can_user_edit_video_urls(video, self.user):
             raise forms.ValidationError(_('You have not permission add video URL for this video'))
 
+        if 'url' in self.cleaned_data:
+            self.create_video_url()
         return self.cleaned_data
 
-    def save(self, commit=True):
-        obj = super(CreateVideoUrlForm, self).save(False)
-        obj.type = self._video_type.abbreviation
-        obj.added_by = self.user
-        obj.videoid = self._video_type.video_id or ''
-        commit and obj.save()
-        return obj
+    def create_video_url(self):
+        """Create our VideoUrl object.
+
+        We do this the last part of the clean() method.
+        """
+
+        try:
+            self.video_url = self.cleaned_data['video'].add_url(
+                self.cleaned_data['url'],
+                self.user)
+        except Video.UrlAlreadyAdded, e:
+            raise forms.ValidationError(self.already_added_message(e.video))
+
+    def already_added_message(self, video):
+        if video == self.cleaned_data.get('video'):
+            return _('Video URL already added to this video')
+
+        if video.can_user_see(self.user):
+            link = mark_safe('<a href="{}">{}</a>'.format(
+                video.get_absolute_url(), ugettext('view video')))
+            return fmt(
+                _('Video URL already added to a different video (%(link)s)'),
+                link=link)
+        else:
+            return _('Video URL already added to a different video')
+
+    def save(self):
+        return self.video_url
 
     def get_errors(self):
         output = {}
@@ -119,8 +157,7 @@ class UserTestResultForm(forms.ModelForm):
         return obj
 
 class VideoForm(forms.Form):
-    # url validation is within the clean method
-    video_url = forms.URLField()
+    video_url = VideoURLField()
 
     def __init__(self, user=None, *args, **kwargs):
         if user and not user.is_authenticated():
@@ -129,48 +166,20 @@ class VideoForm(forms.Form):
         super(VideoForm, self).__init__(*args, **kwargs)
         self.fields['video_url'].widget.attrs['class'] = 'main_video_form_field'
 
-    def clean_video_url(self):
+    def clean(self):
+        if self._errors:
+            return self.cleaned_data
+
+        # Try to create the video and see if any errors happen
         video_url = self.cleaned_data['video_url']
-
-        if video_url:
-            try:
-                video_type = video_type_registrar.video_type_for_url(video_url)
-            except VideoTypeError, e:
-                raise forms.ValidationError(e)
-            if not video_type:
-                contact_link = fmt(
-                    _('<a href="mailto:%(email)s">Contact us</a>'),
-                    email=settings.FEEDBACK_EMAIL)
-                for d in video_type_registrar.domains:
-                    if d in video_url:
-                        raise forms.ValidationError(mark_safe(fmt(
-                            _(u"Please try again with a link to a video page.  "
-                              "%(contact_link)s if there's a problem."),
-                            contact_link=contact_link)))
-
-                raise forms.ValidationError(mark_safe(fmt(
-                    _(u"You must link to a video on a compatible site "
-                      "(like YouTube) or directly to a video file that works "
-                      "with HTML5 browsers. For example: "
-                      "http://mysite.com/myvideo.ogg or "
-                      "http://mysite.com/myipadvideo.m4v "
-                      "%(contact_link)s if there's a problem"),
-                    contact_link=contact_link)))
-
-            else:
-                self._video_type = video_type
-                # we need to use the cannonical url as the user provided might need
-                # redirection (i.e. youtu.be/fdaf/), and django's validator will
-                # choke on redirection (urllib2 for python2.6), see https://unisubs.sifterapp.com/projects/12298/issues/427646/comments
-                video_url = video_type.convert_to_video_url()
-
-        return video_url
-
-    def save(self):
-        video_url = self.cleaned_data['video_url']
-        obj, created = Video.get_or_create_for_url(video_url, self._video_type, self.user)
-        self.created = created
-        return obj
+        try:
+            self.video, video_url = Video.add(
+                self.cleaned_data['video_url'], self.user)
+            self.created = True
+        except Video.UrlAlreadyAdded, e:
+            self.video = e.video
+            self.created = False
+        return self.cleaned_data
 
 class AddFromFeedForm(forms.Form, AjaxForm):
     feed_url = FeedURLField(required=False, help_text=_(u'We support: rss 2.0 media feeds including Vimeo, Dailymotion, and more.'))
@@ -321,7 +330,10 @@ class CreateSubtitlesFormBase(forms.Form):
             else:
                 return len(user_langs)
         field = self.fields['subtitle_language_code']
-        field.choices = sorted(get_language_choices(), key=sort_key)
+        field.choices = sorted(self.get_language_choices(), key=sort_key)
+
+    def get_language_choices(self):
+        return get_language_choices()
 
     def set_primary_audio_language(self):
         # Sometimes we are passed in a cached video, which can't be saved.
@@ -371,13 +383,19 @@ class CreateSubtitlesForm(CreateSubtitlesFormBase):
         if not self.needs_primary_audio_language:
             del self.fields['primary_audio_language_code']
 
-    def setup_subtitle_language_code(self):
-        super(CreateSubtitlesForm, self).setup_subtitle_language_code()
+    def get_language_choices(self):
         # remove languages that already have subtitles
         current_langs = set(self.video.languages_with_versions())
-        field = self.fields['subtitle_language_code']
-        field.choices = [choice for choice in field.choices
-                         if choice[0] not in current_langs]
+        if self.user.is_authenticated():
+            user_language_choices = self.user.get_language_codes_and_names()
+        else:
+            user_language_choices = []
+        if user_language_choices:
+            top_section = (_('Your Languages'), user_language_choices)
+        else:
+            top_section = None
+        return get_language_choices(top_section=top_section,
+                                    exclude=current_langs)
 
     def set_primary_audio_language(self):
         if self.needs_primary_audio_language:

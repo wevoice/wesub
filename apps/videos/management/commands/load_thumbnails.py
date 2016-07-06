@@ -1,4 +1,4 @@
-from utils.commands import ErrorHandlingCommand
+from django.core.management.base import BaseCommand
 from django.conf import settings
 from utils.amazon import default_s3_store
 from videos.models import Video, VIDEO_TYPE_FLV, VIDEO_TYPE_HTML5
@@ -17,7 +17,7 @@ VIDEO_THUMBNAILS_FOLDER = getattr(settings, 'VIDEO_THUMBNAILS_PATH', 'videos/thu
 
 THUMBNAILS_PATH = os.path.join(settings.MEDIA_ROOT, VIDEO_THUMBNAILS_FOLDER) 
 
-class Command(ErrorHandlingCommand):
+class Command(BaseCommand):
     
     def handle(self, *args, **options):
         print 'Run load thumbnail command'
@@ -63,6 +63,10 @@ class Command(ErrorHandlingCommand):
             name = video.thumbnail.strip('/').split('/')[-1]
             cf = ContentFile(urllib.urlopen(video.thumbnail).read())
             video.s3_thumbnail.save('%s/%s' % (video.video_id, name), cf, True)
+
+    def print_to_console(self, msg, min_verbosity=1):
+        if self.verbosity >= min_verbosity:
+            print msg
         
     def init_s3(self):
         if not default_s3_store:

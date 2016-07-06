@@ -26,9 +26,6 @@ from django.db import models
 from django.db.models import query, Q
 from django.utils.translation import ugettext_lazy as _
 import babelsubs
-# because of our insane circular imports we need to import haystack right here
-# or else things blow up
-import haystack
 
 from auth.models import CustomUser as User
 from externalsites import google
@@ -387,7 +384,8 @@ class YouTubeAccount(ExternalAccount):
     oauth_refresh_token = models.CharField(max_length=255)
     last_import_video_id = models.CharField(max_length=100, blank=True,
                                             default='')
-    import_team = models.ForeignKey(Team, null=True)
+    import_team = models.ForeignKey(Team, null=True, blank=True)
+    enable_language_mapping = models.BooleanField(default=True)
     sync_teams = models.ManyToManyField(
         Team, related_name='youtube_sync_accounts')
 
@@ -469,12 +467,14 @@ class YouTubeAccount(ExternalAccount):
         """
         access_token = google.get_new_access_token(self.oauth_refresh_token)
         syncing.youtube.update_subtitles(video_url.videoid, access_token,
-                                         version)
+                                         version,
+                                         self.enable_language_mapping)
 
     def do_delete_subtitles(self, video_url, language):
         access_token = google.get_new_access_token(self.oauth_refresh_token)
         syncing.youtube.delete_subtitles(video_url.videoid, access_token,
-                                         language.language_code)
+                                         language.language_code,
+                                         self.enable_language_mapping)
 
     def delete(self):
         google.revoke_auth_token(self.oauth_refresh_token)
@@ -495,10 +495,18 @@ class YouTubeAccount(ExternalAccount):
                 break
             video_url = 'http://youtube.com/watch?v={}'.format(video_id)
             if self.type == ExternalAccount.TYPE_USER:
-                Video.get_or_create_for_url(video_url, user=self.user)
+                try:
+                    Video.add(video_url, self.user)
+                except Video.UrlAlreadyAdded:
+                    continue
             elif self.import_team:
-                video, created = Video.get_or_create_for_url(video_url)
-                TeamVideo.objects.create(video=video, team=self.import_team)
+                def add_to_team(video, video_url):
+                    TeamVideo.objects.create(video=video,
+                                             team=self.import_team)
+                try:
+                    Video.add(video_url, None, add_to_team)
+                except Video.UrlAlreadyAdded:
+                    continue
 
         self.last_import_video_id = video_ids[0]
         self.save()
@@ -737,7 +745,7 @@ class SyncHistoryManager(models.Manager):
         except SyncHistory.DoesNotExist:
             return None
         if team is not None:
-            if sh.video_url.video.get_team_video() and sh.video_url.video.get_team_video().team == team:
+            if sh.get_account().team == team:
                 sh.retry = True
                 sh.save()
         elif user is not None:

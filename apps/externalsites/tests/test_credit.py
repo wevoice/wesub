@@ -25,6 +25,7 @@ from externalsites import tasks
 from externalsites.credit import (add_credit_to_video_url,
                                          should_add_credit_to_video_url)
 from subtitles import pipeline
+from videos.models import Video
 from videos.templatetags.videos_tags import shortlink_for_video
 from utils import test_utils
 from utils.factories import *
@@ -72,7 +73,8 @@ class AddCreditTest(BaseCreditTest):
         self.mock_get_new_access_token = mock_get_new_access_token
         self.mock_get_new_access_token.return_value = 'test-access-token'
         self.user = UserFactory()
-        self.video = YouTubeVideoFactory(user=self.user)
+        self.video = YouTubeVideoFactory(user=self.user,
+                                         channel_id='test-channel-id')
         self.video_url = self.video.get_primary_videourl_obj()
         self.account = YouTubeAccountFactory(
             user=self.user, channel_id=self.video_url.owner_username)
@@ -122,6 +124,24 @@ class AddCreditTest(BaseCreditTest):
         self.assertEqual(self.mock_get_video_info.call_count, 1)
         self.assertEqual(self.mock_update_video_description.call_count, 0)
 
+    def test_concurency(self):
+        # simulate add_credit_to_video_url() being called by a second thread
+        # while it's still running in the first
+        self.first_call = True
+        def get_video_info(video_id):
+            # this gets called inside add_credit_to_video_url().  Try queing
+            # up a second call to add_credit_to_video_url()
+            if self.first_call:
+                self.first_call = False
+                add_credit_to_video_url(self.video_url, self.account)
+            return self.mock_get_video_info.return_value
+
+        self.mock_get_video_info.side_effect = get_video_info
+        add_credit_to_video_url(self.video_url, self.account)
+
+        self.assertEqual(self.mock_update_video_description.call_count, 1)
+
+
 class AddCreditScheduleTest(BaseCreditTest):
     # Test that we schedule add_credit_to_video_url to be called after certain
     # events
@@ -135,9 +155,9 @@ class AddCreditScheduleTest(BaseCreditTest):
                                              channel_id=self.channel_id)
 
     def test_add_credit_on_new_video(self):
-        video = YouTubeVideoFactory(user=self.user)
-        self.mock_add_amara_credit.delay.assert_called_with(
-            video.get_primary_videourl_obj().id)
+        video, video_url = Video.add('http://youtube.com/watch?v=abcdef',
+                                     self.user)
+        self.mock_add_amara_credit.delay.assert_called_with(video_url.id)
 
     def test_add_credit_on_new_public_tip(self):
         video = YouTubeVideoFactory(user=self.user)

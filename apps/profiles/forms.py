@@ -150,11 +150,10 @@ class EditUserForm(forms.ModelForm):
         fields = ('first_name', 'last_name', 'homepage', 'biography',
                   'pay_rate_code')
 
-
 class EditAccountForm(forms.ModelForm):
     new_password = forms.CharField(widget=forms.PasswordInput, required=False)
     current_password = forms.CharField(widget=forms.PasswordInput,
-                                       required=False)
+                                       required=True)
     new_password_verify = forms.CharField(widget=forms.PasswordInput,
                                           required=False,
                                           label=_(u'Confirm new password:'))
@@ -165,14 +164,14 @@ class EditAccountForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'notify_by_email', 'notify_by_message')
+        fields = ('username', 'email')
 
     def clean_current_password(self):
         password = self.cleaned_data.get('current_password')
-        if password and not self.instance.check_password(password):
-            raise forms.ValidationError(_(u'Invalid password'))
-        elif not password and self.cleaned_data.get('new_password'):
+        if not password:
             raise forms.ValidationError(_(u'Must specify current password'))
+        if not (self.instance.has_valid_password() and self.instance.check_password(password)):
+            raise forms.ValidationError(_(u'Invalid password'))
         return password
 
     def clean_new_password_verify(self):
@@ -191,6 +190,12 @@ class EditAccountForm(forms.ModelForm):
             self.instance.email = email
             self.instance.save()
         return super(EditAccountForm, self).save(commit)
+
+class EditNotificationsForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ('notify_by_email', 'notify_by_message')
 
 class AdminProfileForm(forms.ModelForm):
     """Form for site admins to see on the user's profile page (aka the

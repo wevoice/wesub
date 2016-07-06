@@ -26,16 +26,17 @@ from django.views.generic.base import TemplateView, RedirectView
 from sitemaps import sitemaps, sitemap_view, sitemap_index
 from socialauth.models import AuthMeta, OpenidProfile
 from django.views.decorators.clickjacking import xframe_options_exempt
-
+from auth.forms import CustomPasswordResetForm
 import optionalapps
 from utils.genericviews import JSTemplateView
-
+from auth.views import login as user_login
 admin.autodiscover()
-
+admin.site.login = user_login
 # these really should be unregistred but while in development the dev server
 # might have not registred yet, so we silence this exception
 try:
-    admin.site.unregister([AuthMeta, OpenidProfile])
+    #admin.site.unregister([AuthMeta, OpenidProfile])
+    admin.site.unregister([AuthMeta,])
 except admin.sites.NotRegistered:
     pass
 
@@ -48,10 +49,6 @@ admin.site.unregister([TaskState])
 TaskMonitor.list_display += ('runtime',)
 admin.site.register(TaskState, TaskMonitor)
 
-js_info_dict = {
-    'packages': ('unisubs'),
-}
-
 # run monkey patch django
 from utils import urlvalidator
 urlpatterns = patterns('',
@@ -60,8 +57,6 @@ urlpatterns = patterns('',
     url('^robots.txt$', TemplateView.as_view(template_name='robots.txt')),
     url(r'^crossdomain.xml$',
         'crossdomain_views.root_crossdomain'),
-    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict,
-        name='js_i18n_catalog'),
     url(r'^$', 'videos.views.index', name="home"),
     url(r'^comments/',
         include('comments.urls', namespace='comments')),
@@ -72,19 +67,23 @@ urlpatterns = patterns('',
     #     include('targetter.urls', namespace='targetter')),
     url(r'^logout/',
         'django.contrib.auth.views.logout', name='logout'),
+    url(r'^errortest', 'views.errortest', name='errortest'),
     url(r'^admin/billing/$', 'teams.views.billing', name='billing'),
-    url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset',
-        name='password_reset'),
+    url(r'^admin/password_reset/$', 'auth.views.password_reset', name='password_reset'),
     url(r'^password_reset/done/$',
         'django.contrib.auth.views.password_reset_done'),
     url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        'django.contrib.auth.views.password_reset_confirm'),
+        'django.contrib.auth.views.password_reset_confirm', {'post_reset_redirect': '/reset/done/'}, name='password_reset_confirm'),
+    url(r'^reset-external/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        'django.contrib.auth.views.password_reset_confirm',
+        {'extra_context': {'external_account': True}, 'post_reset_redirect': '/reset/done/'},
+        name='password_reset_confirm_external'),
     url(r'^reset/done/$',
-        'django.contrib.auth.views.password_reset_complete'),
+        'auth.views.password_reset_complete'),
     url(r'^socialauth/',
         include('socialauth.urls')),
-    url(r'^admin/',
-        include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^staff/', include('staff.urls', namespace='staff')),
     url(r'^subtitles/',
         include('subtitles.urls', namespace='subtitles')),
     url(r'^embed(?P<version_no>\d+)?.js$', 'widget.views.embed',
@@ -177,6 +176,10 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += optionalapps.get_urlpatterns()
+
+urlpatterns += patterns('',
+    url(r'^captcha/', include('captcha.urls')),
+)
 
 try:
     import debug_toolbar

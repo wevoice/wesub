@@ -7,7 +7,9 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout
+from django.utils.http import urlencode
 
+from auth.backends import OpenIdBackend
 from socialauth.models import AuthMeta
 from socialauth.forms import EditProfileForm
 from thirdpartyaccounts.models import TwitterAccount
@@ -29,7 +31,6 @@ from auth.models import UserLanguage
 
 TWITTER_CONSUMER_KEY = getattr(settings, 'TWITTER_CONSUMER_KEY', '')
 TWITTER_CONSUMER_SECRET = getattr(settings, 'TWITTER_CONSUMER_SECRET', '')
-
 
 def get_url_host(request):
 # FIXME: Duplication
@@ -139,28 +140,28 @@ def twitter_login_done(request):
     # authentication was successful, use is now logged in
     return HttpResponseRedirect(request.GET.get('next', settings.LOGIN_REDIRECT_URL))
 
-def openid_login(request):
+def openid_login(request, confirmed=True):
     if 'openid_identifier' in request.GET:
         user_url = request.GET.get('openid_identifier')
         request.session['openid_provider'] = user_url
-        return begin(request, user_url = user_url)
+        return begin(request, user_url = user_url, confirmed=confirmed)
     else:
         if 'google.com' in request.POST.get('openid_url', ''):
             request.session['openid_provider'] = 'Google'
-            return begin(request, user_url='https://www.google.com/accounts/o8/id')
+            return begin(request, user_url='https://www.google.com/accounts/o8/id', confirmed=confirmed)
         elif 'yahoo.com' in request.POST.get('openid_url', ''):
             request.session['openid_provider'] = 'Yahoo'
         else:
             request.session['openid_provider'] = 'Openid'
-        return begin(request)
+        return begin(request, confirmed=confirmed)
 
 def gmail_login(request):
     request.session['openid_provider'] = 'Google'
     return begin(request, user_url='https://www.google.com/accounts/o8/id')
 
-def udacity_login(request):
+def udacity_login(request, confirmed=True):
     request.session['openid_provider'] = 'Udacity'
-    return begin(request, user_url='https://www.udacity.com/openid/server')
+    return begin(request, user_url='https://www.udacity.com/openid/server', confirmed=confirmed)
 
 def gmail_login_complete(request):
     pass
@@ -169,7 +170,7 @@ def yahoo_login(request):
     request.session['openid_provider'] = 'Yahoo'
     return begin(request, user_url='http://yahoo.com/')
 
-def openid_done(request, provider=None):
+def openid_done(request, provider=None, confirmed=True):
     """
     When the request reaches here, the user has completed the Openid
     authentication flow. He has authorised us to login via Openid, so
@@ -184,7 +185,21 @@ def openid_done(request, provider=None):
         #check for already existing associations
         openid_key = str(request.openid)
         #authenticate and login
-        user = authenticate(openid_key=openid_key, request=request, provider=provider)
+        if not confirmed:
+            (existing, suggested_email) = OpenIdBackend.pre_authenticate(openid_key=openid_key, request=request, provider=provider)
+            if not existing:
+                if provider == 'Udacity':
+                    return redirect('auth:confirm_create_user', 'udacity', suggested_email)
+                elif provider == 'Openid':
+                    openid_url = request.GET.get('openid_url', '')
+                    response = redirect('auth:confirm_create_user', 'openid', suggested_email)
+                    if openid_url:
+                        response['Location'] += '?' + urlencode({'openid_url': openid_url})
+                    return response
+                else:
+                    return redirect(reverse('auth:confirm_create_user', provider, suggested_email))
+        email = request.GET.get('email', None)
+        user = authenticate(openid_key=openid_key, request=request, provider=provider, email=email)
         if user:
             if not user.userlanguage_set.exists():
                 langs = get_user_languages_from_cookie(request)

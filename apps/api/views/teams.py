@@ -14,279 +14,319 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
-
 """
+Teams
+-----
+
 Team Resource
-^^^^^^^^^^^^^
+*************
 
 Get a list of teams
-+++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^
 
 .. http:get:: /api/teams/
 
-    ``paginated``
+    Get a paginated list of all teams
 
-    :>json name: Name of the team
-    :>json slug: Machine name for the team slug (used in URLs)
-    :>json description: Team description
-    :>json is_visible: Should this team's videos be publicly visible?
-    :>json membership_policy: See below for possible values
-    :>json video_policy: See below for possible values
+    :>json string name: Name of the team
+    :>json slug slug: Machine name for the team slug (used in URLs)
+    :>json string description: Team description
+    :>json boolean is_visible: Should this team's videos be publicly visible?
+    :>json string membership_policy: Team membership policy. One of:
 
-Get a list of teams
-+++++++++++++++++++
-.. http:get:: /api/teams/[team-slug]/
+        - ``Open``
+        - ``Application``
+        - ``Invitation by any team member``
+        - ``Invitation by manager``
+        - ``Invitation by admin``
 
-    Returns one entry from the team list resource data.
+    :>json string video_policy: Team video policy.  One of:
 
-Updating a team
-+++++++++++++++
+        - ``Any team member``
+        - ``Managers and admins``
+        - ``Admins only``
 
-.. http:put:: /api/teams/[team-slug]:
+    :>json uri activity_uri: Team activity resource
+    :>json uri members_uri: Team member list resource
+    :>json uri safe_members_uri: "Safe" team members list resource
+    :>json uri projects_uri: Team projects resource
+    :>json uri applications_uri: Team applications resource (or null if the
+        membership policy is not by application)
+    :>json uri languages_uri: Team preferred/blacklisted languages resource
+    :>json uri tasks_uri: Team tasks resource (or null if tasks are not enabled)
+    :>json uri resource_uri: Team resource
 
-    :<json name: (required) Name of the team
-    :<json slug: (required) Manchine name for the team (used in URLs)
-    :<json description: Team description
-    :<json is_visible: Should this team be publicly visible?
-    :<json membership_policy: See below for possible values
-    :<json video_policy: See below for possible values
+.. http:get:: /api/teams/(team-slug)/
 
-Policy values
-+++++++++++++
+    Get details on a single team
 
-Membership policy:
+    The data is the same as the list endpoint
 
-* ``Open``
-* ``Application``
-* ``Invitation by any team member``
-* ``Invitation by manager``
-* ``Invitation by admin``
+Updating team settings
+~~~~~~~~~~~~~~~~~~~~~~
 
-Video policy:
+.. http:put:: /api/teams/(team-slug)
 
-* ``Any team member``
-* ``Managers and admins``
-* ``Admins only``
+    :<json string name: (required) Name of the team
+    :<json slug slug: (required) Manchine name for the team (used in URLs)
+    :<json string description: Team description
+    :<json boolean is_visible: Should this team be publicly visible?
+    :<json string membership_policy:  Team membership policy.  One of:
 
-Team Member Resource
-^^^^^^^^^^^^^^^^^^^^
+        - ``Open``
+        - ``Application``
+        - ``Invitation by any team member``
+        - ``Invitation by manager``
+        - ``Invitation by admin``
 
-Get info on a team member
-+++++++++++++++++++++++++
+    :<json string video_policy:  Team video policy.  One of:
 
-.. http:get:: /api/teams/[team-slug]/members/[username]
+        - ``Any team member``
+        - ``Managers and admins``
+        - ``Admins only``
 
-    :<json username: username
-    :<json role: One of: ``owner``, ``admin``, ``manager``, or ``contributor``
+Members Resource
+****************
 
-Litsing all team members
-++++++++++++++++++++++++
+API endpoint for team memberships
 
-.. http:get:: /api/teams/[team-slug]/members/
-
-    Returns a list of team member data.  Each item is the same as above.
-
-Add a new member to a team
-++++++++++++++++++++++++++
-
-.. http:post:: /api/teams/[team-slug]/members/
-
-    :>json username: username of the user to add
-    :>json role: One of: ``owner``, ``admin``, ``manager``, or ``contributor``
-
-
-Change a team member's role
-+++++++++++++++++++++++++++
-
-.. http:put:: /api/teams/[team-slug]/members/[username]/
-
-    :>json role: One of: ``owner``, ``admin``, ``manager``, or ``contributor``
-
-Removing a user from a team
-+++++++++++++++++++++++++++
-
-.. http:delete:: /api/teams/[team-slug]/members/[username]/
-
-Safe Team Member Resource
+Listing members of a team
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This resource behaves the same as the normal Team Member resource except with
-couple differences for the POST action to add members
+.. http:get:: /api/teams/(team-slug)/members/
 
-* An invitation is sent to the user to join the team instead of simply adding
-  them
-* If no user exists with the username, and an ``email`` field is included in
-  the POST data, we will create a user and send an email to the email account.
+    :>json username username: username
+    :>json string role: One of: ``owner``, ``admin``, ``manager``, or
+        ``contributor``
 
-Project Resource
-^^^^^^^^^^^^^^^^
+Get info on a team member
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. http:get:: /api/teams/(team-slug)/members/(username)
+
+    The data is in the same format as the listing endpoint.
+
+Adding a member to the team
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. http:post:: /api/teams/(team-slug)/members/
+
+    :<json username username: username of the user to add
+    :<json string role: One of: ``owner``, ``admin``, ``manager``, or
+        ``contributor``
+
+Change a team member's role
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. http:put:: /api/teams/(team-slug)/members/(username)/
+
+    :<json string role: One of: ``owner``, ``admin``, ``manager``, or
+        ``contributor``
+
+Removing a user from a team
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. http:delete:: /api/teams/(team-slug)/members/(username)/
+
+Safe Members Resource
+*********************
+
+This resource behaves the same as the normal Team Member resource except
+with couple differences for the POST action to add members.
+
+- An invitation is sent to the user to join the team instead of simply
+  adding them
+- If no user exists with the username, and the email field is included
+  in the POST data, we will create a user and send an email to the email
+  account.
+
+Projects Resource
+*****************
 
 List a team's projects
-++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^
 
-.. http:get:: /api/teams/[team-slug]/projects/
+.. http:get:: /api/teams/(team-slug)/projects/
 
-    :>jsonarr name: project name
-    :>jsonarr slug: machine-name for the project
-    :>jsonarr description: project description
-    :>jsonarr guidelines: Project guidelines for users working on it
-    :>jsonarr resource_uri: API URI for project details
-    :>jsonarr created: datetime when the project was created
-    :>jsonarr modified: datetime when the project was last changed
-    :>jsonarr workflow_enabled: Are tasks enabled for this project?
+    :>json string name: project name
+    :>json slug slug: slug for the project
+    :>json string description: project description
+    :>json string guidelines: Project guidelines for users working on it
+    :>json datetime created: datetime when the project was created
+    :>json datetime modified: datetime when the project was last changed
+    :>json boolean workflow_enabled: Are tasks enabled for this project?
+    :>json uri resource_uri: Project details resource
 
 Get details on a project
-++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. http:get:: /api/teams/[team-slug]/projects/[project-slug]/
+.. http:get:: /api/teams/(team-slug)/projects/(project-slug)/
 
-    Returns the same data as the project list resource
+    The data is the same as the listing endpoint
 
+Creating a project
+^^^^^^^^^^^^^^^^^^
 
-Create a new project
-++++++++++++++++++++
+.. http:post:: /api/teams/(team-slug)/projects/
 
-.. http:post:: /api/teams/[team-slug]/projects/
-
-    :<json name: project name
-    :<json slug: machine-name for the project
-    :<json description: project description *(optional)*
-    :<json guidelines: Project guidelines for users working on it *(optional)*
+    :<json string name: project name
+    :<json slug slug: slug for the project
+    :<json string description: project description **(optional)**
+    :<json string guidelines: Project guidelines for users working on it
+        **(optional)**
 
 Updating a project
-++++++++++++++++++
+^^^^^^^^^^^^^^^^^^
 
-.. http:put:: /api/teams/[team-slug]/projects/[project-slug]/
+.. http:put:: /api/teams/(team-slug)/projects/(project-slug)/
 
-    Inputs the same data is the create project resource
+    Uses the same data as the POST method
 
 Delete a project
-++++++++++++++++
+^^^^^^^^^^^^^^^^
 
-.. http:delete:: /api/teams/[team-slug]/projects/[project-slug]/
+.. http:delete:: /api/teams/(team-slug)/projects/(project-slug)/
 
-Task Resource
-^^^^^^^^^^^^^
 
-List all tasks for a given team
-+++++++++++++++++++++++++++++++
+Tasks Resource
+**************
 
-.. http:get:: /api/teams/[team-slug]/tasks/
+List all tasks for a team
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    :query assignee: Show only tasks assigned to a username
-    :query priority: Show only tasks with a given priority
-    :query type: Show only tasks of a given type
-    :query video_id: Show only tasks that pertain to a given video
-    :query order_by: Apply sorting to the task list.  Possible values:
+.. http:get:: /api/teams/(team-slug)/tasks/
 
-        * ``created``   Creation date
-        * ``-created``  Creation date (descending)
-        * ``priority``  Priority
-        * ``-priority`` Priority (descending)
-        * ``type``      Task type (details below)
-        * ``-type``     Task type (descending)
+    :queryparam username assignee: Show only tasks assigned to a username
+    :queryparam integer priority: Show only tasks with a given priority
+    :queryparam string type: Show only tasks of a given type
+    :queryparam video-id video_id: Show only tasks that pertain to a given video
+    :queryparam string order_by: Apply sorting to the task list.  Possible values:
 
-    :query completed: Show only complete tasks
-    :query completed-before: Show only tasks completed before a given date
-        (unix timestamp)
-    :query completed-after: Show only tasks completed before a given date
-        (unix timestamp)
-    :query open: Show only incomplete tasks
+        - ``created``   Creation date
+        - ``-created``  Creation date (descending)
+        - ``priority``  Priority
+        - ``-priority`` Priority (descending)
+        - ``type``      Task type (details below)
+        - ``-type``     Task type (descending)
 
-    :>jsonarr video_id: ID of the video being worked on
-    :>jsonarr language: Language code being worked on
-    :>jsonarr id: ID for the task
-    :>jsonarr type: type of task.  One of ``Subtitle``, ``Translate``,
+    :queryparam boolean completed: Show only complete tasks
+    :queryparam integer completed-before: Show only tasks completed before a
+        given date (as a unix timestamp)
+    :queryparam integer completed-after: Show only tasks completed before a
+        given date (as a unix timestamp)
+    :queryparam boolean open: Show only incomplete tasks
+
+Get details on a specific task
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. http:get:: /api/teams/(team-slug)/tasks/(task-id)/
+
+    :>json video-id video_id: ID of the video being worked on
+    :>json bcp-47 language: Language code being worked on
+    :>json integer id: ID for the task
+    :>json string type: type of task.  One of ``Subtitle``, ``Translate``,
          ``Review``, or ``Approve``
-    :>jsonarr assignee: username of the task assignee (or null)
-    :>jsonarr priority: Integer priority for the task
-    :>jsonarr completed: Date/time when the task was completed (or null)
-    :>jsonarr approved: Approval status of the task.  One of ``In Progress``,
-        ``Approved``, or ``Rejected``
-    :>jsonarr resource_uri: API URL for the task
-
-Task detail
-+++++++++++
-
-.. http:get:: /api/teams/[team-slug]/tasks/[task-id]/
-
-    Returns the same data as the task list API
+    :>json username assignee: username of the task assignee (or null)
+    :>json integer priority: Priority for the task
+    :>json datetime created: Date/time when the task was created
+    :>json datetime completed: Date/time when the task was completed (or null)
+    :>json string approved: Approval status of the task.  One of
+        ``In Progress``, ``Approved``, or ``Rejected``
+    :>json resource_uri: Task resource
 
 Create a new task
-+++++++++++++++++
+^^^^^^^^^^^^^^^^^
 
-.. http:post:: /api/teams/[team-slug]/tasks/
+.. http:post:: /api/teams/(team-slug)/tasks/
 
-    :<json video_id: Video ID
-    :<json language: language code
-    :<json type: task type to create.  Must be ``Subtitle`` or ``Translate``
-    :<json assignee: Username of the task assignee *(optional)*
-    :<json priority: Priority for the task *(optional)*
+    :<json video-id video_id: Video ID
+    :<json bcp-47 language: language code
+    :<json string type: task type to create.  Must be ``Subtitle`` or
+        ``Translate``
+    :<json username assignee: Username of the task assignee **(optional)**
+    :<json integer priority: Priority for the task **(optional)**
 
 Update an existing task
-+++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^
 
-.. http:put:: /api/teams/[team-slug]/tasks/[task-id]/
+.. http:put:: /api/teams/(team-slug)/tasks/(task-id)/
 
-    :<json assignee: Username of the task assignee or null to unassign
-    :<json priority: priority of the task
-    :<json send_back: send a truthy value to send the back back *(optional)*
-    :<json complete: send a truthy value to complete/approve the task
-        *(optional)*
-    :<json version_number: Specify the version number of the subtitles that
-        were created for this task *(optional)*
+    :<json username assignee: Username of the task assignee or null to unassign
+    :<json integer priority: priority of the task
+    :<json boolean send_back: send a truthy value to send the back back
+        **(optional)**
+    :<json boolean complete: send a truthy value to complete/approve the task
+        **(optional)**
+    :<json integer version_number: Specify the version number of the subtitles
+        that were created for this task **(optional)**
 
 .. note::
-
     If both send_back and approved are specified, then send_back will take
     preference.
 
 Delete an existing task
-+++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^
 
-.. http:delete:: /api/teams/[team-slug]/tasks/[task-id]/
+.. http:delete:: /api/teams/(team-slug)/tasks/(task-id)/
 
-Team Applications resource
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Applications Resource
+*********************
 
-For teams with membership by application only.
+This endpoint only works for teams with membership by application.
 
 List applications
-+++++++++++++++++
+^^^^^^^^^^^^^^^^^
 
-.. http:get:: /api/teams/[team-slug]/applications
+.. http:get:: /api/teams/(team-slug)/applications
 
-    ``paginated``
+    :queryparam string status: Include only applications with this status
+    :queryparam integer before: Include only applications submitted before
+        this time (as a unix timestamp)
+    :queryparam integer after: Include only applications submitted after this
+        time (as a unix timestamp)
+    :queryparam username user: Include only applications from this user
 
-    :query status: Include only applications with this status
-    :query timestamp integer before: Include only applications submitted before
-        this time.
-    :query timestamp after: Include only applications submitted after this
-        time.
-    :query username user: Include only applications from this user
-    :>jsonarr user: Username of the applicant
-    :>jsonarr note: note given by the applicant
-    :>jsonarr status: status value.  Possible values are ``Denied``,
-        ``Approved``, ``Pending``, ``Member Removed`` and ``Member Left``
-    :>jsonarr id: application ID
-    :>jsonarr created: creation date/time
-    :>jsonarr modified: last modified date/time
-    :>jsonarr resource_uri: API URI for the application
+    List results are paginated
 
 Get details on a single application
-+++++++++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. http:get:: /api/teams/[team-slug]/applications/[application-id]/:
+.. http:get:: /api/teams/(team-slug)/applications/(application-id)/:
 
-    Returns the same data as one entry from the listing endpoint.
+    :>json username user: Username of the applicant
+    :>json string note: note given by the applicant
+    :>json string status: status value.  Possible values are ``Denied``,
+        ``Approved``, ``Pending``, ``Member Removed`` and ``Member Left``
+    :>json integer id: application ID
+    :>json datetime created: creation date/time
+    :>json datetime modified: last modified date/time
+    :>json uri resource_uri: Application resource
 
 Approve/Deny an application
-+++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. http:put:: /api/teams/[team-slug]/applications/[application-id]/
+.. http:put:: /api/teams/(team-slug)/applications/(application-id)/
 
-    :<json status: ``Denied`` to deny the application and ``Approved`` to
+    :<json string status: ``Denied`` to deny the application and ``Approved`` to
         approve it.
+
+Preferred Languages Resource
+****************************
+
+Preferred languages will have tasks auto-created for each video.
+
+.. http:put:: /api/teams/(team-slug)/languages/preferred/
+
+    Send a list of language codes as data.
+
+Blacklisted Languages Resource
+******************************
+
+Subtitles for blacklisted languages will not be allowed.
+
+.. http:put:: /api/teams/(team-slug)/languages/blacklisted/
+
+    Send a list of language codes as data.
 """
 
 from __future__ import absolute_import
@@ -294,21 +334,25 @@ from datetime import datetime
 
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.views import APIView
 
-from .apiswitcher import APISwitcherMixin
 from api.fields import TimezoneAwareDateTimeField
-from api.pagination import AmaraPaginationMixin
 from auth.models import CustomUser as User
 from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
-                          Application)
+                          Application, TeamLanguagePreference)
+from utils.translation import ALL_LANGUAGE_CODES
 import messages.tasks
+import subtitles.signals
 import teams.permissions as team_permissions
 import videos.tasks
 
@@ -359,22 +403,78 @@ class TeamSerializer(serializers.ModelSerializer):
         VIDEO_POLICY_CHOICES, required=False,
         default=Team._meta.get_field('video_policy').get_default())
 
+    activity_uri = serializers.HyperlinkedIdentityField(
+        view_name='api:team-activity',
+        lookup_field='slug',
+    )
+    members_uri = serializers.SerializerMethodField()
+    safe_members_uri = serializers.SerializerMethodField()
+    projects_uri = serializers.SerializerMethodField()
+    applications_uri = serializers.SerializerMethodField()
+    tasks_uri = serializers.SerializerMethodField()
+    languages_uri = serializers.SerializerMethodField()
+    resource_uri = serializers.SerializerMethodField()
+
+    def get_members_uri(self, team):
+        return reverse('api:team-members-list', kwargs={
+            'team_slug': team.slug,
+        }, request=self.context['request'])
+
+    def get_safe_members_uri(self, team):
+        return reverse('api:safe-team-members-list', kwargs={
+            'team_slug': team.slug,
+        }, request=self.context['request'])
+
+    def get_projects_uri(self, team):
+        return reverse('api:projects-list', kwargs={
+            'team_slug': team.slug,
+        }, request=self.context['request'])
+
+    def get_applications_uri(self, team):
+        if not team.is_by_application():
+            return None
+        return reverse('api:team-application-list', kwargs={
+            'team_slug': team.slug,
+        }, request=self.context['request'])
+
+    def get_languages_uri(self, team):
+        if not team.is_old_style():
+            return None
+        return reverse('api:team-languages', kwargs={
+            'team_slug': team.slug,
+        }, request=self.context['request'])
+
+    def get_tasks_uri(self, team):
+        if not team.workflow_enabled:
+            return None
+        return reverse('api:tasks-list', kwargs={
+            'team_slug': team.slug,
+        }, request=self.context['request'])
+
+    def get_resource_uri(self, team):
+        return reverse('api:teams-detail', kwargs={
+            'team_slug': team.slug,
+        }, request=self.context['request'])
+
     class Meta:
         model = Team
         fields = ('name', 'slug', 'description', 'is_visible',
-                  'membership_policy', 'video_policy')
+                  'membership_policy', 'video_policy', 'activity_uri',
+                  'members_uri', 'safe_members_uri', 'projects_uri',
+                  'applications_uri', 'languages_uri', 'tasks_uri',
+                  'resource_uri')
 
 class TeamUpdateSerializer(TeamSerializer):
     name = serializers.CharField(required=False)
     slug = serializers.SlugField(required=False)
 
-class TeamViewSet(AmaraPaginationMixin,
-                  mixins.CreateModelMixin,
+class TeamViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
                   mixins.ListModelMixin,
                   viewsets.GenericViewSet):
     lookup_field = 'slug'
+    lookup_url_kwarg = 'team_slug'
     paginate_by = 20
 
     def get_queryset(self):
@@ -463,7 +563,7 @@ class TeamSubviewMixin(object):
 class TeamSubview(TeamSubviewMixin, viewsets.ModelViewSet):
     pass
 
-class TeamMemberViewSet(AmaraPaginationMixin, TeamSubview):
+class TeamMemberViewSet(TeamSubview):
     lookup_field = 'username'
     paginate_by = 20
 
@@ -485,9 +585,21 @@ class TeamMemberViewSet(AmaraPaginationMixin, TeamSubview):
                                    user__username=self.kwargs['username'])
         return member
 
-    def perform_create(self, serializer):
-        if not team_permissions.can_add_member(self.team, self.request.user):
+    def check_join_permissions(self, role):
+        if not (role == TeamMember.ROLE_CONTRIBUTOR and
+                team_permissions.can_join_team(self.team, self.request.user)):
             raise PermissionDenied()
+
+    def check_add_permissions(self, role):
+        if not team_permissions.can_add_member(
+                self.team, self.request.user, role):
+            raise PermissionDenied()
+
+    def perform_create(self, serializer):
+        if serializer.user == self.request.user:
+            self.check_join_permissions(serializer.validated_data['role'])
+        else:
+            self.check_add_permissions(serializer.validated_data['role'])
         serializer.save()
 
     def perform_update(self, serializer):
@@ -663,6 +775,7 @@ class TaskSerializer(serializers.ModelSerializer):
     video_id = TeamVideoField(source='team_video')
     assignee = TeamMemberField(required=False)
     type = MappedChoiceField(Task.TYPE_CHOICES)
+    created = TimezoneAwareDateTimeField(read_only=True)
     completed = TimezoneAwareDateTimeField(read_only=True)
     approved = MappedChoiceField(
         Task.APPROVED_CHOICES, required=False,
@@ -673,7 +786,7 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = (
             'id', 'video_id', 'language', 'type', 'assignee', 'priority',
-            'completed', 'approved', 'resource_uri',
+            'created', 'completed', 'approved', 'resource_uri',
         )
         read_only_fields = (
             'completed',
@@ -694,8 +807,8 @@ class TaskUpdateSerializer(TaskSerializer):
                               read_only=True)
     type = MappedChoiceField(Task.TYPE_CHOICES, required=False,
                              read_only=True)
-    complete = serializers.BooleanField(required=False)
-    send_back = serializers.BooleanField(required=False)
+    complete = serializers.BooleanField(required=False, write_only=True)
+    send_back = serializers.BooleanField(required=False, write_only=True)
 
     class Meta(TaskSerializer.Meta):
         fields = TaskSerializer.Meta.fields + (
@@ -726,15 +839,21 @@ class TaskUpdateSerializer(TaskSerializer):
         if task.assignee is None:
             task.assignee = self.context['user']
         task.complete()
+        version = task.get_subtitle_version()
+        if version and version.is_public():
+            subtitles.signals.subtitles_completed.send(
+                version.subtitle_language)
+            subtitles.signals.subtitles_published.send(
+                version.subtitle_language, version=version)
 
-class TaskViewSet(AmaraPaginationMixin, TeamSubview):
+class TaskViewSet(TeamSubview):
     lookup_field = 'id'
     paginate_by = 20
 
     def get_queryset(self):
         if not self.team.user_is_member(self.request.user):
             raise PermissionDenied()
-        return (self.order_queryset(self.team.task_set.all())
+        return (self.order_queryset(self.team.task_set.not_deleted())
                 .select_related('team_video__video', 'assignee'))
 
     def order_queryset(self, qs):
@@ -808,7 +927,8 @@ class TaskViewSet(AmaraPaginationMixin, TeamSubview):
             self.team, self.request.user, instance.team_video.project,
             instance.language):
             raise PermissionDenied()
-        instance.delete()
+        instance.deleted = True
+        instance.save()
 
     def _post_save(self, task):
         if task.assignee and not self.task_was_assigned:
@@ -862,8 +982,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             instance.deny(self.context['user'], 'API')
         return instance
 
-class TeamApplicationViewSet(AmaraPaginationMixin,
-                             TeamSubviewMixin,
+class TeamApplicationViewSet(TeamSubviewMixin,
                              mixins.RetrieveModelMixin,
                              mixins.UpdateModelMixin,
                              mixins.ListModelMixin,
@@ -902,29 +1021,68 @@ class TeamApplicationViewSet(AmaraPaginationMixin,
             qs = qs.filter(created__lt=timestamp_to_datetime(params['before']))
         return qs
 
-class ProjectViewSetSwitcher(APISwitcherMixin, ProjectViewSet):
-    switchover_date = 20150716
+@api_view(['GET'])
+def team_languages(request, team_slug):
+    """
+    Links to a team's preferred/blacklisted language endpoints.
 
-    class Deprecated(ProjectViewSet):
-        class serializer_class(ProjectSerializer):
-            created = serializers.DateTimeField(read_only=True)
-            modified = serializers.DateTimeField(read_only=True)
+    These endpoints allows you to control which languages you want worked on in
+    a team.  Preferred languages will have tasks auto-created for each video.
+    Subtitles for blacklisted languages will not be allowed.
+    """
 
-        class update_serializer_class(ProjectUpdateSerializer):
-            created = serializers.DateTimeField(read_only=True)
-            modified = serializers.DateTimeField(read_only=True)
+    return Response({
+        'preferred': reverse('api:team-languages-preferred', kwargs={
+            'team_slug': team_slug,
+        }, request=request),
+        'blacklisted': reverse('api:team-languages-blacklisted', kwargs={
+            'team_slug': team_slug,
+        }, request=request),
+    })
 
-class TeamApplicationViewSetSwitcher(APISwitcherMixin, TeamApplicationViewSet):
-    switchover_date = 20150716
+class TeamLanguageView(TeamSubviewMixin, APIView):
+    def queryset(self):
+        return (TeamLanguagePreference.objects.for_team(self.team)
+                .filter(**self.field_values))
 
-    class Deprecated(TeamApplicationViewSet):
-        class serializer_class(ApplicationSerializer):
-            created = serializers.DateTimeField(read_only=True)
-            modified = serializers.DateTimeField(read_only=True)
+    def get(self, request, *args, **kwargs):
+        return Response(sorted(tlp.language_code for tlp in self.queryset()))
 
-class TaskViewSetSwitcher(APISwitcherMixin, TaskViewSet):
-    switchover_date = 20150716
+    def put(self, request, *args, **kwargs):
+        if not isinstance(request.data, list):
+            raise serializers.ValidationError("Data must be a list")
+        for code in request.data:
+            if code not in ALL_LANGUAGE_CODES:
+                raise serializers.ValidationError(
+                    "Invalid language code: {}".format(code))
+        with transaction.commit_on_success():
+            self.add_languages(request.data)
+            self.remove_languages(request.data)
+        return Response(sorted(request.data))
 
-    class Deprecated(TaskViewSet):
-        class serializer_class(TaskSerializer):
-            completed = serializers.DateTimeField(read_only=True)
+    def add_languages(self, language_codes):
+        for code in language_codes:
+            tlp, created = TeamLanguagePreference.objects.get_or_create(
+                team=self.team, language_code=code,
+                defaults=self.field_values)
+            if not created:
+                for name, value in self.field_values.items():
+                    setattr(tlp, name, value)
+                tlp.save()
+
+    def remove_languages(self, language_codes):
+        self.queryset().exclude(language_code__in=language_codes).delete()
+
+class TeamPreferredLanguagesView(TeamLanguageView):
+    field_values = {
+        'preferred': True,
+        'allow_reads': False,
+        'allow_writes': False,
+    }
+
+class TeamBlacklistedLanguagesView(TeamLanguageView):
+    field_values = {
+        'preferred': False,
+        'allow_reads': False,
+        'allow_writes': False,
+    }

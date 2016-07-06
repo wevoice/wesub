@@ -16,7 +16,9 @@
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
 from rest_framework import negotiation
-from rest_framework import parsers
+from rest_framework.parsers import JSONParser
+from rest_framework_yaml.parsers import YAMLParser
+from rest_framework_xml.parsers import XMLParser
 
 class AmaraContentNegotiation(negotiation.DefaultContentNegotiation):
     """
@@ -37,9 +39,9 @@ class AmaraContentNegotiation(negotiation.DefaultContentNegotiation):
 
     # map format query param values to (parser class, renderer class) tuples
     _format_to_parser_class = {
-        'json': parsers.JSONParser,
-        'yaml': parsers.YAMLParser,
-        'xml': parsers.XMLParser,
+        'json': JSONParser,
+        'yaml': YAMLParser,
+        'xml': XMLParser,
     }
 
     def select_parser_from_format(self, request, parsers):

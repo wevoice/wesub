@@ -366,18 +366,24 @@ def can_delete_team(team, user):
     role = get_role_for_target(user, team)
     return role == ROLE_OWNER
 
-def can_add_member(team, user):
+def can_add_member(team, user, role):
     """
     If a user belongs to a partner team, any admin or above on any of the
     partner's teams can move the user anywhere within the partner's teams.
 
-    ``team`` --- the target team
-    ``user`` --- the user performing the action
+    Arguments:
+        team: the target team
+        role: the target role
+        user: the user performing the action
     """
-    target_team_partner = team.partner
-    return TeamMember.objects.filter(user=user,
-            role__in=[ROLE_ADMIN, ROLE_OWNER],
-            team__partner=target_team_partner).exists()
+    if role == ROLE_OWNER:
+        roles_allowed = [ROLE_OWNER]
+    else:
+        roles_allowed = [ROLE_ADMIN, ROLE_OWNER]
+
+    return TeamMember.objects.filter(
+        team=team, user=user, role__in=roles_allowed
+    ).exists()
 
 def can_remove_member(team, user):
     return can_add_member(team, user)
@@ -409,6 +415,11 @@ def can_add_video(team, user, project=None):
     }[team.video_policy]
 
     return role in _perms_equal_or_greater(role_required)
+
+def can_add_videos_bulk(user):
+    """Return whether the given user can add videos in bulk (using a CSV file).
+    It also implies user can create projects."""
+    return user.is_staff or user.is_superuser
 
 def can_add_video_somewhere(team, user):
     """Return whether the given user can add a video somewhere in the given team."""
@@ -542,6 +553,10 @@ def can_invite(team, user):
     }[team.membership_policy]
 
     return role in _perms_equal_or_greater(role_required)
+
+def can_add_members(team, user):
+    """Return whether the given user can add members to the given team."""
+    return user.is_staff
 
 def can_change_video_settings(user, team_video):
     role = get_role_for_target(user, team_video.team, team_video.project, None)
@@ -1004,4 +1019,9 @@ def can_delete_project(user, team, project):
     return can_edit_project(team, user, project)
 
 def can_create_team(user):
-    return user.is_partner
+    # via API
+    return user.has_perm('teams.add_team') or user.is_partner
+
+def can_create_team_ui(user):
+    # via website
+    return user.has_perm('teams.add_team') and user.is_active

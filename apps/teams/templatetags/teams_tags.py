@@ -54,12 +54,11 @@ from teams.permissions import (
     can_resync as _can_resync,
 )
 from teams.permissions import (
-    can_invite, can_add_video_somewhere,
+    can_invite, can_add_video_somewhere, can_add_members,
     can_create_tasks, can_create_task_subtitle, can_create_task_translate,
-    can_create_and_edit_subtitles, can_create_and_edit_translations
+    can_create_and_edit_subtitles, can_create_and_edit_translations,
+    can_create_team_ui
 )
-
-from haystack import site
 
 DEV_OR_STAGING = getattr(settings, 'DEV', False) or getattr(settings, 'STAGING', False)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 10)
@@ -71,39 +70,21 @@ register = template.Library()
 import logging
 logger = logging.getLogger(__name__)
 
-def _get_team_video_from_search_record(search_record):
-    if getattr(search_record, '_team_video', None):
-        # This is ugly, but allows us to pre-fetch the teamvideos for the
-        # search records all at once to avoid multiple DB queries.
-        return search_record._team_video
-    else:
-        try:
-            return TeamVideo.objects.get(pk=search_record.team_video_pk)
-        except TeamVideo.DoesNotExist:
-            logger.warn('DoesNotExist error when looking up search record',
-                        exc_info=True)
-
-        # ok, for some reason, this search record got stale.
-        # no idea why.
-        # so let's delete it so this can't happen again
-        tv_search_index = site.get_index(TeamVideo)
-        tv_search_index.backend.remove(search_record.id)
-        logger.error("Removing %s from solr since it's stale" % search_record.id)
-
-        return None
-
 @register.filter
 def can_approve_application(team, user):
     return can_invite(team, user)
+
+@register.filter
+def can_add_members_to_team(team, user):
+    return can_add_members(team, user)
 
 @register.filter
 def can_invite_to_team(team, user):
     return can_invite(team, user)
 
 @register.filter
-def can_edit_video(search_record, user):
-    tv = _get_team_video_from_search_record(search_record)
-    return _can_edit_video(tv, user)
+def can_edit_video(team_video, user):
+    return _can_edit_video(team_video, user)
 
 @register.filter
 def can_remove_video(tv, user):
@@ -120,6 +101,10 @@ def can_delete_video_in_team(user, team):
 @register.filter
 def can_add_tasks(team, user):
     return can_create_tasks(team, user)
+
+@register.filter
+def can_add_team(user):
+    return can_create_team_ui(user)
 
 @register.filter
 def is_team_manager(team, user):
@@ -228,11 +213,9 @@ def share_panel_email_url(context):
 
     if not project:
         message = 'Check out the "%s" team on Amara: %s' % (team.name, team.get_site_url())
-        share_panel_email_url = reverse('videos:email_friend')
         share_panel_email_url = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
     else:
         message = 'Check out the "%s" project on Amara: %s' % (project.name, project.get_site_url())
-        share_panel_email_url = reverse('videos:email_friend')
         share_panel_email_url = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
 
     return share_panel_email_url
@@ -251,9 +234,10 @@ def team_move_video_select(context):
     return context
 
 @register.inclusion_tag('teams/_team_video_summary.html', takes_context=True)
-def team_video_summary(context, team_video_search_record):
-    context['search_record'] = team_video_search_record
-    video_url = team_video_search_record.video_url
+def team_video_summary(context, video):
+    context['video'] = video
+    context['team_video'] = video.get_team_video()
+    context['video_url'] = video_url = video.get_video_url()
     context['team_video_widget_params'] = base_widget_params(context['request'], {
         'video_url': video_url,
         'base_state': {},
@@ -262,23 +246,15 @@ def team_video_summary(context, team_video_search_record):
     return context
 
 @register.inclusion_tag('teams/_team_video_detail.html', takes_context=True)
-def team_video_detail(context, team_video_search_record):
-    context['search_record'] = team_video_search_record
-    video_url = team_video_search_record.video_url
+def team_video_detail(context, video):
+    context['video'] = video
+    context['team_video'] = video.get_team_video()
+    context['video_url'] = video_url = video.get_video_url()
     context['team_video_widget_params'] = base_widget_params(context['request'], {
         'video_url': video_url,
         'base_state': {},
         'effectiveVideoURL': video_url
     })
-    return context
-
-@register.inclusion_tag('teams/_complete_team_video_detail.html', takes_context=True)
-def complete_team_video_detail(context, team_video_search_record):
-    context['search_record'] = team_video_search_record
-    langs = team_video_search_record.video_completed_langs or ()
-    urls = team_video_search_record.video_completed_lang_urls or ()
-    context['display_languages'] = \
-        zip([_(ALL_LANGUAGES_DICT[l]) for l in langs if (l and l in ALL_LANGUAGES_DICT)], urls)
     return context
 
 @register.inclusion_tag('teams/_team_video_lang_detail.html', takes_context=True)
@@ -346,7 +322,11 @@ def team_projects(context, team, varname):
     {% endfor %}
 
     """
-    context[varname] = Project.objects.for_team(team)
+    projects = Project.objects.for_team(team).select_related('team')
+    project_video_counts = team.get_project_video_counts()
+    for p in projects:
+        p.set_videos_count_cache(project_video_counts.get(p.id, 0))
+    context[varname] = projects
     return ""
 
 @tag(register, [Variable(), Constant("as"), Name()])

@@ -26,7 +26,6 @@ from babelsubs.storage import diff as diff_subs
 from babelsubs.generators.html import HTMLGenerator
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
@@ -51,6 +50,7 @@ from vidscraper.errors import Error as VidscraperError
 
 import widget
 from widget import rpc as widget_rpc
+from activity.models import ActivityRecord
 from auth.models import CustomUser as User
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.permissions import (user_can_view_private_subtitles,
@@ -58,6 +58,7 @@ from subtitles.permissions import (user_can_view_private_subtitles,
 from subtitles.forms import SubtitlesUploadForm
 from subtitles.pipeline import rollback_to
 from teams.models import Task
+from utils.decorators import staff_member_required
 from videos import permissions
 from videos.decorators import (get_video_revision, get_video_from_code,
                                get_cached_video_from_code)
@@ -67,10 +68,9 @@ from videos.forms import (
     ChangeVideoOriginalLanguageForm, CreateSubtitlesForm,
 )
 from videos.models import (
-    Video, Action, VideoUrl, AlreadyEditingException
+    Video, VideoUrl, AlreadyEditingException
 )
 from videos.rpc import VideosApiClass
-from videos.search_indexes import VideoIndex
 from videos import share_utils
 from videos.tasks import video_changed_tasks
 from widget.views import base_widget_params
@@ -81,10 +81,13 @@ from utils.decorators import never_in_prod
 from utils.objectlist import object_list
 from utils.rpc import RpcRouter
 from utils.text import fmt
-from utils.translation import get_user_languages_from_request
+from utils.translation import (get_user_languages_from_request,
+                               get_language_label)
 
 from teams.permissions import can_edit_video, can_add_version, can_resync
 from . import video_size
+
+VIDEO_IN_ROW = 6
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -109,7 +112,7 @@ class LanguageList(object):
             if public_tip is None or public_tip.subtitle_count == 0:
                 # no versions in this language yet
                 continue
-            language_name = lang.get_language_code_display()
+            language_name = get_language_label(lang.language_code)
             status = self._calc_status(lang)
             tags = self._calc_tags(lang)
             url = lang.get_absolute_url()
@@ -169,27 +172,13 @@ class LanguageList(object):
         return len(self.items)
 
 def index(request):
-    context = {
-        'popular_videos': VideoIndex.get_popular_videos("-today_views")[:VideoIndex.IN_ROW],
-        'featured_videos': VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW],
-    }
-    return render_to_response('index.html', context,
+    return render_to_response('index.html', {},
                               context_instance=RequestContext(request))
 
 def watch_page(request):
-
-    # Assume we're currently indexing if the number of public
-    # indexed vids differs from the count of video objects by
-    # more than 1000
-    is_indexing = cache.get('is_indexing')
-    if is_indexing is None:
-        is_indexing = Video.objects.all().count() - VideoIndex.public().count() > 1000
-        cache.set('is_indexing', is_indexing, 300)
-
     context = {
-        'featured_videos': VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW],
-        'latest_videos': VideoIndex.get_latest_videos()[:VideoIndex.IN_ROW*3],
-        'is_indexing': is_indexing
+        'featured_videos': Video.objects.featured()[:VIDEO_IN_ROW],
+        'latest_videos': Video.objects.latest()[:VIDEO_IN_ROW*3],
     }
     return render_to_response('videos/watch.html', context,
                               context_instance=RequestContext(request))
@@ -210,12 +199,7 @@ def create(request):
         'initial_url': request.GET.get('initial_url'),
     }
     if video_form.is_valid():
-        try:
-            video = video_form.save()
-        except (VidscraperError, RequestError):
-            context['vidscraper_error'] = True
-            return render_to_response('videos/create.html', context,
-                          context_instance=RequestContext(request))
+        video = video_form.video
         messages.info(request, message=_(u'''Here is the subtitle workspace for your video.
         You can share the video with friends, or get an embed code for your site. To start
         new subtitles, click \"Add a new language!\" in the sidebar.'''))
@@ -358,9 +342,9 @@ def _get_related_task(request):
             return
 
 
-def actions_list(request, video_id):
+def activity(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
-    qs = Action.objects.for_video(video)
+    qs = ActivityRecord.objects.for_video(video)
 
     extra_context = {
         'video': video
@@ -368,7 +352,7 @@ def actions_list(request, video_id):
 
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.ACTIVITIES_ONPAGE,
-                       template_name='videos/actions_list.html',
+                       template_name='videos/activity.html',
                        template_object_name='action',
                        extra_context=extra_context)
 
@@ -422,8 +406,6 @@ def upload_subtitles(request):
     except Exception, e:
         import traceback
         traceback.print_exc()
-        from raven.contrib.django.models import client
-        client.create_from_exception()
         output['errors'] = {'__all__': [force_unicode(e)]}
 
     return HttpResponse(json.dumps(output))
@@ -438,31 +420,6 @@ def feedback(request, hide_captcha=False):
     else:
         output['errors'] = form.get_errors()
     return HttpResponse(json.dumps(output), "text/javascript")
-
-def email_friend(request):
-    text = request.GET.get('text', '')
-    link = request.GET.get('link', '')
-    if link:
-        text = link if not text else '%s\n%s' % (text, link)
-    from_email = ''
-    if request.user.is_authenticated():
-        from_email = request.user.email
-    initial = dict(message=text, from_email=from_email)
-    if request.method == 'POST':
-        form = EmailFriendForm(request.POST, auto_id="email_friend_id_%s", label_suffix="")
-        if form.is_valid():
-            form.send()
-            messages.info(request, 'Email Sent!')
-
-            return redirect(request.get_full_path())
-    else:
-        form = EmailFriendForm(auto_id="email_friend_id_%s", initial=initial, label_suffix="")
-    context = {
-        'form': form
-    }
-    return render_to_response('videos/email_friend.html', context,
-                              context_instance=RequestContext(request))
-
 
 @get_video_from_code
 def legacy_history(request, video, lang=None):
@@ -853,15 +810,8 @@ def video_url_create(request):
 
 @staff_member_required
 def reindex_video(request, video_id):
-    from teams.tasks import update_one_team_video
-
     video = get_object_or_404(Video, video_id=video_id)
     video.update_search_index()
-
-    team_video = video.get_team_video()
-
-    if team_video:
-        update_one_team_video.delay(team_video.id)
 
 def subscribe_to_updates(request):
     email_address = request.POST.get('email_address', '')

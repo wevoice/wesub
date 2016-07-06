@@ -27,6 +27,7 @@ from teams.models import Team, TeamMember, TeamVideo, Workflow
 from teams.permissions_const import (
     ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
 )
+from utils.factories import *
 
 # Normal Users ----------------------------------------------------------------
 def get_user(n=1):
@@ -68,9 +69,7 @@ VIDEO_URLS = ('http://youtu.be/heKK95DAKms',
 def get_video(n=1, user=None, url=None):
     if not url:
         url = VIDEO_URLS[n]
-    video, _ = Video.get_or_create_for_url(url, user=user)
-    return video
-
+    return Video.add(url, user)[0]
 
 # Subtitle Languages ----------------------------------------------------------
 def make_subtitle_language(video, language_code):

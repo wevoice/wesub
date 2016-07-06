@@ -14,87 +14,78 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
-
 """
+Users
+-----
+
 Users Resource
-^^^^^^^^^^^^^^
+**************
 
 Fetching user data
-++++++++++++++++++
+^^^^^^^^^^^^^^^^^^
 
 .. http:get:: /api/users/[username]/
 
-    :>json username: username
-    :>json first_name: First name
-    :>json last_name: Last name
-    :>json homepage: Homepage URL
-    :>json biography: Bio text
-    :>json num_videos: Number of videos followed by the user
-    :>json languages: List of languages the user speaks
-    :>json avatar: URL to the user's avatar image
-    :>json resource_uri: User API URI
-    :>json full_name: Full name of the user.
+    :>json username username: username
+    :>json string first_name: First name
+    :>json string last_name: Last name
+    :>json url homepage: Homepage URL
+    :>json string biography: Bio text
+    :>json integer num_videos: Number of videos followed by the user
+    :>json list languages: List of language codes for languages the user
+        speaks.
+    :>json url avatar: URL to the user's avatar image
+    :>json uri activity_uri: User Activity resource
+    :>json uri resource_uri: User resource
+    :>json string full_name: Full name of the user.
 
 .. note::
 
-    Many of these fields will be blank if the user hasn't set them from their
-    profile page
-
-.. note::
-
-    The ``full_name`` field is not used in the amara interface and there is no
-    requirement that it needs to be first_name + last_name.  This field is for
-    API consumers that want to create users to match their internal users and
-    use the full names internally instead of first + last.
+    - Many of these fields will be blank if the user hasn't set them from
+      their profile page
+    - The ``full_name`` field is not used in the amara interface and there is
+      no requirement that it needs to be first_name + last_name.  This field
+      is for API consumers that want to create users to match their internal
+      users and use the full names internally instead of first + last.
 
 Creating Users
-++++++++++++++
+^^^^^^^^^^^^^^
 
 .. http:post:: /api/users/
 
-    :<json username: username.  30 chars or fewer
-        alphanumeric chars, @, _ and - are accepted.
-    :<json email: A valid email address
-    :<json password: any number of chars, all chars allowed.
-    :<json first_name: Any chars, max 30 chars. Optional.
-    :<json last_name: Any chars, max 30 chars. Optional.
-    :<json create_login_token: *optional*, if sent the response will also
-        include a url that when visited will login the created user.  Use this
-        to allow users to login without explicitly setting their passwords.
-        This URL expires in 2 hours
-    :<json find_unique_username: *optional*, if username is taken, we will
-        find a similar, unused, username for the new user.  If passed, make
-        sure you check the username returned since it might not be the same
-        one that you passed in.  If set, usernames can only be a maximum of 24
+    :<json username username: 30 chars or fewer alphanumeric chars,
+        @, _ and are accepted.
+    :<json email email: A valid email address
+    :<json string password: any number of chars, all chars allowed.
+    :<json string first_name: Any chars, max 30 chars. **(optional)**
+    :<json string last_name: Any chars, max 30 chars. **(optional)**
+    :<json boolean create_login_token: If sent the response will also include
+        a url that when visited will login the created user.  Use this to
+        allow users to login without explicitly setting their passwords.  This
+        URL expires in 2 hours.  **(optional)**
+    :<json boolean find_unique_username: If username is taken, we will find a
+        similar, unused, username for the new user.  If passed, make sure you
+        check the username returned since it might not be the same one that
+        you passed in.  If set, usernames can only be a maximum of 24
         characters to make room for potential extra characters.
-    :>json username: username
-    :>json first_name: First name
-    :>json last_name: Last name
-    :>json homepage: Homepage URL
-    :>json biography: Bio text
-    :>json num_videos: Number of videos created by the user
-    :>json languages: List of languages the user speaks
-    :>json avatar: URL to the user's avatar image
-    :>json resource_uri: User API URI
-    :>json email: User's email
-    :>json api_key: User API Key
-    :>json full_name: Full name
+        **(optional)**
 
 .. note::
 
-    This response includes the ``email`` and ``api_key``, which aren't
+    The response includes the ``email`` and ``api_key``, which aren't
     included in the normal GET response.  If clients wish to make requests on
     behalf of this newly created user through the api, they must hold on to
-    this key.
+    this data.
 
-Updating Your Account
-+++++++++++++++++++++
+Updating user accounts
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. http:put:: /api/users/[username]
 
-Use PUT to update your user account.  ``username`` must match the username of
-the auth credentials sent.  PUT inputs the same fields as POST, except
-username, create_login_token, and find_unique_username.
+    :param username username: must match the username of the auth credentials sent
+
+    Inputs the same fields as POST, except `username`, `create_login_token`,
+    and `find_unique_username`.
 """
 
 from __future__ import absolute_import
@@ -110,12 +101,18 @@ from rest_framework.reverse import reverse
 
 from auth.models import CustomUser as User, LoginToken
 
+def can_modify_user(request_user, object_user):
+    return request_user == object_user or \
+        request_user.is_staff
+
 class UserSerializer(serializers.ModelSerializer):
     num_videos = serializers.IntegerField(source='videos.count',
                                           read_only=True)
     languages = serializers.ListField(
         child=serializers.CharField(),
         source='get_languages', read_only=True)
+    activity_uri = serializers.HyperlinkedIdentityField(
+        view_name='api:user-activity', lookup_field='username')
     resource_uri = serializers.HyperlinkedIdentityField(
         view_name='api:users-detail', lookup_field='username')
     created_by = serializers.CharField(source='created_by.username',
@@ -126,8 +123,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'username', 'full_name', 'first_name', 'last_name', 'biography',
-            'homepage', 'avatar', 'languages', 'num_videos', 'resource_uri',
-            'created_by', 'is_partner',
+            'homepage', 'avatar', 'languages', 'num_videos', 'activity_uri',
+            'resource_uri', 'created_by', 'is_partner',
         )
 
     default_error_messages = {
@@ -209,24 +206,28 @@ class UserCreateSerializer(UserSerializer):
 class UserUpdateSerializer(UserSerializer):
     username = serializers.CharField(read_only=True)
     password = PasswordField(required=False, write_only=True)
-    api_key = serializers.CharField(source='api_key.key', read_only=True)
+
+    def __init__(self, *args, **kwargs):
+        super(UserUpdateSerializer, self).__init__(*args, **kwargs)
+        if 'instance' in kwargs and \
+           not can_modify_user(self.context['request'].user, kwargs['instance']):
+            self.fields.pop('email')
 
     def update(self, user, validated_data):
-        if user != self.context['request'].user:
+        if not can_modify_user(user, self.context['request'].user):
             raise PermissionDenied()
         return super(UserSerializer, self).update(user, validated_data)
 
     class Meta:
         model = User
         fields = UserSerializer.Meta.fields + (
-            'email', 'api_key', 'password',
+            'email', 'password',
         )
 
 class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.CreateModelMixin,
                   mixins.UpdateModelMixin,
                   viewsets.GenericViewSet):
-
     queryset = User.objects.all().select_related('created_by')
     lookup_field = 'username'
     lookup_value_regex = r'[\w\-@\.\+\s]+'

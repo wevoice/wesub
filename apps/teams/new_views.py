@@ -31,7 +31,6 @@ from collections import namedtuple, OrderedDict
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.cache import cache
@@ -39,7 +38,7 @@ from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import (Http404, HttpResponse, HttpResponseRedirect,
-                         HttpResponseBadRequest)
+                         HttpResponseBadRequest, HttpResponseForbidden)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext as _
 
@@ -49,20 +48,23 @@ from . import permissions
 from . import signals
 from . import tasks
 from .behaviors import get_main_project
+from .bulk_actions import add_videos_from_csv
 from .exceptions import ApplicationInvalidException
 from .models import (Invite, Setting, Team, Project, TeamVideo,
                      TeamLanguagePreference, TeamMember, Application)
 from .statistics import compute_statistics
+from activity.models import ActivityRecord
 from auth.models import CustomUser as User
 from messages import tasks as messages_tasks
 from subtitles.models import SubtitleLanguage
 from teams.workflows import TeamWorkflow
 from utils.breadcrumbs import BreadCrumb
+from utils.decorators import staff_member_required
 from utils.pagination import AmaraPaginator
 from utils.forms import autocomplete_user_view, FormRouter
 from utils.text import fmt
-from utils.translation import get_language_choices, get_language_label
-from videos.models import Action, Video
+from utils.translation import get_language_label
+from videos.models import Video
 
 logger = logging.getLogger('teams.views')
 
@@ -75,13 +77,32 @@ def team_view(view_func):
     def wrapper(request, slug, *args, **kwargs):
         if not request.user.is_authenticated():
             return redirect_to_login(request.path)
-        try:
-            team = Team.objects.get(slug=slug,
-                                    members__user_id=request.user.id)
-        except Team.DoesNotExist:
+        if isinstance(slug, Team):
+            # we've already fetched the team in with_old_view
+            team = slug
+        else:
+            try:
+                team = Team.objects.get(slug=slug)
+            except Team.DoesNotExist:
+                raise Http404
+        if not team.user_is_member(request.user):
             raise Http404
         return view_func(request, team, *args, **kwargs)
     return wrapper
+
+def with_old_view(old_view_func):
+    def wrap(view_func):
+        @functools.wraps(view_func)
+        def wrapper(request, slug, *args, **kwargs):
+            try:
+                team = Team.objects.get(slug=slug)
+            except Team.DoesNotExist:
+                raise Http404
+            if team.is_old_style():
+                return old_view_func(request, team, *args, **kwargs)
+            return view_func(request, team, *args, **kwargs)
+        return wrapper
+    return wrap
 
 def admin_only_view(view_func):
     @functools.wraps(view_func)
@@ -115,37 +136,6 @@ def team_settings_view(view_func):
             return HttpResponseRedirect(team.get_absolute_url())
         return view_func(request, team, *args, **kwargs)
     return login_required(wrapper)
-
-def fetch_actions_for_activity_page(team, tab, page, params):
-    if tab == 'team':
-        action_qs = Action.objects.filter(team=team)
-    else:
-        video_language = params.get('video_language')
-        subtitles_language = params.get('subtitles_language', 'any')
-        if video_language == 'any':
-            video_language = None
-        action_qs = team.fetch_video_actions(video_language)
-        if subtitles_language != 'any':
-            action_qs = action_qs.filter(
-                new_language__language_code=subtitles_language)
-
-    end = page * ACTIONS_PER_PAGE
-    start = end - ACTIONS_PER_PAGE
-
-    if params.get('action_type', 'any') != 'any':
-        action_qs = action_qs.filter(action_type=params.get('action_type'))
-
-    sort = params.get('sort', '-created')
-    action_qs = action_qs.order_by(sort)[start:end]
-
-    # This query often requires a filesort in mysql.  We can speed things up
-    # by only selecting the ids, which keeps the rows being sorted small.
-    action_ids = list(action_qs.values_list('id', flat=True))
-    # Now do a second query that selects all the columns.
-    return list(Action.objects
-                .filter(id__in=action_ids)
-                .select_related('new_language', 'video', 'user',
-                                'new_language__video'))
 
 class VideoPageExtensionForm(object):
     """Define an extra form on the video page.
@@ -186,7 +176,8 @@ class VideoPageForms(object):
         - Allowing other apps to extend which forms appear in the bottom sheet
     """
     form_classes = {
-        'add': forms.NewAddTeamVideoForm,
+        'add_form': forms.NewAddTeamVideoDataForm,
+        'add_csv': forms.TeamVideoCSVForm,
         'edit': forms.NewEditTeamVideoForm,
         'bulk-edit': forms.BulkEditTeamVideosForm,
         'move': forms.MoveTeamVideosForm,
@@ -198,8 +189,10 @@ class VideoPageForms(object):
         self.user = user
         self.team_videos_qs = team_videos_qs
         self.enabled = set()
+        if permissions.can_add_videos_bulk(user):
+            self.enabled.add('add_csv')
         if permissions.can_add_video(team, user):
-            self.enabled.add('add')
+            self.enabled.add('add_form')
         if permissions.can_edit_videos(team, user):
             self.enabled.update(['edit', 'bulk-edit'])
         if len(permissions.can_move_videos_to(team, user)) > 0:
@@ -225,7 +218,7 @@ class VideoPageForms(object):
             return FormClass(self.team, self.user, self.team_videos_qs,
                              selection, all_selected, filters_form)
 
-    def build_add_form(self, request, filters_form):
+    def build_add_multiple_forms(self, request, filters_form):
         if filters_form.selected_project:
             # use the selected project by default on the add video form
             initial = {
@@ -233,13 +226,12 @@ class VideoPageForms(object):
             }
         else:
             initial = None
-        if request.method == 'POST':
-            return forms.NewAddTeamVideoForm(self.team, self.user,
-                                             initial=initial,
-                                             data=request.POST)
+        if request.method == 'POST' and 'form' in request.POST and request.POST['form'] == 'add':
+            return (forms.NewAddTeamVideoDataForm(self.team, request.POST, files=request.FILES),
+                    forms.TeamVideoURLFormSet(request.POST))
         else:
-            return forms.NewAddTeamVideoForm(self.team, self.user,
-                                             initial=initial)
+            return (forms.NewAddTeamVideoDataForm(self.team),
+                    forms.TeamVideoURLFormSet())
 
     def add_extension_form(self, extension_form):
         """Add an extra form to appear on the video page
@@ -272,61 +264,68 @@ def _videos_and_filters_form(request, team):
     if filters_form.is_bound and filters_form.is_valid():
         team_videos = filters_form.get_queryset()
     else:
-        team_videos = (team.teamvideo_set.all()
+        team_videos = (team.videos.all()
                        .order_by('-created')
-                       .select_related('video'))
+                       .select_related('teamvideo'))
         main_project = get_main_project(team)
         if main_project:
             team_videos = team_videos.filter(
                 video__teamvideo__project=main_project)
     return team_videos, filters_form
 
+@with_old_view(old_views.detail)
 @team_view
 def videos(request, team):
-    if team.is_old_style():
-        return old_views.detail(request, team)
-
     team_videos, filters_form = _videos_and_filters_form(request, team)
 
     page_forms = VideoPageForms(team, request.user, team_videos)
     error_form = error_form_name = None
 
-    add_form = page_forms.build_add_form(request, filters_form)
-    if add_form.is_bound and add_form.is_valid():
-        add_form.save()
-        messages.success(request, add_form.message())
+    add_form, add_formset = page_forms.build_add_multiple_forms(request, filters_form)
+    if add_form.is_bound and add_form.is_valid() and add_formset.is_bound and add_formset.is_valid():
+        errors = ""
+        added = 0
+        project = add_form.cleaned_data['project']
+        thumbnail = add_form.cleaned_data['thumbnail']
+        language = add_form.cleaned_data['language']
+        for form in add_formset:
+            created, error = form.save(team, request.user, project=project, thumbnail=thumbnail, language=language)
+            if len(error) > 0:
+                errors += error + "<br/>"
+            if created:
+                added += 1
+        message = fmt(_(u"%(added)i videos added<br/>%(errors)s"), added=added, errors=errors)
+        messages.success(request, message)
         return HttpResponseRedirect(request.build_absolute_uri())
-
     paginator = AmaraPaginator(team_videos, VIDEOS_PER_PAGE)
     page = paginator.get_page(request)
 
-    if filters_form.is_bound and filters_form.is_valid():
-        # Hack to convert the search index results to regular Video objects.
-        # We will probably be able to drop this when we implement #838
-        team_video_order = {
-            result.team_video_pk: i
-            for i, result in enumerate(page)
-        }
-        team_videos = list(
-            TeamVideo.objects
-            .filter(id__in=team_video_order.keys())
-            .select_related('video')
-        )
-        team_videos.sort(key=lambda tv: team_video_order[tv.id])
+    if request.method == 'POST':
+        csv_form = forms.TeamVideoCSVForm(data=request.POST, files=request.FILES)
+        if csv_form.is_bound and csv_form.is_valid():
+            csv_file = csv_form.cleaned_data['csv_file']
+            if csv_file is not None:
+                try:
+                    add_videos_from_csv(team, request.user, csv_file)
+                    message = fmt(_(u"File successfully uploaded, you should receive the summary shortly."))
+                except:
+                    message = fmt(_(u"File was not successfully parsed."))
+                messages.success(request, message)
     else:
-        team_videos = list(page)
+        csv_form = forms.TeamVideoCSVForm()
 
     return render(request, 'new-teams/videos.html', {
         'team': team,
-        'team_videos': team_videos,
         'page': page,
         'paginator': paginator,
         'filters_form': filters_form,
         'forms': page_forms,
         'add_form': add_form,
+        'add_formset': add_formset,
+        'add_csv_form': csv_form,
         'error_form': error_form,
         'error_form_name': error_form_name,
-        'bulk_mode_enabled': team_videos and page_forms.has_bulk_form,
+        'bulk_mode_enabled': page and page_forms.has_bulk_form,
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Videos')),
@@ -356,8 +355,7 @@ def videos_form(request, team, name):
         response['X-Form-Success'] = '1'
         return response
 
-    first_video = Video.objects.get(
-        teamvideo=team.teamvideo_set.filter(id=selection[0]))
+    first_video = Video.objects.get(id=selection[0])
     template_name = 'new-teams/videos-forms/{}.html'.format(name)
     return render(request, template_name, {
         'team': team,
@@ -368,11 +366,9 @@ def videos_form(request, team, name):
         'all_selected': len(selection) >= VIDEOS_PER_PAGE,
     })
 
+@with_old_view(old_views.detail_members)
 @team_view
 def members(request, team):
-    if team.is_old_style():
-        return old_views.detail_members(request, team)
-
     member = team.get_member(request.user)
 
     filters_form = forms.MemberFiltersForm(request.GET)
@@ -405,6 +401,7 @@ def members(request, team):
         'filters_form': filters_form,
         'edit_form': edit_form,
         'show_invite_link': permissions.can_invite(team, request.user),
+        'show_add_link': permissions.can_add_members(team, request.user),
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Members')),
@@ -546,6 +543,34 @@ def language_page(request, team, language_code):
     )
 
 @team_view
+def add_members(request, team):
+    summary = None
+    if not permissions.can_add_members(team, request.user):
+        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
+    if request.POST:
+        form = forms.AddMembersForm(team, request.user, request.POST)
+        if form.is_valid():
+            summary = form.save()
+
+    form = forms.AddMembersForm(team, request.user)
+
+    if team.is_old_style():
+        template_name = 'teams/add_members.html'
+    else:
+        template_name = 'new-teams/add_members.html'
+
+    return render(request, template_name,  {
+        'team': team,
+        'form': form,
+        'summary': summary,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Members'), 'teams:members', team.slug),
+            BreadCrumb(_('Invite')),
+        ],
+    })
+
+@team_view
 def invite(request, team):
     if not permissions.can_invite(team, request.user):
         return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
@@ -678,39 +703,25 @@ def admin_list(request, team):
     })
 
 @team_view
-def activity(request, team, tab):
-    try:
-        page = int(request.GET['page'])
-    except (ValueError, KeyError):
-        page = 1
-    activity_list = fetch_actions_for_activity_page(team, tab, page,
-                                                    request.GET)
-    language_choices = None
-    if tab == 'videos':
-        readable_langs = TeamLanguagePreference.objects.get_readable(team)
-        language_choices = [(code, name) for code, name in get_language_choices()
-                            if code in readable_langs]
-    action_types = Action.TYPES_CATEGORIES[tab]
+def activity(request, team):
+    filters_form = forms.ActivityFiltersForm(team, request.GET)
+    paginator = AmaraPaginator(filters_form.get_queryset(), ACTIONS_PER_PAGE)
+    page = paginator.get_page(request)
 
-    has_more = len(activity_list) >= ACTIONS_PER_PAGE
-
-    filtered = bool(set(request.GET.keys()).intersection([
-        'action_type', 'language', 'sort']))
+    action_choices = ActivityRecord.type_choices()
 
     next_page_query = request.GET.copy()
-    next_page_query['page'] = page + 1
+    next_page_query['page'] = page.next_page_number()
 
     context = {
-        'activity_list': activity_list,
-        'filtered': filtered,
-        'action_types': action_types,
-        'language_choices': language_choices,
+        'paginator': paginator,
+        'page': page,
+        'filters_form': filters_form,
+        'filtered': filters_form.is_bound,
         'team': team,
+        'tab': 'activity',
         'user': request.user,
-        'next_page': page + 1,
         'next_page_query': next_page_query.urlencode(),
-        'tab': tab,
-        'has_more': has_more,
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Activity')),

@@ -33,7 +33,6 @@ from auth.models import CustomUser as User
 from subtitles import pipeline
 from teams.models import Task
 from teams.permissions_const import ROLE_ADMIN
-from videos.share_utils import make_email_url
 from videos.tasks import video_changed_tasks
 from videos.templatetags.subtitles_tags import format_sub_time
 from videos.tests.videotestutils import (
@@ -133,16 +132,6 @@ class TestViews(WebUseTest):
         self.assertEqual(response['Location'], 'http://testserver' +
                                                video.get_absolute_url())
 
-        len_before = Video.objects.count()
-        data = {
-            'video_url': 'http://www.youtube.com/watch?v=osexbB_hX4g'
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len_before, Video.objects.count())
-        self.assertEqual(response['Location'], 'http://testserver' +
-                                               video.get_absolute_url())
-
     def test_video_url_create(self):
         self._login()
         v = VideoFactory()
@@ -182,8 +171,7 @@ class TestViews(WebUseTest):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.video.videourl_set.count(), 1)
-        delete_actions = self.video.action_set.filter(
-            action_type=Action.DELETE_URL)
+        delete_actions = self.video.activity.filter(type='video-url-deleted')
         self.assertEqual(delete_actions.count(), 1)
         # assert cache is invalidated
         cached_video_urls = video_cache.get_video_urls(self.video.video_id)
@@ -219,31 +207,6 @@ class TestViews(WebUseTest):
     def test_subscribe_to_updates(self):
         # TODO: write test
         pass
-
-    def test_email_friend(self):
-        self._simple_test('videos:email_friend')
-
-        data = {
-            'from_email': 'test@test.com',
-            'to_emails': 'test1@test.com,test@test.com',
-            'subject': 'test',
-            'message': 'test',
-        }
-        response = self.client.post(reverse('videos:email_friend'), data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEquals(len(mail.outbox), 1)
-
-        self._login()
-        data['link'] = 'http://someurl.com'
-        mail.outbox = []
-        response = self.client.post(reverse('videos:email_friend'), data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEquals(len(mail.outbox), 1)
-
-        msg = u'Hey-- just found a version of this video ("Tú - Jennifer Lopez") with captions: http://unisubs.example.com:8000/en/videos/OcuMvG3LrypJ/'
-        url = make_email_url(msg)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
 
     def test_history(self):
         v = pipeline.add_subtitles(self.video, 'en', None)

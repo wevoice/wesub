@@ -38,7 +38,7 @@ class UserAPITest(TestCase):
     def detail_url(self, user):
         return reverse('api:users-detail', args=(user.username,))
 
-    def assert_response_data_correct(self, response, user, get=True):
+    def assert_response_data_correct(self, response, user, method):
         for field in ('username', 'full_name', 'first_name', 'last_name',
                       'biography', 'homepage'):
             value = getattr(user, field)
@@ -57,8 +57,12 @@ class UserAPITest(TestCase):
         assert_items_equal(response.data['languages'], user.get_languages())
         assert_equal(response.data['resource_uri'],
                      'http://testserver' + self.detail_url(user))
-        if get:
+
+        if method == 'get':
             assert_not_in('email', response.data)
+            assert_not_in('api_key', response.data)
+        elif method == 'put':
+            assert_equal(response.data['email'], user.email)
             assert_not_in('api_key', response.data)
         else:
             assert_equal(response.data['email'], user.email)
@@ -79,7 +83,7 @@ class UserAPITest(TestCase):
         response = self.client.get(self.detail_url(user))
         assert_equal(response.status_code, status.HTTP_200_OK,
                      response.content)
-        self.assert_response_data_correct(response, user)
+        self.assert_response_data_correct(response, user, 'get')
 
     def check_user_data(self, user, data, orig_user_data=None):
         if orig_user_data is None:
@@ -105,7 +109,7 @@ class UserAPITest(TestCase):
         user = User.objects.get(username=response.data['username'])
         self.check_user_data(user, data)
         assert_equal(user.created_by, self.user)
-        self.assert_response_data_correct(response, user, get=False)
+        self.assert_response_data_correct(response, user, 'post')
         return user, response
 
     def test_create_user(self):
@@ -226,7 +230,7 @@ class UserAPITest(TestCase):
         user = test_utils.reload_obj(self.user)
         self.check_user_data(user, data, orig_user_data)
         assert_equals(user.created_by, None)
-        self.assert_response_data_correct(response, user, get=False)
+        self.assert_response_data_correct(response, user, 'put')
 
     def test_update_user(self):
         self.check_put({

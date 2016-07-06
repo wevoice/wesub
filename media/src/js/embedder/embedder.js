@@ -203,7 +203,7 @@
             initialize: function() {
 
                 var video = this;
-                var apiURL = '//' + _amaraConf.baseURL + '/api/videos/?video_url=';
+                var apiURL = '/api/videos/?video_url=';
                 this.subtitles = new that.Subtitles();
                 // Make a call to the Amara API to get attributes like available languages,
                 // internal ID, description, etc.
@@ -1117,7 +1117,7 @@
 		'                <div class="modal-body">' +    
 		'                    <p>Step 1: paste this anywhere in your document:</p>' +
                 '                        <pre class="pre-small">' +
-                '&lt;script type="text/javascript" src="//amara.org/embedder-iframe"&gt;\n' +
+                '&lt;script type="text/javascript" src="https://amara.org/embedder-iframe"&gt;\n' +
                 '&lt;/script&gt;' +
                 '                        </pre>' +
                 '                        <p>Step 2: paste this somewhere inside your HTML body, wherever you would like your widgets to appear, with the height, width and options of your choosing:</p>' +

@@ -52,7 +52,7 @@ class TestActionsAPI(TestCase):
         response = self.client.get(self.api_path)
         assert_equal(response.status_code, 200)
         data = json.loads(response.content)
-        assert_equal(data, [
+        assert_equal(data['objects'], [
             {
                 'user': self.user.username,
                 'body': 'test note',

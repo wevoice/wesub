@@ -22,7 +22,6 @@ from caching.tests.utils import assert_invalidates_model_cache
 from subtitles import pipeline
 from subtitles.models import SubtitleLanguage
 from utils.factories import *
-from videos.models import Action
 
 class VideoCacheInvalidationTest(TestCase):
     # test a bunch of actions that should invalidate the video cache
@@ -52,7 +51,7 @@ class VideoCacheInvalidationTest(TestCase):
 
     def test_add_video_url(self):
         with assert_invalidates_model_cache(self.video):
-            VideoURLFactory(video=self.video)
+            self.video.add_url('http://example.com/video4.mp4', UserFactory())
 
     def test_remove_video_url(self):
         video_url = VideoURLFactory(video=self.video)
@@ -84,8 +83,3 @@ class VideoCacheInvalidationTest(TestCase):
         self.video.followers.add(user)
         with assert_invalidates_model_cache(self.video):
             self.video.followers.remove(user)
-
-    def test_add_action(self):
-        user = UserFactory()
-        with assert_invalidates_model_cache(self.video):
-            Action.change_title_handler(self.video, user)

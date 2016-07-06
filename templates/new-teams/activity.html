@@ -15,62 +15,10 @@
   <div class="filters sidebar">
     <h5>{% trans "Filter and Sort" %}</h5>
     <form method="GET" action="">
-      {% if action_types %}
-      <div class="filter">
-        <div>{% trans 'Action Type' %}</div>
-        <select id="id_activity_type" name="action_type" class="type-filter chosen">
-          <option value="any">
-          {% trans 'Any type' %}
-          </option>
-          {% for type in action_types %}
-          <option value="{{ type.0 }}"
-          {% if request.GET.action_type == type.0|slugify %}selected="selected"{% endif %}>
-          {{ type.1 }}
-          </option>
-          {% endfor %}
-        </select>
-      </div>
-      {% endif %}
-
-      {% if language_choices %}
-      <div class="filter">
-        <div>{% trans 'Subtitles Language' %}</div>
-        <select id="id_subtitles_language" name="subtitles_language" class="language-filter chosen">
-          <option value="any">
-          {% trans 'Any Language' %}
-          </option>
-          {% for code, name in language_choices %}
-          <option {% if request.GET.subtitles_language == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="filter">
-        <div>{% trans 'Video Language' %}</div>
-        <select id="id_video_language" name="video_language" class="language-filter chosen">
-          <option value="any">
-          {% trans 'Any Language' %}
-          </option>
-          {% for code, name in language_choices %}
-          <option {% if request.GET.video_language == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      {% endif %}
-
-      <div class="filter">
-        <div>{% trans 'Sorted by' %}</div>
-        <select name="sort">
-          <option {% if request.GET.sort == '-created' or not request.GET.sort %}selected="selected"{% endif %}
-          value="-created">
-          {% trans 'date, newest' %}
-          </option>
-          <option {% if request.GET.sort == 'created' %}selected="selected"{% endif %}
-          value="created">
-          {% trans 'date, oldest' %}
-          </option>
-        </select>
-      </div>
+      {% include "_field.html" with field=filters_form.type %}
+      {% include "_field.html" with field=filters_form.video_language %}
+      {% include "_field.html" with field=filters_form.subtitle_language %}
+      {% include "_field.html" with field=filters_form.sort %}
 
       <div class="actions">
         <button class="submit">Filter</button>

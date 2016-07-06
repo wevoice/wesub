@@ -1,0 +1,8 @@
+#!/bin/bash
+source /usr/local/bin/config_env
+
+manage drop_all_tables
+manage syncdb --all --noinput
+manage migrate --fake
+manage setup_indexes
+manage setup_test_data

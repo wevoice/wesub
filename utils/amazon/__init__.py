@@ -18,7 +18,6 @@ from boto.exception import BotoClientError, BotoServerError
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
-from raven.contrib.django.models import client
 from fields import S3EnabledImageField, S3EnabledFileField
 
 
@@ -89,7 +88,6 @@ class S3Storage(FileSystemStorage):
             key.make_public()
             return name
         except (BotoClientError, BotoServerError), e:
-            client.captureException()
             raise S3StorageError(*e.args)
 
     def _get_traceback(self):

@@ -1263,6 +1263,9 @@ div.workspace-tools {
         div.toolbox-inside:hover ul.toolbox-menu {
           display:block;
         }
+        div.toolbox-inside:hover .helper_margin {
+          display:block;
+        }
         div.toolbox-inside {              
            width: 150px;
            position: relative;
@@ -1277,6 +1280,16 @@ div.workspace-tools {
         position: absolute;
         right: 15px;
         padding: 3px 0px 10px 20px;
+        }
+        div.toolbox-inside > .helper_margin{
+          display:none;
+          position: absolute;
+          text-align: left;
+          top: 0;
+          right: -155px;
+          width: 200px;
+          height: 240px;
+          z-index: 62;
         }
 
 

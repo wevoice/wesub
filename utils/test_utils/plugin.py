@@ -18,7 +18,10 @@
 
 """utils.test_utils.plugin -- Amara nose Plugin
 """
+from __future__ import absolute_import
 import os
+import shutil
+import tempfile
 
 from django.dispatch import Signal
 from django.conf import settings
@@ -29,8 +32,7 @@ from utils.test_utils import monkeypatch
 from utils.test_utils import xvfb
 import optionalapps
 
-test_case_will_start = Signal()
-test_case_complete = Signal()
+before_tests = Signal()
 
 class UnisubsTestPlugin(Plugin):
     name = 'Amara Test Plugin'
@@ -57,17 +59,30 @@ class UnisubsTestPlugin(Plugin):
         self.include_webdriver_tests = options.webdriver
 
     def begin(self):
+        before_tests.send(self)
         self.patcher.patch_functions()
-        test_case_will_start.send(self)
+        self.patch_for_rest_framework()
+        settings.MEDIA_ROOT = tempfile.mkdtemp(prefix='amara-test-media-root')
+
+    def patch_for_rest_framework(self):
+        # patch some of old django code to be compatible with the rest
+        # framework testing tools
+        # restframeworkcompat is the compat module from django-rest-framework
+        # 3.0.3
+        from utils.test_utils import restframeworkcompat
+        import django.test.client
+        import django.utils.encoding
+        django.test.client.RequestFactory = restframeworkcompat.RequestFactory
+        django.utils.encoding.force_bytes = restframeworkcompat.force_bytes_or_smart_bytes
 
     def finalize(self, result):
         self.patcher.unpatch_functions()
         xvfb.stop_xvfb()
+        shutil.rmtree(settings.MEDIA_ROOT)
 
     def afterTest(self, test):
         self.patcher.reset_mocks()
         cache.clear()
-        test_case_complete.send(self)
 
     def wantDirectory(self, dirname):
         if dirname in self.directories_to_skip:

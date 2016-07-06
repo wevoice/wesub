@@ -22,7 +22,7 @@ from __future__ import absolute_import
 
 from .api import *
 from .monkeypatch import *
-from .plugin import *
 from .requests import *
 from .tools import *
 from .xvfb import *
+from .video_types import *

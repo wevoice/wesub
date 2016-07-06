@@ -1,8 +1,8 @@
 {% load i18n %}
 <aside class="modal" id="move-form">
   <h3>
-    {% blocktrans with video_title=first_video.title_display count count=video_count %}
-    Move {{ video_title }}
+    {% blocktrans count count=video_count %}
+    Move Video
     {% plural %}
     Move {{ count }} Videos
     {% endblocktrans %}

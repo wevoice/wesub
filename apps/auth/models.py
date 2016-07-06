@@ -34,11 +34,11 @@ from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.db import models
 from django.db import transaction
+from django.db.models.loading import get_model
 from django.db.models.signals import post_save
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _, ugettext
 from tastypie.models import ApiKey
-
 from caching import CacheGroup, ModelCacheManager
 from utils.amazon import S3EnabledImageField
 from utils import translation
@@ -141,14 +141,21 @@ class CustomUser(BaseUser):
         if not self.is_active:
             return ugettext('Retired user')
 
-        if self.first_name:
-            if self.last_name:
-                return self.get_full_name()
-            else:
-                return self.first_name
-        if self.full_name:
+        if self.first_name or self.last_name:
+            return self.get_full_name()
+        elif self.full_name:
             return self.full_name
-        return self.username
+        else:
+            return self.username
+
+    def has_fullname_set(self):
+        return any([self.first_name, self.last_name, self.full_name])
+
+    def display_name(self):
+        if self.has_fullname_set():
+            return u'{} ({})'.format(unicode(self), self.username)
+        else:
+            return unicode(self.username)
 
     def save(self, *args, **kwargs):
         send_confirmation = False
@@ -379,15 +386,50 @@ class CustomUser(BaseUser):
         return hashlib.sha224(settings.SECRET_KEY+str(self.pk)+video_id).hexdigest()
 
     @classmethod
-    def get_anonymous(cls):
+    def get_amara_anonymous(cls):
         user, created = cls.objects.get_or_create(
             pk=settings.ANONYMOUS_USER_ID,
             defaults={'username': 'anonymous'})
         return user
 
     @property
-    def is_anonymous(self):
+    def is_amara_anonymous(self):
         return self.pk == settings.ANONYMOUS_USER_ID
+
+    @property
+    def is_external(self):
+        """
+        Checks whether accout is external
+        It can me an OpeenId link or a token stored as
+        a ThirdPartyAccount
+        """
+        try:
+            l = self.openid_connect_link
+            return True
+        except:
+            from thirdpartyaccounts import get_thirdpartyaccount_types
+            for thirdpartyaccount_type in get_thirdpartyaccount_types():
+                m = get_model(thirdpartyaccount_type[0], thirdpartyaccount_type[1])
+                if (m is not None) and (len(m.objects.for_user(self)) > 0):
+                    return True
+        return False
+
+    def has_valid_password(self):
+        return len(self.password) > 0 and self.has_usable_password()
+
+    def unlink_external(self):
+        from thirdpartyaccounts import get_thirdpartyaccount_types
+        for thirdpartyaccount_type in get_thirdpartyaccount_types():
+            m = get_model(thirdpartyaccount_type[0], thirdpartyaccount_type[1])
+            if m is not None:
+                m.objects.for_user(self).delete()
+        from socialauth.models import AuthMeta, OpenidProfile
+        AuthMeta.objects.filter(user=self).delete()
+        OpenidProfile.objects.filter(user=self).delete()
+        try:
+            self.openid_connect_link.delete()
+        except:
+            pass
 
     def get_api_key(self):
         return ApiKey.objects.get_or_create(user=self)[0].key

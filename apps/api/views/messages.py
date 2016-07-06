@@ -14,22 +14,23 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
-
-
 """
-Message Resource
-^^^^^^^^^^^^^^^^
+Messages
+--------
 
-The message resource allows you to send messages to user and teams.
+Message Resource
+****************
 
 .. http:post:: /api/message/
 
-    :<json user: Recipient User's username
-    :<json team: Recipient Team's slug
-    :<json subject: Subject of the message
-    :<json content: Content of the message
+    Send a message to a user/team
 
-.. note: You can only send either ``user`` or ``team``, not both
+    :>json username user: Recipient User's username
+    :>json slug team: Recipient Team's slug
+    :>json string subject: Subject of the message
+    :>json string content: Content of the message
+
+.. note:: You can only send either ``user`` or ``team``, not both.
 """
 
 from __future__ import absolute_import

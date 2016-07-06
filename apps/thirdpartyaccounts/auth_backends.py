@@ -24,7 +24,6 @@ from auth.models import CustomUser as User
 from thirdpartyaccounts.models import FacebookAccount, TwitterAccount
 from socialauth.lib import oauthtwitter
 
-
 TWITTER_CONSUMER_KEY = getattr(settings, 'TWITTER_CONSUMER_KEY', '')
 TWITTER_CONSUMER_SECRET = getattr(settings, 'TWITTER_CONSUMER_SECRET', '')
 FACEBOOK_API_KEY = getattr(settings, 'FACEBOOK_API_KEY', '')
@@ -34,7 +33,12 @@ FACEBOOK_REST_SERVER = getattr(settings, 'FACEBOOK_REST_SERVER',
 
 
 class TwitterAuthBackend(object):
-    def _get_existing_user(self, data):
+    @staticmethod
+    def _generate_email(twitter_username):
+        return None
+
+    @staticmethod
+    def _get_existing_user(data):
         try:
             tpa = TwitterAccount.objects.get(username=data.screen_name)
             return User.objects.get(pk=tpa.user_id)
@@ -60,14 +64,14 @@ class TwitterAuthBackend(object):
 
         return first_name, last_name
 
-    def _create_user(self, access_token, data):
+    def _create_user(self, access_token, data, email):
         username = self._find_available_username(data)
 
         twitter_username = data.screen_name
         first_name, last_name = self._get_first_last_name(data)
         avatar = data.profile_image_url
-
-        email = '%s@twitteruser.%s.com' % (twitter_username, settings.SITE_NAME)
+        if email is None:
+            email = TwitterAuthBackend._generate_email(twitter_username)
 
         user = User(username=username, email=email, first_name=first_name,
                     last_name=last_name)
@@ -81,8 +85,8 @@ class TwitterAuthBackend(object):
 
         return user
 
-
-    def authenticate(self, access_token):
+    @staticmethod
+    def pre_authenticate(access_token):
         twitter = oauthtwitter.OAuthApi(TWITTER_CONSUMER_KEY,
                                         TWITTER_CONSUMER_SECRET,
                                         access_token)
@@ -92,11 +96,29 @@ class TwitterAuthBackend(object):
             # If we cannot get the user information, user cannot be authenticated
             raise
 
-        user = self._get_existing_user(userinfo)
-        if not user:
-            user = self._create_user(access_token, userinfo)
+        user = TwitterAuthBackend._get_existing_user(userinfo)
+        if user:
+            return (True, '')
 
-        return user
+        return (False, TwitterAuthBackend._generate_email(userinfo.screen_name))
+
+    def authenticate(self, access_token, email=None):
+        twitter = oauthtwitter.OAuthApi(TWITTER_CONSUMER_KEY,
+                                        TWITTER_CONSUMER_SECRET,
+                                        access_token)
+        try:
+            userinfo = twitter.GetUserInfo()
+        except:
+            # If we cannot get the user information, user cannot be authenticated
+            raise
+
+        user = TwitterAuthBackend._get_existing_user(userinfo)
+        if not user:
+            user = self._create_user(access_token, userinfo, email)
+        if user.is_active:
+            return user
+        else:
+            return
 
     def get_user(self, user_id):
         try:
@@ -106,7 +128,8 @@ class TwitterAuthBackend(object):
 
 
 class FacebookAuthBackend(object):
-    def _get_existing_user(self, data):
+    @staticmethod
+    def _get_existing_user(data):
         try:
             tpa = FacebookAccount.objects.get(uid=data['uid'])
             return User.objects.get(pk=tpa.user_id)
@@ -115,22 +138,29 @@ class FacebookAuthBackend(object):
 
     def _find_available_username(self, data):
         username = data.get('first_name', 'FACEBOOK_USER')
-
-        name_count = User.objects.filter(username__istartswith=username).count()
-        if name_count:
-            username = '%s%d' % (username, name_count + 1)
-
+        taken_names = map(lambda x: x.username.lower(), set(User.objects.filter(username__istartswith=username)))
+        if username.lower() in taken_names:
+            index = 1
+            username_to_try = '%s%d' % (username, index)
+            while username_to_try.lower() in taken_names:
+                index +=1
+                username_to_try = '%s%d' % (username, index)
+            username = username_to_try
         return username
 
-    def _create_user(self, data):
+    @staticmethod
+    def _generate_email(first_name):
+        return None
+
+    def _create_user(self, data, email):
         username = self._find_available_username(data)
 
         first_name = data.get('first_name')
         last_name = data.get('last_name')
         facebook_uid = data.get('uid')
         img_url = data.get('pic_square')
-
-        email = '%s@facebookuser.%s.com' % (first_name, settings.SITE_NAME)
+        if email is None:
+            email = FacebookAuthBackend._generate_email(first_name)
 
         user = User(username=username, email=email, first_name=first_name,
                     last_name=last_name)
@@ -142,22 +172,19 @@ class FacebookAuthBackend(object):
             img = ContentFile(requests.get(img_url).content)
             name = img_url.split('/')[-1]
             user.picture.save(name, img, False)
-
         FacebookAccount.objects.create(uid=facebook_uid, user=user,
                                        avatar=img_url)
 
         return user
 
 
-    def authenticate(self, facebook, request):
+    def authenticate(self, facebook, request, email=None):
         facebook.oauth2_check_session(request)
-
         facebook.uid = facebook.users.getLoggedInUser()
         user_info = facebook.users.getInfo([facebook.uid],
                                            ['first_name', 'last_name', 'pic_square'])[0]
-
         # Check if we already have an active user for this Facebook user
-        user = self._get_existing_user(user_info)
+        user = FacebookAuthBackend._get_existing_user(user_info)
         if user:
             # If so, then we authenticate them if the user account is active, or
             # just return None if it's not.
@@ -168,8 +195,21 @@ class FacebookAuthBackend(object):
 
         # Otherwise this is a Facebook user we've never seen before, so we'll
         # make them an Amara account, Facebook TPA, and link the two.
-        return self._create_user(user_info)
+        return self._create_user(user_info, email)
 
+    @staticmethod
+    def pre_authenticate(facebook, request):
+        facebook.oauth2_check_session(request)
+        facebook.uid = facebook.users.getLoggedInUser()
+        user_info = facebook.users.getInfo([facebook.uid],
+                                           ['first_name', 'last_name', 'pic_square'])[0]
+        # Check if we already have an active user for this Facebook user
+        user = FacebookAuthBackend._get_existing_user(user_info)
+        if user:
+            return (True, None)
+        else:
+            email = FacebookAuthBackend._generate_email(user_info.get('first_name'))
+            return (False, email)
 
     def get_user(self, user_id):
         try:

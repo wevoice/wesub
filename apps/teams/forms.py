@@ -28,6 +28,7 @@ from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.db import transaction
+from django.forms.formsets import formset_factory
 from django.forms.util import ErrorDict
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
@@ -35,6 +36,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.utils.translation import ungettext
 
+from activity.models import ActivityRecord
 from subtitles.forms import SubtitlesUploadForm
 from teams.behaviors import get_main_project
 from teams.models import (
@@ -52,17 +54,15 @@ from teams.permissions import (
 from teams.permissions_const import ROLE_NAMES
 from teams.workflows import TeamWorkflow
 from videos.forms import (AddFromFeedForm, VideoForm, CreateSubtitlesForm,
-                          MultiVideoCreateSubtitlesForm)
+                          MultiVideoCreateSubtitlesForm, VideoURLField)
 from videos.models import (
         VideoMetadata, VIDEO_META_TYPE_IDS, Video, VideoFeed,
 )
-from videos.search_indexes import VideoIndex
 from videos.tasks import import_videos_from_feed
+from videos.types import video_type_registrar, VideoTypeError
 from utils.forms import (ErrorableModelForm, get_label_for_value,
                          UserAutocompleteField)
-from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.panslugify import pan_slugify
-from utils.searching import get_terms
 from utils.translation import get_language_choices, get_language_label
 from utils.text import fmt
 from utils.validators import MaxFileSizeValidator
@@ -114,7 +114,6 @@ class EditTeamVideoForm(forms.ModelForm):
             content = ContentFile(obj.thumbnail.read())
             name = obj.thumbnail.url.split('/')[-1]
             video.s3_thumbnail.save(name, content)
-            VideoIndex(Video).update_object(video)
 
     def _save_metadata(self, video, meta, data):
         '''Save a single piece of metadata for the given video.
@@ -168,15 +167,6 @@ class MoveTeamVideoForm(forms.Form):
 
         return self.cleaned_data
 
-class BaseVideoBoundForm(forms.ModelForm):
-    video_url = UniSubBoundVideoField(label=_('Video URL'),
-        help_text=_("Enter the URL of any compatible video or any video on our site. You can also browse the site and use the 'Add Video to Team' menu."))
-
-    def __init__(self, *args, **kwargs):
-        super(BaseVideoBoundForm, self).__init__(*args, **kwargs)
-        if hasattr(self, 'user'):
-            self.fields['video_url'].user = self.user
-
 class AddVideoToTeamForm(forms.Form):
     """Used to add a non-team video to one of the user's managed teams."""
 
@@ -192,7 +182,7 @@ class AddVideoToTeamForm(forms.Form):
             if can_add_video_somewhere(team, user)
         ]
 
-class AddTeamVideoForm(BaseVideoBoundForm):
+class AddTeamVideoForm(forms.ModelForm):
     language = forms.ChoiceField(label=_(u'Video language'), choices=(),
                                  required=False,
                                  help_text=_(u'It will be saved only if video does not exist in our database.'))
@@ -204,6 +194,8 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         empty_label=None,
         help_text=_(u"Let's keep things tidy, shall we?")
     )
+    video_url = VideoURLField(label=_('Video URL'),
+        help_text=_("Enter the URL of any compatible video or any video on our site. You can also browse the site and use the 'Add Video to Team' menu."))
 
     class Meta:
         model = TeamVideo
@@ -213,7 +205,6 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.team = team
         self.user = user
         super(AddTeamVideoForm, self).__init__(*args, **kwargs)
-
 
         projects = self.team.project_set.all()
 
@@ -232,57 +223,59 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.fields['language'].choices = [c for c in get_language_choices(True)
                                            if c[0] in writable_langs]
 
-    def clean_video_url(self):
-        video_url = self.cleaned_data['video_url']
-        video = self.fields['video_url'].video
-        try:
-            tv = TeamVideo.objects.get(team=self.team, video=video)
-            raise forms.ValidationError(mark_safe(u'Team has this <a href="%s">video</a>' % tv.get_absolute_url()))
-        except TeamVideo.DoesNotExist:
-            pass
-
-        return video_url
-
     def clean(self):
-        language = self.cleaned_data.get('language')
-        video = self.fields['video_url'].video
+        if self._errors:
+            return self.cleaned_data
 
-        if video:
-            team_video = video.get_team_video()
-            if team_video and not team_video.team.deleted:
-                team = team_video.team
-                if team.user_can_view_videos(self.user):
-                    link = '<a href="{}">{}</a>'.format(
-                            team_video.team.get_absolute_url(),
-                            team_video.team.name)
-                    msg = mark_safe(
-                        fmt(_(u'This video already belongs to the '
-                              '%(team_link)s team.'),
-                            team_link=link))
-                else:
-                    msg = _(u'This video already belongs to a team.')
-                self._errors['video_url'] = self.error_class([msg])
+        self.project = self.cleaned_data.get('project')
+        if not self.project:
+            self.project = self.team.default_project
 
-            original_sl = video.subtitle_language()
-
-            if (original_sl and not original_sl.language_code) and not language:
-                msg = _(u'Set original language for this video.')
-                self._errors['language'] = self.error_class([msg])
-
+        # See if any error happen when we create our video
+        try:
+            Video.add(self.cleaned_data['video_url'], self.user,
+                      self.setup_video)
+        except Video.UrlAlreadyAdded, e:
+            self.setup_existing_video(e.video, e.video_url)
         return self.cleaned_data
 
+    def setup_video(self, video, video_url):
+        video.is_public = self.team.is_visible
+        self.saved_team_video = TeamVideo.objects.create(
+            video=video, team=self.team, project=self.project,
+            added_by=self.user)
+        self._success_message = ugettext('Video successfully added to team.')
+
+    def setup_existing_video(self, video, video_url):
+        team_video, created = TeamVideo.objects.get_or_create(
+            video=video, defaults={
+                'team': self.team, 'project': self.project,
+                'added_by': self.user
+            })
+
+        if created:
+            self.saved_team_video = team_video
+            self._success_message = ugettext(
+                'Video successfully added to team from the community videos.'
+            )
+            return
+
+        if team_video.team.user_can_view_videos(self.user):
+            msg = mark_safe(fmt(
+                _(u'This video already belongs to the %(team)s team '
+                  '(<a href="%(link)s">view video</a>)'),
+                team=unicode(team_video.team),
+                link=team_video.video.get_absolute_url()))
+        else:
+            msg = _(u'This video already belongs to another team.')
+        self._errors['video_url'] = self.error_class([msg])
+
     def success_message(self):
-        return 'Video successfully added to team.'
+        return self._success_message
 
-    def save(self, commit=True):
-        video = self.fields['video_url'].video
-
-        obj = super(AddTeamVideoForm, self).save(False)
-
-        obj.video = video
-        obj.team = self.team
-        commit and obj.save()
-        return obj
+    def save(self):
+        # TeamVideo was already created in clean()
+        return self.team_video
 
 class AddTeamVideosFromFeedForm(AddFromFeedForm):
     def __init__(self, team, user, *args, **kwargs):
@@ -295,24 +288,19 @@ class AddTeamVideosFromFeedForm(AddFromFeedForm):
         return VideoFeed.objects.create(team=self.team, user=self.user,
                                         url=url)
 
-class CreateTeamForm(BaseVideoBoundForm):
+class CreateTeamForm(forms.ModelForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
     workflow_type = forms.ChoiceField(choices=(), initial="O")
 
     class Meta:
         model = Team
         fields = ('name', 'slug', 'description', 'logo', 'workflow_type',
-                  'is_visible', 'video_url')
+                  'is_visible')
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(CreateTeamForm, self).__init__(*args, **kwargs)
         self.fields['workflow_type'].choices = TeamWorkflow.get_choices()
-        self.fields['video_url'].label = _(u'Team intro video URL')
-        self.fields['video_url'].required = False
-        self.fields['video_url'].help_text = _(u'''You can put an optional video
-on your team homepage that explains what your team is about, to attract volunteers.
-Enter a link to any compatible video, or to any video page on our site.''')
         self.fields['is_visible'].widget.attrs['class'] = 'checkbox'
         self.fields['slug'].label = _(u'Team URL: http://universalsubtitles.org/teams/')
 
@@ -323,11 +311,7 @@ Enter a link to any compatible video, or to any video page on our site.''')
         return slug
 
     def save(self, user):
-        team = super(CreateTeamForm, self).save(False)
-        video = self.fields['video_url'].video
-        if video:
-            team.video = video
-        team.save()
+        team = super(CreateTeamForm, self).save()
         TeamMember.objects.create_first_member(team=team, user=user)
         return team
 
@@ -349,8 +333,8 @@ class TaskCreateForm(ErrorableModelForm):
         # TODO: This is bad for teams with 10k members.
         team_user_ids = team.members.values_list('user', flat=True)
 
-        langs = [l for l in get_language_choices(with_empty=True)
-                 if l[0] in team.get_writable_langs()]
+        langs = get_language_choices(with_empty=True,
+                                     limit_to=team.get_writable_langs())
         self.fields['language'].choices = langs
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
@@ -597,8 +581,8 @@ class LanguagesForm(forms.Form):
         super(LanguagesForm, self).__init__(*args, **kwargs)
 
         self.team = team
-        self.fields['preferred'].choices = get_language_choices()
-        self.fields['blacklisted'].choices = get_language_choices()
+        self.fields['preferred'].choices = get_language_choices(flat=True)
+        self.fields['blacklisted'].choices = get_language_choices(flat=True)
 
     def clean(self):
         preferred = set(self.cleaned_data['preferred'])
@@ -608,6 +592,40 @@ class LanguagesForm(forms.Form):
             raise forms.ValidationError(_(u'You cannot blacklist a preferred language.'))
 
         return self.cleaned_data
+
+class AddMembersForm(forms.Form):
+    role = forms.ChoiceField(choices=TeamMember.ROLES[::-1],
+                             initial='contributor',
+                             label=_("Assign a role"))
+    members = forms.CharField(required=False,
+                              widget=forms.Textarea(attrs={'rows': 10}),
+                              label=_("Users to add to team"))
+    def __init__(self, team, user, *args, **kwargs):
+        super(AddMembersForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.user = user
+    def save(self):
+        summary = {
+            "added": 0,
+            "unknown": [],
+            "already": [],
+            }
+        member_role = self.cleaned_data['role']
+        for username in set(self.cleaned_data['members'].split()):
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                summary["unknown"].append(username)
+            else:
+                member, created = TeamMember.objects.get_or_create(team=self.team, user=user)
+                if created:
+                    summary["added"] += 1
+                    if member.role != member_role:
+                        member.role = member_role
+                        member.save()
+                else:
+                    summary["already"].append(username)
+        return summary
 
 class InviteForm(forms.Form):
     username = UserAutocompleteField(error_messages={
@@ -980,13 +998,19 @@ class VideoFiltersForm(forms.Form):
     q = forms.CharField(label=_('Title/Description'), required=False)
     project = forms.ChoiceField(label=_('Project'), required=False,
                                 choices=[])
+    has_language = forms.ChoiceField(
+        label=_('Has completed language'), required=False,
+        choices=get_language_choices(with_empty=True))
+    missing_language = forms.ChoiceField(
+        label=_('Missing completed language'), required=False,
+        choices=get_language_choices(with_empty=True))
     sort = forms.ChoiceField(choices=[
         ('name', _('Name, a-z')),
         ('-name', _('Name, z-a')),
         ('time', _('Time, oldest')),
         ('-time', _('Time, newest')),
-        ('subs', _('Most completed languages')),
-        ('-subs', _('Least complete languages')),
+        ('-subs', _('Most completed languages')),
+        ('subs', _('Least complete languages')),
     ], initial='-time', required=False)
 
     def __init__(self, team, get_data=None, **kwargs):
@@ -1027,39 +1051,43 @@ class VideoFiltersForm(forms.Form):
             self.show_project = False
 
     def get_queryset(self):
-        # This code is a bit ugly, since it reflects the ugly state of our
-        # search indexes.  See #838 for our plan to improve things
-        from haystack.query import SearchQuerySet
-
         project = self.cleaned_data.get('project')
+        has_language = self.cleaned_data.get('has_language')
+        missing_language = self.cleaned_data.get('missing_language')
         q = self.cleaned_data['q']
         sort = self.cleaned_data['sort']
 
-        qs = SearchQuerySet().models(TeamVideo).filter(team_id=self.team.id)
+        qs = Video.objects.filter(teamvideo__team=self.team)
+
         if q:
-            for term in get_terms(q):
-                qs = qs.auto_query(qs.query.clean(term).decode('utf-8'))
+            qs = qs.search(q)
+        if has_language:
+            qs = qs.has_completed_language(has_language)
+        if missing_language:
+            qs = qs.missing_completed_language(missing_language)
         if project:
             if project == 'none':
                 project = Project.DEFAULT_NAME
+            qs = qs.filter(teamvideo__project__slug=project)
             try:
                 self.selected_project = self.team.project_set.get(
                     slug=project)
-                project_pk = self.selected_project.pk
             except Project.DoesNotExist:
-                project_pk = -1
-            qs = qs.filter(project_pk=project_pk)
+                pass
+
+        if sort in ('subs', '-subs'):
+            qs = qs.add_num_completed_languages()
 
         qs = qs.order_by({
-             'name':  'video_title_exact',
-            '-name': '-video_title_exact',
-             'subs':  'num_completed_langs',
-            '-subs': '-num_completed_langs',
-             'time':  'team_video_create_date',
-            '-time': '-team_video_create_date',
+             'name':  'title',
+            '-name': '-title',
+             'subs':  'num_completed_languages',
+            '-subs': '-num_completed_languages',
+             'time':  'created',
+            '-time': '-created',
         }.get(sort or '-time'))
 
-        return qs
+        return qs.select_related('video')
 
     def is_filtered(self):
         return self.is_bound and self.is_valid()
@@ -1070,6 +1098,68 @@ class VideoFiltersForm(forms.Form):
                              get_label_for_value(self, name))
             for name in self.changed_data
         ]
+
+class ActivityFiltersForm(forms.Form):
+    SORT_CHOICES = [
+        ('-created', _('date, newest')),
+        ('created', _('date, oldest')),
+    ]
+
+    type = forms.ChoiceField(
+        label=_('Activity Type'), required=False,
+        choices=[])
+    video_language = forms.ChoiceField(
+        label=_('Video Language'), required=False,
+        choices=[])
+    subtitle_language = forms.ChoiceField(
+        label=_('Subtitle Language'), required=False,
+        choices=[])
+    sort = forms.ChoiceField(
+        label=_('Sorted by'), required=True,
+        choices=SORT_CHOICES)
+
+    def __init__(self, team, get_data):
+        super(ActivityFiltersForm, self).__init__(
+                  data=self.calc_data(get_data))
+        self.team = team
+        self.fields['type'].choices = [
+            ('', _('Any type')),
+        ] + ActivityRecord.active_type_choices()
+        language_choices = [
+            ('', ('Any language')),
+        ]
+        if team.is_old_style():
+            language_choices.extend(get_language_choices(flat=True))
+        else:
+            language_choices.extend(get_language_choices())
+        self.fields['video_language'].choices = language_choices
+        self.fields['subtitle_language'].choices = language_choices
+
+    def calc_data(self, get_data):
+        field_names = set(['type', 'video_language', 'subtitle_language',
+                           'sort'])
+        data = {
+            key: value
+            for (key, value) in get_data.items()
+            if key in field_names
+        }
+        return data if data else None
+
+    def get_queryset(self):
+        qs = ActivityRecord.objects.for_team(self.team)
+        if not (self.is_bound and self.is_valid()):
+            return qs
+        type = self.cleaned_data.get('type')
+        subtitle_language = self.cleaned_data.get('subtitle_language')
+        video_language = self.cleaned_data.get('video_language')
+        sort = self.cleaned_data.get('sort', '-created')
+        if type:
+            qs = qs.filter(type=type)
+        if subtitle_language:
+            qs = qs.filter(language_code=subtitle_language)
+        if video_language:
+            qs = qs.filter(video__primary_audio_language_code=video_language)
+        return qs.order_by(sort)
 
 class MemberFiltersForm(forms.Form):
     LANGUAGE_CHOICES = [
@@ -1122,6 +1212,7 @@ class MemberFiltersForm(forms.Form):
             if term:
                 qs = qs.filter(Q(user__first_name__icontains=term)
                                | Q(user__last_name__icontains=term)
+                               | Q(user__full_name__icontains=term)
                                | Q(user__email__icontains=term)
                                | Q(user__username__icontains=term)
                                | Q(user__biography__icontains=term))
@@ -1146,7 +1237,7 @@ class EditMembershipForm(forms.Form):
         (TeamMember.ROLE_CONTRIBUTOR, _('Contributor')),
         (TeamMember.ROLE_MANAGER, _('Manager')),
         (TeamMember.ROLE_ADMIN, _('Admin')),
-    ], initial=TeamMember.ROLE_CONTRIBUTOR)
+    ], initial=TeamMember.ROLE_CONTRIBUTOR, label=_('Member Role'))
     language_narrowings = forms.MultipleChoiceField(required=False)
     project_narrowings = forms.MultipleChoiceField(required=False)
 
@@ -1192,39 +1283,32 @@ class BulkTeamVideoForm(forms.Form):
     """Base class for forms that operate on multiple team videos at once."""
     include_all = forms.BooleanField(label='', required=False)
 
-    def __init__(self, team, user, team_videos_qs, selection, all_selected,
+    def __init__(self, team, user, videos_qs, selection, all_selected,
                  filters_form, *args, **kwargs):
         super(BulkTeamVideoForm, self).__init__(*args, **kwargs)
         self.team = team
         self.user = user
-        self.team_videos_qs = team_videos_qs
+        self.videos_qs = videos_qs
         self.selection = selection
         self.filters_form = filters_form
-        self.setup_include_all(team_videos_qs, selection, all_selected)
+        self.setup_include_all(videos_qs, selection, all_selected)
         self.setup_fields()
 
     def save(self):
         self.perform_save(self.find_team_videos_to_update())
 
     def find_team_videos_to_update(self):
-        from haystack.query import SearchQuerySet
-        qs = self.team_videos_qs
+        qs = self.videos_qs
         if not self.cleaned_data.get('include_all'):
-            qs = TeamVideo.objects.filter(id__in=self.selection)
-        elif isinstance(qs, SearchQuerySet):
-            # hack to make this work if we get a SearchQuerySet.  Fixing
-            # pculture/unisubs#838 would be really nice
-            qs = TeamVideo.objects.filter(
-                id__in=qs.values_list('team_video_pk', flat=True)
-            )
+            qs = qs.filter(id__in=self.selection)
         self.count = qs.count()
-        return qs
+        return TeamVideo.objects.filter(video__in=qs).select_related('video')
 
-    def setup_include_all(self, team_videos_qs, selection, all_selected):
+    def setup_include_all(self, videos_qs, selection, all_selected):
         if not all_selected:
             del self.fields['include_all']
         else:
-            total_videos = team_videos_qs.count()
+            total_videos = videos_qs.count()
             if total_videos <= len(selection):
                 del self.fields['include_all']
             else:
@@ -1345,7 +1429,8 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
 
 class RemoveTeamVideosForm(BulkTeamVideoForm):
     def perform_save(self, qs):
-        qs.delete()
+        for team_video in qs:
+            team_video.remove(self.user)
 
     def message(self):
         msg = ungettext('Video removed from project',
@@ -1404,14 +1489,16 @@ class BulkEditTeamVideosForm(BulkTeamVideoForm):
                         self.count)
         return fmt(msg, count=self.count)
 
-class NewAddTeamVideoForm(VideoForm):
+class NewAddTeamVideoDataForm(forms.Form):
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
+    language = forms.ChoiceField(choices=(), required=False)
     thumbnail = forms.ImageField(required=False)
 
-    def __init__(self, team, user, *args, **kwargs):
-        super(NewAddTeamVideoForm, self).__init__(user, *args, **kwargs)
+    def __init__(self, team, *args, **kwargs):
+        super(NewAddTeamVideoDataForm, self).__init__(*args, **kwargs)
         self.team = team
+        self.fields['language'].choices = get_language_choices(with_empty=True)
         self.fields['project'].choices = [
             ('', _('None')),
         ] + [
@@ -1420,48 +1507,13 @@ class NewAddTeamVideoForm(VideoForm):
         if not self.fields['project'].choices:
             del self.fields['project']
 
-    def clean(self):
-        if not self._errors:
-            video, created = Video.get_or_create_for_url(
-                self.cleaned_data['video_url'], self._video_type, self.user,
-            )
-            if not created and video.get_team_video() is not None:
-                self._errors['video_url'] = self.error_class([
-                    _(u'Video is already part of a team')
-                ])
-                return
-            self.video = video
-            self.created = created
-        return self.cleaned_data
-
-    def save(self):
-        if 'project' in self.fields:
-            project_id = self.cleaned_data['project']
-            if not project_id:
-                project_id = None
-        else:
-            project_id = None
-        team_video = TeamVideo.objects.create(
-            video=self.video, team=self.team, project_id=project_id,
-        )
-        if self.cleaned_data['thumbnail']:
-            thumb = self.cleaned_data['thumbnail']
-            self.video.s3_thumbnail.save(thumb.name, thumb)
-        return team_video
-
-    def message(self):
-        if self.created:
-            return _('Video added to team.')
-        else:
-            return _('Existing video added to team.')
-
 class NewEditTeamVideoForm(forms.Form):
     primary_audio_language = forms.ChoiceField(required=False, choices=[])
     project = forms.ChoiceField(label=_('Project'), choices=[],
                                 required=False)
     thumbnail = forms.ImageField(label=_('Change thumbnail'), required=False)
 
-    def __init__(self, team, user, team_videos_qs, selection, all_selected,
+    def __init__(self, team, user, videos_qs, selection, all_selected,
                  filters_form, *args, **kwargs):
         super(NewEditTeamVideoForm, self).__init__(*args, **kwargs)
         self.team = team
@@ -1472,10 +1524,10 @@ class NewEditTeamVideoForm(forms.Form):
     def fetch_video(self, selection):
         if len(selection) != 1:
             raise ValueError("Exactly 1 video must be selected")
-        self.team_video = (self.team.teamvideo_set
-                           .select_related('video')
-                           .get(id=selection[0]))
-        self.video = self.team_video.video
+        self.video = (self.team.videos
+                      .select_related('teamvideo')
+                      .get(id=selection[0]))
+        self.team_video = self.video.get_team_video()
 
     def setup_project_field(self):
         projects = Project.objects.for_team(self.team)
@@ -1561,3 +1613,46 @@ class ApplicationForm(forms.Form):
             if value:
                 languages.append({"language": value, "priority": i})
         self.application.user.set_languages(languages)
+
+class TeamVideoURLForm(forms.Form):
+    video_url = VideoURLField()
+
+    def save(self, team, user, project=None, thumbnail=None, language=None):
+        errors = ""
+        if not self.cleaned_data.get('video_url'):
+            return (False, "")
+
+        video_type = self.cleaned_data['video_url']
+        def setup_video(video, video_url):
+            video.is_public = team.is_visible
+            if language is not None:
+                video.primary_audio_language_code = language
+            if thumbnail:
+                video.s3_thumbnail.save(thumbnail.name, thumbnail)
+            team_video = TeamVideo.objects.create(video=video, team=team,
+                                                  project_id=project)
+
+        try:
+            Video.add(video_type, user, setup_video)
+        except Video.UrlAlreadyAdded, e:
+            if e.video.get_team_video() is not None:
+                return (False,
+                        self.video_in_team_msg(e.video, e.video_url, user))
+            else:
+                setup_video(e.video, e.video_url)
+                e.video.save()
+        return (True, "")
+
+    def video_in_team_msg(self, video, video_url, user):
+        team = video.get_team_video().team
+        if team.user_can_view_videos(user):
+            return fmt(_(u"Video %(url)s already in the %(team)s Team"),
+                       url=video_url.url, team=team)
+        else:
+            return fmt(_(u"Video %(url)s already in another team"),
+                       url=video_url.url)
+
+TeamVideoURLFormSet = formset_factory(TeamVideoURLForm)
+
+class TeamVideoCSVForm(forms.Form):
+    csv_file = forms.FileField(label=_(u"CSV file"), required=True, allow_empty_file=False)

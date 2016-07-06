@@ -22,12 +22,11 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
+from utils.factories import *
 from videos.models import Video
 from videos.templatetags.subtitles_tags import language_url
 from videos.templatetags.videos_tags import shortlink_for_video
 from videos.tests.data import get_video, make_subtitle_language
-
-
 
 class TestTemplateTags(TestCase):
     def test_language_url_for_empty_lang(self):
@@ -37,7 +36,7 @@ class TestTemplateTags(TestCase):
 
 class ShortUrlTest(TestCase):
     def setUp(self):
-        self.video = Video.get_or_create_for_url("http://example.com/hey.mp4")[0]
+        self.video = VideoFactory(video_url__url="http://example.com/hey.mp4")
         site = Site.objects.get_current()
         site.domain = "www.amara.org"
         site.save()

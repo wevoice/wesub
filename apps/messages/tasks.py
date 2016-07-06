@@ -20,11 +20,14 @@ Centralizes notification sending throught the website.
 Currently we support:
     - email messages
     - site inbox (messages.models.Message)
-    - activity feed (videos.models.Action)
+    - activity feed (activity.models.ActivityRecord)
 
 Messages models will trigger an email to be sent if
 the user has allowed email notifications
 """
+import logging
+
+from celery.task import task
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -32,28 +35,24 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from django.template.loader import render_to_string
 from django.contrib.contenttypes.models import ContentType
 
-from raven.contrib.django.models import client
-
-from celery.task import task
-
 from auth.models import CustomUser as User, UserLanguage
 from localeurl.utils import universal_url
-
 from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
      REVIEWED_AND_PENDING_APPROVAL, REVIEWED_AND_SENT_BACK
-
 from messages.models import Message
 from utils import send_templated_email
 from utils.text import fmt
 from utils.translation import get_language_label
 BATCH_SIZE = 1000
 
+logger = logging.getLogger(__name__)
+
 def get_url_base():
     return "http://" + Site.objects.get_current().domain
 
-def _team_sends_notification(team, notification_setting_name):
+def team_sends_notification(team, notification_setting_name):
     from teams.models import Setting
-    return not team.settings.filter( key=Setting.KEY_IDS[notification_setting_name]).exists()
+    return not team.settings.filter(key=Setting.KEY_IDS[notification_setting_name]).exists()
 
 @task()
 def cleanup():
@@ -84,8 +83,9 @@ def send_new_message_notification(message_id):
     try:
         message = Message.objects.get(pk=message_id)
     except Message.DoesNotExist:
-        msg = '**send_new_message_notification**. Message does not exist. ID: %s' % message_id
-        client.create_from_text(msg, logger='celery')
+        logger.warn(
+            'send_new_message_notification: Message does not exist. ID: %s',
+            message_id)
         return
 
     user = message.user
@@ -111,7 +111,7 @@ def team_invitation_sent(invite_pk):
     from messages.models import Message
     from teams.models import Invite, Setting, TeamMember
     invite = Invite.objects.get(pk=invite_pk)
-    if not _team_sends_notification(invite.team,'block_invitation_sent_message'):
+    if not team_sends_notification(invite.team,'block_invitation_sent_message') or not invite.user.is_active:
         return False
     # does this team have a custom message for this?
     team_default_message = None
@@ -161,10 +161,10 @@ def application_sent(application_pk):
     from messages.models import Message
     from teams.models import Application, TeamMember
     application = Application.objects.get(pk=application_pk)
-    if not _team_sends_notification(application.team,'block_application_sent_message'):
+    if not team_sends_notification(application.team,'block_application_sent_message'):
         return False
-    notifiable = TeamMember.objects.filter( team=application.team,
-       role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
+    notifiable = TeamMember.objects.filter(team=application.team, user__is_active=True,
+                 role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
     for m in notifiable:
 
         template_name = "messages/application-sent.txt"
@@ -201,7 +201,7 @@ def team_application_denied(application_pk):
     from messages.models import Message
     from teams.models import Application
     application = Application.objects.get(pk=application_pk)
-    if not _team_sends_notification(application.team,'block_application_denided_message'):
+    if not team_sends_notification(application.team,'block_application_denided_message') or not application.user.is_active:
         return False
     template_name = "messages/email/team-application-denied.html"
     context = {
@@ -231,16 +231,14 @@ def team_member_new(member_pk):
     from messages.models import Message
     from teams.models import TeamMember, Setting
     member = TeamMember.objects.get(pk=member_pk)
-    if not _team_sends_notification(member.team,'block_team_member_new_message'):
+    if not team_sends_notification(member.team,'block_team_member_new_message'):
         return False
-    from videos.models import Action
     from teams.models import TeamMember
     # the feed item should appear on the timeline for all team members
     # as a team might have thousands of members, this one item has
     # to show up on all of them
-    Action.create_new_member_handler(member)
     # notify  admins and owners through messages
-    notifiable = TeamMember.objects.filter( team=member.team,
+    notifiable = TeamMember.objects.filter(team=member.team, user__is_active=True,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER]).exclude(pk=member.pk)
     for m in notifiable:
         context = {
@@ -312,15 +310,13 @@ def team_member_leave(team_pk, user_pk):
     from teams.models import TeamMember, Team
     user = User.objects.get(pk=user_pk)
     team = Team.objects.get(pk=team_pk)
-    if not _team_sends_notification(team,'block_team_member_leave_message'):
+    if not team_sends_notification(team,'block_team_member_leave_message') or not user.is_active:
         return False
-    from videos.models import Action
     # the feed item should appear on the timeline for all team members
     # as a team might have thousands of members, this one item has
     # to show up on all of them
-    Action.create_member_left_handler(team, user)
     # notify  admins and owners through messages
-    notifiable = TeamMember.objects.filter( team=team,
+    notifiable = TeamMember.objects.filter(team=team, user__is_active=True,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
     subject = fmt(
         ugettext(u"%(user)s has left the %(team)s team"),
@@ -385,6 +381,8 @@ def email_confirmed(user_pk):
 def videos_imported_message(user_pk, imported_videos):
     from messages.models import Message
     user = User.objects.get(pk=user_pk)
+    if not user.is_active:
+        return False
     subject = u"Your videos were imported!"
     url = "%s%s" % (get_url_base(),
                     reverse("profiles:videos", kwargs={'user_id': user_pk}))
@@ -410,13 +408,13 @@ def team_task_assigned(task_pk):
     from messages.models import Message
     try:
         task = Task.objects.select_related("team_video__video", "team_video", "assignee").get(pk=task_pk, assignee__isnull=False)
-        if not _team_sends_notification(task.team,'block_task_assigned_message'):
-            return False
     except Task.DoesNotExist:
         return False
     task_type = Task.TYPE_NAMES[task.type]
     subject = ugettext(u"You have a new task assignment on Amara!")
     user = task.assignee
+    if not team_sends_notification(task.team,'block_task_assigned_message') or not user.is_active:
+        return False
     task_language = None
     if task.language:
         task_language = get_language_label(task.language)
@@ -446,7 +444,7 @@ def team_task_assigned(task_pk):
 
 def _reviewed_notification(task_pk, status):
     from teams.models import Task
-    from videos.models import Action
+    from activity.models import ActivityRecord
     from messages.models import Message
     try:
         task = Task.objects.select_related(
@@ -461,12 +459,6 @@ def _reviewed_notification(task_pk, status):
         REVIEWED_AND_PENDING_APPROVAL: 'block_reviewed_and_pending_approval_message',
         REVIEWED_AND_SENT_BACK: 'block_reviewed_and_sent_back_message',
     }[status]
-    if not _team_sends_notification(task.team, notification_setting_name):
-        return False
-
-    subject = ugettext(u"Your subtitles have been reviewed")
-    if status == REVIEWED_AND_PUBLISHED:
-        subject += ugettext(" and published")
 
     version = task.get_subtitle_version()
 
@@ -474,6 +466,12 @@ def _reviewed_notification(task_pk, status):
         user = task.new_review_base_version.author
     else:
         user = version.author
+    if not team_sends_notification(task.team, notification_setting_name) or not user.is_active:
+        return False
+
+    subject = ugettext(u"Your subtitles have been reviewed")
+    if status == REVIEWED_AND_PUBLISHED:
+        subject += ugettext(" and published")
 
     task_language = get_language_label(task.language)
     reviewer = task.assignee
@@ -526,13 +524,15 @@ def _reviewed_notification(task_pk, status):
 
     if status == REVIEWED_AND_SENT_BACK:
         if task.type == Task.TYPE_IDS['Review']:
-            Action.create_declined_video_handler(version, reviewer)
+            ActivityRecord.objects.create_for_version_declined(version,
+                                                               reviewer)
         else:
-            Action.create_rejected_video_handler(version, reviewer)
+            ActivityRecord.objects.create_for_version_rejected(version,
+                                                               reviewer)
     elif status == REVIEWED_AND_PUBLISHED:
-        Action.create_approved_video_handler(version, reviewer)
+        ActivityRecord.objects.create_for_version_approved(version, reviewer)
     elif status == REVIEWED_AND_PENDING_APPROVAL:
-        Action.create_accepted_video_handler(version, reviewer)
+        ActivityRecord.objects.create_for_version_accepted(version, reviewer)
 
     return msg, email_res
 
@@ -555,14 +555,14 @@ def approved_notification(task_pk, published=False):
     approved and published
     """
     from teams.models import Task
-    from videos.models import Action
+    from activity.models import ActivityRecord
     from messages.models import Message
     from teams.models import TeamNotificationSetting
     try:
         task = Task.objects.select_related(
             "team_video__video", "team_video", "assignee", "subtitle_version").get(
                 pk=task_pk)
-        if not _team_sends_notification(task.team, 'block_approved_message'):
+        if not team_sends_notification(task.team, 'block_approved_message'):
             return False
     except Task.DoesNotExist:
         return False
@@ -588,6 +588,8 @@ def approved_notification(task_pk, published=False):
         user = task.new_review_base_version.author
     else:
         user = version.author
+    if not user.is_active:
+        return False
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
@@ -625,14 +627,14 @@ def approved_notification(task_pk, published=False):
 
     template_name = template_html
     email_res =  send_templated_email(user, subject, template_name, context)
-    Action.create_approved_video_handler(version, reviewer)
+    ActivityRecord.objects.create_for_version_approved(version, reviewer)
     return msg, email_res
 
 @task
 def send_reject_notification(task_pk, sent_back):
     raise NotImplementedError()
     from teams.models import Task
-    from videos.models import Action
+    from activity.models import ActivityRecord
     from messages.models import Message
     try:
         task = Task.objects.select_related(
@@ -641,12 +643,14 @@ def send_reject_notification(task_pk, sent_back):
     except Task.DoesNotExist:
         return False
 
-    version = task.get_subtitle_version()
-    subject = ugettext(u"Your subtitles were not accepted")
     if task.new_review_base_version:
         user = task.new_review_base_version.author
     else:
         user = version.author
+    if not user.is_active:
+        return False
+    version = task.get_subtitle_version()
+    subject = ugettext(u"Your subtitles were not accepted")
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
@@ -685,7 +689,7 @@ def send_reject_notification(task_pk, sent_back):
 
     template_name = "messages/email/team-task-rejected.html"
     email_res =  send_templated_email(user, subject, template_name, context)
-    Action.create_rejected_video_handler(version, reviewer)
+    ActivityRecord.objects.create_for_version_rejected(version, reviewer)
     return msg, email_res
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)

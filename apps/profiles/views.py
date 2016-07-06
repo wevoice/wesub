@@ -25,15 +25,16 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import  reverse
 from django.db.models import Q
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_unicode
 from tastypie.models import ApiKey
 
+from activity.models import ActivityRecord
 from auth.models import CustomUser as User
 from profiles.forms import (EditUserForm, EditAccountForm, SendMessageForm,
-                            EditAvatarForm, AdminProfileForm)
+                            EditAvatarForm, AdminProfileForm, EditNotificationsForm)
 from profiles.rpc import ProfileApiClass
 import externalsites.models
 from utils.objectlist import object_list
@@ -43,7 +44,7 @@ from utils.text import fmt
 from teams.models import Task
 from subtitles.models import SubtitleLanguage
 from videos.models import (
-    Action, VideoUrl, Video, VIDEO_TYPE_YOUTUBE, VideoFeed
+    VideoUrl, Video, VIDEO_TYPE_YOUTUBE, VideoFeed
 )
 
 logger = logging.getLogger(__name__)
@@ -92,11 +93,10 @@ def profile(request, user_id):
             form = AdminProfileForm(instance=user)
     else:
         form = None
-    qs = (Action.objects
-          .filter(user=user)
-          .select_related('new_language', 'new_language__video', 'video',
-                          'user')
-         )
+    qs = (ActivityRecord.objects.for_user(user)
+          .select_related('video', 'team', 'user'))
+    if request.user != user:
+        qs = qs.viewable_by_user(request.user)
 
     extra_context = {
         'user_info': user,
@@ -106,7 +106,7 @@ def profile(request, user_id):
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.ACTIVITIES_ONPAGE,
                        template_name='profiles/view.html',
-                       template_object_name='action',
+                       template_object_name='activity',
                        extra_context=extra_context)
 
 
@@ -117,17 +117,23 @@ def dashboard(request):
     tasks = user.open_tasks()
     since = datetime.now() - timedelta(days=30)
 
-    team_activity = (Action.objects
-                     .for_user_team_activity(user)
-                     .filter(created__gt=since)
-                     .select_related('team', 'member', 'user')
-                    )
-    video_activity = (Action.objects
-                      .for_user_video_activity(user)
-                      .filter(created__gt=since)
-                      .select_related('video', 'new_language',
-                                      'new_language__video', 'user')
-                     )
+    # MySQL optimazies the team activity query very poorly if the user is not
+    # part of any teams
+    if user.teams.all().exists():
+        team_activity = (ActivityRecord.objects
+                         .filter(team__in=user.teams.all(), created__gt=since)
+                         .exclude(user=user)
+                         .original())
+    else:
+        team_activity = ActivityRecord.objects.none()
+    # Ditto for video activity
+    if user.videos.all().exists():
+        video_activity = (ActivityRecord.objects
+                          .filter(video__in=user.videos.all(), created__gt=since)
+                          .exclude(user=user)
+                          .original())
+    else:
+        video_activity = ActivityRecord.objects.none()
 
     context = {
         'user_info': user,
@@ -194,26 +200,40 @@ def edit(request):
     }
     return render(request, 'profiles/edit.html', context)
 
-
 @login_required
 def account(request):
     if request.method == 'POST':
-        form = EditAccountForm(request.POST,
-                            instance=request.user,
-                            files=request.FILES, label_suffix="")
-        if form.is_valid():
-            form.save()
-            messages.success(request, _('Your account has been updated.'))
-            return redirect('profiles:account')
-
+        if 'editaccount' in request.POST:
+            editaccountform = EditAccountForm(request.POST,
+                                              instance=request.user,
+                                              files=request.FILES, label_suffix="",
+                                              prefix='account')
+            if editaccountform.is_valid():
+                editaccountform.save()
+                messages.success(request, _('Your account has been updated.'))
+                return redirect('profiles:account')
+            editnotificationsform = EditNotificationsForm(instance=request.user, label_suffix="", prefix='notifications')
+        elif 'editnotifications' in request.POST:
+            editnotificationsform = EditNotificationsForm(request.POST,
+                                                          instance=request.user,
+                                                          files=request.FILES, label_suffix="", prefix='notifications')
+            if editnotificationsform.is_valid():
+                editnotificationsform.save()
+                messages.success(request, _('Your account has been updated.'))
+                return redirect('profiles:account')
+            editaccountform = EditAccountForm(instance=request.user, label_suffix="", prefix='account')
+        else:
+            return HttpResponseBadRequest()
     else:
-        form = EditAccountForm(instance=request.user, label_suffix="")
+        editnotificationsform = EditNotificationsForm(instance=request.user, label_suffix="", prefix='notifications')
+        editaccountform = EditAccountForm(instance=request.user, label_suffix="", prefix='account')
 
     twitters = request.user.twitteraccount_set.all()
     facebooks = request.user.facebookaccount_set.all()
 
     context = {
-        'form': form,
+        'editnotificationsform': editnotificationsform,
+        'editaccountform': editaccountform,
         'user_info': request.user,
         'edit_profile_page': True,
         'youtube_accounts': (externalsites.models.YouTubeAccount

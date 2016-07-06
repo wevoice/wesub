@@ -46,22 +46,7 @@
                 </em>
             {% endif %}
         {% endwith %}
-        {% with user_info.teams.all as user_teams %}
-            <h3>{% trans "Teams" %}</h3>
-            {% if user_teams %}
-                <ul>
-                    {% for t in user_teams %}
-                    <li>
-                        <a href="{% url "teams:dashboard" slug=t.slug %}">{{ t }}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <em>
-                    {{ user_info }} {% trans "hasn't joined any teams yet." %}
-                </em>
-            {% endif %}
-        {% endwith %}
+        {% profile_teams_list %}
         {% block left_column_extra %}{% endblock %}
     </div>
 

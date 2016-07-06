@@ -16,6 +16,8 @@
         {% if filters_form.show_project %}
         {% include "_field.html" with field=filters_form.project %}
         {% endif %}
+        {% include "_field.html" with field=filters_form.has_language %}
+        {% include "_field.html" with field=filters_form.missing_language %}
         {% include "_field.html" with field=filters_form.sort %}
 
         <div class="actions">
@@ -24,9 +26,14 @@
       </form>
     </div>
 
-    {% if "add" in forms.enabled %}
+    {% if "add_form" in forms.enabled %}
     <div class="section tools">
-      <button class="open-modal" data-modal="add-form">{% trans "Add Video" %}</button>
+      <button class="open-modal" data-modal="add-form">{% trans "Add Videos" %}</button>
+    </div>
+    {% endif %}
+    {% if "add_csv" in forms.enabled %}
+    <div class="section tools">
+      <button class="open-modal" data-modal="add-csv-form">{% trans "Add Videos from CSV" %}</button>
     </div>
     {% endif %}
   </div>
@@ -46,14 +53,13 @@
     <div class="select-all-thumbs"><label><input type="checkbox"> {% trans "Select all" %}</label></div>
     {% endif %}
     <ul class="thumb-list{% if bulk_mode_enabled %} bulk-mode{% endif %}">
-      {% for team_video in team_videos %}
-      {% with video=team_video.video %}
+      {% for video in page %}
       <li>
         <div class="thumb">
           <img src="{{ video.get_wide_thumbnail }}" alt="{{ video.title_display }}">
           {% if video.duration %}<div class="badge">{{ video.duration|format_duration }}</div>{% endif %}
           {% if bulk_mode_enabled %}
-          <input class="selection" type="checkbox" name="team_videos" value="{{ team_video.id }}">
+          <input class="selection" type="checkbox" name="team_videos" value="{{ video.id }}">
           {% endif %}
         </div>
         <div class="extra-info">{{ video.get_primary_audio_language_code_display }}</div>
@@ -63,11 +69,10 @@
         {% with description=video.description|urlize|linebreaks %}
         {% if "edit" in forms.enabled %}
         <div class="three-lines">{{ description }}</div>
-        <button class="open-edit-modal" data-team-video-id="{{ team_video.id }}" data-modal-url="{% url "teams:videos-form" team.slug "edit" %}">{% trans "edit" %}</button>
+        <button class="open-edit-modal" data-video-id="{{ video.id }}" data-modal-url="{% url "teams:videos-form" team.slug "edit" %}">{% trans "edit" %}</button>
         {% else %}
         <div class="four-lines">{{ description }}</div>
         {% endif %}
-        {% endwith %}
       </li>
       {% endwith %}
       {% endfor %}
@@ -86,10 +91,9 @@
   </div>
 </div>
 {% endblock %}
-
 {% block bottom %}
 {% if bulk_mode_enabled %}
-<div class="bottom-sheet" data-title-singular="{% trans "1 videos selected" %}" data-title-plural="{% blocktrans with count="COUNT_PLACEHOLDER" %}{{ count }} videos selected{% endblocktrans %}">
+<div class="bottom-sheet">
   {% if "bulk-edit" in forms.enabled %}
   <button class="needs-multiple-selected" data-modal-url="{% url "teams:videos-form" team.slug "bulk-edit" %}">{% trans "Bulk Edit" %}</button>
   {% endif %}
@@ -106,19 +110,43 @@
 </div>
 {% endif %}
 
-{% if "add" in forms.enabled %}
+{% if "add_form" in forms.enabled %}
 <aside class="modal{% if add_form.errors %} start-open{% endif %}" id="add-form">
-  <h3>{% trans "Add Video" %}</h3>
+  <h3>{% trans "Add Videos" %}</h3>
   <button class="close"></button>
   <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% include "_non-field-errors.html" with form=add_form %}
     <input type="hidden" name="form" value="add">
-    {% include "_field.html" with field=add_form.video_url %}
     {% include "_field.html" with field=add_form.project %}
+    {% include "_field.html" with field=add_form.language %}
     {% include "_field.html" with field=add_form.thumbnail %}
+    {{ add_formset.management_form }}
+    <table class="formset-table">
+      {% for form in add_formset %}
+      {{ form }}
+      {% endfor %}
+    </table>
     <footer class="buttons">
       <button>{% trans "Add" %}</button>
+    </footer>
+  </form>
+</aside>
+{% endif %}
+{% if "add_csv" in forms.enabled %}
+<aside class="modal{% if add_csv_form.errors %} start-open{% endif %}" id="add-csv-form">
+  <h3>{% trans "Add Videos from CSV" %}</h3>
+  <button class="close"></button>
+  <p>{% trans "Please use this " %}<a href="{{ STATIC_URL }}images/template.csv" download>{% trans "CSV Import Template" %}</a>{% trans " as the basis for your import. The Video URL field is mandatory, but all other fields can be left blank." %}</p>
+  <p>{% trans "A CSV file can be created with a text editor or using the export function of a spreadsheet editor." %}</p>
+  <p>{% trans "Upon completion, you will receive a summary by email." %}</p>
+  <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include "_non-field-errors.html" with form=add_csv_form %}
+    <input type="hidden" name="form" value="add-csv">
+    {{ add_csv_form }}
+    <footer class="buttons">
+      <button>{% trans "Upload" %}</button>
     </footer>
   </form>
 </aside>

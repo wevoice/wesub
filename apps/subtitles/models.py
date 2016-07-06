@@ -21,6 +21,7 @@
 import collections
 import itertools
 import json
+import logging
 from datetime import datetime, date, timedelta
 
 from django.core.exceptions import ValidationError
@@ -34,18 +35,21 @@ from subtitles import cache
 from subtitles import shims
 from auth.models import CustomUser as User
 from videos import metadata
-from videos.models import Video, Action
+from videos.models import Video
 from babelsubs.storage import SubtitleSet
 from babelsubs.storage import calc_changes
 from babelsubs.generators.html import HTMLGenerator
 from babelsubs import load_from
 from subtitles import signals
+from utils import dates
 from utils.compress import compress, decompress
 from utils.subtitles import create_new_subtitles
 from utils import translation
 from videos.behaviors import make_video_title
 
 WRITELOCK_EXPIRATION = 30 # 30 seconds
+
+logger = logging.getLogger(__name__)
 
 # Utility functions -----------------------------------------------------------
 def mapcat(fn, iterable):
@@ -389,11 +393,12 @@ class SubtitleLanguage(models.Model):
         unique_together = [('video', 'language_code')]
 
     @classmethod
-    def calc_completed_languages(cls, video_list, names=False):
+    def calc_completed_languages(cls, video_list, prioritize=None, names=False):
         """Calculate completed languages for a list of videos.
 
         Arguments:
             video_list: list of Videos or PKs
+            prioritize: list of languages to put at the top of the list
             names: return language names instead of codes
 
         Returns:
@@ -404,15 +409,26 @@ class SubtitleLanguage(models.Model):
               .values_list('video_id', 'language_code'))
         completed_languages = collections.defaultdict(list)
         for video_id, language in qs:
-            if names:
-                language = translation.get_language_label(language)
             completed_languages[video_id].append(language)
+        if prioritize:
+            for language_list in completed_languages.values():
+                list_size = len(language_list)
+                language_list.sort(
+                    key=(lambda lc: prioritize.index(lc) if lc in prioritize
+                         else list_size))
+        if names:
+            for language_list in completed_languages.values():
+                language_list[:] = [
+                    translation.get_language_label(lc)
+                    for lc in language_list
+                ]
         return completed_languages
 
     def __init__(self, *args, **kwargs):
         super(SubtitleLanguage, self).__init__(*args, **kwargs)
         self._tip_cache = {}
         self._translation_source_version_cache = {}
+        self._frozen = False
 
     # Writelocking
     @property
@@ -481,6 +497,44 @@ class SubtitleLanguage(models.Model):
         else:
             return self.writelock_owner.__unicode__()
 
+    def freeze(self):
+        """Suspend sending signals until thaw() is called
+
+        Right now the only signal this controls is subtitles_completed.  Maybe
+        we will add more in the future.
+        """
+        if self._frozen:
+            return
+        self._frozen = True
+        self._frozen_signals = {}
+
+    def send_signal(self, signal, **kwargs):
+        if not self._frozen:
+            signal.send(self, **kwargs)
+        else:
+            self._frozen_signals[signal] = kwargs
+
+    def thaw(self):
+        """Start sending signals again after a call to freeze()"""
+        if not self._frozen:
+            return
+        thawed = self._frozen_signals
+        del self._frozen_signals
+        self._frozen = False
+        for signal, kwargs in thawed.items():
+            signal.send(self, **kwargs)
+
+    def mark_complete(self):
+        if not self.subtitles_complete:
+            self.subtitles_complete = True
+            self.save()
+        self.send_signal(signals.subtitles_completed)
+
+    def mark_incomplete(self):
+        if not self.subtitles_complete:
+            return
+        self.subtitles_complete = False
+        self.save()
 
     def is_rtl(self):
         return translation.is_rtl(self.language_code)
@@ -506,7 +560,7 @@ class SubtitleLanguage(models.Model):
         creating = not self.pk
 
         if creating and not self.created:
-            self.created = datetime.now()
+            self.created = dates.now()
 
         super(SubtitleLanguage, self).save(*args, **kwargs)
 
@@ -1341,7 +1395,7 @@ class SubtitleVersion(models.Model):
 
     version_number = models.PositiveIntegerField(default=1)
 
-    author = models.ForeignKey(User, default=User.get_anonymous,
+    author = models.ForeignKey(User, default=User.get_amara_anonymous,
                                related_name='newsubtitleversion_set')
 
     title = models.CharField(max_length=2048, blank=True)
@@ -1522,7 +1576,7 @@ class SubtitleVersion(models.Model):
         metadata = kwargs.pop('metadata', None)
 
         if creating and not self.created:
-            self.created = datetime.now()
+            self.created = dates.now()
         if metadata is not None:
             self.update_metadata(metadata, commit=False)
             video_needs_save = True
@@ -1536,8 +1590,6 @@ class SubtitleVersion(models.Model):
 
         assert self.visibility in ('public', 'private',), \
             "Version visibility must be either 'public' or 'private'!"
-
-        Action.create_caption_handler(self, self.created)
 
         super(SubtitleVersion, self).save(*args, **kwargs)
 
@@ -1943,10 +1995,7 @@ class SubtitleNoteBase(models.Model):
         abstract = True
 
     def get_username(self):
-        if self.user:
-            return self.user.username
-        else:
-            return ugettext('None')
+        return unicode(self.user)
 
 class SubtitleNote(SubtitleNoteBase):
     pass

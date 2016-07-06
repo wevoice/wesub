@@ -40,27 +40,6 @@ class TestHelperFunctions(TestCase):
         self.video = make_video()
         self.video2 = make_video_2()
 
-    def test_get_language(self):
-        sl, needs_save = pipeline._get_language(self.video, 'en')
-        self.assertEqual(sl.language_code, 'en')
-        self.assertEqual(needs_save, True)
-
-        sl, needs_save = pipeline._get_language(self.video, 'fr')
-        self.assertEqual(sl.language_code, 'fr')
-        self.assertEqual(needs_save, True)
-
-        l = SubtitleLanguage(video=self.video, language_code='en')
-        l.save()
-
-        sl, needs_save = pipeline._get_language(self.video, 'en')
-        self.assertEqual(sl.language_code, 'en')
-        self.assertEqual(needs_save, False)
-        self.assertEqual(sl.id, l.id)
-
-        sl, needs_save = pipeline._get_language(self.video, 'fr')
-        self.assertEqual(sl.language_code, 'fr')
-        self.assertEqual(needs_save, True)
-
     def test_get_version(self):
         def _assert_eq(a, b):
             if (not a) or (not b):
@@ -135,7 +114,7 @@ class TestBasicAdding(TestCase):
         self.video = make_video()
         self.u1 = UserFactory()
         self.u2 = UserFactory()
-        self.anon = User.get_anonymous()
+        self.anon = User.get_amara_anonymous()
 
     def test_add_empty_versions(self):
         # Start with no SubtitleLanguages.
@@ -295,7 +274,7 @@ class TestBasicAdding(TestCase):
         self.assertEqual(_get_tip_author(), self.anon)
 
         # Passing anonymous.
-        _add(author=User.get_anonymous())
+        _add(author=User.get_amara_anonymous())
         self.assertEqual(_get_tip_author(), self.anon)
 
         # Passing u1.
@@ -658,7 +637,7 @@ class TestRollbacks(TestCase):
         self.video = make_video()
         self.u1 = UserFactory()
         self.u2 = UserFactory()
-        self.anon = User.get_anonymous()
+        self.anon = User.get_amara_anonymous()
 
         v = self.video
         self.en1 = pipeline.add_subtitles(v, 'en',

@@ -1,9 +1,7 @@
 {% load i18n %}
 
-{# is used in videos/actions_list.html #}
-
 <ul class="listing activity">
-    {% for item in events %}
-        {{ item.render_for_video }}
-    {% endfor %}
+  {% for record in records %}
+  <li>{% include "activity/record.html" %}</li>
+  {% endfor %}
 </ul>

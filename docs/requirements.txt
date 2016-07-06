@@ -6,7 +6,6 @@ sphinx_rtd_theme
 -e git+https://github.com/pculture/babelsubs.git#egg=babelsubs
 celery==3.0.11
 django-celery==3.0.10
-raven==5.1.1
 django-haystack==1.2.7
 django-extensions
 pysolr==2.0.14
@@ -23,8 +22,10 @@ PyJWT==0.4.3
 oauth2==1.5.211
 feedparser
 unidecode
+isodate==0.5.4
+pyuca==1.1
 gdata==2.0.16
-django-math-captcha==0.1
+django-simple-captcha==0.5.1
 django-registration
 pygal
 pafy

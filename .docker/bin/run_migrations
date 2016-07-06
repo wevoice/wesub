@@ -1,0 +1,5 @@
+#!/bin/bash
+source /usr/local/bin/config_env
+
+echo "Running migrations..."
+manage migrate --settings=unisubs_settings

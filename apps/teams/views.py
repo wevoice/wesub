@@ -26,7 +26,6 @@ import babelsubs
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.sites.models import Site
@@ -73,11 +72,12 @@ from teams.permissions import (
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
-    update_video_moderation, update_one_team_video, update_video_public_field,
+    update_video_moderation, update_video_public_field,
     invalidate_video_visibility_caches, process_billing_report
 )
 from videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
+from utils.decorators import staff_member_required
 from utils.forms import flatten_errorlists
 from utils.objectlist import object_list
 from utils.panslugify import pan_slugify
@@ -89,7 +89,7 @@ from utils.translation import (
 from utils.chunkediter import chunkediter
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
-from videos.models import Action, VideoUrl, Video, VideoFeed
+from videos.models import VideoUrl, Video, VideoFeed
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
@@ -191,8 +191,7 @@ def index(request, my_teams=False):
 @staff_member_required
 def create(request):
     user = request.user
-
-    if not DEV and not (user.is_superuser and user.is_active):
+    if not DEV and not (user.has_perm('teams.add_team') and user.is_active):
         raise Http404
 
     if request.method == 'POST':
@@ -463,28 +462,43 @@ def _default_project_for_team(team):
 
 def _get_videos_for_detail_page(team, user, query, project, language_code,
                                 language_mode, sort):
+    if not team.is_member(user) and not team.is_visible:
+        return Video.objects.none()
 
-    kwargs = {
-        'language': None,
-        'exclude_language': None,
-        'num_completed_langs': None,
-        'user': user,
-        'project': project,
-        'query': query,
-        'sort': sort
-    }
-    num_completed_langs = language = exclude_language = None
+    qs = Video.objects.filter(teamvideo__team=team)
+    # add a couple of completed values that we use in the template code
+    qs = qs.add_num_completed_languages()
+    num_tasks_sql = ("""
+                     (SELECT COUNT(*) FROM teams_task WHERE
+                     completed IS NULL AND deleted=0 AND
+                     team_video_id=teams_teamvideo.id)""")
+    qs = qs.extra(select={'num_tasks': num_tasks_sql})
+
+    if query:
+        qs = qs.search(query)
+    if project:
+        qs = qs.filter(teamvideo__project=project)
     if language_mode == '+':
-        kwargs['language'] = language_code
+        if language_code is not None:
+            qs = qs.has_completed_language(language_code)
     elif language_mode == '-':
         if language_code is not None:
-            kwargs['exclude_language'] = language_code
+            qs = qs.missing_completed_language(language_code)
         else:
-            kwargs['num_completed_langs'] = 0
-    else:
-        raise ValueError("invalid language_mode: %r" % (language_mode,))
+            qs = qs.no_completed_languages()
 
-    return team.get_videos_for_languages_haystack(**kwargs)
+    qs = qs.order_by({
+         'name':  'title',
+        '-name': '-title',
+         'subs':  'num_completed_languages',
+        '-subs': '-num_completed_languages',
+         'time':  'created',
+        '-time': '-created',
+    }.get(sort or '-time'))
+
+    qs = qs.select_related('teamvideo')
+
+    return qs
 
 # Videos
 @render_to('teams/videos-list.html')
@@ -533,7 +547,6 @@ def detail(request, slug, project_slug=None, languages=None):
         'can_move_videos': can_move_videos(team, request.user),
         'can_edit_videos': can_add_video(team, request.user, project),
         'filtered': filtered,
-        'all_videos_count': team.get_videos_for_user(request.user).count(),
     }
 
     if extra_context['can_add_video'] or extra_context['can_edit_videos']:
@@ -557,8 +570,7 @@ def detail(request, slug, project_slug=None, languages=None):
         })
 
     readable_langs = TeamLanguagePreference.objects.get_readable(team)
-    language_choices = [(code, name) for code, name in get_language_choices()
-                        if code in readable_langs]
+    language_choices = get_language_choices(limit_to=readable_langs)
 
     extra_context['project_choices'] = team.project_set.exclude(name='_root')
 
@@ -594,16 +606,6 @@ def detail(request, slug, project_slug=None, languages=None):
             is_indexing = team.videos.all().count() != extra_context['current_videos_count']
         extra_context['is_indexing'] = is_indexing
 
-    if is_editor:
-        team_video_ids = [record.team_video_pk for record in team_video_md_list]
-        team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('video', 'team', 'project'))
-        team_videos = dict((tv.pk, tv) for tv in team_videos)
-        for record in team_video_md_list:
-            if record:
-                record._team_video = team_videos.get(record.team_video_pk)
-                if record._team_video:
-                    record._team_video.original_language_code = record.original_language
-                    record._team_video.completed_langs = record.video_completed_langs
     return extra_context
 
 @render_to('teams/move_videos.html')
@@ -680,25 +682,9 @@ def move_videos(request, slug, project_slug=None, languages=None):
                                      language_code, language_mode,
                                      sort)
 
-    # This part is a little insane, because we have the constrain
-    # of not changing the index, and there is a shorter limit
-    # in queries to haystack or solr
     if primary_audio_language_code is not None:
-        if primary_audio_language_code == "-":
-            team_videos = TeamVideo.get_videos_non_language_ids(team, "")
-        elif primary_audio_language_code == "+":
-            team_videos = TeamVideo.get_videos_non_language_ids(team, "", non_empty_language_code=True)
-        else:
-            team_videos = TeamVideo.get_videos_non_language_ids(team, primary_audio_language_code)
-
-        # For longer lists, it gets too long for solr. So we have to exclude chunk by chunk
-        # rather than filter.
-        # Also we get around the missing team_video_pk index by using the id, which we
-        # know how it is generated
-        # This does not work for very long lists though, that's why we block that
-        # feature for large teams
-        for chunk in (team_videos[pos:pos + 1000] for pos in xrange(0, len(team_videos), 1000)):
-            qs = qs.exclude(id__in=map(lambda x: "teams.teamvideo.%s" % x, chunk))
+        qs = qs.filter(
+            primary_audio_language_code=primary_audio_language_code)
 
     extra_context = {
         'team': team,
@@ -714,7 +700,6 @@ def move_videos(request, slug, project_slug=None, languages=None):
         'can_move_videos': can_move_videos(team, request.user),
         'can_edit_videos': can_add_video(team, request.user, project),
         'filtered': filtered,
-        'all_videos_count': team.get_videos_for_user(request.user).count(),
         'form': form,
         'projects': managed_projects_choices
     }
@@ -740,8 +725,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
         })
 
     readable_langs = TeamLanguagePreference.objects.get_readable(team)
-    language_choices = [(code, name) for code, name in get_language_choices()
-                        if code in readable_langs]
+    language_choices = get_language_choices(limit_to=readable_langs)
 
     extra_context['project_choices'] = team.project_set.exclude(name='_root')
 
@@ -777,16 +761,6 @@ def move_videos(request, slug, project_slug=None, languages=None):
             is_indexing = team.videos.all().count() != extra_context['current_videos_count']
         extra_context['is_indexing'] = is_indexing
 
-    if is_editor:
-        team_video_ids = [record.team_video_pk for record in team_video_md_list]
-        team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('video', 'team', 'project'))
-        team_videos = dict((tv.pk, tv) for tv in team_videos)
-        for record in team_video_md_list:
-            if record:
-                record._team_video = team_videos.get(record.team_video_pk)
-                if record._team_video:
-                    record._team_video.original_language_code = record.original_language
-                    record._team_video.completed_langs = record.video_completed_langs
     return extra_context
 
 @login_required
@@ -797,7 +771,6 @@ def add_video_to_team(request, video_id):
         if form.is_valid():
             team = Team.objects.get(id=form.cleaned_data['team'])
             team_video = TeamVideo.objects.create(video=video, team=team)
-            update_one_team_video.delay(team_video.pk)
             return redirect(video.get_absolute_url())
     else:
         form = AddVideoToTeamForm(request.user)
@@ -829,12 +802,8 @@ def add_video(request, slug):
     form = AddTeamVideoForm(team, request.user, request.POST or None, request.FILES or None, initial=initial)
 
     if form.is_valid():
-        obj = form.save(False)
-        obj.added_by = request.user
-        obj.save()
-
-        api_teamvideo_new.send(obj)
-        video_changed_tasks.delay(obj.video.pk)
+        api_teamvideo_new.send(form.saved_team_video)
+        video_changed_tasks.delay(form.saved_team_video.video.pk)
         messages.success(request, form.success_message())
         return redirect(team.get_absolute_url())
 
@@ -939,13 +908,10 @@ def remove_video(request, team_video_pk):
     video = team_video.video
 
     if wants_delete:
-        # create the action handler before deleting the video, so that
-        # it can grab the video's title
-        Action.delete_video_handler(video, team_video.team, request.user)
-        video.delete()
+        video.delete(request.user)
         msg = _(u'Video has been deleted from Amara.')
     else:
-        team_video.delete()
+        team_video.remove(request.user)
         msg = _(u'Video has been removed from the team.')
 
     if request.is_ajax():
@@ -1037,7 +1003,7 @@ def detail_members(request, slug, role=None):
         'query': q,
         'role': role,
         'assignable_roles': assignable_roles,
-        'languages': sorted(languages_with_labels(user_langs).items(), key=lambda pair: pair[1]),
+        'languages': get_language_choices(limit_to=user_langs, flat=True),
     })
 
     if team.video:
@@ -1111,7 +1077,7 @@ def approvals(request, slug):
             except:
                 HttpResponseForbidden(_(u'Invalid task to approve'))
 
-    extra_context['language_choices'] =  [(code, name) for code, name in get_language_choices()]
+    extra_context['language_choices'] =  get_language_choices()
     extra_context['project_choices'] = team.project_set.exclude(name=Project.DEFAULT_NAME)
 
     language_filter = request.GET.get('lang')
@@ -1286,11 +1252,9 @@ def leave_team(request, slug):
         member = TeamMember.objects.get(team=team, user=user)
         tm_user_pk = member.user.pk
         team_pk = member.team.pk
-        member.delete()
+        member.leave_team()
         [application.on_member_leave(request.user, "web UI") for application in \
          member.team.applications.filter(status=Application.STATUS_APPROVED)]
-
-        notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))
     return redirect(request.META.get('HTTP_REFERER') or team)
@@ -1717,7 +1681,7 @@ def create_task(request, slug, team_video_pk):
     subtitlable = json.dumps(can_create_task_subtitle(team_video, request.user))
     translatable_languages = json.dumps(can_create_task_translate(team_video, request.user))
 
-    language_choices = json.dumps(get_language_choices(True))
+    language_choices = json.dumps(get_language_choices(True, flat=True))
 
     return { 'form': form, 'team': team, 'team_video': team_video,
              'translatable_languages': translatable_languages,
@@ -2321,7 +2285,6 @@ def delete_language(request, slug, lang_id):
                     language.nuke_language()
 
                     metadata_manager.update_metadata(language.video.pk)
-                    update_one_team_video(team_video.pk)
 
                     messages.success(request,
                                      _(u'Successfully deleted language.'))

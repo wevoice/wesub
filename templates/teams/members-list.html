@@ -36,9 +36,12 @@
 
         <div class="tools group">
             {% include 'teams/_search.html' %}
+            {% if team|can_add_members_to_team:user %}
+                <a href="{% url "teams:add-members" slug=team.slug %}" class="button reduced">{% trans 'Add Members' %}</a>
+            {% endif %}
             {% if team|can_invite_to_team:user %}
                 <a href="{% url "teams:invite" slug=team.slug %}" class="button reduced">{% trans 'Invite Members' %}</a>
-            {% endif %} 
+            {% endif %}
             <a href="#filter" id="sort-filter">{% trans 'Filter and Sort' %}<span></span></a>
         </div>
 
