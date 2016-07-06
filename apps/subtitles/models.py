@@ -1915,7 +1915,7 @@ class SubtitleVersion(models.Model):
             self.video.title = self.title
         if self.description:
             self.video.description = self.description
-        if self.duration:
+        if self.duration and not self.video.duration:
             self.video.duration = self.duration
         self.video.update_metadata(self.get_metadata(), commit=False)
         self.video.save()

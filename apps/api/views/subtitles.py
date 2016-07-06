@@ -766,6 +766,8 @@ class SubtitlesView(generics.CreateAPIView):
         if not workflow.user_can_edit_subtitles(
             self.request.user, self.kwargs['language_code']):
             raise PermissionDenied()
+        if not workflow.user_can_set_video_duration(self.request.user):
+            request.data.pop('duration', None)
         try:
             version = super(SubtitlesView, self).create(request, *args,
                                                         **kwargs)
