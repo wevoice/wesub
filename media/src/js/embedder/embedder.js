@@ -440,6 +440,7 @@
                                 that.setTranscriptDisplay(false);
                             }
                             sizeUpdated(that.model);
+                            window.setInterval(sizeUpdated, 1000, that.model);
 			    notifyVideoLoadedToHost();
                         }
                     );
