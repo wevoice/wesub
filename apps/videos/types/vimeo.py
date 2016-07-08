@@ -85,7 +85,7 @@ class VimeoVideoType(VideoType):
     def _get_vimeo_id(self, video_url):
         return vimeo.VIMEO_REGEX.match(video_url).groupdict().get('video_id') 
 
-    def get_direct_url(self):
+    def get_direct_url(self, prefer_audio=False):
         r = requests.get("https://player.vimeo.com/video/{}/config".format(self.video_id))
         if r.status_code == requests.codes.ok:
             try:
