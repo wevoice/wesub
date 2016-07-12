@@ -198,7 +198,7 @@ class Workflow(object):
         """
         return "<standard>"
 
-    def get_editor_notes(self, language_code):
+    def get_editor_notes(self, user, language_code):
         """Get notes to display in the editor
 
         Returns:
@@ -264,14 +264,20 @@ class Workflow(object):
 
     def editor_data(self, user, language_code):
         """Get data to pass to the editor for this workflow."""
-        editor_notes = self.get_editor_notes(language_code)
-        return {
+        data = {
             'work_mode': self.get_work_mode(user, language_code).editor_data(),
             'actions': [action.editor_data() for action in
                         self.get_actions(user, language_code)],
-            'notesHeading': editor_notes.heading,
-            'notes': editor_notes.note_editor_data(),
         }
+        editor_notes = self.get_editor_notes(user, language_code)
+        if editor_notes:
+            data.update({
+                'notesHeading': editor_notes.heading,
+                'notes': editor_notes.note_editor_data(),
+            })
+        else:
+            data['notesEnabled'] = False
+        return data
 
     def editor_video_urls(self, language_code):
         """Get video URLs to send to the editor."""
@@ -386,8 +392,8 @@ class VideoWorkflow(object):
         return (self.get_language_workflow(language_code)
                 .action_for_add_subtitles(user, complete))
 
-    def get_editor_notes(self, language_code):
-        return self.get_language_workflow(language_code).get_editor_notes()
+    def get_editor_notes(self, user, language_code):
+        return self.get_language_workflow(language_code).get_editor_notes(user)
 
     def lookup_action(self, user, language_code, action_name):
         return (self.get_language_workflow(language_code)
@@ -465,7 +471,7 @@ class LanguageWorkflow(object):
         else:
             return Unpublish()
 
-    def get_editor_notes(self):
+    def get_editor_notes(self, user):
         """Get notes to display in the editor
 
         Returns:
@@ -515,14 +521,20 @@ class LanguageWorkflow(object):
 
     def editor_data(self, user):
         """Get data to pass to the editor for this workflow."""
-        editor_notes = self.get_editor_notes()
-        return {
+        data = {
             'work_mode': self.get_work_mode(user).editor_data(),
             'actions': [action.editor_data() for action in
                         self.get_actions(user)],
-            'notesHeading': editor_notes.heading,
-            'notes': editor_notes.note_editor_data(),
         }
+        editor_notes = self.get_editor_notes(user)
+        if editor_notes:
+            data.update({
+                'notesHeading': editor_notes.heading,
+                'notes': editor_notes.note_editor_data(),
+            })
+        else:
+            data['notesEnabled'] = False
+        return data
 
     def editor_video_urls(self):
         """Get video URLs to send to the editor."""
