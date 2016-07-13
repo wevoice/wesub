@@ -48,6 +48,7 @@
 	    hostPage.source.postMessage({resize: true, index: hostPage.index,
 					 width: width,
 					 height: height,
+					 transcriptHeight: (_$(".amara-tools").height()) - 37,
 					}, hostPage.origin);
 	}
     }
@@ -322,6 +323,8 @@
 	    resize_: function(width, height) {
                 this.$popContainer.width(width);
                 this.$popContainer.height(height);
+                if (this.$amaraTools !== undefined)
+                    this.$amaraTools.width(width);
                 this.$thumbnailContainer.width(width);
                 this.$thumbnailContainer.height(height);
                 this.$videoDivContainer.width(width);
@@ -1077,7 +1080,7 @@
 	    },
 	    templateHTML: function() {
 		return '' +
-                '<div class="amara-tools" style="width: {{ width }}px;">' +
+                '<div class="amara-tools">' +
                 '    <div class="amara-bar amara-group">' +
                 (this.model.get('show_logo') ? '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button" title="View this video on Amara.org in a new window">Amara</a>' : '') +
                 '        <ul class="amara-displays amara-group">' +
