@@ -27,7 +27,13 @@
                 analytics('embedder', 'init-origin', e.origin);
 		hostPage.source.postMessage({initDone: true, index: hostPage.index}, hostPage.origin);
 		window.removeEventListener('message', initReceiver, false);
+		window.addEventListener('message', resizeInside, false);
 	    }
+	}
+    }
+    function resizeInside(e) {
+	if (e && e.data && e.data.resize) {
+	    window._amara.amaraInstances[0].resize_(e.data.width, e.data.height);
 	}
     }
     // Should be triggered whenever the size of the content of the widget changes
@@ -38,14 +44,11 @@
 		width = model.get("width");
 	    else
 		width = _$(".amara-tools").width();
-	    var height;
-	    if (model && model.get("height"))
-		height = model.get("height") + 37;
-	    else
-		height = _$(".amara-popcorn").height() + _$(".amara-tools").height();
+	    var height = _$(".amara-popcorn").height() + _$(".amara-tools").height();
 	    hostPage.source.postMessage({resize: true, index: hostPage.index,
 					 width: width,
 					 height: height,
+					 transcriptHeight: (_$(".amara-tools").height()) - 37,
 					}, hostPage.origin);
 	}
     }
@@ -317,6 +320,18 @@
 	    hideThumbnail: function() {
 		this.$thumbnailContainer.hide();
 	    },
+	    resize_: function(width, height) {
+                this.$popContainer.width(width);
+                this.$popContainer.height(height);
+                if (this.$amaraTools !== undefined)
+                    this.$amaraTools.width(width);
+                this.$thumbnailContainer.width(width);
+                this.$thumbnailContainer.height(height);
+                this.$videoDivContainer.width(width);
+                this.$videoDivContainer.height(height);
+                this.model.set('height', height);
+                this.model.set('width', width);
+	    },
             render: function() {
                 // TODO: Split this monster of a render() into several render()s.
                 var that = this;
@@ -427,7 +442,8 @@
                                 that.setCurrentLanguageMessage('subtitle me');
                                 that.setTranscriptDisplay(false);
                             }
-                            sizeUpdated();
+                            sizeUpdated(that.model);
+                            window.setInterval(sizeUpdated, 1000, that.model);
 			    notifyVideoLoadedToHost();
                         }
                     );
@@ -933,7 +949,7 @@
                 analytics('embedder', 'transcript-display',
                                (this.$amaraTranscript.is(":visible") ? "show" : "hide"));
                 this.$transcriptButton.toggleClass('amara-button-enabled');
-                sizeUpdated();
+                sizeUpdated(this.model);
                 return false;
             },
             setSubtitlesDisplay: function(show) {
@@ -958,7 +974,7 @@
 		}
                 analytics('embedder', 'transcript-display',
                                (this.$amaraTranscript.is(":visible") ? "show" : "hide"));
-		sizeUpdated();
+		sizeUpdated(this.model);
                 return false;
             },
             transcriptLineClicked: function(e) {
@@ -1064,7 +1080,7 @@
 	    },
 	    templateHTML: function() {
 		return '' +
-                '<div class="amara-tools" style="width: {{ width }}px;">' +
+                '<div class="amara-tools">' +
                 '    <div class="amara-bar amara-group">' +
                 (this.model.get('show_logo') ? '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button" title="View this video on Amara.org in a new window">Amara</a>' : '') +
                 '        <ul class="amara-displays amara-group">' +
@@ -1113,6 +1129,7 @@
                 '&lt;div class="amara-embed" data-height="480px" data-width="854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
                 '                        </pre>' +
                 '                        <ul>' +
+                '                            <li>Scale down size depending on container or display (responsive): <code>data-resizable="true"</code>.</li>' +
                 '                            <li>Hide order subtitles menu item: <code>data-hide-order="true"</code>.</li>' +
                 '                            <li>Set initial active subtitle language: <code>data-initial-language="en"</code>.</li>' +
                 '                            <li>Display subtitles by default: <code>data-show-subtitles-default="true"</code>.</li>' +
