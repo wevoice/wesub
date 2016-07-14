@@ -207,7 +207,7 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
                 return [subtitles.workflows.SaveDraft(),
                         subtitles.workflows.Publish()]
 
-    def get_editor_notes(self, language_code):
+    def get_editor_notes(self, user, language_code):
         return TaskTeamEditorNotes(self.team_video, language_code)
 
     def get_add_language_mode(self, user):

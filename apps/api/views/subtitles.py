@@ -817,6 +817,8 @@ class NotesSerializer(serializers.Serializer):
     body = serializers.CharField()
 
     def create(self, validated_data):
+        if self.context['editor_notes'] is None:
+            raise PermissionDenied()
         return self.context['editor_notes'].post(
             self.context['user'], validated_data['body'])
 
@@ -825,13 +827,13 @@ class NotesList(generics.ListCreateAPIView):
 
     @csrf_exempt
     def dispatch(self, request, **kwargs):
-        self.editor_notes = self.get_editor_notes(**kwargs)
+        self.editor_notes = self.get_editor_notes(request.user, **kwargs)
         return generics.ListCreateAPIView.dispatch(self, request, **kwargs)
 
-    def get_editor_notes(self, **kwargs):
+    def get_editor_notes(self, user, **kwargs):
         video = get_object_or_404(Video, video_id=kwargs['video_id'])
         workflow = workflows.get_workflow(video)
-        return workflow.get_editor_notes(kwargs['language_code'])
+        return workflow.get_editor_notes(user, kwargs['language_code'])
 
     def get_queryset(self):
         return self.editor_notes.notes

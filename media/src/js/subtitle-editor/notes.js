@@ -25,6 +25,7 @@ var angular = angular || null;
     module.controller('NotesController', ["$sce", "$scope", "$timeout", "EditorData", "SubtitleStorage", function($sce, $scope, $timeout, EditorData, SubtitleStorage) {
         $scope.heading = EditorData.notesHeading;
         $scope.newNoteText = "";
+        $scope.enabled = EditorData.notesEnabled;
 	$scope.$root.$on('set-note-heading', function(evt, heading) {
             $scope.newNoteText = heading + "\n";
 	});
