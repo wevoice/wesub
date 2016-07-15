@@ -119,11 +119,16 @@ def dashboard(request):
 
     # MySQL optimazies the team activity query very poorly if the user is not
     # part of any teams
+    user_dashboard_extra = []
     if user.teams.all().exists():
         team_activity = (ActivityRecord.objects
                          .filter(team__in=user.teams.all(), created__gt=since)
                          .exclude(user=user)
                          .original())
+        for team in user.teams.all():
+            if not team.is_old_style():
+                if team.new_workflow.user_dashboard_extra:
+                    user_dashboard_extra.append(team.new_workflow.user_dashboard_extra(request, team))
     else:
         team_activity = ActivityRecord.objects.none()
     # Ditto for video activity
@@ -140,6 +145,7 @@ def dashboard(request):
         'team_activity': team_activity[:8],
         'video_activity': video_activity[:8],
         'tasks': tasks,
+        'user_dashboard_extra': user_dashboard_extra,
     }
 
     return render(request, 'profiles/dashboard.html', context)

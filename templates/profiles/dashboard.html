@@ -34,6 +34,16 @@
                 </p>
             </div>
         {% endif %}
+        {% if user_dashboard_extra %}
+            <div class="section">
+              <h3>{% trans "Your Assignments" %}</h3>
+                <ul class="listing">
+                    {% for item in user_dashboard_extra %}
+                    <li>{{ item }}</li>
+		    {% endfor %}
+		</ul>
+	    </div>
+	{% endif %}
         {% if tasks %}
             <div class="section">
                 <h3>{% trans "Videos you're working on" %}</h3>
