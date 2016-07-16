@@ -427,6 +427,7 @@ def _rollback_to(video, language_code, version_number, rollback_author):
         'sl': target.video.subtitle_language(language_code),
         'subtitles': target.get_subtitles(),
         'title': target.title,
+        'duration': target.duration,
         'description': target.description,
         'visibility_override': None,
         'committer': None,
