@@ -36,12 +36,14 @@
         {% endif %}
         {% if user_dashboard_extra %}
             <div class="section">
-              <h3>{% trans "Your Assignments" %}</h3>
+	      {% for item in user_dashboard_extra %}
+              <h3>{{ item.head }}</h3>
                 <ul class="listing">
-                    {% for item in user_dashboard_extra %}
-                    <li>{{ item }}</li>
+                    {% for list_item in item.bodies %}
+                    <li>{{ list_item|safe }}</li>
 		    {% endfor %}
 		</ul>
+		{% endfor %}
 	    </div>
 	{% endif %}
         {% if tasks %}
