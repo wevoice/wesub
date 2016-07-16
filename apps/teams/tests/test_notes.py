@@ -37,7 +37,7 @@ class TestTeamNotes(TestCase):
 
     def test_workflow_returns_team_editor_notes(self):
         workflow = workflows.get_workflow(self.video)
-        editor_notes = workflow.get_editor_notes('en')
+        editor_notes = workflow.get_editor_notes(self.user, 'en')
         assert_is_instance(editor_notes, TeamEditorNotes)
 
     def test_post_adds_team_subtitle_note(self):
@@ -57,7 +57,7 @@ class TestTaskTeamNotes(TestCase):
 
     def test_workflow_returns_task_team_editor_notes(self):
         workflow = workflows.get_workflow(self.video)
-        editor_notes = workflow.get_editor_notes('en')
+        editor_notes = workflow.get_editor_notes(self.user, 'en')
         assert_is_instance(editor_notes, TaskTeamEditorNotes)
 
     def check_send_messages(self, mock_send_messages, note, recipients):

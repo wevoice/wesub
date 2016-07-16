@@ -84,8 +84,8 @@ Updating user accounts
 
     :param username username: must match the username of the auth credentials sent
 
-    Inputs the same fields as POST, except `username`, `create_login_token`,
-    and `find_unique_username`.
+    Inputs the same fields as POST, except `username` and
+    `find_unique_username`.
 """
 
 from __future__ import absolute_import
@@ -206,6 +206,8 @@ class UserCreateSerializer(UserSerializer):
 class UserUpdateSerializer(UserSerializer):
     username = serializers.CharField(read_only=True)
     password = PasswordField(required=False, write_only=True)
+    create_login_token = serializers.BooleanField(write_only=True,
+                                                  required=False)
 
     def __init__(self, *args, **kwargs):
         super(UserUpdateSerializer, self).__init__(*args, **kwargs)
@@ -216,12 +218,14 @@ class UserUpdateSerializer(UserSerializer):
     def update(self, user, validated_data):
         if not can_modify_user(user, self.context['request'].user):
             raise PermissionDenied()
-        return super(UserSerializer, self).update(user, validated_data)
+        if validated_data.get('create_login_token'):
+            self.login_token = LoginToken.objects.for_user(user)
+        return super(UserUpdateSerializer, self).update(user, validated_data)
 
     class Meta:
         model = User
         fields = UserSerializer.Meta.fields + (
-            'email', 'password',
+            'email', 'password', 'create_login_token',
         )
 
 class UserViewSet(mixins.RetrieveModelMixin,

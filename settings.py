@@ -263,6 +263,7 @@ REST_FRAMEWORK = {
     'ORDERING_PARAM': 'order_by',
     'VIEW_NAME_FUNCTION': 'api.viewdocs.amara_get_view_name',
     'VIEW_DESCRIPTION_FUNCTION': 'api.viewdocs.amara_get_view_description',
+    'NON_FIELD_ERRORS_KEY': 'general_errors',
 }
 
 #################

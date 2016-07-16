@@ -214,6 +214,7 @@ class SubtitleEditorBase(View):
             },
             'staticURL': settings.STATIC_URL,
             'notesHeading': 'Editor Notes',
+            'notesEnabled': True,
             'redirectUrl': self.get_redirect_url(),
             'customCss': self.get_custom_css(),
         }
