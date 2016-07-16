@@ -8,17 +8,28 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 
 (function(window) {
     var AmaraIframeController = function() {
+	var toolbarHeight = 37;
 	var iframes = [];
 	var loadingDivs = [];
 	var timers = [];
 	var iframeDomain = '';
 	var absoluteURL = new RegExp('^(?:[a-z]+:)?//', 'i');
-	var resize = function(index, width, height) {
-            if (iframes[index].style.visibility == "visible")
+	var resize = function(index, width, height, transcriptHeight) {
+	    if (iframes[index].style.visibility == "visible")
                 iframes[index].parentNode.style.height = "";
-	    iframes[index].width = 0;
-	    iframes[index].width = width;
-	    iframes[index].height = height;
+	    if (iframes[index].dataset.resizable && (iframes[index].dataset.resizable == "true") &&
+		iframes[index].parentNode && iframes[index].parentNode.parentNode) {
+		var targetWidth = Math.min(iframes[index].parentNode.parentNode.clientWidth, parseInt(iframes[index].parentNode.dataset.width));
+		var targetHeight = parseInt((height - toolbarHeight - transcriptHeight) * targetWidth / width) + toolbarHeight + transcriptHeight;
+		if ((width != targetWidth) || (targetHeight != iframes[index].parentNode.parentNode.clientHeight)) {
+		    width = targetWidth;
+		    height = targetHeight;
+		    iframes[index].contentWindow.postMessage({resize: true, width: width, height: (height - toolbarHeight - transcriptHeight)}, iframeDomain);
+		    iframes[index].width = 0;
+		    iframes[index].width = width;
+		    iframes[index].height = height;
+		}
+	    }
 	};
 	var updateContent = function(index, content) {
 	    iframes[index].innerHTML = content;
@@ -37,7 +48,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	    if (e.data.initDone)
 		window.clearInterval(timers[e.data.index]);
 	    if (e.data.resize)
-		resize(e.data.index, e.data.width, e.data.height);
+		resize(e.data.index, e.data.width, e.data.height, e.data.transcriptHeight);
 	    if (e.data.content)
 		updateContent(e.data.index, e.data.content);
             if (e.data.error == window.MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED)
@@ -87,6 +98,8 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		iframe.style.overflow = "hidden";
 		iframe.scrolling = "no";
 		iframe.style.opacity = 0;
+		if (currentDiv.dataset.resizable)
+		    iframe.dataset.resizable = currentDiv.dataset.resizable;
 		currentDiv.appendChild(iframe);
 		loadingDivs.push(loadingDiv);
 		iframes.push(iframe);

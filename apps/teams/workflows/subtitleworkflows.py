@@ -30,7 +30,7 @@ class TeamSubtitlesWorkflow(subtitles.workflows.DefaultWorkflow):
         self.team_video = team_video
         self.team = team_video.team
 
-    def get_editor_notes(self, language_code):
+    def get_editor_notes(self, user, language_code):
         return TeamEditorNotes(self.team_video.team, self.team_video.video,
                                language_code)
 
