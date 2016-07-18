@@ -65,7 +65,9 @@ class ActivityType(Code):
         if ModelClass is None or related_obj_id is None:
             return None
         else:
-            return ModelClass.objects.get(id=related_obj_id)
+            return (ModelClass.objects.all()
+                    .select_related()
+                    .get(id=related_obj_id))
 
 class ActivityMessageDict(object):
     """Helper class to format our messages.
