@@ -128,9 +128,10 @@ def dashboard(request):
                          .exclude(user=user)
                          .original())
         for team in user.teams.all():
+            more_items = int(request.GET.get('more_extra_items', 0))
             if not team.is_old_style():
                 if team.new_workflow.user_dashboard_extra:
-                    user_dashboard_extra += team.new_workflow.user_dashboard_extra(request, team)
+                    user_dashboard_extra += team.new_workflow.user_dashboard_extra(request, team, more_items=more_items)
         for head, body in groupby(user_dashboard_extra, lambda x:x['head']):
             user_dashboard_extra_list.append({'head': head, 'bodies': map(lambda b:b['body'], body)})
     else:
@@ -150,6 +151,7 @@ def dashboard(request):
         'video_activity': video_activity[:8],
         'tasks': tasks,
         'user_dashboard_extra': user_dashboard_extra_list,
+        'more_items': (more_items + 10) if user_dashboard_extra_list else None
     }
 
     return render(request, 'profiles/dashboard.html', context)
