@@ -151,7 +151,7 @@ def dashboard(request):
         'video_activity': video_activity[:8],
         'tasks': tasks,
         'user_dashboard_extra': user_dashboard_extra_list,
-        'more_items': (more_items + 10) if user_dashboard_extra_list else None
+        'more_items': (more_items + 5) if user_dashboard_extra_list else None
     }
 
     return render(request, 'profiles/dashboard.html', context)
