@@ -127,13 +127,15 @@ def dashboard(request):
                          .filter(team__in=user.teams.all(), created__gt=since)
                          .exclude(user=user)
                          .original())
+        user_dashboard_extra_teams = []
         for team in user.teams.all():
             more_items = int(request.GET.get('more_extra_items', 0))
-            if not team.is_old_style():
-                if team.new_workflow.user_dashboard_extra:
-                    user_dashboard_extra += team.new_workflow.user_dashboard_extra(request, team, more_items=more_items)
-        for head, body in groupby(user_dashboard_extra, lambda x:x['head']):
-            user_dashboard_extra_list.append({'head': head, 'bodies': map(lambda b:b['body'], body)})
+            if not team.is_old_style() and team.new_workflow.user_dashboard_extra:
+                user_dashboard_extra_teams.append(team)
+        if user_dashboard_extra_teams:
+            for extra, teams in groupby(user_dashboard_extra_teams, lambda x: x.new_workflow.user_dashboard_extra):
+                head, bodies = extra(request, teams, more_items=more_items)
+                user_dashboard_extra_list.append({'head': head, 'bodies': bodies})
     else:
         team_activity = ActivityRecord.objects.none()
     # Ditto for video activity
@@ -151,7 +153,7 @@ def dashboard(request):
         'video_activity': video_activity[:8],
         'tasks': tasks,
         'user_dashboard_extra': user_dashboard_extra_list,
-        'more_items': (more_items + 5) if user_dashboard_extra_list else None
+        'more_items': (more_items + 10) if user_dashboard_extra_list else None
     }
 
     return render(request, 'profiles/dashboard.html', context)
