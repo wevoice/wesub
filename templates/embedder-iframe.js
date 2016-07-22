@@ -17,8 +17,7 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	var resize = function(index, width, height, transcriptHeight) {
 	    if (iframes[index].style.visibility == "visible")
                 iframes[index].parentNode.style.height = "";
-	    if (iframes[index].dataset.resizable && (iframes[index].dataset.resizable == "true") &&
-		iframes[index].parentNode && iframes[index].parentNode.parentNode) {
+	    if (iframes[index].parentNode && iframes[index].parentNode.parentNode) {
 		var targetWidth = Math.min(iframes[index].parentNode.parentNode.clientWidth, parseInt(iframes[index].parentNode.dataset.width));
 		var targetHeight = parseInt((height - toolbarHeight - transcriptHeight) * targetWidth / width) + toolbarHeight + transcriptHeight;
 		if ((width != targetWidth) || (targetHeight != iframes[index].parentNode.parentNode.clientHeight)) {
@@ -98,8 +97,6 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 		iframe.style.overflow = "hidden";
 		iframe.scrolling = "no";
 		iframe.style.opacity = 0;
-		if (currentDiv.dataset.resizable)
-		    iframe.dataset.resizable = currentDiv.dataset.resizable;
 		currentDiv.appendChild(iframe);
 		loadingDivs.push(loadingDiv);
 		iframes.push(iframe);
