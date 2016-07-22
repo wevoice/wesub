@@ -135,7 +135,8 @@ def dashboard(request):
         if user_dashboard_extra_teams:
             for extra, teams in groupby(user_dashboard_extra_teams, lambda x: x.new_workflow.user_dashboard_extra):
                 head, bodies = extra(request, teams, more_items=more_items)
-                user_dashboard_extra_list.append({'head': head, 'bodies': bodies})
+                if bodies:
+                    user_dashboard_extra_list.append({'head': head, 'bodies': bodies})
     else:
         team_activity = ActivityRecord.objects.none()
     # Ditto for video activity
@@ -146,7 +147,6 @@ def dashboard(request):
                           .original())
     else:
         video_activity = ActivityRecord.objects.none()
-
     context = {
         'user_info': user,
         'team_activity': team_activity[:8],
