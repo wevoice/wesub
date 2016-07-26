@@ -122,6 +122,7 @@ def dashboard(request):
     # part of any teams
     user_dashboard_extra = []
     user_dashboard_extra_list = []
+    more_items = int(request.GET.get('more_extra_items', 0))
     if user.teams.all().exists():
         team_activity = (ActivityRecord.objects
                          .filter(team__in=user.teams.all(), created__gt=since)
@@ -129,7 +130,6 @@ def dashboard(request):
                          .original())
         user_dashboard_extra_teams = []
         for team in user.teams.all():
-            more_items = int(request.GET.get('more_extra_items', 0))
             if not team.is_old_style() and team.new_workflow.user_dashboard_extra:
                 user_dashboard_extra_teams.append(team)
         if user_dashboard_extra_teams:
