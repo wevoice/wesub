@@ -19,6 +19,7 @@
 import json
 import logging
 from datetime import datetime, timedelta
+from itertools import groupby
 
 from django.conf import settings
 from django.contrib import messages
@@ -119,11 +120,23 @@ def dashboard(request):
 
     # MySQL optimazies the team activity query very poorly if the user is not
     # part of any teams
+    user_dashboard_extra = []
+    user_dashboard_extra_list = []
+    more_items = int(request.GET.get('more_extra_items', 0))
     if user.teams.all().exists():
         team_activity = (ActivityRecord.objects
                          .filter(team__in=user.teams.all(), created__gt=since)
                          .exclude(user=user)
                          .original())
+        user_dashboard_extra_teams = []
+        for team in user.teams.all():
+            if not team.is_old_style() and team.new_workflow.user_dashboard_extra:
+                user_dashboard_extra_teams.append(team)
+        if user_dashboard_extra_teams:
+            for extra, teams in groupby(user_dashboard_extra_teams, lambda x: x.new_workflow.user_dashboard_extra):
+                head, bodies = extra(request, teams, more_items=more_items)
+                if bodies:
+                    user_dashboard_extra_list.append({'head': head, 'bodies': bodies})
     else:
         team_activity = ActivityRecord.objects.none()
     # Ditto for video activity
@@ -134,12 +147,13 @@ def dashboard(request):
                           .original())
     else:
         video_activity = ActivityRecord.objects.none()
-
     context = {
         'user_info': user,
         'team_activity': team_activity[:8],
         'video_activity': video_activity[:8],
         'tasks': tasks,
+        'user_dashboard_extra': user_dashboard_extra_list,
+        'more_items': (more_items + 10) if user_dashboard_extra_list else None
     }
 
     return render(request, 'profiles/dashboard.html', context)
