@@ -83,6 +83,7 @@ var angular = angular || null;
         $scope.uploading = false;
         $scope.uploadError = false;
         $scope.exiting = false;
+        $scope.lastTextEditKeystrokeTime = 0;
         $scope.hideNextTime = function() {
             $scope.showHideNextTime = false;
         };
@@ -396,6 +397,11 @@ var angular = angular || null;
             $event.stopPropagation();
             $scope.dialogManager.open('guidelines');
         }
+        $scope.onPlaybackModeClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dialogManager.open('playback-mode');
+        }
         $scope.onMoreControlsClicked = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
@@ -639,6 +645,8 @@ var angular = angular || null;
 		    $scope.currentEdit.start(subtitle);
 		}
 	    } else if (evt.target.type == 'textarea') {
+                // TODO: Why does this fire twice per keystroke?
+                $scope.$root.$emit('text-edit-keystroke')
                 return;
 	    }
 		// Shortcuts that should be disabled while editing a subtitle
