@@ -42,7 +42,7 @@ Testing
 
 To run the test suite:
 
-        bin/test.sh
+        bin/dev test
 
 
 Dev Notes

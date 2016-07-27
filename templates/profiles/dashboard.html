@@ -34,6 +34,19 @@
                 </p>
             </div>
         {% endif %}
+        {% if user_dashboard_extra %}
+            <div class="section">
+	      {% for item in user_dashboard_extra %}
+              <h3>{{ item.head }}</h3>
+                <ul class="listing">
+                    {% for list_item in item.bodies %}
+                    <li>{{ list_item|safe }}</li>
+		    {% endfor %}
+		</ul>
+		{% endfor %}
+		<a href="{% url "profiles:dashboard" %}?more_extra_items={{ more_items }}">{% trans "Show More" %}</a>
+	    </div>
+	{% endif %}
         {% if tasks %}
             <div class="section">
                 <h3>{% trans "Videos you're working on" %}</h3>

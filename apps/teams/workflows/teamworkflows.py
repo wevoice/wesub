@@ -56,7 +56,10 @@ class TeamWorkflow(object):
     """
     view function for the dashboard page.
     """
-
+    user_dashboard_extra = None
+    """
+    Team-specific extra data to render in user dashboard page.
+    """
     workflow_settings_view = NotImplemented
     """
     view function for the workflow settings page.
