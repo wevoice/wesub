@@ -319,7 +319,7 @@
 </aside>
 <aside modal-dialog="playback-mode" allow-close id="playback-mode-modal" class="modal" role="dialog" tabindex="-1" aria-labeledby="playback-mode-heading" dir="[[ workingSubtitles.language.dir ]]">
     <h3 id="playback-mode-heading">{% trans "Playback Mode" %}</h3>
-    <div class="modal-content" ng-controller="PlaybackModeController">
+    <div class="modal-content">
         <select ng-model="playbackMode">
             <option value="auto-pause">{% trans "Auto-pause Mode" %}</option>
             <option value="standard">{% trans "Standard Mode (use tab to pause)" %}</option>

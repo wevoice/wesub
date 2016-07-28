@@ -645,8 +645,7 @@ var angular = angular || null;
 		    $scope.currentEdit.start(subtitle);
 		}
 	    } else if (evt.target.type == 'textarea') {
-                // TODO: Why does this fire twice per keystroke?
-                $scope.$root.$emit('text-edit-keystroke')
+                $scope.$root.$emit('text-edit-keystroke');
                 return;
 	    }
 		// Shortcuts that should be disabled while editing a subtitle

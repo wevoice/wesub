@@ -104,124 +104,170 @@
                       function($scope, $timeout, $log, VideoPlayer) {
         $scope.playbackMode = 'magic';
 
-        // When paused, we want to know if we have been paused by auto-pause
-
-        function ModeHandler() {}
+		function ModeHandler() {}
         ModeHandler.prototype = { 
             onActivate: function() {},
             onDeactivate: function() {},
             onTextEditKeystroke: function() {},
-            onVideoUpdate: function() {}
+			onUserVideoResume: function() {},
+			onUserVideoPause: function() {}
         }
 
+		// TODO: how to test this?
         function MagicModeHandler() {}
         MagicModeHandler.prototype = Object.create(ModeHandler.prototype);
         _.extend(MagicModeHandler.prototype, {
             keystrokeTimeout: null,
             continuousTypingTimeout: null,
-            magicResumeTimeout: null,
-            magicPaused: false,
-            onVideoUpdate: function() {
-                // TODO: it would be better to have explicit user paused events instead of having to check the video player service
-                // and acting on its current state
-                if(VideoPlayer.isPlaying() && this.magicPaused) {
-                    this.magicPaused = false;
-                    if(this.magicResumeTimeout !== null) {
-                        $timeout.cancel(this.magicResumeTimeout);
-                        this.magicResumeTimeout = null;
-                    }
-                } else if(!VideoPlayer.isPlaying() && !this.magicPaused) {
-                    if(this.keystrokeTimeout !== null) {
-                        $timeout.cancel(this.keystrokeTimeout);
-                        this.keystrokeTimeout = null;
-                    }
-                    if(this.continuousTypingTimeout !== null) {
-                        $timeout.cancel(this.continuousTypingTimeout);
-                        this.continuousTypingTimeout = null;
-                    }
-                }
-            },
-            onTextEditKeystroke: function() {
-                // TODO: make this into a state machine to clean it up
-                // TODO: onVideoUpdate: if(VideoPlayer.isPlaying() && this.magicPaused)
-                var self = this;
+			magicPauseStartTime: -1,
+			anticipatePauseStartTime: -1,
+			state: 'inactive', // inactive, anticipating-pause, magic-paused
 
-                if(this.magicResumeTimeout !== null) {
-                    $timeout.cancel(this.magicResumeTimeout);
-                    self.magicResumeTimeout = $timeout(function() {
-                        VideoPlayer.seek(VideoPlayer.currentTime() - 4000);
-                        self.magicPaused = false;
-                        self.magicResumeTimeout = null;
-                        VideoPlayer.play();
-                    }, 1000);
-                }
+			cancelKeystrokeTimeout: function() {
+				if(this.keystrokeTimeout !== null) {
+					$timeout.cancel(this.keystrokeTimeout);
+					this.keystrokeTimeout = null;
+				}
+			},
+			cancelContinuousTypingTimeout: function() {
+				if(this.continuousTypingTimeout !== null) {
+					$timeout.cancel(this.continuousTypingTimeout);
+					this.continuousTypingTimeout = null;
+				}
+			},
 
-                if(!VideoPlayer.isPlaying()) return;
+			reset: function() {
+				$log.log('[magic-pause] reset');
+				this.state = 'inactive';
+				this.cancelKeystrokeTimeout();
+				this.cancelContinuousTypingTimeout();
+				this.magicPauseStartTime = -1;
+				this.anticipatePauseStartTime = -1;
+			},
+			startAnticipatingPause: function() {
+				$log.log('[magic-pause] start anticipating pause');
+				this.anticipatePauseStartTime = VideoPlayer.currentTime();
 
-                if(this.continuousTypingTimeout === null) {
-                    $log.log('starting continuous typing timeout');
-                    this.continuousTypingTimeout = $timeout(function() {
-                        $log.log('continuous typing timeout completed');
-                        self.magicPaused = true;
-                        self.continuousTypingTimeout = null;
+				var self = this;
+				self.continuousTypingTimeout = $timeout(function() {
+					// At least 4 seconds have elapsed while the user is continuously typing
+					self.continuousTypingTimeout = null;
+					self.startMagicPause();
+				}, 4000);
 
-                        if(self.keystrokeTimeout !== null) {
-                            $timeout.cancel(self.keystrokeTimeout)
-                            self.keystrokeTimeout = null;
-                        }
+				this.continueAnticipatingPause();
+			},
+			continueAnticipatingPause: function() {
+				if(!VideoPlayer.isPlaying()) {
+					this.reset();
+					return;
+				}
 
-                        if(self.magicResumeTimeout === null) {
-                            self.magicResumeTimeout = $timeout(function() {
-                                self.magicPaused = false;
-                                self.magicResumeTimeout = null;
-                                VideoPlayer.seek(VideoPlayer.currentTime() - 4000);
-                                VideoPlayer.play();
-                            }, 1000);
-                        }
+				$log.log('[magic-pause] continue anticipating pause');
 
-                        VideoPlayer.pause();
-                    }, 4000);
-                }
+				this.state = 'anticipating-pause';
 
+				var self = this;
+				self.cancelKeystrokeTimeout();
+				self.keystrokeTimeout = $timeout(function() {
+					// At least 1 second has elapsed without an edit keystroke
+					self.keystrokeTimeout = null;
+					self.reset();
+				}, 1000);
+			},
+			startMagicPause: function() {
+				$log.log('[magic-pause] start magic pause');
+				if(!VideoPlayer.isPlaying()) {
+					// We have been paused by the user or some external piece of code
+					this.reset();
+					return;
+				}
 
-                if(this.keystrokeTimeout !== null) {
-                    $timeout.cancel(this.keystrokeTimeout);
-                    this.keystrokeTimeout = null;
-                }
+				// If we're more than half a second away from the expected pause time,
+				// assume we have been seeked by the user or some external piece of code
+				// 
+				// NOTE: This is a little bit ugly. It solves the problem, but if we do subsecond seeks
+				// somewhere else during a magic pause, this may cause unexpected behavior.
+				//
+				// That being said, we will probably have to modify this code if there's a use case
+				// which involves sub-second seeking during a magic pause.
+				//
+				// The alternative is to truly differentiate between user initiated video updates, and those initiated by external code.
+				// And in that case, we'd have to ignore non-user initiated events generated by calling the VideoPlayer API from within
+				// this mode handler.
+				var currentTime = VideoPlayer.currentTime();
+				var expectedTime = this.anticipatePauseStartTime + 4000;
+				var error = Math.abs(expectedTime - currentTime);
+				if(error > 500) {
+					this.reset();
+					return;
+				}
 
-                this.keystrokeTimeout = $timeout(function() {
-                    self.keystrokeTimeout = null;
+				this.state = 'magic-paused';
+				VideoPlayer.pause();
+				this.magicPauseStartTime = VideoPlayer.currentTime();
+				this.continueMagicPause();
+			},
+			continueMagicPause: function() {
+				var self = this;
 
-                    // At least 1 second has elapsed without an edit keystroke
-                    if(self.continuousTypingTimeout !== null) {
-                        $log.log('cancelled continuous typing timeout');
-                        $timeout.cancel(self.continuousTypingTimeout);
-                        self.continuousTypingTimeout = null;
-                    }
-                }, 1000);
-            }
+				$log.log('[magic-pause] continue magic pause');
+
+				this.cancelKeystrokeTimeout();
+				self.keystrokeTimeout = $timeout(function() {
+					// At least 1 second has elapsed without an edit keystroke
+					self.keystrokeTimeout = null;
+
+					// If we haven't been unpaused and the video time is exactly the magic pause start time,
+					// then the magic pause completed without user or external code intervention.
+					// So we can safely seek backwards.
+					$log.log('[magic-pause] magic resume, current time = ' +  VideoPlayer.currentTime() + ', pause start = ' + self.magicPauseStartTime);
+					var deltaTime = Math.abs(VideoPlayer.currentTime() - self.magicPauseStartTime);
+					if(!VideoPlayer.isPlaying() && deltaTime < 100) {
+						// TODO: if the user hits resume withing 100ms of the magic resume, this may still seek backwards, and be upsetting for the user
+						$log.log('[magic-pause] magic resume succeeded');
+						VideoPlayer.seek(self.magicPauseStartTime - 3000);
+						VideoPlayer.play();
+					}
+
+					self.reset();
+				}, 1000);
+			},
+
+			onActivate: function() {
+				// This mode has just been activated. Return to the initial state.
+				this.reset();
+			},
+			onDeactivate: function() {
+				this.reset();
+			},
+			onTextEditKeystroke: function() {
+				switch(this.state) {
+					case 'inactive':
+						this.startAnticipatingPause();
+						break;
+					case 'anticipating-pause':
+						this.continueAnticipatingPause();
+						break;
+					case 'magic-paused':
+						this.continueMagicPause();
+						break;
+				}
+			}
         });
 
         var currentModeHandler = new MagicModeHandler();
-
-        // TODO: if the user types for 4 seconds continuously (at least 1 keystroke per second) pause
-
-        // when a key is pressed, we want to start tracking the time since the last keystroke
-        //   if it is more than one second, start this timer over
-        //   if it is less than one second, keep counting until we get to 4 seconds
-        //   then pause the video
 
         $scope.$root.$on('text-edit-keystroke', function($event) {
             currentModeHandler.onTextEditKeystroke();
         });
 
-        $scope.$root.$on('video-update', function($event) {
-            $log.log('video update');
-        });
-
         $scope.$watch('playbackMode', function(newMode, oldMode) {
             VideoPlayer.pause();
             $log.log('playbackMode changed to ' + newMode);
+			currentModeHandler.onDeactivate();
+			// TODO: switch the current mode handler
+			currentModeHandler.onActivate();
         });
     }]);
 }).call(this);
