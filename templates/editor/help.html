@@ -70,5 +70,13 @@
     <a class="guidelines-link" ng-switch-when="true" title="" href="" ng-click="onGuidelinesClicked($event)">[[ teamName ]] Guidelines &#187;</a>
     <a class="guidelines-link" ng-switch-when="false" title="" href="" ng-click="onGuidelinesClicked($event)">{% trans "Subtitling Guidelines" %} &#187;</a>
     </ng-switch>
-    <a class="playback-mode-link" title="" href="" ng-click="onPlaybackModeClicked($event)" ng-controller="PlaybackModeController">{% trans "Playback Mode: " %}[[ playbackMode ]] &#187;</a>
+    <a class="playback-mode-link" title="" href="" ng-click="onPlaybackModeClicked($event)">
+        {% trans "Playback Mode:" %}
+        <span ng-switch="playbackMode">
+            <span ng-switch-when="magic">{% trans "Magic" %}</span>
+            <span ng-switch-when="standard">{% trans "Standard" %}</span>
+            <span ng-switch-when="beginner">{% trans "Beginner" %}</span>
+        </span>
+        &#187;
+    </a>
 </div>

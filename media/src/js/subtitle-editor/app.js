@@ -70,6 +70,7 @@ var angular = angular || null;
         $controller('AppControllerLocking', {$scope: $scope});
         $controller('AppControllerEvents', {$scope: $scope});
         $controller('DialogController', {$scope: $scope});
+        $controller('PlaybackModeController', {$scope: $scope});
         $controller('SessionBackend', {$scope: $scope});
         $controller('SessionController', {$scope: $scope});
 
@@ -83,7 +84,6 @@ var angular = angular || null;
         $scope.uploading = false;
         $scope.uploadError = false;
         $scope.exiting = false;
-        $scope.lastTextEditKeystrokeTime = 0;
         $scope.hideNextTime = function() {
             $scope.showHideNextTime = false;
         };
