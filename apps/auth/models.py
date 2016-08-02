@@ -100,6 +100,14 @@ class CustomUser(BaseUser):
         (AUTOPLAY_ON_LANGUAGES, 'Autoplay subtitles in languages I know'),
         (DONT_AUTOPLAY, 'Don\'t autoplay subtitles')
     )
+    PLAYBACK_MODE_MAGIC = 1
+    PLAYBACK_MODE_STANDARD = 2
+    PLAYBACK_MODE_BEGINNER = 3
+    PLAYBACK_MODE_CHOICES = (
+        (PLAYBACK_MODE_MAGIC, 'Recommended: magical auto-pause (just keep typing!)'),
+        (PLAYBACK_MODE_STANDARD, 'Standard: no automatic pausing, use TAB key'),
+        (PLAYBACK_MODE_BEGINNER, 'Beginner: play 4 seconds, then pause')
+    )
     homepage = models.URLField(blank=True)
     preferred_language = models.CharField(
         max_length=16, choices=ALL_LANGUAGES, blank=True)
@@ -127,6 +135,8 @@ class CustomUser(BaseUser):
     pay_rate_code = models.CharField(max_length=3, blank=True, default='')
     can_send_messages = models.BooleanField(default=True)
     show_tutorial = models.BooleanField(default=True)
+    playback_mode = models.IntegerField(
+        choices=PLAYBACK_MODE_CHOICES, default=PLAYBACK_MODE_STANDARD)
     created_by = models.ForeignKey('self', null=True, blank=True,
                                    related_name='created_users')
 
