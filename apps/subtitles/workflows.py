@@ -307,6 +307,14 @@ class VideoWorkflow(object):
         """
         raise NotImplementedError()
 
+    def user_can_set_video_duration(self, user):
+        """Check if a user can set duration of a video
+
+        Returns:
+            True/False
+        """
+        return not user.is_anonymous()
+
     def user_can_edit_video(self, user):
         """Check if a user can view the video
 
