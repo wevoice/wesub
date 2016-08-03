@@ -377,7 +377,7 @@ def _timings_changed(subtitle_language, new_version):
     return new_timings != old_timings
 
 
-def _add_subtitles(video, sl, subtitles, title, description, author,
+def _add_subtitles(video, sl, subtitles, title, duration, description, author,
                    visibility, visibility_override, parents,
                    rollback_of_version_number, committer, created, note,
                    origin, metadata, action):
@@ -391,22 +391,19 @@ def _add_subtitles(video, sl, subtitles, title, description, author,
     # locking at the start prevents deadlocks.
     Video.objects.select_for_update(id=video.id)
 
-    data = {'title': title, 'description': description, 'author': author,
+    data = {'title': title, 'duration': duration, 'description': description, 'author': author,
             'visibility': visibility, 'visibility_override': visibility_override,
             'parents': [_get_version(video, p) for p in (parents or [])],
             'rollback_of_version_number': rollback_of_version_number,
             'created': created, 'note': note, 'origin': origin,
             'metadata': metadata}
     _strip_nones(data)
-
     version = sl.add_version(subtitles=subtitles, **data)
     _perform_team_operations(version, committer, action)
     if action:
         action.validate(author, video, sl, version)
         action.update_language(author, video, sl, version)
-
     _update_followers(sl, author)
-
     if origin in (ORIGIN_UPLOAD, ORIGIN_API):
         _fork_dependents(sl)
     elif origin == ORIGIN_WEB_EDITOR and _timings_changed(sl, version):
@@ -416,7 +413,6 @@ def _add_subtitles(video, sl, subtitles, title, description, author,
         # entire concept of forking.
         sl.fork()
         _fork_dependents(sl)
-
     return version
 
 def _rollback_to(video, language_code, version_number, rollback_author):
@@ -431,6 +427,7 @@ def _rollback_to(video, language_code, version_number, rollback_author):
         'sl': target.video.subtitle_language(language_code),
         'subtitles': target.get_subtitles(),
         'title': target.title,
+        'duration': target.duration,
         'description': target.description,
         'visibility_override': None,
         'committer': None,
@@ -476,7 +473,7 @@ def add_subtitles(video, language_code, subtitles,
                   visibility=None, visibility_override=None,
                   parents=None, committer=None, complete=None,
                   created=None, note=None, origin=None, metadata=None,
-                  action=None):
+                  action=None, duration=None):
     """Add subtitles in the language to the video.  It all starts here.
 
     This function is your main entry point to the subtitle pipeline.
@@ -537,7 +534,7 @@ def add_subtitles(video, language_code, subtitles,
         subtitle_language = _get_language(video, language_code)
         subtitle_language.freeze()
         version = _add_subtitles(video, subtitle_language, subtitles, title,
-                                 description, author, visibility,
+                                 duration, description, author, visibility,
                                  visibility_override, parents, None, committer,
                                  created, note, origin, metadata, action)
     video.cache.invalidate()

@@ -76,7 +76,7 @@ class HtmlFiveVideoType(VideoType):
     def matches_video_url(cls, url):
         return cls.url_extension(url) in cls.valid_extensions
 
-    def get_direct_url(self):
+    def get_direct_url(self, prefer_audio=False):
         return self.url
 
     def set_values(self, video):

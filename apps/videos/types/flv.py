@@ -29,7 +29,7 @@ class FLVVideoType(VideoType):
     def __init__(self, url):
         self.url = url
 
-    def get_direct_url(self):
+    def get_direct_url(self, prefer_audio=False):
         return self.url
 
     @classmethod

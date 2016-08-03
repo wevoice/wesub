@@ -833,7 +833,6 @@ EXISTS(
         ensure_stringy(kwargs.get('title'))
         ensure_stringy(kwargs.get('description'))
         metadata = kwargs.pop('metadata', None)
-
         sv = SubtitleVersion(*args, **kwargs)
 
         sv.set_subtitles(kwargs.get('subtitles', None))
@@ -1546,8 +1545,8 @@ class SubtitleVersion(models.Model):
 
         lineage = kwargs.pop('lineage', None)
 
+        self.duration = kwargs.pop('duration', None)
         super(SubtitleVersion, self).__init__(*args, **kwargs)
-
         self._subtitles = None
         if has_subtitles:
             self.set_subtitles(subtitles)
@@ -1590,7 +1589,6 @@ class SubtitleVersion(models.Model):
 
         assert self.visibility in ('public', 'private',), \
             "Version visibility must be either 'public' or 'private'!"
-
         super(SubtitleVersion, self).save(*args, **kwargs)
 
         if self.is_public() and self.is_for_primary_audio_language():
@@ -1917,6 +1915,8 @@ class SubtitleVersion(models.Model):
             self.video.title = self.title
         if self.description:
             self.video.description = self.description
+        if self.duration and not self.video.duration:
+            self.video.duration = self.duration
         self.video.update_metadata(self.get_metadata(), commit=False)
         self.video.save()
 
