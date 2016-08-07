@@ -89,6 +89,12 @@ def tutorial_shown(request):
     User.tutorial_was_shown(request.user.id)
     return HttpResponse(json.dumps({'success': True}))
 
+@login_required
+@require_POST
+def set_playback_mode(request):
+    User.set_playback_mode(request.user.id, request.POST['playback_mode'])
+    return HttpResponse(json.dumps({'success': True}))
+
 def old_editor(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
     language = get_object_or_404(SubtitleLanguage, video=video,
@@ -209,8 +215,10 @@ class SubtitleEditorBase(View):
                 'video_id': self.video.video_id,
                 'language_code': self.editing_language.language_code,
             }),
+            'playbackModes': self.get_editor_data_for_playback_modes(),
             'preferences': {
                 'showTutorial': self.request.user.show_tutorial,
+                'playbackModeId': self.request.user.playback_mode
             },
             'staticURL': settings.STATIC_URL,
             'notesHeading': 'Editor Notes',
@@ -267,6 +275,28 @@ class SubtitleEditorBase(View):
             'is_rtl': language.is_rtl(),
             'is_original': language.is_primary_audio_language()
         }
+
+    def get_editor_data_for_playback_modes(self):
+        return [
+            {
+                'id': User.PLAYBACK_MODE_MAGIC,
+                'idStr': 'magic',
+                'name': _('Magic'),
+                'desc': _('Recommended: magical auto-pause (just keep typing!)')
+            },
+            {
+                'id': User.PLAYBACK_MODE_STANDARD,
+                'idStr': 'standard',
+                'name': _('Standard'),
+                'desc': _('Standard: no automatic pausing, use TAB key')
+            },
+            {
+                'id': User.PLAYBACK_MODE_BEGINNER,
+                'idStr': 'beginner',
+                'name': _('Beginner'),
+                'desc': _('Beginner: play 4 seconds, then pause')
+            }
+        ]
 
     def get_team_editor_data(self):
         if self.team_video:

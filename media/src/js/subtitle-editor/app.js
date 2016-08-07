@@ -78,6 +78,7 @@ var angular = angular || null;
         $scope.canSync = EditorData.canSync;
         $scope.showHideNextTime = EditorData.preferences.showTutorial
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
+        $scope.playbackModes = EditorData.playbackModes;
         $scope.scrollingSynced = true;
         $scope.loadingFinished = false;
         $scope.tutorialShown = false;

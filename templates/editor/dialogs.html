@@ -320,11 +320,7 @@
 <aside modal-dialog="playback-mode" allow-close id="playback-mode-modal" class="modal" role="dialog" tabindex="-1" aria-labeledby="playback-mode-heading" dir="[[ workingSubtitles.language.dir ]]">
     <h3 id="playback-mode-heading">{% trans "Playback Mode" %}</h3>
     <div class="modal-content">
-        <select ng-model="playbackMode">
-            <option value="magic">{% trans "Recommended: magical auto-pause (just keep typing!)" %}</option>
-            <option value="standard">{% trans "Standard: no automatic pausing, use TAB key" %}</option>
-            <option value="beginner">{% trans "Beginner: play 4 seconds, then pause" %}</option>
-        </select>
+        <select ng-model="playbackMode" ng-options="mode.desc for mode in playbackModes"></select>
     </div>
     <footer class="buttons">
         <button ng-click="dialogManager.onCloseClick($event)">

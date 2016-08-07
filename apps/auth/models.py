@@ -104,9 +104,9 @@ class CustomUser(BaseUser):
     PLAYBACK_MODE_STANDARD = 2
     PLAYBACK_MODE_BEGINNER = 3
     PLAYBACK_MODE_CHOICES = (
-        (PLAYBACK_MODE_MAGIC, 'Recommended: magical auto-pause (just keep typing!)'),
-        (PLAYBACK_MODE_STANDARD, 'Standard: no automatic pausing, use TAB key'),
-        (PLAYBACK_MODE_BEGINNER, 'Beginner: play 4 seconds, then pause')
+        (PLAYBACK_MODE_MAGIC, 'Magical auto-pause'),
+        (PLAYBACK_MODE_STANDARD, 'No automatic pausing'),
+        (PLAYBACK_MODE_BEGINNER, 'Play for X seconds, then pause')
     )
     homepage = models.URLField(blank=True)
     preferred_language = models.CharField(
@@ -209,6 +209,10 @@ class CustomUser(BaseUser):
     @classmethod
     def tutorial_was_shown(self, id):
         self.objects.filter(pk=id).update(show_tutorial=False)
+
+    @classmethod
+    def set_playback_mode(self, id, playback_mode):
+        self.objects.filter(pk=id).update(playback_mode=playback_mode)
 
     @classmethod
     def displayable_users(self, ids):

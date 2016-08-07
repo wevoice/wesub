@@ -100,9 +100,16 @@
 
     }]);
 
-    module.controller('PlaybackModeController', ['$scope', '$timeout', '$log', 'VideoPlayer',
-                      function($scope, $timeout, $log, VideoPlayer) {
-        $scope.playbackMode = 'magic';
+    module.controller('PlaybackModeController', ['$scope', '$timeout', '$log', 'VideoPlayer', 'EditorData', 'PreferencesService',
+                      function($scope, $timeout, $log, VideoPlayer, EditorData, PreferencesService) {
+        var initialPlaybackModeId = EditorData.preferences.playbackModeId;
+        $.each(EditorData.playbackModes, function(index, mode) {
+            if(mode.id === initialPlaybackModeId) {
+                $scope.playbackMode = mode;
+            }
+        });
+
+        $log.log('stored playbackModeId : ' + EditorData.preferences.playbackModeId)
 
         function ModeHandler() {}
         ModeHandler.prototype = { 
@@ -304,13 +311,20 @@
             }
         });
 
-        var modeHandlers = {
-            'magic': new MagicModeHandler(),
-            'standard': new StandardModeHandler(),
-            'beginner': new BeginnerModeHandler()
-        };
 
-        var currentModeHandler = modeHandlers[$scope.playbackMode];
+        // Map playback mode id strings to modes
+        var playbackModes = {};
+        $.each(EditorData.playbackModes, function(index, mode) {
+            playbackModes[mode.idStr] = mode;
+        });
+
+        // Map playback mode ids to mode handlers
+        var modeHandlers = {};
+        modeHandlers[playbackModes.magic.id] = new MagicModeHandler();
+        modeHandlers[playbackModes.standard.id] = new StandardModeHandler();
+        modeHandlers[playbackModes.beginner.id] = new BeginnerModeHandler();
+
+        var currentModeHandler = modeHandlers[$scope.playbackMode.id];
 
         $scope.$root.$on('text-edit-keystroke', function($event) {
             currentModeHandler.onTextEditKeystroke();
@@ -321,11 +335,18 @@
         });
 
         $scope.$watch('playbackMode', function(newMode, oldMode) {
+            if(newMode === oldMode) {
+                return;
+            }
+
             VideoPlayer.pause();
-            $log.log('playbackMode changed to ' + newMode);
+            $log.log('playbackMode changed to ' + JSON.stringify(newMode));
             currentModeHandler.onDeactivate();
-            currentModeHandler = modeHandlers[newMode];
+            currentModeHandler = modeHandlers[newMode.id];
             currentModeHandler.onActivate();
+
+            // Save the new playbackMode preference server-side
+            PreferencesService.setPlaybackMode(newMode.id);
         });
     }]);
 }).call(this);
