@@ -334,7 +334,7 @@ class PrepDeploy(Command):
 
 NEEDS_ROOT = [
     'build_docs',
-    'update_docs',
+    'update_api_docs',
     'update_translations',
     'compile_translations',
     'schemamigration',
