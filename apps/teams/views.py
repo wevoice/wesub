@@ -113,7 +113,6 @@ UNASSIGNED_TASKS_ON_PAGE = getattr(settings, 'UNASSIGNED_TASKS_ON_PAGE', 15)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
 DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
-ALL_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 
 def get_team_for_view(slug, user, exclude_private=True):
