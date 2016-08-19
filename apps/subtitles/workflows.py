@@ -28,7 +28,7 @@ particular they control:
 - Permissions -- Who can edit subtitles, who can view private subtitles
 
 Overriding workflows
--------------------
+--------------------
 
 By default, we use a workflow that makes sense for public videos -- Anyone
 can edit, the only action is Publish, etc.
