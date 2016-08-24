@@ -43,8 +43,6 @@ describe('Test the SubtitleList class', function() {
         expect(sub1.content()).toEqual('<i>test</i>');
         subtitleList.updateSubtitleContent(sub1, '**test**');
         expect(sub1.content()).toEqual('<b>test</b>');
-        subtitleList.updateSubtitleContent(sub1, '_test_');
-        expect(sub1.content()).toEqual('<u>test</u>');
     });
 
     it('should update timing', function() {
