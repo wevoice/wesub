@@ -61,11 +61,11 @@ describe('Test the subtitle-repeat directive', function() {
     }));
 
     function childLIs() {
-        return $('li', elm);
+        return $(elm).children('li');
     }
 
     function readOnlyChildLIs() {
-        return $('li', readOnlyElm)
+        return $(readOnlyElm).children('li');
     }
 
     it('creates an LI for each subtitle', function() {
@@ -115,16 +115,12 @@ describe('Test the subtitle-repeat directive', function() {
         expect(childLIs()[5]).toHaveSubtitleContent(newSubAtBack);
     });
 
-    it('creates buttons except when in read-only mode', function() {
+    it('creates the toolbox, except when in read-only mode', function() {
         var li = childLIs()[0];
-        expect($('button.remove-subtitle', li).length).toBeTruthy();
-        expect($('button.insert-subtitle', li).length).toBeTruthy();
-        expect($('button.new-paragraph', li).length).toBeTruthy();
+        expect($('ul.sub-toolbox-menu', li).length).toBeTruthy();
 
         li = readOnlyChildLIs()[0];
-        expect($('button.remove-subtitle', li).length).toBeFalsy();
-        expect($('button.insert-subtitle', li).length).toBeFalsy();
-        expect($('button.new-paragraph', li).length).toBeFalsy();
+        expect($('ul.sub-toolbox-menu', li).length).toBeFalsy();
     });
 
     it('handles clicks', function() {
@@ -132,7 +128,7 @@ describe('Test the subtitle-repeat directive', function() {
         var sub = subtitles[0];
         // If there is no click handler, the click event shouldn't cause an
         // exception.
-        $('button.insert-subtitle', li).click();
+        $('a.insert-top', li).click();
         // Test click handlers
         var clickActions = [];
         scope.onSubtitleClick = function(evt, subtitle, action) {
@@ -140,18 +136,18 @@ describe('Test the subtitle-repeat directive', function() {
             clickActions.push(action);
         }
         // Test clicks
-        $('button.insert-subtitle', li).click();
-        expect(clickActions).toEqual(['insert']);
-        $('button.remove-subtitle', li).click();
-        expect(clickActions).toEqual(['insert', 'remove']);
-        $('button.new-paragraph', li).click();
-        expect(clickActions).toEqual(['insert', 'remove', 'changeParagraph']);
+        $('a.insert-top', li).click();
+        expect(clickActions).toEqual(['insert-top']);
+        $('a.remove', li).click();
+        expect(clickActions).toEqual(['insert-top', 'remove']);
+        $('a.note-time', li).click();
+        expect(clickActions).toEqual(['insert-top', 'remove', 'note-time']);
         // Clicking outside a button should result in the edit action
         $('.timing', li).click();
-        expect(clickActions).toEqual(['insert', 'remove', 'changeParagraph', 'edit']);
+        expect(clickActions).toEqual(['insert-top', 'remove', 'note-time', 'edit']);
         // Clicking on a read-only list shouldn't result in any action
         $('.timing', readOnlyChildLIs()[0]).click();
-        expect(clickActions).toEqual(['insert', 'remove', 'changeParagraph', 'edit']);
+        expect(clickActions).toEqual(['insert-top', 'remove', 'note-time', 'edit']);
     });
 
     it('adds/removes a textarea based on bind-to-edit', function() {

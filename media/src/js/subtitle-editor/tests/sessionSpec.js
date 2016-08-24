@@ -32,6 +32,9 @@ describe('The SessionBackend', function() {
         $scope.collab = {
             notes: 'test notes'
         };
+        $scope.timeline = {
+            duration: 25000,
+        };
         $controller('SessionBackend', { $scope: $scope, });
     }));
 
@@ -51,6 +54,7 @@ describe('The SessionBackend', function() {
         expect(SubtitleStorage.saveSubtitles).toHaveBeenCalledWith(
             $scope.workingSubtitles.subtitleList.toXMLString(),
             $scope.workingSubtitles.title,
+            $scope.timeline.duration / 1000,
             $scope.workingSubtitles.description,
             $scope.workingSubtitles.metadata,
             null, 'action');

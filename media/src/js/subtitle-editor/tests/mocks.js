@@ -83,6 +83,7 @@
     module.factory('EditorData', function() {
         return {
             "username": "testuser",
+            "user_fullname": "Test User",
             "canSync": true,
             "canAddAndRemove": true,
             "languageCode": "en",

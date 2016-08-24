@@ -74,7 +74,7 @@ describe('The Notes Controller', function() {
         expect($scope.notes.length).toEqual(2);
         // the note should be added to the end of the list
         expect($sce.getTrustedHtml($scope.notes[1].body)).toEqual('new note');
-        expect($scope.notes[1].user).toEqual(EditorData.username);
+        expect($scope.notes[1].user).toEqual(EditorData.user_fullname);
         expect($scope.notes[1].created).toEqual('Just now');
     });
 
