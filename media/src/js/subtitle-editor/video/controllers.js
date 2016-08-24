@@ -325,6 +325,7 @@
         modeHandlers[playbackModes.beginner.id] = new BeginnerModeHandler();
 
         var currentModeHandler = modeHandlers[$scope.playbackMode.id];
+        currentModeHandler.onActivate();
 
         $scope.$root.$on('text-edit-keystroke', function($event) {
             currentModeHandler.onTextEditKeystroke();
