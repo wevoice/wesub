@@ -341,7 +341,7 @@ NEEDS_ROOT = [
     'datamigration',
 ]
 def run_manage(args, **kwargs):
-    if args[0] in NEEDS_ROOT:
+    if args and args[0] in NEEDS_ROOT:
         cmdline = ['docker-compose', 'run', '-u', 'root', 'app', 'manage']
     else:
         cmdline = ['docker-compose', 'run', 'app', 'manage']
