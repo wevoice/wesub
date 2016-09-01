@@ -1104,7 +1104,6 @@ class ActivityFiltersForm(forms.Form):
         ('-created', _('date, newest')),
         ('created', _('date, oldest')),
     ]
-
     type = forms.ChoiceField(
         label=_('Activity Type'), required=False,
         choices=[])
@@ -1122,9 +1121,7 @@ class ActivityFiltersForm(forms.Form):
         super(ActivityFiltersForm, self).__init__(
                   data=self.calc_data(get_data))
         self.team = team
-        self.fields['type'].choices = [
-            ('', _('Any type')),
-        ] + ActivityRecord.active_type_choices()
+        self.fields['type'].choices = self.calc_activity_choices()
         language_choices = [
             ('', ('Any language')),
         ]
@@ -1134,6 +1131,17 @@ class ActivityFiltersForm(forms.Form):
             language_choices.extend(get_language_choices())
         self.fields['video_language'].choices = language_choices
         self.fields['subtitle_language'].choices = language_choices
+
+    def calc_activity_choices(self):
+        choices = [
+            ('', _('Any type')),
+        ]
+        choice_map = dict(ActivityRecord.active_type_choices())
+        choices.extend(
+            (value, choice_map[value])
+            for value in self.team.new_workflow.activity_type_filter_options()
+        )
+        return choices
 
     def calc_data(self, get_data):
         field_names = set(['type', 'video_language', 'subtitle_language',
