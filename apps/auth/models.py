@@ -41,6 +41,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from tastypie.models import ApiKey
 from caching import CacheGroup, ModelCacheManager
 from utils.amazon import S3EnabledImageField
+from utils import secureid
 from utils import translation
 from utils.tasks import send_templated_email_async
 
@@ -90,7 +91,7 @@ class CustomUserManager(UserManager):
                                   for i in xrange(6))
             yield '{}{}{}'.format(part1, rand_string, part2)
 
-class CustomUser(BaseUser):
+class CustomUser(BaseUser, secureid.SecureIDMixin):
     AUTOPLAY_ON_BROWSER = 1
     AUTOPLAY_ON_LANGUAGES = 2
     DONT_AUTOPLAY = 3
@@ -129,6 +130,8 @@ class CustomUser(BaseUser):
     show_tutorial = models.BooleanField(default=True)
     created_by = models.ForeignKey('self', null=True, blank=True,
                                    related_name='created_users')
+
+    SECURE_ID_KEY = 'User'
 
     objects = CustomUserManager()
 
