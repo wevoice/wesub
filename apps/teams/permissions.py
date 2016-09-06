@@ -386,7 +386,8 @@ def can_add_member(team, user, role):
     ).exists()
 
 def can_remove_member(team, user):
-    return can_add_member(team, user)
+    member = team.get_member(user)
+    return can_add_member(team, user, member.role)
 
 def can_move_videos(team, user):
     role = get_role_for_target(user, team, None, None)
