@@ -21,6 +21,7 @@ from urlparse import urlparse
 from nose.tools import *
 import re
 
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core import mail
 from django.test import TestCase
@@ -78,6 +79,10 @@ class UserCreationTest(TestCase):
         user.set_password("secret")
         user.save()
         self.assertEqual(len(mail.outbox), 1)
+
+    def test_username_cant_have_dollar_sign(self):
+        with assert_raises(ValidationError):
+            User(username="user$name").full_clean()
 
 class UniqueUsernameTest(TestCase):
     def test_username_already_unique(self):

@@ -76,7 +76,7 @@ class ActivityTest(TestCase):
             assert_equal(activity_data['user'], record.user.username)
             assert_equal(activity_data['user_uri'], reverse(
                 'api:users-detail', kwargs={
-                    'username': record.user.username,
+                    'identifier': record.user.username,
                 }, request=APIRequestFactory().get('/'))
             )
         else:

@@ -453,10 +453,10 @@ Fetching user data
 
 .. http:get:: /api/users/[identifier]/
 
-    :arg string identifier:  String that identies the user.  You can use either
-        ``[username]``, or ``@[user-id]``
+    :arg user-id identifier:  See :ref:`user_ids` for the format
 
     :>json username username: username
+    :>json string id: user ID
     :>json string first_name: First name
     :>json string last_name: Last name
     :>json url homepage: Homepage URL
@@ -516,6 +516,19 @@ Updating user accounts
 
     Inputs the same fields as POST, except `username` and
     `find_unique_username`.
+
+.. _user_ids:
+
+User Identifiers
+****************
+
+There are a couple ways to specify users:
+
+- Username
+- User ID prefixed with "id$" (``id$abcdef123``)
+
+The user ID method is preferred since it's possible for users to change their
+username.
 
 Activity
 --------

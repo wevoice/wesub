@@ -211,8 +211,28 @@ class TeamMemberAPITest(TeamAPITestBase):
     def detail_url(self, user):
         return reverse('api:team-members-detail', kwargs={
             'team_slug': self.team.slug,
-            'username': user.username,
+            'identifier': 'id$' + user.secure_id(),
         })
+
+    def check_response_data(self, response, user):
+        member = self.team.members.get(user=user)
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_equal(response.data['username'], user.username)
+        assert_equal(response.data['role'], member.role)
+
+    def test_get_details(self):
+        user = TeamMemberFactory(team=self.team).user
+        response = self.client.get(self.detail_url(user))
+        self.check_response_data(response, user)
+
+    def test_get_with_username(self):
+        user = TeamMemberFactory(team=self.team).user
+        url = reverse('api:team-members-detail', kwargs={
+            'team_slug': self.team.slug,
+            'identifier': user.username,
+        })
+        response = self.client.get(url)
+        self.check_response_data(response, user)
 
     def test_add_team_member(self):
         user = UserFactory()
@@ -308,7 +328,6 @@ class TeamMemberAPITest(TeamAPITestBase):
                                TeamMember.ROLE_CONTRIBUTOR))
 
     def test_change_checks_permissions(self):
-#def can_assign_role(team, user, role, to_user):
         self.can_assign_role.return_value = False
         member = TeamMemberFactory(team=self.team,
                                    role=TeamMember.ROLE_CONTRIBUTOR)
@@ -349,7 +368,7 @@ class SafeTeamMemberAPITest(TeamMemberAPITest):
     def detail_url(self, user):
         return reverse('api:safe-team-members-detail', kwargs={
             'team_slug': self.team.slug,
-            'username': user.username,
+            'identifier': 'id$' + user.secure_id(),
         })
 
     def check_invitation(self, user):

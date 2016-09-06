@@ -226,6 +226,7 @@ class ActivitySerializer(serializers.ModelSerializer):
         source='user',
         view_name='api:users-detail',
         lookup_field='username',
+        lookup_url_kwarg='identifier',
         read_only=True)
     video_uri = serializers.HyperlinkedRelatedField(
         source='video',

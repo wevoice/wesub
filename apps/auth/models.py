@@ -29,7 +29,7 @@ from django.contrib.auth.models import UserManager, User as BaseUser
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.cache import cache
-from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.db import models
@@ -182,6 +182,10 @@ class CustomUser(BaseUser, secureid.SecureIDMixin):
 
         if send_confirmation and send_email_confirmation:
             EmailConfirmation.objects.send_confirmation(self)
+
+    def clean(self):
+        if '$' in self.username:
+            raise ValidationError("usernames can't contain the '$' character")
 
     def unread_messages(self, hidden_meassage_id=None):
         from messages.models import Message

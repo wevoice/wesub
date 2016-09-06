@@ -346,6 +346,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
+from api import userlookup
 from api.fields import TimezoneAwareDateTimeField
 from auth.models import CustomUser as User
 from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
@@ -564,11 +565,12 @@ class TeamSubview(TeamSubviewMixin, viewsets.ModelViewSet):
     pass
 
 class TeamMemberViewSet(TeamSubview):
-    lookup_field = 'username'
+    lookup_field = 'identifier'
+    lookup_value_regex = r'[^/]+'
     paginate_by = 20
 
     def get_serializer_class(self):
-        if 'username' in self.kwargs:
+        if 'identifier' in self.kwargs:
             return TeamMemberUpdateSerializer
         else:
             return TeamMemberSerializer
@@ -581,9 +583,11 @@ class TeamMemberViewSet(TeamSubview):
     def get_object(self):
         if not self.team.user_is_member(self.request.user):
             raise PermissionDenied()
-        member = get_object_or_404(self.team.members,
-                                   user__username=self.kwargs['username'])
-        return member
+        try:
+            user = userlookup.lookup_user(self.kwargs['identifier'])
+        except User.DoesNotExist:
+            raise Http404()
+        return get_object_or_404(self.team.members, user=user)
 
     def check_join_permissions(self, role):
         if not (role == TeamMember.ROLE_CONTRIBUTOR and
@@ -652,7 +656,7 @@ class SafeTeamMemberSerializer(TeamMemberSerializer):
 
 class SafeTeamMemberViewSet(TeamMemberViewSet):
     def get_serializer_class(self):
-        if 'username' in self.kwargs:
+        if 'identifier' in self.kwargs:
             return TeamMemberUpdateSerializer
         else:
             return SafeTeamMemberSerializer

@@ -106,7 +106,7 @@ class SubtitleLanguageSerializerTest(TestCase):
             {
                 'author': 'user2',
                 'author_uri': reverse('api:users-detail', kwargs={
-                    'username': 'user2',
+                    'identifier': 'user2',
                 }, request=APIRequestFactory().get("/")),
                 'published': False,
                 'version_no': 2,
@@ -114,7 +114,7 @@ class SubtitleLanguageSerializerTest(TestCase):
             {
                 'author': 'user1',
                 'author_uri': reverse('api:users-detail', kwargs={
-                    'username': 'user1',
+                    'identifier': 'user1',
                 }, request=APIRequestFactory().get("/")),
                 'published': True,
                 'version_no': 1,
@@ -133,7 +133,7 @@ class SubtitleLanguageSerializerTest(TestCase):
             {
                 'author': self.user.username,
                 'author_uri': reverse('api:users-detail', kwargs={
-                    'username': self.user.username,
+                    'identifier': self.user.username,
                 }, request=APIRequestFactory().get("/")),
                 'published': True,
                 'version_no': 2,

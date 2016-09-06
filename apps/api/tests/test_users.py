@@ -36,7 +36,7 @@ class UserAPITest(TestCase):
         self.list_url = reverse('api:users-list')
 
     def detail_url(self, user):
-        return reverse('api:users-detail', args=(user.username,))
+        return reverse('api:users-detail', args=('id$' + user.secure_id(),))
 
     def assert_response_data_correct(self, response, user, method):
         for field in ('username', 'full_name', 'first_name', 'last_name',
@@ -52,6 +52,7 @@ class UserAPITest(TestCase):
                          user.created_by.username)
         else:
             assert_equal(response.data['created_by'], None)
+        assert_equal(response.data['id'], user.secure_id())
         assert_equal(response.data['avatar'], user.avatar())
         assert_equal(response.data['num_videos'], user.videos.count())
         assert_items_equal(response.data['languages'], user.get_languages())
@@ -81,6 +82,14 @@ class UserAPITest(TestCase):
         for i in range(3):
             VideoFactory(user=self.user)
         response = self.client.get(self.detail_url(user))
+        assert_equal(response.status_code, status.HTTP_200_OK,
+                     response.content)
+        self.assert_response_data_correct(response, user, 'get')
+
+    def test_get_with_username(self):
+        user = UserFactory()
+        url =reverse('api:users-detail', args=(user.username,))
+        response = self.client.get(url)
         assert_equal(response.status_code, status.HTTP_200_OK,
                      response.content)
         self.assert_response_data_correct(response, user, 'get')
@@ -159,6 +168,14 @@ class UserAPITest(TestCase):
             'is_partner': True,
         })
         assert_false(user.is_partner)
+
+    def test_create_with_dollar_sign(self):
+        # The dollar sign is reserved for identifiers, so we should prevent
+        # creating users with this.
+        response = self.client.post(self.list_url, {
+            'username': 'test$user',
+        })
+        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_username_max_length(self):
         # we should only allow 30 chars for the username length

@@ -301,7 +301,7 @@ class MiniSubtitleVersionSerializer(serializers.Serializer):
 
     def get_author_uri(self, version):
         kwargs = {
-            'username': version.author.username,
+            'identifier': version.author.username,
         }
         return reverse('api:users-detail', kwargs=kwargs,
                        request=self.context['request'])
