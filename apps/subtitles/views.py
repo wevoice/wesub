@@ -23,7 +23,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, Http404, HttpResponseServerError
+from django.http import HttpResponse, Http404, HttpResponseServerError, HttpResponseForbidden
 from django.db.models import Count
 from django.conf import settings
 from django.contrib import messages
@@ -42,6 +42,7 @@ from auth.models import CustomUser as User
 from subtitles import shims
 from subtitles.workflows import get_workflow
 from subtitles.models import SubtitleLanguage, SubtitleVersion
+from subtitles.permissions import user_can_access_subtitles_format
 from subtitles.templatetags.new_subtitles_tags import visibility
 from subtitles.forms import SubtitlesUploadForm
 from teams.models import Task
@@ -401,10 +402,11 @@ def _user_for_download_permissions(request):
 
 def download(request, video_id, language_code, filename, format,
              version_number=None):
-
+    user = _user_for_download_permissions(request)
+    if not user_can_access_subtitles_format(user, format):
+        raise HttpResponseForbidden(_(u'You are not allowed to download this subtitle format.'))
     video = get_object_or_404(Video, video_id=video_id)
     workflow = video.get_workflow()
-    user = _user_for_download_permissions(request)
     if not workflow.user_can_view_video(user):
         raise PermissionDenied()
 
@@ -424,7 +426,7 @@ def download(request, video_id, language_code, filename, format,
 
     subs_text = babelsubs.to(version.get_subtitles(), format,
                              language=version.language_code)
-    # since this is a downlaod, we can afford not to escape tags, specially
+    # since this is a download, we can afford not to escape tags, specially
     # true since speaker change is denoted by '>>' and that would get entirely
     # stripped out
     response = HttpResponse(subs_text, mimetype="text/plain")

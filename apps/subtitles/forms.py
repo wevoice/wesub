@@ -40,9 +40,12 @@ from utils.translation import (ALL_LANGUAGE_CHOICES,
                                get_language_label)
 
 
+import logging
+logger = logging.getLogger("SUB FORMS")
 SUBTITLE_FILESIZE_LIMIT_KB = 512
 SUBTITLE_FILE_FORMATS = babelsubs.get_available_formats()
-
+logger.error("SUBTITLE_FILE_FORMATS")
+logger.error(SUBTITLE_FILE_FORMATS)
 
 class SubtitlesUploadForm(forms.Form):
     draft = forms.FileField(required=True)
@@ -171,8 +174,10 @@ class SubtitlesUploadForm(forms.Form):
 
         parts = data.name.rsplit('.', 1)
         self.extension = parts[-1].lower()
-
-        if self.extension not in SUBTITLE_FILE_FORMATS:
+        logger.error("Extension")
+        logger.error(self.extension)
+        if self.extension not in babelsubs.get_available_formats():
+            logger.error("Invalid format")
             raise forms.ValidationError(fmt(_(
                 u'Unsupported format. Please upload one of '
                 u'the following: %(formats)s'),
@@ -194,6 +199,7 @@ class SubtitlesUploadForm(forms.Form):
             # we don't know the language code yet, since we are early in the
             # clean process.  Set it to blank for now and we'll set it to the
             # correct value in save()
+            logger.error("About to load")
             self._parsed_subtitles = load_subtitles('', decoded,
                                                     self.extension)
         except TypeError, e:
