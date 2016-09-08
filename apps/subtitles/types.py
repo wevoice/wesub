@@ -20,7 +20,7 @@ class SubtitleFormatListClass(dict):
             self[file_type] = format
 
     def __getitem__(self, item):
-        return super(ParserListClass, self).__getitem__(item.lower())
+        return super(SubtitleFormatListClass, self).__getitem__(item.lower())
     
     def __init__(self, parsers, generators, for_staff=False):
         super(SubtitleFormatListClass, self).__init__(self)
