@@ -810,7 +810,7 @@ class Actions(views.APIView):
         return Response('')
 
 class NotesSerializer(serializers.Serializer):
-    user = serializers.CharField(source='user.username', read_only=True)
+    user = UserField(read_only=True)
     created = TimezoneAwareDateTimeField(read_only=True)
     body = serializers.CharField()
 
@@ -840,6 +840,7 @@ class NotesList(generics.ListCreateAPIView):
         return {
             'editor_notes': self.editor_notes,
             'user': self.request.user,
+            'request': self.request,
         }
 
 #
@@ -880,3 +881,12 @@ class SubtitleLanguageViewSetSwitcher(APISwitcherMixin,
 
     class Deprecated(SubtitleLanguageViewSet):
         serializer_class = OldSubtitleLanguageSerializer
+
+class OldNotesSerializer(NotesSerializer):
+    user = serializers.CharField(source='user.username', read_only=True)
+
+class NotesListSwitcher(APISwitcherMixin, NotesList):
+    switchover_date = 20161201
+
+    class Deprecated(NotesList):
+        serializer_class = OldNotesSerializer
