@@ -23,7 +23,7 @@ from rest_framework import routers
 from . import views
 
 router = routers.SimpleRouter()
-router.register(r'videos', views.videos.VideoViewSet)
+router.register(r'videos', views.videos.VideoViewSetSwitcher)
 router.register(r'videos/(?P<video_id>[\w\d]+)/languages',
                 views.subtitles.SubtitleLanguageViewSetSwitcher,
                 base_name='subtitle-language')
