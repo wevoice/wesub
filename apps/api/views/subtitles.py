@@ -279,6 +279,7 @@ from .videos import VideoMetadataSerializer
 from api import extra
 from api.fields import (LanguageCodeField, TimezoneAwareDateTimeField,
                         UserField)
+from api.views.apiswitcher import APISwitcherMixin
 from videos.models import Video
 from subtitles import compat
 from subtitles import pipeline
@@ -845,7 +846,7 @@ class NotesList(generics.ListCreateAPIView):
 # Deprecated API before the user field changes
 #
 
-class MiniSubtitleVersionSerializer(serializers.Serializer):
+class OldMiniSubtitleVersionSerializer(serializers.Serializer):
     """Serialize a subtitle version for SubtitleLanguageSerializer """
     author = serializers.CharField(source='author.username')
     author_uri = serializers.SerializerMethodField()
@@ -859,9 +860,9 @@ class MiniSubtitleVersionSerializer(serializers.Serializer):
         return reverse('api:users-detail', kwargs=kwargs,
                        request=self.context['request'])
 
-class MiniSubtitleVersionsField(serializers.ListField):
+class OldMiniSubtitleVersionsField(serializers.ListField):
     """Serialize the list of versions for SubtitleLanguageSerializer """
-    child = MiniSubtitleVersionSerializer()
+    child = OldMiniSubtitleVersionSerializer()
 
     def get_attribute(self, language):
         versions = self.context['versions'][language.id]
@@ -870,3 +871,12 @@ class MiniSubtitleVersionsField(serializers.ListField):
         else:
             return [v for v in versions if v.is_public()]
 
+class OldSubtitleLanguageSerializer(SubtitleLanguageSerializer):
+    versions = OldMiniSubtitleVersionsField(read_only=True)
+
+class SubtitleLanguageViewSetSwitcher(APISwitcherMixin,
+                                      SubtitleLanguageViewSet):
+    switchover_date = 20161201
+
+    class Deprecated(SubtitleLanguageViewSet):
+        serializer_class = OldSubtitleLanguageSerializer

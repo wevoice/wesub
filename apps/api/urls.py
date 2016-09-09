@@ -25,7 +25,7 @@ from . import views
 router = routers.SimpleRouter()
 router.register(r'videos', views.videos.VideoViewSet)
 router.register(r'videos/(?P<video_id>[\w\d]+)/languages',
-                views.subtitles.SubtitleLanguageViewSet,
+                views.subtitles.SubtitleLanguageViewSetSwitcher,
                 base_name='subtitle-language')
 router.register(r'videos/(?P<video_id>[\w\d]+)/urls',
                 views.videos.VideoURLViewSet, base_name='video-url')
