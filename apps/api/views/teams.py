@@ -1076,7 +1076,7 @@ class OldTeamMemberSerializer(serializers.Serializer):
         except IntegrityError:
             self.fail('user-already-member')
 
-class OldTeamMemberUpdateSerializer(TeamMemberSerializer):
+class OldTeamMemberUpdateSerializer(OldTeamMemberSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
 
     def update(self, instance, validated_data):
