@@ -28,7 +28,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 import babelsubs
 import mock
 
-from api.tests.utils import format_datetime_field
+from api.tests.utils import format_datetime_field, user_field_data
 from api.views.subtitles import (SubtitleLanguageSerializer,
                                  SubtitleLanguageViewSet,
                                  SubtitlesSerializer,
@@ -95,27 +95,21 @@ class SubtitleLanguageSerializerTest(TestCase):
                                       SubtitleSetFactory(), **kwargs)
 
     def test_versions_field(self):
-        self.make_version('en', visibility='public',
-                          author=UserFactory(username='user1'))
-        self.make_version('en', visibility='private',
-                          author=UserFactory(username='user2'))
+        user1 = UserFactory(username='user1')
+        user2 = UserFactory(username='user2')
+        self.make_version('en', visibility='public', author=user1)
+        self.make_version('en', visibility='private', author=user2)
 
         serializer_data = self.get_serializer_data()
         assert_equal(serializer_data['num_versions'], 2)
         assert_equal(serializer_data['versions'], [
             {
-                'author': 'user2',
-                'author_uri': reverse('api:users-detail', kwargs={
-                    'identifier': 'user2',
-                }, request=APIRequestFactory().get("/")),
+                'author': user_field_data(user2),
                 'published': False,
                 'version_no': 2,
             },
             {
-                'author': 'user1',
-                'author_uri': reverse('api:users-detail', kwargs={
-                    'identifier': 'user1',
-                }, request=APIRequestFactory().get("/")),
+                'author': user_field_data(user1),
                 'published': True,
                 'version_no': 1,
             },
@@ -131,10 +125,7 @@ class SubtitleLanguageSerializerTest(TestCase):
         assert_equal(serializer_data['num_versions'], 1)
         assert_equal(serializer_data['versions'], [
             {
-                'author': self.user.username,
-                'author_uri': reverse('api:users-detail', kwargs={
-                    'identifier': self.user.username,
-                }, request=APIRequestFactory().get("/")),
+                'author': user_field_data(self.user),
                 'published': True,
                 'version_no': 2,
             },
@@ -475,6 +466,58 @@ class SubtitlesViewTest(TestCase):
             'language_code': 'en',
         })
 
+    def check_response_data(self, response, sub_format):
+        subtitle_data = babelsubs.to(self.version.get_subtitles(), sub_format)
+        if sub_format == 'json':
+            subtitle_data = json.loads(subtitle_data)
+        assert_equal(response.data['version_number'],
+                     self.version.version_number)
+        assert_equal(response.data['sub_format'], sub_format)
+        assert_equal(response.data['subtitles'], subtitle_data)
+        assert_equal(response.data['author'],
+                     user_field_data(self.version.author))
+        assert_equal(response.data['language'], {
+            'code': self.version.language_code,
+            'name': self.version.get_language_code_display(),
+            'dir': 'ltr',
+        })
+        assert_equal(response.data['title'], self.version.title)
+        assert_equal(response.data['description'], self.version.description)
+        assert_equal(response.data['metadata'], {})
+        assert_equal(response.data['video_title'], self.video.title_display())
+        assert_equal(response.data['video_description'], self.video.description)
+        assert_equal(response.data['actions_uri'],
+                     reverse('api:subtitle-actions', kwargs={
+                         'video_id': self.video.video_id,
+                         'language_code': self.version.language_code,
+                     }, request=APIRequestFactory().get('/')))
+        assert_equal(response.data['notes_uri'],
+                     reverse('api:subtitle-notes', kwargs={
+                         'video_id': self.video.video_id,
+                         'language_code': self.version.language_code,
+                     }, request=APIRequestFactory().get('/')))
+        assert_equal(response.data['resource_uri'],
+                     reverse('api:subtitles', kwargs={
+                         'video_id': self.video.video_id,
+                         'language_code': self.version.language_code,
+                     }, request=APIRequestFactory().get('/')))
+        assert_equal(response.data['site_uri'],
+                     reverse('videos:subtitleversion_detail', kwargs={
+                         'video_id': self.video.video_id,
+                         'lang': self.version.language_code,
+                         'lang_id': self.version.subtitle_language_id,
+                         'version_id': self.version.id,
+                     }, request=APIRequestFactory().get('/')))
+
+    def test_get(self):
+        response = self.client.get(self.url)
+        self.check_response_data(response, 'json')
+
+    def test_get_with_sub_format(self):
+        # if we're not using a raw subtitle format, we should just return json
+        response = self.client.get(self.url + '?sub_format=srt')
+        self.check_response_data(response, 'srt')
+
     def test_raw_format(self):
         # if we request a format like text/srt that's a subtile format, then
         # we should just return the subtitle data, nothing else
@@ -486,12 +529,6 @@ class SubtitlesViewTest(TestCase):
         response = self.client.get(self.url + "?format=dfxp")
         assert_equal(response.content,
                      babelsubs.to(self.version.get_subtitles(), 'dfxp'))
-
-    def test_normal_format(self):
-        # if we're not using a raw subtitle format, we should just return json
-        response = self.client.get(self.url)
-        # assume we're good if this next statement doesn't crash
-        json.loads(response.content)
 
     def run_get_object(self, **query_params):
         view = SubtitlesView()

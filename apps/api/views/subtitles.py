@@ -277,7 +277,8 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .videos import VideoMetadataSerializer
 from api import extra
-from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
+from api.fields import (LanguageCodeField, TimezoneAwareDateTimeField,
+                        UserField)
 from videos.models import Video
 from subtitles import compat
 from subtitles import pipeline
@@ -294,17 +295,9 @@ logger = logging.getLogger(__name__)
 
 class MiniSubtitleVersionSerializer(serializers.Serializer):
     """Serialize a subtitle version for SubtitleLanguageSerializer """
-    author = serializers.CharField(source='author.username')
-    author_uri = serializers.SerializerMethodField()
+    author = UserField(read_only=True)
     published = serializers.BooleanField(source='is_public')
     version_no = serializers.IntegerField(source='version_number')
-
-    def get_author_uri(self, version):
-        kwargs = {
-            'identifier': version.author.username,
-        }
-        return reverse('api:users-detail', kwargs=kwargs,
-                       request=self.context['request'])
 
 class MiniSubtitleVersionsField(serializers.ListField):
     """Serialize the list of versions for SubtitleLanguageSerializer """
@@ -583,6 +576,7 @@ class SubtitlesSerializer(serializers.Serializer):
     version_number = serializers.IntegerField(read_only=True)
     sub_format = SubFormatField(required=False, default='dfxp', initial='dfxp')
     subtitles = SubtitlesField()
+    author = UserField(read_only=True)
     action = serializers.CharField(required=False, write_only=True,
                                    allow_blank=True)
     is_complete = serializers.NullBooleanField(required=False,
@@ -593,7 +587,7 @@ class SubtitlesSerializer(serializers.Serializer):
                    "amara editor."))
     language = LanguageForSubtitlesSerializer(source='*', read_only=True)
     title = serializers.CharField(required=False, allow_blank=True)
-    duration = serializers.IntegerField(required=False)
+    duration = serializers.IntegerField(required=False, write_only=True)
     description = serializers.CharField(required=False, allow_blank=True)
     metadata = VideoMetadataSerializer(required=False)
     video_title = serializers.CharField(source='video.title_display',
@@ -846,3 +840,33 @@ class NotesList(generics.ListCreateAPIView):
             'editor_notes': self.editor_notes,
             'user': self.request.user,
         }
+
+#
+# Deprecated API before the user field changes
+#
+
+class MiniSubtitleVersionSerializer(serializers.Serializer):
+    """Serialize a subtitle version for SubtitleLanguageSerializer """
+    author = serializers.CharField(source='author.username')
+    author_uri = serializers.SerializerMethodField()
+    published = serializers.BooleanField(source='is_public')
+    version_no = serializers.IntegerField(source='version_number')
+
+    def get_author_uri(self, version):
+        kwargs = {
+            'identifier': version.author.username,
+        }
+        return reverse('api:users-detail', kwargs=kwargs,
+                       request=self.context['request'])
+
+class MiniSubtitleVersionsField(serializers.ListField):
+    """Serialize the list of versions for SubtitleLanguageSerializer """
+    child = MiniSubtitleVersionSerializer()
+
+    def get_attribute(self, language):
+        versions = self.context['versions'][language.id]
+        if self.context['show_private_versions'](language.language_code):
+            return versions
+        else:
+            return [v for v in versions if v.is_public()]
+

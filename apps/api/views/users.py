@@ -102,6 +102,21 @@ There are a couple ways to specify users:
 
 The user ID method is preferred since it's possible for users to change their
 username.
+
+.. _user_fields:
+
+User fields
+***********
+
+Users are often contained in other resources, for example the team members,
+subtitle authors, etc.  When those users are represented, we use a dict with
+the following fields:
+
+  - username -- Username
+  - id -- User ID
+  - uri -- Link to the user API endpoint
+
+If the field is mutable, you can pass in any of the identifiers listed above.
 """
 
 from __future__ import absolute_import

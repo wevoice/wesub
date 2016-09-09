@@ -20,9 +20,14 @@ from __future__ import absolute_import
 from django.test import TestCase
 from nose.tools import *
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
+from rest_framework.serializers import Serializer
+from rest_framework.test import APIClient, APIRequestFactory
+import mock
 
+from api.fields import UserField
+from api.tests.utils import user_field_data
 from auth.models import CustomUser as User, LoginToken
 from utils import test_utils
 from utils.factories import *
@@ -295,3 +300,33 @@ class UserAPITest(TestCase):
         })
         assert_equal(response.status_code, status.HTTP_200_OK)
         assert_equal(test_utils.reload_obj(self.user).username, orig_username)
+
+class UserFieldTest(TestCase):
+    def setUp(self):
+        self.field = UserField()
+        self.serializer = Serializer(context={
+            'request': APIRequestFactory().get('/'),
+        })
+        self.field.bind('user', self.serializer)
+        self.user = UserFactory()
+
+    def test_output(self):
+        assert_equal(self.field.to_representation(self.user),
+                     user_field_data(self.user))
+
+    @test_utils.patch_for_test('api.userlookup.lookup_user')
+    def test_input(self, lookup_user):
+        # Input should be done using the userlookup module.  This allows us to
+        # input users using usernames, user ids, or partner ids
+        lookup_user.return_value = self.user
+        assert_equal(self.field.to_internal_value('test-user-id'),
+                     self.user)
+        assert_equal(lookup_user.call_args, mock.call('test-user-id'))
+
+    @test_utils.patch_for_test('api.userlookup.lookup_user')
+    def test_user_not_found(self, lookup_user):
+        # If lookup_user raises a User.DoesNotExist error, we should turn it
+        # into a validation error
+        lookup_user.side_effect = User.DoesNotExist
+        with assert_raises(ValidationError):
+            self.field.to_internal_value('test-user-id')

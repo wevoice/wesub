@@ -62,6 +62,19 @@ def lookup_user(identifier):
             return _lookup_functions[parts[0]](parts[1])
     return User.objects.get(username=identifier)
 
+def query_user(identifier):
+    """Get a UserQuery that returns the user, if it exists
+
+    This is nice to use for subqueries when you don't care about the actual
+    user object
+    """
+    try:
+        user = lookup_user(identifier)
+    except User.DoesNotExist:
+        return User.objects.none()
+    else:
+        return User.objects.filter(id=user.id)
+
 @register('id')
 def secure_id_lookup(secure_id):
     return User.lookup_by_secure_id(secure_id)

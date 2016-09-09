@@ -347,7 +347,8 @@ from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
 from api import userlookup
-from api.fields import TimezoneAwareDateTimeField
+from api.views.apiswitcher import APISwitcherMixin
+from api.fields import UserField, TimezoneAwareDateTimeField
 from auth.models import CustomUser as User
 from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
                           Application, TeamLanguagePreference)
@@ -518,27 +519,27 @@ class TeamMemberSerializer(serializers.Serializer):
          TeamMember.ROLE_CONTRIBUTOR,
     )
 
-    username = serializers.CharField(source='user.username')
+    user = UserField()
     role = serializers.ChoiceField(ROLE_CHOICES)
-
-    def validate_username(self, username):
-        try:
-            self.user = User.objects.get(username=username)
-            return username
-        except User.DoesNotExist:
-            self.fail('user-does-not-exist', username=username)
+    resource_uri = serializers.SerializerMethodField()
 
     def create(self, validated_data):
         try:
             return self.context['team'].members.create(
-                user=self.user,
+                user=validated_data['user'],
                 role=validated_data['role'],
             )
         except IntegrityError:
             self.fail('user-already-member')
 
+    def get_resource_uri(self, member):
+        return reverse('api:team-members-detail', kwargs={
+            'team_slug': self.context['team'].slug,
+            'identifier': 'id$' + member.user.secure_id(),
+        }, request=self.context['request'])
+
 class TeamMemberUpdateSerializer(TeamMemberSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
+    user = UserField(read_only=True)
 
     def update(self, instance, validated_data):
         instance.role = validated_data['role']
@@ -600,7 +601,8 @@ class TeamMemberViewSet(TeamSubview):
             raise PermissionDenied()
 
     def perform_create(self, serializer):
-        if serializer.user == self.request.user:
+        user = serializer.validated_data['user']
+        if user == self.request.user:
             self.check_join_permissions(serializer.validated_data['role'])
         else:
             self.check_add_permissions(serializer.validated_data['role'])
@@ -620,54 +622,6 @@ class TeamMemberViewSet(TeamSubview):
         if member.role == TeamMember.ROLE_OWNER:
             raise serializers.ValidationError("Can't remove team owner")
         member.delete()
-
-class SafeTeamMemberSerializer(TeamMemberSerializer):
-    email = serializers.EmailField(required=False, write_only=True)
-
-    default_error_messages = {
-        'email-required': "Email required to create user",
-    }
-
-    def validate_username(self, username):
-        return username
-
-    def validate(self, attrs):
-        try:
-            self.user = User.objects.get(username=attrs['user']['username'])
-        except User.DoesNotExist:
-            if 'email' not in attrs:
-                self.fail('email-required')
-            self.user = User.objects.create(
-                username=attrs['user']['username'],
-                email=attrs['email'])
-        return attrs
-
-    def create(self, validated_data):
-        team = self.context['team']
-        if team.members.filter(user=self.user).exists():
-            self.fail('user-already-member')
-        invite = team.invitations.create(user=self.user,
-                                         author=self.context['user'],
-                                         role=validated_data['role'])
-        messages.tasks.team_invitation_sent.delay(invite.id)
-        # return an unsaved TeamMember for serialization purposes
-        return TeamMember(user=self.user, team=team,
-                          role=validated_data['role'])
-
-class SafeTeamMemberViewSet(TeamMemberViewSet):
-    def get_serializer_class(self):
-        if 'identifier' in self.kwargs:
-            return TeamMemberUpdateSerializer
-        else:
-            return SafeTeamMemberSerializer
-
-    def create(self, request, *args, **kwargs):
-        response = super(SafeTeamMemberViewSet, self).create(request, *args,
-                                                             **kwargs)
-        # use 202 status code since we invited the user instead of created a
-        # membership
-        response.status_code = status.HTTP_202_ACCEPTED
-        return response
 
 class ProjectSerializer(serializers.ModelSerializer):
     resource_uri = serializers.SerializerMethodField()
@@ -756,23 +710,17 @@ class TeamVideoField(serializers.Field):
     def to_representation(self, team_video):
         return team_video.video.video_id
 
-class TeamMemberField(serializers.Field):
+class TeamMemberField(UserField):
     default_error_messages = {
-        'unknown-member': "Unknown member: {username}",
+        'unknown-member': "Unknown member: {identifier}",
     }
 
-    def to_internal_value(self, username):
+    def to_internal_value(self, identifier):
+        user = super(TeamMemberField, self).to_internal_value(identifier)
         team = self.context['team']
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            self.fail('unknown-member', username=username)
         if not team.user_is_member(user):
-            self.fail('unknown-member', username=username)
+            self.fail('unknown-member', identifier=identifier)
         return user
-
-    def to_representation(self, user):
-        return user.username
 
 class TaskSerializer(serializers.ModelSerializer):
     resource_uri = serializers.SerializerMethodField()
@@ -872,7 +820,7 @@ class TaskViewSet(TeamSubview):
     def filter_queryset(self, qs):
         params = self.request.query_params
         if 'assignee' in params:
-            qs = qs.filter(assignee__username=params['assignee'])
+            qs = qs.filter(assignee=userlookup.query_user(params['assignee']))
         if 'priority' in params:
             qs = qs.filter(priority=params['priority'])
         if 'language' in params:
@@ -942,7 +890,7 @@ class TaskViewSet(TeamSubview):
         videos.tasks.video_changed_tasks.delay(task.team_video.video_id)
 
 class ApplicationSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(source='user.username', read_only=True)
+    user = UserField(read_only=True)
     status = MappedChoiceField(
         Application.STATUSES,
         default=Application._meta.get_field('status').get_default())
@@ -980,6 +928,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if instance.status != Application.STATUS_PENDING:
             self.fail('not-pending')
+
         if validated_data['status'] == Application.STATUS_APPROVED:
             instance.approve(self.context['user'], 'API')
         elif validated_data['status'] == Application.STATUS_DENIED:
@@ -1012,7 +961,7 @@ class TeamApplicationViewSet(TeamSubviewMixin,
     def filter_queryset(self, qs):
         params = self.request.query_params
         if 'user' in params:
-            qs = qs.filter(user__username=params['user'])
+            qs = qs.filter(user=userlookup.query_user(params['user']))
         if 'status' in params:
             try:
                 status_id = Application.STATUSES_IDS[params['status']]
@@ -1090,3 +1039,186 @@ class TeamBlacklistedLanguagesView(TeamLanguageView):
         'allow_reads': False,
         'allow_writes': False,
     }
+
+#
+# Deprecated API versions before the user field changes
+#
+
+class OldTeamMemberSerializer(serializers.Serializer):
+    default_error_messages = {
+        'user-does-not-exist': "User does not exist: {username}",
+        'user-already-member': "User is already a team member",
+    }
+
+    ROLE_CHOICES = (
+         TeamMember.ROLE_OWNER,
+         TeamMember.ROLE_ADMIN,
+         TeamMember.ROLE_MANAGER,
+         TeamMember.ROLE_CONTRIBUTOR,
+    )
+
+    username = serializers.CharField(source='user.username')
+    role = serializers.ChoiceField(ROLE_CHOICES)
+
+    def validate_username(self, username):
+        try:
+            self.user = User.objects.get(username=username)
+            return username
+        except User.DoesNotExist:
+            self.fail('user-does-not-exist', username=username)
+
+    def create(self, validated_data):
+        try:
+            return self.context['team'].members.create(
+                user=self.user,
+                role=validated_data['role'],
+            )
+        except IntegrityError:
+            self.fail('user-already-member')
+
+class OldTeamMemberUpdateSerializer(TeamMemberSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+
+    def update(self, instance, validated_data):
+        instance.role = validated_data['role']
+        instance.save()
+        return instance
+
+class OldSafeTeamMemberSerializer(OldTeamMemberSerializer):
+    email = serializers.EmailField(required=False, write_only=True)
+
+    default_error_messages = {
+        'email-required': "Email required to create user",
+    }
+
+    def validate_username(self, username):
+        return username
+
+    def validate(self, attrs):
+        try:
+            self.user = User.objects.get(username=attrs['user']['username'])
+        except User.DoesNotExist:
+            if 'email' not in attrs:
+                self.fail('email-required')
+            self.user = User.objects.create(
+                username=attrs['user']['username'],
+                email=attrs['email'])
+        return attrs
+
+    def create(self, validated_data):
+        team = self.context['team']
+        if team.members.filter(user=self.user).exists():
+            self.fail('user-already-member')
+        invite = team.invitations.create(user=self.user,
+                                         author=self.context['user'],
+                                         role=validated_data['role'])
+        messages.tasks.team_invitation_sent.delay(invite.id)
+        # return an unsaved TeamMember for serialization purposes
+        return TeamMember(user=self.user, team=team,
+                          role=validated_data['role'])
+
+
+class TeamMemberViewSetSwitcher(APISwitcherMixin, TeamMemberViewSet):
+    switchover_date = 20161201
+
+    class Deprecated(TeamMemberViewSet):
+        def get_serializer_class(self):
+            if 'identifier' in self.kwargs:
+                return OldTeamMemberUpdateSerializer
+            else:
+                return OldTeamMemberSerializer
+
+class SafeTeamMemberSerializer(TeamMemberSerializer):
+    email = serializers.EmailField(required=False, write_only=True)
+
+    default_error_messages = {
+        'email-required': "Email required to create user",
+    }
+
+    def validate_username(self, username):
+        return username
+
+    def validate(self, attrs):
+        try:
+            self.user = User.objects.get(username=attrs['user']['username'])
+        except User.DoesNotExist:
+            if 'email' not in attrs:
+                self.fail('email-required')
+            self.user = User.objects.create(
+                username=attrs['user']['username'],
+                email=attrs['email'])
+        return attrs
+
+    def create(self, validated_data):
+        team = self.context['team']
+        if team.members.filter(user=self.user).exists():
+            self.fail('user-already-member')
+        invite = team.invitations.create(user=self.user,
+                                         author=self.context['user'],
+                                         role=validated_data['role'])
+        messages.tasks.team_invitation_sent.delay(invite.id)
+        # return an unsaved TeamMember for serialization purposes
+        return TeamMember(user=self.user, team=team,
+                          role=validated_data['role'])
+
+class SafeTeamMemberViewSetSwitcher(APISwitcherMixin, TeamMemberViewSet):
+    switchover_date = 20161201
+    # The plan is to remove this view after the switchover date
+
+    class Deprecated(TeamMemberViewSet):
+        def get_serializer_class(self):
+            if 'identifier' in self.kwargs:
+                return TeamMemberUpdateSerializer
+            else:
+                return SafeTeamMemberSerializer
+
+        def create(self, request, *args, **kwargs):
+            response = super(SafeTeamMemberViewSetSwitcher.Deprecated, self).create(
+                request, *args, **kwargs)
+            # use 202 status code since we invited the user instead of created a
+            # membership
+            response.status_code = status.HTTP_202_ACCEPTED
+            return response
+
+class OldTeamMemberField(serializers.Field):
+    default_error_messages = {
+        'unknown-member': "Unknown member: {username}",
+    }
+
+    def to_internal_value(self, username):
+        team = self.context['team']
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            self.fail('unknown-member', username=username)
+        if not team.user_is_member(user):
+            self.fail('unknown-member', username=username)
+        return user
+
+    def to_representation(self, user):
+        return user.username
+
+class OldTaskSerializer(TaskSerializer):
+    assignee = OldTeamMemberField(required=False)
+
+class OldTaskUpdateSerializer(TaskUpdateSerializer):
+    assignee = OldTeamMemberField(required=False)
+
+class TaskViewSetSwitcher(APISwitcherMixin, TaskViewSet):
+    switchover_date = 20161201
+
+    class Deprecated(TaskViewSet):
+        def get_serializer_class(self):
+            if 'id' not in self.kwargs:
+                return OldTaskSerializer
+            else:
+                return OldTaskUpdateSerializer
+
+class OldApplicationSerializer(ApplicationSerializer):
+    user = serializers.CharField(source='user.username', read_only=True)
+
+class TeamApplicationViewSetSwitcher(APISwitcherMixin, TeamApplicationViewSet):
+    switchover_date = 20161201
+
+    class Deprecated(TeamApplicationViewSet):
+        serializer_class = OldApplicationSerializer
