@@ -83,7 +83,7 @@ def update_subtitles(video_id, access_token, subtitle_version,
         google.captions_update(access_token, caption_id, 'text/vtt', content, video_id=video_id, subtitle_version=subtitle_version)
     else:
         if enable_language_mapping:
-            language_code = convert_language_code(language_code)
+            language_code = google.convert_language_code(language_code)
         google.captions_insert(access_token, video_id, language_code,
                                'text/vtt', content, subtitle_version=subtitle_version)
 
