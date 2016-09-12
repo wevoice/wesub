@@ -182,9 +182,11 @@ class JSTest(Command):
     """Run Javascript unittests."""
 
     def run_inner(self, args, options):
-        subprocess.call(['docker', 'run', '--rm',
-                         '--volume=/home/ben/unisubs:/opt/unisubs',
-                         'amara/jstest'])
+        subprocess.call([
+            'docker', 'run', '--rm',
+            '--volume={}:/opt/apps/amara'.format(unisubs_root()),
+            'amara/jstest',
+        ])
 
 class DBReset(Command):
     """Reset the database."""
