@@ -131,6 +131,7 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.reverse import reverse
 
+from api import extra
 from api import userlookup
 from auth.models import CustomUser as User, LoginToken
 
@@ -173,6 +174,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def to_representation(self, user):
         data = super(UserSerializer, self).to_representation(user)
+        extra.user.add_data(self.context['request'], data, user=user)
         if hasattr(self, 'login_token'):
             data['auto_login_url'] = reverse(
                 "auth:token-login", args=(self.login_token.token,),
