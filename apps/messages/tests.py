@@ -91,6 +91,39 @@ class MessageTest(TestCase):
         self.assertEquals(Message.objects.thread(n, self.user).count(), 6)
         self.assertEquals(Message.objects.thread(m, self.user).count(), 6)
 
+    def test_previous_message_in_thread(self):
+        m = self._create_message(self.user)
+        n = self._create_message(self.user, reply_to=m)
+        o = self._create_message(self.user, reply_to=n)
+        p = self._create_message(self.user, reply_to=m)
+        q = self._create_message(self.user, reply_to=n)
+        self._create_message(self.user)
+        self._create_message(self.user)
+        self.assertEquals(Message.objects.previous_in_thread(m, self.user), None)
+        self.assertEquals(Message.objects.previous_in_thread(n, self.user), m)
+        self.assertEquals(Message.objects.previous_in_thread(o, self.user), n)
+        self.assertEquals(Message.objects.previous_in_thread(p, self.user), o)
+        self.assertEquals(Message.objects.previous_in_thread(q, self.user), p)
+
+    def test_thread_tips(self):
+        m = self._create_message(self.user)
+        n = self._create_message(self.user, reply_to=m)
+        o = self._create_message(self.user, reply_to=n)
+        self.assertEquals(Message.objects.thread(o, self.user).count(), 3)
+        self.assertEquals(Message.objects.for_user(self.user).count(), 3)
+        self.assertEquals(Message.objects.for_user(self.user, thread_tip_only=True).count(), 1)
+        self.assertEquals(Message.objects.for_author(m.author, thread_tip_only=True).count(), 1)
+        self.assertEquals(Message.objects.get(id=m.id).has_reply_for_author, True)
+        self.assertEquals(Message.objects.get(id=n.id).has_reply_for_author, True)
+        self.assertEquals(Message.objects.get(id=o.id).has_reply_for_author, False)
+        self.assertEquals(Message.objects.get(id=m.id).has_reply_for_user, True)
+        self.assertEquals(Message.objects.get(id=n.id).has_reply_for_user, True)
+        self.assertEquals(Message.objects.get(id=o.id).has_reply_for_user, False)
+        o.delete_for_user(o.user)
+        self.assertEquals(Message.objects.get(id=n.id).has_reply_for_user, False)
+        p = self._create_message(self.user)
+        self.assertEquals(Message.objects.for_user(self.user, thread_tip_only=True).count(), 2)
+        
     def test_send_email_to_allowed_user(self):
         self.user.notify_by_email = True
         self.user.save()
