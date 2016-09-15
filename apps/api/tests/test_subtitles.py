@@ -66,7 +66,7 @@ class SubtitleLanguageSerializerTest(TestCase):
         assert_equal(serializer_data['is_original'], True)
         assert_equal(serializer_data['is_primary_audio_language'], True)
         assert_equal(serializer_data['is_rtl'], self.language.is_rtl())
-        assert_equal(serializer_data['public'],
+        assert_equal(serializer_data['published'],
                      self.language.has_public_version())
         assert_equal(serializer_data['language_code'],
                      self.language.language_code)

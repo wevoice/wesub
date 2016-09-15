@@ -239,7 +239,7 @@ import videos.tasks
 class VideoLanguageShortSerializer(serializers.Serializer):
     code = serializers.CharField(source='language_code')
     name = serializers.CharField(source='get_language_code_display')
-    public = serializers.BooleanField(source='has_public_version')
+    published = serializers.BooleanField(source='has_public_version')
     dir = serializers.CharField()
     subtitles_uri = serializers.SerializerMethodField()
     resource_uri = serializers.SerializerMethodField()

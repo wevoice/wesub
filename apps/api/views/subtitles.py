@@ -343,8 +343,8 @@ class SubtitleLanguageSerializer(serializers.Serializer):
     is_primary_audio_language = serializers.BooleanField(required=False)
     is_rtl = serializers.BooleanField(read_only=True)
     is_translation = serializers.SerializerMethodField()
-    public = serializers.BooleanField(read_only=True,
-                                      source='has_public_version')
+    published = serializers.BooleanField(read_only=True,
+                                         source='has_public_version')
     original_language_code = serializers.SerializerMethodField()
     name = serializers.CharField(source='get_language_code_display',
                                  read_only=True)
