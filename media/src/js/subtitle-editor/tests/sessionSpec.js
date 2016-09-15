@@ -6,11 +6,9 @@ describe('The SessionBackend', function() {
     var SubtitleStorage = SubtitleStorage;
     var initialVersion = 1;
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.mocks');
-        module('amara.SubtitleEditor.subtitles.models');
-        module('amara.SubtitleEditor.session');
-    });
+    beforeEach(module('amara.SubtitleEditor.mocks'));
+    beforeEach(module('amara.SubtitleEditor.subtitles.models'));
+    beforeEach(module('amara.SubtitleEditor.session'));
 
     beforeEach(inject(function($controller, $injector) {
         EditorData = $injector.get('EditorData');
@@ -99,11 +97,9 @@ describe('The SessionController', function() {
     var simulateSaveError;
     var actionArg;
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.mocks');
-        module('amara.SubtitleEditor.subtitles.models');
-        module('amara.SubtitleEditor.session');
-    });
+    beforeEach(module('amara.SubtitleEditor.mocks'));
+    beforeEach(module('amara.SubtitleEditor.subtitles.models'));
+    beforeEach(module('amara.SubtitleEditor.session'));
 
     beforeEach(inject(function($controller, $injector) {
         $sce = $injector.get('$sce');
@@ -164,7 +160,7 @@ describe('The SessionController', function() {
         $scope.sessionBackend = {};
         $scope.analytics = jasmine.createSpy('analytics');
         _.each(backendMethods, function(methodName) {
-            var spy = jasmine.createSpy().andCallFake(function(arg) {
+            var spy = jasmine.createSpy().and.callFake(function(arg) {
                 if(methodName == 'saveSubtitles'
                     || methodName == 'performAction') {
                     actionArg = arg;
@@ -181,24 +177,27 @@ describe('The SessionController', function() {
             $scope.sessionBackend[methodName] = spy;
         });
         $scope.sessionBackend.subtitlesComplete =
-            jasmine.createSpy().andReturn(true);
+            jasmine.createSpy().and.returnValue(true);
     }));
 
     beforeEach(function() {
-        this.addMatchers({
-            'toHaveBeenCalledWithTrusted': function(string) {
-                if(this.actual.callCount == 0) {
-                    this.message = function() {
-                        return 'method not called';
+        jasmine.addMatchers({
+            toHaveBeenCalledWithTrusted: function(util, customEqualityTesters) {
+
+                return {
+                    compare: function(actual, expected) {
+                        var result = {};
+                        if(actual.calls.count() == 0) {
+                            result.pass = false;
+                            result.message = 'method not called';
+                            return result;
+                        }
+                        var arg = actual.calls.mostRecent().args[0];
+                        result.pass = util.equals(expected, $sce.getTrustedHtml(arg));
+                        return result;
                     }
-                    return false;
-                }
-                var arg = this.actual.mostRecentCall.args[0];
-                this.message = function() {
-                    return string + " != " + $sce.getTrustedHtml(arg);
-                }
-                return string == $sce.getTrustedHtml(arg);
-            },
+                };
+            }
         });
     });
 
@@ -233,7 +232,7 @@ describe('The SessionController', function() {
     it('handles the exit button on the unsaved work dialog', function() {
         session.subtitlesChanged = true;
         session.exit();
-        var callbacks = $scope.dialogManager.openDialog.mostRecentCall.args[1];
+        var callbacks = $scope.dialogManager.openDialog.calls.mostRecent().args[1];
         callbacks.exit();
         expectRedirectToVideoPage();
     });
@@ -254,7 +253,7 @@ describe('The SessionController', function() {
     it('handles the exit button on the legacy editor unsaved work dialog', function() {
         session.subtitlesChanged = true;
         session.exitToLegacyEditor();
-        var callbacks = $scope.dialogManager.openDialog.mostRecentCall.args[1];
+        var callbacks = $scope.dialogManager.openDialog.calls.mostRecent().args[1];
         callbacks.discardChangesAndOpenLegacyEditor();
         expectRedirectToLegacyEditor();
     });
@@ -278,7 +277,7 @@ describe('The SessionController', function() {
         session.subtitlesChanged = true;
         session.saveDraft();
         $rootScope.$digest();
-        var callbacks = $scope.dialogManager.openDialog.mostRecentCall.args[1];
+        var callbacks = $scope.dialogManager.openDialog.calls.mostRecent().args[1];
         callbacks.exit();
         expectRedirectToVideoPage();
     });
@@ -335,22 +334,22 @@ describe('The SessionController', function() {
     });
 
     it('prevents actions with complete=true to be performed with incomplete subtitles', function() {
-        $scope.sessionBackend.subtitlesComplete.andReturn(false);
+        $scope.sessionBackend.subtitlesComplete.and.returnValue(false);
         expect($scope.actions[0].canPerform()).toBeFalsy();
     });
 
     it('allows actions with complete=true to be performed with complete subtitles', function() {
-        $scope.sessionBackend.subtitlesComplete.andReturn(true);
+        $scope.sessionBackend.subtitlesComplete.and.returnValue(true);
         expect($scope.actions[0].canPerform()).toBeTruthy();
     });
 
     it('always allows actions with complete=false to be performed', function() {
-        $scope.sessionBackend.subtitlesComplete.andReturn(false);
+        $scope.sessionBackend.subtitlesComplete.and.returnValue(false);
         expect($scope.actions[1].canPerform()).toBeTruthy();
     });
 
     it('always allows actions with complete=null to be performed', function() {
-        $scope.sessionBackend.subtitlesComplete.andReturn(false);
+        $scope.sessionBackend.subtitlesComplete.and.returnValue(false);
         expect($scope.actions[2].canPerform()).toBeTruthy();
     });
 

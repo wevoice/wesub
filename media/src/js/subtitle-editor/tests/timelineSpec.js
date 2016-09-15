@@ -5,11 +5,9 @@ describe('TimelineController', function() {
     var subtitles = []
     var MIN_DURATION = null;
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.timeline.controllers');
-        module('amara.SubtitleEditor.subtitles.models');
-        module('amara.SubtitleEditor.mocks')
-    });
+    beforeEach(module('amara.SubtitleEditor.timeline.controllers'));
+    beforeEach(module('amara.SubtitleEditor.subtitles.models'));
+    beforeEach(module('amara.SubtitleEditor.mocks'));
 
     beforeEach(inject(function(SubtitleList) {
         subtitleList = new SubtitleList();
@@ -46,15 +44,27 @@ describe('TimelineController', function() {
     }));
 
     beforeEach(function() {
-        this.addMatchers({
-            'toHaveStartSub': function(sub) {
-                var start = this.actual.mostRecentCall.args[1].start;
-                return start === sub;
+        jasmine.addMatchers({
+            toHaveStartSub: function(util, customEqualityTesters) {
+                return {
+                    compare: function(actual, expected) {
+                        var start = actual.calls.mostRecent().args[1].start;
+                        return {
+                            pass: util.equals(start, expected)
+                        };
+                    }
+                };
             },
-            'toHaveEndSub': function(sub) {
-                var end = this.actual.mostRecentCall.args[1].end;
-                return end === sub;
-            },
+            toHaveEndSub: function(util, customEqualityTesters) {
+                return {
+                    compare: function(actual, expected) {
+                        var end = actual.calls.mostRecent().args[1].end;
+                        return {
+                            pass: util.equals(end, expected)
+                        };
+                    }
+                };
+            }
         });
     });
 
@@ -62,12 +72,12 @@ describe('TimelineController', function() {
         it("Emits will-sync-changed on changes", function() {
             $scope.currentTime = 1800;
             $scope.$emit('work-done');
-            expect(willSyncChangedSpy.callCount).toBe(1);
+            expect(willSyncChangedSpy.calls.count()).toBe(1);
             // If the start/end subs stay the same, we shouldn't emit
             // will-sync again.
             $scope.currentTime = 1900;
             $scope.$emit('work-done');
-            expect(willSyncChangedSpy.callCount).toBe(1);
+            expect(willSyncChangedSpy.calls.count()).toBe(1);
         });
 
         it("Calculates start as the first sub after the current time", function() {

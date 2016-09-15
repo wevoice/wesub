@@ -2,10 +2,8 @@ describe('The Workflow class', function() {
     var subtitleList = null;
     var workflow = null;
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.subtitles.models');
-        module('amara.SubtitleEditor.workflow');
-    });
+    beforeEach(module('amara.SubtitleEditor.subtitles.models'));
+    beforeEach(module('amara.SubtitleEditor.workflow'));
 
     beforeEach(inject(function(SubtitleList, Workflow) {
         subtitleList = new SubtitleList();
@@ -80,11 +78,9 @@ describe('NormalWorkflowController', function() {
     var $scope = null;
     var subtitleList = null;
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.subtitles.models');
-        module('amara.SubtitleEditor.workflow');
-        module('amara.SubtitleEditor.mocks');
-    });
+    beforeEach(module('amara.SubtitleEditor.subtitles.models'));
+    beforeEach(module('amara.SubtitleEditor.workflow'));
+    beforeEach(module('amara.SubtitleEditor.mocks'));
 
     beforeEach(inject(function ($controller, $rootScope, SubtitleList, Workflow) {
         subtitleList = new SubtitleList();
@@ -112,9 +108,9 @@ describe('NormalWorkflowController', function() {
     }));
 
     it('shows the timeline for the sync step', function() {
-        expect($scope.toggleTimelineShown.callCount).toBe(0);
+        expect($scope.toggleTimelineShown.calls.count()).toBe(0);
         $scope.$apply('workflow.stage="syncing"');
-        expect($scope.toggleTimelineShown.callCount).toBe(1);
+        expect($scope.toggleTimelineShown.calls.count()).toBe(1);
     });
 
     it('restarts video playback when switching steps', inject(function(VideoPlayer) {
@@ -127,11 +123,9 @@ describe('NormalWorkflowController', function() {
 describe('when up and down sync subtitles', function() {
     var $scope;
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor');
-        module('amara.SubtitleEditor.subtitles.models');
-        module('amara.SubtitleEditor.mocks');
-    });
+    beforeEach(module('amara.SubtitleEditor'));
+    beforeEach(module('amara.SubtitleEditor.subtitles.models'));
+    beforeEach(module('amara.SubtitleEditor.mocks'));
 
     beforeEach(inject(function($rootScope, $controller, Workflow) {
         $scope = $rootScope;
@@ -163,11 +157,9 @@ describe('when the enter key creates a new subtitle', function() {
     var subtitleList;
     var $scope;
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.subtitles.controllers');
-        module('amara.SubtitleEditor.subtitles.models');
-        module('amara.SubtitleEditor.mocks');
-    });
+    beforeEach(module('amara.SubtitleEditor.subtitles.controllers'));
+    beforeEach(module('amara.SubtitleEditor.subtitles.models'));
+    beforeEach(module('amara.SubtitleEditor.mocks'));
 
     beforeEach(inject(function($rootScope, $controller, CurrentEditManager, SubtitleList) {
         $scope = $rootScope;
@@ -187,7 +179,7 @@ describe('when the enter key creates a new subtitle', function() {
         $controller('WorkingSubtitlesController', {
             $scope: $scope,
         });
-        spyOn(subtitleList, 'insertSubtitleBefore').andCallThrough();
+        spyOn(subtitleList, 'insertSubtitleBefore').and.callThrough();
     }));
 
     it('creates a new subtitle when the timeline is hidden',
@@ -200,7 +192,7 @@ describe('when the enter key creates a new subtitle', function() {
 
         $scope.timelineShown = true;
         $scope.onEditKeydown(MockEvents.keydown(keyCodeForEnter));
-        expect(subtitleList.insertSubtitleBefore.callCount).toBe(1);
+        expect(subtitleList.insertSubtitleBefore.calls.count()).toBe(1);
     }));
 });
 
@@ -218,11 +210,9 @@ describe('The WorkflowController', function() {
         $scope.subController = 'ReviewWorkflowController';
     });
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.mocks');
-        module('amara.SubtitleEditor.workflow');
-        module('MockWorkflowSubControllers');
-    });
+    beforeEach(module('amara.SubtitleEditor.mocks'));
+    beforeEach(module('amara.SubtitleEditor.workflow'));
+    beforeEach(module('MockWorkflowSubControllers'));
 
     it('creates a NormalWorkflowController for normal work mode', inject(function($controller, EditorData) {
         EditorData.work_mode = { type: 'normal' };

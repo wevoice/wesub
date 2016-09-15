@@ -32,7 +32,8 @@
         };
         _.each(methodNames, function(methodName) {
             var deferred = $q.defer();
-            SubtitleStorage[methodName] = jasmine.createSpy(methodName).andReturn(deferred.promise);
+            SubtitleStorage[methodName] = jasmine.createSpy(methodName);
+            SubtitleStorage[methodName].and.returnValue(deferred.promise);
             SubtitleStorage.deferreds[methodName] = deferred;
         });
         return SubtitleStorage;
@@ -43,7 +44,7 @@
             'onDocumentEvent',
             'offDocumentEvent'
         ]);
-        mockObject.caretPos = jasmine.createSpy('caretPos').andReturn(0);
+        mockObject.caretPos = jasmine.createSpy('caretPos').and.returnValue(0);
         return mockObject;
     });
 
