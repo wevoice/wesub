@@ -78,7 +78,7 @@ Get info on a specific video
 
     :>json string code: Language code
     :>json string name: Human readable label for the language
-    :>json boolean visibile: Are the subtitles publicly viewable?
+    :>json boolean published: Are the subtitles publicly viewable?
     :>json string dir: Language direction ("ltr" or "rtl")
     :>json url subtitles_uri: Subtitles Resource
     :>json url resource_uri: Subtitles Language Resource

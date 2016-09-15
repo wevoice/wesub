@@ -48,7 +48,6 @@ Get a list of teams
 
     :>json uri activity_uri: Team activity resource
     :>json uri members_uri: Team member list resource
-    :>json uri safe_members_uri: "Safe" team members list resource
     :>json uri projects_uri: Team projects resource
     :>json uri applications_uri: Team applications resource (or null if the
         membership policy is not by application)
@@ -95,23 +94,26 @@ Listing members of a team
 
 .. http:get:: /api/teams/(team-slug)/members/
 
-    :>json username username: username
+    :>json user user: User associated with the membership (see
+        :ref:`user_fields`)
     :>json string role: One of: ``owner``, ``admin``, ``manager``, or
         ``contributor``
 
 Get info on a team member
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. http:get:: /api/teams/(team-slug)/members/(username)
+.. http:get:: /api/teams/(team-slug)/members/(user-identifier)/
 
     The data is in the same format as the listing endpoint.
+
+    See :ref:`user_ids` for possible values for ``user-identifier``
 
 Adding a member to the team
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. http:post:: /api/teams/(team-slug)/members/
 
-    :<json username username: username of the user to add
+    :<json user-identifier user: User to add (see :ref:`user_ids`)
     :<json string role: One of: ``owner``, ``admin``, ``manager``, or
         ``contributor``
 
@@ -127,18 +129,6 @@ Removing a user from a team
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. http:delete:: /api/teams/(team-slug)/members/(username)/
-
-Safe Members Resource
-*********************
-
-This resource behaves the same as the normal Team Member resource except
-with couple differences for the POST action to add members.
-
-- An invitation is sent to the user to join the team instead of simply
-  adding them
-- If no user exists with the username, and the email field is included
-  in the POST data, we will create a user and send an email to the email
-  account.
 
 Projects Resource
 *****************
@@ -196,7 +186,8 @@ List all tasks for a team
 
 .. http:get:: /api/teams/(team-slug)/tasks/
 
-    :queryparam username assignee: Show only tasks assigned to a username
+    :queryparam user-identifier assignee: Show only tasks assigned to a
+        username (see :ref:`user_ids`)
     :queryparam integer priority: Show only tasks with a given priority
     :queryparam string type: Show only tasks of a given type
     :queryparam video-id video_id: Show only tasks that pertain to a given video
@@ -226,7 +217,7 @@ Get details on a specific task
     :>json integer id: ID for the task
     :>json string type: type of task.  One of ``Subtitle``, ``Translate``,
          ``Review``, or ``Approve``
-    :>json username assignee: username of the task assignee (or null)
+    :>json user-data assignee: Task assignee (see :ref:`user_fields`)
     :>json integer priority: Priority for the task
     :>json datetime created: Date/time when the task was created
     :>json datetime completed: Date/time when the task was completed (or null)
@@ -243,7 +234,7 @@ Create a new task
     :<json bcp-47 language: language code
     :<json string type: task type to create.  Must be ``Subtitle`` or
         ``Translate``
-    :<json username assignee: Username of the task assignee **(optional)**
+    :<json user-identifier assignee:  Task assignee **(:ref:`user_ids`)**
     :<json integer priority: Priority for the task **(optional)**
 
 Update an existing task
@@ -251,7 +242,7 @@ Update an existing task
 
 .. http:put:: /api/teams/(team-slug)/tasks/(task-id)/
 
-    :<json username assignee: Username of the task assignee or null to unassign
+    :<json user-identifier assignee:  Task assignee **(:ref:`user_ids`)**
     :<json integer priority: priority of the task
     :<json boolean send_back: send a truthy value to send the back back
         **(optional)**
@@ -284,7 +275,8 @@ List applications
         this time (as a unix timestamp)
     :queryparam integer after: Include only applications submitted after this
         time (as a unix timestamp)
-    :queryparam username user: Include only applications from this user
+    :queryparam user-identifier user: Include only applications from this user
+        (see :ref:`user_ids`)
 
     List results are paginated
 
@@ -293,7 +285,7 @@ Get details on a single application
 
 .. http:get:: /api/teams/(team-slug)/applications/(application-id)/:
 
-    :>json username user: Username of the applicant
+    :>json user-data user: Applicant user data (see :ref:`user_fields`)
     :>json string note: note given by the applicant
     :>json string status: status value.  Possible values are ``Denied``,
         ``Approved``, ``Pending``, ``Member Removed`` and ``Member Left``
