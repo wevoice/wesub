@@ -65,6 +65,13 @@
             cssClass: cssClass || null
         };
     };
+    function makeInputField(name, label, cssClass) {
+        return {
+	    name: name,
+            label: label,
+            cssClass: cssClass || null
+        };
+    };
     module.value('Buttons', {
         continueEditing: makeButton('Continue editing'),
         continueButton: makeButton('Continue'),
@@ -81,6 +88,11 @@
         exit: makeButton('Exit'),
         waitDontDiscard: makeButton("Wait, don't discard my changes!",
                 'link-style')
+    });
+
+    module.value('InputFields', {
+        scale: makeInputField('scale', 'Scaling factor'),
+        shift: makeInputField('shift', 'Shift timing (msec)')
     });
 
     module.value('Dialogs', {
@@ -110,6 +122,13 @@
             buttons: [ 'continueButton', 'cancel' ],
             allowClose: true
         },
+        shiftScaleTiming: {
+            title: 'Shit/Scale Subtitles Timing',
+            text: 'This will adjust all subtitles timing. Do you want to continue?',
+            buttons: [ 'continueButton', 'cancel' ],
+            inputFields: ['shift', 'scale'],
+            allowClose: true
+        },
         confirmTextReset: {
             title: 'Confirm Text Reset',
             text: 'This will remove all subtitle text. Do you want to continue?',
@@ -137,7 +156,7 @@
         }
     });
 
-    module.controller('DialogController', ["$scope", "Buttons", "Dialogs", "VideoPlayer", function($scope, Buttons, Dialogs, VideoPlayer) {
+    module.controller('DialogController', ["$scope", "Buttons", "InputFields", "Dialogs", "VideoPlayer", function($scope, Buttons, InputFields, Dialogs, VideoPlayer) {
         // Stores the names of all dialogs currently open in oldest-to-newest
         // order.  The last item in the list is the currently displayed
         // dialog.
@@ -286,6 +305,19 @@
                     callback: callbacks[buttonName] || null
                 };
             });
+	    if (dialog.hasOwnProperty('inputFields')) {
+              dialog.inputFields = _.map(dialog.inputFields, function(fieldName) {
+                var fieldDef = InputFields[fieldName];
+                if(fieldDef === undefined) {
+                    throw "no input field named " + fieldName;
+                };
+                return {
+		    name: fieldName,
+                    label: fieldDef.label,
+                    cssClass: fieldDef.cssClass
+                };
+              });
+            }
             return dialog;
         }
     }]);
