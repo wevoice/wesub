@@ -26,7 +26,7 @@ Fetching user data
 
 .. http:get:: /api/users/[identifier]/
 
-    :arg user-id identifier:  See :ref:`user_ids`
+    :arg user-identifier identifier:  See :ref:`user_ids`
 
     :>json username username: username
     :>json string id: user ID
@@ -116,7 +116,25 @@ the following fields:
   - id -- User ID
   - uri -- Link to the user API endpoint
 
-If the field is mutable, you can pass in any of the identifiers listed above.
+Example JSON::
+
+  {
+    "user": {
+      "username": "alice",
+      "id": "abcdef",
+      "uri": "https://amara.org/api/users/id$abcdef/"
+    }
+  }
+
+When you post data to an endpoint with a userfield, you can specify the user
+using any of the identifiers listed abose.  For example, to create a team
+member you can send this data::
+
+  {
+    "user": "id$abcdef",
+    "role": "manager"
+  }
+
 """
 
 from __future__ import absolute_import
