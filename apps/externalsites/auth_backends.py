@@ -45,6 +45,15 @@ class OpenIDConnectBackend(CustomUserBackend):
                 return (True, '')
             except User.DoesNotExist:
                 pass
+        # Case where user exists with allow_3rd_party_login=True
+        try:
+            # There must be one and only one user with selected email
+            # and allow_3rd_party_login=True
+            u = User.objects.get(email=connect_info.email, allow_3rd_party_login=True)
+            OpenIDConnectLink.objects.create(user=u, sub=connect_info.sub)
+            return  (True, '')
+        except:
+            pass
         return (False, connect_info.email)
 
     def authenticate(self, **credentials):

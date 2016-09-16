@@ -59,6 +59,8 @@ Creating Users
     :<json string password: any number of chars, all chars allowed.
     :<json string first_name: Any chars, max 30 chars. **(optional)**
     :<json string last_name: Any chars, max 30 chars. **(optional)**
+    :<json boolean allow_3rd_party_login: If set, account can be automatically
+        linked to 3rd party account at first login. **(optional)**
     :<json boolean create_login_token: If sent the response will also include
         a url that when visited will login the created user.  Use this to
         allow users to login without explicitly setting their passwords.  This
@@ -153,6 +155,7 @@ class PasswordField(serializers.CharField):
 class UserCreateSerializer(UserSerializer):
     username = serializers.CharField(max_length=30)
     password = PasswordField(required=False, write_only=True)
+    allow_3rd_party_login = serializers.BooleanField(write_only=True, required=False)
     api_key = serializers.CharField(source='api_key.key', read_only=True)
     create_login_token = serializers.BooleanField(write_only=True,
                                                   required=False)
@@ -200,7 +203,7 @@ class UserCreateSerializer(UserSerializer):
         model = User
         fields = UserSerializer.Meta.fields + (
             'email', 'api_key', 'password', 'create_login_token',
-            'find_unique_username',
+            'find_unique_username', 'allow_3rd_party_login',
         )
 
 class UserUpdateSerializer(UserSerializer):
