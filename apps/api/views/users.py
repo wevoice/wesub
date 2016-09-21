@@ -165,6 +165,7 @@ class UserCreateSerializer(UserSerializer):
     default_error_messages = {
         'username-not-unique': 'Username not unique: {username}',
         'username-too-long': 'Username too long: {username}',
+        'user-already-linked': 'Username with email already linked: {email}',
     }
 
     def __init__(self, *args, **kwargs):
@@ -184,6 +185,10 @@ class UserCreateSerializer(UserSerializer):
         find_unique_username = validated_data.pop('find_unique_username',
                                                   False)
         create_login_token = validated_data.pop('create_login_token', False)
+        if validated_data['allow_3rd_party_login'] and \
+           User.objects.filter(email=validated_data['email'], openid_connect_link__isnull=False).count() > 0:
+            self.fail('user-already-linked',
+                      email=validated_data['email'])
         try:
             if find_unique_username:
                 user = User.objects.create_with_unique_username(
