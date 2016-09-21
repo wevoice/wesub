@@ -820,7 +820,12 @@ class TaskViewSet(TeamSubview):
     def filter_queryset(self, qs):
         params = self.request.query_params
         if 'assignee' in params:
-            qs = qs.filter(assignee=userlookup.query_user(params['assignee']))
+            try:
+                qs = qs.filter(
+                    assignee=userlookup.lookup_user(params['assignee'])
+                )
+            except User.DoesNotExist:
+                return qs.none()
         if 'priority' in params:
             qs = qs.filter(priority=params['priority'])
         if 'language' in params:
@@ -961,7 +966,12 @@ class TeamApplicationViewSet(TeamSubviewMixin,
     def filter_queryset(self, qs):
         params = self.request.query_params
         if 'user' in params:
-            qs = qs.filter(user=userlookup.query_user(params['user']))
+            try:
+                qs = qs.filter(
+                    user=userlookup.lookup_user(params['user'])
+                )
+            except User.DoesNotExist:
+                return qs.none()
         if 'status' in params:
             try:
                 status_id = Application.STATUSES_IDS[params['status']]
