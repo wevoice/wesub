@@ -182,9 +182,11 @@ class JSTest(Command):
     """Run Javascript unittests."""
 
     def run_inner(self, args, options):
-        subprocess.call(['docker', 'run', '--rm',
-                         '--volume=/home/ben/unisubs:/opt/unisubs',
-                         'amara/jstest'])
+        subprocess.call([
+            'docker', 'run', '--rm',
+            '--volume={}:/opt/apps/amara'.format(unisubs_root()),
+            'amara/jstest',
+        ])
 
 class DBReset(Command):
     """Reset the database."""
@@ -341,7 +343,7 @@ NEEDS_ROOT = [
     'datamigration',
 ]
 def run_manage(args, **kwargs):
-    if args[0] in NEEDS_ROOT:
+    if args and args[0] in NEEDS_ROOT:
         cmdline = ['docker-compose', 'run', '-u', 'root', 'app', 'manage']
     else:
         cmdline = ['docker-compose', 'run', 'app', 'manage']

@@ -406,6 +406,22 @@ var angular = angular || null;
             $event.stopPropagation();
             $scope.dialogManager.open('metadata');
         }
+        $scope.isToolboxMenuOpen = false;
+        $scope.onToolIconClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            // highlight tool icon
+            $(".toolIcon").toggleClass("active");
+            // expose toolbox menu
+            $(".toolbox-menu").toggleClass("hidden");
+            $scope.isToolboxMenuOpen = !$scope.isToolboxMenuOpen;
+            if ($scope.isToolboxMenuOpen) {
+                $window.onclick = function ($event) {
+                    $window.onclick = null;
+                    $scope.onToolIconClicked($event);
+                };
+            } 
+        }
         // Hide the loading modal after we are done with bootstrapping
         // everything
         $scope.$evalAsync(function() {

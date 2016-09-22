@@ -229,6 +229,11 @@ div.toolbar {
 strong {
     font-weight: bold;
 }
+.clippedAndHidden{
+  position: absolute !important;
+  clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+  clip: rect(1px,1px,1px,1px);
+}
 
 // Modals
 div.modal {
@@ -1270,16 +1275,20 @@ div.workspace-tools {
            width: 150px;
            position: relative;
         }
-        div.toolbox-inside > a {
-        color: black;
-        font-weight: 900;
-        font-size: 18px;
-        line-height: 1.34em;
-        text-decoration: none;
-        text-align: right;
+        div.toolbox-inside .active{
+          background-color: $lighter-blue;
+        }
+        div.toolbox-inside > button {
+        outline: none;
+        border-radius: 5px;
+        background-image: url('../images/subtitle-editor/glyphicons_halflings_135_wrench.png');
+        background-position: 10px center;
+        background-repeat: no-repeat;
         position: absolute;
         right: 15px;
-        padding: 3px 0px 10px 20px;
+        padding: 5px 10px 20px 20px;
+        cursor: pointer;
+        z-index: 70;
         }
         div.toolbox-inside > .helper_margin{
           display:none;
@@ -1308,7 +1317,6 @@ div.workspace-tools {
                left: -20px;
            }
            background: $dark-grey;
-           display:none;
            position: absolute;
            text-align: left;
            top: 0;

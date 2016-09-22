@@ -8,8 +8,8 @@
 </ul>
 
 {% if page.has_next %}
-<div class="pagination">
-  <a class="show-more" href="" data-page="{{ page.next_page_number }}">{% trans "Show More" %}</a>
+<div class="pagination show-more-pagination">
+  <a class="show-more" href="{{ request.path }}?{{ next_page_query}}"><span class="fa fa-chevron-circle-down"></span> {% trans "Show More" %}</a>
   <img class="loading-icon" src="{% static_url %}images/ajax-loader.gif">
 </div>
 {% endif %}

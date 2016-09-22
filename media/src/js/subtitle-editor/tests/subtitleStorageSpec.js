@@ -9,10 +9,8 @@ describe('The SubtitleStorage service', function() {
     var notesURL;
 
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.mocks');
-        module('amara.SubtitleEditor.subtitles.services');
-    });
+    beforeEach(module('amara.SubtitleEditor.mocks'));
+    beforeEach(module('amara.SubtitleEditor.subtitles.services'));
 
     beforeEach(inject(function ($injector, EditorData) {
         $httpBackend = $injector.get('$httpBackend');
