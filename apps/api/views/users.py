@@ -107,6 +107,9 @@ def can_modify_user(request_user, object_user):
     return request_user == object_user or \
         request_user.is_staff
 
+def can_create_user(request_user):
+    return request_user.is_staff or request_user.is_partner
+
 class UserSerializer(serializers.ModelSerializer):
     num_videos = serializers.IntegerField(source='videos.count',
                                           read_only=True)
@@ -182,6 +185,9 @@ class UserCreateSerializer(UserSerializer):
         return data
 
     def create(self, validated_data):
+        if not can_create_user(self.context['request'].user):
+            raise PermissionDenied()
+
         find_unique_username = validated_data.pop('find_unique_username',
                                                   False)
         create_login_token = validated_data.pop('create_login_token', False)
@@ -224,7 +230,7 @@ class UserUpdateSerializer(UserSerializer):
             self.fields.pop('email')
 
     def update(self, user, validated_data):
-        if not can_modify_user(user, self.context['request'].user):
+        if not can_modify_user(self.context['request'].user, user):
             raise PermissionDenied()
         if validated_data.get('create_login_token'):
             self.login_token = LoginToken.objects.for_user(user)
