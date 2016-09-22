@@ -29,6 +29,6 @@ class Command(BaseCommand):
         try:
             current_site = Site.objects.get_current()
         except Site.DoesNotExist:
-            current_site = Site.objects.create(pk=settings.CURRENT_SITE)
+            current_site = Site.objects.create(pk=settings.SITE_ID)
         current_site.name = current_site.domain = args[0]
         current_site.save()
