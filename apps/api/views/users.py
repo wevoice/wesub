@@ -191,7 +191,8 @@ class UserCreateSerializer(UserSerializer):
         find_unique_username = validated_data.pop('find_unique_username',
                                                   False)
         create_login_token = validated_data.pop('create_login_token', False)
-        if validated_data['allow_3rd_party_login'] and \
+        if 'allow_3rd_party_login' in validated_data and \
+           validated_data['allow_3rd_party_login'] and \
            User.objects.filter(email=validated_data['email'], openid_connect_link__isnull=False).count() > 0:
             self.fail('user-already-linked',
                       email=validated_data['email'])
