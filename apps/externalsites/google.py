@@ -23,7 +23,6 @@ from email.mime.multipart import MIMEMultipart, MIMEBase
 from lxml import etree
 import json
 import logging
-import unilangs
 import urllib
 import urlparse
 import re
@@ -54,12 +53,6 @@ OpenIDProfile = namedtuple('OpenIDProfile',
                            'sub email full_name first_name last_name')
 
 logger = logging.getLogger(__name__)
-
-def convert_language_code(lc):
-    """
-    Convert an Amara language code to a YouTube one
-    """
-    return unilangs.LanguageCode(lc, 'unisubs').encode('youtube')
 
 def youtube_scopes():
     return [
@@ -359,8 +352,8 @@ def captions_insert(access_token, video_id, language_code,
         if team_video.team.sync_metadata and subtitle_version.title:
             update_video_metadata(video_id,
                                   access_token,
-                                  convert_language_code(subtitle_version.video.primary_audio_language_code).lower(),
-                                  convert_language_code(subtitle_version.subtitle_language.language_code).lower(),
+                                  subtitle_version.video.primary_audio_language_code,
+                                  subtitle_version.subtitle_language.language_code,
                                   subtitle_version.title,
                                   subtitle_version.description)
     except:

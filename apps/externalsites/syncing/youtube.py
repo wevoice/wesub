@@ -24,6 +24,7 @@ import logging
 from django.conf import settings
 from django.utils import translation
 import babelsubs
+import unilangs
 
 from .. import google
 
@@ -43,6 +44,12 @@ logger = logging.getLogger("externalsites.syncing.youtube")
 CAPTION_TRACK_LINK_REL = ('http://gdata.youtube.com'
                           '/schemas/2007#video.captionTracks')
 
+def convert_language_code(lc):
+    """
+    Convert an Amara language code to a YouTube one
+    """
+    return unilangs.LanguageCode(lc, 'unisubs').encode('youtube')
+
 def _format_subs_for_youtube(subtitle_set):
     return babelsubs.to(subtitle_set, 'vtt').encode('utf-8')
 
@@ -61,7 +68,7 @@ def find_existing_caption_id(access_token, video_id, language_code,
         pass
     if enable_language_mapping:
         try:
-            return caption_id_map[google.convert_language_code(language_code).lower()]
+            return caption_id_map[convert_language_code(language_code).lower()]
         except KeyError:
             pass
     return None
