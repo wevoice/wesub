@@ -324,6 +324,23 @@ def captions_download(access_token, caption_id, format='ttml'):
                                          params={'tfmt': format})
     return response.content
 
+def sync_metadata(subtitle_version, video_id, access_token, primary_audio_language_code, language_code):
+    try:
+        team_video = subtitle_version.video.teamvideo
+        if team_video.team.sync_metadata and subtitle_version.title:
+            update_video_metadata(video_id,
+                                  access_token,
+                                  primary_audio_language_code,
+                                  language_code,
+                                  subtitle_version.title,
+                                  subtitle_version.description)
+    except requests.ConnectionError, e:
+        logger.error("Connection Error while updating metadata: %s" % e)
+    except APIError, e:
+        logger.error("API Error while updating metadata: %s" % e)
+    except Exception, e:
+        logger.error("Video not a team video: %s" % e)
+
 def captions_insert(access_token, video_id, primary_audio_language_code, language_code,
                     sub_content_type, sub_data, subtitle_version=None):
     """Download a caption file."""
@@ -347,18 +364,7 @@ def captions_insert(access_token, video_id, primary_audio_language_code, languag
     response = _make_youtube_upload_api_request(
         'post', access_token, 'captions', params=params,
         headers=headers, data=data)
-    try:
-        team_video = subtitle_version.video.teamvideo
-        if team_video.team.sync_metadata and subtitle_version.title:
-            update_video_metadata(video_id,
-                                  access_token,
-                                  primary_audio_language_code,
-                                  language_code,
-                                  subtitle_version.title,
-                                  subtitle_version.description)
-    except:
-        # Not a team video
-        pass
+    sync_metadata(subtitle_version, video_id, access_token, primary_audio_language_code, language_code)
     return response.content
 
 def captions_update(access_token, caption_id, sub_content_type, sub_data,
@@ -381,18 +387,7 @@ def captions_update(access_token, caption_id, sub_content_type, sub_data,
     response = _make_youtube_upload_api_request(
         'put', access_token, 'captions', params=params,
         headers=headers, data=data)
-    try:
-        team_video = subtitle_version.video.teamvideo
-        if team_video.team.sync_metadata and subtitle_version.title:
-            update_video_metadata(video_id,
-                                  access_token,
-                                  primary_audio_language_code,
-                                  language_code,
-                                  subtitle_version.title,
-                                  subtitle_version.description)
-    except:
-        # Not a team video
-        pass
+    sync_metadata(subtitle_version, video_id, access_token, primary_audio_language_code, language_code)
     return response.content
 
 def captions_delete(access_token, caption_id):
