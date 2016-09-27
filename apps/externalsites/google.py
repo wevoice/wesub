@@ -324,7 +324,7 @@ def captions_download(access_token, caption_id, format='ttml'):
                                          params={'tfmt': format})
     return response.content
 
-def captions_insert(access_token, video_id, language_code,
+def captions_insert(access_token, video_id, primary_audio_language_code, language_code,
                     sub_content_type, sub_data, subtitle_version=None):
     """Download a caption file."""
     caption_data = json.dumps({
@@ -352,8 +352,8 @@ def captions_insert(access_token, video_id, language_code,
         if team_video.team.sync_metadata and subtitle_version.title:
             update_video_metadata(video_id,
                                   access_token,
-                                  subtitle_version.video.primary_audio_language_code,
-                                  subtitle_version.subtitle_language.language_code,
+                                  primary_audio_language_code,
+                                  language_code,
                                   subtitle_version.title,
                                   subtitle_version.description)
     except:
@@ -361,7 +361,9 @@ def captions_insert(access_token, video_id, language_code,
         pass
     return response.content
 
-def captions_update(access_token, caption_id, sub_content_type, sub_data, video_id=None, subtitle_version=None):
+def captions_update(access_token, caption_id, sub_content_type, sub_data,
+                    primary_audio_language_code, language_code,
+                    video_id=None, subtitle_version=None):
     """Download a caption file."""
     caption_data = json.dumps({
         'id': caption_id,
@@ -384,8 +386,8 @@ def captions_update(access_token, caption_id, sub_content_type, sub_data, video_
         if team_video.team.sync_metadata and subtitle_version.title:
             update_video_metadata(video_id,
                                   access_token,
-                                  subtitle_version.video.primary_audio_language_code,
-                                  subtitle_version.subtitle_language.language_code,
+                                  primary_audio_language_code,
+                                  language_code,
                                   subtitle_version.title,
                                   subtitle_version.description)
     except:
