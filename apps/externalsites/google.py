@@ -27,6 +27,8 @@ import urllib
 import urlparse
 import re
 
+from teams.models import TeamVideo
+
 from django.conf import settings
 from django.utils.translation import ugettext as _
 import jwt
@@ -338,8 +340,10 @@ def sync_metadata(subtitle_version, video_id, access_token, primary_audio_langua
         logger.error("Connection Error while updating metadata: %s" % e)
     except APIError, e:
         logger.error("API Error while updating metadata: %s" % e)
+    except TeamVideo.DoesNotExist:
+        pass
     except Exception, e:
-        logger.error("Video not a team video: %s" % e)
+        logger.error("Exception syncing metadata: %s" % e)
 
 def captions_insert(access_token, video_id, primary_audio_language_code, language_code,
                     sub_content_type, sub_data, subtitle_version=None):
