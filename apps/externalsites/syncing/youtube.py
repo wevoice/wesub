@@ -26,7 +26,8 @@ from django.utils import translation
 import babelsubs
 import unilangs
 
-from .. import google
+from externalsites import google
+from teams.models import TeamVideo
 
 # NOTE
 # It would be nice to use API version 3 for this and also to use the
@@ -76,11 +77,9 @@ def find_existing_caption_id(access_token, video_id, language_code,
 def update_subtitles(video_id, access_token, subtitle_version,
                      enable_language_mapping):
     """Push the subtitles for a language to YouTube """
+
     language_code = subtitle_version.language_code
-    primary_audio_language_code = subtitle_version.video.primary_audio_language_code
-    if enable_language_mapping:
-        language_code = convert_language_code(language_code)
-        primary_audio_language_code = convert_language_code(primary_audio_language_code)
+
     subs = subtitle_version.get_subtitles()
     if should_add_credit_to_subtitles(subtitle_version, subs):
         add_credit_to_subtitles(subtitle_version, subs)
@@ -90,12 +89,35 @@ def update_subtitles(video_id, access_token, subtitle_version,
                                           language_code,
                                           enable_language_mapping)
     if caption_id:
-        google.captions_update(access_token, caption_id, 'text/vtt', content,
-                               primary_audio_language_code, language_code,
-                               video_id=video_id, subtitle_version=subtitle_version)
+        google.captions_update(access_token, caption_id, 'text/vtt', content)
     else:
-        google.captions_insert(access_token, video_id, primary_audio_language_code, language_code,
-                               'text/vtt', content, subtitle_version=subtitle_version)
+        if enable_language_mapping:
+            language_code = convert_language_code(language_code)
+        google.captions_insert(access_token, video_id, language_code,
+                               'text/vtt', content)
+    sync_metadata(video_id, access_token, subtitle_version,
+                  enable_language_mapping)
+
+def sync_metadata(video_id, access_token, subtitle_version,
+                  enable_language_mapping):
+    video = subtitle_version.video
+    team_video = video.get_team_video()
+    language_code = subtitle_version.language_code
+    if not (team_video and team_video.team.sync_metadata and
+            subtitle_version.title and video.primary_audio_language_code):
+        return
+    primary_audio_language_code = video.primary_audio_language_code
+    if enable_language_mapping:
+        primary_audio_language_code = convert_language_code(
+            primary_audio_language_code)
+        language_code = convert_language_code(language_code)
+
+    google.update_video_metadata(video_id,
+                                 access_token,
+                                 primary_audio_language_code,
+                                 language_code,
+                                 subtitle_version.title,
+                                 subtitle_version.description)
 
 def delete_subtitles(video_id, access_token, language_code,
                      enable_language_mapping):
