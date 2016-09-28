@@ -27,6 +27,8 @@ import urllib
 import urlparse
 import re
 
+from teams.models import TeamVideo
+
 from django.conf import settings
 from django.utils.translation import ugettext as _
 import jwt
@@ -324,8 +326,27 @@ def captions_download(access_token, caption_id, format='ttml'):
                                          params={'tfmt': format})
     return response.content
 
-def captions_insert(access_token, video_id, language_code,
-                    sub_content_type, sub_data):
+def sync_metadata(subtitle_version, video_id, access_token, primary_audio_language_code, language_code):
+    try:
+        team_video = subtitle_version.video.teamvideo
+        if team_video.team.sync_metadata and subtitle_version.title:
+            update_video_metadata(video_id,
+                                  access_token,
+                                  primary_audio_language_code,
+                                  language_code,
+                                  subtitle_version.title,
+                                  subtitle_version.description)
+    except requests.ConnectionError, e:
+        logger.error("Connection Error while updating metadata: %s" % e)
+    except APIError, e:
+        logger.error("API Error while updating metadata: %s" % e)
+    except TeamVideo.DoesNotExist:
+        pass
+    except Exception, e:
+        logger.error("Exception syncing metadata: %s" % e)
+
+def captions_insert(access_token, video_id, primary_audio_language_code, language_code,
+                    sub_content_type, sub_data, subtitle_version=None):
     """Download a caption file."""
     caption_data = json.dumps({
         'snippet': {
@@ -347,9 +368,12 @@ def captions_insert(access_token, video_id, language_code,
     response = _make_youtube_upload_api_request(
         'post', access_token, 'captions', params=params,
         headers=headers, data=data)
+    sync_metadata(subtitle_version, video_id, access_token, primary_audio_language_code, language_code)
     return response.content
 
-def captions_update(access_token, caption_id, sub_content_type, sub_data):
+def captions_update(access_token, caption_id, sub_content_type, sub_data,
+                    primary_audio_language_code, language_code,
+                    video_id=None, subtitle_version=None):
     """Download a caption file."""
     caption_data = json.dumps({
         'id': caption_id,
@@ -367,6 +391,7 @@ def captions_update(access_token, caption_id, sub_content_type, sub_data):
     response = _make_youtube_upload_api_request(
         'put', access_token, 'captions', params=params,
         headers=headers, data=data)
+    sync_metadata(subtitle_version, video_id, access_token, primary_audio_language_code, language_code)
     return response.content
 
 def captions_delete(access_token, caption_id):
@@ -463,3 +488,18 @@ def update_video_description(video_id, access_token, description):
     # send back the snippet with the new description
     snippet['description'] = description
     video_put(access_token, video_id, snippet=snippet)
+
+def update_video_metadata(video_id, access_token, primary_audio_language_code, language_code, title, description):
+    response = video_get(access_token, video_id, ['snippet','localizations'])
+    item = response.json()['items'][0]
+    snippet = item['snippet']
+    if 'defaultLanguage' not in snippet:
+        snippet['defaultLanguage'] = primary_audio_language_code
+        result = video_put(access_token, video_id, snippet=snippet)
+        response = video_get(access_token, video_id, ['snippet','localizations'])
+        item = response.json()['items'][0]
+        snippet = item['snippet']
+    if 'localizations' in item:
+        localizations = response.json()['items'][0]['localizations']
+        localizations[language_code] = {"title": title, "description": description}
+        result = video_put(access_token, video_id, localizations=localizations)
