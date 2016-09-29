@@ -59,6 +59,8 @@ Creating Users
     :<json string password: any number of chars, all chars allowed.
     :<json string first_name: Any chars, max 30 chars. **(optional)**
     :<json string last_name: Any chars, max 30 chars. **(optional)**
+    :<json boolean allow_3rd_party_login: If set, account can be automatically
+        linked to 3rd party account at first login. **(optional)**
     :<json boolean create_login_token: If sent the response will also include
         a url that when visited will login the created user.  Use this to
         allow users to login without explicitly setting their passwords.  This
@@ -104,6 +106,9 @@ from auth.models import CustomUser as User, LoginToken
 def can_modify_user(request_user, object_user):
     return request_user == object_user or \
         request_user.is_staff
+
+def can_create_user(request_user):
+    return request_user.is_staff or request_user.is_partner
 
 class UserSerializer(serializers.ModelSerializer):
     num_videos = serializers.IntegerField(source='videos.count',
@@ -153,6 +158,7 @@ class PasswordField(serializers.CharField):
 class UserCreateSerializer(UserSerializer):
     username = serializers.CharField(max_length=30)
     password = PasswordField(required=False, write_only=True)
+    allow_3rd_party_login = serializers.BooleanField(write_only=True, required=False)
     api_key = serializers.CharField(source='api_key.key', read_only=True)
     create_login_token = serializers.BooleanField(write_only=True,
                                                   required=False)
@@ -162,6 +168,7 @@ class UserCreateSerializer(UserSerializer):
     default_error_messages = {
         'username-not-unique': 'Username not unique: {username}',
         'username-too-long': 'Username too long: {username}',
+        'user-already-linked': 'Username with email already linked: {email}',
     }
 
     def __init__(self, *args, **kwargs):
@@ -178,9 +185,17 @@ class UserCreateSerializer(UserSerializer):
         return data
 
     def create(self, validated_data):
+        if not can_create_user(self.context['request'].user):
+            raise PermissionDenied()
+
         find_unique_username = validated_data.pop('find_unique_username',
                                                   False)
         create_login_token = validated_data.pop('create_login_token', False)
+        if 'allow_3rd_party_login' in validated_data and \
+           validated_data['allow_3rd_party_login'] and \
+           User.objects.filter(email=validated_data['email'], openid_connect_link__isnull=False).count() > 0:
+            self.fail('user-already-linked',
+                      email=validated_data['email'])
         try:
             if find_unique_username:
                 user = User.objects.create_with_unique_username(
@@ -200,7 +215,7 @@ class UserCreateSerializer(UserSerializer):
         model = User
         fields = UserSerializer.Meta.fields + (
             'email', 'api_key', 'password', 'create_login_token',
-            'find_unique_username',
+            'find_unique_username', 'allow_3rd_party_login',
         )
 
 class UserUpdateSerializer(UserSerializer):
@@ -216,7 +231,7 @@ class UserUpdateSerializer(UserSerializer):
             self.fields.pop('email')
 
     def update(self, user, validated_data):
-        if not can_modify_user(user, self.context['request'].user):
+        if not can_modify_user(self.context['request'].user, user):
             raise PermissionDenied()
         if validated_data.get('create_login_token'):
             self.login_token = LoginToken.objects.for_user(user)
