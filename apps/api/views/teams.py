@@ -234,7 +234,7 @@ Create a new task
     :<json bcp-47 language: language code
     :<json string type: task type to create.  Must be ``Subtitle`` or
         ``Translate``
-    :<json user-identifier assignee:  Task assignee **(:ref:`user_ids`)**
+    :<json user-identifier assignee:  Task assignee (:ref:`user_ids`)
     :<json integer priority: Priority for the task **(optional)**
 
 Update an existing task
@@ -242,7 +242,7 @@ Update an existing task
 
 .. http:put:: /api/teams/(team-slug)/tasks/(task-id)/
 
-    :<json user-identifier assignee:  Task assignee **(:ref:`user_ids`)**
+    :<json user-identifier assignee:  Task assignee (:ref:`user_ids`)
     :<json integer priority: priority of the task
     :<json boolean send_back: send a truthy value to send the back back
         **(optional)**
