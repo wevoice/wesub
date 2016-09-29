@@ -295,13 +295,14 @@ class CreateTeamForm(forms.ModelForm):
     class Meta:
         model = Team
         fields = ('name', 'slug', 'description', 'logo', 'workflow_type',
-                  'is_visible')
+                  'is_visible', 'sync_metadata')
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(CreateTeamForm, self).__init__(*args, **kwargs)
         self.fields['workflow_type'].choices = TeamWorkflow.get_choices()
         self.fields['is_visible'].widget.attrs['class'] = 'checkbox'
+        self.fields['sync_metadata'].widget.attrs['class'] = 'checkbox'
         self.fields['slug'].label = _(u'Team URL: http://universalsubtitles.org/teams/')
 
     def clean_slug(self):
@@ -545,7 +546,7 @@ class SettingsForm(forms.ModelForm):
 
     class Meta:
         model = Team
-        fields = ('description', 'logo', 'square_logo', 'is_visible')
+        fields = ('description', 'logo', 'square_logo', 'is_visible', 'sync_metadata')
 
 class RenameableSettingsForm(SettingsForm):
     class Meta(SettingsForm.Meta):
