@@ -28,7 +28,7 @@ particular they control:
 - Permissions -- Who can edit subtitles, who can view private subtitles
 
 Overriding workflows
--------------------
+--------------------
 
 By default, we use a workflow that makes sense for public videos -- Anyone
 can edit, the only action is Publish, etc.
@@ -246,6 +246,14 @@ class Workflow(object):
         """
         raise NotImplementedError()
 
+    def user_can_set_video_duration(self, user):
+        """Check if a user can set duration of a video
+
+        Returns:
+            True/False
+        """
+        return not user.is_anonymous()
+
     def user_can_edit_video(self, user):
         """Check if a user can edit the video
 
@@ -306,6 +314,14 @@ class VideoWorkflow(object):
             True/False
         """
         raise NotImplementedError()
+
+    def user_can_set_video_duration(self, user):
+        """Check if a user can set duration of a video
+
+        Returns:
+            True/False
+        """
+        return not user.is_anonymous()
 
     def user_can_edit_video(self, user):
         """Check if a user can view the video
@@ -647,6 +663,13 @@ class Action(object):
     CLASS_SEND_BACK = 'send-back'
     subtitle_visibility = 'public'
 
+    def require_synced_subtitles(self):
+        """Should we require that all subtitles have timings?
+
+        The default implementation uses the complete attribute
+        """
+        return bool(self.complete)
+
     def validate(self, user, video, subtitle_language, saved_version):
         """Check if we can perform this action.
 
@@ -662,7 +685,7 @@ class Action(object):
         Raises:
             ActionError -- this action can't be performed
         """
-        if self.complete:
+        if self.require_synced_subtitles():
             if saved_version:
                 version = saved_version
             else:
@@ -710,7 +733,7 @@ class Action(object):
             'label': unicode(self.label),
             'in_progress_text': unicode(self.in_progress_text),
             'class': self.visual_class,
-            'complete': self.complete,
+            'requireSyncedSubtitles': self.require_synced_subtitles(),
             'requires_translated_metadata_if_enabled': self.requires_translated_metadata_if_enabled,
         }
 

@@ -463,3 +463,18 @@ def update_video_description(video_id, access_token, description):
     # send back the snippet with the new description
     snippet['description'] = description
     video_put(access_token, video_id, snippet=snippet)
+
+def update_video_metadata(video_id, access_token, primary_audio_language_code, language_code, title, description):
+    response = video_get(access_token, video_id, ['snippet','localizations'])
+    item = response.json()['items'][0]
+    snippet = item['snippet']
+    if 'defaultLanguage' not in snippet:
+        snippet['defaultLanguage'] = primary_audio_language_code
+        result = video_put(access_token, video_id, snippet=snippet)
+        response = video_get(access_token, video_id, ['snippet','localizations'])
+        item = response.json()['items'][0]
+        snippet = item['snippet']
+    if 'localizations' in item:
+        localizations = response.json()['items'][0]['localizations']
+        localizations[language_code] = {"title": title, "description": description}
+        result = video_put(access_token, video_id, localizations=localizations)

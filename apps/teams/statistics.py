@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from auth.models import CustomUser as User
 from utils.graphing import plot
 from utils import DEFAULT_PROTOCOL
+from utils.translation import get_language_label
 from datetime import datetime
 from django.utils.timezone import utc
 
@@ -10,7 +11,7 @@ def compute_statistics(team, stats_type):
     """computes a bunch of statistics for the team, either at
     the video or member levels.
     """
-    from views import TableCell, ALL_LANGUAGES_DICT
+    from views import TableCell
     summary = ''
     graph = ''
     graph_recent = ''
@@ -30,7 +31,7 @@ def compute_statistics(team, stats_type):
         for l in unique_languages:
             count_complete = complete_languages.count(l)
             count_incomplete = incomplete_languages.count(l)
-            numbers.append((ALL_LANGUAGES_DICT[l], count_complete + count_incomplete, "Published: %s, total edits:" % count_complete))
+            numbers.append((get_language_label(l), count_complete + count_incomplete, "Published: %s, total edits:" % count_complete))
             total += count_complete + count_incomplete
         summary = 'Top languages (all time)'
         title = ""
@@ -45,7 +46,7 @@ def compute_statistics(team, stats_type):
         for l in unique_languages_recent:
             count_complete_recent = complete_languages_recent.count(l)
             count_incomplete_recent = incomplete_languages_recent.count(l)
-            numbers_recent.append((ALL_LANGUAGES_DICT[l], count_complete_recent + count_incomplete_recent, "Published: %s, total edits:" % count_complete_recent))
+            numbers_recent.append((get_language_label(l), count_complete_recent + count_incomplete_recent, "Published: %s, total edits:" % count_complete_recent))
             total_recent += count_complete_recent + count_incomplete_recent
         title_recent = ""
         graph_recent = plot(numbers_recent, title=title_recent, graph_type='HorizontalBar', labels=True, max_entries=20, y_title=y_title)
@@ -62,7 +63,8 @@ def compute_statistics(team, stats_type):
         summary = u'Members by language (all time)'
         numbers = []
         for l in unique_languages:
-            numbers.append((ALL_LANGUAGES_DICT[l], languages.count(l), ALL_LANGUAGES_DICT[l]))
+            numbers.append((get_language_label(l), languages.count(l),
+                            get_language_label(l)))
         title = ''
         graph = plot(numbers, graph_type='HorizontalBar', title=title, max_entries=25, labels=True, total_label="Members: ")
         languages_recent = list(team.languages(members_joined_since=30))
@@ -71,9 +73,9 @@ def compute_statistics(team, stats_type):
         numbers_recent = []
         for l in unique_languages_recent:
             numbers_recent.append(
-                (ALL_LANGUAGES_DICT[l],
+                (get_language_label(l),
                  languages_recent.count(l),
-                 ALL_LANGUAGES_DICT[l],
+                 get_language_label(l),
                  "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, reverse('teams:members', args=[], kwargs={'slug': team.slug}) + "?sort=-joined&lang=%s" % l))
                 )
         title_recent = ''

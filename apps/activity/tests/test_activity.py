@@ -270,6 +270,38 @@ class TeamVideoActivityTest(TestCase):
         team_video.remove(UserFactory())
         self.check_copies(record, None, [first_team])
 
+    def test_private_to_team_disables_copies(self):
+        video = VideoFactory()
+        team_video = TeamVideoFactory(video=video)
+        clear_activity()
+        record = ActivityRecord.objects.create_for_video_added(video)
+        record.private_to_team = True
+        record.save()
+        team_video.move_to(TeamFactory())
+        assert_false(
+            ActivityRecord.objects.filter(copied_from=record).exists()
+        )
+
+    def test_private_to_team_with_for_video(self):
+        # If private_to_team is True, we should not make any copies
+        video = VideoFactory()
+        team = TeamFactory()
+        team_video = TeamVideoFactory(video=video, team=team)
+        clear_activity()
+        record = ActivityRecord.objects.create_for_video_added(video)
+        record.private_to_team = True
+        record.save()
+        # By default, we don't include records with private_to_team set.
+        assert_equal(list(ActivityRecord.objects.for_video(video)), [])
+        # If we pass in the team parameter, we do though
+        assert_equal(list(ActivityRecord.objects.for_video(video, team)),
+                     [record])
+        # Check passing in a different team parameter
+        different_team = TeamFactory()
+        assert_equal(
+            list(ActivityRecord.objects.for_video(video, different_team)),
+            [])
+
 class TestViewableByUser(TestCase):
     def setUp(self):
         self.user = UserFactory()

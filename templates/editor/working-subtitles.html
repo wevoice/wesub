@@ -7,10 +7,10 @@
     </div>
     <div class="toolbox">
         <div class="toolbox-inside">
+            <button class="toolIcon" href="#" ng-click="onToolIconClicked($event)" aria-label="Tools"><span class="clippedAndHidden">Tools</span></button>
             <!-- The "helper_margin" is invisible and adds an extra 45px of hover-area on the left to keep the "toolbox-menu" open -->
             <div class="helper_margin"></div>
-            <a href="#"><img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png" alt="Tools"></img></a>
-            <ul class="toolbox-menu">
+            <ul class="toolbox-menu hidden">
                 <li ng-show="copyTimingEnabled()"><a href="#" class="copyover" ng-click="showCopyTimingModal($event)" title="Copy timing and paragraphs from reference language">{% trans "Copy Timing" %}</a></li>
                 <li><a href="#" ng-click="toggleTimelineShown()" class="show-timeline">
                     <span ng-show="timelineShown">{% trans "Hide" %}</span>
@@ -104,4 +104,3 @@
         </div>
     </div>
 </div>
-

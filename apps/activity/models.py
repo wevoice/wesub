@@ -65,7 +65,9 @@ class ActivityType(Code):
         if ModelClass is None or related_obj_id is None:
             return None
         else:
-            return ModelClass.objects.get(id=related_obj_id)
+            return (ModelClass.objects.all()
+                    .select_related()
+                    .get(id=related_obj_id))
 
 class ActivityMessageDict(object):
     """Helper class to format our messages.
@@ -326,8 +328,12 @@ class ActivityManager(models.Manager):
     def original(self):
         return self.get_query_set().original()
 
-    def for_video(self, video):
-        return self.filter(video=video).original()
+    def for_video(self, video, team=None):
+        qs = self.filter(video=video).original()
+        if team is None:
+            return qs.filter(private_to_team=False)
+        else:
+            return qs.filter(team=team)
 
     def for_api_user(self, user):
         # Used for the default API listing.  It would be nice to simplify this
@@ -438,7 +444,8 @@ class ActivityManager(models.Manager):
                                          related_obj_id=url_edit.id)
 
     def move_video_records_to_team(self, video, team):
-        for record in self.filter(video=video, copied_from=None):
+        for record in self.filter(video=video, copied_from=None,
+                                  private_to_team=False):
             record.move_to_team(team)
 
 class ActivityRecord(models.Model):
@@ -475,6 +482,9 @@ class ActivityRecord(models.Model):
     # team.
     copied_from = models.ForeignKey('self', blank=True, null=True,
                                     related_name='copies')
+    # Make a record private to a team.  This does 2 things: disable the
+    # copying behavior above and not include it in the default video listing.
+    private_to_team = models.BooleanField(default=False, blank=True)
 
     objects = ActivityManager()
 

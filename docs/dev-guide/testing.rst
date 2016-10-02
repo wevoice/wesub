@@ -4,6 +4,8 @@ Testing
 The Amara project uses the `Nose <http://nose.readthedocs.org/en/latest/>`_
 testing framework.
 
+.. _running-tests:
+
 Running tests
 -------------
 

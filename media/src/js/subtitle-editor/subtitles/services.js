@@ -231,7 +231,7 @@ var angular = angular || null;
                 return promise;
 
             },
-            saveSubtitles: function(dfxpString, title, description, metadata, isComplete, action) {
+            saveSubtitles: function(dfxpString, title, duration, description, metadata, isComplete, action) {
                 var videoID = EditorData.video.id;
                 var languageCode = EditorData.editingVersion.languageCode;
 
@@ -255,6 +255,7 @@ var angular = angular || null;
                         from_editor: true,
                         metadata: metadata,
                         action: action,
+                        duration: duration,
                     }
                 });
 

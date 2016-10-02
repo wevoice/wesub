@@ -295,13 +295,14 @@ class CreateTeamForm(forms.ModelForm):
     class Meta:
         model = Team
         fields = ('name', 'slug', 'description', 'logo', 'workflow_type',
-                  'is_visible')
+                  'is_visible', 'sync_metadata')
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(CreateTeamForm, self).__init__(*args, **kwargs)
         self.fields['workflow_type'].choices = TeamWorkflow.get_choices()
         self.fields['is_visible'].widget.attrs['class'] = 'checkbox'
+        self.fields['sync_metadata'].widget.attrs['class'] = 'checkbox'
         self.fields['slug'].label = _(u'Team URL: http://universalsubtitles.org/teams/')
 
     def clean_slug(self):
@@ -545,7 +546,7 @@ class SettingsForm(forms.ModelForm):
 
     class Meta:
         model = Team
-        fields = ('description', 'logo', 'square_logo', 'is_visible')
+        fields = ('description', 'logo', 'square_logo', 'is_visible', 'sync_metadata')
 
 class RenameableSettingsForm(SettingsForm):
     class Meta(SettingsForm.Meta):
@@ -1104,7 +1105,6 @@ class ActivityFiltersForm(forms.Form):
         ('-created', _('date, newest')),
         ('created', _('date, oldest')),
     ]
-
     type = forms.ChoiceField(
         label=_('Activity Type'), required=False,
         choices=[])
@@ -1122,9 +1122,7 @@ class ActivityFiltersForm(forms.Form):
         super(ActivityFiltersForm, self).__init__(
                   data=self.calc_data(get_data))
         self.team = team
-        self.fields['type'].choices = [
-            ('', _('Any type')),
-        ] + ActivityRecord.active_type_choices()
+        self.fields['type'].choices = self.calc_activity_choices()
         language_choices = [
             ('', ('Any language')),
         ]
@@ -1134,6 +1132,17 @@ class ActivityFiltersForm(forms.Form):
             language_choices.extend(get_language_choices())
         self.fields['video_language'].choices = language_choices
         self.fields['subtitle_language'].choices = language_choices
+
+    def calc_activity_choices(self):
+        choices = [
+            ('', _('Any type')),
+        ]
+        choice_map = dict(ActivityRecord.active_type_choices())
+        choices.extend(
+            (value, choice_map[value])
+            for value in self.team.new_workflow.activity_type_filter_options()
+        )
+        return choices
 
     def calc_data(self, get_data):
         field_names = set(['type', 'video_language', 'subtitle_language',
@@ -1336,6 +1345,7 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
     def setup_fields(self):
         dest_teams = [self.team] + permissions.can_move_videos_to(
             self.team, self.user)
+        dest_teams.sort(key=lambda t: t.name)
         self.fields['new_team'].choices = [
             (dest.id, dest.name) for dest in dest_teams
         ]

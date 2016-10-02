@@ -67,11 +67,11 @@ class YoutubeVideoType(VideoType):
         return (hostname in YoutubeVideoType.HOSTNAMES and
                 any(pattern.search(url) for pattern in cls._url_patterns))
 
-    def get_direct_url(self, video=False):
-        if video:
-            return google.get_direct_url_to_video(self.video_id)
-        else:
+    def get_direct_url(self, prefer_audio=False):
+        if prefer_audio:
             return google.get_direct_url_to_audio(self.video_id)
+        else:
+            return google.get_direct_url_to_video(self.video_id)
 
     def get_video_info(self):
         if not hasattr(self, '_video_info'):

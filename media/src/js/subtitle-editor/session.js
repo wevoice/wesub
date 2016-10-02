@@ -31,6 +31,7 @@ var angular = angular || null;
                 return SubtitleStorage.saveSubtitles(
                     $scope.workingSubtitles.subtitleList.toXMLString(),
                     $scope.workingSubtitles.title,
+                    Math.floor($scope.timeline.duration / 1000),
                     $scope.workingSubtitles.description,
                     $scope.workingSubtitles.metadata,
                     null, action).then(this.afterSaveSubtitles);
@@ -145,7 +146,7 @@ var angular = angular || null;
                 },
                 canPerform: function() {
                     if ($scope.session.forbidAction(action).forbid) return false;
-                    if(action.complete === true) {
+                    if(action.requireSyncedSubtitles === true) {
                         return $scope.sessionBackend.subtitlesComplete();
                     } else {
                         return true;
