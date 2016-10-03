@@ -24,9 +24,12 @@ Users Resource
 Fetching user data
 ^^^^^^^^^^^^^^^^^^
 
-.. http:get:: /api/users/[username]/
+.. http:get:: /api/users/[identifier]/
+
+    :arg user-identifier identifier:  See :ref:`user_ids`
 
     :>json username username: username
+    :>json string id: user ID
     :>json string first_name: First name
     :>json string last_name: Last name
     :>json url homepage: Homepage URL
@@ -88,6 +91,52 @@ Updating user accounts
 
     Inputs the same fields as POST, except `username` and
     `find_unique_username`.
+
+.. _user_ids:
+
+User Identifiers
+****************
+
+There are a couple ways to specify users:
+
+- Username
+- User ID prefixed with "id$" (``id$abcdef123``)
+
+The user ID method is preferred since it's possible for users to change their
+username.
+
+.. _user_fields:
+
+User fields
+***********
+
+Users are often contained in other resources, for example the team members,
+subtitle authors, etc.  When those users are represented, we use a dict with
+the following fields:
+
+  - username -- Username
+  - id -- User ID
+  - uri -- Link to the user API endpoint
+
+Example JSON::
+
+  {
+    "user": {
+      "username": "alice",
+      "id": "abcdef",
+      "uri": "https://amara.org/api/users/id$abcdef/"
+    }
+  }
+
+When you post data to an endpoint with a userfield, you can specify the user
+using any of the identifiers listed abose.  For example, to create a team
+member you can send this data::
+
+  {
+    "user": "id$abcdef",
+    "role": "manager"
+  }
+
 """
 
 from __future__ import absolute_import
@@ -95,12 +144,15 @@ import re
 
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.db import IntegrityError
 from rest_framework import mixins
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.reverse import reverse
 
+from api import extra
+from api import userlookup
 from auth.models import CustomUser as User, LoginToken
 
 def can_modify_user(request_user, object_user):
@@ -113,13 +165,13 @@ def can_create_user(request_user):
 class UserSerializer(serializers.ModelSerializer):
     num_videos = serializers.IntegerField(source='videos.count',
                                           read_only=True)
+    id = serializers.CharField(source='secure_id', read_only=True)
     languages = serializers.ListField(
         child=serializers.CharField(),
         source='get_languages', read_only=True)
     activity_uri = serializers.HyperlinkedIdentityField(
         view_name='api:user-activity', lookup_field='username')
-    resource_uri = serializers.HyperlinkedIdentityField(
-        view_name='api:users-detail', lookup_field='username')
+    resource_uri = serializers.SerializerMethodField()
     created_by = serializers.CharField(source='created_by.username',
                                        read_only=True)
     is_partner = serializers.BooleanField(required=False, read_only=True)
@@ -127,9 +179,9 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'username', 'full_name', 'first_name', 'last_name', 'biography',
-            'homepage', 'avatar', 'languages', 'num_videos', 'activity_uri',
-            'resource_uri', 'created_by', 'is_partner',
+            'username', 'id', 'full_name', 'first_name', 'last_name',
+            'biography', 'homepage', 'avatar', 'languages', 'num_videos',
+            'activity_uri', 'resource_uri', 'created_by', 'is_partner',
         )
 
     default_error_messages = {
@@ -145,11 +197,17 @@ class UserSerializer(serializers.ModelSerializer):
 
     def to_representation(self, user):
         data = super(UserSerializer, self).to_representation(user)
+        extra.user.add_data(self.context['request'], data, user=user)
         if hasattr(self, 'login_token'):
             data['auto_login_url'] = reverse(
                 "auth:token-login", args=(self.login_token.token,),
                 request=self.context['request'])
         return data
+
+    def get_resource_uri(self, user):
+        return reverse('api:users-detail', kwargs={
+            'identifier': 'id$' + user.secure_id(),
+        }, request=self.context['request'])
 
 class PasswordField(serializers.CharField):
     def to_internal_value(self, password):
@@ -248,8 +306,8 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
                   viewsets.GenericViewSet):
     queryset = User.objects.all().select_related('created_by')
-    lookup_field = 'username'
-    lookup_value_regex = r'[\w\-@\.\+\s]+'
+    lookup_field = 'identifier'
+    lookup_value_regex = r'[^/]+'
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -261,3 +319,11 @@ class UserViewSet(mixins.RetrieveModelMixin,
         else:
             raise ValueError("Invalid request method: {}".format(
                 self.request.method))
+
+    def get_object(self):
+        try:
+            user = userlookup.lookup_user(self.kwargs['identifier'])
+        except User.DoesNotExist:
+            raise Http404()
+        self.check_object_permissions(self.request, user)
+        return user
