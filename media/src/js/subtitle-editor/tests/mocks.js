@@ -3,7 +3,7 @@
     var module = angular.module('amara.SubtitleEditor.mocks', []);
 
     module.factory('VideoPlayer', function() {
-        return jasmine.createSpyObj('VideoPlayer', [
+        var mockVideoPlayer = jasmine.createSpyObj('VideoPlayer', [
             'init',
             'play',
             'pause',
@@ -15,6 +15,30 @@
             'getVolume',
             'setVolume',
             'playChunk',
+        ]);
+        mockVideoPlayer._playing = false;
+        mockVideoPlayer.isPlaying.and.callFake(function() {
+            return mockVideoPlayer._playing;
+        });
+        mockVideoPlayer.play.and.callFake(function() {
+            mockVideoPlayer._playing = true;
+        });
+        mockVideoPlayer.pause.and.callFake(function() {
+            mockVideoPlayer._playing = false;
+        });
+        mockVideoPlayer._currentTime = 0;
+        mockVideoPlayer.currentTime.and.callFake(function() {
+            return mockVideoPlayer._currentTime;
+        });
+        mockVideoPlayer.seek.and.callFake(function(ms) {
+            mockVideoPlayer._currentTime = ms;
+        });
+        return mockVideoPlayer;
+    });
+
+    module.factory('PreferencesService', function() {
+        return jasmine.createSpyObj('PreferencesService', [
+            'setPlaybackMode'
         ]);
     });
 
@@ -112,7 +136,62 @@
                 },
             ],
             'notes': [],
-            'staticURL': 'http://example.com/'
+            'staticURL': 'http://example.com/',
+            'preferences': {}
         };
+    });
+
+    module.factory('$timeout', function($q, $rootScope) {
+        var timeouts = [];
+
+        var mockTimeout = jasmine.createSpy('$timeout')
+            .and.callFake(function(callback, delay) {
+                var deferred = $q.defer();
+                var promise = deferred.promise;
+                var timeout = {
+                    msLeft: delay,
+                    deferred: deferred,
+                    callback: callback,
+                    completed: false
+                };
+
+                promise.index = timeouts.length;
+                promise.then(callback);
+                timeouts.push(timeout);
+                return promise;
+            });
+        mockTimeout.cancel = jasmine.createSpy('cancel')
+            .and.callFake(function(promise) {
+                var timeout = timeouts[promise.index];
+                timeout.completed = true;
+                timeout.deferred.reject("timeout canceled");
+            });
+        mockTimeout.flush = jasmine.createSpy('flush')
+            .and.callFake(function() {
+                $.each(timeouts, function(index, timeout) {
+                    if(!timeout.completed) {
+                        timeout.completed = true;
+                        timeout.deferred.resolve("timeout flushed");
+                    }
+                });
+                timeouts.length = 0;
+                $rootScope.$apply();
+            });
+
+        mockTimeout.simulateTime = function(ms) {
+            for(var i = 0; i < timeouts.length; ++i) {
+                var timeout = timeouts[i];
+                if(!timeout.completed) {
+                    timeout.msLeft -= ms;
+                    if(timeout.msLeft <= 0) {
+                        timeout.msLeft = 0;
+                        timeout.completed = true;
+                        timeout.deferred.resolve("timeout simulated");
+                    }
+                }
+            }
+            $rootScope.$apply();
+        };
+        return mockTimeout;
     });
 }).call(this);

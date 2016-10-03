@@ -21,13 +21,13 @@ var angular = angular || null;
 (function(){
     var module = angular.module('amara.SubtitleEditor.preferences', []);
 
-    var urls_by_type = {
+    var urlsByType = {
         'tutorial_shown': '/en/subtitles/editor/tutorial_shown',
         'set_playback_mode': '/en/subtitles/editor/set_playback_mode'
     };
 
     function getPreferencesUrl(type) {
-        var url = urls_by_type[type];
+        var url = urlsByType[type];
         return url ? url : null;
     }
 
