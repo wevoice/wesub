@@ -126,6 +126,12 @@ class UserAPITest(TestCase):
         self.assert_response_data_correct(response, user, 'post')
         return user, response
 
+    def check_post_permission_denied(self, data):
+        response = self.client.post(self.list_url, data=data)
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN,
+                     response.content)
+        return response
+
     def test_create_user(self):
         self.user.is_partner = True
         self.check_post({
@@ -139,8 +145,23 @@ class UserAPITest(TestCase):
             'homepage': 'http://example.com/test/'
         })
 
+    def test_create_user_denied(self):
+        self.user.is_partner = False
+        response = self.check_post_permission_denied({
+            'username': 'test-user',
+            'email': 'test@example.com',
+            'password': 'test-password',
+            'first_name': 'Test',
+            'last_name': 'User',
+            'full_name': 'Test User',
+            'bio': 'test-bio',
+            'homepage': 'http://example.com/test/'
+        })
+        assert_equal(response.content, """{"detail":"Permission denied."}""")
+
     def test_create_user_with_unique_username(self):
         UserFactory(username='test-user')
+        self.user.is_partner = True
         user, response = self.check_post({
             'username': 'test-user',
             'find_unique_username': 1,
@@ -164,15 +185,14 @@ class UserAPITest(TestCase):
         })
         assert_true(user.is_partner)
 
-    def test_only_partners_can_create_partners(self):
+    def test_only_partners_can_create_users(self):
         self.user.is_partner = False
-        user, response = self.check_post({
+        response = self.client.post(self.list_url, {
             'username': 'test-user',
             'email': 'test@example.com',
             'password': 'test-password',
-            'is_partner': True,
         })
-        assert_false(user.is_partner)
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_with_dollar_sign(self):
         # The dollar sign is reserved for identifiers, so we should prevent
@@ -202,12 +222,14 @@ class UserAPITest(TestCase):
         assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_user_partial_data(self):
+        self.user.is_partner = True
         self.check_post({
             'username': 'test-user',
             'email': 'test@example.com',
         })
 
     def test_create_user_blank_data(self):
+        self.user.is_partner = True
         self.check_post({
             'username': 'test-user',
             'email': 'test@example.com',
@@ -220,6 +242,7 @@ class UserAPITest(TestCase):
 
     def test_create_user_non_unique_username(self):
         UserFactory(username='test-user')
+        self.user.is_partner = True
         response = self.client.post(self.list_url, {
             'username': 'test-user',
             'email': 'test@example.com',
@@ -234,6 +257,7 @@ class UserAPITest(TestCase):
         assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_login_token(self):
+        self.user.is_partner = True
         user, response = self.check_post({
             'username': 'test-user',
             'email': 'test@example.com',
