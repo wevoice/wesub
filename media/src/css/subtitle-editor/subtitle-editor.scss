@@ -244,6 +244,7 @@ div.modal {
     top: 0;
     width: 100%;
     z-index: 99;
+
     div.inner {
         background: $dark-grey;
         color: #F1F1F1;
@@ -1342,9 +1343,6 @@ div.workspace-tools {
                    &.clear-timing {
                      background: url('../images/subtitle-editor/glyphicons_057_history.png') 10px no-repeat;
                    }
-                   &.shift-scale-timing {
-                     background: url('../images/subtitle-editor/glyphicons_057_history.png') 10px no-repeat;
-                   }
                    &.clear-text {
                      background: url('../images/subtitle-editor/glyphicons_207_remove_2.png') 10px no-repeat;
                    }
@@ -1773,11 +1771,6 @@ aside.modal {
             font-size: 14px;
             font-weight: bold;
         }
-    }
-    form {
-      div {
-         margin: 10px 0;
-      }
     }
     .error {
         color: red;

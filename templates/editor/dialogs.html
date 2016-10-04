@@ -327,11 +327,6 @@
 <aside modal-dialog="generic" class="modal">
     <h3>[[ dialogManager.generic.title ]]</h3>
     <p ng-show="dialogManager.generic.text">[[ dialogManager.generic.text ]]</p>
-    <form>
-      <div class="form-group" ng-repeat="field in dialogManager.generic.inputFields">
-	<label ng-class="field.cssClass">[[ field.label ]]</label><input type="text" ng-model="modalValues[field.name]">
-      </div>
-    </form>
     <footer class="buttons">
         <button ng-repeat="button in dialogManager.generic.buttons" ng-click="dialogManager.onButtonClicked(button, $event)" ng-class="button.cssClass">[[ button.text ]]</button>
     </footer>

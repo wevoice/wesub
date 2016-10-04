@@ -83,7 +83,6 @@ var angular = angular || null;
         $scope.uploading = false;
         $scope.uploadError = false;
         $scope.exiting = false;
-        $scope.modalValues = { 'shift': "0", 'scale': "1.0"};
         $scope.hideNextTime = function() {
             $scope.showHideNextTime = false;
         };
@@ -201,18 +200,6 @@ var angular = angular || null;
             // that if anything changed
             $scope.$root.$emit('work-done');
 	}
-        $scope.shiftScaleTiming = function() {
-            var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
-	    var scale = parseFloat($scope.modalValues['scale']);
-	    var shift = parseFloat($scope.modalValues['shift']);
-            while (nextWorkingSubtitle) {
-                $scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, scale * (nextWorkingSubtitle.startTime + shift), scale * (nextWorkingSubtitle.endTime + shift));
-                nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
-            }
-            // Sent no matter anything has changed or not, ideally we'd only emit
-            // that if anything changed
-            $scope.$root.$emit('work-done');
-	}
 
 	$scope.copyTimingEnabled = function() {
             return ($scope.workingSubtitles.subtitleList.length() > 0 &&
@@ -313,14 +300,6 @@ var angular = angular || null;
         $scope.showCopyTimingModal = function($event) {
             $scope.dialogManager.openDialog('confirmCopyTiming', {
                 continueButton: $scope.copyTimingOver
-            });
-            $event.stopPropagation();
-            $event.preventDefault();
-        };
-
-        $scope.showShiftScaleTimingModal = function($event) {
-            $scope.dialogManager.openDialog('shiftScaleTiming', {
-                continueButton: $scope.shiftScaleTiming
             });
             $event.stopPropagation();
             $event.preventDefault();
