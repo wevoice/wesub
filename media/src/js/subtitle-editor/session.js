@@ -146,7 +146,7 @@ var angular = angular || null;
                 },
                 canPerform: function() {
                     if ($scope.session.forbidAction(action).forbid) return false;
-                    if(action.complete === true) {
+                    if(action.requireSyncedSubtitles === true) {
                         return $scope.sessionBackend.subtitlesComplete();
                     } else {
                         return true;

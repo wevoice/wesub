@@ -222,6 +222,7 @@ class Team(models.Model):
                                       upload_to='teams/square-logo/',
                                       thumb_sizes=[(100, 100), (48, 48)])
     is_visible = models.BooleanField(_(u'videos public?'), default=True)
+    sync_metadata = models.BooleanField(_(u'Sync metadata when available (Youtube)?'), default=False)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
 

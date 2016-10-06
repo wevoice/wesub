@@ -41,28 +41,22 @@ from rest_framework import status
 from rest_framework import views
 from rest_framework.response import Response
 
+from api.fields import UserField
 from auth.models import CustomUser as User
 from teams.models import Team
 from messages.models import Message
 import teams.permissions
 
 class MessagesSerializer(serializers.Serializer):
-    user = serializers.CharField(required=False)
+    user = UserField(required=False)
     team = serializers.CharField(required=False)
     subject = serializers.CharField()
     content = serializers.CharField()
 
     default_error_messages = {
-        'unknown-user': "Unknown user: {user}",
         'unknown-team': "Unknown team: {team}",
         'no-user-or-team': "Must specify either user or team",
     }
-
-    def validate_user(self, username):
-        try:
-            return User.objects.get(username=username)
-        except User.DoesNotExist:
-            self.fail('unknown-user', user=username)
 
     def validate_team(self, slug):
         try:

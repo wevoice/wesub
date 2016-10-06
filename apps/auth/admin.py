@@ -77,12 +77,12 @@ class CustomUserForm(forms.ModelForm):
             'username', 'password', 'password1', 'password2', 'first_name',
             'last_name', 'email', 'is_active', 'is_staff', 'is_superuser',
             'groups', 'user_permissions', 'last_login', 'date_joined',
-            'is_partner', 'created_by',
+            'is_partner', 'allow_3rd_party_login', 'created_by',
         ]
 
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff',
-                    'is_superuser', 'last_ip', 'partner')
+                    'is_superuser', 'last_ip', 'partner', 'secure_id')
     search_fields = ('username', 'first_name', 'last_name', 'email', 'id')
     raw_id_fields = ('created_by',)
     form = CustomUserForm
@@ -93,7 +93,7 @@ class CustomUserAdmin(admin.ModelAdmin):
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
-        (_('Amara'), {'fields': ('is_partner', 'created_by')}),
+        (_('Amara'), {'fields': ('is_partner', 'allow_3rd_party_login', 'created_by')}),
     )
 
     actions = ['remove_staff_access']

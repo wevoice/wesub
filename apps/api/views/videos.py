@@ -227,6 +227,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 import json
 
 from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
+from api.views.apiswitcher import APISwitcherMixin
 from teams import permissions as team_perms
 from teams.models import Team, TeamVideo, Project
 from subtitles.models import SubtitleLanguage
@@ -238,7 +239,7 @@ import videos.tasks
 class VideoLanguageShortSerializer(serializers.Serializer):
     code = serializers.CharField(source='language_code')
     name = serializers.CharField(source='get_language_code_display')
-    visible = serializers.BooleanField(source='has_public_version')
+    published = serializers.BooleanField(source='has_public_version')
     dir = serializers.CharField()
     subtitles_uri = serializers.SerializerMethodField()
     resource_uri = serializers.SerializerMethodField()
@@ -700,3 +701,20 @@ class VideoURLViewSet(viewsets.ModelViewSet):
             'user': self.request.user,
             'request': self.request,
         }
+
+# code to make the depracated API work
+class OldVideoLanguageShortSerializer(VideoLanguageShortSerializer):
+    def get_fields(self):
+        fields = super(OldVideoLanguageShortSerializer, self).get_fields()
+        fields['visible'] = fields.pop('published')
+        return fields
+
+class OldVideoSerializer(VideoSerializer):
+    languages = OldVideoLanguageShortSerializer(source='all_subtitle_languages',
+                                                many=True, read_only=True)
+
+class VideoViewSetSwitcher(APISwitcherMixin, VideoViewSet):
+    switchover_date = 20161201
+
+    class Deprecated(VideoViewSet):
+        serializer_class = OldVideoSerializer

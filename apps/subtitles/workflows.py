@@ -663,6 +663,13 @@ class Action(object):
     CLASS_SEND_BACK = 'send-back'
     subtitle_visibility = 'public'
 
+    def require_synced_subtitles(self):
+        """Should we require that all subtitles have timings?
+
+        The default implementation uses the complete attribute
+        """
+        return bool(self.complete)
+
     def validate(self, user, video, subtitle_language, saved_version):
         """Check if we can perform this action.
 
@@ -678,7 +685,7 @@ class Action(object):
         Raises:
             ActionError -- this action can't be performed
         """
-        if self.complete:
+        if self.require_synced_subtitles():
             if saved_version:
                 version = saved_version
             else:
@@ -726,7 +733,7 @@ class Action(object):
             'label': unicode(self.label),
             'in_progress_text': unicode(self.in_progress_text),
             'class': self.visual_class,
-            'complete': self.complete,
+            'requireSyncedSubtitles': self.require_synced_subtitles(),
             'requires_translated_metadata_if_enabled': self.requires_translated_metadata_if_enabled,
         }
 
