@@ -486,8 +486,10 @@ class TaskDeleteForm(forms.Form):
 
 class MessageTextField(forms.CharField):
     def __init__(self, *args, **kwargs):
+        if 'max_length' not in kwargs:
+            kwargs['max_length'] = 4000
         super(MessageTextField, self).__init__(
-            max_length=4000, required=False, widget=forms.Textarea,
+            required=False, widget=forms.Textarea,
             *args, **kwargs)
 
 class GuidelinesMessagesForm(forms.Form):
@@ -497,7 +499,7 @@ class GuidelinesMessagesForm(forms.Form):
     messages_invite = MessageTextField(
         label=_('When a member is invited to join the team'))
     messages_application = MessageTextField(
-        label=_('When a member applies to join the team'))
+        label=_('When a member applies to join the team'), max_length=15000)
     messages_joins = MessageTextField(
         label=_('When a member joins the team'))
     messages_manager = MessageTextField(
