@@ -21,6 +21,8 @@ from rest_framework.reverse import reverse
 import pytz
 
 def format_datetime_field(datetime):
+    if datetime is None:
+        return None
     tz = timezone.get_default_timezone()
     isoformat = tz.localize(datetime).astimezone(pytz.utc).isoformat()
     return isoformat.replace('+00:00', 'Z')

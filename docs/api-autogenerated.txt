@@ -453,7 +453,7 @@ Fetching user data
 
 .. http:get:: /api/users/[identifier]/
 
-    :arg user-id identifier:  See :ref:`user_ids` for the format
+    :arg user-identifier identifier:  See :ref:`user_ids`
 
     :>json username username: username
     :>json string id: user ID
@@ -489,6 +489,8 @@ Creating Users
     :<json string password: any number of chars, all chars allowed.
     :<json string first_name: Any chars, max 30 chars. **(optional)**
     :<json string last_name: Any chars, max 30 chars. **(optional)**
+    :<json boolean allow_3rd_party_login: If set, account can be automatically
+        linked to 3rd party account at first login. **(optional)**
     :<json boolean create_login_token: If sent the response will also include
         a url that when visited will login the created user.  Use this to
         allow users to login without explicitly setting their passwords.  This
@@ -529,6 +531,38 @@ There are a couple ways to specify users:
 
 The user ID method is preferred since it's possible for users to change their
 username.
+
+.. _user_fields:
+
+User fields
+***********
+
+Users are often contained in other resources, for example the team members,
+subtitle authors, etc.  When those users are represented, we use a dict with
+the following fields:
+
+  - username -- Username
+  - id -- User ID
+  - uri -- Link to the user API endpoint
+
+Example JSON::
+
+  {
+    "user": {
+      "username": "alice",
+      "id": "abcdef",
+      "uri": "https://amara.org/api/users/id$abcdef/"
+    }
+  }
+
+When you post data to an endpoint with a userfield, you can specify the user
+using any of the identifiers listed abose.  For example, to create a team
+member you can send this data::
+
+  {
+    "user": "id$abcdef",
+    "role": "manager"
+  }
 
 Activity
 --------
@@ -1045,119 +1079,152 @@ This API endpoint is used for subtitle requests for teams new team that use
 the collaboration model.  At this point it's only used by a limited number of
 teams, but we hope to make it available to everyone in the near future.
 
+Terminology
+***********
+
+Several teams can be involved in a subtitle request.  We use these terms to
+distinguish the teams:
+
+  - *source team* -- Team that the video is part of.
+  - *work team* -- Team that is creating the subtitles.  We call this the
+    *initial work* to differentiate it from the evaluations.
+  - *evaulation teams* -- Teams that are evaluating/checking the subtitles.
+    Each request can have 0-3 evaluation teams.
+
+All subtitle request endpoints are contained inside the main endpoint for a
+team.  When the docs say something like "source team only", it refers to that
+team.
+
 Listing Requests
 ****************
 
 .. http:get:: /api/teams/(team-slug)/subtitle-requests/
 
-    :queryparam string state: Filter by state.  This can be any valid state
-      value (see below), or ``in-progress`` meaning any state except complete.
-    :queryparam video-id video: Filter by video
-    :queryparam bcp-47 video_language: Filter by video request language
+    :queryparam string type: Type of request.  Possible values:
+
+        - ``local`` *(default)* -- The simple case, requests where the team is
+          both the source and work team.
+        - ``outgoing`` -- Request where the team is the source team, but not
+          the work team.
+        - ``incoming`` -- Request where the team is the work team, but not the
+          source team.
+        - ``evaluations`` -- Request where the team is the evaluation team.
+
+    :queryparam string status: *(source team only)* Filter by overall status.
+      Possible values:
+
+        - ``in-progress`` -- initial work in progress
+        - ``in-evaluation`` -- evaluation in progress
+        - ``in-evaluation1`` -- 1st evaluation in progress
+        - ``in-evaluation2`` -- 2nd evaluation in progress
+        - ``in-evaluation[N]`` -- Nth evaluation in progress
+        - ``complete`` -- all work complete
+
+    :queryparam string work_status: *(work team only)* Filter by status of the
+      intial work (not including evaluations).
+
+        - ``in-progress`` -- initial work in progress
+        - ``available`` -- assignment currently available
+        - ``assigned`` -- assignment in progress
+        - ``needs-subtitler`` -- transcribe/translate assignment available
+        - ``being-subtitled`` -- transcribe/translate assignment in progress
+        - ``needs-reviewer`` -- review assignment available
+        - ``being-reviewed`` -- review assignment in progress
+        - ``needs-approver`` -- approval assignment available
+        - ``being-approved`` -- approval assignment in progress
+        - ``complete`` -- initial work complete
+
+    :queryparam string evaluation_status: *(evaluation teams only)* Filter by
+      status of the evaluation.  Possible values:
+
+        - ``upcoming`` -- evaluation not ready to be started
+        - ``in-progress`` -- evaluation in progress
+        - ``available`` -- evaluation assignment currently available
+        - ``assigned`` -- evaluation assignment in progress
+        - ``complete`` -- evaluation complete
+
+    :queryparam video-id video: Filter by video ID
+    :queryparam string video_title: Filter by video title
+    :queryparam bcp-47 video_language: Filter by video language
     :queryparam bc4-47 language: Filter by subtitle request language
-    :queryparam slug project: Filter by project
-    :queryparam username assignee: Filter by username
+    :queryparam slug project: Filter by team project
+    :queryparam username assignee: Filter by assignee
+    :queryparam string sort:  Sort order.  Possible values:
+
+      - ``creation`` *(default)* -- creation date/time (latest first)
+      - ``due`` -- due date/time (earliest first)
+      - ``completion`` -- latest completion date/time (latest first)
 
     :>json job-id job_id: ID for the request
-    :>json slug team: Team handling the request
     :>json video-id video: Video for the request
     :>json bcp-47 language: Language code of the subtitle request
-    :>json string state: current state of the request.  One of:
+    :>json slug team: Team handling the request (source team only)
+    :>json slug-list evaluation_teams: Team evaluating the request.  Only
+      present for requests for the team's videos.
+    :>json string status: *(source team only)* Overall request status.
+      is part of the team. Possible values:
 
-        - ``needs-subtitler``
-        - ``being-subtitled``
-        - ``needs-reviewer``
-        - ``being-reviewed``
-        - ``needs-approver``
-        - ``being-approved``
-        - ``complete``
+        - ``in-progress`` -- initial work in progress
+        - ``in-evaluation1`` -- 1st evaluation in progress
+        - ``in-evaluation2`` -- 2nd evaluation in progress
+        - ``in-evaluation[N]`` -- Nth evaluation in progress
+        - ``complete`` -- all work complete
 
-    :>json datetime created: when the request was created
-    :>json datetime completed: when the request was completed, or null
-    :>json uri resource_uri: Subtitle request details resource
+    :>json string work_status: *(work team only)* Status of the intial work
+      (not including evaluations).  Possible values:
 
-Request Details
-***************
+        - ``needs-subtitler`` -- transcribe/translate assignment available
+        - ``being-subtitled`` -- transcribe/translate assignment in progress
+        - ``needs-reviewer`` -- review assignment available
+        - ``being-reviewed`` -- review assignment in progress
+        - ``needs-approver`` -- approval assignment available
+        - ``being-approved`` -- approval assignment in progress
+        - ``complete`` -- initial work complete
 
-.. http:get:: /api/subtitle-requests/(job-id)/
+    :>json string evaluation_status: *(evaluation teams only*) Status of the
+        evaluation.  Possible values:
 
-    :>json job-id job_id: ID for the request
-    :>json slug team: Team handling the request
-    :>json video-id video: Video for the request
-    :>json bcp-47 language: Language code of the subtitle request
-    :>json string state: current state of the request.  One of:
+        - ``upcoming`` -- evaluation not ready to be started
+        - ``available`` -- evaluation assignment currently available
+        - ``assigned`` -- evaluation assignment in progress
+        - ``complete`` -- evaluation complete
 
-        - ``needs-subtitler``
-        - ``being-subtitled``
-        - ``needs-reviewer``
-        - ``being-reviewed``
-        - ``needs-approver``
-        - ``being-approved``
-        - ``complete``
-
-    :>json datetime created: when the request was created
-    :>json datetime completed: when the request was completed, or null
-    :>json username subtitler: user creating the subtitles
-    :>json username reviewer: user reviewing the subtitles
-    :>json username approver: user approving the subtitles
+    :>json datetime created: when the request was created.
+    :>json datetime completed: *(source team only)* when the entire request
+      was completed, or null.
+    :>json datetime work_completed: *(work team only)* when the initial work
+      was completed, or null.
+    :>json datetime evaluation_completed: *(evaluation team only)* when the
+      initial work was completed, or null.
+    :>json user subtitler: *(work team only*) user creating the subtitles (see
+      :ref:`user_fields`)
+    :>json user reviewer: *(work team only*) user reviewing the subtitles (see
+      :ref:`user_fields`).
+    :>json user approver: *(work team only*) user approving the subtitles (see
+      :ref:`user_fields`).
+    :>json user evaluator: *(evaluation teams only*) user evaluating the
+      subtitles (see :ref:`user_fields`).
     :>json uri video_uri: Video API resource
-    :>json uri subtitler_uri: User resource for the subtitler
-    :>json uri reviewer_uri: User resource for the reviewer
-    :>json uri approver_uri: User resource for the approver
     :>json uri subtitles_uri: Subtitles resource
     :>json uri actions_uri: Subtitle actions resource
     :>json uri resource_uri: Subtitle request details resource
 
-    - Results are ordered by creation time
-    - List results are paginated.
+    List results are paginated.
 
-.. note::
-   Depending on the team settings, there may or may not be a reviewer/approver
-   working on a request.
+Request Details
+***************
 
+.. http:get:: /api/teams/(team-slug)/subtitle-requests/(job-id)/
 
-Listing Remote Requests
-***********************
-
-Remote requests are requests for videos on your team, but being handled by a
-different team.
-
-.. note::
-  The API providers less details on remote requests, since another team is
-  responsible for them.  In particular, the state field is much more granular
-  and there is no link to the details URI.
-
-.. http:get:: /api/teams/(team-slug)/subtitle-requests/remote/
-
-    :queryparam string state: Filter by state.  This can be:
-
-        - ``complete`` -- subtitles complete
-        - ``in-progress`` -- subtitles still being worked on
-
-    :queryparam video-id video: Filter by video
-    :queryparam bcp-47 video_language: Filter by video request language
-    :queryparam bc4-47 language: Filter by subtitle request language
-    :queryparam slug project: Filter by project
-
-    :>json job-id job_id: ID for the request
-    :>json slug team: Team handling the request
-    :>json video-id video: Video for the request
-    :>json bcp-47 language: Language code of the subtitle request
-    :>json string state: current state of the request.  One of:
-
-        - ``complete``
-        - ``in-progress``
-
-    :>json datetime created: when the request was created
-    :>json datetime completed: when the request was completed, or null
+   Response data is the same as above.
 
 Creating Requests
 *****************
 
-.. http:post:: /api/subtitle-requests/
+.. http:post:: /api/teams/(team-slug)/subtitle-requests/
 
-    :<json video-id video: Video ID.  This must be part of a team that you are
-       an admin for.
+    :<json video-id video: Video ID.  This must be part of the team identified
+      in the URL path
     :<json bcp-47 language: language code for the subtitles
     :<json slug team: Team to work on the subtitles.  This can be any team
         you are an admin of.  **(optional, defaults to the team the video is a
@@ -1166,29 +1233,36 @@ Creating Requests
         after the initial work is done.  They can be any team you are an admin
         of.  **(optional)**
 
+    The API user must be an admin of the source team to create a subtitle
+    request.
 
 Updating Requests
 *****************
 
-.. http:PUT:: /api/subtitle-requests/(job-id)/
+.. http:PUT:: /api/teams/(team-slug)/subtitle-requests/(job-id)/
 
-    :<json username subtitler: Username to assign as the subtitler, or null to
-        unassign the current subtitler
-    :<json username reviewer: Username to assign as the reviewer, or null to
-        unassign the current reviewer
-    :<json username approver: Username to assign as the approver, or null to
-        unassign the current approver
-    :<json slug team: Change the team working on the subtitle request.  This
-        is only possible if work has not been started.
-    :<json string state: Change the state of the subtitler request.  The only
-        valid value is "complete" which marks the subtitle request complete.
+    :<json user subtitler: *(work team only)* User to assign as the subtitler,
+      or null to unassign the current subtitler (see :ref:`user_ids`).
+    :<json user reviewer: *(work team only)* User to assign as the reviewer,
+      or null to unassign the current reviewer (see :ref:`user_ids`).
+    :<json user approver: *(work team only)* User to assign as the approver,
+      or null to unassign the current approver (see :ref:`user_ids`).
+    :<json string work_status: *(work team only)* Set to "complete" to mark the
+      subtitles complete.  This is the only value we currently support.
+    :<json slug team: *(source team only)* Change the team working on the
+      subtitle request.  This is only possible if work has not been started.
+    :<json slug evaluation_teams: *(source team only)* Change the teams
+      evaluating on the subtitle request.  This is only possible if
+      evaluations have not been started.
+    :<json user evaluator: *(evaluation teams only)* User to assign as the
+      evaluator, or null to unassign the current evaluator (see
+      :ref:`user_ids`).
 
 **Assigning a user:**
 
-
 .. sourcecode:: http
 
-    PUT /api/subtitle-requests/abc123/
+    PUT /api/teams/my-team/subtitle-requests/abc123/
 
     {
         "subtitler": "alice"
@@ -1198,7 +1272,7 @@ Updating Requests
 
 .. sourcecode:: http
 
-    PUT /api/subtitle-requests/abc123/
+    PUT /api/teams/my-team/subtitle-requests/abc123/
 
     {
         "subtitler": null
@@ -1208,17 +1282,17 @@ Updating Requests
 
 .. sourcecode:: http
 
-    PUT /api/subtitle-requests/abc123/
+    PUT /api/teams/my-team/subtitle-requests/abc123/
 
     {
-        "state": "complete"
+        "work_status": "complete"
     }
 
 **Moving a subtitle request to another team**
 
 .. sourcecode:: http
 
-    PUT /api/subtitle-requests/abc123/
+    PUT /api/teams/my-team/subtitle-requests/abc123/
 
     {
         "team": "other-team-slug"
