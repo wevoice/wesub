@@ -98,3 +98,4 @@ class ExtraDispatcher(object):
                     callback(request.user, data, **kwargs)
 
 video_language = ExtraDispatcher()
+user = ExtraDispatcher()

@@ -210,7 +210,8 @@ import dateutil.parser
 import pytz
 
 from activity.models import ActivityRecord
-from api.fields import TimezoneAwareDateTimeField
+from api.fields import TimezoneAwareDateTimeField, UserField
+from api.views.apiswitcher import APISwitcherMixin
 from subtitles.models import SubtitleLanguage
 from auth.models import CustomUser as User
 from teams.models import Team
@@ -218,15 +219,10 @@ from videos.models import Video
 
 class ActivitySerializer(serializers.ModelSerializer):
     type = serializers.SlugField()
-    user = serializers.CharField(source='user.username')
+    user = UserField(read_only=True)
     date = TimezoneAwareDateTimeField(source='created')
     video = serializers.CharField(source='video.video_id')
     language = serializers.SerializerMethodField()
-    user_uri = serializers.HyperlinkedRelatedField(
-        source='user',
-        view_name='api:users-detail',
-        lookup_field='username',
-        read_only=True)
     video_uri = serializers.HyperlinkedRelatedField(
         source='video',
         view_name='api:video-detail',
@@ -282,8 +278,8 @@ class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityRecord
         fields = (
-            'type', 'date', 'user', 'video', 'language', 'user_uri',
-            'video_uri', 'language_uri',
+            'type', 'date', 'user', 'video', 'language', 'video_uri',
+            'language_uri',
         )
 
 class ActivityFilterBackend(filters.BaseFilterBackend):
@@ -451,3 +447,40 @@ class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(
                 created__gte=datetime.fromtimestamp(int(params['after'])))
         return queryset
+
+
+# Support for the old user data APIs
+
+class OldActivitySerializer(ActivitySerializer):
+    user = serializers.CharField(source='user.username')
+    user_uri = serializers.HyperlinkedRelatedField(
+        source='user',
+        view_name='api:users-detail',
+        lookup_field='username',
+        lookup_url_kwarg='identifier',
+        read_only=True)
+
+    class Meta:
+        model = ActivityRecord
+        fields = (
+            'type', 'date', 'user', 'video', 'language', 'user_uri',
+            'video_uri', 'language_uri',
+        )
+
+class VideoActivityViewSwitcher(APISwitcherMixin, VideoActivityView):
+    switchover_date = 20161201
+
+    class Deprecated(VideoActivityView):
+        serializer_class = OldActivitySerializer
+
+class TeamActivityViewSwitcher(APISwitcherMixin, TeamActivityView):
+    switchover_date = 20161201
+
+    class Deprecated(TeamActivityView):
+        serializer_class = OldActivitySerializer
+
+class UserActivityViewSwitcher(APISwitcherMixin, UserActivityView):
+    switchover_date = 20161201
+
+    class Deprecated(UserActivityView):
+        serializer_class = OldActivitySerializer
