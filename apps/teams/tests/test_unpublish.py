@@ -206,7 +206,7 @@ class DeleteLanguageFormTest(UnpublishTestCase):
     def test_permissions(self):
         # only team admins and staff members should be able to submit the form
         self.check_user_perm(UserFactory(), False)
-        self.check_user_perm(UserFactory(is_staff=True), True)
+        self.check_user_perm(UserFactory(is_superuser=True), True)
         for role in (ROLE_ADMIN, ROLE_OWNER):
             member = TeamMemberFactory(team=self.team, role=role)
             self.check_user_perm(member.user, True)
@@ -271,7 +271,7 @@ class DeleteLanguageViewTest(UnpublishTestCase):
 
     def test_permissions(self):
         self.check_user_perm(UserFactory(), False)
-        self.check_user_perm(UserFactory(is_staff=True), True)
+        self.check_user_perm(UserFactory(is_superuser=True), True)
         for role in (ROLE_ADMIN, ROLE_OWNER):
             member = TeamMemberFactory(team=self.team, role=role)
             self.check_user_perm(member.user, True)

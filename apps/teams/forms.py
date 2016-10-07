@@ -48,7 +48,7 @@ from teams.exceptions import ApplicationInvalidException
 from teams.fields import TeamMemberInput
 from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
-    can_assign_task, can_delete_language, can_remove_video,
+    can_assign_task, can_remove_video,
     can_add_video_somewhere
 )
 from teams.permissions_const import ROLE_NAMES
@@ -846,7 +846,9 @@ class DeleteLanguageForm(forms.Form):
             raise forms.ValidationError(_(
                 u"These subtitles are not under a team's control."))
 
-        if not can_delete_language(team_video.team, self.user):
+        workflow = self.language.video.get_workflow()
+        if not workflow.user_can_delete_subtitles(self.user,
+                                                  self.language.language_code):
             raise forms.ValidationError(_(
                 u'You do not have permission to delete this language.'))
 
