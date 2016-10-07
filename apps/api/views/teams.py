@@ -268,6 +268,7 @@ Get details on a specific task
     :>json username assignee: username of the task assignee (or null)
     :>json integer priority: Priority for the task
     :>json datetime created: Date/time when the task was created
+    :>json datetime modified: Date/time when the task was last updated
     :>json datetime completed: Date/time when the task was completed (or null)
     :>json string approved: Approval status of the task.  One of
         ``In Progress``, ``Approved``, or ``Rejected``
@@ -780,6 +781,7 @@ class TaskSerializer(serializers.ModelSerializer):
     assignee = TeamMemberField(required=False)
     type = MappedChoiceField(Task.TYPE_CHOICES)
     created = TimezoneAwareDateTimeField(read_only=True)
+    modified = TimezoneAwareDateTimeField(read_only=True)
     completed = TimezoneAwareDateTimeField(read_only=True)
     approved = MappedChoiceField(
         Task.APPROVED_CHOICES, required=False,
@@ -790,10 +792,7 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = (
             'id', 'video_id', 'language', 'type', 'assignee', 'priority',
-            'created', 'completed', 'approved', 'resource_uri',
-        )
-        read_only_fields = (
-            'completed',
+            'created', 'modified', 'completed', 'approved', 'resource_uri',
         )
 
     def get_resource_uri(self, task):
@@ -861,7 +860,7 @@ class TaskViewSet(TeamSubview):
                 .select_related('team_video__video', 'assignee'))
 
     def order_queryset(self, qs):
-        valid_orderings = set(['created', 'priority', 'type'])
+        valid_orderings = set(['created', 'modified', 'priority', 'type'])
         reverse_orderings = set('-' + o for o in valid_orderings)
         order_by = self.request.query_params.get('order_by')
         if order_by in valid_orderings.union(reverse_orderings):

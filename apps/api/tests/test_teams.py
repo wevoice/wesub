@@ -572,11 +572,9 @@ class TasksAPITest(TeamAPITestBase):
         assert_equal(data['type'], task.get_type_display())
         assert_equal(data['assignee'], user_field_data(task.assignee))
         assert_equal(data['priority'], task.priority)
-        if task.completed:
-            assert_equal(data['completed'],
-                         format_datetime_field(task.completed))
-        else:
-            assert_equal(data['completed'], None)
+        assert_equal(data['created'], format_datetime_field(task.created))
+        assert_equal(data['modified'], format_datetime_field(task.modified))
+        assert_equal(data['completed'], format_datetime_field(task.completed))
         assert_equal(data['approved'], task.get_approved_display())
         assert_equal(data['resource_uri'],
                      reverse('api:tasks-detail', kwargs={
@@ -748,6 +746,8 @@ class TasksAPITest(TeamAPITestBase):
         tasks = self.make_a_bunch_of_tasks()
         self.check_list_order('created')
         self.check_list_order('-created')
+        self.check_list_order('modified')
+        self.check_list_order('-modified')
         self.check_list_order('priority')
         self.check_list_order('-priority')
         self.check_list_order('type')
