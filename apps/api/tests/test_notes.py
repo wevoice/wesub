@@ -23,7 +23,7 @@ from nose.tools import *
 from rest_framework.test import APIClient
 import mock
 
-from api.tests.utils import format_datetime_field
+from api.tests.utils import format_datetime_field, user_field_data
 from subtitles import workflows
 from subtitles.models import SubtitleNote
 from utils import test_utils
@@ -54,7 +54,7 @@ class TestActionsAPI(TestCase):
         data = json.loads(response.content)
         assert_equal(data['objects'], [
             {
-                'user': self.user.username,
+                'user': user_field_data(self.user),
                 'body': 'test note',
                 'created': format_datetime_field(note.created),
             }

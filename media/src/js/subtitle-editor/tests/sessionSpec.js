@@ -110,25 +110,25 @@ describe('The SessionController', function() {
                 name: 'action1',
                 label: 'Action 1',
                 in_progress_text: 'Doing Action 1',
-                complete: true
+                requireSyncedSubtitles: true
             },
             {
                 name: 'action2',
                 label: 'Action 2',
                 in_progress_text: 'Doing Action 2',
-                complete: false
+                requireSyncedSubtitles: false
             },
             {
                 name: 'action3',
                 label: 'Action 3',
                 in_progress_text: 'Doing Action 3',
-                complete: null
+                requireSyncedSubtitles: null
             },
             {
                 name: 'save-draft',
                 label: 'Save Draft',
                 in_progress_text: 'Saving...',
-                complete: false
+                requireSyncedSubtitles: false
             }
         ];
         $scope = $rootScope.$new();
@@ -333,22 +333,22 @@ describe('The SessionController', function() {
         expectRedirectToVideoPage();
     });
 
-    it('prevents actions with complete=true to be performed with incomplete subtitles', function() {
+    it('prevents actions with requireSyncedSubtitles=true to be performed with incomplete subtitles', function() {
         $scope.sessionBackend.subtitlesComplete.and.returnValue(false);
         expect($scope.actions[0].canPerform()).toBeFalsy();
     });
 
-    it('allows actions with complete=true to be performed with complete subtitles', function() {
+    it('allows actions with requireSyncedSubtitles=true to be performed with complete subtitles', function() {
         $scope.sessionBackend.subtitlesComplete.and.returnValue(true);
         expect($scope.actions[0].canPerform()).toBeTruthy();
     });
 
-    it('always allows actions with complete=false to be performed', function() {
+    it('always allows actions with requireSyncedSubtitles=false to be performed', function() {
         $scope.sessionBackend.subtitlesComplete.and.returnValue(false);
         expect($scope.actions[1].canPerform()).toBeTruthy();
     });
 
-    it('always allows actions with complete=null to be performed', function() {
+    it('always allows actions with requireSyncedSubtitles=null to be performed', function() {
         $scope.sessionBackend.subtitlesComplete.and.returnValue(false);
         expect($scope.actions[2].canPerform()).toBeTruthy();
     });

@@ -18,10 +18,12 @@
 from __future__ import absolute_import
 
 from django.utils import timezone
-from rest_framework.fields import CharField
 from rest_framework import serializers
+from rest_framework.fields import CharField
+from rest_framework.reverse import reverse
 import pytz
 
+from api import userlookup
 from auth.models import CustomUser as User
 from teams.models import Team
 
@@ -29,21 +31,31 @@ class LanguageCodeField(CharField):
     def to_internal_value(self, language_code):
         return language_code.lower()
 
-class UsernameField(CharField):
+class UserField(serializers.CharField):
+    """Serialize user data inside other serializers
+
+    For example: SubtitleVersion.author and TeamMember.user
+    """
     default_error_messages = {
         'invalid-user': "Invalid User"
     }
 
     def to_representation(self, user):
         if user:
-            return user.username
+            identifier = 'id$' + user.secure_id()
+            return {
+                'id': user.secure_id(),
+                'username': user.username,
+                'uri': reverse('api:users-detail', args=[identifier],
+                               request=self.context['request']),
+            }
         else:
             return None
 
-    def to_internal_value(self, username):
-        if username:
+    def to_internal_value(self, identifier):
+        if identifier:
             try:
-                return User.objects.get(username=username)
+                return userlookup.lookup_user(identifier)
             except User.DoesNotExist:
                 self.fail('invalid-user')
         else:
