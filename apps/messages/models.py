@@ -46,14 +46,23 @@ MESSAGE_TYPE_CHOICES = (
 class MessageManager(models.Manager):
     use_for_related_fields = True
 
-    def for_user(self, user):
-        return self.get_query_set().filter(user=user).exclude(deleted_for_user=True)
+    def for_user(self, user, thread_tip_only=False):
+        qs = self.get_query_set().filter(user=user).exclude(deleted_for_user=True)
+        if thread_tip_only:
+            qs = qs.filter(has_reply_for_user=False)
+        return qs
 
-    def for_author(self, user):
-        return self.get_query_set().filter(author=user).exclude(deleted_for_author=True)
+    def for_author(self, user, thread_tip_only=False):
+        qs = self.get_query_set().filter(author=user).exclude(deleted_for_author=True)
+        if thread_tip_only:
+            qs = qs.filter(has_reply_for_author=False)
+        return qs
 
-    def for_user_or_author(self, user):
-        return self.get_query_set().filter((Q(author=user) & Q(deleted_for_author=False)) | (Q(user=user) & Q(deleted_for_user=False)))
+    def for_user_or_author(self, user, thread_tip_only=False):
+        qs = self.get_query_set().filter((Q(author=user) & Q(deleted_for_author=False)) | (Q(user=user) & Q(deleted_for_user=False)))
+        if thread_tip_only:
+            qs = qs.filter(Q(has_reply_for_author=False) | Q(has_reply_for_user=False))
+        return qs
 
     def thread(self, message, user):
         if message.thread:
@@ -61,6 +70,16 @@ class MessageManager(models.Manager):
         else:
             thread_id = message.id
         return self.get_query_set().filter(Q(thread=thread_id) | Q(id=thread_id)).filter((Q(author=user) & Q(deleted_for_author=False)) | (Q(user=user) & Q(deleted_for_user=False)))
+
+    def previous_in_thread(self, message, user):
+        if message.thread:
+            previous_messages = self.thread(message, user)
+            if message.created is not None:
+                previous_messages = previous_messages.filter(created__lt = message.created)
+            previous_messages = previous_messages.order_by('-created')
+            if previous_messages.exists():
+                return previous_messages[0]
+        return None
 
     def unread(self):
         return self.get_query_set().filter(read=False)
@@ -93,6 +112,8 @@ class Message(models.Model):
 
     objects = MessageManager()
     thread = models.PositiveIntegerField(blank=True, null=True, db_index=True)
+    has_reply_for_author = models.BooleanField(default=False)
+    has_reply_for_user = models.BooleanField(default=False)
     hide_cookie_name = 'hide_new_messages'
 
     def validate_message_type(value):
@@ -115,6 +136,11 @@ class Message(models.Model):
     def delete_for_user(self, user):
         if self.user == user:
             self.deleted_for_user = True
+            if self.thread is not None and not self.has_reply_for_user:
+                previous_in_thread = Message.objects.previous_in_thread(self, self.user)
+                if previous_in_thread is not None:
+                    previous_in_thread.has_reply_for_user = False
+                    previous_in_thread.save()
             self.save()
         elif self.author == user:
             self.delete_for_author(user)
@@ -122,6 +148,11 @@ class Message(models.Model):
     def delete_for_author(self, author):
         if self.author == author:
             self.deleted_for_author = True
+            if self.thread is not None and not self.has_reply_for_author:
+                previous_in_thread = Message.objects.previous_in_thread(self, self.user)
+                if previous_in_thread is not None:
+                    previous_in_thread.has_reply_for_author = False
+                    previous_in_thread.save()
             self.save()
 
     def json_data(self):
@@ -184,6 +215,12 @@ class Message(models.Model):
         if getattr(settings, "MESSAGES_DISABLED", False):
             return
         self.auto_truncate_subject()
+        if self.thread is not None and self.pk is None:
+            previous_in_thread = Message.objects.previous_in_thread(self, self.user)
+            if previous_in_thread is not None:
+                previous_in_thread.has_reply_for_author = True
+                previous_in_thread.has_reply_for_user = True
+                previous_in_thread.save()
         super (Message, self).save(*args, **kwargs)
 
     def auto_truncate_subject(self):
