@@ -1,3 +1,4 @@
+from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 import logging
@@ -10,11 +11,18 @@ class Command(BaseCommand):
         make_option('--days',
                     action='store_true',
                     dest='days',
-                    default=30,
-                    help='Days of history of threads to process'),
+                    default=None,
+                    help='Days of history of threads to process, by default all messages in history'),
     )
     def handle(self, *args, **kwargs):
-        for thread in set(Message.objects.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=kwargs['days']), thread__isnull=False).values_list('thread', flat=True)):
+        threads = Message.objects.filter(thread__isnull=False)
+        if kwargs['days'] is not None:
+            threads = threads.filter(created__gt=datetime.datetime.now() - datetime.timedelta(days=kwargs['days']))
+        threads = set(threads.values_list('thread', flat=True))
+        num_threads = len(threads)
+        self.stdout.write("Adding thread tips, found {} threads to process\n".format(num_threads))
+        processed = 0
+        for thread in threads:
             messages = Message.objects.filter(Q(thread=thread) | Q(id=thread), deleted_for_user=False).order_by('-created')
             if messages.count() > 0:
                 messages.update(has_reply_for_user = True)
@@ -27,3 +35,7 @@ class Command(BaseCommand):
                 last_message = messages[0]
                 last_message.has_reply_for_author = False
                 last_message.save()
+            processed += 1
+            self.stdout.write("\rProcessed {}/{} threads".format(processed, num_threads))
+            self.stdout.flush()
+        self.stdout.write('\nSuccessfully processed all threads\n')
