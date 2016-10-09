@@ -1808,6 +1808,14 @@ aside.modal#guidelines-modal {
     }
 }
 
+aside.modal#playback-mode-modal {
+    div.modal-content {
+        select {
+            width: 100%;
+        }
+    }
+}
+
 .warning {
     color: $warning-color;
     font-size: 10px;
