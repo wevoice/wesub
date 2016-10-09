@@ -35,6 +35,7 @@ class Migration(SchemaMigration):
         },
         'auth.customuser': {
             'Meta': {'object_name': 'CustomUser', '_ormbases': ['auth.User']},
+            'allow_3rd_party_login': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'autoplay_preferences': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'award_points': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'biography': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
@@ -173,6 +174,7 @@ class Migration(SchemaMigration):
             'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '50'}),
             'square_logo': ('utils.amazon.fields.S3EnabledImageField', [], {'default': "''", 'max_length': '100', 'thumb_sizes': '[(100, 100), (48, 48)]', 'blank': 'True'}),
             'subtitle_policy': ('django.db.models.fields.IntegerField', [], {'default': '10'}),
+            'sync_metadata': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'task_assign_policy': ('django.db.models.fields.IntegerField', [], {'default': '10'}),
             'task_expiration': ('django.db.models.fields.PositiveIntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'translate_policy': ('django.db.models.fields.IntegerField', [], {'default': '10'}),
