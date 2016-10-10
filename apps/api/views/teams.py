@@ -422,7 +422,10 @@ class MappedChoiceField(serializers.ChoiceField):
             self.fail('unknown-choice', choice=choice)
 
     def to_representation(self, value):
-        return self.map[value]
+        try:
+            return self.map[value]
+        except KeyError:
+            return 'unknown'
 
 class TeamSerializer(serializers.ModelSerializer):
     type = MappedChoiceField(
