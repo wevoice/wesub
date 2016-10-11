@@ -243,6 +243,8 @@ List all tasks for a team
 
         - ``created``   Creation date
         - ``-created``  Creation date (descending)
+        - ``modified``  Last update date
+        - ``-modified`` Last update date (descending)
         - ``priority``  Priority
         - ``-priority`` Priority (descending)
         - ``type``      Task type (details below)
