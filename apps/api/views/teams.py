@@ -386,6 +386,7 @@ from api.fields import UserField, TimezoneAwareDateTimeField
 from auth.models import CustomUser as User
 from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
                           Application, TeamLanguagePreference)
+from teams.workflows import TeamWorkflow
 from utils.translation import ALL_LANGUAGE_CODES
 import messages.tasks
 import subtitles.signals
@@ -415,9 +416,15 @@ class MappedChoiceField(serializers.ChoiceField):
             self.fail('unknown-choice', choice=choice)
 
     def to_representation(self, value):
-        return self.map[value]
+        try:
+            return self.map[value]
+        except KeyError:
+            return 'unknown'
 
 class TeamSerializer(serializers.ModelSerializer):
+    type = MappedChoiceField(
+        source='workflow_type', required=False, default='O',
+        choices=TeamWorkflow.get_api_choices())
     # Handle mapping internal values for membership/video policy to the values
     # we use in the api (currently the english display name)
     MEMBERSHIP_POLICY_CHOICES = (
@@ -494,7 +501,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ('name', 'slug', 'description', 'is_visible',
+        fields = ('name', 'slug', 'type', 'description', 'is_visible',
                   'membership_policy', 'video_policy', 'activity_uri',
                   'members_uri', 'safe_members_uri', 'projects_uri',
                   'applications_uri', 'languages_uri', 'tasks_uri',
@@ -503,6 +510,9 @@ class TeamSerializer(serializers.ModelSerializer):
 class TeamUpdateSerializer(TeamSerializer):
     name = serializers.CharField(required=False)
     slug = serializers.SlugField(required=False)
+    type = MappedChoiceField(
+        source='workflow_type', read_only=True,
+        choices=TeamWorkflow.get_api_choices())
 
 class TeamViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
@@ -517,7 +527,7 @@ class TeamViewSet(mixins.CreateModelMixin,
         return Team.objects.for_user(self.request.user)
 
     def get_serializer_class(self):
-        if 'slug' in self.kwargs:
+        if self.request.method in ('PUT', 'PATCH'):
             return TeamUpdateSerializer
         else:
             return TeamSerializer
@@ -762,6 +772,7 @@ class TaskSerializer(serializers.ModelSerializer):
     assignee = TeamMemberField(required=False)
     type = MappedChoiceField(Task.TYPE_CHOICES)
     created = TimezoneAwareDateTimeField(read_only=True)
+    modified = TimezoneAwareDateTimeField(read_only=True)
     completed = TimezoneAwareDateTimeField(read_only=True)
     approved = MappedChoiceField(
         Task.APPROVED_CHOICES, required=False,
@@ -772,10 +783,7 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = (
             'id', 'video_id', 'language', 'type', 'assignee', 'priority',
-            'created', 'completed', 'approved', 'resource_uri',
-        )
-        read_only_fields = (
-            'completed',
+            'created', 'modified', 'completed', 'approved', 'resource_uri',
         )
 
     def get_resource_uri(self, task):
@@ -843,7 +851,7 @@ class TaskViewSet(TeamSubview):
                 .select_related('team_video__video', 'assignee'))
 
     def order_queryset(self, qs):
-        valid_orderings = set(['created', 'priority', 'type'])
+        valid_orderings = set(['created', 'modified', 'priority', 'type'])
         reverse_orderings = set('-' + o for o in valid_orderings)
         order_by = self.request.query_params.get('order_by')
         if order_by in valid_orderings.union(reverse_orderings):
@@ -854,7 +862,12 @@ class TaskViewSet(TeamSubview):
     def filter_queryset(self, qs):
         params = self.request.query_params
         if 'assignee' in params:
-            qs = qs.filter(assignee=userlookup.query_user(params['assignee']))
+            try:
+                qs = qs.filter(
+                    assignee=userlookup.lookup_user(params['assignee'])
+                )
+            except User.DoesNotExist:
+                return qs.none()
         if 'priority' in params:
             qs = qs.filter(priority=params['priority'])
         if 'language' in params:
@@ -995,7 +1008,12 @@ class TeamApplicationViewSet(TeamSubviewMixin,
     def filter_queryset(self, qs):
         params = self.request.query_params
         if 'user' in params:
-            qs = qs.filter(user=userlookup.query_user(params['user']))
+            try:
+                qs = qs.filter(
+                    user=userlookup.lookup_user(params['user'])
+                )
+            except User.DoesNotExist:
+                return qs.none()
         if 'status' in params:
             try:
                 status_id = Application.STATUSES_IDS[params['status']]

@@ -113,6 +113,7 @@ class CustomUser(BaseUser, secureid.SecureIDMixin):
     # if true, items that end on the user activity stream will also be
     # sent as a message
     notify_by_message = models.BooleanField(default=True)
+    allow_3rd_party_login = models.BooleanField(default=False)
     biography = models.TextField('Bio', blank=True)
     autoplay_preferences = models.IntegerField(
         choices=AUTOPLAY_CHOICES, default=AUTOPLAY_ON_BROWSER)

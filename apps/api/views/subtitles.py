@@ -692,6 +692,9 @@ class SubtitlesSerializer(serializers.Serializer):
             origin=origin)
 
 class SubtitlesView(generics.CreateAPIView):
+    # Note that even though we only inherit from CreateAPIView, we support
+    # more methods than just POST.  However for those methods we don't use
+    # the generic django-rest-framework implementation.
     serializer_class = SubtitlesSerializer
     renderer_classes = views.APIView.renderer_classes + [
         DFXPRenderer, SBVRenderer, SSARenderer, SRTRenderer, VTTRenderer,
@@ -782,6 +785,19 @@ class SubtitlesView(generics.CreateAPIView):
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         videos.tasks.video_changed_tasks.delay(video.pk)
         return version
+
+    def delete(self, request, *args, **kwargs):
+        language_code = kwargs['language_code']
+        video = self.get_video()
+        workflow = workflows.get_workflow(video)
+        if not workflow.user_can_delete_subtitles(
+                self.request.user, language_code):
+            raise PermissionDenied()
+            request.data.pop('duration', None)
+        subtitle_language = video.subtitle_language(language_code)
+        subtitle_language.nuke_language()
+        videos.tasks.video_changed_tasks.delay(video.pk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class ActionsSerializer(serializers.Serializer):
     action = serializers.CharField(source='name')

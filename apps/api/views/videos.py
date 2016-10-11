@@ -706,7 +706,7 @@ class VideoURLViewSet(viewsets.ModelViewSet):
 class OldVideoLanguageShortSerializer(VideoLanguageShortSerializer):
     def get_fields(self):
         fields = super(OldVideoLanguageShortSerializer, self).get_fields()
-        fields['visible'] = fields.pop('public')
+        fields['visible'] = fields.pop('published')
         return fields
 
 class OldVideoSerializer(VideoSerializer):

@@ -67,7 +67,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
-    can_delete_language, can_move_videos, can_view_stats_tab, can_sort_by_primary_language
+    can_move_videos, can_view_stats_tab, can_sort_by_primary_language
 )
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
@@ -2259,11 +2259,13 @@ def _writelock_languages_for_delete(request, subtitle_language):
 
 def delete_language(request, slug, lang_id):
     team = get_object_or_404(Team, slug=slug)
-    if not can_delete_language(team, request.user):
+    language = get_object_or_404(SubtitleLanguage, pk=lang_id)
+    workflow = language.video.get_workflow()
+    if not workflow.user_can_delete_subtitles(request.user,
+                                              language.language_code):
         return redirect_to_login(reverse("teams:delete-language",
                                          kwargs={"slug": team.slug,
                                                  "lang_id": lang_id}))
-    language = get_object_or_404(SubtitleLanguage, pk=lang_id)
     next_url = request.POST.get('next', language.video.get_absolute_url())
     team_video = language.video.get_team_video()
     if team_video.team.pk != team.pk:
