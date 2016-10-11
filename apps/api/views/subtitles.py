@@ -52,6 +52,7 @@ Listing languages for a video
     :>json string approver: Username of the approver for task-based teams
     :>json boolean is_translation: Is this language translated from other
         languages? **(deprecated)**
+    :>json boolean published: Are the subtitles publicly viewable?
     :>json string original_language_code: Source translation language
         **(deprecated)**
     :>json integer num_versions: Number of subtitle versions, the length of the
@@ -119,6 +120,7 @@ Fetching subtitles for a given language
     :>json integer version_number: version number for the subtitles
     :>json object subtitles: Subtitle data.  The format depends on the
         sub_format param
+    :>json user-data author: Subtitle author (see :ref:`user_fields`)
     :>json string sub_format: Format of the subtitles
     :>json object language: Language data
     :>json string title: Video title, translated into the subtitle's language

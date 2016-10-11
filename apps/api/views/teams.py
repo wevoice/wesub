@@ -141,16 +141,18 @@ Listing members of a team
 Get info on a team member
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. http:get:: /api/teams/(team-slug)/members/(username)
+.. http:get:: /api/teams/(team-slug)/members/(user-identifier)/
 
     The data is in the same format as the listing endpoint.
+
+    See :ref:`user_ids` for possible values for ``user-identifier``
 
 Adding a member to the team
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. http:post:: /api/teams/(team-slug)/members/
 
-    :<json username username: username of the user to add
+    :<json user-identifier user: User to add (see :ref:`user_ids`)
     :<json string role: One of: ``owner``, ``admin``, ``manager``, or
         ``contributor``
 
@@ -235,7 +237,8 @@ List all tasks for a team
 
 .. http:get:: /api/teams/(team-slug)/tasks/
 
-    :queryparam username assignee: Show only tasks assigned to a username
+    :queryparam user-identifier assignee: Show only tasks assigned to a
+        username (see :ref:`user_ids`)
     :queryparam integer priority: Show only tasks with a given priority
     :queryparam string type: Show only tasks of a given type
     :queryparam video-id video_id: Show only tasks that pertain to a given video
@@ -285,7 +288,7 @@ Create a new task
     :<json bcp-47 language: language code
     :<json string type: task type to create.  Must be ``Subtitle`` or
         ``Translate``
-    :<json username assignee: Username of the task assignee **(optional)**
+    :<json user-identifier assignee:  Task assignee (:ref:`user_ids`)
     :<json integer priority: Priority for the task **(optional)**
 
 Update an existing task
@@ -293,7 +296,7 @@ Update an existing task
 
 .. http:put:: /api/teams/(team-slug)/tasks/(task-id)/
 
-    :<json username assignee: Username of the task assignee or null to unassign
+    :<json user-identifier assignee:  Task assignee (:ref:`user_ids`)
     :<json integer priority: priority of the task
     :<json boolean send_back: send a truthy value to send the back back
         **(optional)**
@@ -326,7 +329,8 @@ List applications
         this time (as a unix timestamp)
     :queryparam integer after: Include only applications submitted after this
         time (as a unix timestamp)
-    :queryparam username user: Include only applications from this user
+    :queryparam user-identifier user: Include only applications from this user
+        (see :ref:`user_ids`)
 
     List results are paginated
 
