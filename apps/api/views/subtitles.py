@@ -370,7 +370,7 @@ class SubtitleLanguageSerializer(serializers.Serializer):
     resource_uri = serializers.SerializerMethodField()
 
     default_error_messages = {
-        'language-exists': _('Language already created: {language_code}'),
+        'language-exists': 'Language already created: {language_code}',
     }
 
     class Meta:
