@@ -51,8 +51,7 @@ Listing languages for a video
     :>json string reviewer: Username of the reviewer fro task-based teams
     :>json string approver: Username of the approver for task-based teams
     :>json boolean is_translation: Is this language translated from other
-    :>json boolean public: Are the subtitles publicly viewable?
-        languages? **(deprecated)**
+    :>json boolean published: Are the subtitles publicly viewable?
     :>json string original_language_code: Source translation language
         **(deprecated)**
     :>json integer num_versions: Number of subtitle versions, the length of the
