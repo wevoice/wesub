@@ -37,6 +37,7 @@ class SimpleTeamWorkflow(TeamWorkflow):
 
     type_code = 'S'
     label = _('Simple')
+    api_slug = 'simple'
     dashboard_view = staticmethod(old_views.old_dashboard)
 
     def get_subtitle_workflow(self, team_video):

@@ -43,6 +43,7 @@ class OldTeamWorkflow(TeamWorkflow):
 
     type_code = 'O'
     label = _('Old Style')
+    api_slug = 'default'
     dashboard_view = staticmethod(views.old_dashboard)
     workflow_settings_view = staticmethod(views.old_team_settings_workflows)
 
