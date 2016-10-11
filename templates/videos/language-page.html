@@ -65,7 +65,7 @@
                 </div>
             </li>
         </ul> 
-	<div class="amara-embed" data-resizable="true" data-height="{{ height }}px" data-width="{{ width }}px" data-url="{{ video_url }}" data-initial-language="{{ language.language_code }}" data-show-subtitles-default="true" data-hide-subtitle-me="true" data-hide-logo="true" data-hide-order="true" data-hide-improve="true" data-hide-download="true" data-hide-embed="true" data-noanalytics="true">
+	<div class="amara-embed" data-resizable="true" data-height="{{ height }}px" data-width="{{ width }}px" data-url="{{ video_url }}" data-initial-language="{{ language.language_code }}" data-show-subtitles-default="true" data-hide-subtitle-me="true" data-hide-logo="true" data-hide-order="true" data-hide-improve="true" data-hide-download="true" data-hide-embed="true" data-noanalytics="true" data-embed-on-amara="true">
 	</div>
         {% if language.get_description %}
             <div id="description"{% if language.get_description|length > 300 %} class="abbr collapsed{% endif %}">

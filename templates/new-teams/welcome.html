@@ -53,7 +53,7 @@
   <div class="content group">
     {% for video in videos %}
     <div class="video">
-      <div class="amara-embed" data-resizable="true" data-hide-subtitle-me="true" data-hide-logo="true" data-width="560px" data-height="315px" data-url="{{ video.get_video_url }}" data-show-subtitles-default="true" data-noanalytics="true">
+      <div class="amara-embed" data-resizable="true" data-hide-subtitle-me="true" data-hide-logo="true" data-width="560px" data-height="315px" data-url="{{ video.get_video_url }}" data-show-subtitles-default="true" data-noanalytics="true" data-embed-on-amara="true">
       </div>
     </div>
     {% endfor %}

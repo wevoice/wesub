@@ -7,20 +7,25 @@
     var _$ = jQuery.noConflict();
     var _Backbone = Backbone.noConflict();
     var _Popcorn = Popcorn.noConflict();
-
     // _amara may exist with a queue of actions that need to be processed after the
     // embedder has finally loaded. Store the queue in toPush for processing in init().
     var toPush = window._amara || [];
+    var originDomain = null;
     
     //////////////////////////////////////////////////////////////////
     //The following section is to communicate with the host page
     var hostPage = {};
     window.addEventListener('message', initReceiver, false);
+    var apiDomain = function(on_amara) {
+	if (on_amara && originDomain) return originDomain;
+	return '//' + _amaraConf.baseURL;
+    };
     var analytics = function() {
         if (typeof sendAnalytics !== 'undefined')
             sendAnalytics.apply(undefined, Array.prototype.slice.call(arguments, 0));
     };
     function initReceiver(e) {
+	originDomain = e.origin;
 	if (e.data) {
 	    if (e.data.fromIframeController) {
 		hostPage = {origin: e.origin, source: e.source, index: e.data.index};
@@ -171,7 +176,7 @@
             div: '',
             height: '',
             initial_language: null,
-            is_on_amara: null,
+            embed_on_amara: null,
             subtitles: [], // Backbone collection
             url: '',
             video_type: '',
@@ -367,7 +372,7 @@
                 this.model.set('width', this.$popContainer.width());
 
                 this.$el.append(this.template({
-                    video_url: '//' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + this.model.get('url'),
+                    video_url: apiDomain(this.model.get('embed_on_amara')) + '/en/videos/create/?initial_url=' + this.model.get('url'),
 		    original_video_url:  this.model.get('url'),
 		    download_subtitle_url: '',
                     width: this.model.get('width')
@@ -419,8 +424,8 @@
                                 // Build the language selection dropdown menu.
                                 that.buildLanguageSelector();
                                 // update the view on amara button
-                                that.$viewOnAmaraButton.attr('href', '//' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
-                                _$('#amara-video-link').attr('href', '//' + _amaraConf.baseURL + '/subtitles/editor/' + that.model.get('id') + '/en/');
+                                that.$viewOnAmaraButton.attr('href', apiDomain(that.model.get('embed_on_amara')) + '/en/videos/' + that.model.get('id'));
+                                _$('#amara-video-link').attr('href', apiDomain(that.model.get('embed_on_amara')) + '/subtitles/editor/' + that.model.get('id') + '/en/');
                                 // Make the request to fetch the initial subtitles.
                                 // TODO: This needs to be an option.
                                 that.loadSubtitles(that.model.get('initial_language'));
@@ -434,9 +439,9 @@
 				    _$(".amara-languages").hide();
 				_$(".amara-languages").css('min-width', "130px").css({"border-left-color": "#2B2C2D", "border-left-width":"1px", "border-left-style":"solid"});
 				if (that.model.get('is_on_amara'))
-                                    that.$amaraCurrentLang.attr("href", '//' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
+                                    that.$amaraCurrentLang.attr("href", apiDomain(that.model.get('embed_on_amara')) + '/en/videos/' + that.model.get('id'));
 				else
-                                    that.$amaraCurrentLang.attr("href", '//' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'));
+                                    that.$amaraCurrentLang.attr("href", apiDomain(that.model.get('embed_on_amara')) + '/en/videos/create/?initial_url=' + that.model.get('url'));
                                 that.$amaraCurrentLang.attr("target", '_blank');
                                 that.$amaraCurrentLang.removeAttr("data-toggle");
                                 that.setCurrentLanguageMessage('subtitle me');
@@ -492,7 +497,7 @@
 		});
                 var video_url = this.model.get('url');
                 this.$amaraLanguagesList.append(this.templateVideo({
-                        video_url: '//' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
+                        video_url: apiDomain(this.model.get('embed_on_amara')) + '/en/videos/create/?initial_url=' + video_url,
 		}));
 		if (this.model.get('show_order_subtitles') ||
 		    this.model.get('show_download_subtitles') ||
@@ -709,8 +714,8 @@
 			_$('ul.amara-languages-list a').removeClass('currently-selected');
 			this.$amaraLanguagesList.find("[data-language='" + language + "']").addClass('currently-selected');
 			this.$amaraCurrentLang.text(languageName);
-			_$('#amara-download-subtitles').attr('href', '//' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
-			_$('#amara-video-link').attr('href', '//' + _amaraConf.baseURL + '/subtitles/editor/' + this.model.get('id') + '/' + languageCode);
+			_$('#amara-download-subtitles').attr('href', apiDomain(this.model.get('embed_on_amara')) + '/en/videos/' + this.model.get('id') + '/' + languageCode);
+			_$('#amara-video-link').attr('href', apiDomain(this.model.get('embed_on_amara')) + '/subtitles/editor/' + this.model.get('id') + '/' + languageCode);
 			_$('ul.amara-languages-list li').removeClass('currently-selected-item');
 			_$('.currently-selected').parent().addClass('currently-selected-item');
                     } else {
@@ -728,7 +733,7 @@
                 var that = this;
 
                 var apiURL = ''+
-                    '//' + _amaraConf.baseURL + '/api/videos/' +
+                    apiDomain(this.model.get('embed_on_amara')) + '/api/videos/' +
                     this.model.get('id') + '/languages/' + language + '/subtitles/';
 
                 // Make a call to the Amara API to retrieve subtitles for this language.
@@ -1209,6 +1214,7 @@
                         'show_embed_code': $div.data('hide-embed') ? false : true,
 			'show_subtitles_default': $div.data('show-subtitles-default'),
 			'show_transcript_default': $div.data('show-transcript-default'),
+			'embed_on_amara': $div.data('embed-on-amara') ? true : false,
                     }]);
                 });
             }	    
