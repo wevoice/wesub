@@ -542,12 +542,6 @@ class TeamViewSet(mixins.CreateModelMixin,
         if not team_permissions.can_create_team(self.request.user):
             raise PermissionDenied()
         team = serializer.save()
-        print self.request.POST
-        print TeamWorkflow.get_api_choices()
-        print serializer.fields['type'].map
-        print serializer.fields['type'].rmap
-        print serializer.validated_data
-        print team.workflow_type
         TeamMember.objects.create_first_member(team=team,
                                                user=self.request.user)
 
