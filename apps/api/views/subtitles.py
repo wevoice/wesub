@@ -193,6 +193,14 @@ Creating new subtitles
         set is available for this language - optional, defaults to false.
         **(deprecated, use action instead)**
 
+Deleting subtitles
+^^^^^^^^^^^^^^^^^^
+
+.. http:delete:: /api/videos/(video-id)/languages/(language-code)/subtitles/
+
+   This will delete all subtitle versions for a language.  It's only allowed
+   if the video is part of a team and the API user is an admin for that team.
+
 .. _subtitle_actions_resource:
 
 Subtitle Actions Resource

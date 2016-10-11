@@ -62,6 +62,8 @@ Creating Users
     :<json string password: any number of chars, all chars allowed.
     :<json string first_name: Any chars, max 30 chars. **(optional)**
     :<json string last_name: Any chars, max 30 chars. **(optional)**
+    :<json boolean allow_3rd_party_login: If set, account can be automatically
+        linked to 3rd party account at first login. **(optional)**
     :<json boolean create_login_token: If sent the response will also include
         a url that when visited will login the created user.  Use this to
         allow users to login without explicitly setting their passwords.  This

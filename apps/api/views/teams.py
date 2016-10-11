@@ -30,6 +30,12 @@ Get a list of teams
 
     :>json string name: Name of the team
     :>json slug slug: Machine name for the team slug (used in URLs)
+    :>json string type: Team type.  Possible values:
+
+        - ``default`` -- default team type
+        - ``simple`` -- simplified workflow team
+        - ``collaboration`` -- collaboration team
+
     :>json string description: Team description
     :>json boolean is_visible: Should this team's videos be publicly visible?
     :>json string membership_policy: Team membership policy. One of:
@@ -62,7 +68,7 @@ Get a list of teams
     The data is the same as the list endpoint
 
 Updating team settings
-~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. http:put:: /api/teams/(team-slug)
 
@@ -83,6 +89,39 @@ Updating team settings
         - ``Any team member``
         - ``Managers and admins``
         - ``Admins only``
+
+Creating a team
+^^^^^^^^^^^^^^^
+
+Amara partners can create teams via the API.
+
+.. http:post:: /api/teams/
+
+    :<json string name: (required) Name of the team
+    :<json slug slug: (required) Manchine name for the team (used in URLs)
+    :<json string type: Team type.  Possible values:
+
+        - ``default`` -- default team type
+        - ``simple`` -- simplified workflow team
+        - ``collaboration`` -- collaboration team
+
+    :<json string description: Team description
+    :<json boolean is_visible: Should this team be publicly visible?
+    :<json string membership_policy:  Team membership policy.  Possible
+        values:
+
+        - ``Open``
+        - ``Application``
+        - ``Invitation by any team member``
+        - ``Invitation by manager``
+        - ``Invitation by admin``
+
+    :<json string video_policy:  Team video policy.  Possible values:
+
+        - ``Any team member``
+        - ``Managers and admins``
+        - ``Admins only``
+
 
 Members Resource
 ****************
@@ -195,6 +234,8 @@ List all tasks for a team
 
         - ``created``   Creation date
         - ``-created``  Creation date (descending)
+        - ``modified``  Last update date
+        - ``-modified`` Last update date (descending)
         - ``priority``  Priority
         - ``-priority`` Priority (descending)
         - ``type``      Task type (details below)
@@ -220,6 +261,7 @@ Get details on a specific task
     :>json user-data assignee: Task assignee (see :ref:`user_fields`)
     :>json integer priority: Priority for the task
     :>json datetime created: Date/time when the task was created
+    :>json datetime modified: Date/time when the task was last updated
     :>json datetime completed: Date/time when the task was completed (or null)
     :>json string approved: Approval status of the task.  One of
         ``In Progress``, ``Approved``, or ``Rejected``
