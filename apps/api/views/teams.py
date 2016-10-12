@@ -30,6 +30,12 @@ Get a list of teams
 
     :>json string name: Name of the team
     :>json slug slug: Machine name for the team slug (used in URLs)
+    :>json string type: Team type.  Possible values:
+
+        - ``default`` -- default team type
+        - ``simple`` -- simplified workflow team
+        - ``collaboration`` -- collaboration team
+
     :>json string description: Team description
     :>json boolean is_visible: Should this team's videos be publicly visible?
     :>json string membership_policy: Team membership policy. One of:
@@ -63,7 +69,7 @@ Get a list of teams
     The data is the same as the list endpoint
 
 Updating team settings
-~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. http:put:: /api/teams/(team-slug)
 
@@ -85,6 +91,39 @@ Updating team settings
         - ``Managers and admins``
         - ``Admins only``
 
+Creating a team
+^^^^^^^^^^^^^^^
+
+Amara partners can create teams via the API.
+
+.. http:post:: /api/teams/
+
+    :<json string name: (required) Name of the team
+    :<json slug slug: (required) Manchine name for the team (used in URLs)
+    :<json string type: Team type.  Possible values:
+
+        - ``default`` -- default team type
+        - ``simple`` -- simplified workflow team
+        - ``collaboration`` -- collaboration team
+
+    :<json string description: Team description
+    :<json boolean is_visible: Should this team be publicly visible?
+    :<json string membership_policy:  Team membership policy.  Possible
+        values:
+
+        - ``Open``
+        - ``Application``
+        - ``Invitation by any team member``
+        - ``Invitation by manager``
+        - ``Invitation by admin``
+
+    :<json string video_policy:  Team video policy.  Possible values:
+
+        - ``Any team member``
+        - ``Managers and admins``
+        - ``Admins only``
+
+
 Members Resource
 ****************
 
@@ -102,16 +141,18 @@ Listing members of a team
 Get info on a team member
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. http:get:: /api/teams/(team-slug)/members/(username)
+.. http:get:: /api/teams/(team-slug)/members/(user-identifier)/
 
     The data is in the same format as the listing endpoint.
+
+    See :ref:`user_ids` for possible values for ``user-identifier``
 
 Adding a member to the team
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. http:post:: /api/teams/(team-slug)/members/
 
-    :<json username username: username of the user to add
+    :<json user-identifier user: User to add (see :ref:`user_ids`)
     :<json string role: One of: ``owner``, ``admin``, ``manager``, or
         ``contributor``
 
@@ -196,7 +237,8 @@ List all tasks for a team
 
 .. http:get:: /api/teams/(team-slug)/tasks/
 
-    :queryparam username assignee: Show only tasks assigned to a username
+    :queryparam user-identifier assignee: Show only tasks assigned to a
+        username (see :ref:`user_ids`)
     :queryparam integer priority: Show only tasks with a given priority
     :queryparam string type: Show only tasks of a given type
     :queryparam video-id video_id: Show only tasks that pertain to a given video
@@ -204,6 +246,8 @@ List all tasks for a team
 
         - ``created``   Creation date
         - ``-created``  Creation date (descending)
+        - ``modified``  Last update date
+        - ``-modified`` Last update date (descending)
         - ``priority``  Priority
         - ``-priority`` Priority (descending)
         - ``type``      Task type (details below)
@@ -229,6 +273,7 @@ Get details on a specific task
     :>json username assignee: username of the task assignee (or null)
     :>json integer priority: Priority for the task
     :>json datetime created: Date/time when the task was created
+    :>json datetime modified: Date/time when the task was last updated
     :>json datetime completed: Date/time when the task was completed (or null)
     :>json string approved: Approval status of the task.  One of
         ``In Progress``, ``Approved``, or ``Rejected``
@@ -243,7 +288,7 @@ Create a new task
     :<json bcp-47 language: language code
     :<json string type: task type to create.  Must be ``Subtitle`` or
         ``Translate``
-    :<json username assignee: Username of the task assignee **(optional)**
+    :<json user-identifier assignee:  Task assignee (:ref:`user_ids`)
     :<json integer priority: Priority for the task **(optional)**
 
 Update an existing task
@@ -251,7 +296,7 @@ Update an existing task
 
 .. http:put:: /api/teams/(team-slug)/tasks/(task-id)/
 
-    :<json username assignee: Username of the task assignee or null to unassign
+    :<json user-identifier assignee:  Task assignee (:ref:`user_ids`)
     :<json integer priority: priority of the task
     :<json boolean send_back: send a truthy value to send the back back
         **(optional)**
@@ -284,7 +329,8 @@ List applications
         this time (as a unix timestamp)
     :queryparam integer after: Include only applications submitted after this
         time (as a unix timestamp)
-    :queryparam username user: Include only applications from this user
+    :queryparam user-identifier user: Include only applications from this user
+        (see :ref:`user_ids`)
 
     List results are paginated
 
@@ -352,6 +398,7 @@ from api.fields import UserField, TimezoneAwareDateTimeField
 from auth.models import CustomUser as User
 from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
                           Application, TeamLanguagePreference)
+from teams.workflows import TeamWorkflow
 from utils.translation import ALL_LANGUAGE_CODES
 import messages.tasks
 import subtitles.signals
@@ -381,9 +428,15 @@ class MappedChoiceField(serializers.ChoiceField):
             self.fail('unknown-choice', choice=choice)
 
     def to_representation(self, value):
-        return self.map[value]
+        try:
+            return self.map[value]
+        except KeyError:
+            return 'unknown'
 
 class TeamSerializer(serializers.ModelSerializer):
+    type = MappedChoiceField(
+        source='workflow_type', required=False, default='O',
+        choices=TeamWorkflow.get_api_choices())
     # Handle mapping internal values for membership/video policy to the values
     # we use in the api (currently the english display name)
     MEMBERSHIP_POLICY_CHOICES = (
@@ -460,7 +513,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ('name', 'slug', 'description', 'is_visible',
+        fields = ('name', 'slug', 'type', 'description', 'is_visible',
                   'membership_policy', 'video_policy', 'activity_uri',
                   'members_uri', 'safe_members_uri', 'projects_uri',
                   'applications_uri', 'languages_uri', 'tasks_uri',
@@ -469,6 +522,9 @@ class TeamSerializer(serializers.ModelSerializer):
 class TeamUpdateSerializer(TeamSerializer):
     name = serializers.CharField(required=False)
     slug = serializers.SlugField(required=False)
+    type = MappedChoiceField(
+        source='workflow_type', read_only=True,
+        choices=TeamWorkflow.get_api_choices())
 
 class TeamViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
@@ -483,7 +539,7 @@ class TeamViewSet(mixins.CreateModelMixin,
         return Team.objects.for_user(self.request.user)
 
     def get_serializer_class(self):
-        if 'slug' in self.kwargs:
+        if self.request.method in ('PUT', 'PATCH'):
             return TeamUpdateSerializer
         else:
             return TeamSerializer
@@ -728,6 +784,7 @@ class TaskSerializer(serializers.ModelSerializer):
     assignee = TeamMemberField(required=False)
     type = MappedChoiceField(Task.TYPE_CHOICES)
     created = TimezoneAwareDateTimeField(read_only=True)
+    modified = TimezoneAwareDateTimeField(read_only=True)
     completed = TimezoneAwareDateTimeField(read_only=True)
     approved = MappedChoiceField(
         Task.APPROVED_CHOICES, required=False,
@@ -738,10 +795,7 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = (
             'id', 'video_id', 'language', 'type', 'assignee', 'priority',
-            'created', 'completed', 'approved', 'resource_uri',
-        )
-        read_only_fields = (
-            'completed',
+            'created', 'modified', 'completed', 'approved', 'resource_uri',
         )
 
     def get_resource_uri(self, task):
@@ -809,7 +863,7 @@ class TaskViewSet(TeamSubview):
                 .select_related('team_video__video', 'assignee'))
 
     def order_queryset(self, qs):
-        valid_orderings = set(['created', 'priority', 'type'])
+        valid_orderings = set(['created', 'modified', 'priority', 'type'])
         reverse_orderings = set('-' + o for o in valid_orderings)
         order_by = self.request.query_params.get('order_by')
         if order_by in valid_orderings.union(reverse_orderings):

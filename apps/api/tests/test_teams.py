@@ -121,6 +121,7 @@ class TeamAPITest(TeamAPITestBase):
                      response.content)
         team = Team.objects.get(slug='test-team')
         self.check_team_data(response.data, team)
+        assert_equal(team.workflow_type, 'O')
         # check that we set the owner of the team to be the user who created
         # it
         assert_true(team.members.filter(role=TeamMember.ROLE_OWNER,
@@ -139,6 +140,17 @@ class TeamAPITest(TeamAPITestBase):
                      response.content)
         team = Team.objects.get(slug='test-team')
         self.check_team_data(response.data, team)
+
+    def test_create_team_with_type(self):
+        response = self.client.post(self.list_url, data={
+            'name': 'Test Team',
+            'slug': 'test-team',
+            'type': 'simple',
+        })
+        assert_equal(response.status_code, status.HTTP_201_CREATED,
+                     response.content)
+        team = Team.objects.get(slug='test-team')
+        assert_equal(team.workflow_type, 'S')
 
     def test_create_team_slug_collision(self):
         TeamFactory(slug='slug')
@@ -194,6 +206,25 @@ class TeamAPITest(TeamAPITestBase):
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
         assert_equal(self.can_change_team_settings.call_args,
                      mock.call(team, self.user))
+
+    def test_create_fields(self):
+        response = self.client.options(self.list_url)
+        assert_writable_fields(response, 'POST', [
+            'name', 'slug', 'type', 'description', 'is_visible',
+            'membership_policy', 'video_policy',
+        ])
+        assert_required_fields(response, 'POST', [
+            'name', 'slug',
+        ])
+
+    def test_update_writable_fields(self):
+        team = TeamFactory()
+        response = self.client.options(self.detail_url(team))
+        assert_writable_fields(response, 'PUT', [
+            'name', 'slug', 'description', 'is_visible',
+            'membership_policy', 'video_policy',
+        ])
+        assert_required_fields(response, 'PUT', [])
 
 class TeamMemberAPITest(TeamAPITestBase):
     permissions_to_mock = [
@@ -541,11 +572,9 @@ class TasksAPITest(TeamAPITestBase):
         assert_equal(data['type'], task.get_type_display())
         assert_equal(data['assignee'], user_field_data(task.assignee))
         assert_equal(data['priority'], task.priority)
-        if task.completed:
-            assert_equal(data['completed'],
-                         format_datetime_field(task.completed))
-        else:
-            assert_equal(data['completed'], None)
+        assert_equal(data['created'], format_datetime_field(task.created))
+        assert_equal(data['modified'], format_datetime_field(task.modified))
+        assert_equal(data['completed'], format_datetime_field(task.completed))
         assert_equal(data['approved'], task.get_approved_display())
         assert_equal(data['resource_uri'],
                      reverse('api:tasks-detail', kwargs={
@@ -717,6 +746,8 @@ class TasksAPITest(TeamAPITestBase):
         tasks = self.make_a_bunch_of_tasks()
         self.check_list_order('created')
         self.check_list_order('-created')
+        self.check_list_order('modified')
+        self.check_list_order('-modified')
         self.check_list_order('priority')
         self.check_list_order('-priority')
         self.check_list_order('type')

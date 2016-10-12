@@ -662,3 +662,32 @@ class SubtitlesViewTest(TestCase):
         })
         response = self.client.get(url)
         assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)
+
+class DeleteSubtitleLanguageTest(TestCase):
+    def setUp(self):
+        self.user = UserFactory(is_superuser=True)
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
+        self.video = VideoFactory()
+        self.language_code = 'en'
+        self.version = pipeline.add_subtitles(self.video, self.language_code,
+                                              SubtitleSetFactory())
+        self.url = reverse('api:subtitles', kwargs={
+            'video_id': self.video.video_id,
+            'language_code': self.language_code,
+        })
+
+    def test_delete_language(self):
+        response = self.client.delete(self.url)
+        assert_equal(response.status_code, status.HTTP_204_NO_CONTENT)
+        assert_true(test_utils.reload_obj(self.version).is_deleted())
+
+    @test_utils.patch_for_test('subtitles.workflows.get_workflow')
+    def test_permission_check(self, get_workflow):
+        workflow = get_workflow.return_value
+        workflow.user_can_delete_subtitles.return_value = False
+        response = self.client.delete(self.url)
+        assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert_false(test_utils.reload_obj(self.version).is_deleted())
+        assert_equal(workflow.user_can_delete_subtitles.call_args,
+                     mock.call(self.user, self.language_code))
