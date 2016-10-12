@@ -717,12 +717,6 @@ def can_post_edit_subtitles(team_video, user, lang=None):
     else:
         return can_create_and_edit_subtitles(user, team_video, lang=lang)
 
-def can_delete_language(team, user):
-    """Return whether the user has permission to completely delete a language.
-    """
-    role = get_role(get_member(user, team))
-    return user.is_staff or role in _perms_equal_or_greater(ROLE_ADMIN)
-
 def can_add_version(user, video, language_code):
     """Check if a user can add a new version to a SubtitleLanguage
 

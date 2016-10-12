@@ -52,6 +52,7 @@ Listing languages for a video
     :>json string approver: Username of the approver for task-based teams
     :>json boolean is_translation: Is this language translated from other
         languages? **(deprecated)**
+    :>json boolean published: Are the subtitles publicly viewable?
     :>json string original_language_code: Source translation language
         **(deprecated)**
     :>json integer num_versions: Number of subtitle versions, the length of the
@@ -119,6 +120,7 @@ Fetching subtitles for a given language
     :>json integer version_number: version number for the subtitles
     :>json object subtitles: Subtitle data.  The format depends on the
         sub_format param
+    :>json user-data author: Subtitle author (see :ref:`user_fields`)
     :>json string sub_format: Format of the subtitles
     :>json object language: Language data
     :>json string title: Video title, translated into the subtitle's language
@@ -190,6 +192,14 @@ Creating new subtitles
     :<json boolean is_complete: Boolean indicating if the complete subtitling
         set is available for this language - optional, defaults to false.
         **(deprecated, use action instead)**
+
+Deleting subtitles
+^^^^^^^^^^^^^^^^^^
+
+.. http:delete:: /api/videos/(video-id)/languages/(language-code)/subtitles/
+
+   This will delete all subtitle versions for a language.  It's only allowed
+   if the video is part of a team and the API user is an admin for that team.
 
 .. _subtitle_actions_resource:
 
@@ -360,7 +370,7 @@ class SubtitleLanguageSerializer(serializers.Serializer):
     resource_uri = serializers.SerializerMethodField()
 
     default_error_messages = {
-        'language-exists': _('Language already created: {language_code}'),
+        'language-exists': 'Language already created: {language_code}',
     }
 
     class Meta:
@@ -682,6 +692,9 @@ class SubtitlesSerializer(serializers.Serializer):
             origin=origin)
 
 class SubtitlesView(generics.CreateAPIView):
+    # Note that even though we only inherit from CreateAPIView, we support
+    # more methods than just POST.  However for those methods we don't use
+    # the generic django-rest-framework implementation.
     serializer_class = SubtitlesSerializer
     renderer_classes = views.APIView.renderer_classes + [
         DFXPRenderer, SBVRenderer, SSARenderer, SRTRenderer, VTTRenderer,
@@ -772,6 +785,19 @@ class SubtitlesView(generics.CreateAPIView):
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         videos.tasks.video_changed_tasks.delay(video.pk)
         return version
+
+    def delete(self, request, *args, **kwargs):
+        language_code = kwargs['language_code']
+        video = self.get_video()
+        workflow = workflows.get_workflow(video)
+        if not workflow.user_can_delete_subtitles(
+                self.request.user, language_code):
+            raise PermissionDenied()
+            request.data.pop('duration', None)
+        subtitle_language = video.subtitle_language(language_code)
+        subtitle_language.nuke_language()
+        videos.tasks.video_changed_tasks.delay(video.pk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class ActionsSerializer(serializers.Serializer):
     action = serializers.CharField(source='name')

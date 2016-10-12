@@ -50,7 +50,6 @@ from teams.permissions import (
     can_delete_video as _can_delete_video,
     can_delete_video_in_team as _can_delete_video_in_team,
     can_approve as _can_approve,
-    can_delete_language as _can_delete_language,
     can_resync as _can_resync,
 )
 from teams.permissions import (
@@ -536,9 +535,8 @@ def can_create_translations_for(user, video):
 
 @register.filter
 def can_delete_language(user, language):
-    team_video = language.video.get_team_video()
-    return (team_video is not None and
-            _can_delete_language(team_video.team, user))
+    workflow = language.video.get_workflow()
+    return workflow.user_can_delete_subtitles(user, language.language_code)
 
 @register.filter
 def get_upload_form(task, user):

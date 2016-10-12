@@ -43,5 +43,5 @@ def get_workflow_override(video):
     return team_workflow.get_subtitle_workflow(team_video)
 
 # register default team workflows
-OldTeamWorkflow.register()
-SimpleTeamWorkflow.register()
+OldTeamWorkflow.register('O', 'default')
+SimpleTeamWorkflow.register('S', 'simple')
