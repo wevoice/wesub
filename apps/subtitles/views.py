@@ -165,9 +165,9 @@ class SubtitleEditorBase(View):
         if self.workflow.user_can_edit_subtitles(self.user,
                                                  self.language_code):
             return True
-        learn_more_link = '<a href="{}">{}</a>'.format(
-            'http://support.amara.org/solution/articles/212109-why-do-i-see-a-message-saying-that-i-am-not-permitted-to-edit-subtitles',
-            _('Learn more'))
+        learn_more_link = u'<a href="{}">{}</a>'.format(
+            u'http://support.amara.org/solution/articles/212109-why-do-i-see-a-message-saying-that-i-am-not-permitted-to-edit-subtitles',
+            _(u'Learn more'))
 
         messages.error(self.request,
                        fmt(_('Sorry, you do not have permission to edit '
