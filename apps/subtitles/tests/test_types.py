@@ -30,4 +30,4 @@ class SubtitleTypesTest(TestCase):
         pass
     def test_subtitle_list(self):
         l = SubtitleFormatListClass(ParserList, GeneratorList)
-        self.assertEqual(len(l), 5)
+        self.assertEqual(len(l), 13)
