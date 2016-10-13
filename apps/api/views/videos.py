@@ -596,8 +596,16 @@ class VideoViewSet(mixins.CreateModelMixin,
         if serializer.will_add_video_to_team():
             if not team_perms.can_add_video(team, self.request.user, project):
                 raise PermissionDenied()
+        if serializer.instance:
+            self.check_update_permissions(serializer)
+
+    def check_update_permissions(self, serializer):
+        video = serializer.instance
+        team_video = video.get_team_video()
+        workflow = video.get_workflow()
+        if not workflow.user_can_edit_video(self.request.user):
+            raise PermissionDenied()
         if serializer.will_remove_video_from_team():
-            team_video = serializer.instance.get_team_video()
             if not team_perms.can_remove_video(team_video, self.request.user):
                 raise PermissionDenied()
 
