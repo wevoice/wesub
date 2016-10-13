@@ -31,7 +31,7 @@ Team workflows are responsible for:
     - Creating extra tabs or the teams section
 
 ..  autoclass:: TeamWorkflow
-    :members: type_code, label, dashboard_view, workflow_settings_view,
+    :members: label, dashboard_view, workflow_settings_view,
               setup_team, get_subtitle_workflow, extra_pages,
               extra_settings_pages
 
@@ -46,8 +46,6 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render
 
 class TeamWorkflow(object):
-    type_code = NotImplemented
-    """Team.workflow_type value for this workflow."""
     label = NotImplemented
     """Human-friendly name for this workflow.  This is what appears on the
     team creation form.
@@ -154,7 +152,10 @@ class TeamWorkflow(object):
         page_data['videos']= qs[:5]
         return render(request, 'new-teams/language-page.html', page_data)
 
+    # map type codes to subclasses
     _type_code_map = {}
+    # map API codes to type codes
+    _api_code_map = {}
 
     @classmethod
     def get_workflow(cls, team):
@@ -164,23 +165,49 @@ class TeamWorkflow(object):
 
     @classmethod
     def get_choices(cls):
-        choices = [(type_code, cls.label)
-                   for (type_code, cls) in cls._type_code_map.items()]
-        # sort choices so that:
-        #   - unisubs choices are first, then extensions (unisubs choices are
-        #     1-char)
-        #   - after that it's sorted alphabeticaly by code
-        choices.sort(key=lambda (code, _): (len(code), code))
+        choices = [(type_code, subclass.label)
+                   for (type_code, subclass) in cls._type_code_map.items()]
+        cls._sort_choices(choices)
         return choices
 
     @classmethod
-    def register(cls):
+    def get_api_choices(cls):
+        choices = [
+            (type_code, api_code)
+            for (api_code, type_code) in cls._api_code_map.items()
+        ]
+        cls._sort_choices(choices)
+        return choices
+
+    @classmethod
+    def _sort_choices(cls, choices):
+        """Sort workflow type choices
+
+        We sort choices so that:
+           - unisubs choices are first, then extensions (unisubs choices are
+             1-char)
+           - after that it's sorted alphabeticaly by code
+        """
+        choices.sort(key=lambda (code, _): (len(code), code))
+
+    @classmethod
+    def register(cls, type_code, api_code=None):
         """Register a TeamWorkflow subclass.
 
         Calling this class method will enable it for teams whose
-        workflow_type value is cls.type_code
+        workflow_type value is type_code
+
+        Args:
+            type_code: string code value for this workflow.  Workflows in the
+                unisubs repository should be 1 char long.  Workflows on other
+                repositories should be 2 chars with the first char being
+                unique to the repository.
+            api_code: API code value for this workflow.  Pass in a non-None
+                value to enable creating this workflow via the API
         """
-        TeamWorkflow._type_code_map[cls.type_code] = cls
+        TeamWorkflow._type_code_map[type_code] = cls
+        if api_code is not None:
+            TeamWorkflow._api_code_map[api_code] = type_code
 
 TeamPage = namedtuple('TeamPage', 'name title url')
 """Represents a page in the team's section

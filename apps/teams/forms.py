@@ -48,7 +48,7 @@ from teams.exceptions import ApplicationInvalidException
 from teams.fields import TeamMemberInput
 from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
-    can_assign_task, can_delete_language, can_remove_video,
+    can_assign_task, can_remove_video,
     can_add_video_somewhere
 )
 from teams.permissions_const import ROLE_NAMES
@@ -295,13 +295,14 @@ class CreateTeamForm(forms.ModelForm):
     class Meta:
         model = Team
         fields = ('name', 'slug', 'description', 'logo', 'workflow_type',
-                  'is_visible')
+                  'is_visible', 'sync_metadata')
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(CreateTeamForm, self).__init__(*args, **kwargs)
         self.fields['workflow_type'].choices = TeamWorkflow.get_choices()
         self.fields['is_visible'].widget.attrs['class'] = 'checkbox'
+        self.fields['sync_metadata'].widget.attrs['class'] = 'checkbox'
         self.fields['slug'].label = _(u'Team URL: http://universalsubtitles.org/teams/')
 
     def clean_slug(self):
@@ -485,8 +486,10 @@ class TaskDeleteForm(forms.Form):
 
 class MessageTextField(forms.CharField):
     def __init__(self, *args, **kwargs):
+        if 'max_length' not in kwargs:
+            kwargs['max_length'] = 4000
         super(MessageTextField, self).__init__(
-            max_length=4000, required=False, widget=forms.Textarea,
+            required=False, widget=forms.Textarea,
             *args, **kwargs)
 
 class GuidelinesMessagesForm(forms.Form):
@@ -496,7 +499,7 @@ class GuidelinesMessagesForm(forms.Form):
     messages_invite = MessageTextField(
         label=_('When a member is invited to join the team'))
     messages_application = MessageTextField(
-        label=_('When a member applies to join the team'))
+        label=_('When a member applies to join the team'), max_length=15000)
     messages_joins = MessageTextField(
         label=_('When a member joins the team'))
     messages_manager = MessageTextField(
@@ -545,7 +548,7 @@ class SettingsForm(forms.ModelForm):
 
     class Meta:
         model = Team
-        fields = ('description', 'logo', 'square_logo', 'is_visible')
+        fields = ('description', 'logo', 'square_logo', 'is_visible', 'sync_metadata')
 
 class RenameableSettingsForm(SettingsForm):
     class Meta(SettingsForm.Meta):
@@ -845,7 +848,9 @@ class DeleteLanguageForm(forms.Form):
             raise forms.ValidationError(_(
                 u"These subtitles are not under a team's control."))
 
-        if not can_delete_language(team_video.team, self.user):
+        workflow = self.language.video.get_workflow()
+        if not workflow.user_can_delete_subtitles(self.user,
+                                                  self.language.language_code):
             raise forms.ValidationError(_(
                 u'You do not have permission to delete this language.'))
 

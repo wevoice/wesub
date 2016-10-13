@@ -27,7 +27,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 import factory
 import mock
 
-from api.tests.utils import format_datetime_field
+from api.tests.utils import format_datetime_field, user_field_data
 from auth.models import CustomUser as User
 from subtitles import pipeline
 from teams.models import Team, TeamMember, Task, Application
@@ -121,6 +121,7 @@ class TeamAPITest(TeamAPITestBase):
                      response.content)
         team = Team.objects.get(slug='test-team')
         self.check_team_data(response.data, team)
+        assert_equal(team.workflow_type, 'O')
         # check that we set the owner of the team to be the user who created
         # it
         assert_true(team.members.filter(role=TeamMember.ROLE_OWNER,
@@ -139,6 +140,17 @@ class TeamAPITest(TeamAPITestBase):
                      response.content)
         team = Team.objects.get(slug='test-team')
         self.check_team_data(response.data, team)
+
+    def test_create_team_with_type(self):
+        response = self.client.post(self.list_url, data={
+            'name': 'Test Team',
+            'slug': 'test-team',
+            'type': 'simple',
+        })
+        assert_equal(response.status_code, status.HTTP_201_CREATED,
+                     response.content)
+        team = Team.objects.get(slug='test-team')
+        assert_equal(team.workflow_type, 'S')
 
     def test_create_team_slug_collision(self):
         TeamFactory(slug='slug')
@@ -195,6 +207,25 @@ class TeamAPITest(TeamAPITestBase):
         assert_equal(self.can_change_team_settings.call_args,
                      mock.call(team, self.user))
 
+    def test_create_fields(self):
+        response = self.client.options(self.list_url)
+        assert_writable_fields(response, 'POST', [
+            'name', 'slug', 'type', 'description', 'is_visible',
+            'membership_policy', 'video_policy',
+        ])
+        assert_required_fields(response, 'POST', [
+            'name', 'slug',
+        ])
+
+    def test_update_writable_fields(self):
+        team = TeamFactory()
+        response = self.client.options(self.detail_url(team))
+        assert_writable_fields(response, 'PUT', [
+            'name', 'slug', 'description', 'is_visible',
+            'membership_policy', 'video_policy',
+        ])
+        assert_required_fields(response, 'PUT', [])
+
 class TeamMemberAPITest(TeamAPITestBase):
     permissions_to_mock = [
         'can_add_member',
@@ -211,13 +242,39 @@ class TeamMemberAPITest(TeamAPITestBase):
     def detail_url(self, user):
         return reverse('api:team-members-detail', kwargs={
             'team_slug': self.team.slug,
-            'username': user.username,
+            'identifier': 'id$' + user.secure_id(),
+        }, request=APIRequestFactory().get('/'))
+
+    def check_response_data(self, response, user):
+        member = self.team.members.get(user=user)
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_equal(response.data['user'], user_field_data(user))
+        assert_equal(response.data['role'], member.role)
+        assert_equal(response.data['resource_uri'], self.detail_url(user))
+
+    def test_get_details(self):
+        user = TeamMemberFactory(team=self.team).user
+        response = self.client.get(self.detail_url(user))
+        self.check_response_data(response, user)
+
+    def test_get_with_username(self):
+        user = TeamMemberFactory(team=self.team).user
+        url = reverse('api:team-members-detail', kwargs={
+            'team_slug': self.team.slug,
+            'identifier': user.username,
         })
+        response = self.client.get(url)
+        self.check_response_data(response, user)
+
+    def test_get_non_member_username(self):
+        non_member = UserFactory()
+        response = self.client.get(self.detail_url(non_member))
+        assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_add_team_member(self):
         user = UserFactory()
         response = self.client.post(self.list_url, data={
-            'username': user.username,
+            'user': user.username,
             'role': 'contributor',
         })
         assert_equal(response.status_code, status.HTTP_201_CREATED,
@@ -228,7 +285,7 @@ class TeamMemberAPITest(TeamAPITestBase):
     def test_add_existing_team_member(self):
         user = TeamMemberFactory(team=self.team).user
         response = self.client.post(self.list_url, data={
-            'username': user.username,
+            'user': user.username,
             'role': 'contributor',
         })
         assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -250,7 +307,7 @@ class TeamMemberAPITest(TeamAPITestBase):
         member = TeamMemberFactory(team=self.team,
                                    role=TeamMember.ROLE_CONTRIBUTOR)
         response = self.client.put(self.detail_url(member.user), data={
-            'username': 'foo',
+            'user': 'foo',
             'role': 'admin',
         })
         assert_equal(response.status_code, status.HTTP_200_OK,
@@ -299,7 +356,7 @@ class TeamMemberAPITest(TeamAPITestBase):
     def test_add_checks_permissions(self):
         self.can_add_member.return_value = False
         response = self.client.post(self.list_url, data={
-            'username': UserFactory().username,
+            'user': UserFactory().username,
             'role': 'contributor',
         })
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -308,12 +365,11 @@ class TeamMemberAPITest(TeamAPITestBase):
                                TeamMember.ROLE_CONTRIBUTOR))
 
     def test_change_checks_permissions(self):
-#def can_assign_role(team, user, role, to_user):
         self.can_assign_role.return_value = False
         member = TeamMemberFactory(team=self.team,
                                    role=TeamMember.ROLE_CONTRIBUTOR)
         response = self.client.put(self.detail_url(member.user), data={
-            'username': member.user,
+            'user': member.user.username,
             'role': TeamMember.ROLE_ADMIN,
         })
         assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -332,67 +388,6 @@ class TeamMemberAPITest(TeamAPITestBase):
         assert_true(self.team.members.filter(user=member.user).exists())
         assert_equal(self.can_remove_member.call_args,
                      mock.call(self.team, self.user))
-
-class SafeTeamMemberAPITest(TeamMemberAPITest):
-    # The safe team member API should work the same as the regular team member
-    # API for the most part.  So we subclass the unittest, but use different
-    # URLs to test against
-
-    @test_utils.patch_for_test('messages.tasks.team_invitation_sent')
-    def setUp(self, mock_team_invitation_sent):
-        super(SafeTeamMemberAPITest, self).setUp()
-        self.mock_team_invitation_sent = mock_team_invitation_sent
-        self.list_url = reverse('api:safe-team-members-list', kwargs={
-            'team_slug': self.team.slug,
-        })
-
-    def detail_url(self, user):
-        return reverse('api:safe-team-members-detail', kwargs={
-            'team_slug': self.team.slug,
-            'username': user.username,
-        })
-
-    def check_invitation(self, user):
-        assert_false(self.team.members.filter(user=user).exists())
-        invitation = self.team.invitations.get(user=user)
-        assert_equal(self.mock_team_invitation_sent.delay.call_args,
-                     mock.call(invitation.pk))
-
-    def test_add_team_member(self):
-        # When adding a team member, we should send an invite instead of
-        # directly adding them
-        user = UserFactory()
-        response = self.client.post(self.list_url, data={
-            'username': user.username,
-            'role': 'contributor',
-        })
-        # we should return HTTP 202, since we created haven't created the team
-        # member object yet
-        assert_equal(response.status_code, status.HTTP_202_ACCEPTED,
-                     response.content)
-        self.check_invitation(user)
-
-    def test_add_nonexistant_user(self):
-        # We should create a user if the username doesn't exist
-        response = self.client.post(self.list_url, data={
-            'username': 'new-username',
-            'email': 'new-user@example.com',
-            'role': 'contributor',
-        })
-        assert_equal(response.status_code, status.HTTP_202_ACCEPTED,
-                     response.content)
-        user = User.objects.get(username='new-username')
-        assert_equal(user.email, 'new-user@example.com')
-        self.check_invitation(user)
-
-    def test_need_email_if_user_doesnt_exist(self):
-        # When creating a user, require the email.  Otherwise there is no way
-        # to for the person to login since there's no password recovery.
-        response = self.client.post(self.list_url, data={
-            'username': 'new-username',
-            'role': 'contributor',
-        })
-        assert_equal(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 class ProjectAPITest(TeamAPITestBase):
     permissions_to_mock = [
@@ -575,16 +570,11 @@ class TasksAPITest(TeamAPITestBase):
         assert_equal(data['language'], task.language)
         assert_equal(data['id'], task.id)
         assert_equal(data['type'], task.get_type_display())
-        if task.assignee:
-            assert_equal(data['assignee'], task.assignee.username)
-        else:
-            assert_equal(data['assignee'], None)
+        assert_equal(data['assignee'], user_field_data(task.assignee))
         assert_equal(data['priority'], task.priority)
-        if task.completed:
-            assert_equal(data['completed'],
-                         format_datetime_field(task.completed))
-        else:
-            assert_equal(data['completed'], None)
+        assert_equal(data['created'], format_datetime_field(task.created))
+        assert_equal(data['modified'], format_datetime_field(task.modified))
+        assert_equal(data['completed'], format_datetime_field(task.completed))
         assert_equal(data['approved'], task.get_approved_display())
         assert_equal(data['resource_uri'],
                      reverse('api:tasks-detail', kwargs={
@@ -629,6 +619,9 @@ class TasksAPITest(TeamAPITestBase):
         ]
         self.check_list_results(correct_tasks, {
             'assignee': self.member.username,
+        })
+        self.check_list_results(correct_tasks, {
+            'assignee': 'id$' + self.member.secure_id(),
         })
 
     def test_priority_filter(self):
@@ -753,6 +746,8 @@ class TasksAPITest(TeamAPITestBase):
         tasks = self.make_a_bunch_of_tasks()
         self.check_list_order('created')
         self.check_list_order('-created')
+        self.check_list_order('modified')
+        self.check_list_order('-modified')
         self.check_list_order('priority')
         self.check_list_order('-priority')
         self.check_list_order('type')
@@ -1018,7 +1013,7 @@ class TeamApplicationAPITest(TeamAPITestBase):
         }, request=APIRequestFactory().get('/'))
 
     def check_application_data(self, data, application):
-        assert_equal(data['user'], application.user.username)
+        assert_equal(data['user'], user_field_data(application.user))
         assert_equal(data['note'], application.note)
         assert_equal(data['status'], application.get_status_display())
         assert_equal(data['id'], application.id)
@@ -1056,6 +1051,11 @@ class TeamApplicationAPITest(TeamAPITestBase):
     def test_user_filter(self):
         user = self.applications[0].user
         self.check_filter_result({'user': user.username},
+                                 [self.applications[0]])
+
+    def test_user_filter_with_id(self):
+        user = self.applications[0].user
+        self.check_filter_result({'user': 'id$' + user.secure_id()},
                                  [self.applications[0]])
 
     def test_status_filter(self):

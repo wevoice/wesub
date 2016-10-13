@@ -25,7 +25,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient, APIRequestFactory
 
-from api.tests.utils import format_datetime_field
+from api.tests.utils import format_datetime_field, user_field_data
 from comments.models import Comment
 from subtitles import pipeline
 from utils.factories import *
@@ -72,16 +72,7 @@ class ActivityTest(TestCase):
         else:
             assert_equal(activity_data['language'], None)
             assert_equal(activity_data['language_uri'], None)
-        if record.user:
-            assert_equal(activity_data['user'], record.user.username)
-            assert_equal(activity_data['user_uri'], reverse(
-                'api:users-detail', kwargs={
-                    'username': record.user.username,
-                }, request=APIRequestFactory().get('/'))
-            )
-        else:
-            assert_equal(activity_data['user'], None)
-            assert_equal(activity_data['user_uri'], None)
+        assert_equal(activity_data['user'], user_field_data(record.user))
 
     def test_video(self):
         video = VideoFactory(user=self.user)

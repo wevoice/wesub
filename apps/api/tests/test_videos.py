@@ -156,7 +156,7 @@ class VideoSerializerTest(TestCase):
                 'name': 'English',
                 u'subtitles_uri': lang_url_root + 'en/subtitles/',
                 'dir': 'ltr',
-                'visible': True,
+                'published': True,
                 'resource_uri':  lang_url_root + 'en/'
             },
             {
@@ -164,7 +164,7 @@ class VideoSerializerTest(TestCase):
                 'name': 'Hebrew',
                 u'subtitles_uri': lang_url_root + 'he/subtitles/',
                 'dir': 'rtl',
-                'visible': False,
+                'published': False,
                 'resource_uri':  lang_url_root + 'he/'
             },
         ])

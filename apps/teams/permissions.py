@@ -386,7 +386,8 @@ def can_add_member(team, user, role):
     ).exists()
 
 def can_remove_member(team, user):
-    return can_add_member(team, user)
+    member = team.get_member(user)
+    return can_add_member(team, user, member.role)
 
 def can_move_videos(team, user):
     role = get_role_for_target(user, team, None, None)
@@ -715,12 +716,6 @@ def can_post_edit_subtitles(team_video, user, lang=None):
             return team_video.team.is_member(user)
     else:
         return can_create_and_edit_subtitles(user, team_video, lang=lang)
-
-def can_delete_language(team, user):
-    """Return whether the user has permission to completely delete a language.
-    """
-    role = get_role(get_member(user, team))
-    return user.is_staff or role in _perms_equal_or_greater(ROLE_ADMIN)
 
 def can_add_version(user, video, language_code):
     """Check if a user can add a new version to a SubtitleLanguage

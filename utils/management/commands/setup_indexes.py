@@ -10,6 +10,7 @@ class Command(BaseCommand):
         self.setup_videourl_index(cursor)
         self.setup_video_fulltext_index(cursor)
         self.setup_activity_indexdes(cursor)
+        self.setup_message_indexes(cursor)
         optionalapps.exec_repository_scripts('setup_indexes.py',
                                              globals(), locals())
 
@@ -57,3 +58,9 @@ class Command(BaseCommand):
         cursor.execute('ALTER TABLE activity_activityrecord '
                        'ADD INDEX user_copied_created '
                        '(user_id, copied_from_id, created)')
+
+    def setup_message_indexes(self, cursor):
+        cursor.execute('ALTER TABLE messages_message '
+                       'ADD INDEX for_user (user_id, deleted_for_user, has_reply_for_user)')
+        cursor.execute('ALTER TABLE messages_message '
+                       'ADD INDEX for_author (user_id, deleted_for_author, has_reply_for_author)')

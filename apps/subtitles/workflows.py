@@ -55,7 +55,9 @@ Workflow Classes
     :members: user_can_view_video, user_can_edit_view, get_add_language_mode, extra_tabs, get_default_language_workflow
 
 .. autoclass:: LanguageWorkflow
-    :members: get_work_mode, get_actions, action_for_add_subtitles, get_editor_notes, user_can_edit_subtitles, user_can_view_private_subtitles
+    :members: get_work_mode, get_actions, action_for_add_subtitles,
+        get_editor_notes, user_can_edit_subtitles,
+        user_can_view_private_subtitles, user_can_delete_subtitles
 
 Behavior Functions
 ------------------
@@ -232,6 +234,14 @@ class Workflow(object):
         Private subtitles are subtitles with visibility or visibility_override
         set to "private".  A typical use is to limit viewing of the subtitles
         to members of a team.
+
+        Returns:
+            True/False
+        """
+        raise NotImplementedError()
+
+    def user_can_delete_subtitles(self, user, language_code):
+        """Check if a user can delete a language
 
         Returns:
             True/False
@@ -423,6 +433,10 @@ class VideoWorkflow(object):
         return (self.get_language_workflow(language_code)
                 .user_can_view_private_subtitles(user))
 
+    def user_can_delete_subtitles(self, user, language_code):
+        return (self.get_language_workflow(language_code)
+                .user_can_delete_subtitles(user))
+
     def user_can_edit_subtitles(self, user, language_code):
         return (self.get_language_workflow(language_code)
                 .user_can_edit_subtitles(user))
@@ -521,6 +535,14 @@ class LanguageWorkflow(object):
         Private subtitles are subtitles with visibility or visibility_override
         set to "private".  A typical use is to limit viewing of the subtitles
         to members of a team.
+
+        Returns:
+            True/False
+        """
+        raise NotImplementedError()
+
+    def user_can_delete_subtitles(self, user, language_code):
+        """Check if a user can delete a language
 
         Returns:
             True/False
@@ -663,6 +685,13 @@ class Action(object):
     CLASS_SEND_BACK = 'send-back'
     subtitle_visibility = 'public'
 
+    def require_synced_subtitles(self):
+        """Should we require that all subtitles have timings?
+
+        The default implementation uses the complete attribute
+        """
+        return bool(self.complete)
+
     def validate(self, user, video, subtitle_language, saved_version):
         """Check if we can perform this action.
 
@@ -678,7 +707,7 @@ class Action(object):
         Raises:
             ActionError -- this action can't be performed
         """
-        if self.complete:
+        if self.require_synced_subtitles():
             if saved_version:
                 version = saved_version
             else:
@@ -726,7 +755,7 @@ class Action(object):
             'label': unicode(self.label),
             'in_progress_text': unicode(self.in_progress_text),
             'class': self.visual_class,
-            'complete': self.complete,
+            'requireSyncedSubtitles': self.require_synced_subtitles(),
             'requires_translated_metadata_if_enabled': self.requires_translated_metadata_if_enabled,
         }
 
@@ -890,6 +919,9 @@ class DefaultLanguageWorkflow(LanguageWorkflow):
 
     def user_can_view_private_subtitles(self, user):
         return user.is_staff
+
+    def user_can_delete_subtitles(self, user):
+        return user.is_superuser
 
     def user_can_edit_subtitles(self, user):
         return True

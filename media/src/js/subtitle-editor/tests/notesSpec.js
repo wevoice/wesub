@@ -5,10 +5,8 @@ describe('The Notes Controller', function() {
     var $scope;
     var $timeout;
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.mocks');
-        module('amara.SubtitleEditor.notes');
-    });
+    beforeEach(module('amara.SubtitleEditor.mocks'));
+    beforeEach(module('amara.SubtitleEditor.notes'));
 
     beforeEach(inject(function($rootScope, $injector, $controller) {
         $scope = $rootScope.$new();
@@ -90,7 +88,7 @@ describe('The Notes Controller', function() {
     });
 
     it('scrolls to the bottom after posting a new', function() {
-        $scope.scrollToBottom.reset();
+        $scope.scrollToBottom.calls.reset();
         $scope.newNoteText = 'new note';
         $scope.postNote();
         $timeout.flush();

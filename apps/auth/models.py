@@ -29,7 +29,7 @@ from django.contrib.auth.models import UserManager, User as BaseUser
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.cache import cache
-from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.db import models
@@ -41,6 +41,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from tastypie.models import ApiKey
 from caching import CacheGroup, ModelCacheManager
 from utils.amazon import S3EnabledImageField
+from utils import secureid
 from utils import translation
 from utils.tasks import send_templated_email_async
 
@@ -90,7 +91,7 @@ class CustomUserManager(UserManager):
                                   for i in xrange(6))
             yield '{}{}{}'.format(part1, rand_string, part2)
 
-class CustomUser(BaseUser):
+class CustomUser(BaseUser, secureid.SecureIDMixin):
     AUTOPLAY_ON_BROWSER = 1
     AUTOPLAY_ON_LANGUAGES = 2
     DONT_AUTOPLAY = 3
@@ -112,6 +113,7 @@ class CustomUser(BaseUser):
     # if true, items that end on the user activity stream will also be
     # sent as a message
     notify_by_message = models.BooleanField(default=True)
+    allow_3rd_party_login = models.BooleanField(default=False)
     biography = models.TextField('Bio', blank=True)
     autoplay_preferences = models.IntegerField(
         choices=AUTOPLAY_CHOICES, default=AUTOPLAY_ON_BROWSER)
@@ -129,6 +131,8 @@ class CustomUser(BaseUser):
     show_tutorial = models.BooleanField(default=True)
     created_by = models.ForeignKey('self', null=True, blank=True,
                                    related_name='created_users')
+
+    SECURE_ID_KEY = 'User'
 
     objects = CustomUserManager()
 
@@ -179,6 +183,10 @@ class CustomUser(BaseUser):
 
         if send_confirmation and send_email_confirmation:
             EmailConfirmation.objects.send_confirmation(self)
+
+    def clean(self):
+        if '$' in self.username:
+            raise ValidationError("usernames can't contain the '$' character")
 
     def unread_messages(self, hidden_meassage_id=None):
         from messages.models import Message
