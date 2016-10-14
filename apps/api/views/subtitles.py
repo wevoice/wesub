@@ -297,6 +297,7 @@ from subtitles import workflows
 from subtitles.models import (SubtitleLanguage, SubtitleVersion,
                               ORIGIN_WEB_EDITOR, ORIGIN_API)
 from subtitles.exceptions import ActionError
+from subtitles.permissions import user_can_access_subtitles_format
 import babelsubs
 from babelsubs.storage import SubtitleSet
 from utils.subtitles import load_subtitles
@@ -701,6 +702,15 @@ class SubtitlesView(generics.CreateAPIView):
         TextRenderer,
     ]
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    def __init__(self, *args, **kwargs):
+        from subtitles.types import SubtitleFormatList
+        super(SubtitlesView, self).__init__(*args, **kwargs)
+        for f in SubtitleFormatList.for_staff():
+            renderer = type(f, (SubtitleRenderer,), {
+                'media_type': ('application/' + f),
+                'format': f
+                })
+            self.renderer_classes.append(renderer)
 
     def get_video(self):
         if not hasattr(self, '_video'):
@@ -731,9 +741,15 @@ class SubtitlesView(generics.CreateAPIView):
         # If we're rendering the subtitles directly, then we skip creating a
         # serializer and return the subtitles instead
         if isinstance(request.accepted_renderer, SubtitleRenderer):
-            return Response(version.get_subtitles())
+            if user_can_access_subtitles_format(request.user, request.accepted_renderer.format):
+                return Response(version.get_subtitles())
+            else:
+                raise PermissionDenied()
         serializer = self.get_serializer(version)
-        return Response(serializer.data)
+        if user_can_access_subtitles_format(request.user, serializer.context['sub_format']):
+            return Response(serializer.data)
+        else:
+            raise PermissionDenied()
 
     def get_object(self):
         video = self.get_video()
@@ -773,8 +789,8 @@ class SubtitlesView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         video = self.get_video()
         workflow = workflows.get_workflow(video)
-        if not workflow.user_can_edit_subtitles(
-            self.request.user, self.kwargs['language_code']):
+        if not workflow.user_can_edit_subtitles(self.request.user, self.kwargs['language_code']) or \
+           not user_can_access_subtitles_format(self.request.user, request.accepted_renderer.format):
             raise PermissionDenied()
         if not workflow.user_can_set_video_duration(self.request.user):
             request.data.pop('duration', None)
