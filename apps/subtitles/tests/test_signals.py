@@ -27,7 +27,7 @@ import mock
 
 from babelsubs.storage import SubtitleSet
 from utils.factories import *
-from utils.test_utils import patch_for_test
+from utils.test_utils import patch_for_test, mock_handler
 from subtitles import signals
 from subtitles import pipeline
 from subtitles import workflows
@@ -48,6 +48,30 @@ class DeleteLanguageTest(TestCase):
         self.assertEquals(self.language_deleted_handler.call_count, 1)
         self.language_deleted_handler.assert_called_with(signal=mock.ANY,
                                                          sender=language)
+
+class NewVersionTest(TestCase):
+    def test_add_subtitles(self):
+        video = VideoFactory()
+        with mock_handler(signals.subtitles_added) as handler:
+            version = pipeline.add_subtitles(video, 'en',
+                                             SubtitleSetFactory())
+        assert_true(handler.called)
+        assert_equal(handler.call_args,
+                     mock.call(signal=mock.ANY,
+                               sender=version.subtitle_language,
+                               version=version))
+
+    def test_rollback(self):
+        video = VideoFactory()
+        v1 = pipeline.add_subtitles(video, 'en', SubtitleSetFactory())
+        v2 = pipeline.add_subtitles(video, 'en', SubtitleSetFactory())
+        with mock_handler(signals.subtitles_added) as handler:
+            v3 = pipeline.rollback_to(video, 'en', v1.version_number)
+        assert_true(handler.called)
+        assert_equal(handler.call_args,
+                     mock.call(signal=mock.ANY,
+                               sender=v3.subtitle_language,
+                               version=v3))
 
 class SubtitlesPublishedTest(TestCase):
     def setUp(self):

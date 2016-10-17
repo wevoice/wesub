@@ -201,6 +201,7 @@ INSTALLED_APPS = (
     'externalsites',
     'messages',
     'mysqltweaks',
+    'notifications',
     'profiles',
     'search',
     'staff',

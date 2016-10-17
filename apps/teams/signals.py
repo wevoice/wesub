@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 member_leave = dispatch.Signal()
 video_removed_from_team = dispatch.Signal(providing_args=["team", "user"])
 video_moved_from_team_to_team = dispatch.Signal(
-        providing_args=["destination_team", "video"])
+        providing_args=["destination_team", "old_team", "video"])
 build_video_page_forms = dispatch.Signal(
     providing_args=['team', 'user', 'team_videos_qs'])
 

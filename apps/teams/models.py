@@ -1144,7 +1144,9 @@ class TeamVideo(models.Model):
             # fire a http notification that a new video has hit this team:
             api_teamvideo_new.send(self)
             video_moved_from_team_to_team.send(sender=self,
-                                               destination_team=new_team, video=self.video)
+                                               destination_team=new_team,
+                                               old_team=old_team,
+                                               video=self.video)
         # Update search data and other things
         video_changed_tasks.delay(self.video_id)
 

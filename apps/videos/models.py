@@ -2099,6 +2099,9 @@ class VideoUrl(models.Model):
     def is_html5(self):
         return self.type == VIDEO_TYPE_HTML5
 
+    def is_youtube(self):
+        return self.type == VIDEO_TYPE_YOUTUBE
+
     def get_type_display(self):
         for (type_, label) in video_type_choices():
             if self.type == type_:
