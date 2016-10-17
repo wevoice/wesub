@@ -58,6 +58,7 @@ from subtitles.permissions import (user_can_view_private_subtitles,
 from subtitles.forms import SubtitlesUploadForm
 from subtitles.pipeline import rollback_to
 from subtitles.types import SubtitleFormatList
+from subtitles.permissions import user_can_access_subtitles_format
 from teams.models import Task
 from utils.decorators import staff_member_required
 from videos import permissions
@@ -545,8 +546,11 @@ class LanguagePageContextSubtitles(LanguagePageContext):
         public_langs = (video.newsubtitlelanguage_set
                         .having_public_versions().count())
         downloadable_formats = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
-        if request.user.is_staff:
-            downloadable_formats = list(set(downloadable_formats + SubtitleFormatList.for_staff()))
+        downloadable_formats_set = set(downloadable_formats)
+        for format in SubtitleFormatList.for_staff():
+            if user_can_access_subtitles_format(request.user, format):
+                downloadable_formats_set.add(format)
+        downloadable_formats = list(downloadable_formats_set)
         self['downloadable_formats'] = downloadable_formats
         self['edit_disabled'] = not user_can_edit
         self['show_download_all'] = public_langs > 1

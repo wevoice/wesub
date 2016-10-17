@@ -26,7 +26,7 @@ def user_can_view_private_subtitles(user, video, language_code):
 
 def user_can_access_subtitles_format(user, format):
     f = SubtitleFormatList[format]
-    if f.for_staff and not user.is_staff:
+    if f.for_staff and not (user.is_staff or user.has_perm("subtitles.subtitlelanguage_access_restricted_subtitle_format")):
         return False
     return True
 
