@@ -536,7 +536,9 @@ def can_create_translations_for(user, video):
 @register.filter
 def can_delete_language(user, language):
     workflow = language.video.get_workflow()
-    return workflow.user_can_delete_subtitles(user, language.language_code)
+    team_video = language.video.get_team_video()
+    return team_video is not None and \
+        workflow.user_can_delete_subtitles(user, language.language_code)
 
 @register.filter
 def get_upload_form(task, user):
