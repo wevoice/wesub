@@ -298,6 +298,7 @@ from subtitles.models import (SubtitleLanguage, SubtitleVersion,
                               ORIGIN_WEB_EDITOR, ORIGIN_API)
 from subtitles.exceptions import ActionError
 from subtitles.permissions import user_can_access_subtitles_format
+from subtitles.types import SubtitleFormatList
 import babelsubs
 from babelsubs.storage import SubtitleSet
 from utils.subtitles import load_subtitles
@@ -613,6 +614,13 @@ class SubtitlesSerializer(serializers.Serializer):
     resource_uri = serializers.SerializerMethodField()
     site_uri = serializers.SerializerMethodField()
 
+    def __init__(self, *args, **kwargs):
+        super(SubtitlesSerializer, self).__init__(*args, **kwargs)
+        if 'sub_format' in self.fields:
+            for format in self.fields['sub_format'].choices:
+                if not user_can_access_subtitles_format(self.context['user'], format):
+                    self.fields['sub_format'].choices.pop(format)
+
     def get_actions_uri(self, version):
         kwargs = {
             'video_id': version.video.video_id,
@@ -702,15 +710,18 @@ class SubtitlesView(generics.CreateAPIView):
         TextRenderer,
     ]
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    def __init__(self, *args, **kwargs):
-        from subtitles.types import SubtitleFormatList
-        super(SubtitlesView, self).__init__(*args, **kwargs)
+    def set_renderer_classes(self, user):
+        self.renderer_classes = views.APIView.renderer_classes + [
+            DFXPRenderer, SBVRenderer, SSARenderer, SRTRenderer, VTTRenderer,
+            TextRenderer,
+        ]
         for f in SubtitleFormatList.for_staff():
-            renderer = type(f, (SubtitleRenderer,), {
-                'media_type': ('application/' + f),
-                'format': f
+            if user_can_access_subtitles_format(user, f):
+                renderer = type(f, (SubtitleRenderer,), {
+                    'media_type': ('application/' + f),
+                    'format': f
                 })
-            self.renderer_classes.append(renderer)
+                self.renderer_classes.append(renderer)
 
     def get_video(self):
         if not hasattr(self, '_video'):
@@ -740,6 +751,7 @@ class SubtitlesView(generics.CreateAPIView):
         version = self.get_object()
         # If we're rendering the subtitles directly, then we skip creating a
         # serializer and return the subtitles instead
+        self.set_renderer_classes(request.user)
         if isinstance(request.accepted_renderer, SubtitleRenderer):
             if user_can_access_subtitles_format(request.user, request.accepted_renderer.format):
                 return Response(version.get_subtitles())
@@ -787,6 +799,7 @@ class SubtitlesView(generics.CreateAPIView):
                                  version_number=version_number)
 
     def create(self, request, *args, **kwargs):
+        self.set_renderer_classes(request.user)
         video = self.get_video()
         workflow = workflows.get_workflow(video)
         if not workflow.user_can_edit_subtitles(self.request.user, self.kwargs['language_code']) or \
@@ -803,6 +816,7 @@ class SubtitlesView(generics.CreateAPIView):
         return version
 
     def delete(self, request, *args, **kwargs):
+        self.set_renderer_classes(request.user)
         language_code = kwargs['language_code']
         video = self.get_video()
         workflow = workflows.get_workflow(video)
