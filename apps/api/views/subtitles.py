@@ -805,7 +805,7 @@ class SubtitlesView(generics.CreateAPIView):
         video = self.get_video()
         workflow = workflows.get_workflow(video)
         if not workflow.user_can_edit_subtitles(self.request.user, self.kwargs['language_code']) or \
-           not user_can_access_subtitles_format(self.request.user, request.accepted_renderer.format):
+           not user_can_access_subtitles_format(self.request.user, self.request.data.get('sub_format', None)):
             raise PermissionDenied()
         if not workflow.user_can_set_video_duration(self.request.user):
             request.data.pop('duration', None)
