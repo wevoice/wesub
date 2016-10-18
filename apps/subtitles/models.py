@@ -392,7 +392,7 @@ class SubtitleLanguage(models.Model):
     class Meta:
         unique_together = [('video', 'language_code')]
         permissions = (
-            ('access_restricted_subtitle_format', "Can access restricted subtitle format")
+            ('access_restricted_subtitle_format', "Can access restricted subtitle format"),
             )
 
     @classmethod
