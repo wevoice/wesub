@@ -751,7 +751,6 @@ class SubtitlesView(generics.CreateAPIView):
         version = self.get_object()
         # If we're rendering the subtitles directly, then we skip creating a
         # serializer and return the subtitles instead
-        self.set_renderer_classes(request.user)
         if isinstance(request.accepted_renderer, SubtitleRenderer):
             if user_can_access_subtitles_format(request.user, request.accepted_renderer.format):
                 return Response(version.get_subtitles())
@@ -798,8 +797,11 @@ class SubtitlesView(generics.CreateAPIView):
         return get_object_or_404(language.subtitleversion_set.extant(),
                                  version_number=version_number)
 
-    def create(self, request, *args, **kwargs):
+    def initial(self, request, *args, **kwargs):
         self.set_renderer_classes(request.user)
+        super(SubtitlesView, self).initial(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
         video = self.get_video()
         workflow = workflows.get_workflow(video)
         if not workflow.user_can_edit_subtitles(self.request.user, self.kwargs['language_code']) or \
@@ -816,7 +818,6 @@ class SubtitlesView(generics.CreateAPIView):
         return version
 
     def delete(self, request, *args, **kwargs):
-        self.set_renderer_classes(request.user)
         language_code = kwargs['language_code']
         video = self.get_video()
         workflow = workflows.get_workflow(video)
