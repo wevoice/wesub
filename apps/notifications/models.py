@@ -65,6 +65,9 @@ class TeamNotification(models.Model):
     def set_number(self):
         self.number = TeamNotification.next_number_for_team(self.team)
 
+    def is_in_progress(self):
+        return self.response_status is None and self.error_message is None
+
     @classmethod
     def next_number_for_team(cls, team):
         qs = (cls.objects
