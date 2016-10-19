@@ -134,6 +134,9 @@ def register(type_slug, cls):
     """
     _registry[type_slug] = cls
 
+def get_type_choices():
+    return [(key, key) for key in sorted(_registry.keys())]
+
 def call_event_handler(team, name, *args, **kwargs):
     """Call an event handler method
 

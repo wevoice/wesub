@@ -16,11 +16,26 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django import forms
 from django.contrib import admin
+
+from notifications import handlers
 from notifications.models import TeamNotificationSettings, TeamNotification
+
+class TeamNotificationSettingsForm(forms.ModelForm):
+    type = forms.ChoiceField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(TeamNotificationSettingsForm, self).__init__(*args, **kwargs)
+        self.fields['type'].choices = handlers.get_type_choices()
+
+    class Meta:
+        model = TeamNotificationSettings
+        fields = ['team', 'type', 'url']
 
 class TeamNotificationSettingsAdmin(admin.ModelAdmin):
     list_display = ('team', 'type', 'url',)
+    form = TeamNotificationSettingsForm
 
 class TeamNotificationAdmin(admin.ModelAdmin):
     list_display = ('team', 'number', 'url', 'timestamp', 'error_message')
