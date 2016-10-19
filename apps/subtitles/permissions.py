@@ -25,6 +25,8 @@ def user_can_view_private_subtitles(user, video, language_code):
     return workflow.user_can_view_private_subtitles(user, language_code)
 
 def user_can_access_subtitles_format(user, format):
+    if format is None:
+        return True
     if format not in SubtitleFormatList:
         return False
     f = SubtitleFormatList[format]
