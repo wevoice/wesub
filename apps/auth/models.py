@@ -107,7 +107,7 @@ class CustomUser(BaseUser, secureid.SecureIDMixin):
     PLAYBACK_MODE_CHOICES = (
         (PLAYBACK_MODE_MAGIC, 'Magical auto-pause'),
         (PLAYBACK_MODE_STANDARD, 'No automatic pausing'),
-        (PLAYBACK_MODE_BEGINNER, 'Play for X seconds, then pause')
+        (PLAYBACK_MODE_BEGINNER, 'Play for 4 seconds, then pause')
     )
     homepage = models.URLField(blank=True)
     preferred_language = models.CharField(
@@ -214,13 +214,11 @@ class CustomUser(BaseUser, secureid.SecureIDMixin):
     def unread_messages_count(self, hidden_meassage_id=None):
         return self.unread_messages(hidden_meassage_id).count()
 
-    @classmethod
-    def tutorial_was_shown(self, id):
-        self.objects.filter(pk=id).update(show_tutorial=False)
+    def tutorial_was_shown(self):
+        CustomUser.objects.filter(pk=self.id).update(show_tutorial=False)
 
-    @classmethod
-    def set_playback_mode(self, id, playback_mode):
-        self.objects.filter(pk=id).update(playback_mode=playback_mode)
+    def set_playback_mode(self, playback_mode):
+        CustomUser.objects.filter(pk=self.id).update(playback_mode=playback_mode)
 
     @classmethod
     def displayable_users(self, ids):

@@ -86,13 +86,13 @@ def release_lock(request, video_id, language_code):
 @login_required
 @require_POST
 def tutorial_shown(request):
-    User.tutorial_was_shown(request.user.id)
+    request.user.tutorial_was_shown()
     return HttpResponse(json.dumps({'success': True}))
 
 @login_required
 @require_POST
 def set_playback_mode(request):
-    User.set_playback_mode(request.user.id, request.POST['playback_mode'])
+    request.user.set_playback_mode(request.POST['playback_mode'])
     return HttpResponse(json.dumps({'success': True}))
 
 def old_editor(request, video_id, language_code):
