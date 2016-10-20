@@ -1522,14 +1522,12 @@ div.timeline {
         font-size: 11px;
         height: 28px;
         overflow: hidden;
-        padding: 7px 12px 0 12px;
         position: absolute;
         top: 10px;
         @include border-radius(3px);
 
         span {
-            // This is to avoid seeing the second line
-            height: 15px;
+            padding: 7px 12px;
             display: block;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1541,7 +1539,6 @@ div.timeline {
             position: absolute;
             top: 0;
             width: 6px;
-
             &.left {
                 background: #3E8982;
                 left: 0;
@@ -1557,6 +1554,12 @@ div.timeline {
                     top: 8px;
                     width: 12px;
                     @include border-radius(12px);
+                }
+                &:after {
+                    content: "";
+                    display: block;
+                    height: 100%;
+                    width: 12px;
                 }
             }
             &.right {
@@ -1574,6 +1577,14 @@ div.timeline {
                     top: 8px;
                     width: 12px;
                     @include border-radius(12px);
+                }
+                &:after {
+                    content: "";
+                    display: block;
+                    height: 100%;
+                    width: 12px;
+                    position: absolute;
+                    left: -6px;
                 }
              }
          }
