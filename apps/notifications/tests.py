@@ -42,7 +42,7 @@ class TestNotificationHandlerLookup(TestCase):
         self.url = 'http://example.com'
 
     @contextmanager
-    def patch_handler_lookup(self):
+    def patch_handler_lookup(self, call_expected=True):
         mock_settings = mock.Mock(
             team=self.team,
             type='unittest',
@@ -56,9 +56,12 @@ class TestNotificationHandlerLookup(TestCase):
             # We yield the mock handler instance.  This is what gets bound to
             # the as clause
             yield mock_handler_class.return_value
-        # check that the handler gets instantiated with the correct arguments
-        assert_true(mock_handler_class.called)
-        assert_equal(mock_handler_class.call_args, mock.call(mock_settings))
+        if call_expected:
+            # check that the handler gets instantiated with the correct arguments
+            assert_true(mock_handler_class.called)
+            assert_equal(mock_handler_class.call_args, mock.call(mock_settings))
+        else:
+            assert_false(mock_handler_class.called)
         del handlers._registry['unittest']
 
     def test_on_video_added(self):
@@ -66,6 +69,10 @@ class TestNotificationHandlerLookup(TestCase):
             video = VideoFactory(team=self.team)
         assert_equal(mock_handler.on_video_added.call_args,
                      mock.call(video, None))
+        # A second save shouldn't cause the handler to be called again
+        with self.patch_handler_lookup(False) as mock_handler:
+            video.get_team_video().save()
+            assert_false(mock_handler.on_video_added.called)
 
     def test_on_video_added_from_other_team(self):
         other_team = TeamFactory()
@@ -121,6 +128,10 @@ class TestNotificationHandlerLookup(TestCase):
             member = TeamMemberFactory(team=self.team)
         assert_equal(mock_handler.on_user_added.call_args,
                      mock.call(member.user))
+        # A second save shouldn't cause the handler to be called again
+        with self.patch_handler_lookup(False) as mock_handler:
+            member.save()
+            assert_false(mock_handler.on_user_added.called)
 
     def test_on_user_removed(self):
         member = TeamMemberFactory(team=self.team)

@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.dispatch import receiver
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, pre_delete
 
 from auth.models import CustomUser as User
 from notifications.handlers import (call_event_handler,
@@ -27,12 +27,14 @@ import subtitles.signals
 import teams.signals
 
 @receiver(post_save, sender=TeamVideo)
-def on_team_video_save(sender, instance, **kwargs):
-    call_event_handler(instance.team, 'on_video_added', instance.video, None)
+def on_team_video_save(sender, instance, created, **kwargs):
+    if created:
+        call_event_handler(instance.team, 'on_video_added', instance.video,
+                           None)
 
-@receiver(teams.signals.video_removed_from_team)
-def on_team_video_removed(sender, team, **kwargs):
-    call_event_handler(team, 'on_video_removed', sender, None)
+@receiver(pre_delete, sender=TeamVideo)
+def on_team_video_delete(sender, instance, **kwargs):
+    call_event_handler(instance.team, 'on_video_removed', instance.video, None)
 
 @receiver(teams.signals.video_moved_from_team_to_team)
 def on_team_video_move(sender, destination_team, old_team, **kwargs):
@@ -67,7 +69,7 @@ def on_team_member_save(sender, instance, created, **kwargs):
     if created:
         call_event_handler(member.team, 'on_user_added', member.user)
 
-@receiver(post_delete, sender=TeamMember)
+@receiver(pre_delete, sender=TeamMember)
 def on_team_member_delete(sender, instance, **kwargs):
     member = instance
     call_event_handler(member.team, 'on_user_removed', member.user)
