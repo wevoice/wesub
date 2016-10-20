@@ -23,6 +23,7 @@ from auth.models import CustomUser as User
 from notifications.handlers import (call_event_handler,
                                     call_event_handler_for_video)
 from teams.models import TeamVideo, TeamMember
+import auth.signals
 import subtitles.signals
 import teams.signals
 
@@ -74,8 +75,8 @@ def on_team_member_delete(sender, instance, **kwargs):
     member = instance
     call_event_handler(member.team, 'on_user_removed', member.user)
 
-@receiver(post_save, sender=User)
-def on_user_save(sender, instance, **kwargs):
-    user = instance
+@receiver(auth.signals.user_profile_changed)
+def on_user_save(sender, **kwargs):
+    user = sender
     for team in user.teams.all():
         call_event_handler(team, 'on_user_info_updated', user)

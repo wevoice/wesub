@@ -39,6 +39,8 @@ from django.db.models.signals import post_save
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _, ugettext
 from tastypie.models import ApiKey
+
+from auth import signals
 from caching import CacheGroup, ModelCacheManager
 from utils.amazon import S3EnabledImageField
 from utils import secureid
@@ -138,8 +140,19 @@ class CustomUser(BaseUser, secureid.SecureIDMixin):
 
     cache = ModelCacheManager(default_cache_pattern='user')
 
+    # Fields that constitute a user's profile, things like names, bios, etc.
+    # When these change we emit the user_profile_changed signal
+    PROFILE_FIELDS = [
+        'first_name', 'last_name', 'full_name', 'biography', 'picture',
+        'homepage',
+    ]
+
     class Meta:
         verbose_name = 'User'
+
+    def __init__(self, *args, **kwargs):
+        super(CustomUser, self).__init__(*args, **kwargs)
+        self.start_tracking_profile_fields()
 
     def __unicode__(self):
         if not self.is_active:
@@ -179,10 +192,26 @@ class CustomUser(BaseUser, secureid.SecureIDMixin):
             self.valid_email = False
 
         send_email_confirmation = kwargs.pop('send_email_confirmation', True)
+        if self.pk:
+            self.check_profile_changed()
         super(CustomUser, self).save(*args, **kwargs)
+        self.start_tracking_profile_fields()
 
         if send_confirmation and send_email_confirmation:
             EmailConfirmation.objects.send_confirmation(self)
+
+    def start_tracking_profile_fields(self):
+        self._initial_profile_data = self.calc_profile_data()
+
+    def calc_profile_data(self):
+        return {
+            name: getattr(self, name)
+            for name in CustomUser.PROFILE_FIELDS
+        }
+
+    def check_profile_changed(self):
+        if self.calc_profile_data() != self._initial_profile_data:
+            signals.user_profile_changed.send(self)
 
     def clean(self):
         if '$' in self.username:
@@ -292,6 +321,7 @@ class CustomUser(BaseUser, secureid.SecureIDMixin):
                 for l in languages
             ]
         self.cache.invalidate()
+        signals.user_profile_changed.send(self)
 
     def get_language_names(self):
         """Get a list of language names that the user speaks."""
