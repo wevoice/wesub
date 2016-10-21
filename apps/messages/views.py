@@ -28,6 +28,7 @@ from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.utils.http import cookie_date
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
+from django.db.models import Max
 
 from auth.models import CustomUser as User
 from auth.models import UserLanguage
@@ -174,7 +175,6 @@ def new(request):
                 m.save()
                 send_new_message_notification.delay(m.pk)
             elif form.cleaned_data['team']:
-                now = datetime.now()
                 # TODO: Move this into a task for performance?
                 language = form.cleaned_data['language']
                 # We create messages using bulk_create, so that only one transaction is needed
@@ -192,7 +192,8 @@ def new(request):
                                                 content=form.cleaned_data['content'],
                                                 subject=form.cleaned_data['subject']))
                 Message.objects.bulk_create(message_list, batch_size=500);
-                new_messages_ids = Message.objects.filter(created__gt=now).values_list('pk', flat=True)
+                max_id = Message.objects.all().aggregate(max_id=Max('id'))['max_id']
+                new_messages_ids = Message.objects.filter(id__gt=max_id).values_list('pk', flat=True)
                 # Creating a bunch of reasonably-sized tasks
                 batch = 0
                 batch_size = 1000
