@@ -6,7 +6,11 @@
 {% block html_attrs %}id="login"{% endblock %}
 
 {% block main_content %}
-
+<script>
+  var show_disabled_facebook = function() {
+  alert("We are working to re-enable the Facebook authorization and appreciate your patience.\nIf you have used Facebook to log into Amara before, please email support@amara.org for help with accessing your account (include your Facebook login and email address). Otherwise, please select a different authorization method.");
+  }
+</script>
 <div id="login-bg" class="top-banner">
   <div class="container">
     <div class="row">
@@ -17,7 +21,10 @@
             <h5>{% trans "Use an existing identity" %}</h5>
             <ul class="providers">
                 <li><a class="provider" id="google" href="{% url "externalsites:google-login-confirm" %}?next={{ next }}">google</a></li>
+                <!--
                 <li><a class="provider" id="facebook" href="{% url "thirdpartyaccounts:facebook_login_confirm" %}?next={{ next }}">facebook</a></li>
+                -->
+                <li><button class="provider" id="facebook" onclick="show_disabled_facebook()">facebook</button></li>
                 <li><a class="provider" id="twitter" href="{% url "thirdpartyaccounts:twitter_login_confirm" %}?next={{ next }}"> twitter</a></li>
                 <li><a class="provider" id="open-id" href="{% url "socialauth_openid_login_confirm" %}?next={{ next }}">openid</a></li>
             </ul>

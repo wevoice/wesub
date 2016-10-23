@@ -67,6 +67,6 @@ To view logs from a service:
 To create an admin user:
 
         bin/dev manage createsuperuser
-        
-        
+
+
 <a href="https://zenhub.com"><img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png"></a>

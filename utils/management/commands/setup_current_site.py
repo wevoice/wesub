@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
 from django.contrib.sites.models import Site
 
 class Command(BaseCommand):
@@ -25,6 +26,9 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         if len(args) != 1:
             raise CommandError("Usage setup_current_site <domain>")
-        current_site = Site.objects.get_current()
-        current_site.domain = args[0]
+        try:
+            current_site = Site.objects.get_current()
+        except Site.DoesNotExist:
+            current_site = Site.objects.create(pk=settings.SITE_ID)
+        current_site.name = current_site.domain = args[0]
         current_site.save()
