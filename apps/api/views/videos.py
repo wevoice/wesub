@@ -196,6 +196,13 @@ Making a URL the primary URL for a video
 
     Use the `resource_uri` from the listing to find the video URL endpoint
 
+Setting duration of a video
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. http:put:: /api/videos/(video-id)/duration
+
+    :>json integer duration: Video duration in seconds
+
 Deleting Video URLs
 ^^^^^^^^^^^^^^^^^^^
 
@@ -220,10 +227,13 @@ from rest_framework import filters
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import serializers
+from rest_framework import status
+from rest_framework import views
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 import json
 
 from api.fields import LanguageCodeField, TimezoneAwareDateTimeField
@@ -651,6 +661,30 @@ class VideoURLSerializer(serializers.Serializer):
 
 class VideoURLUpdateSerializer(VideoURLSerializer):
     url = serializers.CharField(read_only=True)
+
+class VideoDurationView(views.APIView):
+    def get(self, request, video_id, *args, **kwargs):
+        video = Video.objects.get(video_id=video_id)
+        workflow = video.get_workflow()
+        if not workflow.user_can_view_video(request.user):
+            return Response("Not authorized", status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'duration': video.duration}, status=status.HTTP_200_OK)
+
+    def put(self, request, video_id, *args, **kwargs):
+        video = Video.objects.get(video_id=video_id)
+        workflow = video.get_workflow()
+        if not workflow.user_can_edit_video(request.user):
+            return Response("Not authorized", status=status.HTTP_401_UNAUTHORIZED)
+        if not video.duration:
+            new_duration = request.data.get('duration', None)
+            if new_duration is not None:
+                video.duration = new_duration
+                video.save()
+                return Response({'duration': video.duration}, status=status.HTTP_200_OK)
+            else:
+                return Response("Duration is missing", status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response("Duration already set", status=status.HTTP_304_NOT_MODIFIED)
 
 class VideoURLViewSet(viewsets.ModelViewSet):
     serializer_class = VideoURLSerializer
