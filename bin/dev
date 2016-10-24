@@ -288,7 +288,7 @@ class PrepDeploy(Command):
         self.push('production')
 
     def run_git(self, *args, **kwargs):
-        subprocess.call(['git'] + list(args))
+        subprocess.check_call(['git'] + list(args))
 
     def get_git_output(self, *args, **kwargs):
         return subprocess.check_output(['git'] + list(args), **kwargs).strip()
@@ -324,11 +324,24 @@ class PrepDeploy(Command):
 
     def tag_deploy(self):
         today = date.today()
-        tag_name = 'deploy-{:04}-{:02}-{:02}'.format(today.year, today.month,
-                                                     today.day)
-        print "Creating {} tag".format(tag_name)
-        self.run_git('tag', tag_name)
-        self.run_git('push', 'origin', tag_name)
+        tag_name_base = 'deploy-{:04}-{:02}-{:02}'.format(
+            today.year, today.month, today.day)
+        exsting_tags = self.find_existing_tags(tag_name_base)
+        for tag_name in self.generate_tag_names(tag_name_base):
+            if tag_name not in exsting_tags:
+                self.run_git('tag', tag_name)
+                self.run_git('push', 'origin', tag_name)
+                return
+        raise AssertionError("Can't find new tag name")
+
+    def find_existing_tags(self, tag_name_base):
+        output = self.get_git_output('tag', '-l', tag_name_base + '*')
+        return set(output.split())
+
+    def generate_tag_names(self, tag_name_base):
+        yield tag_name_base
+        for i in range(2, 100):
+            yield tag_name_base + '-{}'.format(i)
 
     def push(self, branch):
         print "Pushing {}".format(branch)
