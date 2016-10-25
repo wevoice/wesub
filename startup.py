@@ -54,8 +54,10 @@ def run_startup_modules():
     for app in settings.INSTALLED_APPS:
         module = __import__(app)
         package_dir = os.path.dirname(module.__file__)
-        if os.path.exists(os.path.join(package_dir, 'startup.py')):
-            __import__('%s.startup' % app)
+        for module in ('startup', 'signalhandlers'):
+            filename = module + '.py'
+            if os.path.exists(os.path.join(package_dir, filename)):
+                __import__('{}.{}'.format(app, module))
 
 def startup():
     """Set up the amara environment.  This should be called before running any

@@ -415,16 +415,14 @@ def _add_subtitles(video, sl, subtitles, title, duration, description, author,
         _fork_dependents(sl)
     return version
 
-def _rollback_to(video, language_code, version_number, rollback_author):
-    sl = SubtitleLanguage.objects.get(video=video, language_code=language_code)
-
-    current = sl.get_tip(full=True)
-    target = sl.subtitleversion_set.full().get(version_number=version_number)
+def _rollback_to(video, subtitle_language, version_number, rollback_author):
+    current = subtitle_language.get_tip(full=True)
+    target = subtitle_language.subtitleversion_set.full().get(version_number=version_number)
 
     # The new version is mostly a copy of the target.
     data = {
         'video': target.video,
-        'sl': target.video.subtitle_language(language_code),
+        'sl': subtitle_language,
         'subtitles': target.get_subtitles(),
         'title': target.title,
         'duration': target.duration,
@@ -560,20 +558,6 @@ def _calc_action_for_add_subtitles(video, language_code, author, complete,
         return workflow.action_for_add_subtitles(author, language_code,
                                                  complete)
 
-def unsafe_rollback_to(video, language_code, version_number,
-                       rollback_author=None):
-    """Rollback to the given video/language/version without a transaction.
-
-    You probably want to use rollback_to instead, but if you're already inside
-    a transaction that will rollback on exceptions you can use this instead of
-    dealing with nested transactions.
-
-    For more information see the docstring for rollback_to.  Aside from the
-    transaction handling this function works exactly the same way.
-
-    """
-    return _rollback_to(video, language_code, version_number, rollback_author)
-
 def rollback_to(video, language_code, version_number,
                 rollback_author=None):
     """Rollback to the given video/language/version.
@@ -592,13 +576,14 @@ def rollback_to(video, language_code, version_number,
     This function runs in a transaction, so while it may fail the DB should be
     left in a consistent state.
 
-    If you already have a transaction running you can use unsafe_rollback_to
-    to avoid dealing with nested transactions.
-
     """
+    subtitle_language = SubtitleLanguage.objects.get(video=video,
+                                                     language_code=language_code)
+    subtitle_language.freeze()
     with transaction.commit_on_success():
-        version = _rollback_to(video, language_code, version_number,
+        version = _rollback_to(video, subtitle_language, version_number,
                                rollback_author)
     video.cache.invalidate()
+    subtitle_language.thaw()
     return version
 

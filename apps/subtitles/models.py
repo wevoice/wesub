@@ -503,8 +503,8 @@ class SubtitleLanguage(models.Model):
     def freeze(self):
         """Suspend sending signals until thaw() is called
 
-        Right now the only signal this controls is subtitles_completed.  Maybe
-        we will add more in the future.
+        This controls the subtitles_completed and subtitles_added signals.  We
+        probably should fold in subtitles_published at some point too.
         """
         if self._frozen:
             return
@@ -849,6 +849,7 @@ EXISTS(
 
         cache.invalidate_language_cache(self)
         self.clear_tip_cache()
+        self.send_signal(signals.subtitles_added, version=sv)
         return sv
 
     def get_metadata(self, public=True):

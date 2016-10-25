@@ -19,12 +19,15 @@
 from datetime import datetime, timedelta
 from urlparse import urlparse
 from nose.tools import *
+import mock
 import re
 
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core import mail
 from django.test import TestCase
+
+from auth import signals
 from auth.models import CustomUser as User, UserLanguage
 from auth.models import LoginToken
 from caching.tests.utils import assert_invalidates_model_cache
@@ -83,6 +86,32 @@ class UserCreationTest(TestCase):
     def test_username_cant_have_dollar_sign(self):
         with assert_raises(ValidationError):
             User(username="user$name").full_clean()
+
+class UserProfileChangedTest(TestCase):
+    def test_create(self):
+        # We shouldn't emit the signal when we initially create a user
+        with test_utils.mock_handler(signals.user_profile_changed) as handler:
+            u = User()
+            u.first_name = 'ben'
+            u.save()
+            assert_false(handler.called)
+
+    def test_update(self):
+        u = User.objects.create()
+        with test_utils.mock_handler(signals.user_profile_changed) as handler:
+            u.first_name = 'ben'
+            u.save()
+            assert_true(handler.called)
+            assert_equal(handler.call_args,
+                         mock.call(signal=mock.ANY, sender=u))
+
+    def test_update_non_profile_fields(self):
+        # Updated non-profile fields shouldn't result in the signal
+        u = User()
+        with test_utils.mock_handler(signals.user_profile_changed) as handler:
+            u.show_tutorial = False
+            u.save()
+            assert_false(handler.called)
 
 class UniqueUsernameTest(TestCase):
     def test_username_already_unique(self):

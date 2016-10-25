@@ -115,6 +115,7 @@ delete_subtitles = mock.Mock()
 update_all_subtitles = mock.Mock()
 fetch_subs_task = mock.Mock()
 import_videos_from_feed = mock.Mock()
+notifications_do_http_post = mock.Mock()
 
 class MonkeyPatcher(object):
     """Replace a functions with mock objects for the tests.
@@ -144,6 +145,7 @@ class MonkeyPatcher(object):
         ('externalsites.tasks.update_all_subtitles', update_all_subtitles),
         ('externalsites.tasks.fetch_subs', fetch_subs_task),
         ('videos.tasks.import_videos_from_feed', import_videos_from_feed),
+        ('notifications.handlers.do_http_post', notifications_do_http_post),
     ]
     @classmethod
     def register_patch(cls, spec, mock_obj):

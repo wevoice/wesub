@@ -314,6 +314,37 @@ Delete an existing task
 
 .. http:delete:: /api/teams/(team-slug)/tasks/(task-id)/
 
+.. _api_notifications:
+
+Notifications Resource
+**********************
+
+This endpoint can be used to view notifications sent to your team.  See
+:doc:`teams-callbacks` for details on how to set up notifications.
+
+List notifications
+^^^^^^^^^^^^^^^^^^
+
+.. http:get:: /api/teams/(team-slug)/notifications/
+
+    :>json integer number: Notification number
+    :>json url url: URL of the POST request
+    :>json string data: HTTP POST data (JSON-encoded)
+    :>json iso-8601 timestamp: date/time the notification was sent
+    :>json boolean in_progress: Is the request still in progress?
+    :>json integer response_status: HTTP response status code (or null)
+    :>json string error_message: String describing any errors that occured
+
+    List results are paginated
+
+Get details for a notification
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. http:get:: /api/teams/(team-slug)/notifications/(number)/
+
+    This returns information on a single notification.  The data has the same
+    format as in the listing endpoint.
+
 Applications Resource
 *********************
 
@@ -396,6 +427,7 @@ from api import userlookup
 from api.views.apiswitcher import APISwitcherMixin
 from api.fields import UserField, TimezoneAwareDateTimeField
 from auth.models import CustomUser as User
+from notifications.models import TeamNotification
 from teams.models import (Team, TeamMember, Project, Task, TeamVideo,
                           Application, TeamLanguagePreference)
 from teams.workflows import TeamWorkflow
@@ -604,12 +636,12 @@ class TeamMemberUpdateSerializer(TeamMemberSerializer):
 
 class TeamSubviewMixin(object):
     def initial(self, request, *args, **kwargs):
-        super(TeamSubviewMixin, self).initial(request, *args, **kwargs)
         try:
             self.team = Team.objects.get(slug=kwargs['team_slug'])
         except Team.DoesNotExist:
             self.team = None
             raise Http404
+        super(TeamSubviewMixin, self).initial(request, *args, **kwargs)
 
     def get_serializer_context(self):
         return {
@@ -1103,6 +1135,31 @@ class TeamBlacklistedLanguagesView(TeamLanguageView):
         'allow_reads': False,
         'allow_writes': False,
     }
+
+class TeamNotificationSerializer(serializers.ModelSerializer):
+    in_progress = serializers.BooleanField(source='is_in_progress')
+    timestamp = TimezoneAwareDateTimeField(read_only=True)
+
+    class Meta:
+        model = TeamNotification
+        fields = ('number', 'url', 'data', 'timestamp', 'in_progress',
+                  'response_status', 'error_message')
+
+class TeamNotificationViewSet(TeamSubviewMixin, viewsets.ReadOnlyModelViewSet):
+    serializer_class = TeamNotificationSerializer
+    lookup_field = 'number'
+    lookup_value_regex = r'\d+'
+
+    def get_queryset(self):
+        return (TeamNotification.objects
+                .filter(team=self.team)
+                .order_by('-number'))
+
+    def check_permissions(self, request):
+        super(TeamNotificationViewSet, self).check_permissions(request)
+        if not team_permissions.can_view_notifications(
+                self.team, request.user):
+            raise PermissionDenied()
 
 #
 # Deprecated API versions before the user field changes

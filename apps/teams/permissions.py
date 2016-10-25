@@ -540,6 +540,12 @@ def can_view_tasks_tab(team, user):
 
     return team.members.filter(user=user).exists()
 
+def can_view_notifications(team, user):
+    """Return whether a user can view notifications for a team.
+    """
+
+    return user.is_superuser or team.user_is_member(user)
+
 def can_invite(team, user):
     """Return whether the given user can send an invite for the given team."""
 

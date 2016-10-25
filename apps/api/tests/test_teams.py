@@ -29,6 +29,7 @@ import mock
 
 from api.tests.utils import format_datetime_field, user_field_data
 from auth.models import CustomUser as User
+from notifications.models import TeamNotification
 from subtitles import pipeline
 from teams.models import Team, TeamMember, Task, Application
 from utils import test_utils
@@ -1159,3 +1160,68 @@ class TeamApplicationAPITest(TeamAPITestBase):
         self.team.save()
         response = self.client.put(self.detail_url(self.applications[0]), {})
         assert_equal(response.status_code, status.HTTP_404_NOT_FOUND)
+
+class TeamNotificationsAPITest(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.team = TeamFactory(admin=self.user)
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
+        self.notifications = [
+            self.make_notification(response_status=200),
+            self.make_notification(response_status=500,
+                                   error_message="Response status: 500"),
+            self.make_notification(error_message="Response timeout"),
+            self.make_notification() # still in progress
+        ]
+        self.list_url = reverse('api:team-notifications-list',
+                                args=(self.team.slug,))
+
+    def details_url(self, notification):
+        return reverse('api:team-notifications-detail',
+                       args=(self.team.slug, notification.number))
+
+    def make_notification(self, response_status=None, error_message=None):
+        return TeamNotification.objects.create(
+            team=self.team,
+            url='http://example.com/notification/',
+            data='{"foo": "bar"}',
+            response_status=response_status,
+            error_message=error_message)
+
+    def check_data(self, notification, data):
+        assert_equal(data['number'], notification.number)
+        assert_equal(data['url'], notification.url)
+        assert_equal(data['data'], notification.data)
+        assert_equal(data['timestamp'],
+                     format_datetime_field(notification.timestamp))
+        assert_equal(data['in_progress'], notification.is_in_progress())
+        assert_equal(data['response_status'], notification.response_status)
+        assert_equal(data['error_message'], notification.error_message)
+
+    def test_listing(self):
+        response = self.client.get(self.list_url)
+        assert_equal(response.status_code, status.HTTP_200_OK)
+        assert_equal(len(response.data['objects']), len(self.notifications))
+        # notifications should be listed last to first
+        for notification, data in zip(reversed(self.notifications),
+                                      response.data['objects']):
+            self.check_data(notification, data)
+
+    def test_details(self):
+        for notification in self.notifications:
+            response = self.client.get(self.details_url(notification))
+            assert_equal(response.status_code, status.HTTP_200_OK)
+            self.check_data(notification, response.data)
+
+    @test_utils.patch_for_test('teams.permissions.can_view_notifications')
+    def test_permissions_check(self, can_view_notifications):
+        can_view_notifications.return_value = False
+        def check_permission_denied(url):
+            response = self.client.get(url)
+            assert_equal(response.status_code, status.HTTP_403_FORBIDDEN)
+            assert_equal(can_view_notifications.call_args,
+                         mock.call(self.team, self.user))
+
+        check_permission_denied(self.list_url)
+        check_permission_denied(self.details_url(self.notifications[0]))

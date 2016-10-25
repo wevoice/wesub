@@ -53,7 +53,8 @@ def store_request_call(url, **kwargs):
     return Response(), ""
 
 ExpectedRequest = collections.namedtuple(
-    "ExpectedRequest", "method url params data headers body status_code")
+    "ExpectedRequest",
+    "method url params data headers body status_code error")
 
 class RequestsMocker(object):
     """Mock code that uses the requests module
@@ -76,10 +77,10 @@ class RequestsMocker(object):
         self.expected_requests = []
 
     def expect_request(self, method, url, params=None, data=None,
-                       headers=None, body='', status_code=200):
+                       headers=None, body='', status_code=200, error=None):
         self.expected_requests.append(
             ExpectedRequest(method, url, params, data, headers, body,
-                            status_code))
+                            status_code, error))
 
     def __enter__(self):
         self.setup_patchers()
@@ -135,6 +136,8 @@ class RequestsMocker(object):
         else:
             assert_equal(data, expected.data)
         assert_equal(headers, expected.headers)
+        if expected.error:
+            raise expected.error
         request = requests.Request(method=method, url=url, params=params,
                                    data=data, headers=headers)
         return self.make_response(request, expected.status_code, expected.body)
