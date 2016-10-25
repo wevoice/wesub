@@ -69,6 +69,8 @@ class CodeField(models.PositiveSmallIntegerField):
     #  digits for the choice itself with a 1-based index.  This allows us to
     #  safely store 999 choices for 64 extensions.
 
+    MAX_CHOICES = 1000
+
     def __init__(self, choices=None, **kwargs):
         super(CodeField, self).__init__(**kwargs)
         self.value_to_code = {} # map DB values to Code instances
@@ -111,7 +113,7 @@ class CodeField(models.PositiveSmallIntegerField):
                 code = SimpleCode(*code)
             assert code.slug is not NotImplemented
             assert code.label is not NotImplemented
-            code_value = (ext_id * 1000) + i + 1
+            code_value = (ext_id * self.MAX_CHOICES) + i + 1
             self.value_to_code[code_value] = code
             self.slug_to_value[code.slug] = code_value
             self._choices.append((code.slug, code.label))
@@ -124,8 +126,10 @@ class CodeField(models.PositiveSmallIntegerField):
             raise ValueError("ext_id {} already taken".format(ext_id))
 
     def _check_choices(self, choices):
-        if len(choices) > 1000:
-            raise ValueError("Only 1000 choices can be stored per extension")
+        if len(choices) > self.MAX_CHOICES:
+            raise ValueError(
+                "Only {} choices can be stored per extension".format(
+                    self.MAX_CHOICES))
 
     def contribute_to_class(self, cls, name):
         super(CodeField, self).contribute_to_class(cls, name)
@@ -173,7 +177,23 @@ class CodeField(models.PositiveSmallIntegerField):
         except KeyError:
             raise KeyError("Unknown code: {!r}".format(value))
 
+
+class TinyCodeField(CodeField):
+    """Codefield that onll uses a TINYINT to store its values.
+
+    Using a TINYINT leads to some limitations:
+      - We only allow 256 choices
+      - We don't allow any extension choices
+    """
+    MAX_CHOICES = 256
+
+    def extend(self, ext_id, choices):
+        raise TypeError("TinyCodeField doesn't support extension codes")
+
+    def db_type(self, connection):
+        return 'tinyint UNSIGNED'
+
 add_introspection_rules([], [
     "^codefield\.CodeField$",
+    "^codefield\.TinyCodeField$",
 ])
-
