@@ -70,6 +70,7 @@ var angular = angular || null;
         $controller('AppControllerLocking', {$scope: $scope});
         $controller('AppControllerEvents', {$scope: $scope});
         $controller('DialogController', {$scope: $scope});
+        $controller('PlaybackModeController', {$scope: $scope});
         $controller('SessionBackend', {$scope: $scope});
         $controller('SessionController', {$scope: $scope});
 
@@ -77,6 +78,7 @@ var angular = angular || null;
         $scope.canSync = EditorData.canSync;
         $scope.showHideNextTime = EditorData.preferences.showTutorial
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
+        $scope.playbackModes = EditorData.playbackModes;
         $scope.scrollingSynced = true;
         $scope.loadingFinished = false;
         $scope.tutorialShown = false;
@@ -396,6 +398,11 @@ var angular = angular || null;
             $event.stopPropagation();
             $scope.dialogManager.open('guidelines');
         }
+        $scope.onPlaybackModeClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dialogManager.open('playback-mode');
+        }
         $scope.onMoreControlsClicked = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
@@ -655,6 +662,7 @@ var angular = angular || null;
 		    $scope.currentEdit.start(subtitle);
 		}
 	    } else if (evt.target.type == 'textarea') {
+                $scope.$root.$emit('text-edit-keystroke');
                 return;
 	    }
 		// Shortcuts that should be disabled while editing a subtitle

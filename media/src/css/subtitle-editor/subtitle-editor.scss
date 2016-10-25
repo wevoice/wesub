@@ -843,6 +843,10 @@ div.help-panel {
         &.guidelines-link {
             line-height: 40px;
         }
+        &.playback-mode-link {
+            float: right;
+            line-height: 40px;
+        }
     }
     span.key {
         width: 20%;
@@ -1811,6 +1815,14 @@ aside.modal#guidelines-modal {
         margin: 15px 0;
         div.team-all-guidelines div {
             padding: 15px 0;
+        }
+    }
+}
+
+aside.modal#playback-mode-modal {
+    div.modal-content {
+        select {
+            width: 100%;
         }
     }
 }
