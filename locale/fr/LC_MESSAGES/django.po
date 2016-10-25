@@ -53,8 +53,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-11 12:51-0500\n"
-"PO-Revision-Date: 2016-10-11 17:51+0000\n"
+"POT-Creation-Date: 2016-10-25 10:01-0500\n"
+"PO-Revision-Date: 2016-10-25 15:01+0000\n"
 "Last-Translator: bendk <ben@pculture.org>\n"
 "Language-Team: French (http://www.transifex.com/universalsubtitles/universalsubtitles/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -240,23 +240,23 @@ msgstr "%(username)s n'est pas membre de l'équipe"
 msgid "New activity on your team video"
 msgstr "Nouvelle activité sur la vidéo de votre équipe"
 
-#: apps/teams/permissions_const.py:44 apps/teams/models.py:1347
-#: apps/teams/forms.py:1252 templates/base.html:163
+#: apps/teams/permissions_const.py:44 apps/teams/forms.py:1252
+#: apps/teams/models.py:1349 templates/base.html:163
 #: templates/hands_base.html:94 templates/new-base.html:108
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/teams/permissions_const.py:45 apps/teams/models.py:1345
+#: apps/teams/permissions_const.py:45 apps/teams/models.py:1347
 msgid "Owner"
 msgstr "Propriétaire"
 
-#: apps/teams/permissions_const.py:46 apps/teams/models.py:1346
-#: apps/teams/forms.py:1251
+#: apps/teams/permissions_const.py:46 apps/teams/forms.py:1251
+#: apps/teams/models.py:1348
 msgid "Manager"
 msgstr "Gestionnaire"
 
-#: apps/teams/permissions_const.py:47 apps/teams/models.py:1348
-#: apps/teams/forms.py:1250
+#: apps/teams/permissions_const.py:47 apps/teams/forms.py:1250
+#: apps/teams/models.py:1350
 msgid "Contributor"
 msgstr "Contributeur"
 
@@ -280,7 +280,7 @@ msgstr "Le champs \"A propos de vous\" est requis afin de postuler. "
 msgid "You have already applied to this team."
 msgstr "Vous avez déjà postulé pour cette équipe."
 
-#: apps/teams/rpc.py:60 apps/teams/models.py:1609
+#: apps/teams/rpc.py:60 apps/teams/models.py:1611
 msgid "Your application has been denied."
 msgstr "Votre candidature a été refusée."
 
@@ -332,6 +332,7 @@ msgstr "Vous ne pouvez pas assigner ce rôle à ce membre."
 
 #: apps/teams/subtitle_actions.py:29
 #: apps/teams/workflows/old/subtitleworkflows.py:76
+#: amara-enterprise/collab/models.py:1358
 #: amara-enterprise/collab/state_pipeline.py:370
 msgid "Complete"
 msgstr "Completer"
@@ -346,7 +347,7 @@ msgstr "Sauvegarde"
 #: apps/teams/subtitle_actions.py:70
 #: apps/teams/workflows/old/subtitleworkflows.py:97
 #: apps/teams/workflows/old/subtitleworkflows.py:181
-#: amara-enterprise/collab/models.py:1214
+#: amara-enterprise/collab/models.py:1371
 #: amara-enterprise/collab/subtitle_workflow.py:322
 #: amara-enterprise/collab/forms/dashboard.py:103
 #: amara-enterprise/vimeo/workflows.py:83 templates/teams/applications.html:62
@@ -430,7 +431,7 @@ msgstr "Fichier téléversé avec succès, vous recevrez rapidement le résumé.
 msgid "File was not successfully parsed."
 msgstr "Le fichier n'a pas été correctement parsé."
 
-#: apps/teams/new_views.py:331 amara-enterprise/collab/views.py:117
+#: apps/teams/new_views.py:331 amara-enterprise/collab/views.py:118
 #: templates/footer.html:35 templates/new-user-menu.html:14
 #: templates/base.html:134 templates/new-base.html:96
 #: templates/profiles/_tabs.html:12 templates/profiles/_user_menu.html:22
@@ -516,7 +517,7 @@ msgstr "Réglages enregostrés."
 #: apps/teams/new_views.py:922 apps/teams/new_views.py:960
 #: apps/teams/new_views.py:1017 apps/teams/new_views.py:1049
 #: apps/teams/workflows/simple.py:65 apps/externalsites/views.py:91
-#: amara-enterprise/collab/views.py:53 amara-enterprise/collab/views.py:71
+#: amara-enterprise/collab/views.py:54 amara-enterprise/collab/views.py:72
 #: templates/teams/_tabs.html:37 templates/teams/_tabs_projects.html:20
 #: templates/teams/settings-lang-messages.html:5
 #: templates/teams/settings-languages.html:5
@@ -597,196 +598,11 @@ msgstr "Projet supprimé."
 msgid "Projects"
 msgstr "Projets"
 
-#: apps/teams/models.py:171
-msgid "Open"
-msgstr "Ouvrir"
-
-#: apps/teams/models.py:172
-msgid "Application"
-msgstr "Formulaire de candidature"
-
-#: apps/teams/models.py:173
-msgid "Invitation by any team member"
-msgstr "Invitation par n’importe quel membre du groupe"
-
-#: apps/teams/models.py:174
-msgid "Invitation by manager"
-msgstr "Invitation par le gestionnaire"
-
-#: apps/teams/models.py:175
-msgid "Invitation by admin"
-msgstr "Invitation par l'admin"
-
-#: apps/teams/models.py:182
-msgid "Any team member"
-msgstr "N’importe quel membre du groupe"
-
-#: apps/teams/models.py:183
-msgid "Managers and admins"
-msgstr "Managers et admins"
-
-#: apps/teams/models.py:184
-msgid "Admins only"
-msgstr "Uniquement les admins."
-
-#: apps/teams/models.py:207
-msgid "Daily"
-msgstr "Quotidiennement"
-
-#: apps/teams/models.py:208
-msgid "Hourly"
-msgstr "Toutes les heures"
-
-#: apps/teams/models.py:211 apps/teams/models.py:3548
-msgid "name"
-msgstr "nom"
-
-#: apps/teams/models.py:212 apps/teams/models.py:3549
-msgid "slug"
-msgstr "\"slug\""
-
-#: apps/teams/models.py:213
-msgid "description"
-msgstr "description"
-
-#: apps/teams/models.py:213
-msgid ""
-"All urls will be converted to links. Line breaks and HTML not supported."
-msgstr "Tous les url vount êtres convertis en lien. Retour à la ligne et HTML 5 non supportés."
-
-#: apps/teams/models.py:215
-msgid "logo"
-msgstr "logo"
-
-#: apps/teams/models.py:219
-msgid "square logo"
-msgstr "Logo carré"
-
-#: apps/teams/models.py:224
-msgid "videos public?"
-msgstr "vidéos publiques ?"
-
-#: apps/teams/models.py:225
-msgid "Sync metadata when available (Youtube)?"
-msgstr ""
-
-#: apps/teams/models.py:226 templates/search/search.html:144
-#: templates/teams/project_list.html:12
-#: templates/videos/featured_videos.html:52
-msgid "videos"
-msgstr "vidéos"
-
-#: apps/teams/models.py:227
-msgid "users"
-msgstr "utilisateurs"
-
-#: apps/teams/models.py:230
-msgid "applicants"
-msgstr "solicitants"
-
-#: apps/teams/models.py:233
-msgid "Intro Video"
-msgstr "Vidéo d'introduction"
-
-#: apps/teams/models.py:235
-msgid "Page content"
-msgstr "Contenu de la page"
-
-#: apps/teams/models.py:235
-msgid "You can use markdown. This will replace Description."
-msgstr "Vous pouvez utiliser Markdown. Ceci remplacera la description."
-
-#: apps/teams/models.py:237
-msgid "HTML that appears at the top of the teams page."
-msgstr "HTML apparaissant en haut de la page de l'équipe."
-
-#: apps/teams/models.py:243
-msgid "authentication provider code"
-msgstr "Authentification requise"
-
-#: apps/teams/models.py:260
-msgid "membership policy"
-msgstr "politique des membres"
-
-#: apps/teams/models.py:263
-msgid "video policy"
-msgstr "politique vidéo"
-
-#: apps/teams/models.py:269
-msgid "task assignment policy"
-msgstr "politique d’attribution de tâche"
-
-#: apps/teams/models.py:272
-msgid "subtitling policy"
-msgstr "police de sous-titrage"
-
-#: apps/teams/models.py:275
-msgid "translation policy"
-msgstr "police de traduction"
-
-#: apps/teams/models.py:278
-msgid "maximum tasks per member"
-msgstr "taches maximum par membre"
-
-#: apps/teams/models.py:280
-msgid "task expiration (days)"
-msgstr "Délai pour accomplir la tâche (jours)"
-
-#: apps/teams/models.py:295 templates/profiles/_teams_list.html:3
-#: templates/teams/teams-list.html:7
-msgid "Teams"
-msgstr "Équipes"
-
-#: apps/teams/models.py:749
-msgid "> 1000"
-msgstr "> 1000"
-
-#: apps/teams/models.py:988
-msgid ""
-"Use this space to explain why you or your team need to caption or subtitle "
-"this video. Adding a note makes volunteers more likely to help out!"
-msgstr "Utiliser cet espace afin d'expliquer pourquoi vous ou votre équipe à besoin de légende ou de sous-titres "
-
-#: apps/teams/models.py:992
-msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
-msgstr "Nous récupérons automatiquement les vignetes pour certains sites, comme Youtube par exemple"
-
-#: apps/teams/models.py:994
-msgid "Need help with all languages"
-msgstr "Besoin d'aide pour toutes les langues"
-
-#: apps/teams/models.py:995
-msgid "If you check this, other languages will not be displayed."
-msgstr "Si vous cochez ceci, les autres langues ne seront pas affichées."
-
-#: apps/teams/models.py:1604
-#, python-format
-msgid "You already have a pending application to %(team)s."
-msgstr "Vous avez déjà une candidature en attente pour %(team)s."
-
-#: apps/teams/models.py:1613
-#, python-format
-msgid "You have been removed from %(team)s."
-msgstr "Vous avez été retiré de %(team)s."
-
-#: apps/teams/models.py:2580
-msgid "Resume"
-msgstr "Reprendre"
-
-#: apps/teams/models.py:2582
-msgid "Start now"
-msgstr "Commencer maintenant"
-
-#: apps/teams/models.py:2780
-#, python-format
-msgid "Help %(team)s reach a world audience"
-msgstr "Aidez %(team)s à obtenir une audience mondiale"
-
 #: apps/teams/forms.py:78 apps/teams/forms.py:191 apps/teams/forms.py:1004
 #: apps/teams/forms.py:1346 apps/teams/forms.py:1457 apps/teams/forms.py:1507
 #: apps/teams/forms.py:1526 apps/teams/templatetags/teams_tags.py:191
-#: amara-enterprise/collab/forms/search.py:195
-#: amara-enterprise/collab/forms/search.py:344
+#: amara-enterprise/collab/forms/search.py:194
+#: amara-enterprise/collab/forms/search.py:336
 #: amara-enterprise/billing/templatetags/billing.py:19
 #: templates/teams/approvals.html:91
 #: templates/new-teams/video-durations.html:11
@@ -1145,7 +961,7 @@ msgid "New Team"
 msgstr "Nouvelle équipe"
 
 #: apps/teams/forms.py:1362 apps/teams/forms.py:1364 apps/teams/forms.py:1517
-#: apps/teams/forms.py:1550 amara-enterprise/collab/models.py:51
+#: apps/teams/forms.py:1550 amara-enterprise/collab/models.py:52
 #: templates/videos/language-sync-history-tab.html:24
 msgid "None"
 msgstr "Aucun"
@@ -1222,23 +1038,6 @@ msgstr "Vidéo %(url)s déjà présente parmi celles d’une autre équipe"
 msgid "CSV file"
 msgstr "Fichier CSV"
 
-#: apps/teams/permissions.py:742
-#, python-format
-msgid ""
-"These subtitles are moderated. See the %s team page for information on how "
-"to contribute."
-msgstr "Ces sous-titres font l’objet d’une modération. Consultez la page du groupe %s pour savoir comment participer."
-
-#: apps/teams/permissions.py:744
-msgid "Sorry, these subtitles are privately moderated."
-msgstr "Désolé, ces sous-titres sont modérés en privé."
-
-#: apps/teams/permissions.py:774
-msgid ""
-"Sorry, you do not have the permission to edit these subtitles. If you "
-"believe that they need correction, please contact the team administrator."
-msgstr "Désolé, vous ne possédez pas les autorisations pour modifier ces sous-titres. Si vous pensez qu’ils doivent être revus, veuillez écrire à l’administrateur du groupe."
-
 #: apps/teams/views.py:162 templates/profiles/edit.html:32
 #: templates/teams/settings-projects-add.html:29
 #: templates/teams/settings-projects-edit.html:37
@@ -1246,7 +1045,7 @@ msgstr "Désolé, vous ne possédez pas les autorisations pour modifier ces sous
 msgid "Name"
 msgstr "Nom"
 
-#: apps/teams/views.py:163 amara-enterprise/collab/forms/search.py:59
+#: apps/teams/views.py:163 amara-enterprise/collab/forms/search.py:58
 #: templates/teams/teams-list.html:48
 msgid "Newest"
 msgstr "Plus récents"
@@ -1426,9 +1225,211 @@ msgstr "Quelqu'un est actuellement en train d'éditer %(language)s. Merci de ré
 msgid "Successfully deleted language."
 msgstr "Langue supprimée avec succès."
 
+#: apps/teams/models.py:171
+msgid "Open"
+msgstr "Ouvrir"
+
+#: apps/teams/models.py:172
+msgid "Application"
+msgstr "Formulaire de candidature"
+
+#: apps/teams/models.py:173
+msgid "Invitation by any team member"
+msgstr "Invitation par n’importe quel membre du groupe"
+
+#: apps/teams/models.py:174
+msgid "Invitation by manager"
+msgstr "Invitation par le gestionnaire"
+
+#: apps/teams/models.py:175
+msgid "Invitation by admin"
+msgstr "Invitation par l'admin"
+
+#: apps/teams/models.py:182
+msgid "Any team member"
+msgstr "N’importe quel membre du groupe"
+
+#: apps/teams/models.py:183
+msgid "Managers and admins"
+msgstr "Managers et admins"
+
+#: apps/teams/models.py:184
+msgid "Admins only"
+msgstr "Uniquement les admins."
+
+#: apps/teams/models.py:207
+msgid "Daily"
+msgstr "Quotidiennement"
+
+#: apps/teams/models.py:208
+msgid "Hourly"
+msgstr "Toutes les heures"
+
+#: apps/teams/models.py:211 apps/teams/models.py:3550
+msgid "name"
+msgstr "nom"
+
+#: apps/teams/models.py:212 apps/teams/models.py:3551
+msgid "slug"
+msgstr "\"slug\""
+
+#: apps/teams/models.py:213
+msgid "description"
+msgstr "description"
+
+#: apps/teams/models.py:213
+msgid ""
+"All urls will be converted to links. Line breaks and HTML not supported."
+msgstr "Tous les url vount êtres convertis en lien. Retour à la ligne et HTML 5 non supportés."
+
+#: apps/teams/models.py:215
+msgid "logo"
+msgstr "logo"
+
+#: apps/teams/models.py:219
+msgid "square logo"
+msgstr "Logo carré"
+
+#: apps/teams/models.py:224
+msgid "videos public?"
+msgstr "vidéos publiques ?"
+
+#: apps/teams/models.py:225
+msgid "Sync metadata when available (Youtube)?"
+msgstr ""
+
+#: apps/teams/models.py:226 templates/search/search.html:144
+#: templates/teams/project_list.html:12
+#: templates/videos/featured_videos.html:52
+msgid "videos"
+msgstr "vidéos"
+
+#: apps/teams/models.py:227
+msgid "users"
+msgstr "utilisateurs"
+
+#: apps/teams/models.py:230
+msgid "applicants"
+msgstr "solicitants"
+
+#: apps/teams/models.py:233
+msgid "Intro Video"
+msgstr "Vidéo d'introduction"
+
+#: apps/teams/models.py:235
+msgid "Page content"
+msgstr "Contenu de la page"
+
+#: apps/teams/models.py:235
+msgid "You can use markdown. This will replace Description."
+msgstr "Vous pouvez utiliser Markdown. Ceci remplacera la description."
+
+#: apps/teams/models.py:237
+msgid "HTML that appears at the top of the teams page."
+msgstr "HTML apparaissant en haut de la page de l'équipe."
+
+#: apps/teams/models.py:243
+msgid "authentication provider code"
+msgstr "Authentification requise"
+
+#: apps/teams/models.py:260
+msgid "membership policy"
+msgstr "politique des membres"
+
+#: apps/teams/models.py:263
+msgid "video policy"
+msgstr "politique vidéo"
+
+#: apps/teams/models.py:269
+msgid "task assignment policy"
+msgstr "politique d’attribution de tâche"
+
+#: apps/teams/models.py:272
+msgid "subtitling policy"
+msgstr "police de sous-titrage"
+
+#: apps/teams/models.py:275
+msgid "translation policy"
+msgstr "police de traduction"
+
+#: apps/teams/models.py:278
+msgid "maximum tasks per member"
+msgstr "taches maximum par membre"
+
+#: apps/teams/models.py:280
+msgid "task expiration (days)"
+msgstr "Délai pour accomplir la tâche (jours)"
+
+#: apps/teams/models.py:295 templates/profiles/_teams_list.html:3
+#: templates/teams/teams-list.html:7
+msgid "Teams"
+msgstr "Équipes"
+
+#: apps/teams/models.py:749
+msgid "> 1000"
+msgstr "> 1000"
+
+#: apps/teams/models.py:988
+msgid ""
+"Use this space to explain why you or your team need to caption or subtitle "
+"this video. Adding a note makes volunteers more likely to help out!"
+msgstr "Utiliser cet espace afin d'expliquer pourquoi vous ou votre équipe à besoin de légende ou de sous-titres "
+
+#: apps/teams/models.py:992
+msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
+msgstr "Nous récupérons automatiquement les vignetes pour certains sites, comme Youtube par exemple"
+
+#: apps/teams/models.py:994
+msgid "Need help with all languages"
+msgstr "Besoin d'aide pour toutes les langues"
+
+#: apps/teams/models.py:995
+msgid "If you check this, other languages will not be displayed."
+msgstr "Si vous cochez ceci, les autres langues ne seront pas affichées."
+
+#: apps/teams/models.py:1606
+#, python-format
+msgid "You already have a pending application to %(team)s."
+msgstr "Vous avez déjà une candidature en attente pour %(team)s."
+
+#: apps/teams/models.py:1615
+#, python-format
+msgid "You have been removed from %(team)s."
+msgstr "Vous avez été retiré de %(team)s."
+
+#: apps/teams/models.py:2582
+msgid "Resume"
+msgstr "Reprendre"
+
+#: apps/teams/models.py:2584
+msgid "Start now"
+msgstr "Commencer maintenant"
+
+#: apps/teams/models.py:2782
+#, python-format
+msgid "Help %(team)s reach a world audience"
+msgstr "Aidez %(team)s à obtenir une audience mondiale"
+
+#: apps/teams/permissions.py:748
+#, python-format
+msgid ""
+"These subtitles are moderated. See the %s team page for information on how "
+"to contribute."
+msgstr "Ces sous-titres font l’objet d’une modération. Consultez la page du groupe %s pour savoir comment participer."
+
+#: apps/teams/permissions.py:750
+msgid "Sorry, these subtitles are privately moderated."
+msgstr "Désolé, ces sous-titres sont modérés en privé."
+
+#: apps/teams/permissions.py:780
+msgid ""
+"Sorry, you do not have the permission to edit these subtitles. If you "
+"believe that they need correction, please contact the team administrator."
+msgstr "Désolé, vous ne possédez pas les autorisations pour modifier ces sous-titres. Si vous pensez qu’ils doivent être revus, veuillez écrire à l’administrateur du groupe."
+
 #: apps/teams/templatetags/teams_tags.py:177
-#: amara-enterprise/collab/forms/search.py:193
-#: amara-enterprise/collab/forms/search.py:342
+#: amara-enterprise/collab/forms/search.py:192
+#: amara-enterprise/collab/forms/search.py:334
 #: templates/teams/approvals.html:90 templates/teams/tasks.html:155
 #: templates/teams/tasks.html:256
 #: templates/videos/set-original-language.html:14
@@ -1485,7 +1486,7 @@ msgid "%(user)s added a note while editing %(title)s"
 msgstr "%(user)s a ajouté une note tout en éditant %(title)s"
 
 #: apps/teams/workflows/old/subtitleworkflows.py:183
-#: amara-enterprise/collab/models.py:1213
+#: amara-enterprise/collab/models.py:1370
 #: amara-enterprise/collab/subtitle_workflow.py:320
 #: amara-enterprise/collab/forms/dashboard.py:100
 #: templates/teams/settings-projects-add.html:58
@@ -1534,71 +1535,40 @@ msgstr "La demande a été annullée "
 msgid "Setup needed"
 msgstr "Configuration nécessaire"
 
-#: apps/subtitles/views.py:135 apps/auth/admin.py:96
-#: templates/admin/base_site.html:4 templates/admin/base_site.html:7
-msgid "Amara"
-msgstr "Amara"
-
-#: apps/subtitles/views.py:158
-msgid ""
-"Sorry, you cannot edit these subtitles now because they are being edited by "
-"another user. Please check back later."
-msgstr "Désolé, impossible de modifier ces sous-titres, un autre utilisateur est en train de le faire. Essayer à nouveau plus tard."
-
-#: apps/subtitles/views.py:170 templates/profiles/account.html:218
-#: templates/teams/dashboard.html:88 templates/videos/create.html:24
-#: templates/videos/video-urls-tab.html:48
-msgid "Learn more"
-msgstr "En apprendre plus"
-
-#: apps/subtitles/views.py:173
-#, python-format
-msgid ""
-"Sorry, you do not have permission to edit these subtitles. "
-"(%(learn_more_link)s)"
-msgstr "Désolé, vous n’avez pas la permission de modifier ces sous-titres. (%(learn_more_link)s)"
-
-#: apps/subtitles/views.py:302
-#, python-format
-msgid ""
-"Another user is currently performing the %(task_type)s task for these "
-"subtitles"
-msgstr "Un autre utilisateur effectue actuellement la tâche %(task_type)s sur ces sous-titres."
-
-#: apps/subtitles/forms.py:90
+#: apps/subtitles/forms.py:89
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr "Désolé, nous ne pouvons pas mettre en ligne vos sous-titres car la traduction en cette langue est en cours."
 
-#: apps/subtitles/forms.py:105
+#: apps/subtitles/forms.py:104
 msgid "The language already exists and is not a translation."
 msgstr "La langue existe déjà et il ne s’agit pas d’une traduction."
 
-#: apps/subtitles/forms.py:111
+#: apps/subtitles/forms.py:110
 #, python-format
 msgid "The language already exists as a translation from %(source_lang)s."
 msgstr "La langue éxiste déjà en tant que traduction de lalangue suivante : %(source_lang)s"
 
-#: apps/subtitles/forms.py:129
+#: apps/subtitles/forms.py:128
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr "Désolé, nous ne pouvons pas télécharger vos sous-titres car un autre utilisateur se charge déjà de cette langue. "
 
-#: apps/subtitles/forms.py:136
+#: apps/subtitles/forms.py:135
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr "Désolé, nous ne pouvons pas télécharger vos sous-titres car vous n'avez pas l'autorisation de travailler sur cette langue. "
 
-#: apps/subtitles/forms.py:147
+#: apps/subtitles/forms.py:146
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr "Désolé, nous ne pouvons pas télécharger vos sous-titres car un brouillon est en attente de révision pour cette langue."
 
-#: apps/subtitles/forms.py:157
+#: apps/subtitles/forms.py:156
 #, python-format
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
@@ -1606,73 +1576,132 @@ msgid ""
 "(%(source_lines)s)."
 msgstr "Désolé, nous n'avons pas pu charger vos fichiers car le nombre de lignes dans votre traduction (%(translation_lines)s) ne correspond pas à l'originale (%(source_lines)s)."
 
-#: apps/subtitles/forms.py:169
+#: apps/subtitles/forms.py:168
 #, python-format
 msgid "File size must be less than %(size)s kb."
 msgstr "La taille d’un fichier doit être inférieure à  %(size)s kb."
 
-#: apps/subtitles/forms.py:177
+#: apps/subtitles/forms.py:175
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %(formats)s"
 msgstr "Format non supporté. Merci d’utiliser un de ces formats : %(formats)s"
 
-#: apps/subtitles/forms.py:185
+#: apps/subtitles/forms.py:183
 msgid "Can not detect file encoding"
 msgstr "L'encodage du fichier ne peut pas être détecté"
 
-#: apps/subtitles/forms.py:211
+#: apps/subtitles/forms.py:209
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Quelqu'un sous-titre déjà cette vidéo actuellement. Essayez plus tard."
 
-#: apps/subtitles/forms.py:223
+#: apps/subtitles/forms.py:221
 #, python-format
 msgid "Invalid from language: %(language)s"
 msgstr "Non valide depuis la langue : %(language)s"
 
-#: apps/subtitles/forms.py:228
+#: apps/subtitles/forms.py:226
 #, python-format
 msgid "%(language)s has no public versions"
 msgstr "Aucune version publique pour : %(language)s"
 
-#: apps/subtitles/forms.py:260
+#: apps/subtitles/forms.py:258
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated."
 msgstr "Désolé, impossible de téléverser vos sous-titres car cette langue est modérée."
 
-#: apps/subtitles/models.py:1339
+#: apps/subtitles/models.py:1343
 #: templates/videos/language-revisions-tab.html:42
 msgid "API"
 msgstr "API"
 
-#: apps/subtitles/models.py:1340
+#: apps/subtitles/models.py:1344
 #: templates/videos/language-revisions-tab.html:46
 msgid "Subtitle Editor"
 msgstr "Éditeur de sous-titres"
 
-#: apps/subtitles/models.py:1341
+#: apps/subtitles/models.py:1345
 msgid "Imported"
 msgstr "Importé"
 
-#: apps/subtitles/models.py:1342
+#: apps/subtitles/models.py:1346
 msgid "Rollback"
 msgstr "Réduction"
 
-#: apps/subtitles/models.py:1343
+#: apps/subtitles/models.py:1347
 msgid "Scripted"
 msgstr "Transcrit"
 
-#: apps/subtitles/models.py:1344
+#: apps/subtitles/models.py:1348
 msgid "Tern"
 msgstr "Sterne"
 
-#: apps/subtitles/models.py:1345
+#: apps/subtitles/models.py:1349
 #: templates/videos/language-revisions-tab.html:40
 msgid "Uploaded"
 msgstr "Téléchargé"
 
-#: apps/subtitles/models.py:1346
+#: apps/subtitles/models.py:1350
 msgid "Through web editor"
 msgstr "Via l’éditeur web"
+
+#: apps/subtitles/views.py:142 apps/auth/admin.py:96
+#: templates/admin/base_site.html:4 templates/admin/base_site.html:7
+msgid "Amara"
+msgstr "Amara"
+
+#: apps/subtitles/views.py:165
+msgid ""
+"Sorry, you cannot edit these subtitles now because they are being edited by "
+"another user. Please check back later."
+msgstr "Désolé, impossible de modifier ces sous-titres, un autre utilisateur est en train de le faire. Essayer à nouveau plus tard."
+
+#: apps/subtitles/views.py:177 templates/profiles/account.html:218
+#: templates/teams/dashboard.html:88 templates/videos/create.html:24
+#: templates/videos/video-urls-tab.html:48
+msgid "Learn more"
+msgstr "En apprendre plus"
+
+#: apps/subtitles/views.py:180
+#, python-format
+msgid ""
+"Sorry, you do not have permission to edit these subtitles. "
+"(%(learn_more_link)s)"
+msgstr "Désolé, vous n’avez pas la permission de modifier ces sous-titres. (%(learn_more_link)s)"
+
+#: apps/subtitles/views.py:286
+msgid "Magic"
+msgstr ""
+
+#: apps/subtitles/views.py:287
+msgid "Recommended: magical auto-pause (just keep typing!)"
+msgstr ""
+
+#: apps/subtitles/views.py:292
+msgid "Standard"
+msgstr ""
+
+#: apps/subtitles/views.py:293
+msgid "Standard: no automatic pausing, use TAB key"
+msgstr ""
+
+#: apps/subtitles/views.py:298
+msgid "Beginner"
+msgstr ""
+
+#: apps/subtitles/views.py:299
+msgid "Beginner: play 4 seconds, then pause"
+msgstr ""
+
+#: apps/subtitles/views.py:334
+#, python-format
+msgid ""
+"Another user is currently performing the %(task_type)s task for these "
+"subtitles"
+msgstr "Un autre utilisateur effectue actuellement la tâche %(task_type)s sur ces sous-titres."
+
+#: apps/subtitles/views.py:438
+msgid "You are not allowed to download this subtitle format."
+msgstr ""
 
 #: apps/subtitles/workflows.py:768
 msgid "Publish"
@@ -1696,12 +1725,12 @@ msgid "Notes"
 msgstr "Notes"
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:39
-#: amara-enterprise/collab/models.py:61
+#: amara-enterprise/collab/models.py:62
 msgid "Public"
 msgstr "Public"
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:40
-#: amara-enterprise/collab/models.py:62 templates/teams/teams-list.html:68
+#: amara-enterprise/collab/models.py:63 templates/teams/teams-list.html:68
 msgid "Private"
 msgstr "Privé"
 
@@ -1789,57 +1818,57 @@ msgstr "Retirer l'accès au staff"
 msgid "Hide"
 msgstr "Cacher"
 
-#: apps/auth/models.py:146
+#: apps/auth/models.py:169
 msgid "Retired user"
 msgstr "Usager retiré"
 
-#: apps/auth/models.py:466
+#: apps/auth/models.py:508
 msgid "Add comment"
 msgstr "Ajouter un commentaire"
 
-#: apps/auth/models.py:467
+#: apps/auth/models.py:509
 msgid "Start subtitles"
 msgstr "Démarrer les sous-titres"
 
-#: apps/auth/models.py:468
+#: apps/auth/models.py:510
 msgid "Start translation"
 msgstr "Démarrer la traduction"
 
-#: apps/auth/models.py:469
+#: apps/auth/models.py:511
 msgid "Edit subtitles"
 msgstr "Modifier les sous-titres"
 
-#: apps/auth/models.py:470
+#: apps/auth/models.py:512
 msgid "Edit translation"
 msgstr "Modifier la traduction"
 
-#: apps/auth/models.py:527
+#: apps/auth/models.py:569
 msgid "understand enough"
 msgstr "suffisamment comprise"
 
-#: apps/auth/models.py:528
+#: apps/auth/models.py:570
 msgid "understand 99%"
 msgstr "comprise à 99%"
 
-#: apps/auth/models.py:529
+#: apps/auth/models.py:571
 msgid "write like a native"
 msgstr "écrite comme sa langue maternelle"
 
-#: apps/auth/models.py:537
+#: apps/auth/models.py:579
 msgid "follow requests in language"
 msgstr "Suivre toutes les langues"
 
-#: apps/auth/models.py:552
+#: apps/auth/models.py:594
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr "C'est la date à laquelle commencer à montrer l'avis. Et seul le dernier sera montré."
 
-#: apps/auth/models.py:652
+#: apps/auth/models.py:694
 msgid "e-mail confirmation"
 msgstr "Confirmation de l'e-mail"
 
-#: apps/auth/models.py:653
+#: apps/auth/models.py:695
 msgid "e-mail confirmations"
 msgstr "confirmation e-mail"
 
@@ -1874,10 +1903,6 @@ msgstr "Ce champ est requis."
 #: apps/messages/rpc.py:37 apps/messages/rpc.py:51
 msgid "Message does not exist."
 msgstr "Le message n'existe pas."
-
-#: apps/messages/views.py:203
-msgid "Message sent."
-msgstr "Message envoyé."
 
 #: apps/messages/tasks.py:97
 #, python-format
@@ -1960,6 +1985,10 @@ msgstr "[pas d'objet]"
 #: apps/messages/models.py:205
 msgid "You should enter subject or message."
 msgstr "Vous devez insérer un objet ou un message."
+
+#: apps/messages/views.py:204
+msgid "Message sent."
+msgstr "Message envoyé."
 
 #: apps/videos/metadata.py:57
 msgid "Speaker Name"
@@ -2136,6 +2165,76 @@ msgstr "Merci de bien vérifier la langue source parlée. Vous ne pourrez pas re
 msgid "Your Languages"
 msgstr "Vos langues"
 
+#: apps/videos/views.py:145
+msgid "original"
+msgstr "original"
+
+#: apps/videos/views.py:150
+msgid "incomplete"
+msgstr "incomplet"
+
+#: apps/videos/views.py:158
+msgid "needs review"
+msgstr "à réviser"
+
+#: apps/videos/views.py:161
+msgid "needs approval"
+msgstr "à approuver"
+
+#: apps/videos/views.py:166
+msgid "needs editing"
+msgstr "à éditer"
+
+#: apps/videos/views.py:205
+msgid ""
+"Here is the subtitle workspace for your video.\n"
+"        You can share the video with friends, or get an embed code for your site. To start\n"
+"        new subtitles, click \"Add a new language!\" in the sidebar."
+msgstr "Voici l'espace de travail pour les sous-titres de votre vidéo.\n        Vous pouvez partager cette vidéo avec vos amis, ou obtenir un code d'intégration pour votre site. Pour commencer\n        de nouveaux sous-titres, cliquer sur \"Ajouter une nouvelle langue !\" dans la barre latérale."
+
+#: apps/videos/views.py:213
+msgid ""
+"You have submitted a video\n"
+"                that is served over http.  Your browser may display mixed\n"
+"                content warnings."
+msgstr "Vous avez soumis votre vidéo"
+
+#: apps/videos/views.py:218
+msgid "Existing subtitles will be imported in a few minutes."
+msgstr "Les sous-titres existants seront importés dans quelques minutes."
+
+#: apps/videos/views.py:402
+msgid ""
+"Thank you for uploading. It may take a minute or so for your subtitles to "
+"appear."
+msgstr "Merci du téléchargement sur le serveur. Vos sous-titres s’afficheront dans environ une minute."
+
+#: apps/videos/views.py:538 apps/videos/models.py:460
+#, python-format
+msgid "%(title)s with subtitles | Amara"
+msgstr "%(title)s avec sous-titres | Amara"
+
+#: apps/videos/views.py:661
+msgid "You don't have permission to rollback this language"
+msgstr "Vous n'avez pas la permission de revenir à ce langage"
+
+#: apps/videos/views.py:757
+msgid "You have not permission change this URL"
+msgstr "Vous n'avez pas la permission de changer cette URL"
+
+#: apps/videos/views.py:762 apps/videos/views.py:786
+msgid "Object does not exist"
+msgstr "L'objet n'existe pas"
+
+#: apps/videos/views.py:777
+msgid "You have not permission delete this URL"
+msgstr "Vous n'avez pas la permission pour effacer cette URL"
+
+#: apps/videos/views.py:902
+#, python-format
+msgid "The language for %(video)s has been changed"
+msgstr "La langue de la vidéo %(video)s a été modifiée"
+
 #: apps/videos/models.py:340
 msgid "in seconds"
 msgstr "en secondes"
@@ -2143,11 +2242,6 @@ msgstr "en secondes"
 #: apps/videos/models.py:377
 msgid "Views"
 msgstr "Vues"
-
-#: apps/videos/models.py:460 apps/videos/views.py:536
-#, python-format
-msgid "%(title)s with subtitles | Amara"
-msgstr "%(title)s avec sous-titres | Amara"
 
 #: apps/videos/models.py:651
 msgid "No Video URL"
@@ -2369,93 +2463,28 @@ msgstr "supprimer l’url"
 msgid "Video already exist on Amara"
 msgstr "La vidéo existe déjà sur Amara"
 
-#: apps/videos/models.py:2106
+#: apps/videos/models.py:2109
 msgid "Unknown video type"
 msgstr "Type de vidéo inconnu"
 
-#: apps/videos/models.py:2116
+#: apps/videos/models.py:2119
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
 "system. You can't add it as a secondary URL."
 msgstr "Cette URL <a href=\"%(url)s\">existe</a> déjà comme sa propre vidéo sur notre système. Vous ne pouvez l'ajouter comme une seconde URL."
 
-#: apps/videos/models.py:2150
+#: apps/videos/models.py:2153
 msgid "Can't remove the primary video URL"
 msgstr "Supprimer l’adresse URL principale est impossible."
-
-#: apps/videos/views.py:143
-msgid "original"
-msgstr "original"
-
-#: apps/videos/views.py:148
-msgid "incomplete"
-msgstr "incomplet"
-
-#: apps/videos/views.py:156
-msgid "needs review"
-msgstr "à réviser"
-
-#: apps/videos/views.py:159
-msgid "needs approval"
-msgstr "à approuver"
-
-#: apps/videos/views.py:164
-msgid "needs editing"
-msgstr "à éditer"
-
-#: apps/videos/views.py:203
-msgid ""
-"Here is the subtitle workspace for your video.\n"
-"        You can share the video with friends, or get an embed code for your site. To start\n"
-"        new subtitles, click \"Add a new language!\" in the sidebar."
-msgstr "Voici l'espace de travail pour les sous-titres de votre vidéo.\n        Vous pouvez partager cette vidéo avec vos amis, ou obtenir un code d'intégration pour votre site. Pour commencer\n        de nouveaux sous-titres, cliquer sur \"Ajouter une nouvelle langue !\" dans la barre latérale."
-
-#: apps/videos/views.py:211
-msgid ""
-"You have submitted a video\n"
-"                that is served over http.  Your browser may display mixed\n"
-"                content warnings."
-msgstr "Vous avez soumis votre vidéo"
-
-#: apps/videos/views.py:216
-msgid "Existing subtitles will be imported in a few minutes."
-msgstr "Les sous-titres existants seront importés dans quelques minutes."
-
-#: apps/videos/views.py:400
-msgid ""
-"Thank you for uploading. It may take a minute or so for your subtitles to "
-"appear."
-msgstr "Merci du téléchargement sur le serveur. Vos sous-titres s’afficheront dans environ une minute."
-
-#: apps/videos/views.py:654
-msgid "You don't have permission to rollback this language"
-msgstr "Vous n'avez pas la permission de revenir à ce langage"
-
-#: apps/videos/views.py:750
-msgid "You have not permission change this URL"
-msgstr "Vous n'avez pas la permission de changer cette URL"
-
-#: apps/videos/views.py:755 apps/videos/views.py:779
-msgid "Object does not exist"
-msgstr "L'objet n'existe pas"
-
-#: apps/videos/views.py:770
-msgid "You have not permission delete this URL"
-msgstr "Vous n'avez pas la permission pour effacer cette URL"
-
-#: apps/videos/views.py:895
-#, python-format
-msgid "The language for %(video)s has been changed"
-msgstr "La langue de la vidéo %(video)s a été modifiée"
 
 #: apps/videos/feed_parser/parser.py:108
 msgid "Feed is unavailable now."
 msgstr "Le fil est indisponible maintenant."
 
 #: apps/videos/templatetags/videos_tags.py:125
-#: amara-enterprise/collab/forms/search.py:205
-#: amara-enterprise/collab/forms/search.py:354
+#: amara-enterprise/collab/forms/search.py:204
+#: amara-enterprise/collab/forms/search.py:346
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -2854,369 +2883,405 @@ msgstr "Cette valeur peut contenir uniquement des lettres, des nombres et les ca
 msgid "The %(team)s team has a new assignment!"
 msgstr ""
 
-#: amara-enterprise/collab/const.py:51 amara-enterprise/providers/forms.py:155
+#: amara-enterprise/collab/startup.py:13
+msgid "Collab"
+msgstr ""
+
+#: amara-enterprise/collab/startup.py:13
+msgid "Evaluation Teams"
+msgstr ""
+
+#: amara-enterprise/collab/team_workflow.py:21
+#: amara-enterprise/collab/forms/search.py:190
+#: amara-enterprise/collab/forms/search.py:332
+#: amara-enterprise/collab/templates/collab/_collab-search-form.html:5
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:9
+#: amara-enterprise/collab/templates/collab/evaluate.html:13
+msgid "Collaboration"
+msgstr "Collaboration"
+
+#: amara-enterprise/collab/team_workflow.py:46
+#: amara-enterprise/collab/views.py:120 amara-enterprise/collab/views.py:374
+#: amara-enterprise/collab/views.py:454 amara-enterprise/collab/views.py:465
+#: amara-enterprise/collab/templates/collab/collaborations.html:7
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:35
+msgid "Collaborations"
+msgstr "Collaborations"
+
+#: amara-enterprise/collab/team_workflow.py:107
+msgid "Customer"
+msgstr "Consommateur"
+
+#: amara-enterprise/collab/const.py:98 amara-enterprise/providers/forms.py:155
 msgid "Any Duration"
 msgstr "Toute durée"
 
-#: amara-enterprise/collab/const.py:52
+#: amara-enterprise/collab/const.py:99
 msgid "Short (0-10 minutes)"
 msgstr "Court (0-10 minutes)"
 
-#: amara-enterprise/collab/const.py:53
+#: amara-enterprise/collab/const.py:100
 msgid "Medium (10-30 minutes)"
 msgstr "Moyen (10-30 minutes)"
 
-#: amara-enterprise/collab/const.py:54
+#: amara-enterprise/collab/const.py:101
 msgid "Long (> 30 minutes)"
 msgstr "Long (plus de 30 minutes)"
 
-#: amara-enterprise/collab/models.py:64
+#: amara-enterprise/collab/models.py:65
 msgid "Private until the collaboration is complete"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:70
+#: amara-enterprise/collab/models.py:71
 msgid "Show collabs for all Languages"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:71
+#: amara-enterprise/collab/models.py:72
 msgid "Show collabs for user's languages"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:527
-#: amara-enterprise/collab/models.py:1979
+#: amara-enterprise/collab/models.py:626
+#: amara-enterprise/collab/models.py:2085
 #, python-format
 msgid "%(language)s captions"
 msgstr "Sous-titres en %(language)s"
 
-#: amara-enterprise/collab/models.py:529
-#: amara-enterprise/collab/models.py:1981
+#: amara-enterprise/collab/models.py:628
+#: amara-enterprise/collab/models.py:2087
 #, python-format
 msgid "%(language)s translation"
 msgstr "traduction en %(language)s"
 
-#: amara-enterprise/collab/models.py:545
+#: amara-enterprise/collab/models.py:644
 msgid "Now"
 msgstr "Maintenant"
 
-#: amara-enterprise/collab/models.py:848
-#: amara-enterprise/collab/models.py:1467
+#: amara-enterprise/collab/models.py:969
+#: amara-enterprise/collab/models.py:1569
 msgid "Subtitler"
 msgstr "Sous-titreur"
 
-#: amara-enterprise/collab/models.py:850
-#: amara-enterprise/collab/models.py:1468
+#: amara-enterprise/collab/models.py:971
+#: amara-enterprise/collab/models.py:1570
 msgid "Reviewer"
 msgstr "Relecteur"
 
-#: amara-enterprise/collab/models.py:852
-#: amara-enterprise/collab/models.py:1469
+#: amara-enterprise/collab/models.py:973
+#: amara-enterprise/collab/models.py:1571
 msgid "Approver"
 msgstr "Approuveur"
 
-#: amara-enterprise/collab/models.py:858 templates/profiles/dashboard.html:67
+#: amara-enterprise/collab/models.py:979 templates/profiles/dashboard.html:67
 #: templates/teams/_perform_task_link.html:11
 #, python-format
 msgid "Create %(language)s subtitles"
 msgstr "Créer des sous-titres en %(language)s"
 
-#: amara-enterprise/collab/models.py:860
+#: amara-enterprise/collab/models.py:981
 #, python-format
 msgid "Review %(language)s subtitles"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:862
+#: amara-enterprise/collab/models.py:983
 #, python-format
 msgid "Approve %(language)s subtitles"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1195
-msgid "Main"
+#: amara-enterprise/collab/models.py:1350
+msgid "Local"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1197
-msgid "Current"
+#: amara-enterprise/collab/models.py:1351
+msgid "Incoming"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1199
-#: amara-enterprise/billing/templatetags/billing.py:28
-msgid "Completed"
-msgstr "Complété"
-
-#: amara-enterprise/collab/models.py:1201
-msgid "Remote"
+#: amara-enterprise/collab/models.py:1352
+msgid "Outgoing"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1203
-msgid "Current Evaluations"
+#: amara-enterprise/collab/models.py:1353
+msgid "Evaluations"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1211 templates/teams/tasks.html:69
+#: amara-enterprise/collab/models.py:1357
+msgid "In Progress"
+msgstr ""
+
+#: amara-enterprise/collab/models.py:1359
+msgid "upcoming"
+msgstr ""
+
+#: amara-enterprise/collab/models.py:1360
+msgid "In Evaluation"
+msgstr ""
+
+#: amara-enterprise/collab/models.py:1368 templates/teams/tasks.html:69
 #: templates/teams/tasks.html:229
 msgid "Transcribe"
 msgstr "Transcrire"
 
-#: amara-enterprise/collab/models.py:1212 templates/teams/tasks.html:71
+#: amara-enterprise/collab/models.py:1369 templates/teams/tasks.html:71
 #: templates/editor/workflow-normal.html:5
 #: amara-enterprise/services/templates/services/translation_request.html:7
 msgid "Translate"
 msgstr "Traduire"
 
-#: amara-enterprise/collab/models.py:1215
+#: amara-enterprise/collab/models.py:1372
 msgid "Evaluate"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1470
+#: amara-enterprise/collab/models.py:1572
 #: amara-enterprise/collab/subtitle_workflow.py:325
 #: amara-enterprise/collab/templates/collab/evaluate-video.html:20
 msgid "Evaluator"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1471
+#: amara-enterprise/collab/models.py:1573
 msgid "Evaluator #2"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1472
+#: amara-enterprise/collab/models.py:1574
 msgid "Evaluator #3"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1588
+#: amara-enterprise/collab/models.py:1694
 msgid "transcribe"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1590
+#: amara-enterprise/collab/models.py:1696
 msgid "translate"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1592
+#: amara-enterprise/collab/models.py:1698
 msgid "review"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1594
+#: amara-enterprise/collab/models.py:1700
 msgid "approve"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1596
+#: amara-enterprise/collab/models.py:1702
 msgid "evaluate"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1598
+#: amara-enterprise/collab/models.py:1704
 msgid "evaluate #2"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1600
+#: amara-enterprise/collab/models.py:1706
 msgid "evaluate #3"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1602
-#: amara-enterprise/collab/models.py:1630
+#: amara-enterprise/collab/models.py:1708
+#: amara-enterprise/collab/models.py:1736
 msgid "unknown"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1616
+#: amara-enterprise/collab/models.py:1722
 msgid "transcriber"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1618
+#: amara-enterprise/collab/models.py:1724
 msgid "translator"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1620
-#: amara-enterprise/collab/models.py:1968
+#: amara-enterprise/collab/models.py:1726
+#: amara-enterprise/collab/models.py:2074
 msgid "reviewer"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1622
-#: amara-enterprise/collab/models.py:1969
+#: amara-enterprise/collab/models.py:1728
+#: amara-enterprise/collab/models.py:2075
 msgid "approver"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1624
+#: amara-enterprise/collab/models.py:1730
 msgid "evaluator"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1626
+#: amara-enterprise/collab/models.py:1732
 msgid "evaluator #2"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1628
+#: amara-enterprise/collab/models.py:1734
 msgid "evaluator #3"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1638
+#: amara-enterprise/collab/models.py:1744
 msgid "Collaboration joined"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1641
+#: amara-enterprise/collab/models.py:1747
 #, python-format
 msgid ""
 "started working as %(role)s on %(language)s for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1648
+#: amara-enterprise/collab/models.py:1754
 msgid "Collaboration left"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1651
+#: amara-enterprise/collab/models.py:1757
 #, python-format
 msgid ""
 "stopped working as %(role)s on %(language)s for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1658
+#: amara-enterprise/collab/models.py:1764
 msgid "Collaboration assigned"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1663
+#: amara-enterprise/collab/models.py:1769
 #, python-format
 msgid ""
 "assigned the %(language)s %(assignment_type)s assignment to %(assignee)s for"
 " <a href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1673
+#: amara-enterprise/collab/models.py:1779
 msgid "Collaboration reassigned"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1678
+#: amara-enterprise/collab/models.py:1784
 #, python-format
 msgid ""
 "reassigned the %(language)s %(assignment_type)s assignment to %(assignee)s "
 "for <a href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1688
+#: amara-enterprise/collab/models.py:1794
 msgid "Collaboration unassigned"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1693
+#: amara-enterprise/collab/models.py:1799
 #, python-format
 msgid ""
 "unassigned the %(language)s %(assignment_type)s assignment from %(assignee)s"
 " for <a href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1703
+#: amara-enterprise/collab/models.py:1809
 msgid "Collaboration endorsed"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1706
+#: amara-enterprise/collab/models.py:1812
 #, python-format
 msgid ""
 "endorsed the %(language)s subtitles for <a "
 "href=\"%(video_url)s\">%(video)s</a> (%(role)s)"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1715
+#: amara-enterprise/collab/models.py:1821
 msgid "Collaboration sent back"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1718
+#: amara-enterprise/collab/models.py:1824
 #, python-format
 msgid ""
 "sent back the %(language)s subtitles for <a "
 "href=\"%(video_url)s\">%(video)s</a> (%(role)s)"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1727
+#: amara-enterprise/collab/models.py:1833
 msgid "Collaboration marked complete"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1730
+#: amara-enterprise/collab/models.py:1836
 #, python-format
 msgid ""
 "marked the %(language)s subtitles complete for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1736
+#: amara-enterprise/collab/models.py:1842
 msgid "Collaboration moved from team"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1740
+#: amara-enterprise/collab/models.py:1846
 #, python-format
 msgid ""
 "moved the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a> to %(new_team)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1748
+#: amara-enterprise/collab/models.py:1854
 msgid "Collaboration moved to team"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1752
+#: amara-enterprise/collab/models.py:1858
 #, python-format
 msgid ""
 "moved the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a> from %(old_team)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1760
+#: amara-enterprise/collab/models.py:1866
 msgid "Collaboration deleted"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1763
+#: amara-enterprise/collab/models.py:1869
 #, python-format
 msgid ""
 "Deleted the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1769
+#: amara-enterprise/collab/models.py:1875
 msgid "Collaboration accepted by provider"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1772
+#: amara-enterprise/collab/models.py:1878
 #, python-format
 msgid ""
 "provider accepted the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1778
+#: amara-enterprise/collab/models.py:1884
 msgid "Collaboration submitted by provider"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1781
+#: amara-enterprise/collab/models.py:1887
 #, python-format
 msgid ""
 "provider submitted the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1787
+#: amara-enterprise/collab/models.py:1893
 msgid "Collaboration unassigned from provider"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1790
+#: amara-enterprise/collab/models.py:1896
 #, python-format
 msgid ""
 "unassigned the provider for the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1915
+#: amara-enterprise/collab/models.py:2021
 #: templates/messages/email/team-you-have-been-invited.html:19
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:31
 msgid "Join"
 msgstr "Rejoindre"
 
-#: amara-enterprise/collab/models.py:1916
+#: amara-enterprise/collab/models.py:2022
 #: amara-enterprise/collab/templates/collab/leave-collaboration.html:14
 msgid "Leave"
 msgstr "Quitter"
 
-#: amara-enterprise/collab/models.py:1917 templates/teams/tasks.html:507
+#: amara-enterprise/collab/models.py:2023 templates/teams/tasks.html:507
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:25
 msgid "Assign"
 msgstr "Assigner"
 
-#: amara-enterprise/collab/models.py:1918
+#: amara-enterprise/collab/models.py:2024
 msgid "Re-Assign"
 msgstr "Re-assigner"
 
-#: amara-enterprise/collab/models.py:1919 templates/profiles/account.html:83
+#: amara-enterprise/collab/models.py:2025 templates/profiles/account.html:83
 #: templates/profiles/account.html:94
 #: templates/teams/_team_video_detail.html:56
 #: templates/teams/_team_video_summary.html:56
@@ -3231,21 +3296,21 @@ msgstr "Re-assigner"
 msgid "Remove"
 msgstr "Supprimer"
 
-#: amara-enterprise/collab/models.py:1920
+#: amara-enterprise/collab/models.py:2026
 msgid "Endorsement"
 msgstr "Endossement"
 
-#: amara-enterprise/collab/models.py:1921
+#: amara-enterprise/collab/models.py:2027
 #: amara-enterprise/collab/subtitle_workflow.py:133
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:122
 msgid "Send back"
 msgstr "Renvoyer"
 
-#: amara-enterprise/collab/models.py:1922
+#: amara-enterprise/collab/models.py:2028
 msgid "Mark complete"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1923 templates/new-teams/videos.html:101
+#: amara-enterprise/collab/models.py:2029 templates/new-teams/videos.html:101
 #: templates/new-teams/videos-forms/move.html:32
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:8
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:82
@@ -3253,158 +3318,158 @@ msgstr ""
 msgid "Move"
 msgstr "Déplacer"
 
-#: amara-enterprise/collab/models.py:1924
+#: amara-enterprise/collab/models.py:2030
 msgid "Delete collaboration"
 msgstr "Supprimer la collaboration"
 
-#: amara-enterprise/collab/models.py:1925
+#: amara-enterprise/collab/models.py:2031
 msgid "Provider Accept"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1926
+#: amara-enterprise/collab/models.py:2032
 msgid "Provider Submit"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1927
+#: amara-enterprise/collab/models.py:2033
 msgid "Unassign Provider"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1953
+#: amara-enterprise/collab/models.py:2059
 #: amara-enterprise/collab/templates/collab/video-collaborations-rows.html:26
 msgid "join"
 msgstr "rejoindre"
 
-#: amara-enterprise/collab/models.py:1954
+#: amara-enterprise/collab/models.py:2060
 msgid "leave"
 msgstr "quitter"
 
-#: amara-enterprise/collab/models.py:1955
+#: amara-enterprise/collab/models.py:2061
 msgid "assign"
 msgstr "assigner"
 
-#: amara-enterprise/collab/models.py:1956
+#: amara-enterprise/collab/models.py:2062
 msgid "remove"
 msgstr "supprimer"
 
-#: amara-enterprise/collab/models.py:1957
+#: amara-enterprise/collab/models.py:2063
 msgid "endorsement"
 msgstr "Endossement"
 
-#: amara-enterprise/collab/models.py:1958
+#: amara-enterprise/collab/models.py:2064
 msgid "send back"
 msgstr "renvoi"
 
-#: amara-enterprise/collab/models.py:1959
+#: amara-enterprise/collab/models.py:2065
 msgid "mark complete"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1960
+#: amara-enterprise/collab/models.py:2066
 msgid "move"
 msgstr "déplacer"
 
-#: amara-enterprise/collab/models.py:1961
+#: amara-enterprise/collab/models.py:2067
 msgid "delete collaboration"
 msgstr "supprimer la collaboration"
 
-#: amara-enterprise/collab/models.py:1967
+#: amara-enterprise/collab/models.py:2073
 msgid "subtitler"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2001
+#: amara-enterprise/collab/models.py:2107
 #, python-format
 msgid "%(action)s by %(role)s "
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2005
+#: amara-enterprise/collab/models.py:2111
 #, python-format
 msgid "Admin move to %(team)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2008
+#: amara-enterprise/collab/models.py:2114
 msgid "Joined Collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2010
+#: amara-enterprise/collab/models.py:2116
 msgid "Left Collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2012
+#: amara-enterprise/collab/models.py:2118
 #: amara-enterprise/collab/forms/admin.py:222
 #, python-format
 msgid "Assigned %(user)s as %(role)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2016
+#: amara-enterprise/collab/models.py:2122
 #, python-format
 msgid "Re-assigned %(user)s as %(role)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2020
+#: amara-enterprise/collab/models.py:2126
 #, python-format
 msgid "Removed %(user)s (%(role)s)"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2025
+#: amara-enterprise/collab/models.py:2131
 msgid "Provider accepted job"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2030
-#: amara-enterprise/collab/models.py:2033
-#: amara-enterprise/collab/models.py:2081
+#: amara-enterprise/collab/models.py:2136
+#: amara-enterprise/collab/models.py:2139
+#: amara-enterprise/collab/models.py:2187
 msgid "Provider submitted subtitles"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2035
+#: amara-enterprise/collab/models.py:2141
 #, python-format
 msgid "Unassigned provider: %(user)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2043
+#: amara-enterprise/collab/models.py:2149
 #, python-format
 msgid "%(role)s %(action)s by %(user)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2048
+#: amara-enterprise/collab/models.py:2154
 #, python-format
 msgid "Move to %(team)s by %(user)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2051
+#: amara-enterprise/collab/models.py:2157
 #, python-format
 msgid "%(user)s joined as %(role)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2054
+#: amara-enterprise/collab/models.py:2160
 #, python-format
 msgid "%(user)s left (%(role)s)"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2058
+#: amara-enterprise/collab/models.py:2164
 #, python-format
 msgid "%(user)s assigned %(other_user)s as %(role)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2063
+#: amara-enterprise/collab/models.py:2169
 #, python-format
 msgid "%(user)s re-assigned %(other_user)s as %(role)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2068
+#: amara-enterprise/collab/models.py:2174
 #, python-format
 msgid "%(user)s removed %(other_user)s (%(role)s)"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2073
+#: amara-enterprise/collab/models.py:2179
 #, python-format
 msgid "Provider %(user)s accepted job"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2078
+#: amara-enterprise/collab/models.py:2184
 #, python-format
 msgid "Provider %(user)s submitted subtitles"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2084
+#: amara-enterprise/collab/models.py:2190
 #, python-format
 msgid "%(user)s unassigned provider %(other_user)s"
 msgstr ""
@@ -3510,36 +3575,28 @@ msgid ""
 "Endorse/Send back when done, or Save Draft to finish later"
 msgstr "Visionner la vidéo et vérifier que les sous-titres sont corrects. Cliquer sur le bouton « Endosser »"
 
-#: amara-enterprise/collab/views.py:54 amara-enterprise/collab/views.py:72
+#: amara-enterprise/collab/views.py:55 amara-enterprise/collab/views.py:73
 #: templates/teams/_subnav_settings.html:14
 msgid "Workflows"
 msgstr " flux"
 
-#: amara-enterprise/collab/views.py:85
+#: amara-enterprise/collab/views.py:86
 msgid "Collaboration created"
 msgstr "Collaboration crée"
 
-#: amara-enterprise/collab/views.py:119 amara-enterprise/collab/views.py:373
-#: amara-enterprise/collab/views.py:454 amara-enterprise/collab/views.py:465
-#: amara-enterprise/collab/team_workflow.py:46
-#: amara-enterprise/collab/templates/collab/collaborations.html:7
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:26
-msgid "Collaborations"
-msgstr "Collaborations"
-
-#: amara-enterprise/collab/views.py:150
+#: amara-enterprise/collab/views.py:151
 msgid "You have already endorsed the collaboration"
 msgstr "Vous avez déjà endossé cette collaboration"
 
-#: amara-enterprise/collab/views.py:217
+#: amara-enterprise/collab/views.py:218
 msgid "Dashboard updated"
 msgstr "Tableau de bord mis à jour"
 
-#: amara-enterprise/collab/views.py:280
+#: amara-enterprise/collab/views.py:281
 msgid "Your assignments (note: collaborations only)"
 msgstr ""
 
-#: amara-enterprise/collab/views.py:322
+#: amara-enterprise/collab/views.py:323
 msgid "Languages updated"
 msgstr "langues mises à jour"
 
@@ -3557,37 +3614,16 @@ msgstr "Activité pour %(project)s"
 msgid "Activity for %(language)s"
 msgstr "Activité en %(language)s"
 
-#: amara-enterprise/collab/views.py:544 amara-enterprise/ondemand/views.py:27
-#: amara-enterprise/ondemand/views.py:45 amara-enterprise/ondemand/views.py:69
-#: amara-enterprise/ondemand/views.py:93
-#: amara-enterprise/ondemand/views.py:130
+#: amara-enterprise/collab/views.py:544 amara-enterprise/ondemand/views.py:29
+#: amara-enterprise/ondemand/views.py:47 amara-enterprise/ondemand/views.py:71
+#: amara-enterprise/ondemand/views.py:95
+#: amara-enterprise/ondemand/views.py:132
 msgid "Staff Dashboard"
 msgstr ""
 
 #: amara-enterprise/collab/views.py:545
 msgid "Bulk set evaluation teams"
 msgstr ""
-
-#: amara-enterprise/collab/startup.py:13
-msgid "Collab"
-msgstr ""
-
-#: amara-enterprise/collab/startup.py:13
-msgid "Evaluation Teams"
-msgstr ""
-
-#: amara-enterprise/collab/team_workflow.py:21
-#: amara-enterprise/collab/forms/search.py:191
-#: amara-enterprise/collab/forms/search.py:340
-#: amara-enterprise/collab/templates/collab/_collab-search-form.html:5
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:9
-#: amara-enterprise/collab/templates/collab/evaluate.html:13
-msgid "Collaboration"
-msgstr "Collaboration"
-
-#: amara-enterprise/collab/team_workflow.py:107
-msgid "Customer"
-msgstr "Consommateur"
 
 #: amara-enterprise/collab/forms/create.py:23
 #: amara-enterprise/providers/forms.py:161 templates/teams/approvals.html:92
@@ -3639,6 +3675,27 @@ msgstr ""
 msgid "Dashboard default config"
 msgstr ""
 
+#: amara-enterprise/collab/forms/dashboard.py:21
+#: amara-enterprise/collab/forms/dashboard.py:27
+msgid "You must select at least one language"
+msgstr "Vous devez sélectionner au moins une langue"
+
+#: amara-enterprise/collab/forms/dashboard.py:58
+msgid "Any Project"
+msgstr "N'importe quel projet"
+
+#: amara-enterprise/collab/forms/dashboard.py:59
+msgid "No project"
+msgstr "Pas de projet"
+
+#: amara-enterprise/collab/forms/dashboard.py:82
+msgid "All languages"
+msgstr "Toutes les langues"
+
+#: amara-enterprise/collab/forms/dashboard.py:99
+msgid "Subtitle creation"
+msgstr "Création de sous-titres"
+
 #: amara-enterprise/collab/forms/admin.py:33
 msgid "Include collaborations on other pages"
 msgstr ""
@@ -3673,17 +3730,17 @@ msgid "User not a team member"
 msgstr "Cet utilisateur n’est pas un membre de l’équipe"
 
 #: amara-enterprise/collab/forms/admin.py:212
-#: amara-enterprise/collab/forms/admin.py:263
+#: amara-enterprise/collab/forms/admin.py:264
 msgid "User already assigned"
 msgstr "Utilisateur déjà assigné"
 
 #: amara-enterprise/collab/forms/admin.py:228
-#: amara-enterprise/collab/forms/admin.py:289
+#: amara-enterprise/collab/forms/admin.py:298
 msgid "Select user to remove"
 msgstr "Sélectionner l’utlisateur à supprimer"
 
 #: amara-enterprise/collab/forms/admin.py:230
-#: amara-enterprise/collab/forms/admin.py:291
+#: amara-enterprise/collab/forms/admin.py:300
 msgid "No user selected."
 msgstr "Aucun utilisateur sélectionné."
 
@@ -3692,129 +3749,111 @@ msgid "Select new user to assign (optional)"
 msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:252
-#: amara-enterprise/collab/forms/admin.py:302
+#: amara-enterprise/collab/forms/admin.py:311
 msgid "User not assigned"
 msgstr "Utilisateur non assigné"
 
-#: amara-enterprise/collab/forms/admin.py:279
+#: amara-enterprise/collab/forms/admin.py:288
 #, python-format
 msgid "Assigned %(new_user)s as %(role)s, replacing %(removed_user)s."
 msgstr ""
 
-#: amara-enterprise/collab/forms/admin.py:284
+#: amara-enterprise/collab/forms/admin.py:293
 #, python-format
 msgid "Removed %(removed_user)s from collaboration"
 msgstr "Utilisateur %(removed_user)s retiré de la collaboration"
 
-#: amara-enterprise/collab/forms/admin.py:311
+#: amara-enterprise/collab/forms/admin.py:320
 #, python-format
 msgid "Removed %(user)s from collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/forms/admin.py:319
+#: amara-enterprise/collab/forms/admin.py:328
 msgid "Unassigned provider from collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/forms/admin.py:326
+#: amara-enterprise/collab/forms/admin.py:335
 msgid "Collaboration sent back to provider"
 msgstr ""
 
-#: amara-enterprise/collab/forms/dashboard.py:21
-#: amara-enterprise/collab/forms/dashboard.py:27
-msgid "You must select at least one language"
-msgstr "Vous devez sélectionner au moins une langue"
-
-#: amara-enterprise/collab/forms/dashboard.py:58
-msgid "Any Project"
-msgstr "N'importe quel projet"
-
-#: amara-enterprise/collab/forms/dashboard.py:59
-msgid "No project"
-msgstr "Pas de projet"
-
-#: amara-enterprise/collab/forms/dashboard.py:82
-msgid "All languages"
-msgstr "Toutes les langues"
-
-#: amara-enterprise/collab/forms/dashboard.py:99
-msgid "Subtitle creation"
-msgstr "Création de sous-titres"
-
-#: amara-enterprise/collab/forms/search.py:28
-#: amara-enterprise/collab/forms/search.py:264
+#: amara-enterprise/collab/forms/search.py:27
 msgid "All States"
 msgstr "Tous les états"
 
-#: amara-enterprise/collab/forms/search.py:29
+#: amara-enterprise/collab/forms/search.py:28
 msgid "Incomplete"
 msgstr "Incomplet"
 
-#: amara-enterprise/collab/forms/search.py:30
+#: amara-enterprise/collab/forms/search.py:29
 msgid "Needs User"
 msgstr "A besoin d’utilisateurs"
 
-#: amara-enterprise/collab/forms/search.py:47
+#: amara-enterprise/collab/forms/search.py:46
 msgid "project slug"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:60
+#: amara-enterprise/collab/forms/search.py:59
 msgid "Oldest"
 msgstr "Le plus vieux"
 
-#: amara-enterprise/collab/forms/search.py:73
+#: amara-enterprise/collab/forms/search.py:72
 msgid "Earliest due"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:74
+#: amara-enterprise/collab/forms/search.py:73
 msgid "Latest due"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:98
-#: amara-enterprise/collab/forms/search.py:292
+#: amara-enterprise/collab/forms/search.py:97
+#: amara-enterprise/collab/forms/search.py:289
 msgid "Any Language"
 msgstr "N'importe quelle langue"
 
-#: amara-enterprise/collab/forms/search.py:99
-#: amara-enterprise/collab/forms/search.py:103
+#: amara-enterprise/collab/forms/search.py:98
+#: amara-enterprise/collab/forms/search.py:102
 msgid "My Languages"
 msgstr "Mes langues"
 
-#: amara-enterprise/collab/forms/search.py:102
-#: amara-enterprise/collab/forms/search.py:295
+#: amara-enterprise/collab/forms/search.py:101
+#: amara-enterprise/collab/forms/search.py:292
 msgid "Any Video Language"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:197
-#: amara-enterprise/collab/forms/search.py:346
+#: amara-enterprise/collab/forms/search.py:196
+#: amara-enterprise/collab/forms/search.py:338
 msgid "Assigned user"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:199
-#: amara-enterprise/collab/forms/search.py:348
+#: amara-enterprise/collab/forms/search.py:198
+#: amara-enterprise/collab/forms/search.py:340
 #: amara-enterprise/collab/templates/collab/_collab-search-form.html:23
 #: amara-enterprise/collab/templates/collab/_collaborations-list.html:39
 msgid "Sort"
 msgstr "Tri"
 
-#: amara-enterprise/collab/forms/search.py:201
-#: amara-enterprise/collab/forms/search.py:350
+#: amara-enterprise/collab/forms/search.py:200
+#: amara-enterprise/collab/forms/search.py:342
 #: amara-enterprise/collab/templates/collab/_collaborations-list.html:28
 #: amara-enterprise/collab/templates/collab/collaboration-state-line.html:35
 msgid "Provider"
 msgstr "Fournisseur"
 
-#: amara-enterprise/collab/forms/search.py:203
-#: amara-enterprise/collab/forms/search.py:352
+#: amara-enterprise/collab/forms/search.py:202
+#: amara-enterprise/collab/forms/search.py:344
 #: amara-enterprise/billing/templatetags/billing.py:16
 msgid "Work team"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:265
-msgid "Needs Evaluator"
+#: amara-enterprise/collab/forms/search.py:261
+msgid "Any Status"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:266
-msgid "Being Evaluated"
+#: amara-enterprise/collab/forms/search.py:262
+msgid "Evaluation Available"
+msgstr ""
+
+#: amara-enterprise/collab/forms/search.py:263
+msgid "Evaluation Assigned"
 msgstr ""
 
 #: amara-enterprise/ensemble/workflow.py:14
@@ -4275,6 +4314,10 @@ msgstr ""
 msgid "Started"
 msgstr "Démarré"
 
+#: amara-enterprise/billing/templatetags/billing.py:28
+msgid "Completed"
+msgstr "Complété"
+
 #: amara-enterprise/ondemand/startup.py:7 templates/new-user-menu.html:8
 #: templates/profiles/_user_menu.html:14 templates/profiles/dashboard.html:9
 #: templates/teams/_tabs.html:7 templates/teams/dashboard.html:7
@@ -4300,29 +4343,29 @@ msgstr ""
 msgid "Language codes (separated by spaces)"
 msgstr ""
 
-#: amara-enterprise/ondemand/views.py:28 amara-enterprise/ondemand/views.py:46
-#: amara-enterprise/ondemand/views.py:70 amara-enterprise/ondemand/views.py:94
-#: amara-enterprise/ondemand/views.py:131
+#: amara-enterprise/ondemand/views.py:30 amara-enterprise/ondemand/views.py:48
+#: amara-enterprise/ondemand/views.py:72 amara-enterprise/ondemand/views.py:96
+#: amara-enterprise/ondemand/views.py:133
 msgid "On Demand Dashboard"
 msgstr "Tableau de bord On Demand"
 
-#: amara-enterprise/ondemand/views.py:47
+#: amara-enterprise/ondemand/views.py:49
 #: amara-enterprise/ondemand/templates/ondemand/edit-batch.html:21
 msgid "Create Batch"
 msgstr ""
 
-#: amara-enterprise/ondemand/views.py:71
+#: amara-enterprise/ondemand/views.py:73
 msgid "Edit Batch"
 msgstr "Modifier la tâche"
 
-#: amara-enterprise/ondemand/views.py:83
+#: amara-enterprise/ondemand/views.py:85
 msgid ""
 "Your collaborations are being created.  An email will be sent when the "
 "process completes"
 msgstr ""
 
-#: amara-enterprise/ondemand/views.py:95
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:37
+#: amara-enterprise/ondemand/views.py:97
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:46
 msgid "Bulk Create Collabs"
 msgstr ""
 
@@ -5282,9 +5325,8 @@ msgstr "Administrateur du site"
 #: templates/comments/_item.html:3 templates/messages/inbox.html:88
 #: templates/messages/message.html:68 templates/messages/sent.html:50
 #: templates/videos/_action_tpl.html:3
-#: templates/videos/_action_tpl_video.html:9
-#: templates/videos/video-urls-tab.html:33 templates/videos/diffing.html:115
-#: templates/videos/diffing.html:159
+#: templates/videos/_action_tpl_video.html:9 templates/videos/diffing.html:115
+#: templates/videos/diffing.html:159 templates/videos/video-urls-tab.html:33
 msgid "ago"
 msgstr "il y a"
 
@@ -5486,7 +5528,7 @@ msgstr "Soumettre"
 #: templates/videos/_create-subtitles-modal.html:20
 #: templates/videos/_feedback_form.html:26
 #: templates/videos/_multi-video-create-subtitles-form.html:14
-#: templates/editor/dialogs.html:406
+#: templates/editor/dialogs.html:417
 #: templates/externalsites/new-team-settings-tab.html:92
 #: templates/externalsites/team-settings-tab.html:102
 #: templates/new-teams/application.html:49
@@ -6242,15 +6284,15 @@ msgstr ""
 msgid "Last modified"
 msgstr "Dernière modification"
 
-#: templates/teams/approvals.html:104
+#: templates/teams/approvals.html:104 templates/videos/diffing.html:129
+#: templates/videos/diffing.html:175
 #: templates/videos/language-subtitles-tab.html:70
-#: templates/videos/diffing.html:129 templates/videos/diffing.html:175
 msgid "Title:"
 msgstr "Titre:"
 
-#: templates/teams/approvals.html:105
+#: templates/teams/approvals.html:105 templates/videos/diffing.html:133
+#: templates/videos/diffing.html:179
 #: templates/videos/language-subtitles-tab.html:74
-#: templates/videos/diffing.html:133 templates/videos/diffing.html:179
 msgid "Description:"
 msgstr "Description:"
 
@@ -7094,8 +7136,8 @@ msgstr "Essayez de modifier votre recherche en utilisant les filtres ci-dessus p
 msgid "You don't have permission to perform this task."
 msgstr "Vous n’avez pas les autorisations pour réaliser cette tâche."
 
-#: templates/teams/tasks.html:234 templates/videos/video-urls-tab.html:20
-#: templates/videos/language-page.html:40
+#: templates/teams/tasks.html:234 templates/videos/language-page.html:40
+#: templates/videos/video-urls-tab.html:20
 msgid "Original"
 msgstr "Original"
 
@@ -7412,8 +7454,8 @@ msgstr "Générer le rapport de facturation"
 msgid "Sign in with your OpenID"
 msgstr "S'identifier avec votre OpenID"
 
-#: templates/openid_consumer/signin.html:23 templates/auth/login.html:16
-#: templates/auth/login.html:35 templates/auth/login_trap.html:16
+#: templates/openid_consumer/signin.html:23 templates/auth/login_trap.html:16
+#: templates/auth/login.html:20 templates/auth/login.html:42
 msgid "Sign In"
 msgstr "S'enregistrer"
 
@@ -7448,30 +7490,6 @@ msgstr "Cette action est irréversible !"
 msgid "Please enter your login password to confirm"
 msgstr "Entrer votre mot-de-passe de connexion pour confirmer"
 
-#: templates/auth/login.html:17
-msgid "Use an existing identity"
-msgstr "Utiliser une identité existante"
-
-#: templates/auth/login.html:30
-msgid "Or use your Amara account"
-msgstr "Ou utilisez votre compte Amara"
-
-#: templates/auth/login.html:39
-msgid "Forgot your password?"
-msgstr "Mot de passe oublié ?"
-
-#: templates/auth/login.html:45
-msgid "Create an Account"
-msgstr "Créer un compte"
-
-#: templates/auth/login.html:46
-msgid "It's free!"
-msgstr "C'est gratuit !"
-
-#: templates/auth/login.html:52
-msgid "Create Account"
-msgstr "Création de compte"
-
 #: templates/auth/login_create.html:16
 msgid "Sign Up"
 msgstr "Signer"
@@ -7501,6 +7519,30 @@ msgstr "Si vous ne souhaitez pas créer un nouveau compte Amara via votre founis
 #: templates/auth/login_trap.html:11
 msgid "Sign in as a different user"
 msgstr "S'enregistrer avec un autre compte"
+
+#: templates/auth/login.html:21
+msgid "Use an existing identity"
+msgstr "Utiliser une identité existante"
+
+#: templates/auth/login.html:37
+msgid "Or use your Amara account"
+msgstr "Ou utilisez votre compte Amara"
+
+#: templates/auth/login.html:46
+msgid "Forgot your password?"
+msgstr "Mot de passe oublié ?"
+
+#: templates/auth/login.html:52
+msgid "Create an Account"
+msgstr "Créer un compte"
+
+#: templates/auth/login.html:53
+msgid "It's free!"
+msgstr "C'est gratuit !"
+
+#: templates/auth/login.html:59
+msgid "Create Account"
+msgstr "Création de compte"
 
 #: templates/admin/base_site.html:12
 msgid "View site"
@@ -7756,7 +7798,7 @@ msgstr "Envoyer un commentaire"
 #: templates/videos/_upload_subtitles.html:11
 #: templates/videos/visibility_form.js:5 templates/videos/video-page.html:34
 #: templates/videos/video-urls-tab.html:47 templates/editor/dialogs.html:122
-#: templates/editor/dialogs.html:292
+#: templates/editor/dialogs.html:292 templates/editor/dialogs.html:327
 msgid "Close"
 msgstr "Fermer"
 
@@ -7895,7 +7937,7 @@ msgid "Upload them directly."
 msgstr "Téléchargez-les directement."
 
 #: templates/videos/_upload_subtitles.html:12
-#: templates/editor/dialogs.html:372
+#: templates/editor/dialogs.html:383
 msgid "Upload Subtitles"
 msgstr "Envoyer des sous-titres"
 
@@ -7919,7 +7961,7 @@ msgstr "Ce fichier de sous-titre est complet à 100 %%"
 
 #: templates/videos/_upload_subtitles.html:55
 #: templates/videos/_upload_subtitles.html:70
-#: templates/editor/dialogs.html:402 templates/new-teams/videos.html:149
+#: templates/editor/dialogs.html:413 templates/new-teams/videos.html:149
 #: amara-enterprise/providers/templates/providers/user-queue.html:128
 msgid "Upload"
 msgstr "Charger"
@@ -8168,8 +8210,9 @@ msgid "Leave a comment"
 msgstr "Laisser un commentaire"
 
 #: templates/videos/language-comments-tab.html:5
+#: templates/videos/language-page.html:91
 #: templates/videos/video-comments-tab.html:6
-#: templates/videos/video-page.html:98 templates/videos/language-page.html:91
+#: templates/videos/video-page.html:98
 msgid "Comments"
 msgstr "Commentaires"
 
@@ -8198,105 +8241,6 @@ msgstr "Éditer dans Django Admin"
 #: templates/videos/language-revisions-tab.html:67
 msgid "No subtitles for this language."
 msgstr "Pas de sous-titres pour cette langue"
-
-#: templates/videos/language-subtitles-tab.html:6
-msgid "Delete Subtitle Language"
-msgstr "Supprimer la langue des sous-titres"
-
-#: templates/videos/language-subtitles-tab.html:14
-msgid "You must use the tasks panel to work with this version."
-msgstr "Vous devez utiliser le panneau des tâches pour travailler avec cette version."
-
-#: templates/videos/language-subtitles-tab.html:15
-#: templates/videos/language-subtitles-tab.html:21
-#: templates/videos/language-subtitles-tab.html:28
-msgid "Edit Subtitles"
-msgstr "Modifier les sous-titres"
-
-#: templates/videos/language-subtitles-tab.html:20
-msgid "You do not have permission to edit this version."
-msgstr "Vous n'avez pas la permission d'éditer cette version."
-
-#: templates/videos/language-subtitles-tab.html:38
-msgid "Download"
-msgstr "Télécharger"
-
-#: templates/videos/language-subtitles-tab.html:45
-msgid "DFXP All Languages"
-msgstr ""
-
-#: templates/videos/language-subtitles-tab.html:54
-msgid "Draft only"
-msgstr "Uniquement un projet"
-
-#: templates/videos/language-subtitles-tab.html:56
-#, python-format
-msgid ""
-"\n"
-"                        Subtitles translated from %(language)s\n"
-"                    "
-msgstr "\n                        Sous-titres traduits à partir de %(language)s\n                    "
-
-#: templates/videos/language-subtitles-tab.html:60
-#, python-format
-msgid ""
-"\n"
-"                Showing <strong>Revision %(version_number)s</strong> created <strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n"
-"                "
-msgstr "\n                Afficher la <strong>révision %(version_number)s</strong> créée <strong>%(revision_time)s</strong> par <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n                "
-
-#: templates/videos/language-subtitles-tab.html:90
-msgid ""
-"\n"
-"                    The most recent revision for this language is blank, but there are older\n"
-"                    revisions that contain subtitles.\n"
-"                    "
-msgstr "\n                    La dernière révision pour cette langue est vide mais il y a des révisions plus anciennes\n                    qui contiennent des sous-titres.\n                    "
-
-#: templates/videos/language-subtitles-tab.html:94
-msgid "View revision history"
-msgstr "Voir l'historique de révision"
-
-#: templates/videos/language-subtitles-tab.html:99
-msgid "These subtitles are in progress."
-msgstr "Ces sous-titres sont en cours."
-
-#: templates/videos/language-subtitles-tab.html:100
-msgid "Make more?"
-msgstr "Faire plus?"
-
-#: templates/videos/language-subtitles-tab.html:102
-msgid "No subtitles available yet."
-msgstr "Pas de sous-titres disponibles."
-
-#: templates/videos/language-subtitles-tab.html:103
-msgid "Make some!"
-msgstr "Créez-en !"
-
-#: templates/videos/language-subtitles-tab.html:111
-msgid ""
-"\n"
-"                    This language contains subtitles that are still waiting to be moderated.  Check back later.\n"
-"                "
-msgstr "\n                    Cette langue contient des sous-titres en attente de modération. Merci de revérifier plus tard.\n                "
-
-#: templates/videos/language-subtitles-tab.html:117
-msgid ""
-"\n"
-"                    Sorry, this language has been removed by Amara staff members or authorized users.\n"
-"                "
-msgstr "\n                    Désolé, cette langue a été supprimée par l'équipe d'Amara ou un utilisateur autorisé.\n                "
-
-#: templates/videos/language-subtitles-tab.html:123
-msgid ""
-"\n"
-"                    No subtitles have been added for this language yet.\n"
-"                "
-msgstr "\n                    Aucun sous-titres ajoutés pour cette langue actuellement.\n                "
-
-#: templates/videos/language-subtitles-tab.html:134
-msgid "Roll back to this version"
-msgstr "Retourner à cette version"
 
 #: templates/videos/language-sync-history-tab.html:6
 #, python-format
@@ -8442,6 +8386,153 @@ msgstr "Obtenez des outils professionnels et des sous-titres Sur Demande"
 msgid "Get Embed Code"
 msgstr "Obtenir le code d’intégration"
 
+#: templates/videos/diffing.html:39
+msgid "Subtitles will be rolled back to a previous version"
+msgstr "Les sous-titres seront rétablis à la version précédente."
+
+#: templates/videos/diffing.html:45
+msgid "You need to log in to do that."
+msgstr "Vous devez vous connecter pour faire cela."
+
+#: templates/videos/diffing.html:85
+msgid "Revision History"
+msgstr "Historique des révisions"
+
+#: templates/videos/diffing.html:89
+msgid "Comparing Revision"
+msgstr "Comparaison des révisions"
+
+#: templates/videos/diffing.html:103 templates/videos/diffing.html:147
+msgid "Roll back to version"
+msgstr "Revenir à la version"
+
+#: templates/videos/diffing.html:107 templates/videos/diffing.html:151
+msgid "Latest Revision"
+msgstr "Dernière révision"
+
+#: templates/videos/language-page.html:14
+msgid "Select two revisions to compare, please"
+msgstr "Veuillez sélectionner deux versions pour les comparer."
+
+#: templates/videos/language-page.html:43
+msgid "subtitles"
+msgstr "sous-titres"
+
+#: templates/videos/language-page.html:58
+msgid "Follower"
+msgstr "Follower"
+
+#: templates/videos/language-page.html:64
+msgid "Line"
+msgstr "Ligne"
+
+#: templates/videos/language-page.html:92
+msgid "Revisions"
+msgstr "Révisions"
+
+#: templates/videos/language-page.html:106
+msgid "Edit SubtitleLanguage in Django Admin"
+msgstr "Éditer la langue des sous-titres dans Django Admin"
+
+#: templates/videos/language-subtitles-tab.html:6
+msgid "Delete Subtitle Language"
+msgstr "Supprimer la langue des sous-titres"
+
+#: templates/videos/language-subtitles-tab.html:14
+msgid "You must use the tasks panel to work with this version."
+msgstr "Vous devez utiliser le panneau des tâches pour travailler avec cette version."
+
+#: templates/videos/language-subtitles-tab.html:15
+#: templates/videos/language-subtitles-tab.html:21
+#: templates/videos/language-subtitles-tab.html:28
+msgid "Edit Subtitles"
+msgstr "Modifier les sous-titres"
+
+#: templates/videos/language-subtitles-tab.html:20
+msgid "You do not have permission to edit this version."
+msgstr "Vous n'avez pas la permission d'éditer cette version."
+
+#: templates/videos/language-subtitles-tab.html:38
+msgid "Download"
+msgstr "Télécharger"
+
+#: templates/videos/language-subtitles-tab.html:45
+msgid "DFXP All Languages"
+msgstr ""
+
+#: templates/videos/language-subtitles-tab.html:54
+msgid "Draft only"
+msgstr "Uniquement un projet"
+
+#: templates/videos/language-subtitles-tab.html:56
+#, python-format
+msgid ""
+"\n"
+"                        Subtitles translated from %(language)s\n"
+"                    "
+msgstr "\n                        Sous-titres traduits à partir de %(language)s\n                    "
+
+#: templates/videos/language-subtitles-tab.html:60
+#, python-format
+msgid ""
+"\n"
+"                Showing <strong>Revision %(version_number)s</strong> created <strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n"
+"                "
+msgstr "\n                Afficher la <strong>révision %(version_number)s</strong> créée <strong>%(revision_time)s</strong> par <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n                "
+
+#: templates/videos/language-subtitles-tab.html:90
+msgid ""
+"\n"
+"                    The most recent revision for this language is blank, but there are older\n"
+"                    revisions that contain subtitles.\n"
+"                    "
+msgstr "\n                    La dernière révision pour cette langue est vide mais il y a des révisions plus anciennes\n                    qui contiennent des sous-titres.\n                    "
+
+#: templates/videos/language-subtitles-tab.html:94
+msgid "View revision history"
+msgstr "Voir l'historique de révision"
+
+#: templates/videos/language-subtitles-tab.html:99
+msgid "These subtitles are in progress."
+msgstr "Ces sous-titres sont en cours."
+
+#: templates/videos/language-subtitles-tab.html:100
+msgid "Make more?"
+msgstr "Faire plus?"
+
+#: templates/videos/language-subtitles-tab.html:102
+msgid "No subtitles available yet."
+msgstr "Pas de sous-titres disponibles."
+
+#: templates/videos/language-subtitles-tab.html:103
+msgid "Make some!"
+msgstr "Créez-en !"
+
+#: templates/videos/language-subtitles-tab.html:111
+msgid ""
+"\n"
+"                    This language contains subtitles that are still waiting to be moderated.  Check back later.\n"
+"                "
+msgstr "\n                    Cette langue contient des sous-titres en attente de modération. Merci de revérifier plus tard.\n                "
+
+#: templates/videos/language-subtitles-tab.html:117
+msgid ""
+"\n"
+"                    Sorry, this language has been removed by Amara staff members or authorized users.\n"
+"                "
+msgstr "\n                    Désolé, cette langue a été supprimée par l'équipe d'Amara ou un utilisateur autorisé.\n                "
+
+#: templates/videos/language-subtitles-tab.html:123
+msgid ""
+"\n"
+"                    No subtitles have been added for this language yet.\n"
+"                "
+msgstr "\n                    Aucun sous-titres ajoutés pour cette langue actuellement.\n                "
+
+#: templates/videos/language-subtitles-tab.html:134
+msgid "Roll back to this version"
+msgstr "Retourner à cette version"
+
 #: templates/videos/video-activity-tab.html:5
 msgid "View all activity"
 msgstr "Voir toutes les activités"
@@ -8564,53 +8655,285 @@ msgid ""
 "matching videos or videos where subtitles fail to display correctly."
 msgstr "Supprimer cette URL?  Attention: cette action est irréversible. Ne supprimer que les URLs des vidéos qui ne correspondent pas ou qui ne propose pas un affiche correcte des sous-titres."
 
-#: templates/videos/diffing.html:39
-msgid "Subtitles will be rolled back to a previous version"
-msgstr "Les sous-titres seront rétablis à la version précédente."
+#: templates/editor/editor.html:12
+#, python-format
+msgid ""
+"\n"
+"            Editing %(language)s subtitles for &ldquo;%(video)s&rdquo; - Amara\n"
+"        "
+msgstr "\nSous-titres en %(language)s pour &ldquo;%(video)s en édition &rdquo; - Amara\n "
 
-#: templates/videos/diffing.html:45
-msgid "You need to log in to do that."
-msgstr "Vous devez vous connecter pour faire cela."
+#: templates/editor/editor.html:41
+msgid "Loading subtitle editor&hellip;"
+msgstr "Chargement de l'éditeur de sous-titre&hellip;"
 
-#: templates/videos/diffing.html:85
-msgid "Revision History"
-msgstr "Historique des révisions"
+#: templates/editor/header.html:6 templates/editor/header.html:7
+#: templates/editor/dialogs.html:298
+msgid "Edit title and description"
+msgstr "Éditer le titre et la description"
 
-#: templates/videos/diffing.html:89
-msgid "Comparing Revision"
-msgstr "Comparaison des révisions"
+#: templates/editor/tutorial.html:3
+msgid "New to Amara? Here are some pointers."
+msgstr "Nouvel utilisateur d'Amara ? Voici quelques astuces."
 
-#: templates/videos/diffing.html:103 templates/videos/diffing.html:147
-msgid "Roll back to version"
-msgstr "Revenir à la version"
+#: templates/editor/tutorial.html:4
+msgid "Click to hide.  Reopen anytime from the tools menu "
+msgstr "Cliquer pour cacher. Vous pouvez l’ouvrir depuis le menu."
 
-#: templates/videos/diffing.html:107 templates/videos/diffing.html:151
-msgid "Latest Revision"
-msgstr "Dernière révision"
+#: templates/editor/tutorial.html:4
+msgid "Show tutorial"
+msgstr "Afficher le tutoriel"
 
-#: templates/videos/language-page.html:14
-msgid "Select two revisions to compare, please"
-msgstr "Veuillez sélectionner deux versions pour les comparer."
+#: templates/editor/tutorial.html:6
+msgid "Please go away."
+msgstr "Veuillez vous en aller."
 
-#: templates/videos/language-page.html:43
-msgid "subtitles"
-msgstr "sous-titres"
+#: templates/editor/tutorial.html:11
+msgid "1. Play the video"
+msgstr "1. Jouez la vidéo"
 
-#: templates/videos/language-page.html:58
-msgid "Follower"
-msgstr "Follower"
+#: templates/editor/tutorial.html:12
+msgid "Use the tab key to play and pause the video."
+msgstr "Utilisez la touche tab pour jouer et mettre en pause la vidéo."
 
-#: templates/videos/language-page.html:64
-msgid "Line"
-msgstr "Ligne"
+#: templates/editor/tutorial.html:15
+msgid "2. Type what you hear"
+msgstr "2. Tapez ce que vous entendez"
 
-#: templates/videos/language-page.html:92
-msgid "Revisions"
-msgstr "Révisions"
+#: templates/editor/tutorial.html:16
+msgid "Once you fill a line, hit enter."
+msgstr "Quand vous avez terminé une ligne, appuyez sur enter."
 
-#: templates/videos/language-page.html:106
-msgid "Edit SubtitleLanguage in Django Admin"
-msgstr "Éditer la langue des sous-titres dans Django Admin"
+#: templates/editor/tutorial.html:17
+msgid "Don't worry about the timing."
+msgstr "Ne vous souciez pas du timing."
+
+#: templates/editor/tutorial.html:20
+msgid "3. Done typing?"
+msgstr "3. Terminé de taper ?"
+
+#: templates/editor/tutorial.html:21
+msgid "Click to start syncing your subtitles."
+msgstr "Cliquez pour commencer à synchroniser vos sous-titres."
+
+#: templates/editor/tutorial.html:24
+msgid "1. Tap the Down arrow to start"
+msgstr "1. Appuyez sur la touche Bas pour commencer"
+
+#: templates/editor/tutorial.html:25
+msgid "Press down again to start each subtitle."
+msgstr "Appuyez à nouveau pour commencer chaque sous-titre."
+
+#: templates/editor/tutorial.html:26
+msgid "Don't worry about small mistakes."
+msgstr "Ne vous souciez pas des petites erreurs."
+
+#: templates/editor/tutorial.html:29
+msgid "2. Need to start over?"
+msgstr "2. Besoin de recommencer ?"
+
+#: templates/editor/tutorial.html:30
+msgid "From the tools menu "
+msgstr "Depuis le menu des outils"
+
+#: templates/editor/tutorial.html:32
+msgid " choose clear timing."
+msgstr "sélectionnez effacer le timing"
+
+#: templates/editor/tutorial.html:35
+msgid "3. Review and correct"
+msgstr "3. Relisez-vous et corrigez-vous"
+
+#: templates/editor/tutorial.html:36
+msgid "Click when all subtitles are synced."
+msgstr "Cliquez quand tous les sous-titres sont synchronisés."
+
+#: templates/editor/tutorial.html:39
+msgid "1. Review the guidelines"
+msgstr "1. Relire le guide"
+
+#: templates/editor/tutorial.html:40
+msgid "They include tips for improving subtitles."
+msgstr "Ils contiennent des astuces pour améliorer les sous-titres."
+
+#: templates/editor/tutorial.html:43
+msgid "2. Check the timing"
+msgstr "2. Vérifiez le timing"
+
+#: templates/editor/tutorial.html:44
+msgid "Drag the edges or slide the bubble to adjust the times."
+msgstr ""
+
+#: templates/editor/tutorial.html:47
+msgid "3. Submit your work"
+msgstr "3. Publiez votre travail"
+
+#: templates/editor/tutorial.html:48
+msgid "Or choose Save Draft (above) to finish later."
+msgstr ""
+
+#: templates/editor/tutorial.html:51
+msgid "1. Select a reference language"
+msgstr "1. Sélectionner une langue de référence"
+
+#: templates/editor/tutorial.html:52
+msgid "If you change the reference language, use "
+msgstr "Pour modifier la langue de référence, utiliser"
+
+#: templates/editor/tutorial.html:53
+msgid "Copy Timings"
+msgstr "Copier les timings"
+
+#: templates/editor/tutorial.html:53
+msgid "to  update the translation timing."
+msgstr "pour mettre à jour le timing de la traduction."
+
+#: templates/editor/tutorial.html:56
+msgid "2. Type the translation"
+msgstr "2. Type de traduction"
+
+#: templates/editor/tutorial.html:57
+msgid "Don't leave any blanks."
+msgstr "Laissez aucune espace."
+
+#: templates/editor/tutorial.html:60
+msgid "3. Done translating?"
+msgstr "3. Traduction terminée ?"
+
+#: templates/editor/tutorial.html:61
+msgid "Click to adjust the timing."
+msgstr "Cliquer pour ajuster le minutage."
+
+#: templates/editor/workflow-normal.html:4
+msgid "Type what you hear"
+msgstr "Saisissez ce que vous entendez."
+
+#: templates/editor/workflow-normal.html:6
+msgid "Is all the content subtitled?"
+msgstr "Est-ce que tout le contenu a été sous-titré ?"
+
+#: templates/editor/workflow-normal.html:7
+msgid "Is all the content translated?"
+msgstr "L’intégralité du contenu a été traduit ?"
+
+#: templates/editor/workflow-normal.html:9
+msgid "Be sure you have no blank lines"
+msgstr "Vérifiez qu’il existe aucune ligne vide"
+
+#: templates/editor/workflow-normal.html:11
+msgid "Yes, start syncing"
+msgstr "Oui, commencer à synchroniser"
+
+#: templates/editor/workflow-normal.html:16
+msgid "Sync Timing"
+msgstr "Synchroniser le timing"
+
+#: templates/editor/workflow-normal.html:18
+#, python-format
+msgid ""
+"\n"
+"            synced subtitles: %(count)s / %(total)s\n"
+"            "
+msgstr ""
+
+#: templates/editor/workflow-normal.html:24
+msgid "Start review"
+msgstr "Commencer la relecture"
+
+#: templates/editor/workflow-normal.html:29
+msgid "Review and complete"
+msgstr "Relecture et complétion"
+
+#: templates/editor/workflow-normal.html:30
+msgid ""
+"Watch the video again and verify that the subtitles are complete and "
+"correct."
+msgstr "Regarder encore la vidéo et vérifier que les sous titres sont complets et correctes"
+
+#: templates/editor/workflow-normal.html:31
+#: templates/editor/workflow-review.html:7
+msgid "Edit title and description."
+msgstr "Modifier le titre et la description"
+
+#: templates/editor/workflow-errors-review.html:6
+#: templates/editor/workflow-errors-typing.html:7
+msgid "Subtitles can not be blank"
+msgstr "Un sous-titre ne peut pas être vide"
+
+#: templates/editor/workflow-errors-review.html:13
+msgid "Timing error in subtitle"
+msgstr "Erreur de minutage pour ce sous-titre."
+
+#: templates/editor/workflow-errors-review.html:18
+#: templates/editor/workflow-errors-typing.html:12
+msgid "Title and description must be translated"
+msgstr "Pour la vidéo, le titre et la description doivent être traduits"
+
+#: templates/editor/working-subtitles.html:4
+#, python-format
+msgid ""
+"\n"
+"        Editing %(language)s&hellip;\n"
+"        "
+msgstr "\n        Modifier la %(language)s&hellip;\n        "
+
+#: templates/editor/working-subtitles.html:14
+msgid "Copy Timing"
+msgstr "Copier les temps"
+
+#: templates/editor/working-subtitles.html:17
+#: templates/editor/working-subtitles.html:26
+msgid "Show"
+msgstr "Montrer"
+
+#: templates/editor/working-subtitles.html:18
+msgid "Timeline"
+msgstr "Chronologie"
+
+#: templates/editor/working-subtitles.html:20
+msgid "Clear timing"
+msgstr "Effacer chronologie"
+
+#: templates/editor/working-subtitles.html:21
+msgid "Clear text"
+msgstr "Effacer texte"
+
+#: templates/editor/working-subtitles.html:22
+msgid "Revert to last saved version"
+msgstr "Revenir à la dernière version sauvegarder"
+
+#: templates/editor/working-subtitles.html:23
+msgid "Upload subtitles"
+msgstr "Télécharger des sous-titres"
+
+#: templates/editor/working-subtitles.html:27
+msgid "Warnings"
+msgstr "Avertissements"
+
+#: templates/editor/working-subtitles.html:29
+msgid "Show Tutorial"
+msgstr "Afficher le tutoriel"
+
+#: templates/editor/working-subtitles.html:75
+msgid "Avoid more than 2 lines per subtitle; split the subtitle into two."
+msgstr "Évitez de mettre plus de 2 lignes par sous-titre; scindez le sous-titre en deux"
+
+#: templates/editor/working-subtitles.html:76
+msgid ""
+"Briefly displayed subtitles are hard to read; the duration should be more "
+"than 700ms."
+msgstr "Un sous-titre qui s’affiche moins de 700 ms est difficile à lire, augmenter sa durée d’affichage."
+
+#: templates/editor/working-subtitles.html:77
+msgid ""
+"Reading rate shouldn't exceed 21 characters / sec; lengthen duration, reduce"
+" text or split the subtitle."
+msgstr "Une vitesse de lecture supérieure à 21 symboles par seconde est difficile à lire, augmenter sa durée ou scinder le sous-titre en deux."
+
+#: templates/editor/working-subtitles.html:78
+msgid ""
+"Line length shouldn't exceed 42 characters; add a line break if necessary."
+msgstr "La longueur d'une ligne ne devrait pas dépasser 42 caractères; ajoutez un retour à la ligne si nécéssaire."
 
 #: templates/editor/dialogs.html:6
 msgid "Amara Style Guidelines"
@@ -9107,11 +9430,6 @@ msgstr "CTRL + t"
 msgid "CMD + t"
 msgstr "CMD + t"
 
-#: templates/editor/dialogs.html:298 templates/editor/header.html:6
-#: templates/editor/header.html:7
-msgid "Edit title and description"
-msgstr "Éditer le titre et la description"
-
 #: templates/editor/dialogs.html:299
 msgid "Title"
 msgstr "Titre"
@@ -9124,91 +9442,83 @@ msgstr "Entrer un titre"
 msgid "Enter Description"
 msgstr "Entrer une description"
 
-#: templates/editor/dialogs.html:336
+#: templates/editor/dialogs.html:321
+msgid "Playback Mode"
+msgstr ""
+
+#: templates/editor/dialogs.html:347
 msgid "Debugging Tools"
 msgstr "Outils de débogage."
 
-#: templates/editor/dialogs.html:354
+#: templates/editor/dialogs.html:365
 msgid "Error saving subtitles"
 msgstr "Erreur de sauvegarde des sous-titres"
 
-#: templates/editor/dialogs.html:357
+#: templates/editor/dialogs.html:368
 msgid ""
 "There was an error saving your subtitles. Save your subtitles using the "
 "download button below and upload them to the system later."
 msgstr "Une erreur s'est produite à l'enregistrement de vos sous-titres. Enregistrez vos sous-titres en utilisant le bouton de téléchargement ci-dessous et chargez-les plus tard sur le système."
 
-#: templates/editor/dialogs.html:358 templates/editor/dialogs.html:415
+#: templates/editor/dialogs.html:369 templates/editor/dialogs.html:426
 msgid ""
 "To avoid data corruption, please do not open the or edit the subtitles in "
 "any text editor."
 msgstr "Pour éviter la corruption des données, veuillez ne pas ouvrir ou éditer les sous-titres dans un éditeur de texte."
 
-#: templates/editor/dialogs.html:361
+#: templates/editor/dialogs.html:372
 msgid ""
 "There was an error saving your subtitles.  Copy the subtitles above and save"
 " them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr "Une erreur s'est produite à l'enregistrement de vos sous-titres. Copiez vos sous-titres ci-dessus et enregistrez-les sur votre ordinateur sous le nom subtitle_backup.dfxp. Vous pourrez les recharger plus tard."
 
-#: templates/editor/dialogs.html:366 templates/editor/dialogs.html:423
+#: templates/editor/dialogs.html:377 templates/editor/dialogs.html:434
 msgid "Download Subtitles"
 msgstr "Télécharger les sous-titres"
 
-#: templates/editor/dialogs.html:367 templates/editor/dialogs.html:424
+#: templates/editor/dialogs.html:378 templates/editor/dialogs.html:435
 msgid "Close Editor"
 msgstr "Fermer l'éditeur"
 
-#: templates/editor/dialogs.html:374
+#: templates/editor/dialogs.html:385
 msgid ""
 "\n"
 "        Uploading subtitles saves a new (incomplete) version that you can edit and save or complete when finished. Uploaded subtitles keep their existing timecodes. You can use the Copy timing option from the Tools menu if you want to apply timing from a reference language.\n"
 "        "
 msgstr ""
 
-#: templates/editor/dialogs.html:379
+#: templates/editor/dialogs.html:390
 msgid ""
 "\n"
 "        Supported formats are: SRT, SSA, SBV, DFXP, TXT, and VTT. Only files ending with the correct extension, .srt, .ssa, .sbv, .txt, .vtt, .dfxp or .xml (for dfxp) are accepted.\n"
 "        "
 msgstr ""
 
-#: templates/editor/dialogs.html:384
+#: templates/editor/dialogs.html:395
 msgid ""
 "Upload failed. The file you uploaded might be invalid or an unsupported "
 "format."
 msgstr ""
 
-#: templates/editor/dialogs.html:399
+#: templates/editor/dialogs.html:410
 msgid "Uploading..."
 msgstr ""
 
-#: templates/editor/dialogs.html:411
+#: templates/editor/dialogs.html:422
 msgid "Error resuming session"
 msgstr "Erreur à la reprise de la session"
 
-#: templates/editor/dialogs.html:414
+#: templates/editor/dialogs.html:425
 msgid ""
 "There was an error resuming your session. Save your subtitles using the "
 "download button below and upload them to the system later."
 msgstr "Une erreur s'est produite à la reprise de votre session. Enregistrez vos sous-titres en utilisant le bouton de téléchargement ci-dessous et rechargez-les plus tard sur le système."
 
-#: templates/editor/dialogs.html:418
+#: templates/editor/dialogs.html:429
 msgid ""
 "There was an error resuming your session.  Copy the subtitles above and save"
 " them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr "Une erreur s'est produite à la reprise de votre session. Copiez les sous-titres ci-dessus et enregistrez-les sur votre ordinateur en tant que subtitle_backup.dfxp. Vous pourrez les recharger plus tard."
-
-#: templates/editor/editor.html:12
-#, python-format
-msgid ""
-"\n"
-"            Editing %(language)s subtitles for &ldquo;%(video)s&rdquo; - Amara\n"
-"        "
-msgstr "\nSous-titres en %(language)s pour &ldquo;%(video)s en édition &rdquo; - Amara\n "
-
-#: templates/editor/editor.html:41
-msgid "Loading subtitle editor&hellip;"
-msgstr "Chargement de l'éditeur de sous-titre&hellip;"
 
 #: templates/editor/help.html:7
 msgid "Keyboard controls"
@@ -9244,268 +9554,9 @@ msgstr "Terminer les sous-titres"
 msgid "Subtitling Guidelines"
 msgstr "Lignes directrices pour sous-titrer"
 
-#: templates/editor/tutorial.html:3
-msgid "New to Amara? Here are some pointers."
-msgstr "Nouvel utilisateur d'Amara ? Voici quelques astuces."
-
-#: templates/editor/tutorial.html:4
-msgid "Click to hide.  Reopen anytime from the tools menu "
-msgstr "Cliquer pour cacher. Vous pouvez l’ouvrir depuis le menu."
-
-#: templates/editor/tutorial.html:4
-msgid "Show tutorial"
-msgstr "Afficher le tutoriel"
-
-#: templates/editor/tutorial.html:6
-msgid "Please go away."
-msgstr "Veuillez vous en aller."
-
-#: templates/editor/tutorial.html:11
-msgid "1. Play the video"
-msgstr "1. Jouez la vidéo"
-
-#: templates/editor/tutorial.html:12
-msgid "Use the tab key to play and pause the video."
-msgstr "Utilisez la touche tab pour jouer et mettre en pause la vidéo."
-
-#: templates/editor/tutorial.html:15
-msgid "2. Type what you hear"
-msgstr "2. Tapez ce que vous entendez"
-
-#: templates/editor/tutorial.html:16
-msgid "Once you fill a line, hit enter."
-msgstr "Quand vous avez terminé une ligne, appuyez sur enter."
-
-#: templates/editor/tutorial.html:17
-msgid "Don't worry about the timing."
-msgstr "Ne vous souciez pas du timing."
-
-#: templates/editor/tutorial.html:20
-msgid "3. Done typing?"
-msgstr "3. Terminé de taper ?"
-
-#: templates/editor/tutorial.html:21
-msgid "Click to start syncing your subtitles."
-msgstr "Cliquez pour commencer à synchroniser vos sous-titres."
-
-#: templates/editor/tutorial.html:24
-msgid "1. Tap the Down arrow to start"
-msgstr "1. Appuyez sur la touche Bas pour commencer"
-
-#: templates/editor/tutorial.html:25
-msgid "Press down again to start each subtitle."
-msgstr "Appuyez à nouveau pour commencer chaque sous-titre."
-
-#: templates/editor/tutorial.html:26
-msgid "Don't worry about small mistakes."
-msgstr "Ne vous souciez pas des petites erreurs."
-
-#: templates/editor/tutorial.html:29
-msgid "2. Need to start over?"
-msgstr "2. Besoin de recommencer ?"
-
-#: templates/editor/tutorial.html:30
-msgid "From the tools menu "
-msgstr "Depuis le menu des outils"
-
-#: templates/editor/tutorial.html:32
-msgid " choose clear timing."
-msgstr "sélectionnez effacer le timing"
-
-#: templates/editor/tutorial.html:35
-msgid "3. Review and correct"
-msgstr "3. Relisez-vous et corrigez-vous"
-
-#: templates/editor/tutorial.html:36
-msgid "Click when all subtitles are synced."
-msgstr "Cliquez quand tous les sous-titres sont synchronisés."
-
-#: templates/editor/tutorial.html:39
-msgid "1. Review the guidelines"
-msgstr "1. Relire le guide"
-
-#: templates/editor/tutorial.html:40
-msgid "They include tips for improving subtitles."
-msgstr "Ils contiennent des astuces pour améliorer les sous-titres."
-
-#: templates/editor/tutorial.html:43
-msgid "2. Check the timing"
-msgstr "2. Vérifiez le timing"
-
-#: templates/editor/tutorial.html:44
-msgid "Drag the edges or slide the bubble to adjust the times."
+#: templates/editor/help.html:74
+msgid "Playback Mode:"
 msgstr ""
-
-#: templates/editor/tutorial.html:47
-msgid "3. Submit your work"
-msgstr "3. Publiez votre travail"
-
-#: templates/editor/tutorial.html:48
-msgid "Or choose Save Draft (above) to finish later."
-msgstr ""
-
-#: templates/editor/tutorial.html:51
-msgid "1. Select a reference language"
-msgstr "1. Sélectionner une langue de référence"
-
-#: templates/editor/tutorial.html:52
-msgid "If you change the reference language, use "
-msgstr "Pour modifier la langue de référence, utiliser"
-
-#: templates/editor/tutorial.html:53
-msgid "Copy Timings"
-msgstr "Copier les timings"
-
-#: templates/editor/tutorial.html:53
-msgid "to  update the translation timing."
-msgstr "pour mettre à jour le timing de la traduction."
-
-#: templates/editor/tutorial.html:56
-msgid "2. Type the translation"
-msgstr "2. Type de traduction"
-
-#: templates/editor/tutorial.html:57
-msgid "Don't leave any blanks."
-msgstr "Laissez aucune espace."
-
-#: templates/editor/tutorial.html:60
-msgid "3. Done translating?"
-msgstr "3. Traduction terminée ?"
-
-#: templates/editor/tutorial.html:61
-msgid "Click to adjust the timing."
-msgstr "Cliquer pour ajuster le minutage."
-
-#: templates/editor/workflow-normal.html:4
-msgid "Type what you hear"
-msgstr "Saisissez ce que vous entendez."
-
-#: templates/editor/workflow-normal.html:6
-msgid "Is all the content subtitled?"
-msgstr "Est-ce que tout le contenu a été sous-titré ?"
-
-#: templates/editor/workflow-normal.html:7
-msgid "Is all the content translated?"
-msgstr "L’intégralité du contenu a été traduit ?"
-
-#: templates/editor/workflow-normal.html:9
-msgid "Be sure you have no blank lines"
-msgstr "Vérifiez qu’il existe aucune ligne vide"
-
-#: templates/editor/workflow-normal.html:11
-msgid "Yes, start syncing"
-msgstr "Oui, commencer à synchroniser"
-
-#: templates/editor/workflow-normal.html:16
-msgid "Sync Timing"
-msgstr "Synchroniser le timing"
-
-#: templates/editor/workflow-normal.html:18
-#, python-format
-msgid ""
-"\n"
-"            synced subtitles: %(count)s / %(total)s\n"
-"            "
-msgstr ""
-
-#: templates/editor/workflow-normal.html:24
-msgid "Start review"
-msgstr "Commencer la relecture"
-
-#: templates/editor/workflow-normal.html:29
-msgid "Review and complete"
-msgstr "Relecture et complétion"
-
-#: templates/editor/workflow-normal.html:30
-msgid ""
-"Watch the video again and verify that the subtitles are complete and "
-"correct."
-msgstr "Regarder encore la vidéo et vérifier que les sous titres sont complets et correctes"
-
-#: templates/editor/workflow-normal.html:31
-#: templates/editor/workflow-review.html:7
-msgid "Edit title and description."
-msgstr "Modifier le titre et la description"
-
-#: templates/editor/workflow-errors-review.html:6
-#: templates/editor/workflow-errors-typing.html:7
-msgid "Subtitles can not be blank"
-msgstr "Un sous-titre ne peut pas être vide"
-
-#: templates/editor/workflow-errors-review.html:13
-msgid "Timing error in subtitle"
-msgstr "Erreur de minutage pour ce sous-titre."
-
-#: templates/editor/workflow-errors-review.html:18
-#: templates/editor/workflow-errors-typing.html:12
-msgid "Title and description must be translated"
-msgstr "Pour la vidéo, le titre et la description doivent être traduits"
-
-#: templates/editor/working-subtitles.html:4
-#, python-format
-msgid ""
-"\n"
-"        Editing %(language)s&hellip;\n"
-"        "
-msgstr "\n        Modifier la %(language)s&hellip;\n        "
-
-#: templates/editor/working-subtitles.html:14
-msgid "Copy Timing"
-msgstr "Copier les temps"
-
-#: templates/editor/working-subtitles.html:17
-#: templates/editor/working-subtitles.html:26
-msgid "Show"
-msgstr "Montrer"
-
-#: templates/editor/working-subtitles.html:18
-msgid "Timeline"
-msgstr "Chronologie"
-
-#: templates/editor/working-subtitles.html:20
-msgid "Clear timing"
-msgstr "Effacer chronologie"
-
-#: templates/editor/working-subtitles.html:21
-msgid "Clear text"
-msgstr "Effacer texte"
-
-#: templates/editor/working-subtitles.html:22
-msgid "Revert to last saved version"
-msgstr "Revenir à la dernière version sauvegarder"
-
-#: templates/editor/working-subtitles.html:23
-msgid "Upload subtitles"
-msgstr "Télécharger des sous-titres"
-
-#: templates/editor/working-subtitles.html:27
-msgid "Warnings"
-msgstr "Avertissements"
-
-#: templates/editor/working-subtitles.html:29
-msgid "Show Tutorial"
-msgstr "Afficher le tutoriel"
-
-#: templates/editor/working-subtitles.html:75
-msgid "Avoid more than 2 lines per subtitle; split the subtitle into two."
-msgstr "Évitez de mettre plus de 2 lignes par sous-titre; scindez le sous-titre en deux"
-
-#: templates/editor/working-subtitles.html:76
-msgid ""
-"Briefly displayed subtitles are hard to read; the duration should be more "
-"than 700ms."
-msgstr "Un sous-titre qui s’affiche moins de 700 ms est difficile à lire, augmenter sa durée d’affichage."
-
-#: templates/editor/working-subtitles.html:77
-msgid ""
-"Reading rate shouldn't exceed 21 characters / sec; lengthen duration, reduce"
-" text or split the subtitle."
-msgstr "Une vitesse de lecture supérieure à 21 symboles par seconde est difficile à lire, augmenter sa durée ou scinder le sous-titre en deux."
-
-#: templates/editor/working-subtitles.html:78
-msgid ""
-"Line length shouldn't exceed 42 characters; add a line break if necessary."
-msgstr "La longueur d'une ligne ne devrait pas dépasser 42 caractères; ajoutez un retour à la ligne si nécéssaire."
 
 #: templates/externalsites/_sync-errors-form.html:10
 msgid "Resync"
@@ -10231,7 +10282,7 @@ msgstr ""
 
 #: amara-enterprise/collab/templates/collab/assignments-list.html:47
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:25
-#: amara-enterprise/collab/templates/collab/evaluate.html:77
+#: amara-enterprise/collab/templates/collab/evaluate.html:79
 msgid "Open Editor"
 msgstr "Ouvrir l’éditeur"
 
@@ -10453,27 +10504,6 @@ msgstr ""
 msgid "open editor"
 msgstr ""
 
-#: amara-enterprise/collab/templates/collab/evaluate.html:44
-msgid "Evaluate Subtitles"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/evaluate.html:74
-msgid "Evaluate subtitles"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/evaluate.html:80
-msgid "drop assignment"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/evaluate.html:91
-#, python-format
-msgid "%(count)s total requests to be evaluated"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/evaluate.html:94
-msgid "No evaluations available"
-msgstr ""
-
 #: amara-enterprise/collab/templates/collab/collaboration-state-line.html:7
 #, python-format
 msgid "Waiting for provider: %(provider)s"
@@ -10502,6 +10532,32 @@ msgstr ""
 
 #: amara-enterprise/collab/templates/collab/dashboard.html:77
 msgid "Assignment type"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:44
+msgid "Evaluate Subtitles"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:74
+msgid "Evaluate subtitles"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:76
+#, python-format
+msgid "Can't evaluate because you were the %(role)s for this request "
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:82
+msgid "drop assignment"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:93
+#, python-format
+msgid "%(count)s total requests to be evaluated"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:96
+msgid "No evaluations available"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/email/new-editor-note.html:6
@@ -10789,40 +10845,6 @@ msgstr ""
 msgid "Create Collabs"
 msgstr ""
 
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:7
-msgid "Amara On-Demand Dashboard"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:9
-msgid "Welcome to the Amara On-Demand dashboard"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:10
-msgid "Define a new batch to get started."
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:13
-msgid "Define new batch"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:21
-#, python-format
-msgid "%(percent)s complete"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:22
-#, python-format
-msgid "%(percent)s in progress"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:38
-msgid "Download Master Spreadsheet"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:39
-msgid "Edit batch"
-msgstr ""
-
 #: amara-enterprise/ondemand/templates/ondemand/edit-batch.html:7
 #, python-format
 msgid "Edit %(batch)s"
@@ -10838,4 +10860,38 @@ msgstr ""
 
 #: amara-enterprise/ondemand/templates/ondemand/edit-batch.html:21
 msgid "Update Batch"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:16
+msgid "Amara On-Demand Dashboard"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:18
+msgid "Welcome to the Amara On-Demand dashboard"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:19
+msgid "Define a new batch to get started."
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:22
+msgid "Define new batch"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:30
+#, python-format
+msgid "%(percent)s complete"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:31
+#, python-format
+msgid "%(percent)s in progress"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:47
+msgid "Download Master Spreadsheet"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:48
+msgid "Edit batch"
 msgstr ""

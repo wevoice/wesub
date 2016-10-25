@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-11 12:51-0500\n"
-"PO-Revision-Date: 2016-10-11 17:51+0000\n"
+"POT-Creation-Date: 2016-10-25 10:01-0500\n"
+"PO-Revision-Date: 2016-10-25 15:01+0000\n"
 "Last-Translator: bendk <ben@pculture.org>\n"
 "Language-Team: Greek (Greece) (http://www.transifex.com/universalsubtitles/universalsubtitles/language/el_GR/)\n"
 "MIME-Version: 1.0\n"
@@ -205,23 +205,23 @@ msgstr "%(username)s δεν είναι μέλος της ομάδας"
 msgid "New activity on your team video"
 msgstr "Νέα εργασία στο ομαδικό σας βίντεο"
 
-#: apps/teams/permissions_const.py:44 apps/teams/models.py:1347
-#: apps/teams/forms.py:1252 templates/base.html:163
+#: apps/teams/permissions_const.py:44 apps/teams/forms.py:1252
+#: apps/teams/models.py:1349 templates/base.html:163
 #: templates/hands_base.html:94 templates/new-base.html:108
 msgid "Admin"
 msgstr "Διαχειριστής"
 
-#: apps/teams/permissions_const.py:45 apps/teams/models.py:1345
+#: apps/teams/permissions_const.py:45 apps/teams/models.py:1347
 msgid "Owner"
 msgstr "Ιδιοκτήτης"
 
-#: apps/teams/permissions_const.py:46 apps/teams/models.py:1346
-#: apps/teams/forms.py:1251
+#: apps/teams/permissions_const.py:46 apps/teams/forms.py:1251
+#: apps/teams/models.py:1348
 msgid "Manager"
 msgstr "Διαχειριστής"
 
-#: apps/teams/permissions_const.py:47 apps/teams/models.py:1348
-#: apps/teams/forms.py:1250
+#: apps/teams/permissions_const.py:47 apps/teams/forms.py:1250
+#: apps/teams/models.py:1350
 msgid "Contributor"
 msgstr "Συνεισφέρων"
 
@@ -245,7 +245,7 @@ msgstr "Το πεδίο «Σχετικά με σας» είναι απαραίτ
 msgid "You have already applied to this team."
 msgstr "Έχετε ήδη υποβάλει αίτηση εγγραφής σε αυτή την ομάδα."
 
-#: apps/teams/rpc.py:60 apps/teams/models.py:1609
+#: apps/teams/rpc.py:60 apps/teams/models.py:1611
 msgid "Your application has been denied."
 msgstr "Το αίτημά σας απερρίφθη."
 
@@ -297,6 +297,7 @@ msgstr "Δεν μπορείτε να αναθέσετε αυτό τον ρόλο
 
 #: apps/teams/subtitle_actions.py:29
 #: apps/teams/workflows/old/subtitleworkflows.py:76
+#: amara-enterprise/collab/models.py:1358
 #: amara-enterprise/collab/state_pipeline.py:370
 msgid "Complete"
 msgstr "Ολοκληρωμένο"
@@ -311,7 +312,7 @@ msgstr "Αποθήκευση"
 #: apps/teams/subtitle_actions.py:70
 #: apps/teams/workflows/old/subtitleworkflows.py:97
 #: apps/teams/workflows/old/subtitleworkflows.py:181
-#: amara-enterprise/collab/models.py:1214
+#: amara-enterprise/collab/models.py:1371
 #: amara-enterprise/collab/subtitle_workflow.py:322
 #: amara-enterprise/collab/forms/dashboard.py:103
 #: amara-enterprise/vimeo/workflows.py:83 templates/teams/applications.html:62
@@ -395,7 +396,7 @@ msgstr "Το αρχείο ανέβηκε επιτυχώς, σύντομα θα �
 msgid "File was not successfully parsed."
 msgstr "Ανεπιτυχής επεξεργασία αρχείου."
 
-#: apps/teams/new_views.py:331 amara-enterprise/collab/views.py:117
+#: apps/teams/new_views.py:331 amara-enterprise/collab/views.py:118
 #: templates/footer.html:35 templates/new-user-menu.html:14
 #: templates/base.html:134 templates/new-base.html:96
 #: templates/profiles/_tabs.html:12 templates/profiles/_user_menu.html:22
@@ -481,7 +482,7 @@ msgstr "Οι ρυθμίσεις αποθηκεύθηκαν."
 #: apps/teams/new_views.py:922 apps/teams/new_views.py:960
 #: apps/teams/new_views.py:1017 apps/teams/new_views.py:1049
 #: apps/teams/workflows/simple.py:65 apps/externalsites/views.py:91
-#: amara-enterprise/collab/views.py:53 amara-enterprise/collab/views.py:71
+#: amara-enterprise/collab/views.py:54 amara-enterprise/collab/views.py:72
 #: templates/teams/_tabs.html:37 templates/teams/_tabs_projects.html:20
 #: templates/teams/settings-lang-messages.html:5
 #: templates/teams/settings-languages.html:5
@@ -562,196 +563,11 @@ msgstr "Το project διεγράφη."
 msgid "Projects"
 msgstr "Projects"
 
-#: apps/teams/models.py:171
-msgid "Open"
-msgstr "Ανοικτός/ή"
-
-#: apps/teams/models.py:172
-msgid "Application"
-msgstr "Εφαρμογή"
-
-#: apps/teams/models.py:173
-msgid "Invitation by any team member"
-msgstr "Πρόσκληση από οποιοδήποτε μέλος της ομάδας"
-
-#: apps/teams/models.py:174
-msgid "Invitation by manager"
-msgstr "Πρόσκληση από διαχειριστή"
-
-#: apps/teams/models.py:175
-msgid "Invitation by admin"
-msgstr "Πρόσκληση από Διαχειριστή"
-
-#: apps/teams/models.py:182
-msgid "Any team member"
-msgstr "Οποιοδήποτε μέλος της ομάδας"
-
-#: apps/teams/models.py:183
-msgid "Managers and admins"
-msgstr "Διευθυντές και Διαχειριστές"
-
-#: apps/teams/models.py:184
-msgid "Admins only"
-msgstr "Μόνο για διαχειριστές"
-
-#: apps/teams/models.py:207
-msgid "Daily"
-msgstr "Καθημερινά"
-
-#: apps/teams/models.py:208
-msgid "Hourly"
-msgstr "Ανά ώρα"
-
-#: apps/teams/models.py:211 apps/teams/models.py:3548
-msgid "name"
-msgstr "όνομα"
-
-#: apps/teams/models.py:212 apps/teams/models.py:3549
-msgid "slug"
-msgstr "Περιθωρίου τυπογραφικού"
-
-#: apps/teams/models.py:213
-msgid "description"
-msgstr "περιγραφή"
-
-#: apps/teams/models.py:213
-msgid ""
-"All urls will be converted to links. Line breaks and HTML not supported."
-msgstr "Όλες οι διευθύνσεις url θα μετατρέπονται σε συνδέσμους. Δεν υποστηρίζονται αλλαγές γραμμής."
-
-#: apps/teams/models.py:215
-msgid "logo"
-msgstr "λογότυπο"
-
-#: apps/teams/models.py:219
-msgid "square logo"
-msgstr "τετράγωνο λογότυπο"
-
-#: apps/teams/models.py:224
-msgid "videos public?"
-msgstr "δημόσια βίντεο;"
-
-#: apps/teams/models.py:225
-msgid "Sync metadata when available (Youtube)?"
-msgstr ""
-
-#: apps/teams/models.py:226 templates/search/search.html:144
-#: templates/teams/project_list.html:12
-#: templates/videos/featured_videos.html:52
-msgid "videos"
-msgstr "Βίντεο"
-
-#: apps/teams/models.py:227
-msgid "users"
-msgstr "Χρήστες"
-
-#: apps/teams/models.py:230
-msgid "applicants"
-msgstr "Οι αιτούντες"
-
-#: apps/teams/models.py:233
-msgid "Intro Video"
-msgstr "Εισαγωγικό Βίντεο"
-
-#: apps/teams/models.py:235
-msgid "Page content"
-msgstr "Περιεχόμενο σελίδας"
-
-#: apps/teams/models.py:235
-msgid "You can use markdown. This will replace Description."
-msgstr "Μπορείτε να χρησιμοποιήσετε markdown. Αυτό θα αντικαταστήσει την Περιγραφή."
-
-#: apps/teams/models.py:237
-msgid "HTML that appears at the top of the teams page."
-msgstr "Το HTML εμφανίζεται στην κορυφή της σελίδας των ομάδων."
-
-#: apps/teams/models.py:243
-msgid "authentication provider code"
-msgstr "κωδικός παρόχου πιστοποίησης"
-
-#: apps/teams/models.py:260
-msgid "membership policy"
-msgstr "Πολιτική σχετικά με την ιδιότητα του μέλους"
-
-#: apps/teams/models.py:263
-msgid "video policy"
-msgstr "Πολιτική για τα Βίντεο"
-
-#: apps/teams/models.py:269
-msgid "task assignment policy"
-msgstr "Πολιτική ανάθεσης εργασιών"
-
-#: apps/teams/models.py:272
-msgid "subtitling policy"
-msgstr "Πολιτική υποτιτλισμού"
-
-#: apps/teams/models.py:275
-msgid "translation policy"
-msgstr "Πολιτική μεταφράσεων"
-
-#: apps/teams/models.py:278
-msgid "maximum tasks per member"
-msgstr "Μέγιστος αριθμός επιτρεπόμενων εργασιών ανά μέλος"
-
-#: apps/teams/models.py:280
-msgid "task expiration (days)"
-msgstr "Λήξη εργασίας (ημέρες)"
-
-#: apps/teams/models.py:295 templates/profiles/_teams_list.html:3
-#: templates/teams/teams-list.html:7
-msgid "Teams"
-msgstr "Ομάδες"
-
-#: apps/teams/models.py:749
-msgid "> 1000"
-msgstr "> 1000"
-
-#: apps/teams/models.py:988
-msgid ""
-"Use this space to explain why you or your team need to caption or subtitle "
-"this video. Adding a note makes volunteers more likely to help out!"
-msgstr "Χρησιμοποιήστε αυτό τον χώρο για να εξηγήσετε τον λόγο για τον οποίο εσείς ή η ομάδα σας χρειάζεσθε να προσθέσετε τους υπότιτλους σε αυτό το video. Προσθέτοντας μερικές σημειώσεις, θα είναι πιο πιθανό για τους εθελοντές να βοηθήσουν!"
-
-#: apps/teams/models.py:992
-msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
-msgstr "Πιάνουμε υποχρεωτικά τα thumbnails για κάποιες ιστοσελίδες, π.χ. για το Youtube"
-
-#: apps/teams/models.py:994
-msgid "Need help with all languages"
-msgstr "Χρειάζεται βοήθεια για όλες τις γλώσσες"
-
-#: apps/teams/models.py:995
-msgid "If you check this, other languages will not be displayed."
-msgstr "Αν τσεκάρετε εδώ, τότε δεν θα εμφανίζονται άλλες γλώσσες."
-
-#: apps/teams/models.py:1604
-#, python-format
-msgid "You already have a pending application to %(team)s."
-msgstr "Έχετε ήδη εκκρεμή αίτηση σε %(team)s."
-
-#: apps/teams/models.py:1613
-#, python-format
-msgid "You have been removed from %(team)s."
-msgstr "Έχετε διαγραφεί από την ομάδα %(team)s."
-
-#: apps/teams/models.py:2580
-msgid "Resume"
-msgstr "Ανάκτηση"
-
-#: apps/teams/models.py:2582
-msgid "Start now"
-msgstr "Έναρξη τώρα"
-
-#: apps/teams/models.py:2780
-#, python-format
-msgid "Help %(team)s reach a world audience"
-msgstr "Βοηθήστε την ομάδα %(team)s να προσεγγίσει ένα παγκόσμιο κοινό"
-
 #: apps/teams/forms.py:78 apps/teams/forms.py:191 apps/teams/forms.py:1004
 #: apps/teams/forms.py:1346 apps/teams/forms.py:1457 apps/teams/forms.py:1507
 #: apps/teams/forms.py:1526 apps/teams/templatetags/teams_tags.py:191
-#: amara-enterprise/collab/forms/search.py:195
-#: amara-enterprise/collab/forms/search.py:344
+#: amara-enterprise/collab/forms/search.py:194
+#: amara-enterprise/collab/forms/search.py:336
 #: amara-enterprise/billing/templatetags/billing.py:19
 #: templates/teams/approvals.html:91
 #: templates/new-teams/video-durations.html:11
@@ -1110,7 +926,7 @@ msgid "New Team"
 msgstr "Καινούργια ομάδα"
 
 #: apps/teams/forms.py:1362 apps/teams/forms.py:1364 apps/teams/forms.py:1517
-#: apps/teams/forms.py:1550 amara-enterprise/collab/models.py:51
+#: apps/teams/forms.py:1550 amara-enterprise/collab/models.py:52
 #: templates/videos/language-sync-history-tab.html:24
 msgid "None"
 msgstr "Κανένα"
@@ -1187,23 +1003,6 @@ msgstr "Το βίντεο %(url)s υπάρχει ήδη σε άλλη ομάδα
 msgid "CSV file"
 msgstr "αρχείο τύπου CSV"
 
-#: apps/teams/permissions.py:742
-#, python-format
-msgid ""
-"These subtitles are moderated. See the %s team page for information on how "
-"to contribute."
-msgstr "Aυτοί οι υπότιτλοι επιτηρούνται / moderated. Δείτε τη σελίδα της ομάδας %s για πληροφορίες σχετικά με το πως μπορείτε να συνεισφέρετε."
-
-#: apps/teams/permissions.py:744
-msgid "Sorry, these subtitles are privately moderated."
-msgstr "Σγγνώμη, αυτοί οι υπότιτλοι επιτηρούνται ιδιωτικά/ moderated"
-
-#: apps/teams/permissions.py:774
-msgid ""
-"Sorry, you do not have the permission to edit these subtitles. If you "
-"believe that they need correction, please contact the team administrator."
-msgstr "Συγγνώμη, αλλά δεν έχετε τα δικαιώματα για να επεξεργαστείτε αυτούς τους υποτίτλους. Αν πιστεύετε ότι χρειάζονται διόρθωση, παρακαλώ ελάτε σε επαφή με τον διαχειριστή ομάδας."
-
 #: apps/teams/views.py:162 templates/profiles/edit.html:32
 #: templates/teams/settings-projects-add.html:29
 #: templates/teams/settings-projects-edit.html:37
@@ -1211,7 +1010,7 @@ msgstr "Συγγνώμη, αλλά δεν έχετε τα δικαιώματα �
 msgid "Name"
 msgstr "Όνομα"
 
-#: apps/teams/views.py:163 amara-enterprise/collab/forms/search.py:59
+#: apps/teams/views.py:163 amara-enterprise/collab/forms/search.py:58
 #: templates/teams/teams-list.html:48
 msgid "Newest"
 msgstr "Το πιο πρόσφατο"
@@ -1391,9 +1190,211 @@ msgstr "Κάποιος άλλος κάνει αυτή τη στιγμή επεξ
 msgid "Successfully deleted language."
 msgstr "Η γλώσσα διαγράφηκε επιτυχώς."
 
+#: apps/teams/models.py:171
+msgid "Open"
+msgstr "Ανοικτός/ή"
+
+#: apps/teams/models.py:172
+msgid "Application"
+msgstr "Εφαρμογή"
+
+#: apps/teams/models.py:173
+msgid "Invitation by any team member"
+msgstr "Πρόσκληση από οποιοδήποτε μέλος της ομάδας"
+
+#: apps/teams/models.py:174
+msgid "Invitation by manager"
+msgstr "Πρόσκληση από διαχειριστή"
+
+#: apps/teams/models.py:175
+msgid "Invitation by admin"
+msgstr "Πρόσκληση από Διαχειριστή"
+
+#: apps/teams/models.py:182
+msgid "Any team member"
+msgstr "Οποιοδήποτε μέλος της ομάδας"
+
+#: apps/teams/models.py:183
+msgid "Managers and admins"
+msgstr "Διευθυντές και Διαχειριστές"
+
+#: apps/teams/models.py:184
+msgid "Admins only"
+msgstr "Μόνο για διαχειριστές"
+
+#: apps/teams/models.py:207
+msgid "Daily"
+msgstr "Καθημερινά"
+
+#: apps/teams/models.py:208
+msgid "Hourly"
+msgstr "Ανά ώρα"
+
+#: apps/teams/models.py:211 apps/teams/models.py:3550
+msgid "name"
+msgstr "όνομα"
+
+#: apps/teams/models.py:212 apps/teams/models.py:3551
+msgid "slug"
+msgstr "Περιθωρίου τυπογραφικού"
+
+#: apps/teams/models.py:213
+msgid "description"
+msgstr "περιγραφή"
+
+#: apps/teams/models.py:213
+msgid ""
+"All urls will be converted to links. Line breaks and HTML not supported."
+msgstr "Όλες οι διευθύνσεις url θα μετατρέπονται σε συνδέσμους. Δεν υποστηρίζονται αλλαγές γραμμής."
+
+#: apps/teams/models.py:215
+msgid "logo"
+msgstr "λογότυπο"
+
+#: apps/teams/models.py:219
+msgid "square logo"
+msgstr "τετράγωνο λογότυπο"
+
+#: apps/teams/models.py:224
+msgid "videos public?"
+msgstr "δημόσια βίντεο;"
+
+#: apps/teams/models.py:225
+msgid "Sync metadata when available (Youtube)?"
+msgstr ""
+
+#: apps/teams/models.py:226 templates/search/search.html:144
+#: templates/teams/project_list.html:12
+#: templates/videos/featured_videos.html:52
+msgid "videos"
+msgstr "Βίντεο"
+
+#: apps/teams/models.py:227
+msgid "users"
+msgstr "Χρήστες"
+
+#: apps/teams/models.py:230
+msgid "applicants"
+msgstr "Οι αιτούντες"
+
+#: apps/teams/models.py:233
+msgid "Intro Video"
+msgstr "Εισαγωγικό Βίντεο"
+
+#: apps/teams/models.py:235
+msgid "Page content"
+msgstr "Περιεχόμενο σελίδας"
+
+#: apps/teams/models.py:235
+msgid "You can use markdown. This will replace Description."
+msgstr "Μπορείτε να χρησιμοποιήσετε markdown. Αυτό θα αντικαταστήσει την Περιγραφή."
+
+#: apps/teams/models.py:237
+msgid "HTML that appears at the top of the teams page."
+msgstr "Το HTML εμφανίζεται στην κορυφή της σελίδας των ομάδων."
+
+#: apps/teams/models.py:243
+msgid "authentication provider code"
+msgstr "κωδικός παρόχου πιστοποίησης"
+
+#: apps/teams/models.py:260
+msgid "membership policy"
+msgstr "Πολιτική σχετικά με την ιδιότητα του μέλους"
+
+#: apps/teams/models.py:263
+msgid "video policy"
+msgstr "Πολιτική για τα Βίντεο"
+
+#: apps/teams/models.py:269
+msgid "task assignment policy"
+msgstr "Πολιτική ανάθεσης εργασιών"
+
+#: apps/teams/models.py:272
+msgid "subtitling policy"
+msgstr "Πολιτική υποτιτλισμού"
+
+#: apps/teams/models.py:275
+msgid "translation policy"
+msgstr "Πολιτική μεταφράσεων"
+
+#: apps/teams/models.py:278
+msgid "maximum tasks per member"
+msgstr "Μέγιστος αριθμός επιτρεπόμενων εργασιών ανά μέλος"
+
+#: apps/teams/models.py:280
+msgid "task expiration (days)"
+msgstr "Λήξη εργασίας (ημέρες)"
+
+#: apps/teams/models.py:295 templates/profiles/_teams_list.html:3
+#: templates/teams/teams-list.html:7
+msgid "Teams"
+msgstr "Ομάδες"
+
+#: apps/teams/models.py:749
+msgid "> 1000"
+msgstr "> 1000"
+
+#: apps/teams/models.py:988
+msgid ""
+"Use this space to explain why you or your team need to caption or subtitle "
+"this video. Adding a note makes volunteers more likely to help out!"
+msgstr "Χρησιμοποιήστε αυτό τον χώρο για να εξηγήσετε τον λόγο για τον οποίο εσείς ή η ομάδα σας χρειάζεσθε να προσθέσετε τους υπότιτλους σε αυτό το video. Προσθέτοντας μερικές σημειώσεις, θα είναι πιο πιθανό για τους εθελοντές να βοηθήσουν!"
+
+#: apps/teams/models.py:992
+msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
+msgstr "Πιάνουμε υποχρεωτικά τα thumbnails για κάποιες ιστοσελίδες, π.χ. για το Youtube"
+
+#: apps/teams/models.py:994
+msgid "Need help with all languages"
+msgstr "Χρειάζεται βοήθεια για όλες τις γλώσσες"
+
+#: apps/teams/models.py:995
+msgid "If you check this, other languages will not be displayed."
+msgstr "Αν τσεκάρετε εδώ, τότε δεν θα εμφανίζονται άλλες γλώσσες."
+
+#: apps/teams/models.py:1606
+#, python-format
+msgid "You already have a pending application to %(team)s."
+msgstr "Έχετε ήδη εκκρεμή αίτηση σε %(team)s."
+
+#: apps/teams/models.py:1615
+#, python-format
+msgid "You have been removed from %(team)s."
+msgstr "Έχετε διαγραφεί από την ομάδα %(team)s."
+
+#: apps/teams/models.py:2582
+msgid "Resume"
+msgstr "Ανάκτηση"
+
+#: apps/teams/models.py:2584
+msgid "Start now"
+msgstr "Έναρξη τώρα"
+
+#: apps/teams/models.py:2782
+#, python-format
+msgid "Help %(team)s reach a world audience"
+msgstr "Βοηθήστε την ομάδα %(team)s να προσεγγίσει ένα παγκόσμιο κοινό"
+
+#: apps/teams/permissions.py:748
+#, python-format
+msgid ""
+"These subtitles are moderated. See the %s team page for information on how "
+"to contribute."
+msgstr "Aυτοί οι υπότιτλοι επιτηρούνται / moderated. Δείτε τη σελίδα της ομάδας %s για πληροφορίες σχετικά με το πως μπορείτε να συνεισφέρετε."
+
+#: apps/teams/permissions.py:750
+msgid "Sorry, these subtitles are privately moderated."
+msgstr "Σγγνώμη, αυτοί οι υπότιτλοι επιτηρούνται ιδιωτικά/ moderated"
+
+#: apps/teams/permissions.py:780
+msgid ""
+"Sorry, you do not have the permission to edit these subtitles. If you "
+"believe that they need correction, please contact the team administrator."
+msgstr "Συγγνώμη, αλλά δεν έχετε τα δικαιώματα για να επεξεργαστείτε αυτούς τους υποτίτλους. Αν πιστεύετε ότι χρειάζονται διόρθωση, παρακαλώ ελάτε σε επαφή με τον διαχειριστή ομάδας."
+
 #: apps/teams/templatetags/teams_tags.py:177
-#: amara-enterprise/collab/forms/search.py:193
-#: amara-enterprise/collab/forms/search.py:342
+#: amara-enterprise/collab/forms/search.py:192
+#: amara-enterprise/collab/forms/search.py:334
 #: templates/teams/approvals.html:90 templates/teams/tasks.html:155
 #: templates/teams/tasks.html:256
 #: templates/videos/set-original-language.html:14
@@ -1450,7 +1451,7 @@ msgid "%(user)s added a note while editing %(title)s"
 msgstr "%(user)s πρόσθεσε μια σημείωση κατά την επεξεργασία %(title)s"
 
 #: apps/teams/workflows/old/subtitleworkflows.py:183
-#: amara-enterprise/collab/models.py:1213
+#: amara-enterprise/collab/models.py:1370
 #: amara-enterprise/collab/subtitle_workflow.py:320
 #: amara-enterprise/collab/forms/dashboard.py:100
 #: templates/teams/settings-projects-add.html:58
@@ -1499,71 +1500,40 @@ msgstr "Το αίτημα διεγράφη"
 msgid "Setup needed"
 msgstr "Χρειάζεται ρύθμιση"
 
-#: apps/subtitles/views.py:135 apps/auth/admin.py:96
-#: templates/admin/base_site.html:4 templates/admin/base_site.html:7
-msgid "Amara"
-msgstr "Amara"
-
-#: apps/subtitles/views.py:158
-msgid ""
-"Sorry, you cannot edit these subtitles now because they are being edited by "
-"another user. Please check back later."
-msgstr "Δυστυχώς δεν μπορείτε να επεξεργαστείτε τους υπότιτλους αυτή τη στιγμή γιατί επεξεργάζονται από άλλο χρήστη. Δοκιμάστε αργότερα."
-
-#: apps/subtitles/views.py:170 templates/profiles/account.html:218
-#: templates/teams/dashboard.html:88 templates/videos/create.html:24
-#: templates/videos/video-urls-tab.html:48
-msgid "Learn more"
-msgstr "Μάθετε περισσότερα"
-
-#: apps/subtitles/views.py:173
-#, python-format
-msgid ""
-"Sorry, you do not have permission to edit these subtitles. "
-"(%(learn_more_link)s)"
-msgstr "Συγγνώμη, δεν έχετε δικαιώματα επεξεργασίας αυτών των υπότιτλων. (%(learn_more_link)s)"
-
-#: apps/subtitles/views.py:302
-#, python-format
-msgid ""
-"Another user is currently performing the %(task_type)s task for these "
-"subtitles"
-msgstr "Κάποιος άλλος χρήστης κάνει αυτή τη στιγμή την εργασία %(task_type)s για αυτούς τους υπότιτλους"
-
-#: apps/subtitles/forms.py:90
+#: apps/subtitles/forms.py:89
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr "Συγγνώμη, δεν μπορούμε να φορτώσουμε τους υποτίτλους σας, διότι υπάρχει ήδη σε εξέλιξη εργασίας για αυτήν τη γλώσσα."
 
-#: apps/subtitles/forms.py:105
+#: apps/subtitles/forms.py:104
 msgid "The language already exists and is not a translation."
 msgstr "Η γλώσσα υπάρχει ήδη και δεν αποτελεί μετάφραση."
 
-#: apps/subtitles/forms.py:111
+#: apps/subtitles/forms.py:110
 #, python-format
 msgid "The language already exists as a translation from %(source_lang)s."
 msgstr "Η γλώσσα υπάρχει ήδη μεταφρασμένη από τα %(source_lang)s."
 
-#: apps/subtitles/forms.py:129
+#: apps/subtitles/forms.py:128
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr "Δυστυχώς δεν μπορούμε να ανεβάσουμε τους υπότιτλούς σας, επειδή αυτή η γλώσσα έχει ανατεθεί σε διαφορετικό χρήστη."
 
-#: apps/subtitles/forms.py:136
+#: apps/subtitles/forms.py:135
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr "Λυπούμαστε, δεν μπορούμε να ανεβάσουμε τους υποτίτλούς σας επειδή δεν έχετε δικαίωμα ανάθεσης σε αυτή τη γλώσσα."
 
-#: apps/subtitles/forms.py:147
+#: apps/subtitles/forms.py:146
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr "Λυπούμαστε, δεν μπορούμε να φορτώσουμε τους υποτίτλους σας, διότι υπάρχει ήδη ένα πρόχειρο/ draft για τη γλώσσα αυτή υπό επιτήρηση/ moderation."
 
-#: apps/subtitles/forms.py:157
+#: apps/subtitles/forms.py:156
 #, python-format
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
@@ -1571,73 +1541,132 @@ msgid ""
 "(%(source_lines)s)."
 msgstr "Λυπούμαστε, δεν μπορούσαμε να ανεβάσουμε το αρχείο σας, διότι ο αριθμός γραμμών στη μετάφρασή σας (%(translation_lines)s) δεν αντιστοιχεί με εκείνες στο πρωτότυπο (%(source_lines)s)."
 
-#: apps/subtitles/forms.py:169
+#: apps/subtitles/forms.py:168
 #, python-format
 msgid "File size must be less than %(size)s kb."
 msgstr "Το μέγεθος αρχείου πρέπει να είναι λιγότερο από %(size)s kb."
 
-#: apps/subtitles/forms.py:177
+#: apps/subtitles/forms.py:175
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %(formats)s"
 msgstr "Μη υποστηριζόμενη μορφή. Παρακαλούμε μεταφορτώστε σε μια από τις ακόλουθες: %(formats)s"
 
-#: apps/subtitles/forms.py:185
+#: apps/subtitles/forms.py:183
 msgid "Can not detect file encoding"
 msgstr "Δεν εντοπίζεται η κωδικοποίηση του αρχείου"
 
-#: apps/subtitles/forms.py:211
+#: apps/subtitles/forms.py:209
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Κάποιος υποτιτλίζει το βίντεο ακριβώς τώρα. Προσπαθείστε αργότερα."
 
-#: apps/subtitles/forms.py:223
+#: apps/subtitles/forms.py:221
 #, python-format
 msgid "Invalid from language: %(language)s"
 msgstr "Μη έγκυρο από γλώσσα: %(language)s"
 
-#: apps/subtitles/forms.py:228
+#: apps/subtitles/forms.py:226
 #, python-format
 msgid "%(language)s has no public versions"
 msgstr "Η γλώσσα %(language)s δεν έχει δημόσιες εκδόσεις. "
 
-#: apps/subtitles/forms.py:260
+#: apps/subtitles/forms.py:258
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated."
 msgstr "Λυπούμαστε, δεν μπορούμε να ανεβάσουμε τους υποτίτλους σας επειδή αυτή η γλώσσα είναι υπό διαχείριση."
 
-#: apps/subtitles/models.py:1339
+#: apps/subtitles/models.py:1343
 #: templates/videos/language-revisions-tab.html:42
 msgid "API"
 msgstr "API"
 
-#: apps/subtitles/models.py:1340
+#: apps/subtitles/models.py:1344
 #: templates/videos/language-revisions-tab.html:46
 msgid "Subtitle Editor"
 msgstr "Επεξεργαστής Υποτίτλων"
 
-#: apps/subtitles/models.py:1341
+#: apps/subtitles/models.py:1345
 msgid "Imported"
 msgstr "Έγινε εισαγωγή"
 
-#: apps/subtitles/models.py:1342
+#: apps/subtitles/models.py:1346
 msgid "Rollback"
 msgstr "Επιστροφή σε προηγούμενο σημείο"
 
-#: apps/subtitles/models.py:1343
+#: apps/subtitles/models.py:1347
 msgid "Scripted"
 msgstr "σενάριο"
 
-#: apps/subtitles/models.py:1344
+#: apps/subtitles/models.py:1348
 msgid "Tern"
 msgstr "Tern"
 
-#: apps/subtitles/models.py:1345
+#: apps/subtitles/models.py:1349
 #: templates/videos/language-revisions-tab.html:40
 msgid "Uploaded"
 msgstr "Έχει μεταφορτωθεί"
 
-#: apps/subtitles/models.py:1346
+#: apps/subtitles/models.py:1350
 msgid "Through web editor"
 msgstr "Μέσα από επεξεργαστή στο web"
+
+#: apps/subtitles/views.py:142 apps/auth/admin.py:96
+#: templates/admin/base_site.html:4 templates/admin/base_site.html:7
+msgid "Amara"
+msgstr "Amara"
+
+#: apps/subtitles/views.py:165
+msgid ""
+"Sorry, you cannot edit these subtitles now because they are being edited by "
+"another user. Please check back later."
+msgstr "Δυστυχώς δεν μπορείτε να επεξεργαστείτε τους υπότιτλους αυτή τη στιγμή γιατί επεξεργάζονται από άλλο χρήστη. Δοκιμάστε αργότερα."
+
+#: apps/subtitles/views.py:177 templates/profiles/account.html:218
+#: templates/teams/dashboard.html:88 templates/videos/create.html:24
+#: templates/videos/video-urls-tab.html:48
+msgid "Learn more"
+msgstr "Μάθετε περισσότερα"
+
+#: apps/subtitles/views.py:180
+#, python-format
+msgid ""
+"Sorry, you do not have permission to edit these subtitles. "
+"(%(learn_more_link)s)"
+msgstr "Συγγνώμη, δεν έχετε δικαιώματα επεξεργασίας αυτών των υπότιτλων. (%(learn_more_link)s)"
+
+#: apps/subtitles/views.py:286
+msgid "Magic"
+msgstr ""
+
+#: apps/subtitles/views.py:287
+msgid "Recommended: magical auto-pause (just keep typing!)"
+msgstr ""
+
+#: apps/subtitles/views.py:292
+msgid "Standard"
+msgstr ""
+
+#: apps/subtitles/views.py:293
+msgid "Standard: no automatic pausing, use TAB key"
+msgstr ""
+
+#: apps/subtitles/views.py:298
+msgid "Beginner"
+msgstr ""
+
+#: apps/subtitles/views.py:299
+msgid "Beginner: play 4 seconds, then pause"
+msgstr ""
+
+#: apps/subtitles/views.py:334
+#, python-format
+msgid ""
+"Another user is currently performing the %(task_type)s task for these "
+"subtitles"
+msgstr "Κάποιος άλλος χρήστης κάνει αυτή τη στιγμή την εργασία %(task_type)s για αυτούς τους υπότιτλους"
+
+#: apps/subtitles/views.py:438
+msgid "You are not allowed to download this subtitle format."
+msgstr ""
 
 #: apps/subtitles/workflows.py:768
 msgid "Publish"
@@ -1661,12 +1690,12 @@ msgid "Notes"
 msgstr "Σημειώσεις"
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:39
-#: amara-enterprise/collab/models.py:61
+#: amara-enterprise/collab/models.py:62
 msgid "Public"
 msgstr "Δημόσιο"
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:40
-#: amara-enterprise/collab/models.py:62 templates/teams/teams-list.html:68
+#: amara-enterprise/collab/models.py:63 templates/teams/teams-list.html:68
 msgid "Private"
 msgstr "Ιδιωτικό"
 
@@ -1754,57 +1783,57 @@ msgstr ""
 msgid "Hide"
 msgstr "Απόκρυψη"
 
-#: apps/auth/models.py:146
+#: apps/auth/models.py:169
 msgid "Retired user"
 msgstr "Χρήστης που αποσύρθηκε"
 
-#: apps/auth/models.py:466
+#: apps/auth/models.py:508
 msgid "Add comment"
 msgstr "Προσθήκη σχολίου"
 
-#: apps/auth/models.py:467
+#: apps/auth/models.py:509
 msgid "Start subtitles"
 msgstr "Έναρξη υποτίτλων"
 
-#: apps/auth/models.py:468
+#: apps/auth/models.py:510
 msgid "Start translation"
 msgstr "Έναρξη μετάφρασης"
 
-#: apps/auth/models.py:469
+#: apps/auth/models.py:511
 msgid "Edit subtitles"
 msgstr "Επεξεργασία υπότιτλων"
 
-#: apps/auth/models.py:470
+#: apps/auth/models.py:512
 msgid "Edit translation"
 msgstr "Επεξεργασία μετάφρασης"
 
-#: apps/auth/models.py:527
+#: apps/auth/models.py:569
 msgid "understand enough"
 msgstr "αρκετή κατανόηση"
 
-#: apps/auth/models.py:528
+#: apps/auth/models.py:570
 msgid "understand 99%"
 msgstr "κατανόηση του 99%"
 
-#: apps/auth/models.py:529
+#: apps/auth/models.py:571
 msgid "write like a native"
 msgstr "γράφει σαν γηγενής"
 
-#: apps/auth/models.py:537
+#: apps/auth/models.py:579
 msgid "follow requests in language"
 msgstr "Παρακολουθήστε τα αιτήματα στη γλώσσα"
 
-#: apps/auth/models.py:552
+#: apps/auth/models.py:594
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr "Αυτή είναι η ημερομηνία κατά την οποία θα αρχίσει η προβολή της αναγγελίας. Θα προβάλλεται μόνον η τελευταία."
 
-#: apps/auth/models.py:652
+#: apps/auth/models.py:694
 msgid "e-mail confirmation"
 msgstr "Επιβεβαίωση email"
 
-#: apps/auth/models.py:653
+#: apps/auth/models.py:695
 msgid "e-mail confirmations"
 msgstr "Επβεβαιώσεις email"
 
@@ -1839,10 +1868,6 @@ msgstr "Απαιτούμενο πεδίο"
 #: apps/messages/rpc.py:37 apps/messages/rpc.py:51
 msgid "Message does not exist."
 msgstr "Το μήνυμα δεν υπάρχει."
-
-#: apps/messages/views.py:203
-msgid "Message sent."
-msgstr "Το μήνυμα στάλθηκε."
 
 #: apps/messages/tasks.py:97
 #, python-format
@@ -1925,6 +1950,10 @@ msgstr "[χωρίς θέμα]"
 #: apps/messages/models.py:205
 msgid "You should enter subject or message."
 msgstr "Πρέπει να βάλετε ένα θέμα ή ένα μήνυμα"
+
+#: apps/messages/views.py:204
+msgid "Message sent."
+msgstr "Το μήνυμα στάλθηκε."
 
 #: apps/videos/metadata.py:57
 msgid "Speaker Name"
@@ -2101,6 +2130,76 @@ msgstr "Παρακαλούμε, κάντε διπλό κλικ στις βασι
 msgid "Your Languages"
 msgstr "Οι γλώσσες σας"
 
+#: apps/videos/views.py:145
+msgid "original"
+msgstr "αρχικό"
+
+#: apps/videos/views.py:150
+msgid "incomplete"
+msgstr "ατελής"
+
+#: apps/videos/views.py:158
+msgid "needs review"
+msgstr "χρειάζεται αναθεώρηση"
+
+#: apps/videos/views.py:161
+msgid "needs approval"
+msgstr "χρειάζεται έγκριση"
+
+#: apps/videos/views.py:166
+msgid "needs editing"
+msgstr "χρειάζεται επεξεργασία"
+
+#: apps/videos/views.py:205
+msgid ""
+"Here is the subtitle workspace for your video.\n"
+"        You can share the video with friends, or get an embed code for your site. To start\n"
+"        new subtitles, click \"Add a new language!\" in the sidebar."
+msgstr "Εδώ είναι ο χώρος εργασίας για τους υπότιτλους του βίντεό σας.\nΜπορείτε να μοιρασθείτε το βίντεο με φίλους  ή να πάρετε έναν κωδικό ενσωμάτωσης για τον ιστότοπό σας.  Για να ξεκινήσετε\nνέους υπότιτλους, πατήστε \"Προσθήκη νέας γλώσσας!\" στην πλευρική στήλη."
+
+#: apps/videos/views.py:213
+msgid ""
+"You have submitted a video\n"
+"                that is served over http.  Your browser may display mixed\n"
+"                content warnings."
+msgstr "Υποβάλατε ένα video\nπου σερβίρεται πάνω σε http.  Ο περιηγητής σας μπορεί να εμφανίσει\nπροειδοποιήσεις ανάμεικτου περιεχομένου."
+
+#: apps/videos/views.py:218
+msgid "Existing subtitles will be imported in a few minutes."
+msgstr "Οι υπάρχοντες υπότιτλοιο θα εισαχθούν σε λίγα λεπτά."
+
+#: apps/videos/views.py:402
+msgid ""
+"Thank you for uploading. It may take a minute or so for your subtitles to "
+"appear."
+msgstr "Σας ευχαριστούμε για τη μεταφόρτωση. Μπορεί να χρειαστεί περίπου ένα λεπτό για να εμφανιστούν οι υπότιτλοί σας."
+
+#: apps/videos/views.py:538 apps/videos/models.py:460
+#, python-format
+msgid "%(title)s with subtitles | Amara"
+msgstr "%(title)s με υπότιτλους | Amara"
+
+#: apps/videos/views.py:661
+msgid "You don't have permission to rollback this language"
+msgstr "Δεν έχετε την άδεια για να επαναφέρετε αυτή τη γλώσσα"
+
+#: apps/videos/views.py:757
+msgid "You have not permission change this URL"
+msgstr "Δεν έχετε εξουσιοδότηση να αλλάξετε αυτό το URL"
+
+#: apps/videos/views.py:762 apps/videos/views.py:786
+msgid "Object does not exist"
+msgstr "Το Αντικείμενο δεν υπάρχει"
+
+#: apps/videos/views.py:777
+msgid "You have not permission delete this URL"
+msgstr "Δεν έχετε εξουσιοδότηση να διαγράψετε αυτό το URL"
+
+#: apps/videos/views.py:902
+#, python-format
+msgid "The language for %(video)s has been changed"
+msgstr "Η γλώσσα για το %(video)s έχει αλλάξει"
+
 #: apps/videos/models.py:340
 msgid "in seconds"
 msgstr "σε δευτερόλεπτα"
@@ -2108,11 +2207,6 @@ msgstr "σε δευτερόλεπτα"
 #: apps/videos/models.py:377
 msgid "Views"
 msgstr "Αριθμός προβολών"
-
-#: apps/videos/models.py:460 apps/videos/views.py:536
-#, python-format
-msgid "%(title)s with subtitles | Amara"
-msgstr "%(title)s με υπότιτλους | Amara"
 
 #: apps/videos/models.py:651
 msgid "No Video URL"
@@ -2334,93 +2428,28 @@ msgstr "διαγραφή του url"
 msgid "Video already exist on Amara"
 msgstr "Το βίντεο υπάρχει ήδη στο Amara"
 
-#: apps/videos/models.py:2106
+#: apps/videos/models.py:2109
 msgid "Unknown video type"
 msgstr "Άγνωστος τύπος βίντεο"
 
-#: apps/videos/models.py:2116
+#: apps/videos/models.py:2119
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
 "system. You can't add it as a secondary URL."
 msgstr "Αυτό το URL ήδη<a href=\"%(url)s\">υπάρχει</a> ως ένα δικό μας βίντεο στο σύστημά μας. Δεν μπορείτε να το προσθέσετε σαν δευτερεύον URL."
 
-#: apps/videos/models.py:2150
+#: apps/videos/models.py:2153
 msgid "Can't remove the primary video URL"
 msgstr "Δεν μπορείτε να αφαιρέσετε το πρωτεύον URL του βίντεο"
-
-#: apps/videos/views.py:143
-msgid "original"
-msgstr "αρχικό"
-
-#: apps/videos/views.py:148
-msgid "incomplete"
-msgstr "ατελής"
-
-#: apps/videos/views.py:156
-msgid "needs review"
-msgstr "χρειάζεται αναθεώρηση"
-
-#: apps/videos/views.py:159
-msgid "needs approval"
-msgstr "χρειάζεται έγκριση"
-
-#: apps/videos/views.py:164
-msgid "needs editing"
-msgstr "χρειάζεται επεξεργασία"
-
-#: apps/videos/views.py:203
-msgid ""
-"Here is the subtitle workspace for your video.\n"
-"        You can share the video with friends, or get an embed code for your site. To start\n"
-"        new subtitles, click \"Add a new language!\" in the sidebar."
-msgstr "Εδώ είναι ο χώρος εργασίας για τους υπότιτλους του βίντεό σας.\nΜπορείτε να μοιρασθείτε το βίντεο με φίλους  ή να πάρετε έναν κωδικό ενσωμάτωσης για τον ιστότοπό σας.  Για να ξεκινήσετε\nνέους υπότιτλους, πατήστε \"Προσθήκη νέας γλώσσας!\" στην πλευρική στήλη."
-
-#: apps/videos/views.py:211
-msgid ""
-"You have submitted a video\n"
-"                that is served over http.  Your browser may display mixed\n"
-"                content warnings."
-msgstr "Υποβάλατε ένα video\nπου σερβίρεται πάνω σε http.  Ο περιηγητής σας μπορεί να εμφανίσει\nπροειδοποιήσεις ανάμεικτου περιεχομένου."
-
-#: apps/videos/views.py:216
-msgid "Existing subtitles will be imported in a few minutes."
-msgstr "Οι υπάρχοντες υπότιτλοιο θα εισαχθούν σε λίγα λεπτά."
-
-#: apps/videos/views.py:400
-msgid ""
-"Thank you for uploading. It may take a minute or so for your subtitles to "
-"appear."
-msgstr "Σας ευχαριστούμε για τη μεταφόρτωση. Μπορεί να χρειαστεί περίπου ένα λεπτό για να εμφανιστούν οι υπότιτλοί σας."
-
-#: apps/videos/views.py:654
-msgid "You don't have permission to rollback this language"
-msgstr "Δεν έχετε την άδεια για να επαναφέρετε αυτή τη γλώσσα"
-
-#: apps/videos/views.py:750
-msgid "You have not permission change this URL"
-msgstr "Δεν έχετε εξουσιοδότηση να αλλάξετε αυτό το URL"
-
-#: apps/videos/views.py:755 apps/videos/views.py:779
-msgid "Object does not exist"
-msgstr "Το Αντικείμενο δεν υπάρχει"
-
-#: apps/videos/views.py:770
-msgid "You have not permission delete this URL"
-msgstr "Δεν έχετε εξουσιοδότηση να διαγράψετε αυτό το URL"
-
-#: apps/videos/views.py:895
-#, python-format
-msgid "The language for %(video)s has been changed"
-msgstr "Η γλώσσα για το %(video)s έχει αλλάξει"
 
 #: apps/videos/feed_parser/parser.py:108
 msgid "Feed is unavailable now."
 msgstr "Η ροή δεν είναι διαθέσιμη τώρα"
 
 #: apps/videos/templatetags/videos_tags.py:125
-#: amara-enterprise/collab/forms/search.py:205
-#: amara-enterprise/collab/forms/search.py:354
+#: amara-enterprise/collab/forms/search.py:204
+#: amara-enterprise/collab/forms/search.py:346
 msgid "Unknown"
 msgstr "Άγνωστη"
 
@@ -2819,369 +2848,405 @@ msgstr "Αυτή η τιμή μπορεί να περιέχει μόνο γρά�
 msgid "The %(team)s team has a new assignment!"
 msgstr ""
 
-#: amara-enterprise/collab/const.py:51 amara-enterprise/providers/forms.py:155
+#: amara-enterprise/collab/startup.py:13
+msgid "Collab"
+msgstr ""
+
+#: amara-enterprise/collab/startup.py:13
+msgid "Evaluation Teams"
+msgstr ""
+
+#: amara-enterprise/collab/team_workflow.py:21
+#: amara-enterprise/collab/forms/search.py:190
+#: amara-enterprise/collab/forms/search.py:332
+#: amara-enterprise/collab/templates/collab/_collab-search-form.html:5
+#: amara-enterprise/collab/templates/collab/_collaborations-list.html:9
+#: amara-enterprise/collab/templates/collab/evaluate.html:13
+msgid "Collaboration"
+msgstr ""
+
+#: amara-enterprise/collab/team_workflow.py:46
+#: amara-enterprise/collab/views.py:120 amara-enterprise/collab/views.py:374
+#: amara-enterprise/collab/views.py:454 amara-enterprise/collab/views.py:465
+#: amara-enterprise/collab/templates/collab/collaborations.html:7
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:35
+msgid "Collaborations"
+msgstr ""
+
+#: amara-enterprise/collab/team_workflow.py:107
+msgid "Customer"
+msgstr ""
+
+#: amara-enterprise/collab/const.py:98 amara-enterprise/providers/forms.py:155
 msgid "Any Duration"
 msgstr ""
 
-#: amara-enterprise/collab/const.py:52
+#: amara-enterprise/collab/const.py:99
 msgid "Short (0-10 minutes)"
 msgstr ""
 
-#: amara-enterprise/collab/const.py:53
+#: amara-enterprise/collab/const.py:100
 msgid "Medium (10-30 minutes)"
 msgstr ""
 
-#: amara-enterprise/collab/const.py:54
+#: amara-enterprise/collab/const.py:101
 msgid "Long (> 30 minutes)"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:64
+#: amara-enterprise/collab/models.py:65
 msgid "Private until the collaboration is complete"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:70
+#: amara-enterprise/collab/models.py:71
 msgid "Show collabs for all Languages"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:71
+#: amara-enterprise/collab/models.py:72
 msgid "Show collabs for user's languages"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:527
-#: amara-enterprise/collab/models.py:1979
+#: amara-enterprise/collab/models.py:626
+#: amara-enterprise/collab/models.py:2085
 #, python-format
 msgid "%(language)s captions"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:529
-#: amara-enterprise/collab/models.py:1981
+#: amara-enterprise/collab/models.py:628
+#: amara-enterprise/collab/models.py:2087
 #, python-format
 msgid "%(language)s translation"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:545
+#: amara-enterprise/collab/models.py:644
 msgid "Now"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:848
-#: amara-enterprise/collab/models.py:1467
+#: amara-enterprise/collab/models.py:969
+#: amara-enterprise/collab/models.py:1569
 msgid "Subtitler"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:850
-#: amara-enterprise/collab/models.py:1468
+#: amara-enterprise/collab/models.py:971
+#: amara-enterprise/collab/models.py:1570
 msgid "Reviewer"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:852
-#: amara-enterprise/collab/models.py:1469
+#: amara-enterprise/collab/models.py:973
+#: amara-enterprise/collab/models.py:1571
 msgid "Approver"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:858 templates/profiles/dashboard.html:67
+#: amara-enterprise/collab/models.py:979 templates/profiles/dashboard.html:67
 #: templates/teams/_perform_task_link.html:11
 #, python-format
 msgid "Create %(language)s subtitles"
 msgstr "Δημιουργία υποτίτλων στα %(language)s"
 
-#: amara-enterprise/collab/models.py:860
+#: amara-enterprise/collab/models.py:981
 #, python-format
 msgid "Review %(language)s subtitles"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:862
+#: amara-enterprise/collab/models.py:983
 #, python-format
 msgid "Approve %(language)s subtitles"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1195
-msgid "Main"
+#: amara-enterprise/collab/models.py:1350
+msgid "Local"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1197
-msgid "Current"
+#: amara-enterprise/collab/models.py:1351
+msgid "Incoming"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1199
-#: amara-enterprise/billing/templatetags/billing.py:28
-msgid "Completed"
+#: amara-enterprise/collab/models.py:1352
+msgid "Outgoing"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1201
-msgid "Remote"
+#: amara-enterprise/collab/models.py:1353
+msgid "Evaluations"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1203
-msgid "Current Evaluations"
+#: amara-enterprise/collab/models.py:1357
+msgid "In Progress"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1211 templates/teams/tasks.html:69
+#: amara-enterprise/collab/models.py:1359
+msgid "upcoming"
+msgstr ""
+
+#: amara-enterprise/collab/models.py:1360
+msgid "In Evaluation"
+msgstr ""
+
+#: amara-enterprise/collab/models.py:1368 templates/teams/tasks.html:69
 #: templates/teams/tasks.html:229
 msgid "Transcribe"
 msgstr "Μεταγραφή διαλόγων/ Transcribe"
 
-#: amara-enterprise/collab/models.py:1212 templates/teams/tasks.html:71
+#: amara-enterprise/collab/models.py:1369 templates/teams/tasks.html:71
 #: templates/editor/workflow-normal.html:5
 #: amara-enterprise/services/templates/services/translation_request.html:7
 msgid "Translate"
 msgstr "Μετάφραση"
 
-#: amara-enterprise/collab/models.py:1215
+#: amara-enterprise/collab/models.py:1372
 msgid "Evaluate"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1470
+#: amara-enterprise/collab/models.py:1572
 #: amara-enterprise/collab/subtitle_workflow.py:325
 #: amara-enterprise/collab/templates/collab/evaluate-video.html:20
 msgid "Evaluator"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1471
+#: amara-enterprise/collab/models.py:1573
 msgid "Evaluator #2"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1472
+#: amara-enterprise/collab/models.py:1574
 msgid "Evaluator #3"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1588
+#: amara-enterprise/collab/models.py:1694
 msgid "transcribe"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1590
+#: amara-enterprise/collab/models.py:1696
 msgid "translate"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1592
+#: amara-enterprise/collab/models.py:1698
 msgid "review"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1594
+#: amara-enterprise/collab/models.py:1700
 msgid "approve"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1596
+#: amara-enterprise/collab/models.py:1702
 msgid "evaluate"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1598
+#: amara-enterprise/collab/models.py:1704
 msgid "evaluate #2"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1600
+#: amara-enterprise/collab/models.py:1706
 msgid "evaluate #3"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1602
-#: amara-enterprise/collab/models.py:1630
+#: amara-enterprise/collab/models.py:1708
+#: amara-enterprise/collab/models.py:1736
 msgid "unknown"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1616
+#: amara-enterprise/collab/models.py:1722
 msgid "transcriber"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1618
+#: amara-enterprise/collab/models.py:1724
 msgid "translator"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1620
-#: amara-enterprise/collab/models.py:1968
+#: amara-enterprise/collab/models.py:1726
+#: amara-enterprise/collab/models.py:2074
 msgid "reviewer"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1622
-#: amara-enterprise/collab/models.py:1969
+#: amara-enterprise/collab/models.py:1728
+#: amara-enterprise/collab/models.py:2075
 msgid "approver"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1624
+#: amara-enterprise/collab/models.py:1730
 msgid "evaluator"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1626
+#: amara-enterprise/collab/models.py:1732
 msgid "evaluator #2"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1628
+#: amara-enterprise/collab/models.py:1734
 msgid "evaluator #3"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1638
+#: amara-enterprise/collab/models.py:1744
 msgid "Collaboration joined"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1641
+#: amara-enterprise/collab/models.py:1747
 #, python-format
 msgid ""
 "started working as %(role)s on %(language)s for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1648
+#: amara-enterprise/collab/models.py:1754
 msgid "Collaboration left"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1651
+#: amara-enterprise/collab/models.py:1757
 #, python-format
 msgid ""
 "stopped working as %(role)s on %(language)s for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1658
+#: amara-enterprise/collab/models.py:1764
 msgid "Collaboration assigned"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1663
+#: amara-enterprise/collab/models.py:1769
 #, python-format
 msgid ""
 "assigned the %(language)s %(assignment_type)s assignment to %(assignee)s for"
 " <a href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1673
+#: amara-enterprise/collab/models.py:1779
 msgid "Collaboration reassigned"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1678
+#: amara-enterprise/collab/models.py:1784
 #, python-format
 msgid ""
 "reassigned the %(language)s %(assignment_type)s assignment to %(assignee)s "
 "for <a href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1688
+#: amara-enterprise/collab/models.py:1794
 msgid "Collaboration unassigned"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1693
+#: amara-enterprise/collab/models.py:1799
 #, python-format
 msgid ""
 "unassigned the %(language)s %(assignment_type)s assignment from %(assignee)s"
 " for <a href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1703
+#: amara-enterprise/collab/models.py:1809
 msgid "Collaboration endorsed"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1706
+#: amara-enterprise/collab/models.py:1812
 #, python-format
 msgid ""
 "endorsed the %(language)s subtitles for <a "
 "href=\"%(video_url)s\">%(video)s</a> (%(role)s)"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1715
+#: amara-enterprise/collab/models.py:1821
 msgid "Collaboration sent back"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1718
+#: amara-enterprise/collab/models.py:1824
 #, python-format
 msgid ""
 "sent back the %(language)s subtitles for <a "
 "href=\"%(video_url)s\">%(video)s</a> (%(role)s)"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1727
+#: amara-enterprise/collab/models.py:1833
 msgid "Collaboration marked complete"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1730
+#: amara-enterprise/collab/models.py:1836
 #, python-format
 msgid ""
 "marked the %(language)s subtitles complete for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1736
+#: amara-enterprise/collab/models.py:1842
 msgid "Collaboration moved from team"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1740
+#: amara-enterprise/collab/models.py:1846
 #, python-format
 msgid ""
 "moved the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a> to %(new_team)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1748
+#: amara-enterprise/collab/models.py:1854
 msgid "Collaboration moved to team"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1752
+#: amara-enterprise/collab/models.py:1858
 #, python-format
 msgid ""
 "moved the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a> from %(old_team)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1760
+#: amara-enterprise/collab/models.py:1866
 msgid "Collaboration deleted"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1763
+#: amara-enterprise/collab/models.py:1869
 #, python-format
 msgid ""
 "Deleted the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1769
+#: amara-enterprise/collab/models.py:1875
 msgid "Collaboration accepted by provider"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1772
+#: amara-enterprise/collab/models.py:1878
 #, python-format
 msgid ""
 "provider accepted the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1778
+#: amara-enterprise/collab/models.py:1884
 msgid "Collaboration submitted by provider"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1781
+#: amara-enterprise/collab/models.py:1887
 #, python-format
 msgid ""
 "provider submitted the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1787
+#: amara-enterprise/collab/models.py:1893
 msgid "Collaboration unassigned from provider"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1790
+#: amara-enterprise/collab/models.py:1896
 #, python-format
 msgid ""
 "unassigned the provider for the %(language)s subtitles request for <a "
 "href=\"%(video_url)s\">%(video)s</a>"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1915
+#: amara-enterprise/collab/models.py:2021
 #: templates/messages/email/team-you-have-been-invited.html:19
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:31
 msgid "Join"
 msgstr "Εγγραφείτε"
 
-#: amara-enterprise/collab/models.py:1916
+#: amara-enterprise/collab/models.py:2022
 #: amara-enterprise/collab/templates/collab/leave-collaboration.html:14
 msgid "Leave"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1917 templates/teams/tasks.html:507
+#: amara-enterprise/collab/models.py:2023 templates/teams/tasks.html:507
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:25
 msgid "Assign"
 msgstr "Ανάθεση"
 
-#: amara-enterprise/collab/models.py:1918
+#: amara-enterprise/collab/models.py:2024
 msgid "Re-Assign"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1919 templates/profiles/account.html:83
+#: amara-enterprise/collab/models.py:2025 templates/profiles/account.html:83
 #: templates/profiles/account.html:94
 #: templates/teams/_team_video_detail.html:56
 #: templates/teams/_team_video_summary.html:56
@@ -3196,21 +3261,21 @@ msgstr ""
 msgid "Remove"
 msgstr "Διαγραφή"
 
-#: amara-enterprise/collab/models.py:1920
+#: amara-enterprise/collab/models.py:2026
 msgid "Endorsement"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1921
+#: amara-enterprise/collab/models.py:2027
 #: amara-enterprise/collab/subtitle_workflow.py:133
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:122
 msgid "Send back"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1922
+#: amara-enterprise/collab/models.py:2028
 msgid "Mark complete"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1923 templates/new-teams/videos.html:101
+#: amara-enterprise/collab/models.py:2029 templates/new-teams/videos.html:101
 #: templates/new-teams/videos-forms/move.html:32
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:8
 #: amara-enterprise/collab/templates/collab/_collaborations-admin-forms.html:82
@@ -3218,158 +3283,158 @@ msgstr ""
 msgid "Move"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1924
+#: amara-enterprise/collab/models.py:2030
 msgid "Delete collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1925
+#: amara-enterprise/collab/models.py:2031
 msgid "Provider Accept"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1926
+#: amara-enterprise/collab/models.py:2032
 msgid "Provider Submit"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1927
+#: amara-enterprise/collab/models.py:2033
 msgid "Unassign Provider"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1953
+#: amara-enterprise/collab/models.py:2059
 #: amara-enterprise/collab/templates/collab/video-collaborations-rows.html:26
 msgid "join"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1954
+#: amara-enterprise/collab/models.py:2060
 msgid "leave"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1955
+#: amara-enterprise/collab/models.py:2061
 msgid "assign"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1956
+#: amara-enterprise/collab/models.py:2062
 msgid "remove"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1957
+#: amara-enterprise/collab/models.py:2063
 msgid "endorsement"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1958
+#: amara-enterprise/collab/models.py:2064
 msgid "send back"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1959
+#: amara-enterprise/collab/models.py:2065
 msgid "mark complete"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1960
+#: amara-enterprise/collab/models.py:2066
 msgid "move"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1961
+#: amara-enterprise/collab/models.py:2067
 msgid "delete collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:1967
+#: amara-enterprise/collab/models.py:2073
 msgid "subtitler"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2001
+#: amara-enterprise/collab/models.py:2107
 #, python-format
 msgid "%(action)s by %(role)s "
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2005
+#: amara-enterprise/collab/models.py:2111
 #, python-format
 msgid "Admin move to %(team)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2008
+#: amara-enterprise/collab/models.py:2114
 msgid "Joined Collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2010
+#: amara-enterprise/collab/models.py:2116
 msgid "Left Collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2012
+#: amara-enterprise/collab/models.py:2118
 #: amara-enterprise/collab/forms/admin.py:222
 #, python-format
 msgid "Assigned %(user)s as %(role)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2016
+#: amara-enterprise/collab/models.py:2122
 #, python-format
 msgid "Re-assigned %(user)s as %(role)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2020
+#: amara-enterprise/collab/models.py:2126
 #, python-format
 msgid "Removed %(user)s (%(role)s)"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2025
+#: amara-enterprise/collab/models.py:2131
 msgid "Provider accepted job"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2030
-#: amara-enterprise/collab/models.py:2033
-#: amara-enterprise/collab/models.py:2081
+#: amara-enterprise/collab/models.py:2136
+#: amara-enterprise/collab/models.py:2139
+#: amara-enterprise/collab/models.py:2187
 msgid "Provider submitted subtitles"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2035
+#: amara-enterprise/collab/models.py:2141
 #, python-format
 msgid "Unassigned provider: %(user)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2043
+#: amara-enterprise/collab/models.py:2149
 #, python-format
 msgid "%(role)s %(action)s by %(user)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2048
+#: amara-enterprise/collab/models.py:2154
 #, python-format
 msgid "Move to %(team)s by %(user)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2051
+#: amara-enterprise/collab/models.py:2157
 #, python-format
 msgid "%(user)s joined as %(role)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2054
+#: amara-enterprise/collab/models.py:2160
 #, python-format
 msgid "%(user)s left (%(role)s)"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2058
+#: amara-enterprise/collab/models.py:2164
 #, python-format
 msgid "%(user)s assigned %(other_user)s as %(role)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2063
+#: amara-enterprise/collab/models.py:2169
 #, python-format
 msgid "%(user)s re-assigned %(other_user)s as %(role)s"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2068
+#: amara-enterprise/collab/models.py:2174
 #, python-format
 msgid "%(user)s removed %(other_user)s (%(role)s)"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2073
+#: amara-enterprise/collab/models.py:2179
 #, python-format
 msgid "Provider %(user)s accepted job"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2078
+#: amara-enterprise/collab/models.py:2184
 #, python-format
 msgid "Provider %(user)s submitted subtitles"
 msgstr ""
 
-#: amara-enterprise/collab/models.py:2084
+#: amara-enterprise/collab/models.py:2190
 #, python-format
 msgid "%(user)s unassigned provider %(other_user)s"
 msgstr ""
@@ -3475,36 +3540,28 @@ msgid ""
 "Endorse/Send back when done, or Save Draft to finish later"
 msgstr ""
 
-#: amara-enterprise/collab/views.py:54 amara-enterprise/collab/views.py:72
+#: amara-enterprise/collab/views.py:55 amara-enterprise/collab/views.py:73
 #: templates/teams/_subnav_settings.html:14
 msgid "Workflows"
 msgstr "Ροή εργασίας"
 
-#: amara-enterprise/collab/views.py:85
+#: amara-enterprise/collab/views.py:86
 msgid "Collaboration created"
 msgstr ""
 
-#: amara-enterprise/collab/views.py:119 amara-enterprise/collab/views.py:373
-#: amara-enterprise/collab/views.py:454 amara-enterprise/collab/views.py:465
-#: amara-enterprise/collab/team_workflow.py:46
-#: amara-enterprise/collab/templates/collab/collaborations.html:7
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:26
-msgid "Collaborations"
-msgstr ""
-
-#: amara-enterprise/collab/views.py:150
+#: amara-enterprise/collab/views.py:151
 msgid "You have already endorsed the collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/views.py:217
+#: amara-enterprise/collab/views.py:218
 msgid "Dashboard updated"
 msgstr ""
 
-#: amara-enterprise/collab/views.py:280
+#: amara-enterprise/collab/views.py:281
 msgid "Your assignments (note: collaborations only)"
 msgstr ""
 
-#: amara-enterprise/collab/views.py:322
+#: amara-enterprise/collab/views.py:323
 msgid "Languages updated"
 msgstr ""
 
@@ -3522,36 +3579,15 @@ msgstr ""
 msgid "Activity for %(language)s"
 msgstr ""
 
-#: amara-enterprise/collab/views.py:544 amara-enterprise/ondemand/views.py:27
-#: amara-enterprise/ondemand/views.py:45 amara-enterprise/ondemand/views.py:69
-#: amara-enterprise/ondemand/views.py:93
-#: amara-enterprise/ondemand/views.py:130
+#: amara-enterprise/collab/views.py:544 amara-enterprise/ondemand/views.py:29
+#: amara-enterprise/ondemand/views.py:47 amara-enterprise/ondemand/views.py:71
+#: amara-enterprise/ondemand/views.py:95
+#: amara-enterprise/ondemand/views.py:132
 msgid "Staff Dashboard"
 msgstr ""
 
 #: amara-enterprise/collab/views.py:545
 msgid "Bulk set evaluation teams"
-msgstr ""
-
-#: amara-enterprise/collab/startup.py:13
-msgid "Collab"
-msgstr ""
-
-#: amara-enterprise/collab/startup.py:13
-msgid "Evaluation Teams"
-msgstr ""
-
-#: amara-enterprise/collab/team_workflow.py:21
-#: amara-enterprise/collab/forms/search.py:191
-#: amara-enterprise/collab/forms/search.py:340
-#: amara-enterprise/collab/templates/collab/_collab-search-form.html:5
-#: amara-enterprise/collab/templates/collab/_collaborations-list.html:9
-#: amara-enterprise/collab/templates/collab/evaluate.html:13
-msgid "Collaboration"
-msgstr ""
-
-#: amara-enterprise/collab/team_workflow.py:107
-msgid "Customer"
 msgstr ""
 
 #: amara-enterprise/collab/forms/create.py:23
@@ -3604,6 +3640,27 @@ msgstr ""
 msgid "Dashboard default config"
 msgstr ""
 
+#: amara-enterprise/collab/forms/dashboard.py:21
+#: amara-enterprise/collab/forms/dashboard.py:27
+msgid "You must select at least one language"
+msgstr ""
+
+#: amara-enterprise/collab/forms/dashboard.py:58
+msgid "Any Project"
+msgstr ""
+
+#: amara-enterprise/collab/forms/dashboard.py:59
+msgid "No project"
+msgstr ""
+
+#: amara-enterprise/collab/forms/dashboard.py:82
+msgid "All languages"
+msgstr ""
+
+#: amara-enterprise/collab/forms/dashboard.py:99
+msgid "Subtitle creation"
+msgstr ""
+
 #: amara-enterprise/collab/forms/admin.py:33
 msgid "Include collaborations on other pages"
 msgstr ""
@@ -3638,17 +3695,17 @@ msgid "User not a team member"
 msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:212
-#: amara-enterprise/collab/forms/admin.py:263
+#: amara-enterprise/collab/forms/admin.py:264
 msgid "User already assigned"
 msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:228
-#: amara-enterprise/collab/forms/admin.py:289
+#: amara-enterprise/collab/forms/admin.py:298
 msgid "Select user to remove"
 msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:230
-#: amara-enterprise/collab/forms/admin.py:291
+#: amara-enterprise/collab/forms/admin.py:300
 msgid "No user selected."
 msgstr ""
 
@@ -3657,129 +3714,111 @@ msgid "Select new user to assign (optional)"
 msgstr ""
 
 #: amara-enterprise/collab/forms/admin.py:252
-#: amara-enterprise/collab/forms/admin.py:302
+#: amara-enterprise/collab/forms/admin.py:311
 msgid "User not assigned"
 msgstr ""
 
-#: amara-enterprise/collab/forms/admin.py:279
+#: amara-enterprise/collab/forms/admin.py:288
 #, python-format
 msgid "Assigned %(new_user)s as %(role)s, replacing %(removed_user)s."
 msgstr ""
 
-#: amara-enterprise/collab/forms/admin.py:284
+#: amara-enterprise/collab/forms/admin.py:293
 #, python-format
 msgid "Removed %(removed_user)s from collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/forms/admin.py:311
+#: amara-enterprise/collab/forms/admin.py:320
 #, python-format
 msgid "Removed %(user)s from collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/forms/admin.py:319
+#: amara-enterprise/collab/forms/admin.py:328
 msgid "Unassigned provider from collaboration"
 msgstr ""
 
-#: amara-enterprise/collab/forms/admin.py:326
+#: amara-enterprise/collab/forms/admin.py:335
 msgid "Collaboration sent back to provider"
 msgstr ""
 
-#: amara-enterprise/collab/forms/dashboard.py:21
-#: amara-enterprise/collab/forms/dashboard.py:27
-msgid "You must select at least one language"
-msgstr ""
-
-#: amara-enterprise/collab/forms/dashboard.py:58
-msgid "Any Project"
-msgstr ""
-
-#: amara-enterprise/collab/forms/dashboard.py:59
-msgid "No project"
-msgstr ""
-
-#: amara-enterprise/collab/forms/dashboard.py:82
-msgid "All languages"
-msgstr ""
-
-#: amara-enterprise/collab/forms/dashboard.py:99
-msgid "Subtitle creation"
-msgstr ""
-
-#: amara-enterprise/collab/forms/search.py:28
-#: amara-enterprise/collab/forms/search.py:264
+#: amara-enterprise/collab/forms/search.py:27
 msgid "All States"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:29
+#: amara-enterprise/collab/forms/search.py:28
 msgid "Incomplete"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:30
+#: amara-enterprise/collab/forms/search.py:29
 msgid "Needs User"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:47
+#: amara-enterprise/collab/forms/search.py:46
 msgid "project slug"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:60
+#: amara-enterprise/collab/forms/search.py:59
 msgid "Oldest"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:73
+#: amara-enterprise/collab/forms/search.py:72
 msgid "Earliest due"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:74
+#: amara-enterprise/collab/forms/search.py:73
 msgid "Latest due"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:98
-#: amara-enterprise/collab/forms/search.py:292
+#: amara-enterprise/collab/forms/search.py:97
+#: amara-enterprise/collab/forms/search.py:289
 msgid "Any Language"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:99
-#: amara-enterprise/collab/forms/search.py:103
+#: amara-enterprise/collab/forms/search.py:98
+#: amara-enterprise/collab/forms/search.py:102
 msgid "My Languages"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:102
-#: amara-enterprise/collab/forms/search.py:295
+#: amara-enterprise/collab/forms/search.py:101
+#: amara-enterprise/collab/forms/search.py:292
 msgid "Any Video Language"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:197
-#: amara-enterprise/collab/forms/search.py:346
+#: amara-enterprise/collab/forms/search.py:196
+#: amara-enterprise/collab/forms/search.py:338
 msgid "Assigned user"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:199
-#: amara-enterprise/collab/forms/search.py:348
+#: amara-enterprise/collab/forms/search.py:198
+#: amara-enterprise/collab/forms/search.py:340
 #: amara-enterprise/collab/templates/collab/_collab-search-form.html:23
 #: amara-enterprise/collab/templates/collab/_collaborations-list.html:39
 msgid "Sort"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:201
-#: amara-enterprise/collab/forms/search.py:350
+#: amara-enterprise/collab/forms/search.py:200
+#: amara-enterprise/collab/forms/search.py:342
 #: amara-enterprise/collab/templates/collab/_collaborations-list.html:28
 #: amara-enterprise/collab/templates/collab/collaboration-state-line.html:35
 msgid "Provider"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:203
-#: amara-enterprise/collab/forms/search.py:352
+#: amara-enterprise/collab/forms/search.py:202
+#: amara-enterprise/collab/forms/search.py:344
 #: amara-enterprise/billing/templatetags/billing.py:16
 msgid "Work team"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:265
-msgid "Needs Evaluator"
+#: amara-enterprise/collab/forms/search.py:261
+msgid "Any Status"
 msgstr ""
 
-#: amara-enterprise/collab/forms/search.py:266
-msgid "Being Evaluated"
+#: amara-enterprise/collab/forms/search.py:262
+msgid "Evaluation Available"
+msgstr ""
+
+#: amara-enterprise/collab/forms/search.py:263
+msgid "Evaluation Assigned"
 msgstr ""
 
 #: amara-enterprise/ensemble/workflow.py:14
@@ -4240,6 +4279,10 @@ msgstr ""
 msgid "Started"
 msgstr ""
 
+#: amara-enterprise/billing/templatetags/billing.py:28
+msgid "Completed"
+msgstr ""
+
 #: amara-enterprise/ondemand/startup.py:7 templates/new-user-menu.html:8
 #: templates/profiles/_user_menu.html:14 templates/profiles/dashboard.html:9
 #: templates/teams/_tabs.html:7 templates/teams/dashboard.html:7
@@ -4265,29 +4308,29 @@ msgstr ""
 msgid "Language codes (separated by spaces)"
 msgstr ""
 
-#: amara-enterprise/ondemand/views.py:28 amara-enterprise/ondemand/views.py:46
-#: amara-enterprise/ondemand/views.py:70 amara-enterprise/ondemand/views.py:94
-#: amara-enterprise/ondemand/views.py:131
+#: amara-enterprise/ondemand/views.py:30 amara-enterprise/ondemand/views.py:48
+#: amara-enterprise/ondemand/views.py:72 amara-enterprise/ondemand/views.py:96
+#: amara-enterprise/ondemand/views.py:133
 msgid "On Demand Dashboard"
 msgstr ""
 
-#: amara-enterprise/ondemand/views.py:47
+#: amara-enterprise/ondemand/views.py:49
 #: amara-enterprise/ondemand/templates/ondemand/edit-batch.html:21
 msgid "Create Batch"
 msgstr ""
 
-#: amara-enterprise/ondemand/views.py:71
+#: amara-enterprise/ondemand/views.py:73
 msgid "Edit Batch"
 msgstr ""
 
-#: amara-enterprise/ondemand/views.py:83
+#: amara-enterprise/ondemand/views.py:85
 msgid ""
 "Your collaborations are being created.  An email will be sent when the "
 "process completes"
 msgstr ""
 
-#: amara-enterprise/ondemand/views.py:95
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:37
+#: amara-enterprise/ondemand/views.py:97
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:46
 msgid "Bulk Create Collabs"
 msgstr ""
 
@@ -5247,9 +5290,8 @@ msgstr ""
 #: templates/comments/_item.html:3 templates/messages/inbox.html:88
 #: templates/messages/message.html:68 templates/messages/sent.html:50
 #: templates/videos/_action_tpl.html:3
-#: templates/videos/_action_tpl_video.html:9
-#: templates/videos/video-urls-tab.html:33 templates/videos/diffing.html:115
-#: templates/videos/diffing.html:159
+#: templates/videos/_action_tpl_video.html:9 templates/videos/diffing.html:115
+#: templates/videos/diffing.html:159 templates/videos/video-urls-tab.html:33
 msgid "ago"
 msgstr "πριν"
 
@@ -5451,7 +5493,7 @@ msgstr "Υποβολή"
 #: templates/videos/_create-subtitles-modal.html:20
 #: templates/videos/_feedback_form.html:26
 #: templates/videos/_multi-video-create-subtitles-form.html:14
-#: templates/editor/dialogs.html:406
+#: templates/editor/dialogs.html:417
 #: templates/externalsites/new-team-settings-tab.html:92
 #: templates/externalsites/team-settings-tab.html:102
 #: templates/new-teams/application.html:49
@@ -6207,15 +6249,15 @@ msgstr ""
 msgid "Last modified"
 msgstr ""
 
-#: templates/teams/approvals.html:104
+#: templates/teams/approvals.html:104 templates/videos/diffing.html:129
+#: templates/videos/diffing.html:175
 #: templates/videos/language-subtitles-tab.html:70
-#: templates/videos/diffing.html:129 templates/videos/diffing.html:175
 msgid "Title:"
 msgstr "Τίτλος:"
 
-#: templates/teams/approvals.html:105
+#: templates/teams/approvals.html:105 templates/videos/diffing.html:133
+#: templates/videos/diffing.html:179
 #: templates/videos/language-subtitles-tab.html:74
-#: templates/videos/diffing.html:133 templates/videos/diffing.html:179
 msgid "Description:"
 msgstr "Περιγραφή:"
 
@@ -7059,8 +7101,8 @@ msgstr "Δοκιμάστε να αλλάξετε την επιλογή σας, �
 msgid "You don't have permission to perform this task."
 msgstr "Δεν έχετε δικαιώματα να εκτελέσετε αυτή την εργασία."
 
-#: templates/teams/tasks.html:234 templates/videos/video-urls-tab.html:20
-#: templates/videos/language-page.html:40
+#: templates/teams/tasks.html:234 templates/videos/language-page.html:40
+#: templates/videos/video-urls-tab.html:20
 msgid "Original"
 msgstr "Πρωτότυπο"
 
@@ -7377,8 +7419,8 @@ msgstr "Δημιουργία Αναφοράς Τιμολόγησης"
 msgid "Sign in with your OpenID"
 msgstr "Συνδεθείτε με τον Κωδικό σας OpenID "
 
-#: templates/openid_consumer/signin.html:23 templates/auth/login.html:16
-#: templates/auth/login.html:35 templates/auth/login_trap.html:16
+#: templates/openid_consumer/signin.html:23 templates/auth/login_trap.html:16
+#: templates/auth/login.html:20 templates/auth/login.html:42
 msgid "Sign In"
 msgstr "Συνδεθείτε με κωδικό"
 
@@ -7413,30 +7455,6 @@ msgstr ""
 msgid "Please enter your login password to confirm"
 msgstr ""
 
-#: templates/auth/login.html:17
-msgid "Use an existing identity"
-msgstr ""
-
-#: templates/auth/login.html:30
-msgid "Or use your Amara account"
-msgstr "Ή, χρησιμοποιήστε τον λογαρισμό σας Amara"
-
-#: templates/auth/login.html:39
-msgid "Forgot your password?"
-msgstr "Ξεχάσατε τον κωδικό πρόσβασης;"
-
-#: templates/auth/login.html:45
-msgid "Create an Account"
-msgstr "Δημιουργήστε έναν Λογαριασμό"
-
-#: templates/auth/login.html:46
-msgid "It's free!"
-msgstr ""
-
-#: templates/auth/login.html:52
-msgid "Create Account"
-msgstr "Δημιουργία Λογαριασμού"
-
 #: templates/auth/login_create.html:16
 msgid "Sign Up"
 msgstr "Εγγραφή"
@@ -7466,6 +7484,30 @@ msgstr ""
 #: templates/auth/login_trap.html:11
 msgid "Sign in as a different user"
 msgstr "Συνδεθείτε ως ένας διαφορετικός χρήστης"
+
+#: templates/auth/login.html:21
+msgid "Use an existing identity"
+msgstr ""
+
+#: templates/auth/login.html:37
+msgid "Or use your Amara account"
+msgstr "Ή, χρησιμοποιήστε τον λογαρισμό σας Amara"
+
+#: templates/auth/login.html:46
+msgid "Forgot your password?"
+msgstr "Ξεχάσατε τον κωδικό πρόσβασης;"
+
+#: templates/auth/login.html:52
+msgid "Create an Account"
+msgstr "Δημιουργήστε έναν Λογαριασμό"
+
+#: templates/auth/login.html:53
+msgid "It's free!"
+msgstr ""
+
+#: templates/auth/login.html:59
+msgid "Create Account"
+msgstr "Δημιουργία Λογαριασμού"
 
 #: templates/admin/base_site.html:12
 msgid "View site"
@@ -7721,7 +7763,7 @@ msgstr "Στείλτε τη γνώμη σας"
 #: templates/videos/_upload_subtitles.html:11
 #: templates/videos/visibility_form.js:5 templates/videos/video-page.html:34
 #: templates/videos/video-urls-tab.html:47 templates/editor/dialogs.html:122
-#: templates/editor/dialogs.html:292
+#: templates/editor/dialogs.html:292 templates/editor/dialogs.html:327
 msgid "Close"
 msgstr "Κλείσιμο"
 
@@ -7860,7 +7902,7 @@ msgid "Upload them directly."
 msgstr "Μεταφορτώστε τους απευθείας."
 
 #: templates/videos/_upload_subtitles.html:12
-#: templates/editor/dialogs.html:372
+#: templates/editor/dialogs.html:383
 msgid "Upload Subtitles"
 msgstr "Ανεβάστε Υπότιτλους"
 
@@ -7884,7 +7926,7 @@ msgstr "Το αρχείο υποτιτλισμού είναι 100%% πλήρες
 
 #: templates/videos/_upload_subtitles.html:55
 #: templates/videos/_upload_subtitles.html:70
-#: templates/editor/dialogs.html:402 templates/new-teams/videos.html:149
+#: templates/editor/dialogs.html:413 templates/new-teams/videos.html:149
 #: amara-enterprise/providers/templates/providers/user-queue.html:128
 msgid "Upload"
 msgstr "Φόρτωση"
@@ -8133,8 +8175,9 @@ msgid "Leave a comment"
 msgstr "Αφήστε ένα σχόλιο"
 
 #: templates/videos/language-comments-tab.html:5
+#: templates/videos/language-page.html:91
 #: templates/videos/video-comments-tab.html:6
-#: templates/videos/video-page.html:98 templates/videos/language-page.html:91
+#: templates/videos/video-page.html:98
 msgid "Comments"
 msgstr "Σχόλια"
 
@@ -8163,105 +8206,6 @@ msgstr "Επεξεργασία στο Django Admin"
 #: templates/videos/language-revisions-tab.html:67
 msgid "No subtitles for this language."
 msgstr "Δεν υπάρχουν υπότιτλοι για την γλώσσα αυτή."
-
-#: templates/videos/language-subtitles-tab.html:6
-msgid "Delete Subtitle Language"
-msgstr "Διαγράψτε την γλώσσα του υπότιτλου"
-
-#: templates/videos/language-subtitles-tab.html:14
-msgid "You must use the tasks panel to work with this version."
-msgstr "Πρέπει να χρησιμοποιήσετε την περιοχή εργασιών για να εργασθείτε με αυτή την έκδοση."
-
-#: templates/videos/language-subtitles-tab.html:15
-#: templates/videos/language-subtitles-tab.html:21
-#: templates/videos/language-subtitles-tab.html:28
-msgid "Edit Subtitles"
-msgstr "Επεξεργασία υπότιτλων"
-
-#: templates/videos/language-subtitles-tab.html:20
-msgid "You do not have permission to edit this version."
-msgstr "Δεν έχετε δικαίωμα να επεξεργαστείτε αυτή την έκδοση."
-
-#: templates/videos/language-subtitles-tab.html:38
-msgid "Download"
-msgstr "Download"
-
-#: templates/videos/language-subtitles-tab.html:45
-msgid "DFXP All Languages"
-msgstr ""
-
-#: templates/videos/language-subtitles-tab.html:54
-msgid "Draft only"
-msgstr "Mόνο πρόχειρο/ draft"
-
-#: templates/videos/language-subtitles-tab.html:56
-#, python-format
-msgid ""
-"\n"
-"                        Subtitles translated from %(language)s\n"
-"                    "
-msgstr "\n                        Υπότιτλοι μεταφρασμένοι από %(language)s\n                    "
-
-#: templates/videos/language-subtitles-tab.html:60
-#, python-format
-msgid ""
-"\n"
-"                Showing <strong>Revision %(version_number)s</strong> created <strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n"
-"                "
-msgstr "\n                Showing <strong>Revision %(version_number)s</strong> created <strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n                "
-
-#: templates/videos/language-subtitles-tab.html:90
-msgid ""
-"\n"
-"                    The most recent revision for this language is blank, but there are older\n"
-"                    revisions that contain subtitles.\n"
-"                    "
-msgstr "\n                    Η πιο πρόσφατη αναθεώρηση για την γλώσσα αυτή είναι κενή, αλλά υπάρχουν \n                    παλιότερες αναθεωρήσεις που περιέχουν υποτίτλους.\n                    "
-
-#: templates/videos/language-subtitles-tab.html:94
-msgid "View revision history"
-msgstr "Δείτε το ιστορικό αναθεωρήσεων"
-
-#: templates/videos/language-subtitles-tab.html:99
-msgid "These subtitles are in progress."
-msgstr "Αυτοί οι υπότιτλοι είναι υπό επεξεργασία."
-
-#: templates/videos/language-subtitles-tab.html:100
-msgid "Make more?"
-msgstr "Θέλετε να κάνετε περισσότερους;"
-
-#: templates/videos/language-subtitles-tab.html:102
-msgid "No subtitles available yet."
-msgstr "Δεν υπάρχουν ακόμη διαθέσιμοι υπότιτλοι."
-
-#: templates/videos/language-subtitles-tab.html:103
-msgid "Make some!"
-msgstr "Δημιουργήστε μερικούς!"
-
-#: templates/videos/language-subtitles-tab.html:111
-msgid ""
-"\n"
-"                    This language contains subtitles that are still waiting to be moderated.  Check back later.\n"
-"                "
-msgstr "\n                            Αυτή η γλώσσα περιέχει υπότιτλους που περιμένουν, ακόμη, επιτήρηση/ moderation. Ξαναελέγξτε αργότερα.\n                        "
-
-#: templates/videos/language-subtitles-tab.html:117
-msgid ""
-"\n"
-"                    Sorry, this language has been removed by Amara staff members or authorized users.\n"
-"                "
-msgstr "\nΛυπούμαστε, η γλώσσα αυτή διαγράφηκε από προσωπικό της Amara ή από εξουσιοδοτημένο χρήστη."
-
-#: templates/videos/language-subtitles-tab.html:123
-msgid ""
-"\n"
-"                    No subtitles have been added for this language yet.\n"
-"                "
-msgstr "\nΔεν έχουν προστεθεί υπότιτλοι για τη γλώσσα αυτή ακόμα.\n                        "
-
-#: templates/videos/language-subtitles-tab.html:134
-msgid "Roll back to this version"
-msgstr "Επιστρέψτε σε αυτή την έκδοση"
 
 #: templates/videos/language-sync-history-tab.html:6
 #, python-format
@@ -8407,6 +8351,153 @@ msgstr ""
 msgid "Get Embed Code"
 msgstr "Πάρτε τον Κωδικό ενσωμάτωσης"
 
+#: templates/videos/diffing.html:39
+msgid "Subtitles will be rolled back to a previous version"
+msgstr "Οι Υπότιτλοι θα μεταπέσουν σε μία προγενέστερη έκδοση"
+
+#: templates/videos/diffing.html:45
+msgid "You need to log in to do that."
+msgstr "Πρέπει να συνδεθείτε για να το κάνετε αυτό."
+
+#: templates/videos/diffing.html:85
+msgid "Revision History"
+msgstr "Ιστορικό Αναθεώρησης"
+
+#: templates/videos/diffing.html:89
+msgid "Comparing Revision"
+msgstr "Σύγκριση εκδόσεων"
+
+#: templates/videos/diffing.html:103 templates/videos/diffing.html:147
+msgid "Roll back to version"
+msgstr "Επαναφορά στην έκδοση"
+
+#: templates/videos/diffing.html:107 templates/videos/diffing.html:151
+msgid "Latest Revision"
+msgstr ""
+
+#: templates/videos/language-page.html:14
+msgid "Select two revisions to compare, please"
+msgstr "Παρακακλώ, επιλέξτε δύο αναθεωρήσεις προς σύγκριση"
+
+#: templates/videos/language-page.html:43
+msgid "subtitles"
+msgstr "υπότιτλους"
+
+#: templates/videos/language-page.html:58
+msgid "Follower"
+msgstr "Οπαδός"
+
+#: templates/videos/language-page.html:64
+msgid "Line"
+msgstr "Γραμμή"
+
+#: templates/videos/language-page.html:92
+msgid "Revisions"
+msgstr "Αναθεωρήσεις"
+
+#: templates/videos/language-page.html:106
+msgid "Edit SubtitleLanguage in Django Admin"
+msgstr "Επεξεργασία γλώσσας υπότιτλου στο Django Admin"
+
+#: templates/videos/language-subtitles-tab.html:6
+msgid "Delete Subtitle Language"
+msgstr "Διαγράψτε την γλώσσα του υπότιτλου"
+
+#: templates/videos/language-subtitles-tab.html:14
+msgid "You must use the tasks panel to work with this version."
+msgstr "Πρέπει να χρησιμοποιήσετε την περιοχή εργασιών για να εργασθείτε με αυτή την έκδοση."
+
+#: templates/videos/language-subtitles-tab.html:15
+#: templates/videos/language-subtitles-tab.html:21
+#: templates/videos/language-subtitles-tab.html:28
+msgid "Edit Subtitles"
+msgstr "Επεξεργασία υπότιτλων"
+
+#: templates/videos/language-subtitles-tab.html:20
+msgid "You do not have permission to edit this version."
+msgstr "Δεν έχετε δικαίωμα να επεξεργαστείτε αυτή την έκδοση."
+
+#: templates/videos/language-subtitles-tab.html:38
+msgid "Download"
+msgstr "Download"
+
+#: templates/videos/language-subtitles-tab.html:45
+msgid "DFXP All Languages"
+msgstr ""
+
+#: templates/videos/language-subtitles-tab.html:54
+msgid "Draft only"
+msgstr "Mόνο πρόχειρο/ draft"
+
+#: templates/videos/language-subtitles-tab.html:56
+#, python-format
+msgid ""
+"\n"
+"                        Subtitles translated from %(language)s\n"
+"                    "
+msgstr "\n                        Υπότιτλοι μεταφρασμένοι από %(language)s\n                    "
+
+#: templates/videos/language-subtitles-tab.html:60
+#, python-format
+msgid ""
+"\n"
+"                Showing <strong>Revision %(version_number)s</strong> created <strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n"
+"                "
+msgstr "\n                Showing <strong>Revision %(version_number)s</strong> created <strong>%(revision_time)s</strong> by <a href=\"%(profile_url)s\" title=\"View %(author)s's profile\"><strong>%(author)s</strong></a>.\n                "
+
+#: templates/videos/language-subtitles-tab.html:90
+msgid ""
+"\n"
+"                    The most recent revision for this language is blank, but there are older\n"
+"                    revisions that contain subtitles.\n"
+"                    "
+msgstr "\n                    Η πιο πρόσφατη αναθεώρηση για την γλώσσα αυτή είναι κενή, αλλά υπάρχουν \n                    παλιότερες αναθεωρήσεις που περιέχουν υποτίτλους.\n                    "
+
+#: templates/videos/language-subtitles-tab.html:94
+msgid "View revision history"
+msgstr "Δείτε το ιστορικό αναθεωρήσεων"
+
+#: templates/videos/language-subtitles-tab.html:99
+msgid "These subtitles are in progress."
+msgstr "Αυτοί οι υπότιτλοι είναι υπό επεξεργασία."
+
+#: templates/videos/language-subtitles-tab.html:100
+msgid "Make more?"
+msgstr "Θέλετε να κάνετε περισσότερους;"
+
+#: templates/videos/language-subtitles-tab.html:102
+msgid "No subtitles available yet."
+msgstr "Δεν υπάρχουν ακόμη διαθέσιμοι υπότιτλοι."
+
+#: templates/videos/language-subtitles-tab.html:103
+msgid "Make some!"
+msgstr "Δημιουργήστε μερικούς!"
+
+#: templates/videos/language-subtitles-tab.html:111
+msgid ""
+"\n"
+"                    This language contains subtitles that are still waiting to be moderated.  Check back later.\n"
+"                "
+msgstr "\n                            Αυτή η γλώσσα περιέχει υπότιτλους που περιμένουν, ακόμη, επιτήρηση/ moderation. Ξαναελέγξτε αργότερα.\n                        "
+
+#: templates/videos/language-subtitles-tab.html:117
+msgid ""
+"\n"
+"                    Sorry, this language has been removed by Amara staff members or authorized users.\n"
+"                "
+msgstr "\nΛυπούμαστε, η γλώσσα αυτή διαγράφηκε από προσωπικό της Amara ή από εξουσιοδοτημένο χρήστη."
+
+#: templates/videos/language-subtitles-tab.html:123
+msgid ""
+"\n"
+"                    No subtitles have been added for this language yet.\n"
+"                "
+msgstr "\nΔεν έχουν προστεθεί υπότιτλοι για τη γλώσσα αυτή ακόμα.\n                        "
+
+#: templates/videos/language-subtitles-tab.html:134
+msgid "Roll back to this version"
+msgstr "Επιστρέψτε σε αυτή την έκδοση"
+
 #: templates/videos/video-activity-tab.html:5
 msgid "View all activity"
 msgstr "Προβολή όλων των δραστηριοτήτων"
@@ -8529,53 +8620,285 @@ msgid ""
 "matching videos or videos where subtitles fail to display correctly."
 msgstr "Να διαγραφεί αυτή η URL; Προειδοποίηση: αυτή η ενέργεια δεν μπορεί να αναστραφεί. Να διαγράφετε μόνο τις URLs για τα video που δεν ταιριάζουν, ή για τα video των οποίων οι υπότιτλοι δεν εμφανίζονται σωστά."
 
-#: templates/videos/diffing.html:39
-msgid "Subtitles will be rolled back to a previous version"
-msgstr "Οι Υπότιτλοι θα μεταπέσουν σε μία προγενέστερη έκδοση"
+#: templates/editor/editor.html:12
+#, python-format
+msgid ""
+"\n"
+"            Editing %(language)s subtitles for &ldquo;%(video)s&rdquo; - Amara\n"
+"        "
+msgstr "\n\nEditing %(language)s subtitles for &ldquo;%(video)s\n&rdquo; - Amara"
 
-#: templates/videos/diffing.html:45
-msgid "You need to log in to do that."
-msgstr "Πρέπει να συνδεθείτε για να το κάνετε αυτό."
+#: templates/editor/editor.html:41
+msgid "Loading subtitle editor&hellip;"
+msgstr "Γίνεται φόρτωση του editor&hellip;"
 
-#: templates/videos/diffing.html:85
-msgid "Revision History"
-msgstr "Ιστορικό Αναθεώρησης"
+#: templates/editor/header.html:6 templates/editor/header.html:7
+#: templates/editor/dialogs.html:298
+msgid "Edit title and description"
+msgstr "Γράψτε τον τίτλο και την περιγραφή"
 
-#: templates/videos/diffing.html:89
-msgid "Comparing Revision"
-msgstr "Σύγκριση εκδόσεων"
-
-#: templates/videos/diffing.html:103 templates/videos/diffing.html:147
-msgid "Roll back to version"
-msgstr "Επαναφορά στην έκδοση"
-
-#: templates/videos/diffing.html:107 templates/videos/diffing.html:151
-msgid "Latest Revision"
+#: templates/editor/tutorial.html:3
+msgid "New to Amara? Here are some pointers."
 msgstr ""
 
-#: templates/videos/language-page.html:14
-msgid "Select two revisions to compare, please"
-msgstr "Παρακακλώ, επιλέξτε δύο αναθεωρήσεις προς σύγκριση"
+#: templates/editor/tutorial.html:4
+msgid "Click to hide.  Reopen anytime from the tools menu "
+msgstr ""
 
-#: templates/videos/language-page.html:43
-msgid "subtitles"
-msgstr "υπότιτλους"
+#: templates/editor/tutorial.html:4
+msgid "Show tutorial"
+msgstr ""
 
-#: templates/videos/language-page.html:58
-msgid "Follower"
-msgstr "Οπαδός"
+#: templates/editor/tutorial.html:6
+msgid "Please go away."
+msgstr ""
 
-#: templates/videos/language-page.html:64
-msgid "Line"
-msgstr "Γραμμή"
+#: templates/editor/tutorial.html:11
+msgid "1. Play the video"
+msgstr ""
 
-#: templates/videos/language-page.html:92
-msgid "Revisions"
-msgstr "Αναθεωρήσεις"
+#: templates/editor/tutorial.html:12
+msgid "Use the tab key to play and pause the video."
+msgstr ""
 
-#: templates/videos/language-page.html:106
-msgid "Edit SubtitleLanguage in Django Admin"
-msgstr "Επεξεργασία γλώσσας υπότιτλου στο Django Admin"
+#: templates/editor/tutorial.html:15
+msgid "2. Type what you hear"
+msgstr "1. Πληκτρολογήστε αυτό που ακούτε"
+
+#: templates/editor/tutorial.html:16
+msgid "Once you fill a line, hit enter."
+msgstr ""
+
+#: templates/editor/tutorial.html:17
+msgid "Don't worry about the timing."
+msgstr ""
+
+#: templates/editor/tutorial.html:20
+msgid "3. Done typing?"
+msgstr ""
+
+#: templates/editor/tutorial.html:21
+msgid "Click to start syncing your subtitles."
+msgstr ""
+
+#: templates/editor/tutorial.html:24
+msgid "1. Tap the Down arrow to start"
+msgstr ""
+
+#: templates/editor/tutorial.html:25
+msgid "Press down again to start each subtitle."
+msgstr ""
+
+#: templates/editor/tutorial.html:26
+msgid "Don't worry about small mistakes."
+msgstr ""
+
+#: templates/editor/tutorial.html:29
+msgid "2. Need to start over?"
+msgstr ""
+
+#: templates/editor/tutorial.html:30
+msgid "From the tools menu "
+msgstr ""
+
+#: templates/editor/tutorial.html:32
+msgid " choose clear timing."
+msgstr ""
+
+#: templates/editor/tutorial.html:35
+msgid "3. Review and correct"
+msgstr ""
+
+#: templates/editor/tutorial.html:36
+msgid "Click when all subtitles are synced."
+msgstr ""
+
+#: templates/editor/tutorial.html:39
+msgid "1. Review the guidelines"
+msgstr ""
+
+#: templates/editor/tutorial.html:40
+msgid "They include tips for improving subtitles."
+msgstr ""
+
+#: templates/editor/tutorial.html:43
+msgid "2. Check the timing"
+msgstr ""
+
+#: templates/editor/tutorial.html:44
+msgid "Drag the edges or slide the bubble to adjust the times."
+msgstr ""
+
+#: templates/editor/tutorial.html:47
+msgid "3. Submit your work"
+msgstr ""
+
+#: templates/editor/tutorial.html:48
+msgid "Or choose Save Draft (above) to finish later."
+msgstr ""
+
+#: templates/editor/tutorial.html:51
+msgid "1. Select a reference language"
+msgstr ""
+
+#: templates/editor/tutorial.html:52
+msgid "If you change the reference language, use "
+msgstr ""
+
+#: templates/editor/tutorial.html:53
+msgid "Copy Timings"
+msgstr ""
+
+#: templates/editor/tutorial.html:53
+msgid "to  update the translation timing."
+msgstr ""
+
+#: templates/editor/tutorial.html:56
+msgid "2. Type the translation"
+msgstr ""
+
+#: templates/editor/tutorial.html:57
+msgid "Don't leave any blanks."
+msgstr ""
+
+#: templates/editor/tutorial.html:60
+msgid "3. Done translating?"
+msgstr ""
+
+#: templates/editor/tutorial.html:61
+msgid "Click to adjust the timing."
+msgstr ""
+
+#: templates/editor/workflow-normal.html:4
+msgid "Type what you hear"
+msgstr ""
+
+#: templates/editor/workflow-normal.html:6
+msgid "Is all the content subtitled?"
+msgstr "Είναι όλο το περιεχόμενο υποτιτλισμένο;"
+
+#: templates/editor/workflow-normal.html:7
+msgid "Is all the content translated?"
+msgstr ""
+
+#: templates/editor/workflow-normal.html:9
+msgid "Be sure you have no blank lines"
+msgstr ""
+
+#: templates/editor/workflow-normal.html:11
+msgid "Yes, start syncing"
+msgstr "Ναι, ξεκινήστε συγχρονισμό"
+
+#: templates/editor/workflow-normal.html:16
+msgid "Sync Timing"
+msgstr ""
+
+#: templates/editor/workflow-normal.html:18
+#, python-format
+msgid ""
+"\n"
+"            synced subtitles: %(count)s / %(total)s\n"
+"            "
+msgstr ""
+
+#: templates/editor/workflow-normal.html:24
+msgid "Start review"
+msgstr ""
+
+#: templates/editor/workflow-normal.html:29
+msgid "Review and complete"
+msgstr ""
+
+#: templates/editor/workflow-normal.html:30
+msgid ""
+"Watch the video again and verify that the subtitles are complete and "
+"correct."
+msgstr "Δείτε το βίντεο και ξανά και επιβεβαιώστε ότι οι υπότιτλοι είναι πλήρεις και σωστοί."
+
+#: templates/editor/workflow-normal.html:31
+#: templates/editor/workflow-review.html:7
+msgid "Edit title and description."
+msgstr ""
+
+#: templates/editor/workflow-errors-review.html:6
+#: templates/editor/workflow-errors-typing.html:7
+msgid "Subtitles can not be blank"
+msgstr ""
+
+#: templates/editor/workflow-errors-review.html:13
+msgid "Timing error in subtitle"
+msgstr ""
+
+#: templates/editor/workflow-errors-review.html:18
+#: templates/editor/workflow-errors-typing.html:12
+msgid "Title and description must be translated"
+msgstr ""
+
+#: templates/editor/working-subtitles.html:4
+#, python-format
+msgid ""
+"\n"
+"        Editing %(language)s&hellip;\n"
+"        "
+msgstr ""
+
+#: templates/editor/working-subtitles.html:14
+msgid "Copy Timing"
+msgstr "Αντιγραφή χρονισμού"
+
+#: templates/editor/working-subtitles.html:17
+#: templates/editor/working-subtitles.html:26
+msgid "Show"
+msgstr "Προβολή"
+
+#: templates/editor/working-subtitles.html:18
+msgid "Timeline"
+msgstr "Γραμμή χρόνου"
+
+#: templates/editor/working-subtitles.html:20
+msgid "Clear timing"
+msgstr "Καθαρισμός χρονισμού"
+
+#: templates/editor/working-subtitles.html:21
+msgid "Clear text"
+msgstr "Καθαρισμός κειμένου"
+
+#: templates/editor/working-subtitles.html:22
+msgid "Revert to last saved version"
+msgstr "Επιστροφή στην τελευταία αποθηκευμένη έκδοση"
+
+#: templates/editor/working-subtitles.html:23
+msgid "Upload subtitles"
+msgstr ""
+
+#: templates/editor/working-subtitles.html:27
+msgid "Warnings"
+msgstr ""
+
+#: templates/editor/working-subtitles.html:29
+msgid "Show Tutorial"
+msgstr ""
+
+#: templates/editor/working-subtitles.html:75
+msgid "Avoid more than 2 lines per subtitle; split the subtitle into two."
+msgstr ""
+
+#: templates/editor/working-subtitles.html:76
+msgid ""
+"Briefly displayed subtitles are hard to read; the duration should be more "
+"than 700ms."
+msgstr ""
+
+#: templates/editor/working-subtitles.html:77
+msgid ""
+"Reading rate shouldn't exceed 21 characters / sec; lengthen duration, reduce"
+" text or split the subtitle."
+msgstr ""
+
+#: templates/editor/working-subtitles.html:78
+msgid ""
+"Line length shouldn't exceed 42 characters; add a line break if necessary."
+msgstr ""
 
 #: templates/editor/dialogs.html:6
 msgid "Amara Style Guidelines"
@@ -9072,11 +9395,6 @@ msgstr "CTRL + t"
 msgid "CMD + t"
 msgstr "CMD + t"
 
-#: templates/editor/dialogs.html:298 templates/editor/header.html:6
-#: templates/editor/header.html:7
-msgid "Edit title and description"
-msgstr "Γράψτε τον τίτλο και την περιγραφή"
-
 #: templates/editor/dialogs.html:299
 msgid "Title"
 msgstr "Τίτλος"
@@ -9089,91 +9407,83 @@ msgstr "Εισάγετε τον τίτλο"
 msgid "Enter Description"
 msgstr "Εισάγετε την περιγραφή"
 
-#: templates/editor/dialogs.html:336
+#: templates/editor/dialogs.html:321
+msgid "Playback Mode"
+msgstr ""
+
+#: templates/editor/dialogs.html:347
 msgid "Debugging Tools"
 msgstr "Εργαλεία Debugging"
 
-#: templates/editor/dialogs.html:354
+#: templates/editor/dialogs.html:365
 msgid "Error saving subtitles"
 msgstr "Σφάλμα στην αποθήκευση υποτίτλων"
 
-#: templates/editor/dialogs.html:357
+#: templates/editor/dialogs.html:368
 msgid ""
 "There was an error saving your subtitles. Save your subtitles using the "
 "download button below and upload them to the system later."
 msgstr "Παρουσιάστηκε σφάλμα κατά την αποθήκευση των υπότιτλων. Αποθηκεύστε τους υπότιτλους με το κουμπί \"download\" και ανεβάστε τους στο σύστημα αργότερα."
 
-#: templates/editor/dialogs.html:358 templates/editor/dialogs.html:415
+#: templates/editor/dialogs.html:369 templates/editor/dialogs.html:426
 msgid ""
 "To avoid data corruption, please do not open the or edit the subtitles in "
 "any text editor."
 msgstr "Για να αποφευχθεί η αλλοίωση των δεδομένων, παρακαλούμε να μην ανοίγετε και να μην επεξεργάζεστε τους υπότιτλους σε επεξεργαστές κειμένου."
 
-#: templates/editor/dialogs.html:361
+#: templates/editor/dialogs.html:372
 msgid ""
 "There was an error saving your subtitles.  Copy the subtitles above and save"
 " them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr "Παρουσιάστηκε σφάλμα κατά την αποθήκευση των υπότιτλων. Αντιγράψτε τους παραπάνω υπότιτλους και αποθηκεύστε τους στον υπολογιστή σας με όνομα subtitle_backup.dfxp. Θα μπορέσετε να τους ανεβάσετε αργότερα. "
 
-#: templates/editor/dialogs.html:366 templates/editor/dialogs.html:423
+#: templates/editor/dialogs.html:377 templates/editor/dialogs.html:434
 msgid "Download Subtitles"
 msgstr "Κατεβάστε Υπότιτλους"
 
-#: templates/editor/dialogs.html:367 templates/editor/dialogs.html:424
+#: templates/editor/dialogs.html:378 templates/editor/dialogs.html:435
 msgid "Close Editor"
 msgstr "Κλείσιμο Επεξεργαστή"
 
-#: templates/editor/dialogs.html:374
+#: templates/editor/dialogs.html:385
 msgid ""
 "\n"
 "        Uploading subtitles saves a new (incomplete) version that you can edit and save or complete when finished. Uploaded subtitles keep their existing timecodes. You can use the Copy timing option from the Tools menu if you want to apply timing from a reference language.\n"
 "        "
 msgstr ""
 
-#: templates/editor/dialogs.html:379
+#: templates/editor/dialogs.html:390
 msgid ""
 "\n"
 "        Supported formats are: SRT, SSA, SBV, DFXP, TXT, and VTT. Only files ending with the correct extension, .srt, .ssa, .sbv, .txt, .vtt, .dfxp or .xml (for dfxp) are accepted.\n"
 "        "
 msgstr ""
 
-#: templates/editor/dialogs.html:384
+#: templates/editor/dialogs.html:395
 msgid ""
 "Upload failed. The file you uploaded might be invalid or an unsupported "
 "format."
 msgstr ""
 
-#: templates/editor/dialogs.html:399
+#: templates/editor/dialogs.html:410
 msgid "Uploading..."
 msgstr ""
 
-#: templates/editor/dialogs.html:411
+#: templates/editor/dialogs.html:422
 msgid "Error resuming session"
 msgstr "Σφάλμα κατά την επανάκτηση της εργασίας"
 
-#: templates/editor/dialogs.html:414
+#: templates/editor/dialogs.html:425
 msgid ""
 "There was an error resuming your session. Save your subtitles using the "
 "download button below and upload them to the system later."
 msgstr "Παρουσιάστηκε σφάλμα κατά την επανάκτηση της σύνδεσης εργασίας. Αποθηκεύστε τους υπότιτλους χρησιμοποιώντας το κουμπί download και ανεβάστε τους στο σύστημα αργότερα."
 
-#: templates/editor/dialogs.html:418
+#: templates/editor/dialogs.html:429
 msgid ""
 "There was an error resuming your session.  Copy the subtitles above and save"
 " them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr "Παρουσιάστηκε σφάλμα κατά την επανάκτηση της σύνδεσής σας. Αντιγράψτε τους παραπάνω υπότιτλους και αποθηκεύστε τους στον υπολογιστή σας με όνομα subtitle_backup.dfxp. Θα μπορέσετε να τους ανεβάσετε αργότερα. "
-
-#: templates/editor/editor.html:12
-#, python-format
-msgid ""
-"\n"
-"            Editing %(language)s subtitles for &ldquo;%(video)s&rdquo; - Amara\n"
-"        "
-msgstr "\n\nEditing %(language)s subtitles for &ldquo;%(video)s\n&rdquo; - Amara"
-
-#: templates/editor/editor.html:41
-msgid "Loading subtitle editor&hellip;"
-msgstr "Γίνεται φόρτωση του editor&hellip;"
 
 #: templates/editor/help.html:7
 msgid "Keyboard controls"
@@ -9209,267 +9519,8 @@ msgstr "Τέλος υπότιτλου"
 msgid "Subtitling Guidelines"
 msgstr "Οδηγίες Υποτιτλισμού"
 
-#: templates/editor/tutorial.html:3
-msgid "New to Amara? Here are some pointers."
-msgstr ""
-
-#: templates/editor/tutorial.html:4
-msgid "Click to hide.  Reopen anytime from the tools menu "
-msgstr ""
-
-#: templates/editor/tutorial.html:4
-msgid "Show tutorial"
-msgstr ""
-
-#: templates/editor/tutorial.html:6
-msgid "Please go away."
-msgstr ""
-
-#: templates/editor/tutorial.html:11
-msgid "1. Play the video"
-msgstr ""
-
-#: templates/editor/tutorial.html:12
-msgid "Use the tab key to play and pause the video."
-msgstr ""
-
-#: templates/editor/tutorial.html:15
-msgid "2. Type what you hear"
-msgstr "1. Πληκτρολογήστε αυτό που ακούτε"
-
-#: templates/editor/tutorial.html:16
-msgid "Once you fill a line, hit enter."
-msgstr ""
-
-#: templates/editor/tutorial.html:17
-msgid "Don't worry about the timing."
-msgstr ""
-
-#: templates/editor/tutorial.html:20
-msgid "3. Done typing?"
-msgstr ""
-
-#: templates/editor/tutorial.html:21
-msgid "Click to start syncing your subtitles."
-msgstr ""
-
-#: templates/editor/tutorial.html:24
-msgid "1. Tap the Down arrow to start"
-msgstr ""
-
-#: templates/editor/tutorial.html:25
-msgid "Press down again to start each subtitle."
-msgstr ""
-
-#: templates/editor/tutorial.html:26
-msgid "Don't worry about small mistakes."
-msgstr ""
-
-#: templates/editor/tutorial.html:29
-msgid "2. Need to start over?"
-msgstr ""
-
-#: templates/editor/tutorial.html:30
-msgid "From the tools menu "
-msgstr ""
-
-#: templates/editor/tutorial.html:32
-msgid " choose clear timing."
-msgstr ""
-
-#: templates/editor/tutorial.html:35
-msgid "3. Review and correct"
-msgstr ""
-
-#: templates/editor/tutorial.html:36
-msgid "Click when all subtitles are synced."
-msgstr ""
-
-#: templates/editor/tutorial.html:39
-msgid "1. Review the guidelines"
-msgstr ""
-
-#: templates/editor/tutorial.html:40
-msgid "They include tips for improving subtitles."
-msgstr ""
-
-#: templates/editor/tutorial.html:43
-msgid "2. Check the timing"
-msgstr ""
-
-#: templates/editor/tutorial.html:44
-msgid "Drag the edges or slide the bubble to adjust the times."
-msgstr ""
-
-#: templates/editor/tutorial.html:47
-msgid "3. Submit your work"
-msgstr ""
-
-#: templates/editor/tutorial.html:48
-msgid "Or choose Save Draft (above) to finish later."
-msgstr ""
-
-#: templates/editor/tutorial.html:51
-msgid "1. Select a reference language"
-msgstr ""
-
-#: templates/editor/tutorial.html:52
-msgid "If you change the reference language, use "
-msgstr ""
-
-#: templates/editor/tutorial.html:53
-msgid "Copy Timings"
-msgstr ""
-
-#: templates/editor/tutorial.html:53
-msgid "to  update the translation timing."
-msgstr ""
-
-#: templates/editor/tutorial.html:56
-msgid "2. Type the translation"
-msgstr ""
-
-#: templates/editor/tutorial.html:57
-msgid "Don't leave any blanks."
-msgstr ""
-
-#: templates/editor/tutorial.html:60
-msgid "3. Done translating?"
-msgstr ""
-
-#: templates/editor/tutorial.html:61
-msgid "Click to adjust the timing."
-msgstr ""
-
-#: templates/editor/workflow-normal.html:4
-msgid "Type what you hear"
-msgstr ""
-
-#: templates/editor/workflow-normal.html:6
-msgid "Is all the content subtitled?"
-msgstr "Είναι όλο το περιεχόμενο υποτιτλισμένο;"
-
-#: templates/editor/workflow-normal.html:7
-msgid "Is all the content translated?"
-msgstr ""
-
-#: templates/editor/workflow-normal.html:9
-msgid "Be sure you have no blank lines"
-msgstr ""
-
-#: templates/editor/workflow-normal.html:11
-msgid "Yes, start syncing"
-msgstr "Ναι, ξεκινήστε συγχρονισμό"
-
-#: templates/editor/workflow-normal.html:16
-msgid "Sync Timing"
-msgstr ""
-
-#: templates/editor/workflow-normal.html:18
-#, python-format
-msgid ""
-"\n"
-"            synced subtitles: %(count)s / %(total)s\n"
-"            "
-msgstr ""
-
-#: templates/editor/workflow-normal.html:24
-msgid "Start review"
-msgstr ""
-
-#: templates/editor/workflow-normal.html:29
-msgid "Review and complete"
-msgstr ""
-
-#: templates/editor/workflow-normal.html:30
-msgid ""
-"Watch the video again and verify that the subtitles are complete and "
-"correct."
-msgstr "Δείτε το βίντεο και ξανά και επιβεβαιώστε ότι οι υπότιτλοι είναι πλήρεις και σωστοί."
-
-#: templates/editor/workflow-normal.html:31
-#: templates/editor/workflow-review.html:7
-msgid "Edit title and description."
-msgstr ""
-
-#: templates/editor/workflow-errors-review.html:6
-#: templates/editor/workflow-errors-typing.html:7
-msgid "Subtitles can not be blank"
-msgstr ""
-
-#: templates/editor/workflow-errors-review.html:13
-msgid "Timing error in subtitle"
-msgstr ""
-
-#: templates/editor/workflow-errors-review.html:18
-#: templates/editor/workflow-errors-typing.html:12
-msgid "Title and description must be translated"
-msgstr ""
-
-#: templates/editor/working-subtitles.html:4
-#, python-format
-msgid ""
-"\n"
-"        Editing %(language)s&hellip;\n"
-"        "
-msgstr ""
-
-#: templates/editor/working-subtitles.html:14
-msgid "Copy Timing"
-msgstr "Αντιγραφή χρονισμού"
-
-#: templates/editor/working-subtitles.html:17
-#: templates/editor/working-subtitles.html:26
-msgid "Show"
-msgstr "Προβολή"
-
-#: templates/editor/working-subtitles.html:18
-msgid "Timeline"
-msgstr "Γραμμή χρόνου"
-
-#: templates/editor/working-subtitles.html:20
-msgid "Clear timing"
-msgstr "Καθαρισμός χρονισμού"
-
-#: templates/editor/working-subtitles.html:21
-msgid "Clear text"
-msgstr "Καθαρισμός κειμένου"
-
-#: templates/editor/working-subtitles.html:22
-msgid "Revert to last saved version"
-msgstr "Επιστροφή στην τελευταία αποθηκευμένη έκδοση"
-
-#: templates/editor/working-subtitles.html:23
-msgid "Upload subtitles"
-msgstr ""
-
-#: templates/editor/working-subtitles.html:27
-msgid "Warnings"
-msgstr ""
-
-#: templates/editor/working-subtitles.html:29
-msgid "Show Tutorial"
-msgstr ""
-
-#: templates/editor/working-subtitles.html:75
-msgid "Avoid more than 2 lines per subtitle; split the subtitle into two."
-msgstr ""
-
-#: templates/editor/working-subtitles.html:76
-msgid ""
-"Briefly displayed subtitles are hard to read; the duration should be more "
-"than 700ms."
-msgstr ""
-
-#: templates/editor/working-subtitles.html:77
-msgid ""
-"Reading rate shouldn't exceed 21 characters / sec; lengthen duration, reduce"
-" text or split the subtitle."
-msgstr ""
-
-#: templates/editor/working-subtitles.html:78
-msgid ""
-"Line length shouldn't exceed 42 characters; add a line break if necessary."
+#: templates/editor/help.html:74
+msgid "Playback Mode:"
 msgstr ""
 
 #: templates/externalsites/_sync-errors-form.html:10
@@ -10196,7 +10247,7 @@ msgstr ""
 
 #: amara-enterprise/collab/templates/collab/assignments-list.html:47
 #: amara-enterprise/collab/templates/collab/collaboration-details.html:25
-#: amara-enterprise/collab/templates/collab/evaluate.html:77
+#: amara-enterprise/collab/templates/collab/evaluate.html:79
 msgid "Open Editor"
 msgstr ""
 
@@ -10418,27 +10469,6 @@ msgstr ""
 msgid "open editor"
 msgstr ""
 
-#: amara-enterprise/collab/templates/collab/evaluate.html:44
-msgid "Evaluate Subtitles"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/evaluate.html:74
-msgid "Evaluate subtitles"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/evaluate.html:80
-msgid "drop assignment"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/evaluate.html:91
-#, python-format
-msgid "%(count)s total requests to be evaluated"
-msgstr ""
-
-#: amara-enterprise/collab/templates/collab/evaluate.html:94
-msgid "No evaluations available"
-msgstr ""
-
 #: amara-enterprise/collab/templates/collab/collaboration-state-line.html:7
 #, python-format
 msgid "Waiting for provider: %(provider)s"
@@ -10467,6 +10497,32 @@ msgstr ""
 
 #: amara-enterprise/collab/templates/collab/dashboard.html:77
 msgid "Assignment type"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:44
+msgid "Evaluate Subtitles"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:74
+msgid "Evaluate subtitles"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:76
+#, python-format
+msgid "Can't evaluate because you were the %(role)s for this request "
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:82
+msgid "drop assignment"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:93
+#, python-format
+msgid "%(count)s total requests to be evaluated"
+msgstr ""
+
+#: amara-enterprise/collab/templates/collab/evaluate.html:96
+msgid "No evaluations available"
 msgstr ""
 
 #: amara-enterprise/collab/templates/collab/email/new-editor-note.html:6
@@ -10754,40 +10810,6 @@ msgstr ""
 msgid "Create Collabs"
 msgstr ""
 
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:7
-msgid "Amara On-Demand Dashboard"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:9
-msgid "Welcome to the Amara On-Demand dashboard"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:10
-msgid "Define a new batch to get started."
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:13
-msgid "Define new batch"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:21
-#, python-format
-msgid "%(percent)s complete"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:22
-#, python-format
-msgid "%(percent)s in progress"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:38
-msgid "Download Master Spreadsheet"
-msgstr ""
-
-#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:39
-msgid "Edit batch"
-msgstr ""
-
 #: amara-enterprise/ondemand/templates/ondemand/edit-batch.html:7
 #, python-format
 msgid "Edit %(batch)s"
@@ -10803,4 +10825,38 @@ msgstr ""
 
 #: amara-enterprise/ondemand/templates/ondemand/edit-batch.html:21
 msgid "Update Batch"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:16
+msgid "Amara On-Demand Dashboard"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:18
+msgid "Welcome to the Amara On-Demand dashboard"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:19
+msgid "Define a new batch to get started."
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:22
+msgid "Define new batch"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:30
+#, python-format
+msgid "%(percent)s complete"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:31
+#, python-format
+msgid "%(percent)s in progress"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:47
+msgid "Download Master Spreadsheet"
+msgstr ""
+
+#: amara-enterprise/ondemand/templates/ondemand/dashboard.html:48
+msgid "Edit batch"
 msgstr ""
