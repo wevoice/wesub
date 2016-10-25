@@ -198,6 +198,7 @@ class SubtitleEditorBase(View):
                 'id': self.video.video_id,
                 'title': self.video.title,
                 'description': self.video.description,
+                'duration': self.video.duration,
                 'primaryVideoURL': self.video.get_video_url(),
                 'primaryVideoURLType': video_type_registrar.video_type_for_url(self.video.get_video_url()).abbreviation,
                 'videoURLs': self.get_video_urls(),
