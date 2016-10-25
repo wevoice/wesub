@@ -25,10 +25,10 @@ Message Resource
 
     Send a message to a user/team
 
-    :>json user-identifier user: Recipient (see :ref:`user_ids`)
-    :>json slug team: Recipient Team's slug
-    :>json string subject: Subject of the message
-    :>json string content: Content of the message
+    :<json user-identifier user: Recipient (see :ref:`user_ids`)
+    :<json slug team: Recipient Team's slug
+    :<json string subject: Subject of the message
+    :<json string content: Content of the message
 
 .. note:: You can only send either ``user`` or ``team``, not both.
 """
