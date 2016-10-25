@@ -1202,7 +1202,7 @@ Listing Requests
     :queryparam video-id video: Filter by video ID
     :queryparam string video_title: Filter by video title
     :queryparam bcp-47 video_language: Filter by video language
-    :queryparam bc4-47 language: Filter by subtitle request language
+    :queryparam bcp-47 language: Filter by subtitle request language
     :queryparam slug project: Filter by team project
     :queryparam username assignee: Filter by assignee
     :queryparam string sort:  Sort order.  Possible values:
