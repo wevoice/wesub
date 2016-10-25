@@ -151,10 +151,10 @@ class CustomUser(BaseUser, secureid.SecureIDMixin):
     cache = ModelCacheManager(default_cache_pattern='user')
 
     # Fields that constitute a user's profile, things like names, bios, etc.
-    # When these change we emit the user_profile_changed signal
+    # When these change we emit the user_profile_changed signal.
     PROFILE_FIELDS = [
         'first_name', 'last_name', 'full_name', 'biography', 'picture',
-        'homepage',
+        'homepage', 'email',
     ]
 
     class Meta:
