@@ -52,7 +52,7 @@ Workflow Classes
 ----------------
 
 .. autoclass:: VideoWorkflow
-    :members: user_can_view_video, user_can_edit_view, get_add_language_mode, extra_tabs, get_default_language_workflow
+    :members: user_can_view_video, user_can_edit_video, get_add_language_mode, extra_tabs, get_default_language_workflow
 
 .. autoclass:: LanguageWorkflow
     :members: get_work_mode, get_actions, action_for_add_subtitles,

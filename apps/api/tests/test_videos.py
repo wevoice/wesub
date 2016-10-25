@@ -563,13 +563,16 @@ class ViewSetCreateUpdateTestCase(TestCase):
     def setUp(self):
         # set up a bunch of mock objects so that we can test VideoViewSetTest
         # methods.
-        self.team = TeamFactory()
-        self.project = ProjectFactory(team=self.team)
         self.user = UserFactory()
-        self.serializer = mock.Mock(validated_data={
-            'team': self.team,
-            'project': self.project,
-        })
+        self.team = TeamFactory(admin=self.user)
+        self.project = ProjectFactory(team=self.team)
+        self.serializer = mock.Mock(
+            validated_data={
+                'team': self.team,
+                'project': self.project,
+            },
+            instance=None,
+        )
         self.serializer.will_add_video_to_team.return_value = False
         self.serializer.will_remove_video_from_team.return_value = False
         self.viewset = VideoViewSet()
@@ -593,6 +596,16 @@ class ViewSetCreateUpdateTestCase(TestCase):
         mock_can_add_video.return_value = False
         with assert_raises(PermissionDenied):
             self.viewset.check_save_permissions(self.serializer)
+
+    def test_edit_video_permission_check(self):
+        team_video = TeamVideoFactory(team=self.team)
+        self.serializer.instance = team_video.video
+        with test_utils.patch_get_workflow() as workflow:
+            workflow.user_can_edit_video.return_value = False
+            with assert_raises(PermissionDenied):
+                self.viewset.check_save_permissions(self.serializer)
+            assert_equal(workflow.user_can_edit_video.call_args,
+                         mock.call(self.user))
 
     @test_utils.patch_for_test('teams.permissions.can_remove_video')
     def test_remove_video_perm_check(self, mock_can_remove_video):
