@@ -277,21 +277,21 @@ var angular = angular || null;
         $scope.onEditKeydown = function(evt) {
             var subtitle = $scope.currentEdit.draft.storedSubtitle;
 
-	    var isAltPressed = function(evt) {
-		return (evt.altKey || evt.metaKey);
-	    };
+            var isAltPressed = function(evt) {
+                return (evt.altKey || evt.metaKey);
+            };
 
             if (evt.keyCode === 13 && !evt.shiftKey) {
                 // Enter without shift finishes editing
-                var nextSubtitle = subtitleList.nextSubtitle(subtitle);
                 finishEdit(true);
-                if(nextSubtitle === null) {
-                    if(!$scope.timelineShown) {
+                if(!$scope.timelineShown) {
+                    var nextSubtitle = subtitleList.nextSubtitle(subtitle);
+                    if(nextSubtitle === null) {
                         insertAndStartEdit(null);
+                    } else {
+                        $scope.currentEdit.start(nextSubtitle);
+                        $scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
                     }
-                } else {
-                    $scope.currentEdit.start(nextSubtitle);
-                    $scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
                 }
                 evt.preventDefault();
                 evt.stopPropagation();
