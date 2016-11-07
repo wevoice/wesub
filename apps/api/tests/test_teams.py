@@ -17,6 +17,7 @@
 
 from __future__ import absolute_import
 from datetime import datetime, timedelta
+import json
 import time
 
 from django.test import TestCase
@@ -1182,17 +1183,19 @@ class TeamNotificationsAPITest(TestCase):
                        args=(self.team.slug, notification.number))
 
     def make_notification(self, response_status=None, error_message=None):
-        return TeamNotification.objects.create(
-            team=self.team,
-            url='http://example.com/notification/',
-            data='{"foo": "bar"}',
-            response_status=response_status,
-            error_message=error_message)
+        notification = TeamNotification.create_new(
+            self.team,
+            'http://example.com/notification/',
+            {"foo": "bar"})
+        notification.response_status = response_status
+        notification.error_message = error_message
+        notification.save()
+        return notification
 
     def check_data(self, notification, data):
         assert_equal(data['number'], notification.number)
         assert_equal(data['url'], notification.url)
-        assert_equal(data['data'], notification.data)
+        assert_equal(data['data'], json.loads(notification.data))
         assert_equal(data['timestamp'],
                      format_datetime_field(notification.timestamp))
         assert_equal(data['in_progress'], notification.is_in_progress())

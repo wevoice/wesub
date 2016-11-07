@@ -31,7 +31,8 @@ class TeamNotificationSettingsForm(forms.ModelForm):
 
     class Meta:
         model = TeamNotificationSettings
-        fields = ['team', 'type', 'url']
+        fields = ['team', 'type', 'url', 'auth_username', 'auth_password',
+                  'header1', 'header2', 'header3',]
 
 class TeamNotificationSettingsAdmin(admin.ModelAdmin):
     list_display = ('team', 'type', 'url',)

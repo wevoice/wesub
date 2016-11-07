@@ -19,6 +19,7 @@
 from contextlib import contextmanager
 from django.test import TestCase
 from nose.tools import *
+from requests.auth import HTTPBasicAuth
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 import mock
@@ -157,33 +158,61 @@ class TestNotificationHandlerLookup(TestCase):
             video = VideoFactory(team=self.team)
         assert_true(mock_handler.on_video_added.called)
 
-class TestNotificationNumbers(TestCase):
+class TeamNotificationTest(TestCase):
+    def test_create_new(TestCase):
+        team = TeamFactory()
+        notification = TeamNotification.create_new(
+            team, 'http://example.com', {'foo': 'bar'})
+        assert_equal(json.loads(notification.data), {
+            'foo': 'bar',
+            'number': notification.number,
+        })
+
+    def test_create_new_with_team_id(TestCase):
+        team = TeamFactory()
+        notification = TeamNotification.create_new(
+            team.id, 'http://example.com', {'foo': 'bar'})
+        assert_equal(notification.team, team)
+
     def test_notification_number(TestCase):
         # test setting the number field
         team = TeamFactory()
         def make_notification():
-            return TeamNotification.objects.create(team=team,
-                                                   url='http://example.com',
-                                                   data='123')
+            return TeamNotification.create_new(
+                team, 'http://example.com', {'foo': 'bar'})
         assert_equal(make_notification().number, 1)
         assert_equal(make_notification().number, 2)
         assert_equal(make_notification().number, 3)
 
-    def test_notification_number_collision(self):
+    @patch_for_test('notifications.models.TeamNotification.next_number_for_team')
+    def test_notification_number_collision(self, next_number_for_team):
         # Simulate a potential race condition where we create notifications in
         # different threads.  We should still get unique, increasing,
         # notification numbers and not get Integrity Errors
+        next_number_for_team.return_value = 1
         team = TeamFactory()
-        notification1 = TeamNotification.objects.create(
-            team=team, url='http://example.com', data='123')
-        notification2 = TeamNotification.objects.create(
-            team=team, url='http://example.com', data='123')
-        notification1.set_number()
-        notification2.set_number()
-        notification1.save()
-        # If we aren't careful, this next save will cause an IntegrityError
-        notification2.save()
-        assert_equal(notification2.number, notification1.number + 1)
+        notification1 = TeamNotification.create_new(
+            team, 'http://example.com', {'foo': 'bar'})
+        # This next create_new() will try to save the same number as the
+        # first.  It should recover from the IntegrityError
+        notification2 = TeamNotification.create_new(
+            team, 'http://example.com', {'foo': 'bar'})
+        assert_equal(notification1.number, 1)
+        assert_equal(notification2.number, 2)
+        # check that the number is stored correctly in the data
+        assert_equal(json.loads(notification1.data)['number'], 1)
+        assert_equal(json.loads(notification2.data)['number'], 2)
+
+class TeamNotificationSettingsTest(TestCase):
+    def test_get_headers(self):
+        settings = TeamNotificationSettings(
+            header1='Foo: bar',
+            header2='  Foo2:  bar2',  # extra space should be trimmed
+        )
+        assert_equal(settings.get_headers(), {
+            'Foo': 'bar',
+            'Foo2': 'bar2',
+        })
 
 class TestSendNotification(TestCase):
     def test_send_notification(self):
@@ -197,7 +226,9 @@ class TestSendNotification(TestCase):
         # Note: do_http_post gets replaced with a mock function for the
         # unittests
         assert_equal(handlers.do_http_post.delay.call_args,
-                     mock.call(team.id, settings.url, data))
+                     mock.call(team.id, settings.url, data,
+                               settings.get_headers(), settings.auth_username,
+                               settings.auth_password))
 
 class TestDoHTTPPost(TestCase):
     def setUp(self):
@@ -211,10 +242,15 @@ class TestDoHTTPPost(TestCase):
         notification = TeamNotification.objects.get(team=self.team)
         assert_equal(notification.team, self.team)
         assert_equal(notification.url, self.url)
-        assert_equal(notification.data, json.dumps(self.data))
         assert_equal(notification.timestamp, self.now)
         assert_equal(notification.response_status, status_code)
         assert_equal(notification.error_message, error_message)
+        self.check_notification_data(notification)
+
+    def check_notification_data(self, notification):
+        correct_data = self.data.copy()
+        correct_data['number'] = notification.number
+        assert_equal(json.loads(notification.data), correct_data)
 
     def calc_post_data(self):
         post_data = self.data.copy()
@@ -225,10 +261,15 @@ class TestDoHTTPPost(TestCase):
         mocker = RequestsMocker()
         mocker.expect_request(
             'post', self.url, data=self.calc_post_data(),
-            headers={'Content-type': 'application/json'},
+            headers={
+                'Content-type': 'application/json',
+                'extra-header': '123',
+            },
+            auth=HTTPBasicAuth('alice', '1234'),
         )
         with mocker:
-            handlers.do_http_post(self.team.id, self.url, self.data)
+            handlers.do_http_post(self.team.id, self.url, self.data,
+                                  {'extra-header': '123'}, 'alice', '1234')
         self.check_notification(200)
 
     def test_status_code_error(self):
@@ -239,7 +280,7 @@ class TestDoHTTPPost(TestCase):
             status_code=500,
         )
         with mocker:
-            handlers.do_http_post(self.team.id, self.url, self.data)
+            handlers.do_http_post(self.team.id, self.url, self.data, {}, '', '')
         self.check_notification(500, "Response status: 500")
 
     def test_network_errors(self):
@@ -255,6 +296,7 @@ class TestDoHTTPPost(TestCase):
             error=exception,
         )
         with mocker:
-            handlers.do_http_post(self.team.id, self.url, self.data)
+            handlers.do_http_post(self.team.id, self.url, self.data, {}, '',
+                                  '')
         self.check_notification(None, error_message)
         TeamNotification.objects.all().delete()
