@@ -103,7 +103,7 @@
 - model: sites.site
   pk: 18
   fields:
-    domain: www.amara.org
+    domain: amara.org
     name: amara-production
 
 - model: sites.site
