@@ -204,8 +204,7 @@ class TaskTeamSubtitlesWorkflow(TeamSubtitlesWorkflow):
                 return [TaskSaveDraft(), Complete()]
             else:
                 # post publish edit
-                return [subtitles.workflows.SaveDraft(),
-                        subtitles.workflows.Publish()]
+                return [subtitles.workflows.Publish()]
 
     def get_editor_notes(self, user, language_code):
         return TaskTeamEditorNotes(self.team_video, language_code)
