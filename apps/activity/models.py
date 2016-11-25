@@ -285,11 +285,32 @@ class VideoURLDeleted(ActivityType):
         msg = _('deleted url <a href="%(url)s">%(url)s</a>')
         return self.format_message(record, msg, url=url_edit.old_url)
 
+class VideoMovedToTeam(ActivityType):
+    slug = 'video-moved-to-team'
+    label = _('Video moved to team')
+    related_model = Team
+
+    def get_message(self, record):
+        team = record.get_related_obj()
+        msg = _('Moved to team %(team)')
+        return self.format_message(record, msg, team=team.name)
+
+class VideoMovedFromTeam(ActivityType):
+    slug = 'video-moved-from-team'
+    label = _('Video moved from team')
+    related_model = Team
+
+    def get_message(self, record):
+        team = record.get_related_obj()
+        msg = _('Moved from team %(team)')
+        return self.format_message(record, msg, team=team.name)
+
 activity_choices = [
     VideoAdded, VideoTitleChanged, CommentAdded, VersionAdded, VideoURLAdded,
     TranslationAdded, SubtitleRequestCreated, VersionApproved, MemberJoined,
     VersionRejected, MemberLeft, VersionReviewed, VersionAccepted,
     VersionDeclined, VideoDeleted, VideoURLEdited, VideoURLDeleted,
+    VideoMovedToTeam, VideoMovedFromTeam,
 ]
 
 class ActivityQueryset(query.QuerySet):
@@ -442,6 +463,19 @@ class ActivityManager(models.Manager):
             return self.create_for_video('video-url-deleted', video_url.video,
                                          user=user, created=dates.now(),
                                          related_obj_id=url_edit.id)
+
+    def create_for_video_moved(self, video, from_team=None, to_team=None):
+        with transaction.commit_on_success():
+            if from_team is not None:
+                self.create_for_video('video-moved-from-team', video,
+                                      created=dates.now(),
+                                      related_obj_id=from_team.id,
+                                      private_to_team=True)
+            if to_team is not None:
+                self.create_for_video('video-moved-to-team', video,
+                                      created=dates.now(),
+                                      related_obj_id=to_team.id,
+                                      private_to_team=True)
 
     def move_video_records_to_team(self, video, team):
         for record in self.filter(video=video, copied_from=None,
