@@ -50,18 +50,15 @@ def messages(context):
     user.cache.set('messages', (hidden_message_id, content), 30 * 60)
     return content
 
-def split(x,n):
-    start = 0
-    out = u''
-    while len(x[start:start+n]) > 0:
-        out += x[start:start+n] + '\n'
-        start += n
-    return out
+def split_long_lines(s):
+    if len(s) > 140:
+        return s.replace(" ", "\n")
+    return s
 
 @register.filter
 def encode_html(message):
     return "<br/>".join(
         map(
-            lambda x: cgi.escape(split(x,20)).encode('ascii', 'xmlcharrefreplace'),
+            lambda x: split_long_lines(cgi.escape(x).encode('ascii', 'xmlcharrefreplace')),
             message.split("\n")
         ))
