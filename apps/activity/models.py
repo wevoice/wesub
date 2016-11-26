@@ -292,7 +292,7 @@ class VideoMovedToTeam(ActivityType):
 
     def get_message(self, record):
         team = record.get_related_obj()
-        msg = _('Moved to team %(team)')
+        msg = _('Moved to team %(team)s')
         return self.format_message(record, msg, team=team.name)
 
 class VideoMovedFromTeam(ActivityType):
@@ -302,7 +302,7 @@ class VideoMovedFromTeam(ActivityType):
 
     def get_message(self, record):
         team = record.get_related_obj()
-        msg = _('Moved from team %(team)')
+        msg = _('Moved from team %(team)s')
         return self.format_message(record, msg, team=team.name)
 
 activity_choices = [
