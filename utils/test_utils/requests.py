@@ -24,6 +24,7 @@ from __future__ import absolute_import
 import collections
 import json
 import urlparse
+from requests.auth import HTTPBasicAuth
 
 from nose.tools import *
 import mock
@@ -54,7 +55,16 @@ def store_request_call(url, **kwargs):
 
 ExpectedRequest = collections.namedtuple(
     "ExpectedRequest",
-    "method url params data headers body status_code error")
+    "method url params data headers body status_code error auth")
+
+def assert_auth_equal(auth, correct_auth):
+    if isinstance(correct_auth, HTTPBasicAuth):
+        # We need to check the hard way because HTTPBasicAuth doesn't
+        # implemint __equals__
+        assert_equal((auth.username, auth.password),
+                     (correct_auth.username, correct_auth.password))
+    else:
+        return assert_equal(auth, correct_auth)
 
 class RequestsMocker(object):
     """Mock code that uses the requests module
@@ -77,10 +87,11 @@ class RequestsMocker(object):
         self.expected_requests = []
 
     def expect_request(self, method, url, params=None, data=None,
-                       headers=None, body='', status_code=200, error=None):
+                       headers=None, body='', status_code=200, error=None,
+                       auth=None):
         self.expected_requests.append(
             ExpectedRequest(method, url, params, data, headers, body,
-                            status_code, error))
+                            status_code, error, auth))
 
     def __enter__(self):
         self.setup_patchers()
@@ -104,22 +115,28 @@ class RequestsMocker(object):
             patcher.stop()
         self.patchers = []
 
-    def mock_get(self, url, params=None, data=None, headers=None, verify=True):
-        return self.check_request('get', url, params, data, headers)
+    def mock_get(self, url, params=None, data=None, headers=None, auth=None,
+                 verify=True):
+        return self.check_request('get', url, params, data, headers, auth)
 
-    def mock_post(self, url, params=None, data=None, headers=None, verify=True):
-        return self.check_request('post', url, params, data, headers)
+    def mock_post(self, url, params=None, data=None, headers=None, auth=None,
+                  verify=True):
+        return self.check_request('post', url, params, data, headers, auth)
 
-    def mock_put(self, url, params=None, data=None, headers=None, verify=True):
-        return self.check_request('put', url, params, data, headers)
+    def mock_put(self, url, params=None, data=None, headers=None, auth=None,
+                 verify=True):
+        return self.check_request('put', url, params, data, headers, auth)
 
-    def mock_delete(self, url, params=None, data=None, headers=None, verify=True):
-        return self.check_request('delete', url, params, data, headers)
+    def mock_delete(self, url, params=None, data=None, headers=None,
+                    auth=None, verify=True):
+        return self.check_request('delete', url, params, data, headers, auth)
 
-    def mock_request(self, method, url, params=None, data=None, headers=None, verify=True):
-        return self.check_request(method.lower(), url, params, data, headers)
+    def mock_request(self, method, url, params=None, data=None, headers=None,
+                     auth=None, verify=True):
+        return self.check_request(method.lower(), url, params, data, headers,
+                                  auth)
 
-    def check_request(self, method, url, params, data, headers):
+    def check_request(self, method, url, params, data, headers, auth):
         try:
             expected = self.expected_requests.pop(0)
         except IndexError:
@@ -136,6 +153,7 @@ class RequestsMocker(object):
         else:
             assert_equal(data, expected.data)
         assert_equal(headers, expected.headers)
+        assert_auth_equal(auth, expected.auth)
         if expected.error:
             raise expected.error
         request = requests.Request(method=method, url=url, params=params,

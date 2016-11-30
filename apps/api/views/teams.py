@@ -329,7 +329,7 @@ List notifications
 
     :>json integer number: Notification number
     :>json url url: URL of the POST request
-    :>json string data: HTTP POST data (JSON-encoded)
+    :>json object data: Data that we posted to the URL.
     :>json iso-8601 timestamp: date/time the notification was sent
     :>json boolean in_progress: Is the request still in progress?
     :>json integer response_status: HTTP response status code (or null)
@@ -408,6 +408,7 @@ Subtitles for blacklisted languages will not be allowed.
 
 from __future__ import absolute_import
 from datetime import datetime
+import json
 
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
@@ -1139,11 +1140,19 @@ class TeamBlacklistedLanguagesView(TeamLanguageView):
 class TeamNotificationSerializer(serializers.ModelSerializer):
     in_progress = serializers.BooleanField(source='is_in_progress')
     timestamp = TimezoneAwareDateTimeField(read_only=True)
+    data = serializers.SerializerMethodField()
 
     class Meta:
         model = TeamNotification
         fields = ('number', 'url', 'data', 'timestamp', 'in_progress',
                   'response_status', 'error_message')
+
+    def get_data(self, notification):
+        try:
+            return json.loads(notification.data)
+        except StandardError:
+            # Error parsing the JSON.   Just return data as a string
+            return notification.data
 
 class TeamNotificationViewSet(TeamSubviewMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = TeamNotificationSerializer

@@ -16,6 +16,8 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import json
+
 from django.db import models, IntegrityError
 from django.db.models import Max
 
@@ -26,6 +28,11 @@ class TeamNotificationSettings(models.Model):
     team = models.OneToOneField(Team)
     type = models.CharField(max_length=30)
     url = models.URLField(max_length=512)
+    auth_username = models.CharField(max_length=128, blank=True)
+    auth_password = models.CharField(max_length=128, blank=True)
+    header1 = models.CharField(max_length=256, blank=True)
+    header2 = models.CharField(max_length=256, blank=True)
+    header3 = models.CharField(max_length=256, blank=True)
 
     class Meta:
         verbose_name_plural = 'Team notification settings'
@@ -37,6 +44,15 @@ class TeamNotificationSettings(models.Model):
         except TeamNotificationSettings.DoesNotExist:
             return None
 
+    def get_headers(self):
+        headers = {}
+        for i in xrange(1, 4):
+            header = getattr(self, 'header{}'.format(i))
+            if header:
+                key, value = header.split(':', 1)
+                headers[key.strip()] = value.strip()
+        return headers
+
 class TeamNotification(models.Model):
     """Records a sent notication."""
     team = models.ForeignKey(Team)
@@ -47,19 +63,25 @@ class TeamNotification(models.Model):
     response_status = models.IntegerField(null=True, blank=True)
     error_message = models.CharField(max_length=256, null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if self.timestamp is None:
-            self.timestamp = dates.now()
-        if self.number is None:
-            self.set_number()
+    @classmethod
+    def create_new(cls, team, url, data):
+        data = data.copy()
+        if isinstance(team, Team):
+            obj = cls(team=team, url=url, timestamp=dates.now())
+        else:
+            obj = cls(team_id=team, url=url, timestamp=dates.now())
+        obj.set_number()
         # There is a potential race condition here where another thread also
         # creates a TeamNotification and takes our number.  If that happens,
         # then try with the next number.
         for i in range(10):
             try:
-                return super(TeamNotification, self).save(*args, **kwargs)
+                data['number'] = obj.number
+                obj.data = json.dumps(data)
+                obj.save()
+                return obj
             except IntegrityError:
-                self.number = self.number + 1
+                obj.number = obj.number + 1
         raise IntegrityError("Couldn't find unused number")
 
     def set_number(self):

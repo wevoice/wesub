@@ -18,6 +18,7 @@
 
 import json
 import logging
+from requests.auth import HTTPBasicAuth
 
 from celery.task import task
 from notifications.models import TeamNotificationSettings, TeamNotification
@@ -46,6 +47,9 @@ class NotificationHandlerBase(object):
         self.notification_settings = notification_settings
         self.team = notification_settings.team
         self.url = notification_settings.url
+        self.headers = notification_settings.get_headers()
+        self.auth_username = notification_settings.auth_username
+        self.auth_password = notification_settings.auth_password
 
     def send_notification(self, data):
         """Send an HTTP notification
@@ -57,7 +61,8 @@ class NotificationHandlerBase(object):
               do_http_post() will add the number field which corresponds to
               the TeamNotification.number
         """
-        do_http_post.delay(self.team.id, self.url, data)
+        do_http_post.delay(self.team.id, self.url, data, self.headers,
+                           self.auth_username, self.auth_password)
 
     def on_video_added(self, video, old_team):
         pass
@@ -84,7 +89,7 @@ class NotificationHandlerBase(object):
         pass
 
 @task
-def do_http_post(team_id, url, data):
+def do_http_post(team_id, url, data, headers, auth_username, auth_password):
     """Handle the HTTP POST for a notifaction
 
     This function also handles creating the TeamNotification object associated
@@ -97,19 +102,25 @@ def do_http_post(team_id, url, data):
         data: array of primitive data to JSON-encode and send.  We will also
             add the number field, which will store the number of the
             associated TeamNotification.
+        headers: extra headers to add to the request
+        auth_username: authentication to send with the request
+        auth_password: authentication to send with the request
     """
-    notification = TeamNotification.objects.create(team_id=team_id, url=url,
-                                                   data=json.dumps(data))
+    if auth_username:
+        auth = HTTPBasicAuth(auth_username, auth_password)
+    else:
+        auth = None
+    notification = TeamNotification.create_new(team_id, url, data)
     post_data = data.copy()
     post_data['number'] = notification.number
-    headers = {
+    headers.update({
         'Content-type': 'application/json',
-    }
+    })
     status_code = None
     error_message = None
     try:
         response = requests.post(url, data=json.dumps(post_data),
-                                 headers=headers)
+                                 headers=headers, auth=auth)
     except requests.ConnectionError:
         notification.error_message = "Connection error"
     except requests.Timeout:
