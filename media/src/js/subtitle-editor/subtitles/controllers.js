@@ -308,7 +308,11 @@ var angular = angular || null;
         
         $scope.bottomState = function() {
             if($scope.currentEdit.inProgress()) {
-                return 'edit-help'
+                if($scope.timelineShown) {
+                    return 'edit-help-timeline-shown'
+                } else {
+                    return 'edit-help'
+                }
             } else if($scope.timelineShown) {
                 return 'add-button'
             } else {
