@@ -500,7 +500,7 @@ class VideoSerializer(serializers.Serializer):
             if project is None:
                 project = team.default_project
             if team_video:
-                team_video.move_to(team, project)
+                team_video.move_to(team, project, self.context['user'])
             else:
                 TeamVideo.objects.create(video=video, team=team,
                                          project=project)

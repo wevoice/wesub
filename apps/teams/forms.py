@@ -1408,7 +1408,8 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
     def perform_save(self, qs):
         for team_video in qs:
             team_video.move_to(self.cleaned_data['new_team'],
-                               self.cleaned_data['project'])
+                               self.cleaned_data['project'],
+                               self.user)
 
     def message(self):
         new_team = self.cleaned_data['new_team']

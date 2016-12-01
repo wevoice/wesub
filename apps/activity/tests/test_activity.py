@@ -302,6 +302,29 @@ class TeamVideoActivityTest(TestCase):
             list(ActivityRecord.objects.for_video(video, different_team)),
             [])
 
+    def test_video_moved_from_team_to_public(self):
+        video = VideoFactory()
+        team = TeamFactory()
+        team_video = TeamVideoFactory(video=video, team=team)
+        clear_activity()
+        team_video.remove(None)
+        records_to = ActivityRecord.objects.filter(type='video-moved-to-team')
+        assert_equal(len(list(records_to)), 0)
+        record_from = ActivityRecord.objects.get(type='video-moved-from-team')
+        assert_equal(record_from.video, video)
+        assert_equal(record_from.get_related_obj(), team)
+
+    def test_video_moved_from_public_to_team(self):
+        video = VideoFactory()
+        team = TeamFactory()
+        clear_activity()
+        team_video = TeamVideoFactory(video=video, team=team)
+        records_from = ActivityRecord.objects.filter(type='video-moved-from-team')
+        assert_equal(len(list(records_from)), 0)
+        record_to = ActivityRecord.objects.get(type='video-moved-to-team')
+        assert_equal(record_to.video, video)
+        assert_equal(record_to.get_related_obj(), team)
+
     def test_video_moved_from_team_to_team(self):
         video = VideoFactory()
         team_1 = TeamFactory()

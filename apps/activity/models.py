@@ -292,7 +292,7 @@ class VideoMovedToTeam(ActivityType):
 
     def get_message(self, record):
         team = record.get_related_obj()
-        msg = _('Moved to team %(team)s')
+        msg = _('moved to team %(team)s')
         return self.format_message(record, msg, team=team.name)
 
 class VideoMovedFromTeam(ActivityType):
@@ -302,7 +302,7 @@ class VideoMovedFromTeam(ActivityType):
 
     def get_message(self, record):
         team = record.get_related_obj()
-        msg = _('Moved from team %(team)s')
+        msg = _('moved from team %(team)s')
         return self.format_message(record, msg, team=team.name)
 
 activity_choices = [
@@ -464,16 +464,16 @@ class ActivityManager(models.Manager):
                                          user=user, created=dates.now(),
                                          related_obj_id=url_edit.id)
 
-    def create_for_video_moved(self, video, from_team=None, to_team=None):
+    def create_for_video_moved(self, video, user, from_team=None, to_team=None):
         with transaction.commit_on_success():
             if from_team is not None:
                 self.create_for_video('video-moved-from-team', video,
-                                      created=dates.now(),
+                                      user=user, created=dates.now(),
                                       related_obj_id=from_team.id,
                                       private_to_team=True)
             if to_team is not None:
                 self.create_for_video('video-moved-to-team', video,
-                                      created=dates.now(),
+                                      user=user, created=dates.now(),
                                       related_obj_id=to_team.id,
                                       private_to_team=True)
 
