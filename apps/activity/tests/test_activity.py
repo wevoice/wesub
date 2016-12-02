@@ -312,7 +312,8 @@ class TeamVideoActivityTest(TestCase):
         assert_equal(len(list(records_to)), 0)
         record_from = ActivityRecord.objects.get(type='video-moved-from-team')
         assert_equal(record_from.video, video)
-        assert_equal(record_from.get_related_obj(), team)
+        assert_equal(record_from.team, team)
+        assert_equal(record_from.get_related_obj(), None)
 
     def test_video_moved_from_public_to_team(self):
         video = VideoFactory()
@@ -323,7 +324,8 @@ class TeamVideoActivityTest(TestCase):
         assert_equal(len(list(records_from)), 0)
         record_to = ActivityRecord.objects.get(type='video-moved-to-team')
         assert_equal(record_to.video, video)
-        assert_equal(record_to.get_related_obj(), team)
+        assert_equal(record_to.team, team)
+        assert_equal(record_to.get_related_obj(), None)
 
     def test_video_moved_from_team_to_team(self):
         video = VideoFactory()
@@ -334,10 +336,12 @@ class TeamVideoActivityTest(TestCase):
         team_video.move_to(team_2)
         record_from = ActivityRecord.objects.get(type='video-moved-from-team')
         assert_equal(record_from.video, video)
-        assert_equal(record_from.get_related_obj(), team_1)
+        assert_equal(record_from.team, team_1)
+        assert_equal(record_from.get_related_obj(), team_2)
         record_to = ActivityRecord.objects.get(type='video-moved-to-team')
         assert_equal(record_to.video, video)
-        assert_equal(record_to.get_related_obj(), team_2)
+        assert_equal(record_to.team, team_2)
+        assert_equal(record_to.get_related_obj(), team_1)
 
 class TestViewableByUser(TestCase):
     def setUp(self):
