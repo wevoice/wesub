@@ -16,19 +16,10 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.contrib import admin
+from django import template
 
-from activity.models import ActivityRecord
-from django.contrib.auth.models import AnonymousUser
+register = template.Library()
 
-class ActivityRecordAdmin(admin.ModelAdmin):
-    list_display = ('type', 'user', 'team', 'video', 'language_code',
-                    'message',)
-
-    def message(self, record):
-        return record.get_message(AnonymousUser())
-
-    class Meta:
-        model = ActivityRecord
-
-admin.site.register(ActivityRecord, ActivityRecordAdmin)
+@register.filter
+def get_record_message(record, user):
+    return record.get_message(user)

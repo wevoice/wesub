@@ -27,6 +27,7 @@ from codefield import CodeField, Code
 from comments.models import Comment
 from mysqltweaks import query
 from teams.models import Team
+from teams.permissions import can_view_notifications
 from teams.permissions_const import (ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
                                      ROLE_CONTRIBUTOR, ROLE_NAMES)
 from utils import dates
@@ -53,7 +54,7 @@ class ActivityType(Code):
     # Is this type still in active use?
     active = True
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         """Get the message to display in activity logs."""
         raise NotImplementedError()
 
@@ -101,7 +102,7 @@ class VideoAdded(ActivityType):
     slug = 'video-added'
     label = _('Video Added')
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return self.format_message(
             record,
             _('added a video: <a href="%(video_url)s">%(video)s</a>'))
@@ -112,7 +113,7 @@ class VideoTitleChanged(ActivityType):
     # The subtitle version history tells the story better
     active = False
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return _('edited a video title')
 
 class CommentAdded(ActivityType):
@@ -120,7 +121,7 @@ class CommentAdded(ActivityType):
     label = _('Comment added')
     related_model = Comment
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         if record.language_code:
             return self.format_message(record,
                 _(u'commented on <a href="%(language_url)s">%(language)s '
@@ -133,7 +134,7 @@ class VersionAdded(ActivityType):
     slug = 'version-added'
     label = _('Version added')
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return self.format_message(record,
             _(u'edited <a href="%(language_url)s">%(language)s '
               'subtitles</a> for <a href="%(video_url)s">%(video)s</a>'))
@@ -143,7 +144,7 @@ class VideoURLAdded(ActivityType):
     label = _('Video URL added')
     related_model = URLEdit
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         url_edit = record.get_related_obj()
         return self.format_message(record,
             _(u'added new URL for <a href="%(video_url)s">%(video)s</a>'))
@@ -155,7 +156,7 @@ class TranslationAdded(ActivityType):
     # of this since 2013
     active = False
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return _('added a translation')
 
 class SubtitleRequestCreated(ActivityType):
@@ -165,14 +166,14 @@ class SubtitleRequestCreated(ActivityType):
     # instances of this in the database
     active = False
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return _('created a subtitle request')
 
 class VersionApproved(ActivityType):
     slug = 'version-approved'
     label = _('Version approved')
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return self.format_message(record,
             _('approved <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
@@ -191,7 +192,7 @@ class MemberJoined(ActivityType):
     }
     code_to_role = { v: k for (k, v) in role_to_code.items() }
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return self.format_message(record,
             _("joined the %(team)s team as a %(role)s"),
             role=self.get_role_name(record.related_obj_id))
@@ -210,7 +211,7 @@ class VersionRejected(ActivityType):
     slug = 'version-rejected'
     label = _('Version Rejected')
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return self.format_message(record,
             _('rejected <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
@@ -219,7 +220,7 @@ class MemberLeft(ActivityType):
     slug = 'member-left'
     label = _('Member Left')
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return self.format_message(record, _("left the %(team)s team"))
 
 class VersionReviewed(ActivityType):
@@ -229,7 +230,7 @@ class VersionReviewed(ActivityType):
     # production database
     active = False
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return self.format_message(record,
             _('reviewed <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
@@ -238,7 +239,7 @@ class VersionAccepted(ActivityType):
     slug = 'version-accepted'
     label = _('Version Accepted')
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return self.format_message(record,
             _('accepted <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
@@ -247,7 +248,7 @@ class VersionDeclined(ActivityType):
     slug = 'version-declined'
     label = _('Version Declined')
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         return self.format_message(record,
             _('declined <a href="%(language_url)s">%(language)s</a> subtitles'
               ' for <a href="%(video_url)s">%(video)s</a>'))
@@ -257,7 +258,7 @@ class VideoDeleted(ActivityType):
     label = _('Video deleted')
     related_model = VideoDeletion
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         deletion = record.get_related_obj()
         return self.format_message(record, _('deleted a video: %(title)s'),
                                    title=deletion.title)
@@ -267,7 +268,7 @@ class VideoURLEdited(ActivityType):
     label = _('Video URL edited')
     related_model = URLEdit
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         url_edit = record.get_related_obj()
         msg = _('changed primary url from '
                 '<a href="%(old_url)s">%(old_url)s</a> to '
@@ -280,7 +281,7 @@ class VideoURLDeleted(ActivityType):
     label = _('Video URL deleted')
     related_model = URLEdit
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         url_edit = record.get_related_obj()
         msg = _('deleted url <a href="%(url)s">%(url)s</a>')
         return self.format_message(record, msg, url=url_edit.old_url)
@@ -290,16 +291,20 @@ class VideoMovedToTeam(ActivityType):
     label = _('Video moved to team')
     related_model = Team
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         team = record.get_related_obj()
         if team is None:
             msg = _('moved <a href="%(video_url)s">%(video)s</a> to %(to_team)s from non-team video')
             from_team_name = None
             from_team_url = None
-        else:
+        elif can_view_notifications(team, user):
             msg = _('moved <a href="%(video_url)s">%(video)s</a> to %(to_team)s from <a href="%(from_team_url)s">%(from_team_name)s</a>')
             from_team_name = team.name
             from_team_url = reverse('teams:dashboard', args=(team.slug,))
+        else:
+            msg = _('moved <a href="%(video_url)s">%(video)s</a> to %(to_team)s from another team')
+            from_team_name = None
+            from_team_url = None
         return self.format_message(record, msg, from_team_name=from_team_name, from_team_url=from_team_url, to_team=record.team.name)
 
 class VideoMovedFromTeam(ActivityType):
@@ -307,16 +312,20 @@ class VideoMovedFromTeam(ActivityType):
     label = _('Video moved from team')
     related_model = Team
 
-    def get_message(self, record):
+    def get_message(self, record, user):
         team = record.get_related_obj()
         if team is None:
             msg = _('removed <a href="%(video_url)s">%(video)s</a> from %(from_team)s')
             to_team_name = None
             to_team_url = None
-        else:
+        elif can_view_notifications(team, user):
             msg = _('moved <a href="%(video_url)s">%(video)s</a> from %(from_team)s to <a href="%(to_team_url)s">%(to_team_name)s</a>')
             to_team_name = team.name
             to_team_url = reverse('teams:dashboard', args=(team.slug,))
+        else:
+            msg = _('moved <a href="%(video_url)s">%(video)s</a> from %(from_team)s to another team')
+            to_team_name = None
+            to_team_url = None
         return self.format_message(record, msg, from_team=record.team.name, to_team_name=to_team_name, to_team_url=to_team_url)
 
 activity_choices = [
@@ -623,8 +632,8 @@ class ActivityRecord(models.Model):
         else:
             return ''
 
-    def get_message(self):
-        return self.type_obj.get_message(self)
+    def get_message(self, user=None):
+        return self.type_obj.get_message(self, user)
 
     def get_related_obj(self):
         if not hasattr(self, '_related_obj_cache'):
