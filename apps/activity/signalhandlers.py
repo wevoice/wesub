@@ -74,7 +74,6 @@ def on_subtitle_version_save(instance, created, **kwargs):
 @receiver(post_save, sender=TeamVideo)
 def on_team_video_save(instance, created, **kwargs):
     if created:
-        ActivityRecord.objects.create_for_video_moved(instance.video, None, to_team=instance.team)
         ActivityRecord.objects.move_video_records_to_team(instance.video,
                                                           instance.team)
 

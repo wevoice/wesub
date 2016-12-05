@@ -310,7 +310,7 @@ class VideoMovedFromTeam(ActivityType):
     def get_message(self, record):
         team = record.get_related_obj()
         if team is None:
-            msg = _('moved <a href="%(video_url)s">%(video)s</a> from %(from_team)s to non-team video')
+            msg = _('removed <a href="%(video_url)s">%(video)s</a> from %(from_team)s')
             to_team_name = None
             to_team_url = None
         else:
