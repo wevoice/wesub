@@ -458,12 +458,14 @@ class ActivityManager(models.Manager):
 
     def create_for_video_deleted(self, video, user):
         with transaction.commit_on_success():
+            team_video = video.get_team_video()
+            team_id = team_video.team_id if team_video else None
             url = video.get_video_url()
             video_deletion = VideoDeletion.objects.create(
                 title=video.title_display(),
                 url=url if url is not None else '')
             return self.create('video-deleted', user=user,
-                               created=dates.now(),
+                               created=dates.now(), team_id=team_id,
                                related_obj_id=video_deletion.id)
 
     def create_for_video_url_made_primary(self, video_url, old_url, user):
