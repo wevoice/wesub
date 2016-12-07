@@ -1,6 +1,6 @@
 {% load amara_cache i18n recent_activity %}
 {% load url from future %}
 <div class="tab" id="activity-tab">
-    {% video_activity video %}
+    {% video_activity video user %}
     <p class="view-more"><a href="{% url "videos:activity" video.video_id %}">{% trans 'View all activity' %}</a></p>
 </div>
