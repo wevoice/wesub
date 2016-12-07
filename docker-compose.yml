@@ -9,7 +9,7 @@ app:
     JSON_LOGGING:
     DB_LOGGING:
   volumes:
-    - .:/opt/apps/amara
+    - .:/opt/apps/amara:Z
   hostname: unisubs.example.com
   ports:
     - "8000:8000"
@@ -28,7 +28,7 @@ worker:
     LANG: en_US.UTF-8
     JSON_LOGGING:
   volumes:
-    - .:/opt/apps/amara
+    - .:/opt/apps/amara:Z
   links:
     - db
     - queue
@@ -42,7 +42,7 @@ db:
     MYSQL_PASSWORD: amara
     MYSQL_DATABASE: amara
   volumes:
-    - ./docker-dev/mysql/conf.d/:/etc/mysql/conf.d
+    - ./docker-dev/mysql/conf.d/:/etc/mysql/conf.d:Z
   ports:
     - "3306"
 
