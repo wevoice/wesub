@@ -73,7 +73,7 @@ Get info on a specific video
 
     :>json string code: Language code
     :>json string name: Human readable label for the language
-    :>json boolean visibile: Are the subtitles publicly viewable?
+    :>json boolean published: Are the subtitles publicly viewable?
     :>json string dir: Language direction ("ltr" or "rtl")
     :>json url subtitles_uri: Subtitles Resource
     :>json url resource_uri: Subtitles Language Resource
@@ -254,7 +254,7 @@ Listing languages for a video
 
     Subtitle version data:
 
-    :>json string author: Subtitle author's username
+    :>json user-data author: Subtitle author (see :ref:`user_fields`)
     :>json integer version_no: number of the version
     :>json boolean published: is this version publicly viewable?
 
@@ -583,18 +583,19 @@ Video Activity Resource
 .. http:get:: /api/videos/(video-id)/activity/
 
     :queryparam string type: Filter by activity type (:ref:`activity_types`)
-    :queryparam string user: Filter by user who performed the action
+    :queryparam user-identifier user: Filter by user who performed the action
+        (see :ref:`user_ids`)
     :queryparam bcp-47 language: Filter by the subtitle language
     :queryparam iso-8601 before: Only include activity before this date/time
     :queryparam iso-8601 after: Only include activity after
 
     :>json string type: Activity type (:ref:`activity_types`)
     :>json iso-8601 date: Date/time of the activity
-    :>json username user: User who performed the activity
+    :>json user-data user: User who performed the activity (see
+        :ref:`user_fields`)
     :>json video-id video: Video related to the activity (or null)
     :>json bcp-47 language: Language of the subtitles related to the activity
         (or null)
-    :>json uri user_uri: Link to the user resource endpoint
     :>json uri video_uri: Link to the video resource endpoint
     :>json uri language_uri: Link to the subtitle language resource endpoint
 
@@ -607,7 +608,8 @@ Team Activity Resource
 .. http:get:: /api/teams/(slug)/activity/
 
     :queryparam string type: Filter by activity type (:ref:`activity_types`)
-    :queryparam string user: Filter by user who performed the action
+    :queryparam user-identifier user: Filter by user who performed the action
+        (see :ref:`user_ids`)
     :queryparam video-id video: Filter by video
     :queryparam bcp-47 video_language: Filter by video language
     :queryparam bcp-47 language: Filter by the subtitle language
@@ -763,7 +765,7 @@ Message Resource
     Send a message to a user/team
 
     :<json user-identifier user: Recipient (see :ref:`user_ids`)
-    :<json slug team: Recipient Team's slug
+    :<json slug team: Recipient team's slug
     :<json string subject: Subject of the message
     :<json string content: Content of the message
 
@@ -808,7 +810,6 @@ Get a list of teams
 
     :>json uri activity_uri: Team activity resource
     :>json uri members_uri: Team member list resource
-    :>json uri safe_members_uri: "Safe" team members list resource
     :>json uri projects_uri: Team projects resource
     :>json uri applications_uri: Team applications resource (or null if the
         membership policy is not by application)
@@ -888,7 +889,8 @@ Listing members of a team
 
 .. http:get:: /api/teams/(team-slug)/members/
 
-    :>json username username: username
+    :>json user user: User associated with the membership (see
+        :ref:`user_fields`)
     :>json string role: One of: ``owner``, ``admin``, ``manager``, or
         ``contributor``
 
@@ -922,18 +924,6 @@ Removing a user from a team
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. http:delete:: /api/teams/(team-slug)/members/(username)/
-
-Safe Members Resource
-*********************
-
-This resource behaves the same as the normal Team Member resource except
-with couple differences for the POST action to add members.
-
-- An invitation is sent to the user to join the team instead of simply
-  adding them
-- If no user exists with the username, and the email field is included
-  in the POST data, we will create a user and send an email to the email
-  account.
 
 Projects Resource
 *****************
@@ -1024,7 +1014,7 @@ Get details on a specific task
     :>json integer id: ID for the task
     :>json string type: type of task.  One of ``Subtitle``, ``Translate``,
          ``Review``, or ``Approve``
-    :>json username assignee: username of the task assignee (or null)
+    :>json user-data assignee: Task assignee (see :ref:`user_fields`)
     :>json integer priority: Priority for the task
     :>json datetime created: Date/time when the task was created
     :>json datetime modified: Date/time when the task was last updated
@@ -1083,7 +1073,7 @@ List notifications
 
     :>json integer number: Notification number
     :>json url url: URL of the POST request
-    :>json string data: HTTP POST data (JSON-encoded)
+    :>json object data: Data that we posted to the URL.
     :>json iso-8601 timestamp: date/time the notification was sent
     :>json boolean in_progress: Is the request still in progress?
     :>json integer response_status: HTTP response status code (or null)
@@ -1124,7 +1114,7 @@ Get details on a single application
 
 .. http:get:: /api/teams/(team-slug)/applications/(application-id)/:
 
-    :>json username user: Username of the applicant
+    :>json user-data user: Applicant user data (see :ref:`user_fields`)
     :>json string note: note given by the applicant
     :>json string status: status value.  Possible values are ``Denied``,
         ``Approved``, ``Pending``, ``Member Removed`` and ``Member Left``
