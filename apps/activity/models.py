@@ -294,7 +294,7 @@ class VideoMovedToTeam(ActivityType):
     def get_message(self, record, user):
         team = record.get_related_obj()
         if team is None:
-            msg = _('moved <a href="%(video_url)s">%(video)s</a> to %(to_team)s from non-team video')
+            msg = _('moved <a href="%(video_url)s">%(video)s</a> to %(to_team)s')
             from_team_name = None
             from_team_url = None
         elif can_view_notifications(team, user):

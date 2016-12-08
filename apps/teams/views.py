@@ -769,7 +769,7 @@ def add_video_to_team(request, video_id):
         form = AddVideoToTeamForm(request.user, request.POST)
         if form.is_valid():
             team = Team.objects.get(id=form.cleaned_data['team'])
-            team_video = TeamVideo.objects.create(video=video, team=team)
+            team_video = TeamVideo.objects.create(video=video, team=team, added_by=request.user)
             return redirect(video.get_absolute_url())
     else:
         form = AddVideoToTeamForm(request.user)
