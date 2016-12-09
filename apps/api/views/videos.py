@@ -503,7 +503,8 @@ class VideoSerializer(serializers.Serializer):
                 team_video.move_to(team, project, self.context['user'])
             else:
                 TeamVideo.objects.create(video=video, team=team,
-                                         project=project)
+                                         project=project,
+                                         added_by=self.context['user'])
                 video.is_public = team.is_visible
 
         video.clear_team_video_cache()

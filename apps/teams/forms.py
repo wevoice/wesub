@@ -1645,7 +1645,8 @@ class TeamVideoURLForm(forms.Form):
             if thumbnail:
                 video.s3_thumbnail.save(thumbnail.name, thumbnail)
             team_video = TeamVideo.objects.create(video=video, team=team,
-                                                  project_id=project)
+                                                  project_id=project,
+                                                  added_by=user)
 
         try:
             Video.add(video_type, user, setup_video)
