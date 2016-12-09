@@ -21,7 +21,7 @@
 
 import logging
 
-from unilangs import LanguageCode
+import unilangs
 
 from externalsites import google
 from externalsites.models import YouTubeAccount
@@ -30,6 +30,17 @@ from subtitles import pipeline
 from videos.models import VIDEO_TYPE_YOUTUBE
 
 logger = logging.getLogger('externalsites.subfetch')
+
+def convert_language_code(lc):
+    """
+    Convert from a YouTube language code to an Amara one
+    """
+    try:
+        return unilangs.LanguageCode(lc, 'youtube').encode('unisubs')
+    except KeyError:
+        # Error looking up the youtube language code.  Return none and we'll
+        # skip importing the subtitles.
+        return None
 
 def should_fetch_subs(video_url):
     if video_url.type == VIDEO_TYPE_YOUTUBE:
@@ -65,8 +76,8 @@ def fetch_subs_youtube(video_url):
     access_token = google.get_new_access_token(account.oauth_refresh_token)
     captions_list = google.captions_list(access_token, video_id)
     for caption_id, language_code, caption_name in captions_list:
-        language_code = language_code.lower()
-        if language_code not in existing_langs:
+        language_code = convert_language_code(language_code.lower())
+        if language_code and language_code not in existing_langs:
             dfxp = google.captions_download(access_token, caption_id)
             pipeline.add_subtitles(video_url.video, language_code, dfxp,
                                    note="From youtube", complete=True,

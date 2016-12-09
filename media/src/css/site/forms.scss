@@ -97,14 +97,17 @@ ul.errorlist {
 
 .autocomplete {
     position: absolute;
-    padding: 0 4px;
     margin: 0;
     border: 1px solid $light-gray;
     background: $white;
     z-index: $z-index-floating;
 
     li {
-        padding: 3px 0;
+        padding: 3px 4px;
+        &:hover {
+            background: $lightest-gray;
+            cursor: pointer;
+        }
     }
 }
 .language-selects select{
@@ -113,4 +116,12 @@ ul.errorlist {
 
 hr.form-separator {
     margin: 20px 0;
+}
+
+div.summary {
+    border: 1px solid $light-gray;
+    background: $white;
+    margin: 20px 20px;
+    padding: 20px;
+    width: 500px;
 }

@@ -5,16 +5,14 @@ describe('Test the SubtitleBackupStorage service', function() {
     var versionNumber = 5;
     var $window;
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.subtitles.services');
-    });
+    beforeEach(module('amara.SubtitleEditor.subtitles.services'));
 
     beforeEach(inject(function($injector) {
         SubtitleBackupStorage = $injector.get('SubtitleBackupStorage');
         $window = $injector.get('$window');
     }));
 
-    afterEach(function($injector) {
+    afterEach(function() {
         SubtitleBackupStorage.clearBackup();
     });
 

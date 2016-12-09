@@ -67,7 +67,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
-    can_delete_language, can_move_videos, can_view_stats_tab, can_sort_by_primary_language
+    can_move_videos, can_view_stats_tab, can_sort_by_primary_language
 )
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
@@ -89,7 +89,7 @@ from utils.translation import (
 from utils.chunkediter import chunkediter
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
-from videos.models import Action, VideoUrl, Video, VideoFeed
+from videos.models import VideoUrl, Video, VideoFeed
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
@@ -113,7 +113,6 @@ UNASSIGNED_TASKS_ON_PAGE = getattr(settings, 'UNASSIGNED_TASKS_ON_PAGE', 15)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
 DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
-ALL_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 
 def get_team_for_view(slug, user, exclude_private=True):
@@ -191,8 +190,7 @@ def index(request, my_teams=False):
 @staff_member_required
 def create(request):
     user = request.user
-
-    if not DEV and not (user.is_superuser and user.is_active):
+    if not DEV and not (user.has_perm('teams.add_team') and user.is_active):
         raise Http404
 
     if request.method == 'POST':
@@ -464,7 +462,7 @@ def _default_project_for_team(team):
 def _get_videos_for_detail_page(team, user, query, project, language_code,
                                 language_mode, sort):
     if not team.is_member(user) and not team.is_visible:
-        return Videos.objects.none()
+        return Video.objects.none()
 
     qs = Video.objects.filter(teamvideo__team=team)
     # add a couple of completed values that we use in the template code
@@ -803,12 +801,8 @@ def add_video(request, slug):
     form = AddTeamVideoForm(team, request.user, request.POST or None, request.FILES or None, initial=initial)
 
     if form.is_valid():
-        obj = form.save(False)
-        obj.added_by = request.user
-        obj.save()
-
-        api_teamvideo_new.send(obj)
-        video_changed_tasks.delay(obj.video.pk)
+        api_teamvideo_new.send(form.saved_team_video)
+        video_changed_tasks.delay(form.saved_team_video.video.pk)
         messages.success(request, form.success_message())
         return redirect(team.get_absolute_url())
 
@@ -913,13 +907,10 @@ def remove_video(request, team_video_pk):
     video = team_video.video
 
     if wants_delete:
-        # create the action handler before deleting the video, so that
-        # it can grab the video's title
-        Action.delete_video_handler(video, team_video.team, request.user)
-        video.delete()
+        video.delete(request.user)
         msg = _(u'Video has been deleted from Amara.')
     else:
-        team_video.delete()
+        team_video.remove(request.user)
         msg = _(u'Video has been removed from the team.')
 
     if request.is_ajax():
@@ -1260,11 +1251,9 @@ def leave_team(request, slug):
         member = TeamMember.objects.get(team=team, user=user)
         tm_user_pk = member.user.pk
         team_pk = member.team.pk
-        member.delete()
+        member.leave_team()
         [application.on_member_leave(request.user, "web UI") for application in \
          member.team.applications.filter(status=Application.STATUS_APPROVED)]
-
-        notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))
     return redirect(request.META.get('HTTP_REFERER') or team)
@@ -2270,11 +2259,13 @@ def _writelock_languages_for_delete(request, subtitle_language):
 
 def delete_language(request, slug, lang_id):
     team = get_object_or_404(Team, slug=slug)
-    if not can_delete_language(team, request.user):
+    language = get_object_or_404(SubtitleLanguage, pk=lang_id)
+    workflow = language.video.get_workflow()
+    if not workflow.user_can_delete_subtitles(request.user,
+                                              language.language_code):
         return redirect_to_login(reverse("teams:delete-language",
                                          kwargs={"slug": team.slug,
                                                  "lang_id": lang_id}))
-    language = get_object_or_404(SubtitleLanguage, pk=lang_id)
     next_url = request.POST.get('next', language.video.get_absolute_url())
     team_video = language.video.get_team_video()
     if team_video.team.pk != team.pk:

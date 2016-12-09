@@ -43,12 +43,9 @@ def get_video_id(video_url, public_only=False, referer=None):
     else:
         from videos.models import Video
         try:
-            video, create = Video.get_or_create_for_url(video_url)
-        except VideoTypeError:
-            raise
-
-        if not video:
-            return None
+            video, _ = Video.add(video_url, None)
+        except Video.UrlAlreadyAdded, e:
+            video = e.video
 
         video_id = video.video_id
 
@@ -115,10 +112,6 @@ def invalidate_video_moderation(video_id):
 
 def invalidate_video_visibility(video_id):
     cache.delete(_video_visibility_policy_key(video_id))
-
-def on_video_url_save(sender, instance, **kwargs):
-    if instance.video_id:
-        invalidate_cache(instance.video.video_id)
 
 def on_video_url_delete(sender, instance, **kwargs):
     if instance.video and instance.video.video_id:

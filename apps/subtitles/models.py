@@ -35,12 +35,13 @@ from subtitles import cache
 from subtitles import shims
 from auth.models import CustomUser as User
 from videos import metadata
-from videos.models import Video, Action
+from videos.models import Video
 from babelsubs.storage import SubtitleSet
 from babelsubs.storage import calc_changes
 from babelsubs.generators.html import HTMLGenerator
 from babelsubs import load_from
 from subtitles import signals
+from utils import dates
 from utils.compress import compress, decompress
 from utils.subtitles import create_new_subtitles
 from utils import translation
@@ -390,6 +391,9 @@ class SubtitleLanguage(models.Model):
 
     class Meta:
         unique_together = [('video', 'language_code')]
+        permissions = (
+            ('access_restricted_subtitle_format', "Can access restricted subtitle format"),
+            )
 
     @classmethod
     def calc_completed_languages(cls, video_list, prioritize=None, names=False):
@@ -499,8 +503,8 @@ class SubtitleLanguage(models.Model):
     def freeze(self):
         """Suspend sending signals until thaw() is called
 
-        Right now the only signal this controls is subtitles_completed.  Maybe
-        we will add more in the future.
+        This controls the subtitles_completed and subtitles_added signals.  We
+        probably should fold in subtitles_published at some point too.
         """
         if self._frozen:
             return
@@ -559,7 +563,7 @@ class SubtitleLanguage(models.Model):
         creating = not self.pk
 
         if creating and not self.created:
-            self.created = datetime.now()
+            self.created = dates.now()
 
         super(SubtitleLanguage, self).save(*args, **kwargs)
 
@@ -832,7 +836,6 @@ EXISTS(
         ensure_stringy(kwargs.get('title'))
         ensure_stringy(kwargs.get('description'))
         metadata = kwargs.pop('metadata', None)
-
         sv = SubtitleVersion(*args, **kwargs)
 
         sv.set_subtitles(kwargs.get('subtitles', None))
@@ -846,6 +849,7 @@ EXISTS(
 
         cache.invalidate_language_cache(self)
         self.clear_tip_cache()
+        self.send_signal(signals.subtitles_added, version=sv)
         return sv
 
     def get_metadata(self, public=True):
@@ -1394,7 +1398,7 @@ class SubtitleVersion(models.Model):
 
     version_number = models.PositiveIntegerField(default=1)
 
-    author = models.ForeignKey(User, default=User.get_anonymous,
+    author = models.ForeignKey(User, default=User.get_amara_anonymous,
                                related_name='newsubtitleversion_set')
 
     title = models.CharField(max_length=2048, blank=True)
@@ -1545,8 +1549,8 @@ class SubtitleVersion(models.Model):
 
         lineage = kwargs.pop('lineage', None)
 
+        self.duration = kwargs.pop('duration', None)
         super(SubtitleVersion, self).__init__(*args, **kwargs)
-
         self._subtitles = None
         if has_subtitles:
             self.set_subtitles(subtitles)
@@ -1575,7 +1579,7 @@ class SubtitleVersion(models.Model):
         metadata = kwargs.pop('metadata', None)
 
         if creating and not self.created:
-            self.created = datetime.now()
+            self.created = dates.now()
         if metadata is not None:
             self.update_metadata(metadata, commit=False)
             video_needs_save = True
@@ -1589,9 +1593,6 @@ class SubtitleVersion(models.Model):
 
         assert self.visibility in ('public', 'private',), \
             "Version visibility must be either 'public' or 'private'!"
-
-        Action.create_caption_handler(self, self.created)
-
         super(SubtitleVersion, self).save(*args, **kwargs)
 
         if self.is_public() and self.is_for_primary_audio_language():
@@ -1918,6 +1919,8 @@ class SubtitleVersion(models.Model):
             self.video.title = self.title
         if self.description:
             self.video.description = self.description
+        if self.duration and not self.video.duration:
+            self.video.duration = self.duration
         self.video.update_metadata(self.get_metadata(), commit=False)
         self.video.save()
 

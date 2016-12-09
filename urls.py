@@ -49,10 +49,6 @@ admin.site.unregister([TaskState])
 TaskMonitor.list_display += ('runtime',)
 admin.site.register(TaskState, TaskMonitor)
 
-js_info_dict = {
-    'packages': ('unisubs'),
-}
-
 # run monkey patch django
 from utils import urlvalidator
 urlpatterns = patterns('',
@@ -61,8 +57,6 @@ urlpatterns = patterns('',
     url('^robots.txt$', TemplateView.as_view(template_name='robots.txt')),
     url(r'^crossdomain.xml$',
         'crossdomain_views.root_crossdomain'),
-    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict,
-        name='js_i18n_catalog'),
     url(r'^$', 'videos.views.index', name="home"),
     url(r'^comments/',
         include('comments.urls', namespace='comments')),

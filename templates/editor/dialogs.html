@@ -317,6 +317,17 @@
         </footer>
     </form>
 </aside>
+<aside modal-dialog="playback-mode" allow-close id="playback-mode-modal" class="modal" role="dialog" tabindex="-1" aria-labeledby="playback-mode-heading" dir="[[ workingSubtitles.language.dir ]]">
+    <h3 id="playback-mode-heading">{% trans "Playback Mode" %}</h3>
+    <div class="modal-content">
+        <select ng-model="playbackMode" ng-options="mode.desc for mode in playbackModes"></select>
+    </div>
+    <footer class="buttons">
+        <button ng-click="dialogManager.onCloseClick($event)">
+            {% trans "Close" %}
+        </button>
+    </footer>
+</aside>
 
 {# include bold style too #}
 <link href='//fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>

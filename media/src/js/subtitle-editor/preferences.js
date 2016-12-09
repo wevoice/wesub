@@ -21,23 +21,38 @@ var angular = angular || null;
 (function(){
     var module = angular.module('amara.SubtitleEditor.preferences', []);
 
-    function getPreferencesUrl(type){
-	if (type === "tutorial_shown")
-            return '/en/subtitles/editor/tutorial_shown';
+    var urlsByType = {
+        'tutorial_shown': '/en/subtitles/editor/tutorial_shown',
+        'set_playback_mode': '/en/subtitles/editor/set_playback_mode'
+    };
+
+    function getPreferencesUrl(type) {
+        var url = urlsByType[type];
+        return url ? url : null;
     }
 
     module.factory('PreferencesService', ["$http", "$cookies", function($http, $cookies){
         return {
-            makePreferencesRequest: function(type) {
-                return $http({
+            makePreferencesRequest: function(type, data) {
+                var config = {
                     method: 'POST',
                     headers: {'X-CSRFToken': $cookies.csrftoken},
                     url: getPreferencesUrl(type)
-                });
+                };
+
+                if(data !== undefined) {
+                    config.data = $.param(data);
+                }
+
+                return $http(config);
             },
 
             tutorialShown: function(){
                 return this.makePreferencesRequest('tutorial_shown')
+            },
+
+            setPlaybackMode: function(playbackMode) {
+                return this.makePreferencesRequest('set_playback_mode', {playback_mode: playbackMode})
             }
         }
     }]);

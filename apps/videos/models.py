@@ -47,11 +47,13 @@ from caching import ModelCacheManager
 from videos import behaviors
 from videos import metadata
 from videos import signals
-from videos.types import video_type_registrar, video_type_choices
+from videos.types import (video_type_registrar, video_type_choices,
+                          VideoTypeError)
 from videos.feed_parser import VideoImporter
 from comments.models import Comment
 from widget import video_cache
 from utils import codes
+from utils import dates
 from utils import translation
 from utils.amazon import S3EnabledImageField
 from utils.panslugify import pan_slugify
@@ -294,6 +296,41 @@ class VideoCacheManager(ModelCacheManager):
         self._video_id_to_pk[video_id] = pk
         return pk
 
+class VideoFieldMonitor(object):
+    """Monitor model fields for the Video model"""
+
+    # map field names to signals
+    field_map = {
+        'title': signals.title_changed,
+        'duration': signals.duration_changed,
+        'primary_audio_language_code': signals.language_changed,
+    }
+
+    def __init__(self, video):
+        self.data = {
+            name: getattr(video, name, None)
+            for name in self.field_map
+        }
+
+    def on_save(self, video, created):
+        """Call this in the save() method.  If any of the fields have changed,
+        then we will emit the corresponding signal.
+        """
+        for name in self.field_map:
+            new_value = getattr(video, name, None)
+            old_value = self.data[name]
+            if new_value != old_value:
+                self.data[name] = new_value
+                if not created:
+                    self.send_signal(video, name, old_value)
+
+    def send_signal(self, video, name, old_value):
+        signal = self.field_map[name]
+        kwargs = {
+            'old_{}'.format(name): old_value
+        }
+        signal.send(sender=video, **kwargs)
+
 class Video(models.Model):
     """Central object in the system"""
 
@@ -319,7 +356,7 @@ class Video(models.Model):
             (288,162),
             (120,90),))
     edited = models.DateTimeField(null=True, editable=False)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField()
     user = models.ForeignKey(User, null=True, blank=True)
     followers = models.ManyToManyField(User, blank=True, related_name='followed_videos', editable=False)
     complete_date = models.DateTimeField(null=True, blank=True, editable=False)
@@ -356,11 +393,25 @@ class Video(models.Model):
 
     objects = VideoManager()
 
+    class UrlAlreadyAdded(Exception):
+        """
+        Video.add() was called with a URL that already exists in amara
+
+        Attributes:
+          video: Video for the URL
+          video_url: VideoUrl for the URL
+        """
+        def __init__(self, video_url):
+            self.video_url = video_url
+            self.video = video_url.video
+
+        def __unicode__(self):
+            return 'Video.UrlAlreadyAdded: {}'.format(self.url)
+
     def __init__(self, *args, **kwargs):
         super(Video, self).__init__(*args, **kwargs)
         self._language_fetcher = SubtitleLanguageFetcher()
-        self.orig_title = self.title
-        self.orig_duration = self.duration
+        self.monitor = VideoFieldMonitor(self)
 
     def __unicode__(self):
         title = self.title_display()
@@ -369,16 +420,15 @@ class Video(models.Model):
         return title
 
     def save(self, *args, **kwargs):
+        creating = self.id is None
+        if creating:
+            self.created = dates.now()
         super(Video, self).save(*args, **kwargs)
-        if self.title != self.orig_title:
-            old_title = self.orig_title
-            self.orig_title = self.title
-            signals.title_changed.send(sender=self, old_title=old_title)
-        if self.duration != self.orig_duration:
-            old_duration = self.orig_duration
-            self.orig_duration = self.duration
-            signals.duration_changed.send(sender=self,
-                                          old_duration=old_duration)
+        self.monitor.on_save(self, creating)
+
+    def delete(self, user=None):
+        signals.video_deleted.send(sender=self, user=user)
+        super(Video, self).delete()
 
     def update_search_index(self):
         """Update this video's search index text."""
@@ -570,6 +620,12 @@ class Video(models.Model):
 
     get_absolute_url = _get_absolute_url
 
+    def get_language_url(self, language_code):
+        return reverse('videos:translation_history_legacy', kwargs={
+            'video_id': self.video_id,
+            'lang': language_code,
+        })
+
     def get_primary_videourl_obj(self):
         """Return the primary video URL for this video if one exists, otherwise None.
 
@@ -604,87 +660,110 @@ class Video(models.Model):
     def _calc_url_count(self):
         return self.videourl_set.count()
 
-    @classmethod
-    def get_or_create_for_url(cls, video_url=None, vt=None, user=None,
-                              timestamp=None, fetch_subs_async=True,
-                              set_values=None, in_task=False):
+    @staticmethod
+    def add(url, user, setup_callback=None):
         """
-        If used withing a backgound task in which one wants to
-        modify the video afterwards, then in_task must be set 
-        to True to avoid having the video being modified twice
-        at the same time.
+        Add a new Video
+
+        Note:
+            If you want to do some extra setup of the video like setting some
+            attributes, adding it to a team, etc, then you must use the
+            setup_callback param to do it.  Simply calling add_video(), then
+            do the setup after creates a race condition because we have all
+            kinds of tasks that run once a video is added.  There's no knowing
+            if those tasks will happen before or after your database update
+            gets committed.
+
+        Args:
+            url: URL of the video to add (either a string or a VideoType)
+            user: User adding the video
+            setup_callback: callback function to do extra setup on the video.
+              It will be passed 2 args: a Video and VideoUrl.  Video.save()
+              will be called after, so there's no need to call it in
+              setup_callback().
+
+        Raises:
+            VideoTypeError: The video URL is invalid
+            Video.UrlAlreadyAdded: The video URL has already been added
+
+        Returns:
+            (video, video_url) tuple
         """
-        assert video_url or vt, 'should be video URL or VideoType'
-        from types.base import VideoTypeError
-        from videos.tasks import (
-            save_thumbnail_in_s3,
-        )
+        with transaction.commit_on_success():
+            # We need to be a little careful when creating the VideoUrl
+            # because it has a foreign key to Video.  We want to call
+            # get_or_create(), and we need to pass the Video to that.
+            # However, we don't want to fully set up the video since that's
+            # wasted work if the VideoUrl already exists.
+            #
+            # To work around this, we create an video without the setup code,
+            # pass that to get_or_create(), and only run the setup code if we
+            # end up creating a VideoUrl.
+            video = Video.objects.create()
+            vt, video_url = video._add_video_url(url, user, True)
+            # okay, we can now run the setup
+            vt.set_values(video)
+            video.user = user
+            if setup_callback:
+                setup_callback(video, video_url)
+            if not video.title:
+                video.title = make_title_from_url(video_url.url)
+            video.update_search_index()
+            video.save()
+            if user and user.notify_by_message:
+                video.followers.add(user)
+        # Run post-creation code
+        video_cache.invalidate_cache(video.video_id)
+        video.cache.invalidate()
+        signals.video_added.send(sender=video, video_url=video_url)
+        signals.video_url_added.send(sender=video_url, video=video,
+                                     new_video=True)
 
-        try:
-            vt = vt or video_type_registrar.video_type_for_url(video_url)
-        except VideoTypeError:
-            return None, False
+        return (video, video_url)
 
-        if not vt:
-            return None, False
+    def add_url(self, url, user):
+        """
+        Add an extra URL to an existing video
+        
+        Args:
+            url: URL of the video to add (either a string or a VideoType)
+            user: User adding the URL
 
-        try:
-            video_url_obj = VideoUrl.objects.get(
-                url=vt.convert_to_video_url(),
-                type=vt.abbreviation)
-            video, created = video_url_obj.video, False
-        except models.ObjectDoesNotExist:
-            video, created = None, False
+        Returns:
+            VideoUrl object that was added
 
-        if not video:
-            obj = Video()
-            # video types can can fecth subtitles might do it async:
-            kwargs = {}
-            if vt.CAN_IMPORT_SUBTITLES:
-                kwargs['fetch_subs_async'] = fetch_subs_async
-            vt.set_values(obj, **kwargs)
-            if set_values:
-                for name, value in set_values.items():
-                    if name == 'metadata':
-                        obj.update_metadata(value, commit=False)
-                    elif name == 'duration':
-                        if value and not getattr(obj, name):
-                            setattr(obj, name, value)
-                    else:
-                        setattr(obj, name, value)
-            if not obj.title:
-                obj.title = make_title_from_url(vt.convert_to_video_url())
-            obj.user = user
-            obj.save()
-            if in_task:
-                save_thumbnail_in_s3(obj.pk)
-            else:
-                save_thumbnail_in_s3.delay(obj.pk)
-            Action.create_video_handler(obj, user)
+        Raises:
+            Video.UrlAlreadyAdded: The URL was already added to a different video
+        """
+        vt, video_url = self._add_video_url(url, user, False)
 
-            #Save video url
-            defaults = {
-                'original': True,
-                'primary': True,
+        video_cache.invalidate_cache(self.video_id)
+        self.cache.invalidate()
+        signals.video_url_added.send(sender=video_url, video=self,
+                                     new_video=False)
+
+        return video_url
+
+    def _add_video_url(self, url, user, primary):
+        # Low-level video URL adding code for add() and add_url()
+        if isinstance(url, basestring):
+            vt = video_type_registrar.video_type_for_url(url)
+            if vt is None:
+                raise VideoTypeError(url)
+        else:
+            vt = url
+        video_url, created = VideoUrl.objects.get_or_create(
+            url=vt.convert_to_video_url(), type=vt.abbreviation, defaults={
+                'video': self,
                 'added_by': user,
-                'video': obj,
+                'primary': primary,
+                'original': primary,
+                'videoid': vt.video_id if vt.video_id else '',
                 'owner_username': vt.owner_username(),
-            }
-            if vt.video_id:
-                defaults['videoid'] = vt.video_id
-            video_url_obj, created = VideoUrl.objects.get_or_create(
-                url=vt.convert_to_video_url(),
-                type=vt.abbreviation,
-                defaults=defaults)
-            obj.update_search_index()
-            video, created = obj, True
-
-        if timestamp and video_url_obj.created != timestamp:
-           video_url_obj.created = timestamp
-           video_url_obj.save(updates_timestamp=False)
-        user and user.notify_by_message and video.followers.add(user)
-
-        return video, created
+            })
+        if not created:
+            raise Video.UrlAlreadyAdded(video_url)
+        return vt, video_url
 
     @property
     def language(self):
@@ -694,7 +773,6 @@ class Video(models.Model):
 
         """
         return self.primary_audio_language_code or None
-
 
     @property
     def filename(self):
@@ -1327,13 +1405,13 @@ class SubtitleVersion(models.Model):
     """
     user -> The legacy data model allowed null users. We do not allow it anymore, but
     for those cases, we've replaced it with the user created on the syncdb commit (see
-    apps.auth.CustomUser.get_anonymous.
+    apps.auth.CustomUser.get_amara_anonymous.
 
     """
     language = models.ForeignKey(SubtitleLanguage)
     version_no = models.PositiveIntegerField(default=0)
     datetime_started = models.DateTimeField(editable=False)
-    user = models.ForeignKey(User, default=User.get_anonymous)
+    user = models.ForeignKey(User, default=User.get_amara_anonymous)
     note = models.CharField(max_length=512, blank=True)
     time_change = models.FloatField(null=True, blank=True, editable=False)
     text_change = models.FloatField(null=True, blank=True, editable=False)
@@ -1903,13 +1981,13 @@ class Action(models.Model):
         action.save()
 
     @classmethod
-    def create_video_url_handler(cls, sender, instance, created, **kwargs):
-        if created and instance.video_id and sender.objects.filter(video=instance.video).count() > 1:
-            obj = cls(video=instance.video)
-            obj.user = instance.added_by
-            obj.action_type = cls.ADD_VIDEO_URL
-            obj.created = instance.created
-            obj.save()
+    def create_video_url_handler(cls, video, video_url):
+        cls.objects.create(
+            action_type=cls.ADD_VIDEO_URL,
+            video=video,
+            user=video_url.added_by,
+            created=video_url.created,
+        )
 
     @classmethod
     def create_approved_video_handler(cls, version, moderator,  **kwargs):
@@ -1970,10 +2048,6 @@ class Action(models.Model):
             instance.action = obj
             instance.save()
 
-
-post_save.connect(Action.create_comment_handler, Comment)
-
-
 # UserTestResult
 class UserTestResult(models.Model):
     email = models.EmailField()
@@ -2025,6 +2099,9 @@ class VideoUrl(models.Model):
     def is_html5(self):
         return self.type == VIDEO_TYPE_HTML5
 
+    def is_youtube(self):
+        return self.type == VIDEO_TYPE_YOUTUBE
+
     def get_type_display(self):
         for (type_, label) in video_type_choices():
             if self.type == type_:
@@ -2049,23 +2126,15 @@ class VideoUrl(models.Model):
 
     def make_primary(self, user=None):
         # create activity item
-        obj = Action(video=self.video)
-        urls = VideoUrl.objects.filter(video=self.video)
-        obj.action_type = Action.EDIT_URL
-        data = {
-            'old_url': urls.filter(primary=True)[0].url,
-            'new_url': self.url,
-        }
-        obj.new_video_title = json.dumps(data)
-        obj.created = datetime.now()
-        obj.user = user
-        obj.save()
+        old_url = self.video.get_primary_videourl_obj()
         # reset existing urls to non-primary
         VideoUrl.objects.filter(video=self.video).exclude(pk=self.pk).update(
             primary=False)
         # set this one to primary
         self.primary = True
         self.save(updates_timestamp=False)
+        signals.video_url_made_primary.send(sender=self, old_url=old_url,
+                                            user=user)
 
     def remove(self, user):
         """Remove this URL from our video.
@@ -2084,11 +2153,7 @@ class VideoUrl(models.Model):
             msg = ugettext("Can't remove the primary video URL")
             raise IntegrityError(msg)
 
-        action = Action(video=self.video, action_type=Action.DELETE_URL)
-        action.new_video_title = self.url
-        action.created = datetime.now()
-        action.user = user
-        action.save()
+        signals.video_url_deleted.send(sender=self, user=user)
         self.delete()
 
     def fix_owner_username(self):
@@ -2148,8 +2213,6 @@ def video_url_remove_handler(sender, instance, **kwargs):
 
 models.signals.pre_save.connect(create_video_id, sender=Video)
 models.signals.pre_delete.connect(video_delete_handler, sender=Video)
-post_save.connect(Action.create_video_url_handler, VideoUrl)
-post_save.connect(video_cache.on_video_url_save, VideoUrl)
 pre_delete.connect(video_cache.on_video_url_delete, VideoUrl)
 
 
@@ -2174,7 +2237,7 @@ class VideoFeed(models.Model):
         return urlparse.urlparse(self.url).netloc
 
     def update(self):
-        importer = VideoImporter(self.url, self.user)
+        importer = VideoImporter(self.url, self.user, self.team)
         new_videos = importer.import_videos(
             import_next=self.last_update is None)
 

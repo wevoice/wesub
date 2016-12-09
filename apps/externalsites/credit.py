@@ -48,7 +48,9 @@ def add_credit_to_video_url(video_url, account):
     add credit to the description.  It will only add credit once per video
     URL.
     """
-    if videourl_has_credit(video_url):
+    creditedvideourl, created = models.CreditedVideoUrl.objects.get_or_create(
+        video_url=video_url)
+    if not created:
         return
     access_token = google.get_new_access_token(account.oauth_refresh_token)
     video_id = video_url.videoid
@@ -58,5 +60,3 @@ def add_credit_to_video_url(video_url, account):
         new_description = '%s\n\n%s' % (current_description, credit_text)
         google.update_video_description(video_id, access_token,
                                         new_description)
-
-    models.CreditedVideoUrl.objects.create(video_url=video_url)

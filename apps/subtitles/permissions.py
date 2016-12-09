@@ -16,12 +16,23 @@
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
 from subtitles import workflows
+from subtitles.types import SubtitleFormatList
 
 def user_can_view_private_subtitles(user, video, language_code):
     if user.is_staff:
         return True
     workflow = workflows.get_workflow(video)
     return workflow.user_can_view_private_subtitles(user, language_code)
+
+def user_can_access_subtitles_format(user, format):
+    if format is None:
+        return True
+    if format not in SubtitleFormatList:
+        return False
+    f = SubtitleFormatList[format]
+    if f.for_staff and not (user.is_staff or user.has_perm("subtitles.subtitlelanguage_access_restricted_subtitle_format")):
+        return False
+    return True
 
 def user_can_edit_subtitles(user, video, language_code):
     if user.is_staff:

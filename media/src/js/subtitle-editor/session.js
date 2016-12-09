@@ -31,6 +31,7 @@ var angular = angular || null;
                 return SubtitleStorage.saveSubtitles(
                     $scope.workingSubtitles.subtitleList.toXMLString(),
                     $scope.workingSubtitles.title,
+                    Math.floor($scope.timeline.duration / 1000),
                     $scope.workingSubtitles.description,
                     $scope.workingSubtitles.metadata,
                     null, action).then(this.afterSaveSubtitles);
@@ -103,6 +104,18 @@ var angular = angular || null;
                     return action.name == 'save-draft';
                 });
             },
+            forbidAction: function(action) {
+                if ((action.requires_translated_metadata_if_enabled === true) &&
+                    $scope.translating() &&
+                    (($scope.workingSubtitles.title == "") ||
+                     (($scope.referenceSubtitles.description.length > 0) && ($scope.workingSubtitles.description == "")) ||
+                     (("speaker-name" in $scope.referenceSubtitles.metadata) &&
+                      ($scope.workingSubtitles.metadata["speaker-name"].trim() == ""))) &&
+                    EditorData.teamAttributes &&
+                    (EditorData.teamAttributes.features.indexOf('require_translated_metadata') > -1))
+                    return {'forbid': true, 'tooltip': 'Title and description must be translated'};
+		return {'forbid': false};
+	    },
             saveDraft: function() {
                 var msg = $sce.trustAsHtml('Saving&hellip;');
                 $scope.dialogManager.showFreezeBox(msg);
@@ -126,8 +139,14 @@ var angular = angular || null;
             var sessionAction = {
                 label: action.label,
                 class: action.class,
+                tooltip: function() {
+                    var forbid = $scope.session.forbidAction(action);
+                    if (forbid.forbid) return forbid.tooltip;
+                    return "";
+                },
                 canPerform: function() {
-                    if(action.complete === true) {
+                    if ($scope.session.forbidAction(action).forbid) return false;
+                    if(action.requireSyncedSubtitles === true) {
                         return $scope.sessionBackend.subtitlesComplete();
                     } else {
                         return true;

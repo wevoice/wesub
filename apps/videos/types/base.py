@@ -61,7 +61,7 @@ class VideoType(object):
                 os.remove(file_name)
             except Exception, e:
                 logger.error(repr(e))
-        url = self.get_direct_url()
+        url = self.get_direct_url(prefer_audio=True)
         download_file = os.path.join(settings.TMP_FOLDER, str(uuid.uuid4()))
         with open(download_file, 'wb') as handle:
             try:
@@ -102,8 +102,8 @@ class VideoType(object):
         clean(download_file)
         return output
 
-    def get_direct_url(self):
-        raise Exception('Not implemented')
+    def get_direct_url(self, prefer_audio=False):
+        return None
     
     def convert_to_video_url(self):
         return self.format_url(self.url)

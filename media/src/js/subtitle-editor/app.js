@@ -70,6 +70,7 @@ var angular = angular || null;
         $controller('AppControllerLocking', {$scope: $scope});
         $controller('AppControllerEvents', {$scope: $scope});
         $controller('DialogController', {$scope: $scope});
+        $controller('PlaybackModeController', {$scope: $scope});
         $controller('SessionBackend', {$scope: $scope});
         $controller('SessionController', {$scope: $scope});
 
@@ -77,6 +78,7 @@ var angular = angular || null;
         $scope.canSync = EditorData.canSync;
         $scope.showHideNextTime = EditorData.preferences.showTutorial
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
+        $scope.playbackModes = EditorData.playbackModes;
         $scope.scrollingSynced = true;
         $scope.loadingFinished = false;
         $scope.tutorialShown = false;
@@ -137,6 +139,10 @@ var angular = angular || null;
 	$scope.invalidTimingWarningShown = function() {
             return ((!$scope.currentEdit.inProgress()) &&
                     ($scope.workflow.subtitleList.firstInvalidTiming()));
+        };
+	$scope.missingTranslationShown = function() {
+            action = {'requires_translated_metadata_if_enabled': true};
+            return $scope.session.forbidAction(action).forbid;
         };
         $scope.warningsShown = true;
         $scope.timelineShown = $scope.workflow.stage != 'typing';
@@ -392,6 +398,11 @@ var angular = angular || null;
             $event.stopPropagation();
             $scope.dialogManager.open('guidelines');
         }
+        $scope.onPlaybackModeClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dialogManager.open('playback-mode');
+        }
         $scope.onMoreControlsClicked = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
@@ -401,6 +412,22 @@ var angular = angular || null;
             $event.preventDefault();
             $event.stopPropagation();
             $scope.dialogManager.open('metadata');
+        }
+        $scope.isToolboxMenuOpen = false;
+        $scope.onToolIconClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            // highlight tool icon
+            $(".toolIcon").toggleClass("active");
+            // expose toolbox menu
+            $(".toolbox-menu").toggleClass("hidden");
+            $scope.isToolboxMenuOpen = !$scope.isToolboxMenuOpen;
+            if ($scope.isToolboxMenuOpen) {
+                $window.onclick = function ($event) {
+                    $window.onclick = null;
+                    $scope.onToolIconClicked($event);
+                };
+            } 
         }
         // Hide the loading modal after we are done with bootstrapping
         // everything
@@ -591,8 +618,28 @@ var angular = angular || null;
 			$scope.currentEdit.storedSubtitle());
             } else if (isDel(evt.keyCode) && isAltPressed(evt)) {
                 // Alt+del, remove current subtitle
-		if($scope.currentEdit.storedSubtitle())
-		    $scope.workingSubtitles.subtitleList.removeSubtitle($scope.currentEdit.storedSubtitle());
+		if($scope.currentEdit.storedSubtitle()){
+                    var subtitleList = $scope.workingSubtitles.subtitleList;
+                    var currentSubtitle = $scope.currentEdit.storedSubtitle();
+                    var nextSubtitle = subtitleList.nextSubtitle(currentSubtitle);
+                    var prevSubtitle = subtitleList.prevSubtitle(currentSubtitle);
+                    var replacement = nextSubtitle || prevSubtitle;
+
+                    subtitleList.removeSubtitle(currentSubtitle);
+
+                    // After removing current subtitle, move cursor and open text-area of adjacent subtitle
+                    if (replacement){
+                        // Tell the root scope that we're no longer editing, now.
+                        if($scope.currentEdit.finish(commitChanges = true, subtitleList = subtitleList)) {
+                            $scope.$root.$emit('work-done');
+                        }
+
+                        $scope.currentEdit.start(replacement);
+                        $scope.$root.$emit('scroll-to-subtitle', replacement);
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                   }
+                }
             } else if (isAltPressed(evt) && ((evt.keyCode === 38) || (evt.keyCode === 40))) {
 		var nextSubtitle;
 		var subtitle = $scope.currentEdit.storedSubtitle();
@@ -615,6 +662,7 @@ var angular = angular || null;
 		    $scope.currentEdit.start(subtitle);
 		}
 	    } else if (evt.target.type == 'textarea') {
+                $scope.$root.$emit('text-edit-keystroke');
                 return;
 	    }
 		// Shortcuts that should be disabled while editing a subtitle

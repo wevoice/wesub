@@ -16,32 +16,39 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-"""Defines signals relevant to Teams.
-
-There is quite a bit of indirection here, but the goal is to make
-dispatching these events as simple as possible, since it might occur
-in multiple places.
-
-1) Client codes dispatches a signal listed in this module:
-   ex: signals.api_on_subtitles_edited.send(subtitle_version)
-2) The signal calls that handler, which chooses the right event name
-   for the signal and calls the matching sub method (for videos, languages, etc)
-3) The submethod finds all teams that should be notified (since a video)
-   can belong to more than on team). For each team:
-3a) Puts the right task on queue, if the teams has a TeamNotificationsSettings
-3b) The taks querys the TeamNotificationSettings models to fire notifications
-3c) The TNS checks if there is available data (e.g. which url to post to)
-3d) Instantiates the right notification class (since specific partners must
-    have their notification data massaged to their needs - e.g. changing the video
-    ids to their own, or the api links to their own endpoints)
-3e) The notification class fires the notification
-"""
 
 import logging
 
 from django import dispatch
 
 logger = logging.getLogger(__name__)
+
+member_leave = dispatch.Signal()
+video_removed_from_team = dispatch.Signal(providing_args=["team", "user"])
+video_moved_from_team_to_team = dispatch.Signal(
+        providing_args=["destination_team", "old_team", "video"])
+build_video_page_forms = dispatch.Signal(
+    providing_args=['team', 'user', 'team_videos_qs'])
+
+# Notification-related signals
+
+# There is quite a bit of indirection here, but the goal is to make
+# dispatching these events as simple as possible, since it might occur
+# in multiple places.
+#
+# 1) Client codes dispatches a signal listed in this module:
+#    ex: signals.api_on_subtitles_edited.send(subtitle_version)
+# 2) The signal calls that handler, which chooses the right event name
+#    for the signal and calls the matching sub method (for videos, languages, etc)
+# 3) The submethod finds all teams that should be notified (since a video)
+#    can belong to more than on team). For each team:
+# 3a) Puts the right task on queue, if the teams has a TeamNotificationsSettings
+# 3b) The taks querys the TeamNotificationSettings models to fire notifications
+# 3c) The TNS checks if there is available data (e.g. which url to post to)
+# 3d) Instantiates the right notification class (since specific partners must
+#     have their notification data massaged to their needs - e.g. changing the video
+#     ids to their own, or the api links to their own endpoints)
+# 3e) The notification class fires the notification
 
 def _teams_to_notify(video):
     """
@@ -157,10 +164,6 @@ api_video_edited = dispatch.Signal(providing_args=["video"])
 api_language_new = dispatch.Signal(providing_args=["language"])
 api_teamvideo_new = dispatch.Signal(providing_args=["video"])
 api_application_new = dispatch.Signal(providing_args=["application"])
-video_moved_from_team_to_team = dispatch.Signal(
-        providing_args=["destination_team", "video"])
-build_video_page_forms = dispatch.Signal(
-    providing_args=['team', 'user', 'team_videos_qs'])
 # connect handlers
 api_subtitles_edited.connect(api_on_subtitles_edited)
 api_subtitles_approved.connect(api_on_subtitles_approved)

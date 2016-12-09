@@ -7,27 +7,38 @@
     var _$ = jQuery.noConflict();
     var _Backbone = Backbone.noConflict();
     var _Popcorn = Popcorn.noConflict();
-
     // _amara may exist with a queue of actions that need to be processed after the
     // embedder has finally loaded. Store the queue in toPush for processing in init().
     var toPush = window._amara || [];
+    var originDomain = null;
     
     //////////////////////////////////////////////////////////////////
     //The following section is to communicate with the host page
     var hostPage = {};
     window.addEventListener('message', initReceiver, false);
+    var apiDomain = function(on_amara) {
+	if (on_amara && originDomain) return originDomain;
+	return '//' + _amaraConf.baseURL;
+    };
     var analytics = function() {
         if (typeof sendAnalytics !== 'undefined')
             sendAnalytics.apply(undefined, Array.prototype.slice.call(arguments, 0));
     };
     function initReceiver(e) {
+	originDomain = e.origin;
 	if (e.data) {
 	    if (e.data.fromIframeController) {
 		hostPage = {origin: e.origin, source: e.source, index: e.data.index};
                 analytics('embedder', 'init-origin', e.origin);
 		hostPage.source.postMessage({initDone: true, index: hostPage.index}, hostPage.origin);
 		window.removeEventListener('message', initReceiver, false);
+		window.addEventListener('message', resizeInside, false);
 	    }
+	}
+    }
+    function resizeInside(e) {
+	if (e && e.data && e.data.resize) {
+	    window._amara.amaraInstances[0].resize_(e.data.width, e.data.height);
 	}
     }
     // Should be triggered whenever the size of the content of the widget changes
@@ -38,14 +49,11 @@
 		width = model.get("width");
 	    else
 		width = _$(".amara-tools").width();
-	    var height;
-	    if (model && model.get("height"))
-		height = model.get("height") + 37;
-	    else
-		height = _$(".amara-popcorn").height() + _$(".amara-tools").height();
+	    var height = _$(".amara-popcorn").height() + _$(".amara-tools").height();
 	    hostPage.source.postMessage({resize: true, index: hostPage.index,
 					 width: width,
 					 height: height,
+					 transcriptHeight: (_$(".amara-tools").height()) - 37,
 					}, hostPage.origin);
 	}
     }
@@ -168,7 +176,7 @@
             div: '',
             height: '',
             initial_language: null,
-            is_on_amara: null,
+            embed_on_amara: null,
             subtitles: [], // Backbone collection
             url: '',
             video_type: '',
@@ -201,7 +209,7 @@
             initialize: function() {
 
                 var video = this;
-                var apiURL = '//' + _amaraConf.baseURL + '/api/videos/?video_url=';
+                var apiURL = '/api/videos/?video_url=';
                 this.subtitles = new that.Subtitles();
                 // Make a call to the Amara API to get attributes like available languages,
                 // internal ID, description, etc.
@@ -216,7 +224,7 @@
                                 // Set all of the API attrs as attrs on the video model.
                                 video.set(resp.objects[0]);
 				sizeUpdated(video);
-				var visibleLanguages = _$.map(_$.grep(video.get('languages'), function(language) {return language.visible;}),
+				var visibleLanguages = _$.map(_$.grep(video.get('languages'), function(language) {return language.published;}),
 							  function(language) {return language.code;});
 				video.get('languages').forEach(function(lang) {
 				    video.languages_dir[lang.code] = lang.dir;
@@ -317,6 +325,18 @@
 	    hideThumbnail: function() {
 		this.$thumbnailContainer.hide();
 	    },
+	    resize_: function(width, height) {
+                this.$popContainer.width(width);
+                this.$popContainer.height(height);
+                if (this.$amaraTools !== undefined)
+                    this.$amaraTools.width(width);
+                this.$thumbnailContainer.width(width);
+                this.$thumbnailContainer.height(height);
+                this.$videoDivContainer.width(width);
+                this.$videoDivContainer.height(height);
+                this.model.set('height', height);
+                this.model.set('width', width);
+	    },
             render: function() {
                 // TODO: Split this monster of a render() into several render()s.
                 var that = this;
@@ -352,7 +372,7 @@
                 this.model.set('width', this.$popContainer.width());
 
                 this.$el.append(this.template({
-                    video_url: '//' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + this.model.get('url'),
+                    video_url: apiDomain(this.model.get('embed_on_amara')) + '/en/videos/create/?initial_url=' + this.model.get('url'),
 		    original_video_url:  this.model.get('url'),
 		    download_subtitle_url: '',
                     width: this.model.get('width')
@@ -404,8 +424,8 @@
                                 // Build the language selection dropdown menu.
                                 that.buildLanguageSelector();
                                 // update the view on amara button
-                                that.$viewOnAmaraButton.attr('href', '//' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
-                                _$('#amara-video-link').attr('href', '//' + _amaraConf.baseURL + '/subtitles/editor/' + that.model.get('id') + '/en/');
+                                that.$viewOnAmaraButton.attr('href', apiDomain(that.model.get('embed_on_amara')) + '/en/videos/' + that.model.get('id'));
+                                _$('#amara-video-link').attr('href', apiDomain(that.model.get('embed_on_amara')) + '/subtitles/editor/' + that.model.get('id') + '/en/');
                                 // Make the request to fetch the initial subtitles.
                                 // TODO: This needs to be an option.
                                 that.loadSubtitles(that.model.get('initial_language'));
@@ -419,15 +439,16 @@
 				    _$(".amara-languages").hide();
 				_$(".amara-languages").css('min-width', "130px").css({"border-left-color": "#2B2C2D", "border-left-width":"1px", "border-left-style":"solid"});
 				if (that.model.get('is_on_amara'))
-                                    that.$amaraCurrentLang.attr("href", '//' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
+                                    that.$amaraCurrentLang.attr("href", apiDomain(that.model.get('embed_on_amara')) + '/en/videos/' + that.model.get('id'));
 				else
-                                    that.$amaraCurrentLang.attr("href", '//' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'));
+                                    that.$amaraCurrentLang.attr("href", apiDomain(that.model.get('embed_on_amara')) + '/en/videos/create/?initial_url=' + that.model.get('url'));
                                 that.$amaraCurrentLang.attr("target", '_blank');
                                 that.$amaraCurrentLang.removeAttr("data-toggle");
                                 that.setCurrentLanguageMessage('subtitle me');
                                 that.setTranscriptDisplay(false);
                             }
-                            sizeUpdated();
+                            sizeUpdated(that.model);
+                            window.setInterval(sizeUpdated, 1000, that.model);
 			    notifyVideoLoadedToHost();
                         }
                     );
@@ -476,7 +497,7 @@
 		});
                 var video_url = this.model.get('url');
                 this.$amaraLanguagesList.append(this.templateVideo({
-                        video_url: '//' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
+                        video_url: apiDomain(this.model.get('embed_on_amara')) + '/en/videos/create/?initial_url=' + video_url,
 		}));
 		if (this.model.get('show_order_subtitles') ||
 		    this.model.get('show_download_subtitles') ||
@@ -492,7 +513,7 @@
                         _$('#language-list-inside').append('' +
 							   '<li role="presentation">' +
 							   '<a role="menuitem" tabindex="-1" ' +
-							   (langs[i].visible  ? ('href="#" class="language-item" data-language="' + langs[i].code + '"') : 'class="language-item-inactive"') +
+							   (langs[i].published  ? ('href="#" class="language-item" data-language="' + langs[i].code + '"') : 'class="language-item-inactive"') +
 							   '>' +
 							   langs[i].name +
 							   '</a>' +
@@ -693,8 +714,8 @@
 			_$('ul.amara-languages-list a').removeClass('currently-selected');
 			this.$amaraLanguagesList.find("[data-language='" + language + "']").addClass('currently-selected');
 			this.$amaraCurrentLang.text(languageName);
-			_$('#amara-download-subtitles').attr('href', '//' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
-			_$('#amara-video-link').attr('href', '//' + _amaraConf.baseURL + '/subtitles/editor/' + this.model.get('id') + '/' + languageCode);
+			_$('#amara-download-subtitles').attr('href', apiDomain(this.model.get('embed_on_amara')) + '/en/videos/' + this.model.get('id') + '/' + languageCode);
+			_$('#amara-video-link').attr('href', apiDomain(this.model.get('embed_on_amara')) + '/subtitles/editor/' + this.model.get('id') + '/' + languageCode);
 			_$('ul.amara-languages-list li').removeClass('currently-selected-item');
 			_$('.currently-selected').parent().addClass('currently-selected-item');
                     } else {
@@ -712,7 +733,7 @@
                 var that = this;
 
                 var apiURL = ''+
-                    '//' + _amaraConf.baseURL + '/api/videos/' +
+                    apiDomain(this.model.get('embed_on_amara')) + '/api/videos/' +
                     this.model.get('id') + '/languages/' + language + '/subtitles/';
 
                 // Make a call to the Amara API to retrieve subtitles for this language.
@@ -933,7 +954,7 @@
                 analytics('embedder', 'transcript-display',
                                (this.$amaraTranscript.is(":visible") ? "show" : "hide"));
                 this.$transcriptButton.toggleClass('amara-button-enabled');
-                sizeUpdated();
+                sizeUpdated(this.model);
                 return false;
             },
             setSubtitlesDisplay: function(show) {
@@ -958,7 +979,7 @@
 		}
                 analytics('embedder', 'transcript-display',
                                (this.$amaraTranscript.is(":visible") ? "show" : "hide"));
-		sizeUpdated();
+		sizeUpdated(this.model);
                 return false;
             },
             transcriptLineClicked: function(e) {
@@ -1064,7 +1085,7 @@
 	    },
 	    templateHTML: function() {
 		return '' +
-                '<div class="amara-tools" style="width: {{ width }}px;">' +
+                '<div class="amara-tools">' +
                 '    <div class="amara-bar amara-group">' +
                 (this.model.get('show_logo') ? '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button" title="View this video on Amara.org in a new window">Amara</a>' : '') +
                 '        <ul class="amara-displays amara-group">' +
@@ -1113,6 +1134,7 @@
                 '&lt;div class="amara-embed" data-height="480px" data-width="854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
                 '                        </pre>' +
                 '                        <ul>' +
+                '                            <li>Scale down size depending on container or display (responsive): <code>data-resizable="true"</code>.</li>' +
                 '                            <li>Hide order subtitles menu item: <code>data-hide-order="true"</code>.</li>' +
                 '                            <li>Set initial active subtitle language: <code>data-initial-language="en"</code>.</li>' +
                 '                            <li>Display subtitles by default: <code>data-show-subtitles-default="true"</code>.</li>' +
@@ -1192,6 +1214,7 @@
                         'show_embed_code': $div.data('hide-embed') ? false : true,
 			'show_subtitles_default': $div.data('show-subtitles-default'),
 			'show_transcript_default': $div.data('show-transcript-default'),
+			'embed_on_amara': $div.data('embed-on-amara') ? true : false,
                     }]);
                 });
             }	    

@@ -156,7 +156,7 @@ class VideoSerializerTest(TestCase):
                 'name': 'English',
                 u'subtitles_uri': lang_url_root + 'en/subtitles/',
                 'dir': 'ltr',
-                'visible': True,
+                'published': True,
                 'resource_uri':  lang_url_root + 'en/'
             },
             {
@@ -164,7 +164,7 @@ class VideoSerializerTest(TestCase):
                 'name': 'Hebrew',
                 u'subtitles_uri': lang_url_root + 'he/subtitles/',
                 'dir': 'rtl',
-                'visible': False,
+                'published': False,
                 'resource_uri':  lang_url_root + 'he/'
             },
         ])
@@ -475,20 +475,17 @@ class VideoViewSetTest(TestCase):
         self.viewset.kwargs = {}
 
     def test_listing_with_no_filters(self):
-        # Listing videos without a filter should return 0 videos
-        public_team = TeamFactory()
-        private_team = TeamFactory(is_visible=False)
-        user_team = TeamFactory(is_visible=False, member=self.user)
-
-        v1 = VideoFactory(title='public video')
-        v2 = VideoFactory(title='public team video')
-        v3 = VideoFactory(title='user team video')
-        v4 = VideoFactory(title='private team video')
-        TeamVideoFactory(video=v2, team=public_team)
-        TeamVideoFactory(video=v3, team=user_team)
-        TeamVideoFactory(video=v4, team=private_team)
-
-        assert_items_equal([], self.viewset.get_queryset())
+        # Listing videos without a filter should return the last 20 public videos
+        public_videos = [
+            VideoFactory(title='public', is_public=True)
+            for i in range(30)
+        ]
+        private_videos = [
+            VideoFactory(title='private', is_public=False)
+            for i in range(30)
+        ]
+        assert_equal(list(reversed([v.id for v in public_videos[-20:]])),
+                     [v.id for v in self.viewset.get_queryset()])
 
     @test_utils.patch_for_test('subtitles.workflows.get_workflow')
     def test_get_detail_checks_workflow_permissions(self, mock_get_workflow):
@@ -566,13 +563,16 @@ class ViewSetCreateUpdateTestCase(TestCase):
     def setUp(self):
         # set up a bunch of mock objects so that we can test VideoViewSetTest
         # methods.
-        self.team = TeamFactory()
-        self.project = ProjectFactory(team=self.team)
         self.user = UserFactory()
-        self.serializer = mock.Mock(validated_data={
-            'team': self.team,
-            'project': self.project,
-        })
+        self.team = TeamFactory(admin=self.user)
+        self.project = ProjectFactory(team=self.team)
+        self.serializer = mock.Mock(
+            validated_data={
+                'team': self.team,
+                'project': self.project,
+            },
+            instance=None,
+        )
         self.serializer.will_add_video_to_team.return_value = False
         self.serializer.will_remove_video_from_team.return_value = False
         self.viewset = VideoViewSet()
@@ -596,6 +596,16 @@ class ViewSetCreateUpdateTestCase(TestCase):
         mock_can_add_video.return_value = False
         with assert_raises(PermissionDenied):
             self.viewset.check_save_permissions(self.serializer)
+
+    def test_edit_video_permission_check(self):
+        team_video = TeamVideoFactory(team=self.team)
+        self.serializer.instance = team_video.video
+        with test_utils.patch_get_workflow() as workflow:
+            workflow.user_can_edit_video.return_value = False
+            with assert_raises(PermissionDenied):
+                self.viewset.check_save_permissions(self.serializer)
+            assert_equal(workflow.user_can_edit_video.call_args,
+                         mock.call(self.user))
 
     @test_utils.patch_for_test('teams.permissions.can_remove_video')
     def test_remove_video_perm_check(self, mock_can_remove_video):
@@ -657,7 +667,7 @@ class VideoURLTestCase(TestCase):
     def test_list_urls(self):
         response = self.client.get(self.list_url)
         assert_equal(response.status_code, status.HTTP_200_OK)
-        assert_items_equal(response.data, [
+        assert_items_equal(response.data['objects'], [
             self.correct_data(self.primary_url),
             self.correct_data(self.other_url)
         ])

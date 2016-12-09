@@ -386,7 +386,8 @@ def can_add_member(team, user, role):
     ).exists()
 
 def can_remove_member(team, user):
-    return can_add_member(team, user)
+    member = team.get_member(user)
+    return can_add_member(team, user, member.role)
 
 def can_move_videos(team, user):
     role = get_role_for_target(user, team, None, None)
@@ -539,6 +540,12 @@ def can_view_tasks_tab(team, user):
 
     return team.members.filter(user=user).exists()
 
+def can_view_notifications(team, user):
+    """Return whether a user can view notifications for a team.
+    """
+
+    return user.is_superuser or team.user_is_member(user)
+
 def can_invite(team, user):
     """Return whether the given user can send an invite for the given team."""
 
@@ -553,6 +560,10 @@ def can_invite(team, user):
     }[team.membership_policy]
 
     return role in _perms_equal_or_greater(role_required)
+
+def can_add_members(team, user):
+    """Return whether the given user can add members to the given team."""
+    return user.is_staff
 
 def can_change_video_settings(user, team_video):
     role = get_role_for_target(user, team_video.team, team_video.project, None)
@@ -711,12 +722,6 @@ def can_post_edit_subtitles(team_video, user, lang=None):
             return team_video.team.is_member(user)
     else:
         return can_create_and_edit_subtitles(user, team_video, lang=lang)
-
-def can_delete_language(team, user):
-    """Return whether the user has permission to completely delete a language.
-    """
-    role = get_role(get_member(user, team))
-    return user.is_staff or role in _perms_equal_or_greater(ROLE_ADMIN)
 
 def can_add_version(user, video, language_code):
     """Check if a user can add a new version to a SubtitleLanguage
@@ -1015,4 +1020,9 @@ def can_delete_project(user, team, project):
     return can_edit_project(team, user, project)
 
 def can_create_team(user):
-    return user.is_partner
+    # via API
+    return user.has_perm('teams.add_team') or user.is_partner
+
+def can_create_team_ui(user):
+    # via website
+    return user.has_perm('teams.add_team') and user.is_active

@@ -125,7 +125,7 @@
             {% include "teams/_search.html" %}
         </div>
         
-        {% if user.is_superuser and user.is_active %}
+        {% if user|can_add_team %}
             <a href="{% url "teams:create" %}" class="button primary start_team">{% trans 'Start a Team' %}</a>
         {% endif %}
         

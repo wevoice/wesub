@@ -35,7 +35,7 @@ var USER_IDLE_MINUTES = 15;
             });
         };
     });
-    module.directive('workingSubtitles', ['VideoPlayer', function(VideoPlayer) {
+    module.directive('workingSubtitles', ['VideoPlayer', '$timeout', function(VideoPlayer, $timeout) {
         return function link(scope, elem, attrs) {
             var startHelper = $('div.sync-help.begin', elem);
             var endHelper = $('div.sync-help.end', elem);
@@ -129,7 +129,19 @@ var USER_IDLE_MINUTES = 15;
                 if (currentArrow) {
                     currentArrow.hide(); // Kinda hate this, i think it would be cleaner to give each line its own controller
                 }
-                scope.positionInfoTray();
+                $timeout(function() {
+                    // use timeout to make sure that this happens after the DOM has updated,
+                    // since changes to contents of the info tray may have changed its size.
+                    scope.positionInfoTray();
+                }, 0, false);
+            });
+
+            scope.$watch("currentEdit.draft.markdown", function() {
+                $timeout(function() {
+                    // use timeout to make sure that this happens after the DOM has updated,
+                    // since changes to contents of the info tray may have changed its size.
+                    scope.positionInfoTray();
+                }, 0, false);
             });
 
             scope.$watch("timelineShown", function() {

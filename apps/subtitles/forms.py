@@ -43,7 +43,6 @@ from utils.translation import (ALL_LANGUAGE_CHOICES,
 SUBTITLE_FILESIZE_LIMIT_KB = 512
 SUBTITLE_FILE_FORMATS = babelsubs.get_available_formats()
 
-
 class SubtitlesUploadForm(forms.Form):
     draft = forms.FileField(required=True)
     complete = forms.BooleanField(initial=False, required=False)
@@ -171,8 +170,7 @@ class SubtitlesUploadForm(forms.Form):
 
         parts = data.name.rsplit('.', 1)
         self.extension = parts[-1].lower()
-
-        if self.extension not in SUBTITLE_FILE_FORMATS:
+        if self.extension not in babelsubs.get_available_formats():
             raise forms.ValidationError(fmt(_(
                 u'Unsupported format. Please upload one of '
                 u'the following: %(formats)s'),
@@ -288,15 +286,16 @@ class SubtitlesUploadForm(forms.Form):
         subtitle_language = self.video.subtitle_language(language_code)
         title, description = self.video.title, self.video.description
         metadata = self.video.get_metadata()
-
+        from_previous_version = False
         if subtitle_language:
             previous_version = subtitle_language.get_tip()
             if previous_version:
+                from_previous_version = True
                 title = previous_version.title
                 description = previous_version.description
                 metadata = previous_version.get_metadata()
 
-        return title, description, metadata
+        return title, description, metadata, from_previous_version
 
     def _find_parents(self, from_language_code):
         """Find the parents that should be used for this upload.
@@ -353,7 +352,20 @@ class SubtitlesUploadForm(forms.Form):
             if self.extension == 'txt':
                 complete = False
 
-        title, description, metadata = self._find_title_description_metadata(language_code)
+        # Only pre-populate those if team does not have
+        # the setting
+        get_title_description_metadata = True
+        team_video = self.video.get_team_video()
+        if team_video:
+            for f in team_video.team.settings.features():
+                if f.key_name == "enable_require_translated_metadata":
+                    get_title_description_metadata = False
+                    break
+
+        title, description, metadata, previous_version = self._find_title_description_metadata(language_code)
+        if not (get_title_description_metadata or previous_version):
+            title, description, metadata = "", "", {}
+
         parents = self._find_parents(from_language_code)
 
         version = pipeline.add_subtitles(

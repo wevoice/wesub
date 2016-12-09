@@ -16,9 +16,15 @@
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
 """
-API index view.
+Index
+-----
 
-This links to the main top-level API endpoints.
+Index Resource
+**************
+
+.. http:get:: /api/
+
+    This links to the main top-level API endpoints.
 """
 
 from collections import OrderedDict

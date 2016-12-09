@@ -21,3 +21,10 @@ from django import dispatch
 feed_imported = dispatch.Signal(providing_args=['new_videos'])
 title_changed = dispatch.Signal(providing_args=['old_title'])
 duration_changed = dispatch.Signal(providing_args=['old_duration'])
+language_changed = dispatch.Signal(
+    providing_args=['old_primary_audio_language_code'])
+video_added = dispatch.Signal(providing_args=['video_url'])
+video_url_added = dispatch.Signal(providing_args=['video', 'new_video'])
+video_url_made_primary = dispatch.Signal(providing_args=['old_url', 'user'])
+video_url_deleted = dispatch.Signal(providing_args=['user'])
+video_deleted = dispatch.Signal(providing_args=['user'])

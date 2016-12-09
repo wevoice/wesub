@@ -14,10 +14,27 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
+
 from django.utils import timezone
+from rest_framework.test import APIRequestFactory
+from rest_framework.reverse import reverse
 import pytz
 
 def format_datetime_field(datetime):
+    if datetime is None:
+        return None
     tz = timezone.get_default_timezone()
     isoformat = tz.localize(datetime).astimezone(pytz.utc).isoformat()
     return isoformat.replace('+00:00', 'Z')
+
+def user_field_data(user):
+    if user:
+        return {
+            'username': user.username,
+            'id': user.secure_id(),
+            'uri': reverse('api:users-detail', kwargs={
+                'identifier': 'id$' + user.secure_id(),
+            }, request=APIRequestFactory().get('/')),
+        }
+    else:
+        return None

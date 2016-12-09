@@ -42,5 +42,7 @@ class KalturaVideoType(VideoType):
         parsed = urlparse(url)
         return parsed.netloc.endswith("kaltura.com") and get_kaltura_id(url)
 
+    # FIXME we should probably just use video_id like all the other video
+    # types
     def kaltura_id(self):
         return get_kaltura_id(self.url)

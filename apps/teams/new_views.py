@@ -38,7 +38,7 @@ from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import (Http404, HttpResponse, HttpResponseRedirect,
-                         HttpResponseBadRequest)
+                         HttpResponseBadRequest, HttpResponseForbidden)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext as _
 
@@ -53,6 +53,7 @@ from .exceptions import ApplicationInvalidException
 from .models import (Invite, Setting, Team, Project, TeamVideo,
                      TeamLanguagePreference, TeamMember, Application)
 from .statistics import compute_statistics
+from activity.models import ActivityRecord
 from auth.models import CustomUser as User
 from messages import tasks as messages_tasks
 from subtitles.models import SubtitleLanguage
@@ -62,8 +63,8 @@ from utils.decorators import staff_member_required
 from utils.pagination import AmaraPaginator
 from utils.forms import autocomplete_user_view, FormRouter
 from utils.text import fmt
-from utils.translation import get_language_choices, get_language_label
-from videos.models import Action, Video
+from utils.translation import get_language_label
+from videos.models import Video
 
 logger = logging.getLogger('teams.views')
 
@@ -135,37 +136,6 @@ def team_settings_view(view_func):
             return HttpResponseRedirect(team.get_absolute_url())
         return view_func(request, team, *args, **kwargs)
     return login_required(wrapper)
-
-def fetch_actions_for_activity_page(team, tab, page, params):
-    if tab == 'team':
-        action_qs = Action.objects.filter(team=team)
-    else:
-        video_language = params.get('video_language')
-        subtitles_language = params.get('subtitles_language', 'any')
-        if video_language == 'any':
-            video_language = None
-        action_qs = team.fetch_video_actions(video_language)
-        if subtitles_language != 'any':
-            action_qs = action_qs.filter(
-                new_language__language_code=subtitles_language)
-
-    end = page * ACTIONS_PER_PAGE
-    start = end - ACTIONS_PER_PAGE
-
-    if params.get('action_type', 'any') != 'any':
-        action_qs = action_qs.filter(action_type=params.get('action_type'))
-
-    sort = params.get('sort', '-created')
-    action_qs = action_qs.order_by(sort)[start:end]
-
-    # This query often requires a filesort in mysql.  We can speed things up
-    # by only selecting the ids, which keeps the rows being sorted small.
-    action_ids = list(action_qs.values_list('id', flat=True))
-    # Now do a second query that selects all the columns.
-    return list(Action.objects
-                .filter(id__in=action_ids)
-                .select_related('new_language', 'video', 'user',
-                                'new_language__video'))
 
 class VideoPageExtensionForm(object):
     """Define an extra form on the video page.
@@ -257,7 +227,6 @@ class VideoPageForms(object):
         else:
             initial = None
         if request.method == 'POST' and 'form' in request.POST and request.POST['form'] == 'add':
-            logger.error(request)
             return (forms.NewAddTeamVideoDataForm(self.team, request.POST, files=request.FILES),
                     forms.TeamVideoURLFormSet(request.POST))
         else:
@@ -432,6 +401,7 @@ def members(request, team):
         'filters_form': filters_form,
         'edit_form': edit_form,
         'show_invite_link': permissions.can_invite(team, request.user),
+        'show_add_link': permissions.can_add_members(team, request.user),
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Members')),
@@ -573,6 +543,34 @@ def language_page(request, team, language_code):
     )
 
 @team_view
+def add_members(request, team):
+    summary = None
+    if not permissions.can_add_members(team, request.user):
+        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
+    if request.POST:
+        form = forms.AddMembersForm(team, request.user, request.POST)
+        if form.is_valid():
+            summary = form.save()
+
+    form = forms.AddMembersForm(team, request.user)
+
+    if team.is_old_style():
+        template_name = 'teams/add_members.html'
+    else:
+        template_name = 'new-teams/add_members.html'
+
+    return render(request, template_name,  {
+        'team': team,
+        'form': form,
+        'summary': summary,
+        'breadcrumbs': [
+            BreadCrumb(team, 'teams:dashboard', team.slug),
+            BreadCrumb(_('Members'), 'teams:members', team.slug),
+            BreadCrumb(_('Invite')),
+        ],
+    })
+
+@team_view
 def invite(request, team):
     if not permissions.can_invite(team, request.user):
         return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
@@ -705,39 +703,25 @@ def admin_list(request, team):
     })
 
 @team_view
-def activity(request, team, tab):
-    try:
-        page = int(request.GET['page'])
-    except (ValueError, KeyError):
-        page = 1
-    activity_list = fetch_actions_for_activity_page(team, tab, page,
-                                                    request.GET)
-    language_choices = None
-    if tab == 'videos':
-        readable_langs = TeamLanguagePreference.objects.get_readable(team)
-        language_choices = [(code, name) for code, name in get_language_choices()
-                            if code in readable_langs]
-    action_types = Action.TYPES_CATEGORIES[tab]
+def activity(request, team):
+    filters_form = forms.ActivityFiltersForm(team, request.GET)
+    paginator = AmaraPaginator(filters_form.get_queryset(), ACTIONS_PER_PAGE)
+    page = paginator.get_page(request)
 
-    has_more = len(activity_list) >= ACTIONS_PER_PAGE
-
-    filtered = bool(set(request.GET.keys()).intersection([
-        'action_type', 'language', 'sort']))
+    action_choices = ActivityRecord.type_choices()
 
     next_page_query = request.GET.copy()
-    next_page_query['page'] = page + 1
+    next_page_query['page'] = page.next_page_number()
 
     context = {
-        'activity_list': activity_list,
-        'filtered': filtered,
-        'action_types': action_types,
-        'language_choices': language_choices,
+        'paginator': paginator,
+        'page': page,
+        'filters_form': filters_form,
+        'filtered': filters_form.is_bound,
         'team': team,
+        'tab': 'activity',
         'user': request.user,
-        'next_page': page + 1,
         'next_page_query': next_page_query.urlencode(),
-        'tab': tab,
-        'has_more': has_more,
         'breadcrumbs': [
             BreadCrumb(team, 'teams:dashboard', team.slug),
             BreadCrumb(_('Activity')),

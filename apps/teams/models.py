@@ -53,14 +53,14 @@ from teams import tasks
 from teams import workflows
 from teams.exceptions import ApplicationInvalidException
 from teams.notifications import BaseNotification
-from teams.signals import api_subtitles_approved, api_subtitles_rejected
+from teams.signals import (member_leave, api_subtitles_approved,
+                           api_subtitles_rejected, video_removed_from_team)
 from utils import DEFAULT_PROTOCOL
 from utils import translation
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.text import fmt
-from videos.models import (Video, VideoUrl, SubtitleVersion, SubtitleLanguage,
-                           Action)
+from videos.models import Video, VideoUrl, SubtitleVersion, SubtitleLanguage
 from videos.tasks import video_changed_tasks
 from subtitles.models import (
     SubtitleVersion as NewSubtitleVersion,
@@ -222,6 +222,7 @@ class Team(models.Model):
                                       upload_to='teams/square-logo/',
                                       thumb_sizes=[(100, 100), (48, 48)])
     is_visible = models.BooleanField(_(u'videos public?'), default=True)
+    sync_metadata = models.BooleanField(_(u'Sync metadata when available (Youtube)?'), default=False)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
 
@@ -454,6 +455,17 @@ class Team(models.Model):
                               Site.objects.get_current().domain,
                               self.get_absolute_url())
 
+    def get_project_video_counts(self):
+        counts = self.cache.get('project_video_counts')
+        if counts is None:
+            counts = self.calc_project_videos_count()
+            self.cache.set('project_video_counts', counts)
+        return counts
+
+    def calc_project_videos_count(self):
+        return dict(self.teamvideo_set.order_by()
+                    .values_list('project')
+                    .annotate(Count('project')))
 
     # Membership and roles
     def get_member(self, user):
@@ -515,6 +527,14 @@ class Team(models.Model):
             del self._member_cache[user.id]
         except KeyError:
             pass
+
+    def user_is_admin(self, user):
+        member = self.get_member(user)
+        return bool(member and member.is_admin())
+
+    def user_is_manager(self, user):
+        member = self.get_member(user)
+        return bool(member and member.is_manager())
 
     def invitable_users(self):
         pending_invites = (Invite.objects
@@ -584,19 +604,6 @@ class Team(models.Model):
         if not user.is_authenticated():
             return False
         return self.is_member(user)
-
-    def fetch_video_actions(self, video_language=None):
-        """Fetch the Action objects for this team's videos
-
-        Args:
-            video_language: only actions for videos with this
-                            primary_audio_language_code
-        """
-        video_q = TeamVideo.objects.filter(team=self).values_list('video_id')
-        if video_language is not None:
-            video_q = video_q.filter(
-                video__primary_audio_language_code=video_language)
-        return Action.objects.filter(video_id__in=video_q)
 
     def projects_with_video_stats(self):
         """Fetch all projects for this team and stats about their videos
@@ -934,6 +941,13 @@ class Project(models.Model):
             setattr(self, '_videos_count', TeamVideo.objects.filter(project=self).count())
         return self._videos_count
 
+    def clear_videos_count_cache(self):
+        if hasattr(self, '_videos_count'):
+            del self._videos_count
+
+    def set_videos_count_cache(self, count):
+        self._videos_count = count
+
     def _count_tasks(self):
         qs = tasks.filter(team_video__project = self)
         # quick, check, are there more than 1000 tasks, if so return 1001, and
@@ -1028,6 +1042,7 @@ class TeamVideo(models.Model):
             self.created = datetime.datetime.now()
         self.video.cache.invalidate()
         self.video.clear_team_video_cache()
+        Team.cache.invalidate_by_pk(self.team_id)
         super(TeamVideo, self).save(*args, **kwargs)
 
     def is_checked_out(self, ignore_user=None):
@@ -1073,6 +1088,12 @@ class TeamVideo(models.Model):
     def get_workflow(self):
         """Return the appropriate Workflow for this TeamVideo."""
         return Workflow.get_for_team_video(self)
+
+    def remove(self, user):
+        team = self.team
+        video = self.video
+        self.delete()
+        video_removed_from_team.send(sender=video, team=team, user=user)
 
     def move_to(self, new_team, project=None):
         """
@@ -1123,7 +1144,9 @@ class TeamVideo(models.Model):
             # fire a http notification that a new video has hit this team:
             api_teamvideo_new.send(self)
             video_moved_from_team_to_team.send(sender=self,
-                                               destination_team=new_team, video=self.video)
+                                               destination_team=new_team,
+                                               old_team=old_team,
+                                               video=self.video)
         # Update search data and other things
         video_changed_tasks.delay(self.video_id)
 
@@ -1351,6 +1374,10 @@ class TeamMember(models.Model):
     def delete(self):
         super(TeamMember, self).delete()
         Team.cache.invalidate_by_pk(self.team_id)
+
+    def leave_team(self):
+        member_leave.send(sender=self)
+        notifier.team_member_leave(self.team_id, self.user_id)
 
     def project_narrowings(self):
         """Return any project narrowings applied to this member."""
@@ -2701,6 +2728,9 @@ class SettingManager(models.Manager):
         })
         return messages
 
+    def features(self):
+        return self.get_query_set().filter(key__in=Setting.FEATURE_KEYS)
+
     def localized_messages(self):
         """Return a QS of settings related to team messages."""
         keys = [key for key, name in Setting.KEY_CHOICES
@@ -2733,6 +2763,8 @@ class Setting(models.Model):
         (311, 'block_new_collab_assignments_message'),
         # 400 is for text displayed on web pages
         (401, 'pagetext_welcome_heading'),
+        # 500 is to enable features
+        (501, 'enable_require_translated_metadata'),
     )
     KEY_NAMES = dict(KEY_CHOICES)
     KEY_IDS = dict([choice[::-1] for choice in KEY_CHOICES])
@@ -2749,6 +2781,10 @@ class Setting(models.Model):
     MESSAGE_DEFAULTS = {
         'pagetext_welcome_heading': _("Help %(team)s reach a world audience"),
     }
+    FEATURE_KEYS = [
+        key for key, name in KEY_CHOICES
+        if name.startswith('enable_')
+    ]
     key = models.PositiveIntegerField(choices=KEY_CHOICES)
     data = models.TextField(blank=True)
     team = models.ForeignKey(Team, related_name='settings')

@@ -5,359 +5,144 @@ This guide describes the development workflow for Amara.
 
 .. contents::
 
-Git Setup
----------
-
-TODO: Write a git precommit hook and describe how to install it.
-
 Branches
 --------
 
-Amara development tries to follow a "one branch per feature or bugfix" workflow
-(for the most part).  There are two main parts.
+The ``production`` branch is what gets deployed to our production server.
+It's what gets deployed to production server.  ``staging`` branch
+is what gets deployed to the staging server.  Commits should *never* be made
+directly to production and only trivial commits should be made to staging.
 
-First, the ``master`` branch is the "base" branch.  It's what gets deployed to
-staging and production servers.  Commits should *never* be made directly on this
-base branch (except for merges).
+Instead, Amara development tries to follow a "one branch per feature or
+bugfix" workflow.  Typically changes happen like this:
 
-Actual code changes should *always* be made on "feature" branches.  Each feature
-branch should contain changes related to a single feature or bugfix.  Each
-feature or bugfix should have an issue in the bug tracker (Sifter).  Each
-feature branch should be named after its issue number (e.g.  ``i-1234`` would be
-a branch for issue 1234).
+  - Someone creates a github issue that captures the bug/feature
+  - A developer creates a branch to handle the issue.  Each feature branch
+    should be named after its issue number (e.g.  ``gh-1234`` would be a branch
+    for github issue 1234).  Changes for the issue always get commited to this
+    branch.
+  - Once development on the issue is complete, we open a pull request from the
+    topic branch to staging.  Another developer will review the code and merge
+    it once they think it's good to go.
+  - Once we decide that staging is ready to be deployed to production, we will
+    merge the staging branch to production then deploy.
 
-Workflow
---------
+Creating issues
+---------------
 
-The Amara development workflow should go something like this.
+Please follow these guidelines when creating issues, to ensure that they are
+easy to implement:
 
-Create an Issue
-~~~~~~~~~~~~~~~
+  - Do a quick search to check for any existing issues before creating a new
+    one.
+  - Make sure the title clearly and succinctly captures the issue at hand
+  - For bugs, describe the steps needed to reproduce the problem and what
+    the correct behavior is.
+  - Try to describe the severity of the issue.  Who is it affecting?  How bad
+    is the current behavior, etc.
 
-First, a Sifter issue is created for the task.  It might be a new feature, a bug
-fix, or some code cleanup.  For this example we'll assume the issue number is
-1234.
+Development Workflow
+--------------------
 
-Create a Feature Branch
-~~~~~~~~~~~~~~~~~~~~~~~
+Overview
+~~~~~~~~
 
-A Git branch for the issue is created from the current head of ``master``, and
-it is named ``i-1234``.
+We use zenhub for project management.  It's basically a chrome extension that
+adds a kanban-like board to github.  You can get it from
+https://www.zenhub.com/.
 
-Create an Instance
-~~~~~~~~~~~~~~~~~~
+Zenhub adds a pipeline field to github issues.  We use this field to track the
+current status of work on the issue.  We use the following pipelines:
 
-To test changes non-locally an instance will need to be created for the feature
-branch.  You should do this as soon as you create the branch, so that test data
-will be populated (and later migrated) correctly.
+  - ``To Do`` -- Issue that a developer wants to work on, but hasn't started yet
+  - ``In Progress`` -- Issue that a developer is currently working on
+  - ``Testing`` -- Issue that a developer believes to be handled and needs
+    testing to verify the fix
+  - ``Waiting for Deploy`` -- Issue that has been fixed in the staging branch
+    and we need to deploy the change to production.
 
-Create the "demo" instance using either Launchpad (https://launchpad.amara.org)
-or Fabric.
+Here's the workflow for a typical issue:
 
-Using Launchpad, login and select the "Create Demo from Branch"
-workflow.  Select the branch from the dropdown and an optional url.  You will
-need to enter the full url name: (i.e. ``mybranch.demo.amara.org``). If you
-don't specify a custom url, the branch name will be used.
+  - Someone creates a github issue to capture a bug/feature
+  - Developer starts working on the issue.
 
-If you use fabric, use the following:
+     - They assign it to themself
+     - Move the issue to the ``In progress`` pipeline
+     - Create a topic branch to work in
 
-``fab demo:<username>,<branch_name> create_demo``
+  - Developer does the initial work on the feature
 
-Or to use a custom url:
+    - They commit code to the branch to handle the issue
+    - Move the issue to the ``Testing`` pipeline
+    - Add a comment to the github issue with any notes needed to test the
+      issue (what changes were needed, any areas that should be thoroughly
+      tested, etc.)
 
-``fab demo:<username>,<branch_name> create_demo:url_prefix=mybranch.demo.amara.org``
+  - Tester tests the changes.  If there are problems they make a comment in
+    the issue explaining them, then move it back to the ``In progress``
+    pieline.  As work continues, we iterate back and forth between ``In
+    progress`` and ``Testing``.
+  - Once the tester decides everyting is set to go, they:
 
-Make Changes on the Feature Branch
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    - Create a pull request in github from the topic branch to staging
+    - Add a comment explaining any notes that came up during testing
 
-Changes that fulfill the issue are made on that branch.  The repository now
-looks like this::
+  - A second developer reviews the code.
 
-    .
-      O i-1234
-      |
-      O
-     /
-    O master
-    |
+    - If there are any issues, they should add a comment to the pull request
+      and the first developer should address them.
+    - Once the code is good, then we merge to staging.
+    - Once the code is merged, the tester should move the issue to the
+      ``Waiting for deploy`` pipeline
 
-Commit messages should start with the issue number, a colon, and a space, like
-this::
+  - At some point we decide to deploy the code on staging to production.
 
-    1234: Remove the foo from the bar
+     - When this happens the tester closes the issue.
 
-This makes it easy to grep the Git log for changes related to a specific issue.
+Keep the Topic Branch Up To Date
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If at all possible, the developer should add a test case that covers the
-feature/bug as a separate commit first.
+As you work on your topic branch, other branches may have been merged into
+``staging`` by other people.  Make sure you merge staging back to your branch
+as often as possible to keep it up-to-date.
 
-They can then push that to the branch on GitHub, watch it fail, then add the
-code that fixes the problem and watch it start passing.  This is a good sanity
-check that their code (and test) does what they think it does.
+Testing
+~~~~~~~
 
-Keep the Feature Branch Up To Date
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+At a minimum, make sure you :ref:`run the tests <running-tests>`
+after your changes and ensure that all tests pass.
 
-As the programmer works on the feature branch, other feature branches may have
-been merged into ``master`` by other people.  The programmer should merge these
-changes back into their feature branch as often as possible to keep it up to
-date.  For example::
+If possible, use test driven development.  Write new tests that cover the
+issue you're working on before you start any code.  Write code that makes the
+test pass.  Then consider refactoring code to fix the problem in a cleaner
+way.
 
-    .
-                  master O
-                        /|
-                       | | O i-1234
-       work by another . | |
-    dev on a different . | |
-        feature branch . | |
-                       | | O
-                        \|/
-                         O
-                         |
-
-The programmer working on ``i-1234`` should merge these changes into their
-feature branch to keep it up to date::
-
-    .
-                           O i-1234
-                          /|
-                  master O |
-                        /| |
-                       | | O 
-       work by another . | |
-    dev on a different . | |
-        feature branch . | |
-                       | | O
-                        \|/
-                         O
-                         |
-
-Run the Full Test Suite
-~~~~~~~~~~~~~~~~~~~~~~~
-
-The small set of tests should be run automatically after every commit.  Once the
-programmer thinks they've solved the issue they should kick off the full suite
-of Selenium tests and wait for the results (by email).
-
-TODO: Describe how to do this.
-
-Resolve the Ticket for QA
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Along with the automated test suite which should be run automatically, QA will
-need to test the changes.  Once the developer has received the full tests
-results (and they're passing) they should resolve the Sifter ticket.  QA will
-then test the instance running from the ``i-1234`` branch.
-
-If there's a problem, they'll reopen the ticket and the developer can make some
-more changes on the feature branch.  Otherwise they'll comment on the ticket and
-say that it's ready to go.
-
-Merging Back to the Base Branch
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Once QA has tested a feature branch, the developer should send a pull request
-to merge ``i-1234`` back into ``master``.  The other developers should review
-all the code as a last line of defense against bugs.
-
-If there's a problem, the original developer should make some more changes on
-``i-1234`` that fix the problem, QA retests, and a new pull request should be
-made.
-
-Otherwise, the branch can be merged into ``master``.
-
-Delete the Feature Branch
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Once the feature branch (``i-1234``) has been merged back into the base branch
-(``master``) it can be deleted.
-
-You can find commits made on a particular feature branch later by grepping
-through the commit logs for ``1234:``, thanks to the commit message format.
-
-The git command to delete a branch both locally and remotely is:
-
-::
-
-    git push origing --delete i-1234
-
-Delete the Instance
-~~~~~~~~~~~~~~~~~~~
-
-From the launchpad, choose `Delete Demo` and remove it.  If you use fabric, use
-the following:
-
-::
-
-    fab demo:<username>,<branch_name> remove_demo
-
-Deploy to Production
-~~~~~~~~~~~~~~~~~~~~
-
-Once the feature branch has been merged back into the base branch and deleted,
-the base branch can be deployed to production.
-
-TODO: Have Evan describe how to do this.
-
-Integration Repository
+Other Git Repositories
 ----------------------
 
-The integration repository should function the same way as the main repository.
+Inside the unisubs repository, you may want to check out some other repositories.
 
-If you don't need to make any changes inside of it there's no need to create
-an empty ``i-####`` feature branch in it though.
+If you have access to our private repository
+(https://github.com/pculture/amara-enterprise/).  Check that out inside the
+root directory of the unisubs repository to add the extra functionality.  See
+:ref:`optional-apps` for details on how this works.
 
-TODO: Add more details here.
+We also have a couple other repositories that integrate into unisubs:
 
-"Buffer" Branches
------------------
+  - https://github.com/pculture/babelsubs/
+  - https://github.com/pculture/unilangs/
 
-Sometimes there are larger projects that span multiple Sifter issues which don't
-make sense to deploy individually.  When this is the case, a "buffer" branch
-should be used.
+Both of these get installed inside your docker container.  Normally you don't
+need to do anything to use them.  However, if you want to test changes to
+those repositories you need to check out a local copy:
 
-A "buffer" branch is a separate Git branch with a descriptive name like
-``data-model-refactor`` or ``new-editor``.  Once created it takes over the role
-of the "base" branch for changes related to that project.
-
-Instead of creating ``i-2222`` as a branch off of ``master``, it would be
-created as a branch off of ``new-editor``.  It would be kept up to date by
-merging ``new-editor`` back in, and once complete a pull request to merge it
-back into ``new-editor`` would be created.
-
-Note that ``new-editor`` itself should be kept up to date with changes from
-``master`` as well.
-
-An instance can be deployed to track the buffer branch itself (in addition to
-instances for each feature branch off of it).
-
-Once all the development has been completed, the buffer branch itself can be
-merged back into ``master`` and deployed.
-
-Basic Example
--------------
-
-Let's walk through a full example of a workflow.  First, we'll start with
-a clean slate::
-
-    .
-
-    O master
-    |
-    ⋯
-
-Now someone creates a feature branch for an issue and makes some changes::
-
-    .
-
-      O i-1111
-      |
-      O
-     /
-    O master
-    |
-    ⋯
-
-At the same time, someone *else* creates a feature branch for a different
-issue::
-
-    .
-
-    i-2222 O
-           |
-           |   O i-1111
-           |   |
-           |   O
-            \ /
-             O master
-             |
-             ⋯
-
-Now the first developer marks their ticket as resolved, QA tests, and everything
-is okay.
-
-They create a pull request to merge ``i-1111`` back into ``master``.  The other
-developers review it and it looks fine, so they merge it and delete the feature
-branch::
-
-    .
-
-             O master
-    i-2222 O |\
-           | | |
-           | | O
-           | | |
-           | | O
-            \|/
-             O
-             |
-             ⋯
-
-Now the second developer notices that there are new changes on ``master``, so
-they merge ``master`` into their feature branch to keep the feature branch up to
-date::
-
-    .
-
-    i-2222 O
-           |\
-           | O master
-           O |\
-           | | |
-           | | O
-           | | |
-           | | O
-            \|/
-             O
-             |
-             ⋯
-
-They make a few more changes::
-
-    .
-
-    i-2222 O
-           |
-           O
-           |
-           O
-           |\
-           | O master
-           O |\
-           | | |
-           | | O
-           | | |
-           | | O
-            \|/
-             O
-             |
-             ⋯
-
-They mark the ticket as resolved, QA tests, they create a pull request, devs
-review, and their feature branch gets merged into ``master`` and deleted::
-
-    .
-
-             O master
-            /|
-           O |
-           | |
-           O |
-           | |
-           O |
-           |\|
-           | O
-           O |\
-           | | |
-           | | O
-           | | |
-           | | O
-            \|/
-             O
-             |
-             ⋯
-
-Buffer Branch Example
----------------------
-
-TODO: This.
+  - Check out the git repository inside the root unisubs directory.
+  - Make a symlink from the root directory to the python package (for example:
+    ``ln -s babelsubs-git/babelsubs .``)
+  - After this the unisubs code will be using your local checkout rather than
+    the default package.  Make changes there, test them on your dev
+    environment, then commit/push the changes back to a branch on the pculture
+    repository, then open a PR to maste.
+  - When we deploy amara, we pick up the the latest commit in master for these
+    libraries.  So once your changes are merged to master, they will be live
+    the next time we deploy.

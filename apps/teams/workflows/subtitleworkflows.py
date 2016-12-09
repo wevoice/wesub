@@ -30,7 +30,7 @@ class TeamSubtitlesWorkflow(subtitles.workflows.DefaultWorkflow):
         self.team_video = team_video
         self.team = team_video.team
 
-    def get_editor_notes(self, language_code):
+    def get_editor_notes(self, user, language_code):
         return TeamEditorNotes(self.team_video.team, self.team_video.video,
                                language_code)
 
@@ -42,6 +42,9 @@ class TeamSubtitlesWorkflow(subtitles.workflows.DefaultWorkflow):
 
     def user_can_view_private_subtitles(self, user, language_code):
         return self.team_video.team.is_member(user)
+
+    def user_can_delete_subtitles(self, user, language_code):
+        return user.is_superuser or self.team.user_is_admin(user)
 
     def user_can_edit_subtitles(self, user, language_code):
         return permissions.can_add_version(user, self.video, language_code)
@@ -79,3 +82,6 @@ class TeamLanguageWorkflow(subtitles.workflows.DefaultLanguageWorkflow):
 
     def user_can_view_private_subtitles(self, user):
         return user.is_staff or self.team.is_member(user)
+
+    def user_can_delete_subtitles(self, user):
+        return user.is_superuser or self.team.user_is_admin(user)

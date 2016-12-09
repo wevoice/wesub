@@ -17,6 +17,8 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 """
+.. _optional-apps:
+
 Optional Apps
 =============
 Amara.org uses several apps/packages that are stored in private github

@@ -30,6 +30,9 @@ from nose.tools import *
 def reload_obj(model_obj):
     return model_obj.__class__.objects.get(pk=model_obj.pk)
 
+def obj_exists(model_obj):
+    return model_obj.__class__.objects.filter(pk=model_obj.pk).exists()
+
 def assert_saved(model_obj):
     assert_exists(model_obj)
     assert_equal(model_obj, reload_obj(model_obj))
@@ -43,5 +46,5 @@ def with_db_teardown(func):
     return with_setup(setup=None, teardown=teardown)(func)
 
 __all__ = [
-    'reload_obj', 'assert_saved', 'with_db_teardown',
+    'reload_obj', 'obj_exists', 'assert_saved', 'with_db_teardown',
 ]

@@ -3,10 +3,8 @@ describe('Test the SubtitleList class', function() {
     var VideoPlayer;
     var $scope;
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.mocks');
-        module('amara.SubtitleEditor.modal');
-    });
+    beforeEach(module('amara.SubtitleEditor.mocks'));
+    beforeEach(module('amara.SubtitleEditor.modal'));
 
     beforeEach(inject(function($controller, $injector, $rootScope) {
         $scope = $rootScope.$new();

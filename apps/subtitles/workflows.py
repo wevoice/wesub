@@ -28,7 +28,7 @@ particular they control:
 - Permissions -- Who can edit subtitles, who can view private subtitles
 
 Overriding workflows
--------------------
+--------------------
 
 By default, we use a workflow that makes sense for public videos -- Anyone
 can edit, the only action is Publish, etc.
@@ -52,10 +52,12 @@ Workflow Classes
 ----------------
 
 .. autoclass:: VideoWorkflow
-    :members: user_can_view_video, user_can_edit_view, get_add_language_mode, extra_tabs, get_default_language_workflow
+    :members: user_can_view_video, user_can_edit_video, get_add_language_mode, extra_tabs, get_default_language_workflow
 
 .. autoclass:: LanguageWorkflow
-    :members: get_work_mode, get_actions, action_for_add_subtitles, get_editor_notes, user_can_edit_subtitles, user_can_view_private_subtitles
+    :members: get_work_mode, get_actions, action_for_add_subtitles,
+        get_editor_notes, user_can_edit_subtitles,
+        user_can_view_private_subtitles, user_can_delete_subtitles
 
 Behavior Functions
 ------------------
@@ -198,7 +200,7 @@ class Workflow(object):
         """
         return "<standard>"
 
-    def get_editor_notes(self, language_code):
+    def get_editor_notes(self, user, language_code):
         """Get notes to display in the editor
 
         Returns:
@@ -238,6 +240,14 @@ class Workflow(object):
         """
         raise NotImplementedError()
 
+    def user_can_delete_subtitles(self, user, language_code):
+        """Check if a user can delete a language
+
+        Returns:
+            True/False
+        """
+        raise NotImplementedError()
+
     def user_can_view_video(self, user):
         """Check if a user can view the video
 
@@ -245,6 +255,14 @@ class Workflow(object):
             True/False
         """
         raise NotImplementedError()
+
+    def user_can_set_video_duration(self, user):
+        """Check if a user can set duration of a video
+
+        Returns:
+            True/False
+        """
+        return not user.is_anonymous()
 
     def user_can_edit_video(self, user):
         """Check if a user can edit the video
@@ -264,14 +282,20 @@ class Workflow(object):
 
     def editor_data(self, user, language_code):
         """Get data to pass to the editor for this workflow."""
-        editor_notes = self.get_editor_notes(language_code)
-        return {
+        data = {
             'work_mode': self.get_work_mode(user, language_code).editor_data(),
             'actions': [action.editor_data() for action in
                         self.get_actions(user, language_code)],
-            'notesHeading': editor_notes.heading,
-            'notes': editor_notes.note_editor_data(),
         }
+        editor_notes = self.get_editor_notes(user, language_code)
+        if editor_notes:
+            data.update({
+                'notesHeading': editor_notes.heading,
+                'notes': editor_notes.note_editor_data(),
+            })
+        else:
+            data['notesEnabled'] = False
+        return data
 
     def editor_video_urls(self, language_code):
         """Get video URLs to send to the editor."""
@@ -300,6 +324,14 @@ class VideoWorkflow(object):
             True/False
         """
         raise NotImplementedError()
+
+    def user_can_set_video_duration(self, user):
+        """Check if a user can set duration of a video
+
+        Returns:
+            True/False
+        """
+        return not user.is_anonymous()
 
     def user_can_edit_video(self, user):
         """Check if a user can view the video
@@ -386,8 +418,8 @@ class VideoWorkflow(object):
         return (self.get_language_workflow(language_code)
                 .action_for_add_subtitles(user, complete))
 
-    def get_editor_notes(self, language_code):
-        return self.get_language_workflow(language_code).get_editor_notes()
+    def get_editor_notes(self, user, language_code):
+        return self.get_language_workflow(language_code).get_editor_notes(user)
 
     def lookup_action(self, user, language_code, action_name):
         return (self.get_language_workflow(language_code)
@@ -400,6 +432,10 @@ class VideoWorkflow(object):
     def user_can_view_private_subtitles(self, user, language_code):
         return (self.get_language_workflow(language_code)
                 .user_can_view_private_subtitles(user))
+
+    def user_can_delete_subtitles(self, user, language_code):
+        return (self.get_language_workflow(language_code)
+                .user_can_delete_subtitles(user))
 
     def user_can_edit_subtitles(self, user, language_code):
         return (self.get_language_workflow(language_code)
@@ -465,7 +501,7 @@ class LanguageWorkflow(object):
         else:
             return Unpublish()
 
-    def get_editor_notes(self):
+    def get_editor_notes(self, user):
         """Get notes to display in the editor
 
         Returns:
@@ -505,6 +541,14 @@ class LanguageWorkflow(object):
         """
         raise NotImplementedError()
 
+    def user_can_delete_subtitles(self, user, language_code):
+        """Check if a user can delete a language
+
+        Returns:
+            True/False
+        """
+        raise NotImplementedError()
+
     def user_can_edit_subtitles(self, user):
         """Check if a user can edit subtitles
 
@@ -515,14 +559,20 @@ class LanguageWorkflow(object):
 
     def editor_data(self, user):
         """Get data to pass to the editor for this workflow."""
-        editor_notes = self.get_editor_notes()
-        return {
+        data = {
             'work_mode': self.get_work_mode(user).editor_data(),
             'actions': [action.editor_data() for action in
                         self.get_actions(user)],
-            'notesHeading': editor_notes.heading,
-            'notes': editor_notes.note_editor_data(),
         }
+        editor_notes = self.get_editor_notes(user)
+        if editor_notes:
+            data.update({
+                'notesHeading': editor_notes.heading,
+                'notes': editor_notes.note_editor_data(),
+            })
+        else:
+            data['notesEnabled'] = False
+        return data
 
     def editor_video_urls(self):
         """Get video URLs to send to the editor."""
@@ -630,9 +680,17 @@ class Action(object):
     in_progress_text = NotImplemented
     visual_class = None
     complete = None
+    requires_translated_metadata_if_enabled = False
     CLASS_ENDORSE = 'endorse'
     CLASS_SEND_BACK = 'send-back'
     subtitle_visibility = 'public'
+
+    def require_synced_subtitles(self):
+        """Should we require that all subtitles have timings?
+
+        The default implementation uses the complete attribute
+        """
+        return bool(self.complete)
 
     def validate(self, user, video, subtitle_language, saved_version):
         """Check if we can perform this action.
@@ -649,7 +707,7 @@ class Action(object):
         Raises:
             ActionError -- this action can't be performed
         """
-        if self.complete:
+        if self.require_synced_subtitles():
             if saved_version:
                 version = saved_version
             else:
@@ -697,7 +755,8 @@ class Action(object):
             'label': unicode(self.label),
             'in_progress_text': unicode(self.in_progress_text),
             'class': self.visual_class,
-            'complete': self.complete,
+            'requireSyncedSubtitles': self.require_synced_subtitles(),
+            'requires_translated_metadata_if_enabled': self.requires_translated_metadata_if_enabled,
         }
 
 class Publish(Action):
@@ -710,6 +769,7 @@ class Publish(Action):
     in_progress_text = ugettext_lazy('Saving')
     visual_class = 'endorse'
     complete = True
+    requires_translated_metadata_if_enabled = True
 
     def perform(self, user, video, subtitle_language, saved_version):
         tip = subtitle_language.get_tip()
@@ -728,12 +788,14 @@ class Unpublish(Action):
     in_progress_text = ugettext_lazy('Saving')
     visual_class = 'send-back'
     complete = False
+    requires_translated_metadata_if_enabled = False
 
 class SaveDraft(Action):
     name = 'save-draft'
     label = ugettext_lazy('Save Draft')
     in_progress_text = ugettext_lazy('Saving')
     complete = None
+    requires_translated_metadata_if_enabled = False
 
 class APIComplete(Action):
     """Action that handles complete=True from the API
@@ -748,6 +810,7 @@ class APIComplete(Action):
     in_progress_text = ugettext_lazy('Saving')
     visual_class = 'endorse'
     complete = None
+    requires_translated_metadata_if_enabled = False
 
     def update_language(self, user, video, subtitle_language, saved_version):
         if saved_version.is_synced():
@@ -856,6 +919,9 @@ class DefaultLanguageWorkflow(LanguageWorkflow):
 
     def user_can_view_private_subtitles(self, user):
         return user.is_staff
+
+    def user_can_delete_subtitles(self, user):
+        return user.is_superuser
 
     def user_can_edit_subtitles(self, user):
         return True

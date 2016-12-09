@@ -22,7 +22,39 @@ var angular = angular || null;
 
     var module = angular.module('amara.SubtitleEditor.video.services', []);
 
-    module.factory('VideoPlayer', ["$rootScope", "SubtitleStorage", "EditorData", function($rootScope, SubtitleStorage, EditorData) {
+
+    module.factory('VideoData', ["$http", "EditorData", function($http, EditorData) {
+        var getVideoDurationAPIURL = function(videoId) {
+            return ('/api/videos/' + videoId + '/duration');
+        };
+        function authHeaders() {
+            var rv = {};
+            for (var key in EditorData.authHeaders) {
+                var val = EditorData.authHeaders[key];
+                var utfVal = unescape(encodeURIComponent(val));
+               rv[key] = utfVal;
+            }
+            return rv;
+        }
+        return {
+            updateVideoDuration: function(duration) {
+               duration = Math.round(duration / 1000);
+		if (isNaN(parseInt(EditorData.video.duration))) {
+                    var url = getVideoDurationAPIURL(EditorData.video.id);
+                    $http({
+                        method: 'PUT',
+                        headers: authHeaders(),
+                        url: url,
+                        data: {'duration': duration}
+                    }).then(function(response) {
+                        EditorData.video.duration = duration;
+                    });
+               }
+           }
+        };
+    }]);
+
+    module.factory('VideoPlayer', ["$rootScope", "SubtitleStorage", "EditorData", "VideoData", function($rootScope, SubtitleStorage, EditorData, VideoData) {
         var videoURLs = [];
         var pop = null;
         var playing = false;
@@ -36,6 +68,14 @@ var angular = angular || null;
             } else {
                 $rootScope.$emit(signalName, data);
             }
+        }
+        function routeEvents() {
+            $rootScope.$on("video-loadedmetadata", function() {
+               VideoData.updateVideoDuration(getDuration());
+           });
+        }
+        function getDuration() {
+                return Math.round(pop.duration() * 1000);
         }
 
         function handlePopcornEvents() {
@@ -56,6 +96,8 @@ var angular = angular || null;
                 emitSignal('video-update');
             }).on('durationchange', function() {
                 emitSignal('video-update');
+            }).on('loadedmetadata', function() {
+                emitSignal('video-loadedmetadata');
             }).on('seeked', function() {
                 emitSignal('video-update');
             }).on('timeupdate', function() {
@@ -87,6 +129,7 @@ var angular = angular || null;
 			controls: false,
                     });
                 handlePopcornEvents();
+                routeEvents();
             },
             play: function() {
                 pop.play();
@@ -113,7 +156,7 @@ var angular = angular || null;
                 return Math.round(pop.currentTime() * 1000);
             },
             duration: function() {
-                return Math.round(pop.duration() * 1000);
+                return getDuration();
             },
             isPlaying: function() {
                 return playing;

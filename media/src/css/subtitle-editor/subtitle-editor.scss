@@ -229,6 +229,11 @@ div.toolbar {
 strong {
     font-weight: bold;
 }
+.clippedAndHidden{
+  position: absolute !important;
+  clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+  clip: rect(1px,1px,1px,1px);
+}
 
 // Modals
 div.modal {
@@ -838,6 +843,10 @@ div.help-panel {
         &.guidelines-link {
             line-height: 40px;
         }
+        &.playback-mode-link {
+            float: right;
+            line-height: 40px;
+        }
     }
     span.key {
         width: 20%;
@@ -1263,20 +1272,37 @@ div.workspace-tools {
         div.toolbox-inside:hover ul.toolbox-menu {
           display:block;
         }
+        div.toolbox-inside:hover .helper_margin {
+          display:block;
+        }
         div.toolbox-inside {              
            width: 150px;
            position: relative;
         }
-        div.toolbox-inside > a {
-        color: black;
-        font-weight: 900;
-        font-size: 18px;
-        line-height: 1.34em;
-        text-decoration: none;
-        text-align: right;
+        div.toolbox-inside .active{
+          background-color: $lighter-blue;
+        }
+        div.toolbox-inside > button {
+        outline: none;
+        border-radius: 5px;
+        background-image: url('../images/subtitle-editor/glyphicons_halflings_135_wrench.png');
+        background-position: 10px center;
+        background-repeat: no-repeat;
         position: absolute;
         right: 15px;
-        padding: 3px 0px 10px 20px;
+        padding: 5px 10px 20px 20px;
+        cursor: pointer;
+        z-index: 70;
+        }
+        div.toolbox-inside > .helper_margin{
+          display:none;
+          position: absolute;
+          text-align: left;
+          top: 0;
+          right: -155px;
+          width: 200px;
+          height: 240px;
+          z-index: 62;
         }
 
 
@@ -1295,7 +1321,6 @@ div.workspace-tools {
                left: -20px;
            }
            background: $dark-grey;
-           display:none;
            position: absolute;
            text-align: left;
            top: 0;
@@ -1501,14 +1526,12 @@ div.timeline {
         font-size: 11px;
         height: 28px;
         overflow: hidden;
-        padding: 7px 12px 0 12px;
         position: absolute;
         top: 10px;
         @include border-radius(3px);
 
         span {
-            // This is to avoid seeing the second line
-            height: 15px;
+            padding: 7px 12px;
             display: block;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1520,7 +1543,6 @@ div.timeline {
             position: absolute;
             top: 0;
             width: 6px;
-
             &.left {
                 background: #3E8982;
                 left: 0;
@@ -1536,6 +1558,12 @@ div.timeline {
                     top: 8px;
                     width: 12px;
                     @include border-radius(12px);
+                }
+                &:after {
+                    content: "";
+                    display: block;
+                    height: 100%;
+                    width: 12px;
                 }
             }
             &.right {
@@ -1553,6 +1581,14 @@ div.timeline {
                     top: 8px;
                     width: 12px;
                     @include border-radius(12px);
+                }
+                &:after {
+                    content: "";
+                    display: block;
+                    height: 100%;
+                    width: 12px;
+                    position: absolute;
+                    left: -6px;
                 }
              }
          }
@@ -1779,6 +1815,14 @@ aside.modal#guidelines-modal {
         margin: 15px 0;
         div.team-all-guidelines div {
             padding: 15px 0;
+        }
+    }
+}
+
+aside.modal#playback-mode-modal {
+    div.modal-content {
+        select {
+            width: 100%;
         }
     }
 }

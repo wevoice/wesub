@@ -20,6 +20,7 @@
 import datetime
 
 from django.test import TestCase
+from nose.tools import *
 import mock
 
 from utils import test_utils
@@ -71,8 +72,8 @@ class VideoImporterTestCase(TestCase):
             }
         self.mock_feedparser_class.return_value = self.feed_parser
 
-    def run_import_videos(self, import_next=False):
-        import_obj = importer.VideoImporter(self.feed_url(), self.user)
+    def run_import_videos(self, import_next=False, team=None):
+        import_obj = importer.VideoImporter(self.feed_url(), self.user, team)
         self.import_videos_rv = import_obj.import_videos(import_next)
 
     def check_videos(self, *feed_item_names):
@@ -110,6 +111,19 @@ class VideoImporterTestCase(TestCase):
         video2 = VideoUrl.objects.get(url=self.url('item-2')).video
         self.assertEquals(video1.title, 'foo')
         self.assertEquals(video2.title, 'bar')
+
+    def test_import_with_team(self):
+        # test a simple import
+        self.setup_feed_items([
+            ('item-1', {}),
+            ('item-2', {}),
+            ('item-3', {}),
+        ])
+        team = TeamFactory()
+        self.run_import_videos(team=team)
+        for v in self.import_videos_rv:
+            assert_not_equal(v.get_team_video(), None)
+            assert_equal(v.get_team_video().team, team)
 
     def test_import_new_items(self):
         # Test that we import videos when some already have been created
@@ -208,7 +222,7 @@ class VideoFeedTest(TestCase):
 
         self.mock_video_importer.import_videos.return_value = feed_videos
         rv = feed.update()
-        self.MockVideoImporter.assert_called_with(url, user)
+        self.MockVideoImporter.assert_called_with(url, user, None)
         self.mock_video_importer.import_videos.assert_called_with(import_next=True)
         self.assertEquals(rv, feed_videos)
         mock_feed_imported_handler.assert_called_with(
@@ -217,7 +231,7 @@ class VideoFeedTest(TestCase):
         # import_next=False
         self.mock_video_importer.import_videos.return_value = []
         rv = feed.update()
-        self.MockVideoImporter.assert_called_with(url, user)
+        self.MockVideoImporter.assert_called_with(url, user, None)
         self.mock_video_importer.import_videos.assert_called_with(import_next=False)
         self.assertEquals(rv, [])
         mock_feed_imported_handler.assert_called_with(

@@ -14,6 +14,24 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
+"""
+Messages
+--------
+
+Message Resource
+****************
+
+.. http:post:: /api/message/
+
+    Send a message to a user/team
+
+    :<json user-identifier user: Recipient (see :ref:`user_ids`)
+    :<json slug team: Recipient team's slug
+    :<json string subject: Subject of the message
+    :<json string content: Content of the message
+
+.. note:: You can only send either ``user`` or ``team``, not both.
+"""
 
 from __future__ import absolute_import
 
@@ -23,28 +41,22 @@ from rest_framework import status
 from rest_framework import views
 from rest_framework.response import Response
 
+from api.fields import UserField
 from auth.models import CustomUser as User
 from teams.models import Team
 from messages.models import Message
 import teams.permissions
 
 class MessagesSerializer(serializers.Serializer):
-    user = serializers.CharField(required=False)
+    user = UserField(required=False)
     team = serializers.CharField(required=False)
     subject = serializers.CharField()
     content = serializers.CharField()
 
     default_error_messages = {
-        'unknown-user': "Unknown user: {user}",
         'unknown-team': "Unknown team: {team}",
         'no-user-or-team': "Must specify either user or team",
     }
-
-    def validate_user(self, username):
-        try:
-            return User.objects.get(username=username)
-        except User.DoesNotExist:
-            self.fail('unknown-user', user=username)
 
     def validate_team(self, slug):
         try:
@@ -82,19 +94,6 @@ class MessagesSerializer(serializers.Serializer):
         Message.objects.bulk_create(messages)
 
 class Messages(views.APIView):
-    """
-    The message resource allows you to send messages to user and teams.
-
-    ## `POST /api/message/`
-
-    - **user:** Recipient User's username
-    - **team:** Recipient Team's slug
-    - **subject:** Subject of the message
-    - **content:** Content of the message
-
-    **note:** You can only send either ``user`` or ``team``, not both.
-    """
-
     def get_serializer(self):
         return MessagesSerializer()
 

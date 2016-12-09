@@ -29,7 +29,7 @@ from django.contrib.auth.models import UserManager, User as BaseUser
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.cache import cache
-from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.db import models
@@ -39,8 +39,11 @@ from django.db.models.signals import post_save
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _, ugettext
 from tastypie.models import ApiKey
+
+from auth import signals
 from caching import CacheGroup, ModelCacheManager
 from utils.amazon import S3EnabledImageField
+from utils import secureid
 from utils import translation
 from utils.tasks import send_templated_email_async
 
@@ -90,7 +93,7 @@ class CustomUserManager(UserManager):
                                   for i in xrange(6))
             yield '{}{}{}'.format(part1, rand_string, part2)
 
-class CustomUser(BaseUser):
+class CustomUser(BaseUser, secureid.SecureIDMixin):
     AUTOPLAY_ON_BROWSER = 1
     AUTOPLAY_ON_LANGUAGES = 2
     DONT_AUTOPLAY = 3
@@ -99,6 +102,14 @@ class CustomUser(BaseUser):
          'Autoplay subtitles based on browser preferred languages'),
         (AUTOPLAY_ON_LANGUAGES, 'Autoplay subtitles in languages I know'),
         (DONT_AUTOPLAY, 'Don\'t autoplay subtitles')
+    )
+    PLAYBACK_MODE_MAGIC = 1
+    PLAYBACK_MODE_STANDARD = 2
+    PLAYBACK_MODE_BEGINNER = 3
+    PLAYBACK_MODE_CHOICES = (
+        (PLAYBACK_MODE_MAGIC, 'Magical auto-pause'),
+        (PLAYBACK_MODE_STANDARD, 'No automatic pausing'),
+        (PLAYBACK_MODE_BEGINNER, 'Play for 4 seconds, then pause')
     )
     homepage = models.URLField(blank=True)
     preferred_language = models.CharField(
@@ -112,6 +123,7 @@ class CustomUser(BaseUser):
     # if true, items that end on the user activity stream will also be
     # sent as a message
     notify_by_message = models.BooleanField(default=True)
+    allow_3rd_party_login = models.BooleanField(default=False)
     biography = models.TextField('Bio', blank=True)
     autoplay_preferences = models.IntegerField(
         choices=AUTOPLAY_CHOICES, default=AUTOPLAY_ON_BROWSER)
@@ -127,15 +139,30 @@ class CustomUser(BaseUser):
     pay_rate_code = models.CharField(max_length=3, blank=True, default='')
     can_send_messages = models.BooleanField(default=True)
     show_tutorial = models.BooleanField(default=True)
+    playback_mode = models.IntegerField(
+        choices=PLAYBACK_MODE_CHOICES, default=PLAYBACK_MODE_STANDARD)
     created_by = models.ForeignKey('self', null=True, blank=True,
                                    related_name='created_users')
+
+    SECURE_ID_KEY = 'User'
 
     objects = CustomUserManager()
 
     cache = ModelCacheManager(default_cache_pattern='user')
 
+    # Fields that constitute a user's profile, things like names, bios, etc.
+    # When these change we emit the user_profile_changed signal.
+    PROFILE_FIELDS = [
+        'first_name', 'last_name', 'full_name', 'biography', 'picture',
+        'homepage', 'email',
+    ]
+
     class Meta:
         verbose_name = 'User'
+
+    def __init__(self, *args, **kwargs):
+        super(CustomUser, self).__init__(*args, **kwargs)
+        self.start_tracking_profile_fields()
 
     def __unicode__(self):
         if not self.is_active:
@@ -175,10 +202,30 @@ class CustomUser(BaseUser):
             self.valid_email = False
 
         send_email_confirmation = kwargs.pop('send_email_confirmation', True)
+        if self.pk:
+            self.check_profile_changed()
         super(CustomUser, self).save(*args, **kwargs)
+        self.start_tracking_profile_fields()
 
         if send_confirmation and send_email_confirmation:
             EmailConfirmation.objects.send_confirmation(self)
+
+    def start_tracking_profile_fields(self):
+        self._initial_profile_data = self.calc_profile_data()
+
+    def calc_profile_data(self):
+        return {
+            name: getattr(self, name)
+            for name in CustomUser.PROFILE_FIELDS
+        }
+
+    def check_profile_changed(self):
+        if self.calc_profile_data() != self._initial_profile_data:
+            signals.user_profile_changed.send(self)
+
+    def clean(self):
+        if '$' in self.username:
+            raise ValidationError("usernames can't contain the '$' character")
 
     def unread_messages(self, hidden_meassage_id=None):
         from messages.models import Message
@@ -196,9 +243,11 @@ class CustomUser(BaseUser):
     def unread_messages_count(self, hidden_meassage_id=None):
         return self.unread_messages(hidden_meassage_id).count()
 
-    @classmethod
-    def tutorial_was_shown(self, id):
-        self.objects.filter(pk=id).update(show_tutorial=False)
+    def tutorial_was_shown(self):
+        CustomUser.objects.filter(pk=self.id).update(show_tutorial=False)
+
+    def set_playback_mode(self, playback_mode):
+        CustomUser.objects.filter(pk=self.id).update(playback_mode=playback_mode)
 
     @classmethod
     def displayable_users(self, ids):
@@ -284,6 +333,7 @@ class CustomUser(BaseUser):
                 for l in languages
             ]
         self.cache.invalidate()
+        signals.user_profile_changed.send(self)
 
     def get_language_names(self):
         """Get a list of language names that the user speaks."""
@@ -386,14 +436,14 @@ class CustomUser(BaseUser):
         return hashlib.sha224(settings.SECRET_KEY+str(self.pk)+video_id).hexdigest()
 
     @classmethod
-    def get_anonymous(cls):
+    def get_amara_anonymous(cls):
         user, created = cls.objects.get_or_create(
             pk=settings.ANONYMOUS_USER_ID,
             defaults={'username': 'anonymous'})
         return user
 
     @property
-    def is_anonymous(self):
+    def is_amara_anonymous(self):
         return self.pk == settings.ANONYMOUS_USER_ID
 
     @property
@@ -692,6 +742,14 @@ class LoginToken(models.Model):
     @property
     def is_expired(self):
         return self.created + LoginToken.EXPIRES_IN <  datetime.now()
+
+    def is_valid(self):
+        if self.is_expired:
+            return False
+        # be paranoid, these users should never be login / staff members
+        if self.user.is_staff or self.user.is_superuser:
+            return False
+        return True
 
     def __unicode__(self):
         return u"LoginToken for %s" %(self.user)

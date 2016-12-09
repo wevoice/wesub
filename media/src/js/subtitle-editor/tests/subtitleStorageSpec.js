@@ -9,10 +9,8 @@ describe('The SubtitleStorage service', function() {
     var notesURL;
 
 
-    beforeEach(function() {
-        module('amara.SubtitleEditor.mocks');
-        module('amara.SubtitleEditor.subtitles.services');
-    });
+    beforeEach(module('amara.SubtitleEditor.mocks'));
+    beforeEach(module('amara.SubtitleEditor.subtitles.services'));
 
     beforeEach(inject(function ($injector, EditorData) {
         $httpBackend = $injector.get('$httpBackend');
@@ -33,7 +31,7 @@ describe('The SubtitleStorage service', function() {
     });
 
     it('saves subtitles with actions', function() {
-        SubtitleStorage.saveSubtitles('dfxp-string', 'title', 'description',
+        SubtitleStorage.saveSubtitles('dfxp-string', 'title', 1000, 'description',
             'metadata', true, 'test-action');
         $httpBackend.expectPOST(subtitlesURL, {
             video: videoId,
@@ -41,6 +39,7 @@ describe('The SubtitleStorage service', function() {
             subtitles: 'dfxp-string',
             sub_format: 'dfxp',
             title: 'title',
+            duration: 1000,
             description: 'description',
             from_editor: true,
             metadata: 'metadata',

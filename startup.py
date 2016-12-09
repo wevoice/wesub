@@ -31,7 +31,6 @@ startup process.  Right after the django settings are set up is a good time.
 import os
 import sys
 
-from localeurl import patch_reverse
 import optionalapps
 
 def setup_ca():
@@ -39,7 +38,8 @@ def setup_ca():
     # up-to-date.  In particular, they work with the google HTTPS
     os.environ['REQUESTS_CA_BUNDLE'] = "/etc/ssl/certs/ca-certificates.crt"
 
-def setup_patch_reverse():
+def setup_monkeypatches():
+    from localeurl import patch_reverse
     patch_reverse()
 
 def setup_celery_loader():
@@ -54,8 +54,10 @@ def run_startup_modules():
     for app in settings.INSTALLED_APPS:
         module = __import__(app)
         package_dir = os.path.dirname(module.__file__)
-        if os.path.exists(os.path.join(package_dir, 'startup.py')):
-            __import__('%s.startup' % app)
+        for module in ('startup', 'signalhandlers'):
+            filename = module + '.py'
+            if os.path.exists(os.path.join(package_dir, filename)):
+                __import__('{}.{}'.format(app, module))
 
 def startup():
     """Set up the amara environment.  This should be called before running any
@@ -63,6 +65,6 @@ def startup():
     """
     optionalapps.setup_path()
     setup_ca()
-    setup_patch_reverse()
+    setup_monkeypatches()
     setup_celery_loader()
     run_startup_modules()

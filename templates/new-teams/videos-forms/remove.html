@@ -1,8 +1,8 @@
 {% load i18n %}
 <aside class="modal" id="remove-form">
   <h3>
-    {% blocktrans with video_title=first_video.title_display count count=video_count %}
-    Remove {{ video_title }}
+    {% blocktrans count count=video_count %}
+    Remove Video
     {% plural %}
     Remove {{ count }} Videos
     {% endblocktrans %}

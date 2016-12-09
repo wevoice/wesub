@@ -28,6 +28,7 @@ from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.utils.http import cookie_date
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
+from django.db.models import Max
 
 from auth.models import CustomUser as User
 from auth.models import UserLanguage
@@ -174,7 +175,6 @@ def new(request):
                 m.save()
                 send_new_message_notification.delay(m.pk)
             elif form.cleaned_data['team']:
-                now = datetime.now()
                 # TODO: Move this into a task for performance?
                 language = form.cleaned_data['language']
                 # We create messages using bulk_create, so that only one transaction is needed
@@ -187,17 +187,18 @@ def new(request):
                 else:
                     members = map(lambda member: member.user, UserLanguage.objects.filter(user__in=form.cleaned_data['team'].members.values('user')).filter(language__exact=language).exclude(user__exact=request.user).select_related('user'))
                 for member in members:
-                    message_list.append(Message(user=member, author=request.user,
-                                                message_type='M',
-                                                content=form.cleaned_data['content'],
-                                                subject=form.cleaned_data['subject']))
-                Message.objects.bulk_create(message_list, batch_size=500);
-                new_messages_ids = Message.objects.filter(created__gt=now).values_list('pk', flat=True)
+                    message_list.append(Message.objects.create(
+                        user=member, author=request.user,
+                        message_type='M',
+                        content=form.cleaned_data['content'],
+                        subject=form.cleaned_data['subject']))
                 # Creating a bunch of reasonably-sized tasks
                 batch = 0
                 batch_size = 1000
-                while batch < len(new_messages_ids):
-                    send_new_messages_notifications.delay(new_messages_ids[batch:batch+batch_size])
+                while batch < len(message_list):
+                    send_new_messages_notifications.delay(
+                        [m.pk for m in message_list[batch:batch+batch_size]]
+                    )
                     batch += batch_size
 
             messages.success(request, _(u'Message sent.'))

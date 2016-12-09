@@ -29,6 +29,10 @@ import optionalapps
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 DEFAULT_PROTOCOL  = 'http'
 
+LOCALE_PATHS = [
+    os.path.join(PROJECT_ROOT, 'locale')
+]
+
 def rel(*x):
     return os.path.join(PROJECT_ROOT, *x)
 
@@ -187,13 +191,17 @@ INSTALLED_APPS = (
     'socialauth',
     # our apps
     'accountlinker',
+    'activity',
     'amaradotorg',
     'amaracelery',
     'api',
     'caching',
+    'codefield',
     'comments',
     'externalsites',
     'messages',
+    'mysqltweaks',
+    'notifications',
     'profiles',
     'search',
     'staff',
@@ -256,6 +264,7 @@ REST_FRAMEWORK = {
     'ORDERING_PARAM': 'order_by',
     'VIEW_NAME_FUNCTION': 'api.viewdocs.amara_get_view_name',
     'VIEW_DESCRIPTION_FUNCTION': 'api.viewdocs.amara_get_view_description',
+    'NON_FIELD_ERRORS_KEY': 'general_errors',
 }
 
 #################
@@ -372,6 +381,18 @@ ROSETTA_EXCLUDED_APPLICATIONS = (
 )
 
 INSTALLED_APPS += optionalapps.get_apps()
+
+# List of modules to extract docstrings from for the update_docs management
+# command.
+API_DOCS_MODULES = [
+    'api.views.languages',
+    'api.views.videos',
+    'api.views.subtitles',
+    'api.views.users',
+    'api.views.activity',
+    'api.views.messages',
+    'api.views.teams',
+]
 
 MEDIA_BUNDLES = {
     "base.css": {

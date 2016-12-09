@@ -50,13 +50,13 @@ from teams.permissions import (
     can_delete_video as _can_delete_video,
     can_delete_video_in_team as _can_delete_video_in_team,
     can_approve as _can_approve,
-    can_delete_language as _can_delete_language,
     can_resync as _can_resync,
 )
 from teams.permissions import (
-    can_invite, can_add_video_somewhere,
+    can_invite, can_add_video_somewhere, can_add_members,
     can_create_tasks, can_create_task_subtitle, can_create_task_translate,
-    can_create_and_edit_subtitles, can_create_and_edit_translations
+    can_create_and_edit_subtitles, can_create_and_edit_translations,
+    can_create_team_ui
 )
 
 DEV_OR_STAGING = getattr(settings, 'DEV', False) or getattr(settings, 'STAGING', False)
@@ -72,6 +72,10 @@ logger = logging.getLogger(__name__)
 @register.filter
 def can_approve_application(team, user):
     return can_invite(team, user)
+
+@register.filter
+def can_add_members_to_team(team, user):
+    return can_add_members(team, user)
 
 @register.filter
 def can_invite_to_team(team, user):
@@ -96,6 +100,10 @@ def can_delete_video_in_team(user, team):
 @register.filter
 def can_add_tasks(team, user):
     return can_create_tasks(team, user)
+
+@register.filter
+def can_add_team(user):
+    return can_create_team_ui(user)
 
 @register.filter
 def is_team_manager(team, user):
@@ -313,7 +321,11 @@ def team_projects(context, team, varname):
     {% endfor %}
 
     """
-    context[varname] = Project.objects.for_team(team)
+    projects = Project.objects.for_team(team).select_related('team')
+    project_video_counts = team.get_project_video_counts()
+    for p in projects:
+        p.set_videos_count_cache(project_video_counts.get(p.id, 0))
+    context[varname] = projects
     return ""
 
 @tag(register, [Variable(), Constant("as"), Name()])
@@ -523,9 +535,10 @@ def can_create_translations_for(user, video):
 
 @register.filter
 def can_delete_language(user, language):
+    workflow = language.video.get_workflow()
     team_video = language.video.get_team_video()
-    return (team_video is not None and
-            _can_delete_language(team_video.team, user))
+    return team_video is not None and \
+        workflow.user_can_delete_subtitles(user, language.language_code)
 
 @register.filter
 def get_upload_form(task, user):

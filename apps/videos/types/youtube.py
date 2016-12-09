@@ -67,15 +67,18 @@ class YoutubeVideoType(VideoType):
         return (hostname in YoutubeVideoType.HOSTNAMES and
                 any(pattern.search(url) for pattern in cls._url_patterns))
 
-    def get_direct_url(self):
-        return google.get_direct_url_to_audio(self.video_id)
+    def get_direct_url(self, prefer_audio=False):
+        if prefer_audio:
+            return google.get_direct_url_to_audio(self.video_id)
+        else:
+            return google.get_direct_url_to_video(self.video_id)
 
     def get_video_info(self):
         if not hasattr(self, '_video_info'):
             self._video_info = google.get_video_info(self.video_id)
         return self._video_info
 
-    def set_values(self, video, fetch_subs_async=True):
+    def set_values(self, video):
         try:
             video_info = self.get_video_info()
         except google.APIError:

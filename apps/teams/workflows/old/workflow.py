@@ -43,8 +43,25 @@ class OldTeamWorkflow(TeamWorkflow):
 
     type_code = 'O'
     label = _('Old Style')
+    api_slug = 'default'
     dashboard_view = staticmethod(views.old_dashboard)
     workflow_settings_view = staticmethod(views.old_team_settings_workflows)
+
+    def activity_type_filter_options(self):
+        """
+        Get possible activity type filter values
+
+        This is used on the activity page to populate the type dropdown.
+        """
+        options = super(OldTeamWorkflow, self).activity_type_filter_options()
+        if self.team.is_tasks_team():
+            options.extend([
+                'version-approved',
+                'version-rejected',
+                'version-accepted',
+                'version-declined',
+            ])
+        return options
 
     def get_subtitle_workflow(self, team_video):
         """Get the SubtitleWorkflow for a video with this workflow.  """

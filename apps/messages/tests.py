@@ -34,7 +34,7 @@ from teams.models import (
 from teams.moderation_const import WAITING_MODERATION
 from utils import send_templated_email
 from utils.factories import *
-from videos.models import Action, Video
+from videos.models import Video
 from videos.tasks import video_changed_tasks
 import messages.tasks
 
@@ -91,6 +91,39 @@ class MessageTest(TestCase):
         self.assertEquals(Message.objects.thread(n, self.user).count(), 6)
         self.assertEquals(Message.objects.thread(m, self.user).count(), 6)
 
+    def test_previous_message_in_thread(self):
+        m = self._create_message(self.user)
+        n = self._create_message(self.user, reply_to=m)
+        o = self._create_message(self.user, reply_to=n)
+        p = self._create_message(self.user, reply_to=m)
+        q = self._create_message(self.user, reply_to=n)
+        self._create_message(self.user)
+        self._create_message(self.user)
+        self.assertEquals(Message.objects.previous_in_thread(m, self.user), None)
+        self.assertEquals(Message.objects.previous_in_thread(n, self.user), m)
+        self.assertEquals(Message.objects.previous_in_thread(o, self.user), n)
+        self.assertEquals(Message.objects.previous_in_thread(p, self.user), o)
+        self.assertEquals(Message.objects.previous_in_thread(q, self.user), p)
+
+    def test_thread_tips(self):
+        m = self._create_message(self.user)
+        n = self._create_message(self.user, reply_to=m)
+        o = self._create_message(self.user, reply_to=n)
+        self.assertEquals(Message.objects.thread(o, self.user).count(), 3)
+        self.assertEquals(Message.objects.for_user(self.user).count(), 3)
+        self.assertEquals(Message.objects.for_user(self.user, thread_tip_only=True).count(), 1)
+        self.assertEquals(Message.objects.for_author(m.author, thread_tip_only=True).count(), 1)
+        self.assertEquals(Message.objects.get(id=m.id).has_reply_for_author, True)
+        self.assertEquals(Message.objects.get(id=n.id).has_reply_for_author, True)
+        self.assertEquals(Message.objects.get(id=o.id).has_reply_for_author, False)
+        self.assertEquals(Message.objects.get(id=m.id).has_reply_for_user, True)
+        self.assertEquals(Message.objects.get(id=n.id).has_reply_for_user, True)
+        self.assertEquals(Message.objects.get(id=o.id).has_reply_for_user, False)
+        o.delete_for_user(o.user)
+        self.assertEquals(Message.objects.get(id=n.id).has_reply_for_user, False)
+        p = self._create_message(self.user)
+        self.assertEquals(Message.objects.for_user(self.user, thread_tip_only=True).count(), 2)
+        
     def test_send_email_to_allowed_user(self):
         self.user.notify_by_email = True
         self.user.save()
@@ -173,91 +206,6 @@ class MessageTest(TestCase):
         contributor_messge_count_2, contributor_email_count_2 = _get_counts(contributor)
         self.assertEqual(contributor_messge_count_1 , contributor_messge_count_2)
         self.assertEqual(contributor_email_count_1 , contributor_email_count_2)
-
-
-        # now, this has to show up on everybody activitis fed
-        action = Action.objects.get(team=team, user=tm.user, action_type=Action.MEMBER_JOINED)
-        self.assertTrue(Action.objects.for_user(tm.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(owner.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(manager.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(contributor.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(admin.user).filter(pk=action.pk).exists())
-
-    def test_member_leave(self):
-        return # fix me now
-        def _get_counts(member):
-            email_to = "%s" %( member.user.email)
-            return Message.objects.filter(user=member.user).count() , \
-                len([x for x in mail.outbox if email_to in x.recipients()])
-
-
-        team , created= Team.objects.get_or_create(name='test', slug='test')
-
-        # creates dummy users:
-        for x in xrange(0,5):
-            user = UserFactory(
-                username="test%s" % x,
-                email = "test%s@example.com" % x,
-                notify_by_email = True,
-            )
-            tm = TeamMember(team=team, user=user)
-            if x == 0:
-                tm.role = TeamMember.ROLE_OWNER
-                owner = tm
-            elif x == 1:
-                tm.role = TeamMember.ROLE_ADMIN
-                admin = tm
-            elif x == 2:
-                tm.role = TeamMember.ROLE_MANAGER
-                manager = tm
-            elif x == 3:
-                tm.role = TeamMember.ROLE_CONTRIBUTOR
-                contributor = tm
-            if x < 4:
-                # don't save the last role until we have counts
-                tm.save()
-            else:
-                tm.role= TeamMember.ROLE_CONTRIBUTOR
-
-        tm.save()
-        # now make sure we count previsou messages
-        owner_messge_count_1, owner_email_count_1 = _get_counts(owner)
-        admin_messge_count_1, admin_email_count_1 = _get_counts(admin)
-        manager_messge_count_1, manager_email_count_1 = _get_counts(manager)
-        contributor_messge_count_1, contributor_email_count_1 = _get_counts(contributor)
-
-        # now delete and check numers
-
-        tm_user = tm.user
-        tm_user_pk = tm.user.pk
-        team_pk = tm.team.pk
-        tm.delete()
-        messages.tasks.team_member_leave(team_pk, tm_user_pk)
-        # save the last team member and check that each group has appropriate counts
-        # owner and admins should receive email + message
-        owner_messge_count_2, owner_email_count_2 = _get_counts(owner)
-        self.assertEqual(owner_messge_count_1 + 1, owner_messge_count_2)
-        self.assertEqual(owner_email_count_1 + 1, owner_email_count_2)
-        admin_messge_count_2, admin_email_count_2 = _get_counts(admin)
-        self.assertEqual(admin_messge_count_1 + 1, admin_messge_count_2)
-        self.assertEqual(admin_email_count_1 + 1, admin_email_count_2)
-        # manager shoud not
-        manager_messge_count_2, manager_email_count_2 = _get_counts(manager)
-        self.assertEqual(manager_messge_count_1 , manager_messge_count_2)
-        self.assertEqual(manager_email_count_1 , manager_email_count_2)
-        # contributor shoud not
-        contributor_messge_count_2, contributor_email_count_2 = _get_counts(contributor)
-        self.assertEqual(contributor_messge_count_1 , contributor_messge_count_2)
-        self.assertEqual(contributor_email_count_1 , contributor_email_count_2)
-
-
-        # now, this has to show up on everybody activitis fed
-        action = Action.objects.get(team=team, user=tm_user, action_type=Action.MEMBER_LEFT)
-        self.assertTrue(Action.objects.for_user(tm.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(owner.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(manager.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(contributor.user).filter(pk=action.pk).exists())
-        self.assertTrue(Action.objects.for_user(admin.user).filter(pk=action.pk).exists())
 
     def test_application_new(self):
         def _get_counts(member):

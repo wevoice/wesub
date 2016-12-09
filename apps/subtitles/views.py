@@ -23,7 +23,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, Http404, HttpResponseServerError
+from django.http import HttpResponse, Http404, HttpResponseServerError, HttpResponseForbidden
 from django.db.models import Count
 from django.conf import settings
 from django.contrib import messages
@@ -42,6 +42,7 @@ from auth.models import CustomUser as User
 from subtitles import shims
 from subtitles.workflows import get_workflow
 from subtitles.models import SubtitleLanguage, SubtitleVersion
+from subtitles.permissions import user_can_access_subtitles_format
 from subtitles.templatetags.new_subtitles_tags import visibility
 from subtitles.forms import SubtitlesUploadForm
 from teams.models import Task
@@ -86,7 +87,13 @@ def release_lock(request, video_id, language_code):
 @login_required
 @require_POST
 def tutorial_shown(request):
-    User.tutorial_was_shown(request.user.id)
+    request.user.tutorial_was_shown()
+    return HttpResponse(json.dumps({'success': True}))
+
+@login_required
+@require_POST
+def set_playback_mode(request):
+    request.user.set_playback_mode(request.POST['playback_mode'])
     return HttpResponse(json.dumps({'success': True}))
 
 def old_editor(request, video_id, language_code):
@@ -165,9 +172,9 @@ class SubtitleEditorBase(View):
         if self.workflow.user_can_edit_subtitles(self.user,
                                                  self.language_code):
             return True
-        learn_more_link = '<a href="{}">{}</a>'.format(
-            'http://support.amara.org/solution/articles/212109-why-do-i-see-a-message-saying-that-i-am-not-permitted-to-edit-subtitles',
-            _('Learn more'))
+        learn_more_link = u'<a href="{}">{}</a>'.format(
+            u'http://support.amara.org/solution/articles/212109-why-do-i-see-a-message-saying-that-i-am-not-permitted-to-edit-subtitles',
+            _(u'Learn more'))
 
         messages.error(self.request,
                        fmt(_('Sorry, you do not have permission to edit '
@@ -191,6 +198,7 @@ class SubtitleEditorBase(View):
                 'id': self.video.video_id,
                 'title': self.video.title,
                 'description': self.video.description,
+                'duration': self.video.duration,
                 'primaryVideoURL': self.video.get_video_url(),
                 'primaryVideoURLType': video_type_registrar.video_type_for_url(self.video.get_video_url()).abbreviation,
                 'videoURLs': self.get_video_urls(),
@@ -209,11 +217,14 @@ class SubtitleEditorBase(View):
                 'video_id': self.video.video_id,
                 'language_code': self.editing_language.language_code,
             }),
+            'playbackModes': self.get_editor_data_for_playback_modes(),
             'preferences': {
                 'showTutorial': self.request.user.show_tutorial,
+                'playbackModeId': self.request.user.playback_mode
             },
             'staticURL': settings.STATIC_URL,
             'notesHeading': 'Editor Notes',
+            'notesEnabled': True,
             'redirectUrl': self.get_redirect_url(),
             'customCss': self.get_custom_css(),
         }
@@ -267,14 +278,38 @@ class SubtitleEditorBase(View):
             'is_original': language.is_primary_audio_language()
         }
 
+    def get_editor_data_for_playback_modes(self):
+        return [
+            {
+                'id': User.PLAYBACK_MODE_MAGIC,
+                'idStr': 'magic',
+                'name': _('Magic'),
+                'desc': _('Recommended: magical auto-pause (just keep typing!)')
+            },
+            {
+                'id': User.PLAYBACK_MODE_STANDARD,
+                'idStr': 'standard',
+                'name': _('Standard'),
+                'desc': _('Standard: no automatic pausing, use TAB key')
+            },
+            {
+                'id': User.PLAYBACK_MODE_BEGINNER,
+                'idStr': 'beginner',
+                'name': _('Beginner'),
+                'desc': _('Beginner: play 4 seconds, then pause')
+            }
+        ]
+
     def get_team_editor_data(self):
         if self.team_video:
             team = self.team_video.team
-            return dict([('teamName', team.name), ('type', team.workflow_type), ('guidelines', dict(
-                [(s.key_name.split('_', 1)[-1],
-                  linebreaks(urlize(force_escape(s.data))))
-                 for s in team.settings.guidelines()
-                 if s.data.strip()]))])
+            return dict([('teamName', team.name), ('type', team.workflow_type),
+                         ('features', [f.key_name.split('_', 1)[-1] for f in team.settings.features()]),
+                         ('guidelines', dict(
+                             [(s.key_name.split('_', 1)[-1],
+                               linebreaks(urlize(force_escape(s.data))))
+                              for s in team.settings.guidelines()
+                              if s.data.strip()]))])
         else:
             return None
 
@@ -398,10 +433,11 @@ def _user_for_download_permissions(request):
 
 def download(request, video_id, language_code, filename, format,
              version_number=None):
-
+    user = _user_for_download_permissions(request)
+    if not user_can_access_subtitles_format(user, format):
+        raise HttpResponseForbidden(_(u'You are not allowed to download this subtitle format.'))
     video = get_object_or_404(Video, video_id=video_id)
     workflow = video.get_workflow()
-    user = _user_for_download_permissions(request)
     if not workflow.user_can_view_video(user):
         raise PermissionDenied()
 
@@ -421,7 +457,7 @@ def download(request, video_id, language_code, filename, format,
 
     subs_text = babelsubs.to(version.get_subtitles(), format,
                              language=version.language_code)
-    # since this is a downlaod, we can afford not to escape tags, specially
+    # since this is a download, we can afford not to escape tags, specially
     # true since speaker change is denoted by '>>' and that would get entirely
     # stripped out
     response = HttpResponse(subs_text, mimetype="text/plain")

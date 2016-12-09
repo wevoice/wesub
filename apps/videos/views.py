@@ -50,12 +50,15 @@ from vidscraper.errors import Error as VidscraperError
 
 import widget
 from widget import rpc as widget_rpc
+from activity.models import ActivityRecord
 from auth.models import CustomUser as User
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from subtitles.permissions import (user_can_view_private_subtitles,
                                    user_can_edit_subtitles)
 from subtitles.forms import SubtitlesUploadForm
 from subtitles.pipeline import rollback_to
+from subtitles.types import SubtitleFormatList
+from subtitles.permissions import user_can_access_subtitles_format
 from teams.models import Task
 from utils.decorators import staff_member_required
 from videos import permissions
@@ -67,7 +70,7 @@ from videos.forms import (
     ChangeVideoOriginalLanguageForm, CreateSubtitlesForm,
 )
 from videos.models import (
-    Video, Action, VideoUrl, AlreadyEditingException
+    Video, VideoUrl, AlreadyEditingException
 )
 from videos.rpc import VideosApiClass
 from videos import share_utils
@@ -80,7 +83,8 @@ from utils.decorators import never_in_prod
 from utils.objectlist import object_list
 from utils.rpc import RpcRouter
 from utils.text import fmt
-from utils.translation import get_user_languages_from_request
+from utils.translation import (get_user_languages_from_request,
+                               get_language_label)
 
 from teams.permissions import can_edit_video, can_add_version, can_resync
 from . import video_size
@@ -110,7 +114,7 @@ class LanguageList(object):
             if public_tip is None or public_tip.subtitle_count == 0:
                 # no versions in this language yet
                 continue
-            language_name = lang.get_language_code_display()
+            language_name = get_language_label(lang.language_code)
             status = self._calc_status(lang)
             tags = self._calc_tags(lang)
             url = lang.get_absolute_url()
@@ -197,12 +201,7 @@ def create(request):
         'initial_url': request.GET.get('initial_url'),
     }
     if video_form.is_valid():
-        try:
-            video = video_form.save()
-        except (VidscraperError, RequestError):
-            context['vidscraper_error'] = True
-            return render_to_response('videos/create.html', context,
-                          context_instance=RequestContext(request))
+        video = video_form.video
         messages.info(request, message=_(u'''Here is the subtitle workspace for your video.
         You can share the video with friends, or get an embed code for your site. To start
         new subtitles, click \"Add a new language!\" in the sidebar.'''))
@@ -345,9 +344,9 @@ def _get_related_task(request):
             return
 
 
-def actions_list(request, video_id):
+def activity(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
-    qs = Action.objects.for_video(video)
+    qs = ActivityRecord.objects.for_video(video)
 
     extra_context = {
         'video': video
@@ -355,7 +354,7 @@ def actions_list(request, video_id):
 
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.ACTIVITIES_ONPAGE,
-                       template_name='videos/actions_list.html',
+                       template_name='videos/activity.html',
                        template_object_name='action',
                        extra_context=extra_context)
 
@@ -546,8 +545,13 @@ class LanguagePageContextSubtitles(LanguagePageContext):
                                                 language.language_code)
         public_langs = (video.newsubtitlelanguage_set
                         .having_public_versions().count())
-
-        self['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
+        downloadable_formats = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
+        downloadable_formats_set = set(downloadable_formats)
+        for format in SubtitleFormatList.for_staff():
+            if user_can_access_subtitles_format(request.user, format):
+                downloadable_formats_set.add(format)
+        downloadable_formats = list(downloadable_formats_set)
+        self['downloadable_formats'] = downloadable_formats
         self['edit_disabled'] = not user_can_edit
         self['show_download_all'] = public_langs > 1
         # If there are tasks for this language, the user has to go through the
