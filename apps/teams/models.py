@@ -1107,6 +1107,7 @@ class TeamVideo(models.Model):
         # these imports are here to avoid circular imports, hacky
         from teams.signals import api_teamvideo_new
         from teams.signals import video_moved_from_team_to_team
+        from teams.signals import video_moved_from_project_to_project
         from videos import metadata_manager
         # For now, we'll just delete any tasks associated with the moved video.
         if not within_team:
@@ -1117,6 +1118,7 @@ class TeamVideo(models.Model):
             self.team = new_team
 
         # projects are always team dependent:
+        old_project = self.project
         if project:
             self.project = project
         else:
@@ -1124,7 +1126,13 @@ class TeamVideo(models.Model):
 
         self.save()
 
-        if not within_team:
+        if within_team:
+            if old_project is not None and project is not None:
+                video_moved_from_project_to_project.send(sender=self,
+                                                         new_project=project,
+                                                         old_project=old_project,
+                                                         video=self.video)
+        else:
             # We need to make any as-yet-unmoderated versions public.
             # TODO: Dedupe this and the team video delete signal.
             video = self.video

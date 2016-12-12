@@ -98,6 +98,27 @@ class TestNotificationHandlerLookup(TestCase):
         assert_equal(mock_handler.on_video_removed.call_args,
                      mock.call(tv.video, other_team))
 
+    def test_on_video_moved_to_other_project_same_team(self):
+        old_project = ProjectFactory(team=self.team)
+        new_project = ProjectFactory(team=self.team)
+        tv = TeamVideoFactory(team=self.team, project=old_project)
+        with self.patch_handler_lookup() as mock_handler:
+            tv.move_to(self.team, project=new_project)
+        assert_equal(mock_handler.on_video_moved_project.call_args,
+                     mock.call(tv.video, old_project, new_project))
+
+    def test_on_video_moved_to_other_project_other_team(self):
+        old_project = ProjectFactory(team=self.team)
+        other_team = TeamFactory()
+        new_project = ProjectFactory(team=other_team)
+        tv = TeamVideoFactory(team=self.team, project=old_project)
+        with self.patch_handler_lookup() as mock_handler:
+            tv.move_to(other_team, project=new_project)
+        assert_not_equal(mock_handler.on_video_moved_project.call_args,
+                     mock.call(tv.video, old_project, new_project))
+        assert_equal(mock_handler.on_video_removed.call_args,
+                     mock.call(tv.video, other_team))
+
     def test_on_subtitle_version_added(self):
         video = VideoFactory(team=self.team)
         with self.patch_handler_lookup() as mock_handler:
