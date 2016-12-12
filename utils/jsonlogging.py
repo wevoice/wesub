@@ -24,7 +24,8 @@ import traceback
 
 from utils.dataprintout import DataPrinter
 
-EXTRA_FIELDS = ['path', 'status_code', 'method', 'view', 'query', 'post_data', 'metrics', 'user']
+EXTRA_FIELDS = ['path', 'status_code', 'method', 'view', 'query', 'post_data',
+                'metrics', 'user', 'ip_address',]
 
 data_printer = DataPrinter(
     max_size=500, max_item_size=100, max_repr_size=50)
