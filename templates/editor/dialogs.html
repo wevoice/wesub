@@ -394,7 +394,7 @@
         <p class="error" ng-show="uploadError">
         {% trans "Upload failed. The file you uploaded might be invalid or an unsupported format." %}
         </p>
-        <form method="post" id="upload-subtitles-form" action="{% url "videos:upload_subtitles" %}" enctype="multipart/form-data">
+        <form method="post" id="upload-subtitles-form" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="video" value="{{ video.id }}" />
             <div style="visibility: hidden">
