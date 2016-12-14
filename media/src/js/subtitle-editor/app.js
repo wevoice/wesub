@@ -270,35 +270,6 @@ var angular = angular || null;
             return rv;
         }
 
-        $scope.submitUploadForm = function($event) {
-            $scope.uploading = true;
-            $scope.uploadError = false;
-            var form = $('#upload-subtitles-form')[0];
-            $.ajax({
-              url: form.action,
-              type: 'POST',
-              data: new FormData(form),
-              dataType: 'JSON',
-              headers: authHeaders(),
-              processData: false,
-              contentType: false,
-              success: function(data, status, xhr) {
-		  if (data && data.success)
-                      location.reload();
-		  else {
-                      $scope.uploading = false;
-                      $scope.uploadError = true;
-		  }
-              },
-              error: function(xhr, status, error) {
-                  $scope.uploading = false;
-                  $scope.uploadError = true;
-              }
-            });
-            $event.stopPropagation();
-            $event.preventDefault();
-        };
-
         $scope.showCopyTimingModal = function($event) {
             $scope.dialogManager.openDialog('confirmCopyTiming', {
                 continueButton: $scope.copyTimingOver
@@ -715,6 +686,33 @@ var angular = angular || null;
             $scope.workingSubtitles.initEmptySubtitles(
                     editingVersion.languageCode, EditorData.baseLanguage);
         }
+
+        $scope.submitUploadForm = function($event) {
+            $scope.uploading = true;
+            $scope.uploadError = false;
+            var file = $('#subtitles-file-field')[0].files[0];
+            var fileData = new FileReader();
+            var sub_format = file.name.split('.').pop();
+            fileData.onload = function(e) {
+                SubtitleStorage.saveSubtitles(
+                    fileData.result,
+                    $scope.workingSubtitles.title,
+                    $scope.duration,
+                    $scope.workingSubtitles.description,
+                    $scope.workingSubtitles.metadata,
+                    null, "save-draft", sub_format).then(
+                        function onSuccess(data, status, xhr) {
+			    location.reload();
+		        },
+                        function onError(xhr, status, error) {
+                            $scope.uploading = false;
+                            $scope.uploadError = true;
+		    });
+	    };
+            fileData.readAsText(file, "UTF-8");
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
 
         $scope.saveAutoBackup = function() {
             SubtitleBackupStorage.saveBackup(video.id,

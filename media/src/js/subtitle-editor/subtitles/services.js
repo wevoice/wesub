@@ -231,9 +231,10 @@ var angular = angular || null;
                 return promise;
 
             },
-            saveSubtitles: function(dfxpString, title, duration, description, metadata, isComplete, action) {
+            saveSubtitles: function(subString, title, duration, description, metadata, isComplete, action, sub_format) {
                 var videoID = EditorData.video.id;
                 var languageCode = EditorData.editingVersion.languageCode;
+                var sub_format = (typeof sub_format !== 'undefined') ?  sub_format : 'dfxp';
 
                 var url = getSubtitlesAPIURL(videoID, languageCode);
                 // if isComplete is not specified as true or false, we send
@@ -248,8 +249,8 @@ var angular = angular || null;
                     data:  {
                         video: videoID,
                         language: languageCode,
-                        subtitles: dfxpString,
-                        sub_format: 'dfxp',
+                        subtitles: subString,
+                        sub_format: sub_format,
                         title: title,
                         description: description,
                         from_editor: true,
