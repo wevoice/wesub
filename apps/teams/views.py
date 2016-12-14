@@ -141,9 +141,12 @@ def settings_page(view_func):
 def index(request, my_teams=False):
     q = request.REQUEST.get('q')
 
-    if my_teams and request.user.is_authenticated():
-        ordering = 'name'
-        qs = Team.objects.filter(members__user=request.user)
+    if my_teams:
+        if request.user.is_authenticated():
+            ordering = 'name'
+            qs = Team.objects.filter(members__user=request.user).add_user_is_member(request.user)
+        else:
+             return redirect_to_login(reverse("teams:user_teams"))
     else:
         ordering = request.GET.get('o', 'members')
         qs = (Team.objects.for_user(request.user)
