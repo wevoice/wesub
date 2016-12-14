@@ -27,7 +27,7 @@ from codefield import CodeField, Code
 from comments.models import Comment
 from mysqltweaks import query
 from teams.models import Team
-from teams.permissions import can_view_notifications
+from teams.permissions import can_view_activity
 from teams.permissions_const import (ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
                                      ROLE_CONTRIBUTOR, ROLE_NAMES)
 from utils import dates
@@ -297,7 +297,7 @@ class VideoMovedToTeam(ActivityType):
             msg = _('moved <a href="%(video_url)s">%(video)s</a> to %(to_team)s')
             from_team_name = None
             from_team_url = None
-        elif can_view_notifications(team, user):
+        elif can_view_activity(team, user):
             msg = _('moved <a href="%(video_url)s">%(video)s</a> to %(to_team)s from <a href="%(from_team_url)s">%(from_team_name)s</a>')
             from_team_name = team.name
             from_team_url = reverse('teams:dashboard', args=(team.slug,))
@@ -318,7 +318,7 @@ class VideoMovedFromTeam(ActivityType):
             msg = _('removed <a href="%(video_url)s">%(video)s</a> from %(from_team)s')
             to_team_name = None
             to_team_url = None
-        elif can_view_notifications(team, user):
+        elif can_view_activity(team, user):
             msg = _('moved <a href="%(video_url)s">%(video)s</a> from %(from_team)s to <a href="%(to_team_url)s">%(to_team_name)s</a>')
             to_team_name = team.name
             to_team_url = reverse('teams:dashboard', args=(team.slug,))

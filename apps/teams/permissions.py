@@ -546,6 +546,12 @@ def can_view_notifications(team, user):
 
     return user.is_superuser or team.user_is_member(user)
 
+def can_view_activity(team, user):
+    """Return whether a user can view activity for a team.
+    """
+
+    return user.is_superuser or team.user_is_member(user)
+
 def can_invite(team, user):
     """Return whether the given user can send an invite for the given team."""
 
