@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import cgi
+from textwrap import wrap
 from django import template
 from django.template.loader import render_to_string
 
@@ -50,15 +51,10 @@ def messages(context):
     user.cache.set('messages', (hidden_message_id, content), 30 * 60)
     return content
 
-def split_long_lines(s):
-    if len(s) > 140:
-        return s.replace(" ", "\n")
-    return s
-
 @register.filter
-def encode_html(message):
+def encode_html_email(message):
     return "<br/>".join(
         map(
-            lambda x: split_long_lines(cgi.escape(x).encode('ascii', 'xmlcharrefreplace')),
+            lambda x: cgi.escape("\n".join(wrap(x, 40))).encode('ascii', 'xmlcharrefreplace'),
             message.split("\n")
         ))
