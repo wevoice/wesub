@@ -29,6 +29,14 @@ SECTIONS = {
 data_printer = DataPrinter(
     max_size=1024, max_item_size=100, max_repr_size=50)
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
 class P3PHeaderMiddleware(object):
     def process_response(self, request, response):
         response['P3P'] = settings.P3P_COMPACT
@@ -104,7 +112,6 @@ class LogRequest(object):
 
     def process_request(self, request):
         request._start_time = time.time()
-
     def process_exception(self, request, exception):
         try:
             msg = u'{}'.format(exception)
@@ -133,6 +140,7 @@ class LogRequest(object):
             'method': request.method,
             'path': request.path_info,
             'size': request.META.get('CONTENT_LENGTH'),
+            'ip_address': get_client_ip(request),
         }
         if response is not None:
             extra['status_code'] = response.status_code

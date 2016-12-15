@@ -224,7 +224,7 @@
                                 // Set all of the API attrs as attrs on the video model.
                                 video.set(resp.objects[0]);
 				sizeUpdated(video);
-				var visibleLanguages = _$.map(_$.grep(video.get('languages'), function(language) {return language.visible;}),
+				var visibleLanguages = _$.map(_$.grep(video.get('languages'), function(language) {return language.published;}),
 							  function(language) {return language.code;});
 				video.get('languages').forEach(function(lang) {
 				    video.languages_dir[lang.code] = lang.dir;
@@ -513,7 +513,7 @@
                         _$('#language-list-inside').append('' +
 							   '<li role="presentation">' +
 							   '<a role="menuitem" tabindex="-1" ' +
-							   (langs[i].visible  ? ('href="#" class="language-item" data-language="' + langs[i].code + '"') : 'class="language-item-inactive"') +
+							   (langs[i].published  ? ('href="#" class="language-item" data-language="' + langs[i].code + '"') : 'class="language-item-inactive"') +
 							   '>' +
 							   langs[i].name +
 							   '</a>' +

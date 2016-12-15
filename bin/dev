@@ -357,9 +357,10 @@ NEEDS_ROOT = [
 ]
 def run_manage(args, **kwargs):
     if args and args[0] in NEEDS_ROOT:
-        cmdline = ['docker-compose', 'run', '-u', 'root', 'app', 'manage']
+        cmdline = ['docker-compose', 'run', '--rm', '-u', 'root', 'app',
+                   'manage']
     else:
-        cmdline = ['docker-compose', 'run', 'app', 'manage']
+        cmdline = ['docker-compose', 'run', '--rm', 'app', 'manage']
     subprocess.call(cmdline + args, **kwargs)
 
 def usage():
