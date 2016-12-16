@@ -898,6 +898,11 @@ class Project(models.Model):
             return default_project_label
         return self.__unicode__()
 
+    def slug_display(self, default_project_label=None):
+        if self.is_default_project:
+            return default_project_label
+        return self.slug
+
     def save(self, slug=None,*args, **kwargs):
         self.modified = datetime.datetime.now()
         if slug is not None:
