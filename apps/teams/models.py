@@ -983,7 +983,6 @@ class TeamVideo(models.Model):
     THUMBNAIL_SIZE = (288, 162)
 
     team = models.ForeignKey(Team)
-    __old_team = None
     video = models.OneToOneField(Video)
     description = models.TextField(blank=True,
         help_text=_(u'Use this space to explain why you or your team need to '
@@ -1001,20 +1000,12 @@ class TeamVideo(models.Model):
     partner_id = models.CharField(max_length=100, blank=True, default="")
 
     project = models.ForeignKey(Project)
-    __old_project = None
 
     class Meta:
         unique_together = (('team', 'video'),)
 
     def __unicode__(self):
         return unicode(self.video)
-
-    def __init__(self, *args, **kwargs):
-        super(TeamVideo, self).__init__(*args, **kwargs)
-        if hasattr(self, "team"):
-            self.__old_team = self.team
-        if hasattr(self, "project"):
-            self.__old_project = self.project
 
     @models.permalink
     def get_absolute_url(self):
@@ -1040,13 +1031,19 @@ class TeamVideo(models.Model):
         return getattr(self, 'original_language_code')
 
     def save(self, *args, **kwargs):
+
+        if self.pk:
+            old = TeamVideo.objects.select_related('team', 'project').get(pk=self.pk)
+            __old_team = old.team
+            __old_project = old.project
+        else:
+            __old_team = __old_project = None
+            self.created = datetime.datetime.now()
+
         if not hasattr(self, "project"):
             self.project = self.team.default_project
 
-        if not self.pk:
-            self.created = datetime.datetime.now()
-
-        within_team = (self.__old_team == self.team)
+        within_team = (__old_team == self.team)
         # these imports are here to avoid circular imports, hacky
         from teams.signals import api_teamvideo_new
         from teams.signals import video_moved_from_team_to_team
@@ -1055,7 +1052,7 @@ class TeamVideo(models.Model):
         # For now, we'll just delete any tasks associated with the moved video.
         if not within_team:
             self.task_set.update(deleted=True)
-            if self.project == self.__old_project:
+            if self.project == __old_project:
                 self.project = self.team.default_project
 
 
@@ -1066,16 +1063,14 @@ class TeamVideo(models.Model):
         assert self.project.team == self.team, \
                     "%s: Team (%s) is not equal to project's (%s) team (%s)"\
                          % (self, self.team, self.project, self.project.team)
-
         super(TeamVideo, self).save(*args, **kwargs)
-
         if within_team:
-            if self.project != self.__old_project:
+            if __old_project is not None and self.project != __old_project:
                 video_moved_from_project_to_project.send(sender=self,
                                                          new_project=self.project,
-                                                         old_project=self.__old_project,
+                                                         old_project=__old_project,
                                                          video=self.video)
-        else:
+        elif __old_team is not None:
             # We need to make any as-yet-unmoderated versions public.
             # TODO: Dedupe this and the team video delete signal.
             video = self.video
@@ -1085,7 +1080,7 @@ class TeamVideo(models.Model):
             video.moderated_by = self.team if self.team.moderates_videos() else None
             video.save()
 
-            TeamVideoMigration.objects.create(from_team=self.__old_team,
+            TeamVideoMigration.objects.create(from_team=__old_team,
                                               to_team=self.team,
                                               to_project=self.project)
 
@@ -1096,10 +1091,8 @@ class TeamVideo(models.Model):
             api_teamvideo_new.send(self)
             video_moved_from_team_to_team.send(sender=self,
                                                destination_team=self.team,
-                                               old_team=self.__old_team,
+                                               old_team=__old_team,
                                                video=self.video)
-        self.__old_project = self.project
-        self.__old_team = self.team
         # Update search data and other things
         video_changed_tasks.delay(self.video_id)
 
