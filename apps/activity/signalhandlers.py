@@ -74,11 +74,13 @@ def on_subtitle_version_save(instance, created, **kwargs):
 @receiver(post_save, sender=TeamVideo)
 def on_team_video_save(instance, created, **kwargs):
     if created:
+        ActivityRecord.objects.create_for_video_moved(instance.video, instance.added_by, to_team=instance.team)
         ActivityRecord.objects.move_video_records_to_team(instance.video,
                                                           instance.team)
 
 @receiver(teams.signals.video_removed_from_team)
-def on_team_video_delete(sender, user, **kwargs):
+def on_team_video_delete(sender, team, user, **kwargs):
+    ActivityRecord.objects.create_for_video_moved(sender, user, from_team=team)
     ActivityRecord.objects.move_video_records_to_team(sender, None)
 
 @receiver(post_save, sender=TeamMember)
@@ -91,5 +93,6 @@ def on_team_member_deleted(sender, **kwargs):
     ActivityRecord.objects.create_for_member_deleted(sender)
 
 @receiver(teams.signals.video_moved_from_team_to_team)
-def on_video_moved_from_team_to_team(destination_team, video, **kwargs):
+def on_video_moved_from_team_to_team(user, destination_team, old_team, video, **kwargs):
+    ActivityRecord.objects.create_for_video_moved(video, user, from_team=old_team, to_team=destination_team)
     ActivityRecord.objects.move_video_records_to_team(video, destination_team)

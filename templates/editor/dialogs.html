@@ -156,7 +156,7 @@
                 <td> {% trans "CMD + Shift + ." %}</td>
             </tr>
             <tr>
-                <td> {% trans "Navigate to the next subtitle or insert one at the end" %}</td>
+                <td> {% trans "Navigate to the next subtitle or edit the currently playing subtitle" %}</td>
                 <td> {% trans "ENTER" %}</td>
                 <td> {% trans "ENTER" %}</td>
             </tr>
@@ -394,7 +394,7 @@
         <p class="error" ng-show="uploadError">
         {% trans "Upload failed. The file you uploaded might be invalid or an unsupported format." %}
         </p>
-        <form method="post" id="upload-subtitles-form" action="{% url "videos:upload_subtitles" %}" enctype="multipart/form-data">
+        <form method="post" id="upload-subtitles-form" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="video" value="{{ video.id }}" />
             <div style="visibility: hidden">

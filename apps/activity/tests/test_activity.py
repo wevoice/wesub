@@ -260,7 +260,7 @@ class TeamVideoActivityTest(TestCase):
         self.check_copies(record, first_team, [second_team])
 
     def test_move_back_to_public(self):
-        # Test a team video being deleted, putting the video pack in the
+        # Test a team video being deleted, putting the video back in the
         # public area
         video = VideoFactory()
         team_video = TeamVideoFactory(video=video)
@@ -301,6 +301,47 @@ class TeamVideoActivityTest(TestCase):
         assert_equal(
             list(ActivityRecord.objects.for_video(video, different_team)),
             [])
+
+    def test_video_moved_from_team_to_public(self):
+        video = VideoFactory()
+        team = TeamFactory()
+        team_video = TeamVideoFactory(video=video, team=team)
+        clear_activity()
+        team_video.remove(None)
+        records_to = ActivityRecord.objects.filter(type='video-moved-to-team')
+        assert_equal(len(list(records_to)), 0)
+        record_from = ActivityRecord.objects.get(type='video-moved-from-team')
+        assert_equal(record_from.video, video)
+        assert_equal(record_from.team, team)
+        assert_equal(record_from.get_related_obj(), None)
+
+    def test_video_moved_from_public_to_team(self):
+        video = VideoFactory()
+        team = TeamFactory()
+        clear_activity()
+        team_video = TeamVideoFactory(video=video, team=team)
+        records_from = ActivityRecord.objects.filter(type='video-moved-from-team')
+        assert_equal(len(list(records_from)), 0)
+        record_to = ActivityRecord.objects.get(type='video-moved-to-team')
+        assert_equal(record_to.video, video)
+        assert_equal(record_to.team, team)
+        assert_equal(record_to.get_related_obj(), None)
+
+    def test_video_moved_from_team_to_team(self):
+        video = VideoFactory()
+        team_1 = TeamFactory()
+        team_2 = TeamFactory()
+        team_video = TeamVideoFactory(video=video, team=team_1)
+        clear_activity()
+        team_video.move_to(team_2)
+        record_from = ActivityRecord.objects.get(type='video-moved-from-team')
+        assert_equal(record_from.video, video)
+        assert_equal(record_from.team, team_1)
+        assert_equal(record_from.get_related_obj(), team_2)
+        record_to = ActivityRecord.objects.get(type='video-moved-to-team')
+        assert_equal(record_to.video, video)
+        assert_equal(record_to.team, team_2)
+        assert_equal(record_to.get_related_obj(), team_1)
 
 class TestViewableByUser(TestCase):
     def setUp(self):

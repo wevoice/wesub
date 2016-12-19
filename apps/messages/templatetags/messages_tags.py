@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import cgi
+from textwrap import wrap
 from django import template
 from django.template.loader import render_to_string
 
@@ -49,3 +51,10 @@ def messages(context):
     user.cache.set('messages', (hidden_message_id, content), 30 * 60)
     return content
 
+@register.filter
+def encode_html_email(message):
+    return "<br/>".join(
+        map(
+            lambda x: cgi.escape("\n".join(wrap(x, 40))).encode('ascii', 'xmlcharrefreplace'),
+            message.split("\n")
+        ))

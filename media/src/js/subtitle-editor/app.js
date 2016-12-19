@@ -270,35 +270,6 @@ var angular = angular || null;
             return rv;
         }
 
-        $scope.submitUploadForm = function($event) {
-            $scope.uploading = true;
-            $scope.uploadError = false;
-            var form = $('#upload-subtitles-form')[0];
-            $.ajax({
-              url: form.action,
-              type: 'POST',
-              data: new FormData(form),
-              dataType: 'JSON',
-              headers: authHeaders(),
-              processData: false,
-              contentType: false,
-              success: function(data, status, xhr) {
-		  if (data && data.success)
-                      location.reload();
-		  else {
-                      $scope.uploading = false;
-                      $scope.uploadError = true;
-		  }
-              },
-              error: function(xhr, status, error) {
-                  $scope.uploading = false;
-                  $scope.uploadError = true;
-              }
-            });
-            $event.stopPropagation();
-            $event.preventDefault();
-        };
-
         $scope.showCopyTimingModal = function($event) {
             $scope.dialogManager.openDialog('confirmCopyTiming', {
                 continueButton: $scope.copyTimingOver
@@ -587,12 +558,12 @@ var angular = angular || null;
 
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
-	    var isDel = function(key) {
-		return ((key === 46) || (key === 8));
-	    };
-	    var isAltPressed = function(evt) {
-		return (evt.altKey || evt.metaKey);
-	    };
+            var isDel = function(key) {
+                return ((key === 46) || (key === 8));
+            };
+            var isAltPressed = function(evt) {
+                return (evt.altKey || evt.metaKey);
+            };
             $scope.minutesIdle = 0;
             $scope.$root.$emit("user-action");
             if (evt.keyCode == 9 && !evt.shiftKey) {
@@ -608,17 +579,17 @@ var angular = angular || null;
                 VideoPlayer.seek(VideoPlayer.currentTime() + 4000);
             } else if (evt.keyCode === 73 && isAltPressed(evt) && evt.shiftKey) {
                 // Alt+Shift+i, insert subtitle below
-		if($scope.currentEdit.storedSubtitle())
-		    $scope.workingSubtitles.subtitleList.insertSubtitleBefore(
-			$scope.workingSubtitles.subtitleList.nextSubtitle($scope.currentEdit.storedSubtitle()));
+                if($scope.currentEdit.storedSubtitle())
+                    $scope.workingSubtitles.subtitleList.insertSubtitleBefore(
+                        $scope.workingSubtitles.subtitleList.nextSubtitle($scope.currentEdit.storedSubtitle()));
             } else if (evt.keyCode === 73 && isAltPressed(evt)) {
                 // Alt+i, insert subtitle above
-		if($scope.currentEdit.storedSubtitle())
-		    $scope.workingSubtitles.subtitleList.insertSubtitleBefore(
-			$scope.currentEdit.storedSubtitle());
+                if($scope.currentEdit.storedSubtitle())
+                    $scope.workingSubtitles.subtitleList.insertSubtitleBefore(
+                        $scope.currentEdit.storedSubtitle());
             } else if (isDel(evt.keyCode) && isAltPressed(evt)) {
                 // Alt+del, remove current subtitle
-		if($scope.currentEdit.storedSubtitle()){
+                if($scope.currentEdit.storedSubtitle()) {
                     var subtitleList = $scope.workingSubtitles.subtitleList;
                     var currentSubtitle = $scope.currentEdit.storedSubtitle();
                     var nextSubtitle = subtitleList.nextSubtitle(currentSubtitle);
@@ -641,31 +612,31 @@ var angular = angular || null;
                    }
                 }
             } else if (isAltPressed(evt) && ((evt.keyCode === 38) || (evt.keyCode === 40))) {
-		var nextSubtitle;
-		var subtitle = $scope.currentEdit.storedSubtitle();
-		var subtitleList = $scope.workingSubtitles.subtitleList;
-		if(subtitle) {
-		    if (evt.keyCode === 38)
-			nextSubtitle = subtitleList.prevSubtitle(subtitle);
-		    else
-			nextSubtitle = subtitleList.nextSubtitle(subtitle);
-		    if (nextSubtitle) {
-			if($scope.currentEdit.finish(true, subtitleList))
-			    $scope.$root.$emit('work-done');
-			$scope.currentEdit.start(nextSubtitle);
-			$scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
-			evt.preventDefault();
-			evt.stopPropagation();
-		    }
-		} else if ((evt.keyCode === 40) && (subtitleList.length() > 0)){
-		    subtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
-		    $scope.currentEdit.start(subtitle);
-		}
-	    } else if (evt.target.type == 'textarea') {
+                var nextSubtitle;
+                var subtitle = $scope.currentEdit.storedSubtitle();
+                var subtitleList = $scope.workingSubtitles.subtitleList;
+                if(subtitle) {
+                    if (evt.keyCode === 38)
+                        nextSubtitle = subtitleList.prevSubtitle(subtitle);
+                    else
+                        nextSubtitle = subtitleList.nextSubtitle(subtitle);
+                    if (nextSubtitle) {
+                        if($scope.currentEdit.finish(true, subtitleList))
+                            $scope.$root.$emit('work-done');
+                        $scope.currentEdit.start(nextSubtitle);
+                        $scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                    }
+                } else if ((evt.keyCode === 40) && (subtitleList.length() > 0)){
+                    subtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
+                    $scope.currentEdit.start(subtitle);
+                }
+            } else if (evt.target.type == 'textarea') {
                 $scope.$root.$emit('text-edit-keystroke');
                 return;
-	    }
-		// Shortcuts that should be disabled while editing a subtitle
+            }
+            // Shortcuts that should be disabled while editing a subtitle
             else if (evt.keyCode === 32) {
                 VideoPlayer.togglePlay();
                 // Space: toggle play / pause.
@@ -673,8 +644,17 @@ var angular = angular || null;
                 $scope.$root.$emit("sync-next-start-time");
             } else if ((evt.keyCode == 38) && ($scope.timelineShown)) {
                 $scope.$root.$emit("sync-next-end-time");
-            } else if ((evt.keyCode == 13) && (!$scope.timelineShown)) {
-                insertAndEditSubtitle();
+            } else if ((evt.keyCode == 13) && (!$scope.currentEdit.inProgress())) {
+                if (!$scope.timelineShown) {
+                    insertAndEditSubtitle();
+                } else {
+                    // Edit currently selected subtitle
+                    var subtitle = $scope.workingSubtitles.subtitleList.subtitleAt(VideoPlayer.currentTime());
+                    if(subtitle !== null) {
+                        VideoPlayer.pause();
+                        $scope.currentEdit.start(subtitle);
+                    }
+                }
             } else {
                 return;
             }
@@ -715,6 +695,33 @@ var angular = angular || null;
             $scope.workingSubtitles.initEmptySubtitles(
                     editingVersion.languageCode, EditorData.baseLanguage);
         }
+
+        $scope.submitUploadForm = function($event) {
+            $scope.uploading = true;
+            $scope.uploadError = false;
+            var file = $('#subtitles-file-field')[0].files[0];
+            var fileData = new FileReader();
+            var sub_format = file.name.split('.').pop();
+            fileData.onload = function(e) {
+                SubtitleStorage.saveSubtitles(
+                    fileData.result,
+                    $scope.workingSubtitles.title,
+                    $scope.duration,
+                    $scope.workingSubtitles.description,
+                    $scope.workingSubtitles.metadata,
+                    null, "save-draft", sub_format).then(
+                        function onSuccess(data, status, xhr) {
+			    location.reload();
+		        },
+                        function onError(xhr, status, error) {
+                            $scope.uploading = false;
+                            $scope.uploadError = true;
+		    });
+	    };
+            fileData.readAsText(file, "UTF-8");
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
 
         $scope.saveAutoBackup = function() {
             SubtitleBackupStorage.saveBackup(video.id,

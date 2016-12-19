@@ -130,6 +130,8 @@ class TeamWorkflow(object):
             'video-deleted',
             'video-url-edited',
             'video-url-deleted',
+            'video-moved-from-team',
+            'video-moved-to-team',
         ]
 
 

@@ -1299,6 +1299,42 @@ Request Details
 
    Response data is the same as above.
 
+Request Status Fields
+*********************
+
+We return several status fields for requests (``status``, ``work_status``,
+``evaluation_status``).  The status field that you see depends on the team's
+relationship to the request (where "the team" is identified by the
+``team-slug`` param in the URL).  This gives each team a different view of the
+request.  Each team gets the information revelant to it's work, and doesn't
+get information about the work being done by other teams.
+
+As an example, consider a request that has 2 evaluation teams.  As the request
+progresses, here are the values that we will return for the various status
+fields:
+
+=============== =============== ========================= =========================
+status          work_status     evaluation_status (team1) evaluation_status (team2)
+=============== =============== ========================= =========================
+in-progress     needs-subtitler pending                   pending
+in-progress     being-subtitled pending                   pending
+in-progress     needs-reviewer  pending                   pending
+in-progress     being-reviewed  pending                   pending
+in-progress     needs-approver  pending                   pending
+in-progress     being-approved  pending                   pending
+in-evaluation1  complete        available                 pending
+in-evaluation1  complete        assigned                  pending
+in-evaluation2  complete        complete                  available
+in-evaluation2  complete        complete                  assigned
+complete        complete        complete                  complete
+=============== =============== ========================= =========================
+
+* ``status`` will be returned to the source team
+* ``work_status`` will be returned to the work team
+* ``evaluation_status`` will be returned to evaluation teams
+* Multiple status fields can be returned if the team fits into more than one
+  of the above categories
+
 Creating Requests
 *****************
 
