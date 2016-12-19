@@ -1095,7 +1095,7 @@ class TeamVideo(models.Model):
         self.delete()
         video_removed_from_team.send(sender=video, team=team, user=user)
 
-    def move_to(self, new_team, project=None):
+    def move_to(self, new_team, project=None, user=None):
         """
         Moves this TeamVideo to a new team.
         This method expects you to have run the correct permissions checks.
@@ -1144,6 +1144,7 @@ class TeamVideo(models.Model):
             # fire a http notification that a new video has hit this team:
             api_teamvideo_new.send(self)
             video_moved_from_team_to_team.send(sender=self,
+                                               user=user,
                                                destination_team=new_team,
                                                old_team=old_team,
                                                video=self.video)

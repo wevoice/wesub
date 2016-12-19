@@ -1408,7 +1408,8 @@ class MoveTeamVideosForm(BulkTeamVideoForm):
     def perform_save(self, qs):
         for team_video in qs:
             team_video.move_to(self.cleaned_data['new_team'],
-                               self.cleaned_data['project'])
+                               self.cleaned_data['project'],
+                               self.user)
 
     def message(self):
         new_team = self.cleaned_data['new_team']
@@ -1644,7 +1645,8 @@ class TeamVideoURLForm(forms.Form):
             if thumbnail:
                 video.s3_thumbnail.save(thumbnail.name, thumbnail)
             team_video = TeamVideo.objects.create(video=video, team=team,
-                                                  project_id=project)
+                                                  project_id=project,
+                                                  added_by=user)
 
         try:
             Video.add(video_type, user, setup_video)

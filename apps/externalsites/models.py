@@ -502,7 +502,8 @@ class YouTubeAccount(ExternalAccount):
             elif self.import_team:
                 def add_to_team(video, video_url):
                     TeamVideo.objects.create(video=video,
-                                             team=self.import_team)
+                                             team=self.import_team,
+                                             added_by=self.user)
                 try:
                     Video.add(video_url, None, add_to_team)
                 except Video.UrlAlreadyAdded:

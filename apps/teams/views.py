@@ -649,7 +649,7 @@ def move_videos(request, slug, project_slug=None, languages=None):
                     team_video = TeamVideo.objects.get(id=video_id)
                     if team_video.team not in managed_teams:
                         return  HttpResponseForbidden("Not allowed")
-                    team_video.move_to(target_team, project=target_project)
+                    team_video.move_to(target_team, project=target_project, user=request.user)
                 except Entry.DoesNotExist:
                     return  HttpResponseBadRequest("Illegal Request")
                 except MultipleObjectsReturned:
@@ -772,7 +772,7 @@ def add_video_to_team(request, video_id):
         form = AddVideoToTeamForm(request.user, request.POST)
         if form.is_valid():
             team = Team.objects.get(id=form.cleaned_data['team'])
-            team_video = TeamVideo.objects.create(video=video, team=team)
+            team_video = TeamVideo.objects.create(video=video, team=team, added_by=request.user)
             return redirect(video.get_absolute_url())
     else:
         form = AddVideoToTeamForm(request.user)
@@ -822,7 +822,7 @@ def move_video(request):
         team_video = form.cleaned_data['team_video']
         team = form.cleaned_data['team']
         project = form.cleaned_data['project']
-        team_video.move_to(team, project)
+        team_video.move_to(team, project, request.user)
         messages.success(request, _(u'The video has been moved to the new team.'))
     else:
         for e in flatten_errorlists(form.errors):
