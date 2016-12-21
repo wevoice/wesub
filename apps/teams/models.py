@@ -1036,7 +1036,10 @@ class TeamVideo(models.Model):
         return getattr(self, 'original_language_code')
 
     def save(self, *args, **kwargs):
-
+        if 'user' in kwargs:
+            user = kwargs.pop('user')
+        else:
+            user = None
         if self.pk:
             old = TeamVideo.objects.select_related('team', 'project').get(pk=self.pk)
             __old_team = old.team
@@ -1095,6 +1098,7 @@ class TeamVideo(models.Model):
             # fire a http notification that a new video has hit this team:
             api_teamvideo_new.send(self)
             video_moved_from_team_to_team.send(sender=self,
+                                               user=user,
                                                destination_team=self.team,
                                                old_team=__old_team,
                                                video=self.video)
@@ -1160,7 +1164,7 @@ class TeamVideo(models.Model):
             self.team = new_team
             if project is not None:
                 self.project = project
-            self.save()
+            self.save(user=user)
 
     def get_task_for_editor(self, language_code):
         if not hasattr(self, '_editor_task'):
