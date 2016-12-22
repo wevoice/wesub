@@ -709,7 +709,7 @@ var angular = angular || null;
                     $scope.duration,
                     $scope.workingSubtitles.description,
                     $scope.workingSubtitles.metadata,
-                    null, "save-draft", sub_format).then(
+                    null, "", sub_format).then(
                         function onSuccess(data, status, xhr) {
 			    location.reload();
 		        },
