@@ -1102,8 +1102,6 @@ class TeamVideo(models.Model):
                                                destination_team=self.team,
                                                old_team=__old_team,
                                                video=self.video)
-        # Update search data and other things
-        video_changed_tasks.delay(self.video_id)
 
     def is_checked_out(self, ignore_user=None):
         '''Return whether this video is checked out in a task.
@@ -1165,6 +1163,7 @@ class TeamVideo(models.Model):
             if project is not None:
                 self.project = project
             self.save(user=user)
+            video_changed_tasks.delay(self.video_id)
 
     def get_task_for_editor(self, language_code):
         if not hasattr(self, '_editor_task'):
