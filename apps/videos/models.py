@@ -412,7 +412,7 @@ class Video(models.Model):
         super(Video, self).__init__(*args, **kwargs)
         self._language_fetcher = SubtitleLanguageFetcher()
         self.monitor = VideoFieldMonitor(self)
-
+        self.re_unicode = re.compile(u'[^\u0000-\uD7FF\uE000-\uFFFF]', re.UNICODE)
     def __unicode__(self):
         title = self.title_display()
         if len(title) > 35:
@@ -702,7 +702,7 @@ class Video(models.Model):
             video = Video.objects.create()
             vt, video_url = video._add_video_url(url, user, True)
             # okay, we can now run the setup
-            vt.set_values(video)
+            video.set_values(vt)
             video.user = user
             if setup_callback:
                 setup_callback(video, video_url)
@@ -720,6 +720,11 @@ class Video(models.Model):
                                      new_video=True)
 
         return (video, video_url)
+
+    def set_values(self, video_type):
+        video_type.set_values(self)
+        self.title = self.re_unicode.sub(u'\uFFFD', self.title)
+        self.description = self.re_unicode.sub(u'\uFFFD', self.description)
 
     def add_url(self, url, user):
         """
@@ -1759,7 +1764,7 @@ class ActionRenderer(object):
         try:
             data = json.loads(item.new_video_title)
         except Exception, e:
-            logging.error('Unable to parse urls: {0}'.format(e))
+            logger.error('Unable to parse urls: {0}'.format(e))
         kwargs['old_url'] = data.get('old_url', 'unknown')
         kwargs['new_url'] = data.get('new_url', 'unknown')
         msg = _('  changed primary url from <a href="%(old_url)s">%(old_url)s</a> to <a href="%(new_url)s">%(new_url)s</a>')

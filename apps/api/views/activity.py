@@ -24,18 +24,19 @@ Video Activity Resource
 .. http:get:: /api/videos/(video-id)/activity/
 
     :queryparam string type: Filter by activity type (:ref:`activity_types`)
-    :queryparam string user: Filter by user who performed the action
+    :queryparam user-identifier user: Filter by user who performed the action
+        (see :ref:`user_ids`)
     :queryparam bcp-47 language: Filter by the subtitle language
     :queryparam iso-8601 before: Only include activity before this date/time
     :queryparam iso-8601 after: Only include activity after
 
     :>json string type: Activity type (:ref:`activity_types`)
     :>json iso-8601 date: Date/time of the activity
-    :>json username user: User who performed the activity
+    :>json user-data user: User who performed the activity (see
+        :ref:`user_fields`)
     :>json video-id video: Video related to the activity (or null)
     :>json bcp-47 language: Language of the subtitles related to the activity
         (or null)
-    :>json uri user_uri: Link to the user resource endpoint
     :>json uri video_uri: Link to the video resource endpoint
     :>json uri language_uri: Link to the subtitle language resource endpoint
 
@@ -48,7 +49,8 @@ Team Activity Resource
 .. http:get:: /api/teams/(slug)/activity/
 
     :queryparam string type: Filter by activity type (:ref:`activity_types`)
-    :queryparam string user: Filter by user who performed the action
+    :queryparam user-identifier user: Filter by user who performed the action
+        (see :ref:`user_ids`)
     :queryparam video-id video: Filter by video
     :queryparam bcp-47 video_language: Filter by video language
     :queryparam bcp-47 language: Filter by the subtitle language

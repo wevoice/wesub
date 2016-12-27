@@ -70,6 +70,9 @@ class NotificationHandlerBase(object):
     def on_video_removed(self, video, new_team):
         pass
 
+    def on_video_moved_project(self, video, old_project, new_project):
+        pass
+
     def on_subtitles_added(self, video, subtitle_version):
         pass
 

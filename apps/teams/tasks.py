@@ -216,7 +216,7 @@ def add_team_videos(team_pk, user_pk, videos):
                 else:
                     project = team.default_project
                 team_video = TeamVideo.objects.create(video=video, team=team,
-                                                      project=project)
+                                                      project=project, added_by=user)
 
             try:
                 video, video_url = Video.add(video_type, user, setup_video)

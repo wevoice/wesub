@@ -64,7 +64,7 @@ Listing languages for a video
 
     Subtitle version data:
 
-    :>json string author: Subtitle author's username
+    :>json user-data author: Subtitle author (see :ref:`user_fields`)
     :>json integer version_no: number of the version
     :>json boolean published: is this version publicly viewable?
 

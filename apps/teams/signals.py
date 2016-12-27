@@ -27,6 +27,8 @@ member_leave = dispatch.Signal()
 video_removed_from_team = dispatch.Signal(providing_args=["team", "user"])
 video_moved_from_team_to_team = dispatch.Signal(
         providing_args=["destination_team", "old_team", "video"])
+video_moved_from_project_to_project = dispatch.Signal(
+        providing_args=["old_project", "new_project", "video"])
 build_video_page_forms = dispatch.Signal(
     providing_args=['team', 'user', 'team_videos_qs'])
 

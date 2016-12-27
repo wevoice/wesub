@@ -54,7 +54,6 @@ Get a list of teams
 
     :>json uri activity_uri: Team activity resource
     :>json uri members_uri: Team member list resource
-    :>json uri safe_members_uri: "Safe" team members list resource
     :>json uri projects_uri: Team projects resource
     :>json uri applications_uri: Team applications resource (or null if the
         membership policy is not by application)
@@ -134,7 +133,8 @@ Listing members of a team
 
 .. http:get:: /api/teams/(team-slug)/members/
 
-    :>json username username: username
+    :>json user user: User associated with the membership (see
+        :ref:`user_fields`)
     :>json string role: One of: ``owner``, ``admin``, ``manager``, or
         ``contributor``
 
@@ -168,18 +168,6 @@ Removing a user from a team
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. http:delete:: /api/teams/(team-slug)/members/(username)/
-
-Safe Members Resource
-*********************
-
-This resource behaves the same as the normal Team Member resource except
-with couple differences for the POST action to add members.
-
-- An invitation is sent to the user to join the team instead of simply
-  adding them
-- If no user exists with the username, and the email field is included
-  in the POST data, we will create a user and send an email to the email
-  account.
 
 Projects Resource
 *****************
@@ -270,7 +258,7 @@ Get details on a specific task
     :>json integer id: ID for the task
     :>json string type: type of task.  One of ``Subtitle``, ``Translate``,
          ``Review``, or ``Approve``
-    :>json username assignee: username of the task assignee (or null)
+    :>json user-data assignee: Task assignee (see :ref:`user_fields`)
     :>json integer priority: Priority for the task
     :>json datetime created: Date/time when the task was created
     :>json datetime modified: Date/time when the task was last updated
@@ -370,7 +358,7 @@ Get details on a single application
 
 .. http:get:: /api/teams/(team-slug)/applications/(application-id)/:
 
-    :>json username user: Username of the applicant
+    :>json user-data user: Applicant user data (see :ref:`user_fields`)
     :>json string note: note given by the applicant
     :>json string status: status value.  Possible values are ``Denied``,
         ``Approved``, ``Pending``, ``Member Removed`` and ``Member Left``

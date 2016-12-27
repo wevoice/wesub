@@ -898,6 +898,11 @@ class Project(models.Model):
             return default_project_label
         return self.__unicode__()
 
+    def slug_display(self, default_project_label=None):
+        if self.is_default_project:
+            return default_project_label
+        return self.slug
+
     def save(self, slug=None,*args, **kwargs):
         self.modified = datetime.datetime.now()
         if slug is not None:
@@ -1031,19 +1036,72 @@ class TeamVideo(models.Model):
         return getattr(self, 'original_language_code')
 
     def save(self, *args, **kwargs):
+        if 'user' in kwargs:
+            user = kwargs.pop('user')
+        else:
+            user = None
+        if self.pk:
+            old = TeamVideo.objects.select_related('team', 'project').get(pk=self.pk)
+            __old_team = old.team
+            __old_project = old.project
+        else:
+            __old_team = __old_project = None
+            self.created = datetime.datetime.now()
+
         if not hasattr(self, "project"):
             self.project = self.team.default_project
+
+        within_team = (__old_team == self.team)
+        # these imports are here to avoid circular imports, hacky
+        from teams.signals import api_teamvideo_new
+        from teams.signals import video_moved_from_team_to_team
+        from teams.signals import video_moved_from_project_to_project
+        from videos import metadata_manager
+        # For now, we'll just delete any tasks associated with the moved video.
+        if not within_team:
+            self.task_set.update(deleted=True)
+            if self.project == __old_project:
+                self.project = self.team.default_project
+
+
+        self.video.cache.invalidate()
+        self.video.clear_team_video_cache()
+        Team.cache.invalidate_by_pk(self.team_id)
 
         assert self.project.team == self.team, \
                     "%s: Team (%s) is not equal to project's (%s) team (%s)"\
                          % (self, self.team, self.project, self.project.team)
-
-        if not self.pk:
-            self.created = datetime.datetime.now()
-        self.video.cache.invalidate()
-        self.video.clear_team_video_cache()
-        Team.cache.invalidate_by_pk(self.team_id)
         super(TeamVideo, self).save(*args, **kwargs)
+        if within_team:
+            if __old_project is not None and self.project != __old_project:
+                video_moved_from_project_to_project.send(sender=self,
+                                                         new_project=self.project,
+                                                         old_project=__old_project,
+                                                         video=self.video)
+        elif __old_team is not None:
+            # We need to make any as-yet-unmoderated versions public.
+            # TODO: Dedupe this and the team video delete signal.
+            video = self.video
+
+            video.newsubtitleversion_set.extant().update(visibility='public')
+            video.is_public = self.team.is_visible
+            video.moderated_by = self.team if self.team.moderates_videos() else None
+            video.save()
+
+            TeamVideoMigration.objects.create(from_team=__old_team,
+                                              to_team=self.team,
+                                              to_project=self.project)
+
+            # Create any necessary tasks.
+            autocreate_tasks(self)
+
+            # fire a http notification that a new video has hit this team:
+            api_teamvideo_new.send(self)
+            video_moved_from_team_to_team.send(sender=self,
+                                               user=user,
+                                               destination_team=self.team,
+                                               old_team=__old_team,
+                                               video=self.video)
 
     def is_checked_out(self, ignore_user=None):
         '''Return whether this video is checked out in a task.
@@ -1095,60 +1153,17 @@ class TeamVideo(models.Model):
         self.delete()
         video_removed_from_team.send(sender=video, team=team, user=user)
 
-    def move_to(self, new_team, project=None):
+    def move_to(self, new_team, project=None, user=None):
         """
         Moves this TeamVideo to a new team.
         This method expects you to have run the correct permissions checks.
         """
-        old_team = self.team
-        if old_team == new_team and project == self.project:
-            return
-        within_team = (old_team == new_team)
-        # these imports are here to avoid circular imports, hacky
-        from teams.signals import api_teamvideo_new
-        from teams.signals import video_moved_from_team_to_team
-        from videos import metadata_manager
-        # For now, we'll just delete any tasks associated with the moved video.
-        if not within_team:
-            self.task_set.update(deleted=True)
-
-            # We move the video by just switching the team, instead of deleting and
-            # recreating it.
+        if self.team != new_team or (project is not None and project != self.project):
             self.team = new_team
-
-        # projects are always team dependent:
-        if project:
-            self.project = project
-        else:
-            self.project = new_team.default_project
-
-        self.save()
-
-        if not within_team:
-            # We need to make any as-yet-unmoderated versions public.
-            # TODO: Dedupe this and the team video delete signal.
-            video = self.video
-
-            video.newsubtitleversion_set.extant().update(visibility='public')
-            video.is_public = new_team.is_visible
-            video.moderated_by = new_team if new_team.moderates_videos() else None
-            video.save()
-
-            TeamVideoMigration.objects.create(from_team=old_team,
-                                              to_team=new_team,
-                                              to_project=self.project)
-
-            # Create any necessary tasks.
-            autocreate_tasks(self)
-
-            # fire a http notification that a new video has hit this team:
-            api_teamvideo_new.send(self)
-            video_moved_from_team_to_team.send(sender=self,
-                                               destination_team=new_team,
-                                               old_team=old_team,
-                                               video=self.video)
-        # Update search data and other things
-        video_changed_tasks.delay(self.video_id)
+            if project is not None:
+                self.project = project
+            self.save(user=user)
+            video_changed_tasks.delay(self.video_id)
 
     def get_task_for_editor(self, language_code):
         if not hasattr(self, '_editor_task'):

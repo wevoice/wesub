@@ -19,13 +19,19 @@
 from django.contrib import admin
 
 from activity.models import ActivityRecord
+from django.contrib.auth.models import AnonymousUser
 
 class ActivityRecordAdmin(admin.ModelAdmin):
     list_display = ('type', 'user', 'team', 'video', 'language_code',
                     'message',)
 
+    def render_change_form(self, request, context, *args, **kwargs):
+        # For convenience, displaying video id beside the default widget
+        context['adminform'].form.fields['video'].help_text = "Video id {}".format(context['original'].video.id)
+        return super(ActivityRecordAdmin, self).render_change_form(request, context, args, kwargs)
+
     def message(self, record):
-        return record.get_message()
+        return record.get_message(AnonymousUser())
 
     class Meta:
         model = ActivityRecord

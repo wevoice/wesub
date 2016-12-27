@@ -78,7 +78,7 @@ Get info on a specific video
 
     :>json string code: Language code
     :>json string name: Human readable label for the language
-    :>json boolean visibile: Are the subtitles publicly viewable?
+    :>json boolean published: Are the subtitles publicly viewable?
     :>json string dir: Language direction ("ltr" or "rtl")
     :>json url subtitles_uri: Subtitles Resource
     :>json url resource_uri: Subtitles Language Resource
@@ -500,10 +500,11 @@ class VideoSerializer(serializers.Serializer):
             if project is None:
                 project = team.default_project
             if team_video:
-                team_video.move_to(team, project)
+                team_video.move_to(team, project, self.context['user'])
             else:
                 TeamVideo.objects.create(video=video, team=team,
-                                         project=project)
+                                         project=project,
+                                         added_by=self.context['user'])
                 video.is_public = team.is_visible
 
         video.clear_team_video_cache()

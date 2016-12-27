@@ -43,6 +43,12 @@ def on_team_video_move(sender, destination_team, old_team, **kwargs):
     call_event_handler(destination_team, 'on_video_added', video, old_team)
     call_event_handler(old_team, 'on_video_removed', video, destination_team)
 
+@receiver(teams.signals.video_moved_from_project_to_project)
+def on_team_video_moved_project(sender, old_project, new_project, **kwargs):
+    video = sender.video
+    team = new_project.team
+    call_event_handler(team, 'on_video_moved_project', video, old_project, new_project)
+
 @receiver(subtitles.signals.subtitles_added)
 def on_subtitles_added(sender, version, **kwargs):
     subtitle_language = sender
