@@ -48,4 +48,5 @@ def render_js_language_script():
             for code, en_label in translation.SUPPORTED_LANGUAGE_CHOICES
         ],
         'popular_languages': translation.POPULAR_LANGUAGES,
+        'locale_choices': translation.get_locale_choices(),
     }).encode('utf-8')
