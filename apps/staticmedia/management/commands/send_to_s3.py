@@ -37,6 +37,7 @@ from staticmedia import oldembedder
 from staticmedia import utils
 from staticmedia.jsi18ncompat import (get_javascript_catalog,
                                       render_javascript_catalog)
+from staticmedia.jslanguagedata import render_js_language_script
 
 class Command(BaseCommand):
     help = """Upload static media to S3 """
@@ -60,6 +61,7 @@ class Command(BaseCommand):
         self.upload_static_dir('flowplayer')
         self.upload_app_static_media()
         self.upload_js_catalogs()
+        self.upload_js_language_data()
         self.upload_old_embedder()
 
     def setup_s3_subdir(self):
@@ -150,6 +152,14 @@ class Command(BaseCommand):
             catalog, plural = get_javascript_catalog(locale, 'djangojs', [])
             response = render_javascript_catalog(catalog, plural)
             self.upload_string(filename, response.content, headers)
+
+    def upload_js_language_data(self):
+        headers = self.cache_forever_headers()
+        headers['Content-Type'] = 'application/javascript'
+        for locale in self.all_locales():
+            activate(locale)
+            filename = "jslanguagedata/{}.js".format(locale)
+            self.upload_string(filename, render_js_language_script(), headers)
 
     def all_locales(self):
         locale_dir = os.path.join(settings.PROJECT_ROOT, 'locale')

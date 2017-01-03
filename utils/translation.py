@@ -122,17 +122,18 @@ def calc_language_choices(language_code):
     """Do the work for get_language_choices() """
     languages = []
     translation_locale = lookup_babel_locale(language_code)
-    def label(code):
-        english_name = _supported_languages_map[code]
-        translated_name = _(english_name)
-        return u'{} [{}]'.format(translated_name, code)
     languages.append((_('Popular'), [
-        (code, label(code)) for code in POPULAR_LANGUAGES
+        (code, choice_label(code)) for code in POPULAR_LANGUAGES
     ]))
     languages.append((_('All'), [
-        (code, label(code)) for code in sorted(SUPPORTED_LANGUAGE_CODES)
+        (code, choice_label(code)) for code in sorted(SUPPORTED_LANGUAGE_CODES)
     ]))
     return languages
+
+def choice_label(code):
+    english_name = _supported_languages_map[code]
+    translated_name = _(english_name)
+    return u'{} [{}]'.format(translated_name, code)
 
 def choice_sort_key(item):
     return collator.sort_key(item[1])
