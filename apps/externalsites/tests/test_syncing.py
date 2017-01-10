@@ -977,7 +977,7 @@ class YouTubeLanguageMappingTest(TestCase):
 
     def test_no_languages_on_youtube(self):
         # The simplest case is no languages on youtube
-        self.check_update_subtitles_choice('zh-cn', 'zh-hans')
+        self.check_update_subtitles_choice('zh-cn', 'zh-Hans')
         self.check_delete_subtitles_choice('zh-cn', None)
 
     def test_mapped_language_on_youtube(self):
