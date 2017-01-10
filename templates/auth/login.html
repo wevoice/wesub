@@ -1,11 +1,17 @@
 {% extends "hands_base.html" %}
 
-{% load i18n teams_tags %}
+{% load i18n teams_tags media_bundle %}
 {% load url from future %}
 
 {% block html_attrs %}id="login"{% endblock %}
-
 {% block main_content %}
+
+<script>
+  document.facebook_app_public_id = "{{ app_id }}";
+  document.facebook_login_confirm = "{{ facebook_login_confirm }}";
+</script>
+
+{% media_bundle "login.js" %}
 
 <div id="login-bg" class="top-banner">
   <div class="container">
@@ -17,9 +23,11 @@
             <h5>{% trans "Use an existing identity" %}</h5>
             <ul class="providers">
                 <li><a class="provider" id="google" href="{% url "externalsites:google-login-confirm" %}?next={{ next }}">google</a></li>
-                <li><a class="provider" id="facebook" href="{% url "thirdpartyaccounts:facebook_login_confirm" %}?next={{ next }}">facebook</a></li>
                 <li><a class="provider" id="twitter" href="{% url "thirdpartyaccounts:twitter_login_confirm" %}?next={{ next }}"> twitter</a></li>
                 <li><a class="provider" id="open-id" href="{% url "socialauth_openid_login_confirm" %}?next={{ next }}">openid</a></li>
+            </ul>
+            <ul class="providers">
+              <li><fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button></li>
             </ul>
             <ul class="providers additional">
                 <li><a class="provider" id="ted" href="{{ ted_auth.url_confirm }}">ted</a></li>
@@ -51,7 +59,7 @@
                 <li>
                   <button type="submit" value="create account"  class="green_button big">{% trans 'Create Account' %}</button>
                 </li>
-              <ul>
+              </ul>
               <input type="hidden" name="next" value="{{ next }}" />
           </form>
         </div>
