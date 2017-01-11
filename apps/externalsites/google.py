@@ -160,7 +160,7 @@ def handle_callback(request, redirect_uri):
     return OAuthCallbackData(
         response_data.get('refresh_token'),
         response_data['access_token'],
-        token_data['openid_id'],
+        "",
         token_data['sub'],
         state,
     )
