@@ -173,8 +173,8 @@ API Changes / Versioning
 
 Sometimes we need to make backwards incompatible changes to the API.  Here's our system for allowing our partners and other API consumers to deal with them:
 
-* All changes are announced on the `Amara Development Blog <https://about.amara.org/category/development-blog/>`_ and the `API Changes mailing list <https://groups.google.com/forum/#!forum/amara-api-changes>`_.
-* When we make a change, we give clients at least a month of transition time to update their code to work with the new sytem.
+* All changes are announced on the `Amara Development Blog <https://about.amara.org/category/development-blog/>`_ and the `API Changes mailing list <https://groups.google.com/a/amara.org/d/forum/api-users>`_.
+* When we make a change, we give clients at least three months of transition time to update their code to work with the new system.
 * During the transition time, we return an HTTP header to indicate that the API will be changing.  The name is ``X-API-DEPRECATED`` and the value is the date the API will change in ``YYYYMMDD`` format.
 * Clients can start using the new API during the transition time by sending the ``X-API-FUTURE`` header.  The value should be the date of the API that you want to use, also in ``YYYYMMDD`` format.  If the ``X-API-FUTURE`` date is >= the switchover date then the new API code will be used.
 * You can use ``X-API-FUTURE`` to test changes to your API client code and to deploy new code that works with the updated API.  Using this method you can ensure your integration works seamlessly through the API change.
