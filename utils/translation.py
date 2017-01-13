@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import copy
 import json
+import os
 import time
 
 from django.conf import settings
@@ -14,6 +15,8 @@ import babel
 import pyuca
 
 from unilangs import get_language_name_mapping, LanguageCode
+
+from utils.memoize import memoize
 
 collator = pyuca.Collator()
 
@@ -122,17 +125,18 @@ def calc_language_choices(language_code):
     """Do the work for get_language_choices() """
     languages = []
     translation_locale = lookup_babel_locale(language_code)
-    def label(code):
-        english_name = _supported_languages_map[code]
-        translated_name = _(english_name)
-        return u'{} [{}]'.format(translated_name, code)
     languages.append((_('Popular'), [
-        (code, label(code)) for code in POPULAR_LANGUAGES
+        (code, choice_label(code)) for code in POPULAR_LANGUAGES
     ]))
     languages.append((_('All'), [
-        (code, label(code)) for code in sorted(SUPPORTED_LANGUAGE_CODES)
+        (code, choice_label(code)) for code in sorted(SUPPORTED_LANGUAGE_CODES)
     ]))
     return languages
+
+def choice_label(code):
+    english_name = _supported_languages_map[code]
+    translated_name = _(english_name)
+    return u'{} [{}]'.format(translated_name, code)
 
 def choice_sort_key(item):
     return collator.sort_key(item[1])
@@ -229,6 +233,32 @@ def languages_with_labels(langs):
 
     """
     return dict([code, get_language_label(code)] for code in langs)
+
+BLACKLISTED_LOCALE_CHOICES = set([
+    # these two seem to overlap and there's not much text in either.  Let's
+    # disable for now
+    'my',
+    'my_MM',
+])
+
+@memoize
+def get_locale_choices():
+    """Get a list of language code, label options for locales
+
+    This is the list of languages that we can translate our interface into (at
+    least partially)
+    """
+    localedir = os.path.join(settings.PROJECT_ROOT, 'locale')
+    choices = set()
+    for name in os.listdir(localedir):
+        if not os.path.isdir(os.path.join(localedir, name)):
+            continue
+        if name in BLACKLISTED_LOCALE_CHOICES:
+            continue
+        name = name.split('.', 1)[0]
+        name = name.replace('_', '-').lower()
+        choices.add(name)
+    return list(choices)
 
 # This handles RTL info for languages where get_language_info() is not correct
 _RTL_OVERRIDE_MAP = {

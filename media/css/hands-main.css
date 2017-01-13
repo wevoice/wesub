@@ -705,6 +705,11 @@ a #footer-pcf h6:hover {
 	font-weight: 300;
 }
 
+#footer-nav .languageSwitcher {
+	margin-top: 10px;
+	margin-left: 55px;
+}
+
 /*HELP BUTTON*/
 
 .help-tab {

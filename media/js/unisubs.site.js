@@ -457,6 +457,40 @@ var Site = function(Site) {
                     window.location = $(this).children('option:selected').attr('value');
                 });
             }
+            $('select.languageSwitcher').each(function(i, select) {
+                select = $(select);
+                var alreadyAdded = {};
+                var popularLanguageGroup = $('<optgroup/>', {
+                    label: popularLanguagesLabel
+                });
+                var allLanguageGroup = $('<optgroup/>', {
+                    label: allLanguagesLabel
+                });
+                function makeOption(optgroup, lc) {
+                    if(!localeChoices[lc] || alreadyAdded[lc]) return;
+                    var option = new Option(getLanguageName(lc), lc);
+                    if(lc == LANGUAGE_CODE) {
+                        option.selected = true;
+                    }
+                    optgroup.append(option);
+                    alreadyAdded[lc] = 1;
+                }
+                $.each(popularLanguages, function(i, lc) {
+                    makeOption(popularLanguageGroup, lc);
+                });
+                $.each(allLanguages, function(i, lc) {
+                    makeOption(allLanguageGroup, lc);
+                });
+                select.append(popularLanguageGroup);
+                select.append(allLanguageGroup);
+
+                select.change(function(evt) {
+                    var newUrl = window.location.pathname.replace(new RegExp("^/[^/]*"), "/" + select.val());
+                    console.log(newUrl);
+                    window.location = newUrl;
+                    return false;
+                });
+            });
             $('.notes textarea').keypress(function(evt) {
                 if(evt.which == 13 && !evt.shiftKey) {
                     evt.preventDefault();

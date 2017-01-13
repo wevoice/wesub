@@ -35,6 +35,7 @@
 
   <link rel="shortcut icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
   <link rel="icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
+  {% js_language_data %}
 
   <!--[if IE]>
       <style type="text/css"> .group { display: block; zoom: 1; } </style>
@@ -63,6 +64,7 @@
   {% endblock %}
   <script type="text/javascript">
     window.STATIC_URL = '{{ STATIC_URL }}';
+    window.LANGUAGE_CODE = '{{ LANGUAGE_CODE }}';
     {% block oldmodal %}
       window.OLD_MODAL = true;
     {% endblock %}
