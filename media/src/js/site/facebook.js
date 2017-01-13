@@ -16,6 +16,9 @@ window.fbAsyncInit = function() {
     if (document.getElementById("submit-proceed-to-create") != null) {
 	document.getElementById("submit-proceed-to-create").disabled = true;
     }
+    if (document.getElementById("facebook") != null) {
+	document.getElementById("facebook").onclick = doLogin;
+    }
     FB.init({
 	appId      : document.facebook_app_public_id,
 	cookie     : true,  // enable cookies to allow the server to access
@@ -37,13 +40,12 @@ window.fbAsyncInit = function() {
     fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
 
-function checkLoginState() {
-  FB.getLoginStatus(function(response) {
-      if (response.status === 'connected') {
-	  console.log(response.authResponse);
+function doLogin() {
+    FB.login(function(response) {
+	  if (response.status === 'connected') {
 	  FB.api('/me?fields=first_name,last_name,email,picture', function(response) {
 	      window.location = document.facebook_login_confirm + response.email + "/";
 	  });
       }
-  });
-}
+    }, {scope: 'public_profile,email'});
+};

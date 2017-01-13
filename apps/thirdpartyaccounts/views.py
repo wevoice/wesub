@@ -178,7 +178,6 @@ def facebook_login(request, next=None, confirmed=False, email=None, form_data=No
         account = FacebookAccount.objects.get(uid=data['user_id'])
         user = account.user
         if user.is_active:
-            #user.backend = 'thirdpartyaccounts.auth_backends.FacebookAuthBackend'
             user = authenticate(facebook=True, user=user)
             auth_login(request, user)
             return redirect(next)
@@ -189,7 +188,7 @@ def facebook_login(request, next=None, confirmed=False, email=None, form_data=No
                'first_name' in form_data and \
                'last_name' in form_data and \
                len(form_data['first_name'] + form_data['last_name']) > 0:
-                username = form_data['first_name'] + "." + form_data['last_name'] + ".fb_user"
+                username = form_data['first_name']
                 taken_names = map(lambda x: x.username.lower(), set(User.objects.filter(username__istartswith=username)))
                 if username.lower() in taken_names:
                     index = 1
@@ -219,4 +218,4 @@ def facebook_login(request, next=None, confirmed=False, email=None, form_data=No
                 return redirect('/')
         else:
             return redirect('auth:confirm_create_user', 'facebook', email)
-        return redirect('/')
+    return redirect('auth:login')

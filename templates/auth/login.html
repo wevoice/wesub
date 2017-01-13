@@ -22,12 +22,10 @@
             <h2>{% trans "Sign In" %}</h2>
             <h5>{% trans "Use an existing identity" %}</h5>
             <ul class="providers">
-                <li><a class="provider" id="google" href="{% url "externalsites:google-login-confirm" %}?next={{ next }}">google</a></li>
-                <li><a class="provider" id="twitter" href="{% url "thirdpartyaccounts:twitter_login_confirm" %}?next={{ next }}"> twitter</a></li>
-                <li><a class="provider" id="open-id" href="{% url "socialauth_openid_login_confirm" %}?next={{ next }}">openid</a></li>
-            </ul>
-            <ul class="providers">
-              <li><fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button></li>
+              <li><a class="provider" id="google" href="{% url "externalsites:google-login-confirm" %}?next={{ next }}">google</a></li>
+	      <li><button class="provider" id="facebook">facebook</button></li>
+              <li><a class="provider" id="twitter" href="{% url "thirdpartyaccounts:twitter_login_confirm" %}?next={{ next }}"> twitter</a></li>
+              <li><a class="provider" id="open-id" href="{% url "socialauth_openid_login_confirm" %}?next={{ next }}">openid</a></li>
             </ul>
             <ul class="providers additional">
                 <li><a class="provider" id="ted" href="{{ ted_auth.url_confirm }}">ted</a></li>
