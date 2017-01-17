@@ -103,7 +103,6 @@ def sync_metadata(video_id, access_token, subtitle_version,
                   enable_language_mapping):
     video = subtitle_version.video
     team_video = video.get_team_video()
-    language_code = language_code
     if not (team_video and team_video.team.sync_metadata and
             subtitle_version.title and video.primary_audio_language_code):
         return
