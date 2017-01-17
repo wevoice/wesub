@@ -188,25 +188,24 @@ def facebook_login(request, next=None, confirmed=False, email=None, form_data=No
                'first_name' in form_data and \
                'last_name' in form_data and \
                len(form_data['first_name'] + form_data['last_name']) > 0:
-                username = form_data['first_name']
-                taken_names = map(lambda x: x.username.lower(), set(User.objects.filter(username__istartswith=username)))
-                if username.lower() in taken_names:
-                    index = 1
-                    username_to_try = '%s%d' % (username, index)
-                    while username_to_try.lower() in taken_names:
-                        index +=1
-                        username_to_try = '%s%d' % (username, index)
-                        username = username_to_try
+                user_created = False
                 first_name = form_data['first_name']
                 last_name = form_data['last_name']
                 facebook_uid = data['user_id']
                 img_url = form_data['avatar']
                 email = email
-                user = User(username=username, email=email, first_name=first_name,
-                            last_name=last_name)
+                username_to_try = username_base = form_data['first_name']
+                index = 1
                 temp_password = User.objects.make_random_password(length=24)
-                user.set_password(temp_password)
-                user.save()
+                while not user_created:
+                    try:
+                        user = User(username=username_to_try, email=email, first_name=first_name,
+                                    last_name=last_name)
+                        user.set_password(temp_password)
+                        user.save()
+                        user_created = True
+                    except:
+                        username_to_try = '%s%d' % (username_base, index)
                 if img_url:
                     img = ContentFile(requests.get(img_url).content)
                     name = img_url.split('/')[-1]
