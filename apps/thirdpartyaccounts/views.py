@@ -181,6 +181,9 @@ def facebook_login(request, next=None, confirmed=False, email=None, form_data=No
             user = authenticate(facebook=True, user=user)
             auth_login(request, user)
             return redirect(next)
+        else:
+            account.delete()
+            raise FacebookAccount.DoesNotExist
     except FacebookAccount.DoesNotExist:
         if confirmed:
             if form_data is not None and \
@@ -206,6 +209,7 @@ def facebook_login(request, next=None, confirmed=False, email=None, form_data=No
                         user_created = True
                     except:
                         username_to_try = '%s%d' % (username_base, index)
+                        index += 1
                 if img_url:
                     img = ContentFile(requests.get(img_url).content)
                     name = img_url.split('/')[-1]
