@@ -277,21 +277,21 @@ var angular = angular || null;
         $scope.onEditKeydown = function(evt) {
             var subtitle = $scope.currentEdit.draft.storedSubtitle;
 
-            var isAltPressed = function(evt) {
-                return (evt.altKey || evt.metaKey);
-            };
+	    var isAltPressed = function(evt) {
+		return (evt.altKey || evt.metaKey);
+	    };
 
             if (evt.keyCode === 13 && !evt.shiftKey) {
                 // Enter without shift finishes editing
+                var nextSubtitle = subtitleList.nextSubtitle(subtitle);
                 finishEdit(true);
-                if(!$scope.timelineShown) {
-                    var nextSubtitle = subtitleList.nextSubtitle(subtitle);
-                    if(nextSubtitle === null) {
+                if(nextSubtitle === null) {
+                    if(!$scope.timelineShown) {
                         insertAndStartEdit(null);
-                    } else {
-                        $scope.currentEdit.start(nextSubtitle);
-                        $scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
                     }
+                } else {
+                    $scope.currentEdit.start(nextSubtitle);
+                    $scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
                 }
                 evt.preventDefault();
                 evt.stopPropagation();
@@ -308,11 +308,7 @@ var angular = angular || null;
         
         $scope.bottomState = function() {
             if($scope.currentEdit.inProgress()) {
-                if($scope.timelineShown) {
-                    return 'edit-help-timeline-shown'
-                } else {
-                    return 'edit-help'
-                }
+                return 'edit-help'
             } else if($scope.timelineShown) {
                 return 'add-button'
             } else {

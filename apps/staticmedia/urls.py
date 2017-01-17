@@ -33,7 +33,10 @@ else:
         'staticmedia.views',
         url(r'^css/(?P<bundle_name>[\w\.-]+)$', 'css_bundle', name='css_bundle'),
         url(r'^js/(?P<bundle_name>[\w\.-]+)$', 'js_bundle', name='js_bundle'),
-        url(r'^js_i18n_catalog.js$', 'js_i18n_catalog', name='js_i18n_catalog'),
+        url(r'^jsi18catalog/(?P<locale>[\w-]+)\.js$', 'js_i18n_catalog',
+            name='js_i18n_catalog'),
+        url(r'^jslanguagedata/(?P<locale>[\w-]+)\.js$',
+            'js_language_data', name='js_language_data'),
         # embed.js is a weird file, but we want to continue support for a
         # while
         url(r'^embed.js$', 'old_embedder_js', name='old_embedder_js'),
