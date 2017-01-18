@@ -17,35 +17,17 @@ def get_repo_names():
     return [f for f in os.listdir(optional_dir())
             if not f.startswith(".")]
 
-def get_topic_branch_name(repo_name):
-    """Get the name of a topic branch
-
-    This function checks if there's a branch with the same name on the
-    other repository as the one on the unisubs repository.  If so, we assume
-    that we're in topic branch mode and return "origin/[branch]".  If not,
-    then we return None
-    """
-    os.chdir(root_dir)
-    branch = get_branch_name()
-    if branch is None:
-        return None
-    else:
-        branch = "origin/" + branch
-    os.chdir(repo_dir(repo_name))
-    if branch_exists(branch):
-        return branch
-    else:
-        return None
-
 def get_branch_name():
     cmd = ["git", "rev-parse", "--abbrev-ref", "HEAD"]
     branch = subprocess.check_output(cmd).strip()
     return branch if branch != "HEAD" else None
 
-def branch_exists(branch_name):
-    cmd = ["git", "branch", "-r", "--list", branch_name]
+def branch_exists(repo_name, branch_name):
+    os.chdir(repo_dir(repo_name))
+    print branch_name
+    cmd = ["git", "branch", "-a", "--list", branch_name]
     output = subprocess.check_output(cmd).strip()
-    return output.strip() == branch_name
+    return output.strip() != ''
 
 def get_repo_commit(repo_name):
     path = os.path.join(optional_dir(), repo_name)
@@ -73,10 +55,9 @@ def run_git_fetch(repo_name, skip_fetch):
         print "{0}: skipping fetch".format(repo_name)
 
 def reset_to_commit(repo_name, topic_branch):
-    ref = None
-    if topic_branch:
-        ref = get_topic_branch_name(repo_name)
-    if ref is None:
+    if topic_branch and branch_exists(repo_name, "origin/" + topic_branch):
+        ref = "origin/" + topic_branch
+    else:
         ref = get_repo_commit(repo_name)
     print "{0} reset to {1}".format(repo_name, ref)
     run_command("git", "reset", "--hard", ref)
@@ -88,10 +69,10 @@ def make_option_parser():
     parser.add_option("--clone-missing", dest="clone_missing",
                       action='store_true', help="clone missing repositories")
     parser.add_option("--topic-branch", dest="topic_branch",
-                      action='store_true',
-                      help="Use topic branch logic (use the HEAD of the "
-                      "branch with the same name as unisubs branch if it "
-                      "exists)")
+                      help="Try to checkout the latest commit for this "
+                      "branch instead of using the commit ID in the repo "
+                      "file.  If the branch doesn't exist then we fallback "
+                      "to the normal logic")
     return parser
 
 def main(argv):
