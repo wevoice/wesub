@@ -578,3 +578,8 @@ text-decoration: underline;
   padding-left: 55px;
   font-weight: 300;
 }
+
+#footer-nav .languageSwitcher {
+  margin-top: 10px;
+  margin-left: 55px;
+}
