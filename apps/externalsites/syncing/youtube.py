@@ -79,7 +79,7 @@ def find_existing_caption_id(access_token, video_id, language_code,
 def update_subtitles(video_id, access_token, subtitle_version,
                      enable_language_mapping):
     """Push the subtitles for a language to YouTube """
-
+    logger.error("update_subtitles")
     language_code = subtitle_version.language_code
 
     subs = subtitle_version.get_subtitles()
@@ -96,20 +96,31 @@ def update_subtitles(video_id, access_token, subtitle_version,
         language_code = convert_language_code(language_code, enable_language_mapping)
         google.captions_insert(access_token, video_id, language_code,
                                'text/vtt', content)
+    logger.error("About to sync metadata")
     sync_metadata(video_id, access_token, subtitle_version,
                   enable_language_mapping)
 
 def sync_metadata(video_id, access_token, subtitle_version,
                   enable_language_mapping):
+    logger.error("Sync metadata {}".format(enable_language_mapping))
     video = subtitle_version.video
     team_video = video.get_team_video()
     if not (team_video and team_video.team.sync_metadata and
             subtitle_version.title and video.primary_audio_language_code):
+        logger.error(team_video)
+        logger.error(team_video.team.sync_metadata)
+        logger.error(subtitle_version.id)
+        logger.error(subtitle_version.title)
+        logger.error(video.primary_audio_language_code)
+        logger.error(team_video and team_video.team.sync_metadata and
+                     subtitle_version.title and video.primary_audio_language_code)
+        logger.error("Not updating")
         return
     primary_audio_language_code = convert_language_code(
         video.primary_audio_language_code, enable_language_mapping)
     language_code = convert_language_code(subtitle_version.language_code, \
                                           enable_language_mapping)
+    logger.error("About to update for {} - {}".format(primary_audio_language_code, language_code))
     google.update_video_metadata(video_id,
                                  access_token,
                                  primary_audio_language_code,
