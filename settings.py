@@ -21,8 +21,7 @@
 import os, sys
 from datetime import datetime
 
-from django.conf import global_settings
-from unilangs import get_language_code_mapping
+from unilangs import get_language_name_mapping
 
 import optionalapps
 
@@ -40,18 +39,29 @@ def env_flag_set(name):
     value = os.environ.get(name)
     return bool(value and value != '0')
 
+def calc_locale_choices():
+    """Get a list of language (code, label) tuples for each supported locale
+
+    This is the list of languages that we can translate our interface into (at
+    least partially)
+    """
+    localedir = os.path.join(PROJECT_ROOT, 'locale')
+    codes = set()
+    for name in os.listdir(localedir):
+        if not os.path.isdir(os.path.join(localedir, name)):
+            continue
+        name = name.split('.', 1)[0]
+        name = name.replace('_', '-').lower()
+        codes.add(name)
+    mapping = get_language_name_mapping('gettext')
+    return [
+        (lc, mapping[lc]) for lc in sorted(codes)
+        if lc in mapping
+    ]
+
 # Rebuild the language dicts to support more languages.
-
-# We use a custom format for our language labels:
-# Translated Language Name (Native Name)
-#
-# For example: if you are an English user you'll see something like:
-# French (Français)
-language_choices = [(code,
-                     u'%s' % lc.name())
-                    for code, lc in get_language_code_mapping('unisubs').items()]
-
-global_settings.LANGUAGES = ALL_LANGUAGES = language_choices
+# ALL_LANGUAGES is a deprecated name for LANGUAGES.
+ALL_LANGUAGES = LANGUAGES = calc_locale_choices()
 
 # Languages representing metadata
 METADATA_LANGUAGES = (

@@ -37,6 +37,7 @@ the script to be stored in the browser cache.
 """
 from __future__ import absolute_import
 
+from django.conf import settings
 from django.template.loader import render_to_string
 
 from utils import translation
@@ -48,5 +49,5 @@ def render_js_language_script():
             for code, en_label in translation.SUPPORTED_LANGUAGE_CHOICES
         ],
         'popular_languages': translation.POPULAR_LANGUAGES,
-        'locale_choices': translation.get_locale_choices(),
+        'locale_choices': [code for (code, label) in settings.LANGUAGES],
     }).encode('utf-8')
