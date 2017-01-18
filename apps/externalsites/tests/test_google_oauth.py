@@ -89,7 +89,6 @@ class TestRequestTokenURL(TestCase):
 class OauthTokenMocker(RequestsMocker):
     redirect_uri = 'http://example.com/my-callback'
     access_token = 'test-access_token'
-    openid_id = 'test-openid-id'
     sub = '12345'
 
     def expect_token_request(self, response_data=None, status_code=200,
@@ -98,7 +97,6 @@ class OauthTokenMocker(RequestsMocker):
             response_data = {
                 'access_token': self.access_token,
                 'id_token': jwt.encode({
-                    'openid_id': self.openid_id,
                     'sub': self.sub,
                 }, 'test-secret'),
             }
@@ -138,7 +136,7 @@ class OAuthCallbackTest(TestCase):
                 mocker.redirect_uri)
         self.assertEqual(auth_info.access_token, mocker.access_token)
         self.assertEqual(auth_info.refresh_token, None)
-        self.assertEqual(auth_info.openid_id, mocker.openid_id)
+        self.assertEqual(auth_info.openid_id, '')
         self.assertEqual(auth_info.sub, mocker.sub)
         self.assertEqual(auth_info.state, self.test_state)
 
