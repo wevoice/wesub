@@ -737,20 +737,3 @@ class VideoURLViewSet(viewsets.ModelViewSet):
             'user': self.request.user,
             'request': self.request,
         }
-
-# code to make the depracated API work
-class OldVideoLanguageShortSerializer(VideoLanguageShortSerializer):
-    def get_fields(self):
-        fields = super(OldVideoLanguageShortSerializer, self).get_fields()
-        fields['visible'] = fields.pop('published')
-        return fields
-
-class OldVideoSerializer(VideoSerializer):
-    languages = OldVideoLanguageShortSerializer(source='all_subtitle_languages',
-                                                many=True, read_only=True)
-
-class VideoViewSetSwitcher(APISwitcherMixin, VideoViewSet):
-    switchover_date = 20161201
-
-    class Deprecated(VideoViewSet):
-        serializer_class = OldVideoSerializer
