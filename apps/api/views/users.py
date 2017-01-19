@@ -169,8 +169,7 @@ class UserSerializer(serializers.ModelSerializer):
     languages = serializers.ListField(
         child=serializers.CharField(),
         source='get_languages', read_only=True)
-    activity_uri = serializers.HyperlinkedIdentityField(
-        view_name='api:user-activity', lookup_field='username')
+    activity_uri = serializers.SerializerMethodField()
     resource_uri = serializers.SerializerMethodField()
     created_by = serializers.CharField(source='created_by.username',
                                        read_only=True)
@@ -203,6 +202,12 @@ class UserSerializer(serializers.ModelSerializer):
                 "auth:token-login", args=(self.login_token.token,),
                 request=self.context['request'])
         return data
+
+
+    def get_activity_uri(self, user):
+        return reverse('api:user-activity', kwargs={
+            'identifier': 'id$' + user.secure_id(),
+        }, request=self.context['request'])
 
     def get_resource_uri(self, user):
         return reverse('api:users-detail', kwargs={

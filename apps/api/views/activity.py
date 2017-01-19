@@ -212,6 +212,7 @@ import dateutil.parser
 import pytz
 
 from activity.models import ActivityRecord
+from api import userlookup
 from api.fields import TimezoneAwareDateTimeField, UserField
 from api.views.apiswitcher import APISwitcherMixin
 from subtitles.models import SubtitleLanguage
@@ -343,7 +344,10 @@ class UserActivityView(generics.ListAPIView):
                        'language', 'before', 'after']
 
     def get_queryset(self):
-        user = get_object_or_404(User, username=self.kwargs['username'])
+        try:
+            user = userlookup.lookup_user(self.kwargs['identifier'])
+        except User.DoesNotExist:
+            raise Http404()
         return ActivityRecord.objects.for_user(user)
 
 class LegacyActivitySerializer(serializers.ModelSerializer):
