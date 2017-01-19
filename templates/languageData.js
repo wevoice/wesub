@@ -4,8 +4,8 @@ var popularLanguages = [{% for code in popular_languages %}"{{ code }}"{% if not
 var languageNames = { {% for code, name in languages %}"{{ code }}": "{{ name }}"{% if not forloop.last %},{% endif %}{% endfor %} };
 var localeChoices = { {% for code in locale_choices %}"{{ code }}":1{% if not forloop.last %},{% endif %}{% endfor %} };
 
-var allLanguagesLabel = "{% trans 'All Languages' %}";
-var popularLanguagesLabel = "{% trans 'Popular Languages' %}";
+var allLanguagesLabel = {{ allLanguagesLabel|safe }};
+var popularLanguagesLabel = {{ popularLanguagesLabel|safe }};
 
 function getLanguageName(languageCode) {
     return languageNames[languageCode];

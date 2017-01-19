@@ -708,6 +708,7 @@ a #footer-pcf h6:hover {
 #footer-nav .languageSwitcher {
 	margin-top: 10px;
 	margin-left: 55px;
+        height: 2em;
 }
 
 /*HELP BUTTON*/

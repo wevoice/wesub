@@ -36,9 +36,11 @@ This eliminates the issue of having to duplicate the options and also allows
 the script to be stored in the browser cache.
 """
 from __future__ import absolute_import
+import json
 
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.utils.translation import ugettext
 
 from utils import translation
 
@@ -50,4 +52,6 @@ def render_js_language_script():
         ],
         'popular_languages': translation.POPULAR_LANGUAGES,
         'locale_choices': [code for (code, label) in settings.LANGUAGES],
+        'allLanguagesLabel': json.dumps(ugettext('All Languages')),
+        'popularLanguagesLabel': json.dumps(ugettext('Popular Languages')),
     }).encode('utf-8')
