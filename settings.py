@@ -654,6 +654,11 @@ MEDIA_BUNDLES = {
             "css/unisubs-widget.css",
         ),
     },
+    'login.js': {
+        'files': (
+            'src/js/site/facebook.js',
+        ),
+    },
 }
 
 # Where we should tell OAuth providers to redirect the user to.  We want to

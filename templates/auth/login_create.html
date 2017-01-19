@@ -1,11 +1,17 @@
 {% extends "hands_base.html" %}
 
-{% load i18n teams_tags %}
+{% load i18n teams_tags media_bundle %}
 {% load url from future %}
 
 {% block html_attrs %}id="login"{% endblock %}
 
 {% block main_content %}
+
+<script>
+  document.facebook_app_public_id = "{{ app_id }}";
+</script>
+
+{% media_bundle "login.js" %}
 
 <div id="login-bg" class="top-banner">
   <div class="container">
@@ -20,7 +26,10 @@
 	      <ul>
 		<li>{{ email_form.email }}</li>
 		<li>{{ email_form.url }}</li>
-		<li><button type="submit">Proceed</button></li>
+		<li>{{ email_form.first_name }}</li>
+		<li>{{ email_form.last_name }}</li>
+		<li>{{ email_form.avatar }}</li>
+		<li><button type="submit" id="submit-proceed-to-create">Proceed</button></li>
 	      </ul>
 	    </form>
 	    <h5>{% trans "IMPORTANT: Without a valid email, some Amara features will remain inaccessible and password retrieval will not be possible." %}</h5>

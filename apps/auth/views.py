@@ -18,7 +18,6 @@
 import base64
 from urllib2 import URLError
 
-import facebook.djangofb as facebook
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import (
@@ -56,6 +55,9 @@ from utils.translation import get_user_languages_from_cookie
 
 LOGIN_CACHE_TIMEOUT = 60
 
+import logging
+logger = logging.getLogger(__name__)
+
 def login(request):
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
     if cache_get(request):
@@ -72,7 +74,7 @@ def confirm_create_user(request, account_type, email):
         if form.is_valid():
             email = form.cleaned_data['email']
             if account_type == 'facebook':
-                return facebook_login(request, next=redirect_to, confirmed=True, email=email)
+                return facebook_login(request, next=redirect_to, confirmed=True, email=email, form_data=form.cleaned_data)
             if account_type == 'google':
                 return google_login(request, next=redirect_to, confirmed=True, email=email)
             if account_type == 'twitter':
@@ -284,12 +286,14 @@ def render_login(request, user_creation_form, login_form, redirect_to, email_for
     redirect_to = redirect_to or '/'
     context = {
         REDIRECT_FIELD_NAME: redirect_to,
+        'app_id': settings.FACEBOOK_APP_ID,
     }
     if confirm_type is None:
         context['creation_form'] = user_creation_form
         context['login_form'] = login_form
         context['ted_auth'] = get_authentication_provider('ted')
         context['stanford_auth'] = get_authentication_provider('stanford')
+        context['facebook_login_confirm'] = reverse('thirdpartyaccounts:facebook_login_confirm');
         template = 'auth/login.html'
     else:
         if email_form:

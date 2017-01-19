@@ -19,12 +19,9 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('thirdpartyaccounts.views',
-    url(r'^facebook_login/$', 'facebook_login', name='facebook_login'),
-    url(r'^facebook_login_confirm/$', 'facebook_login', {'confirmed': False}, name='facebook_login_confirm'),
-    url(r'^facebook_login_done/(?P<next>[^/]+)/(?P<email>[^/]+)/$', 'facebook_login_done', name='facebook_login_done'),
-    url(r'^facebook_login_done/(?P<next>[^/]+)/$', 'facebook_login_done', name='facebook_login_done_noemail'),
-    url(r'^facebook_login_done_confirm/(?P<next>[^/]+)/$', 'facebook_login_done', {'confirmed': False}, name='facebook_login_done_confirm'),
-
+    url(r'^facebook_login/(?P<email>[^/]+)/$', 'facebook_login', name='facebook_login'),
+    url(r'^facebook_login_confirm/(?P<email>[^/]+)/$', 'facebook_login', {'confirmed': False}, name='facebook_login_confirm_email'),
+    url(r'^facebook_login_confirm/$', 'facebook_login', {'confirmed': False, 'email': None}, name='facebook_login_confirm'),
     url(r'^twitter_login/$', 'twitter_login', name='twitter_login'),
     url(r'^twitter_login_done/$', 'twitter_login_done', name='twitter_login_done'),
     url(r'^twitter_login_confirm/$', 'twitter_login', {'confirmed': False}, name='twitter_login_confirm'),
