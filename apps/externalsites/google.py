@@ -216,7 +216,6 @@ def _make_api_request(method, access_token, url, **kwargs):
             authentication
         **kwargs: args to send to requests.request()
     """
-    logger.error("Entering _make_api_request")
     if access_token is not None:
         if 'headers' not in kwargs:
             kwargs['headers'] = {}
@@ -226,8 +225,6 @@ def _make_api_request(method, access_token, url, **kwargs):
             kwargs['params'] = {}
         kwargs['params']['key'] = settings.YOUTUBE_API_KEY
     response = requests.request(method, url, **kwargs)
-    logger.error("response")
-    logger.error(response)
     if method == 'delete':
         expected_status_code = 204
     else:
@@ -240,11 +237,7 @@ def _make_api_request(method, access_token, url, **kwargs):
             logger.error("%s parsing youtube response (%s): %s" % (
                 e, response.status_code, response.content))
             message = 'Unkown error'
-        logger.error("About to raise")
-        logger.error(message)
         raise APIError(message)
-    logger.error("About to response")
-    logger.error(response)
     return response
 
 def _make_youtube_api_request(method, access_token, url_path, **kwargs):
@@ -475,14 +468,12 @@ def update_video_metadata(video_id, access_token, primary_audio_language_code, l
     response = video_get(access_token, video_id, ['snippet','localizations'])
     item = response.json()['items'][0]
     snippet = item['snippet']
-    logger.error("In update_video_metadata")
     if 'defaultLanguage' not in snippet:
         snippet['defaultLanguage'] = primary_audio_language_code
         result = video_put(access_token, video_id, snippet=snippet)
         response = video_get(access_token, video_id, ['snippet','localizations'])
         item = response.json()['items'][0]
         snippet = item['snippet']
-    logger.error(item)
     if 'localizations' in item:
         localizations = response.json()['items'][0]['localizations']
         localizations[language_code] = {"title": title, "description": description}
