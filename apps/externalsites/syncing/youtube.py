@@ -50,8 +50,8 @@ def convert_language_code(lc, enable_language_mapping):
     Convert an Amara language code to a YouTube one
     """
     if enable_language_mapping:
-        return unilangs.LanguageCode(lc, 'unisubs').encode('youtube')
-    return unilangs.LanguageCode(lc, 'unisubs').encode('unisubs')
+        return unilangs.LanguageCode(lc, 'unisubs').encode('youtube_with_mapping')
+    return unilangs.LanguageCode(lc, 'unisubs').encode('youtube')
 
 def _format_subs_for_youtube(subtitle_set):
     return babelsubs.to(subtitle_set, 'vtt').encode('utf-8')
