@@ -201,6 +201,7 @@ from __future__ import absolute_import
 from datetime import datetime
 
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import filters
@@ -212,6 +213,7 @@ import dateutil.parser
 import pytz
 
 from activity.models import ActivityRecord
+from api import userlookup
 from api.fields import TimezoneAwareDateTimeField, UserField
 from api.views.apiswitcher import APISwitcherMixin
 from subtitles.models import SubtitleLanguage
@@ -343,7 +345,10 @@ class UserActivityView(generics.ListAPIView):
                        'language', 'before', 'after']
 
     def get_queryset(self):
-        user = get_object_or_404(User, username=self.kwargs['username'])
+        try:
+            user = userlookup.lookup_user(self.kwargs['identifier'])
+        except User.DoesNotExist:
+            raise Http404()
         return ActivityRecord.objects.for_user(user)
 
 class LegacyActivitySerializer(serializers.ModelSerializer):
@@ -449,40 +454,3 @@ class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(
                 created__gte=datetime.fromtimestamp(int(params['after'])))
         return queryset
-
-
-# Support for the old user data APIs
-
-class OldActivitySerializer(ActivitySerializer):
-    user = serializers.CharField(source='user.username')
-    user_uri = serializers.HyperlinkedRelatedField(
-        source='user',
-        view_name='api:users-detail',
-        lookup_field='username',
-        lookup_url_kwarg='identifier',
-        read_only=True)
-
-    class Meta:
-        model = ActivityRecord
-        fields = (
-            'type', 'date', 'user', 'video', 'language', 'user_uri',
-            'video_uri', 'language_uri',
-        )
-
-class VideoActivityViewSwitcher(APISwitcherMixin, VideoActivityView):
-    switchover_date = 20161201
-
-    class Deprecated(VideoActivityView):
-        serializer_class = OldActivitySerializer
-
-class TeamActivityViewSwitcher(APISwitcherMixin, TeamActivityView):
-    switchover_date = 20161201
-
-    class Deprecated(TeamActivityView):
-        serializer_class = OldActivitySerializer
-
-class UserActivityViewSwitcher(APISwitcherMixin, UserActivityView):
-    switchover_date = 20161201
-
-    class Deprecated(UserActivityView):
-        serializer_class = OldActivitySerializer

@@ -23,24 +23,21 @@ from rest_framework import routers
 from . import views
 
 router = routers.SimpleRouter()
-router.register(r'videos', views.videos.VideoViewSetSwitcher)
+router.register(r'videos', views.videos.VideoViewSet)
 router.register(r'videos/(?P<video_id>[\w\d]+)/languages',
-                views.subtitles.SubtitleLanguageViewSetSwitcher,
+                views.subtitles.SubtitleLanguageViewSet,
                 base_name='subtitle-language')
 router.register(r'videos/(?P<video_id>[\w\d]+)/urls',
                 views.videos.VideoURLViewSet, base_name='video-url')
 router.register(r'teams', views.teams.TeamViewSet, base_name='teams')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/members',
-                views.teams.TeamMemberViewSetSwitcher, base_name='team-members')
-router.register(r'teams/(?P<team_slug>[\w\d\-]+)/safe-members',
-                views.teams.SafeTeamMemberViewSetSwitcher,
-                base_name='safe-team-members')
+                views.teams.TeamMemberViewSet, base_name='team-members')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/projects',
                 views.teams.ProjectViewSet, base_name='projects')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/tasks',
-                views.teams.TaskViewSetSwitcher, base_name='tasks')
+                views.teams.TaskViewSet, base_name='tasks')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/applications',
-                views.teams.TeamApplicationViewSetSwitcher,
+                views.teams.TeamApplicationViewSet,
                 base_name='team-application')
 router.register(r'teams/(?P<team_slug>[\w\d\-]+)/notifications',
                 views.teams.TeamNotificationViewSet,
@@ -52,7 +49,7 @@ router.register(r'activity', views.activity.ActivityViewSet,
 urlpatterns = router.urls + patterns('',
     url(r'^$', views.index.index, name='index'),
     url(r'videos/(?P<video_id>[\w\d]+)/activity/$',
-        views.activity.VideoActivityViewSwitcher.as_view(), name='video-activity'),
+        views.activity.VideoActivityView.as_view(), name='video-activity'),
     url(r'^videos/(?P<video_id>[\w\d]+)'
         '/languages/(?P<language_code>[\w-]+)/subtitles/$',
         views.subtitles.SubtitlesView.as_view(), name='subtitles'),
@@ -61,7 +58,7 @@ urlpatterns = router.urls + patterns('',
         views.subtitles.Actions.as_view(), name='subtitle-actions'),
     url(r'^videos/(?P<video_id>[\w\d]+)'
         '/languages/(?P<language_code>[\w-]+)/subtitles/notes/$',
-        views.subtitles.NotesListSwitcher.as_view(), name='subtitle-notes'),
+        views.subtitles.NotesList.as_view(), name='subtitle-notes'),
     url(r'videos/(?P<video_id>[\w\d]+)/duration',
         views.videos.VideoDurationView.as_view(), name='video-duration'),
     url(r'^teams/(?P<team_slug>[\w\d\-]+)/languages/$',
@@ -74,8 +71,8 @@ urlpatterns = router.urls + patterns('',
          name='team-languages-blacklisted'),
     url(r'^languages/$', views.languages.languages, name='languages'),
     url(r'^message/$', views.messages.Messages.as_view(), name='messages'),
-    url(r'users/(?P<username>[\w\-@\.\+\s]+)/activity/$',
-        views.activity.UserActivityViewSwitcher.as_view(), name='user-activity'),
+    url(r'users/(?P<identifier>[^/]+)/activity/$',
+        views.activity.UserActivityView.as_view(), name='user-activity'),
     url(r'teams/(?P<slug>[\w\d-]+)/activity/$',
-        views.activity.TeamActivityViewSwitcher.as_view(), name='team-activity'),
+        views.activity.TeamActivityView.as_view(), name='team-activity'),
 )
