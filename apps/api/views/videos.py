@@ -608,7 +608,7 @@ class VideoViewSet(mixins.CreateModelMixin,
         if team_video is not None and \
            team_perms.can_delete_video(team_video,
                                         self.request.user):
-            video.delete()
+            video.delete(user=self.request.user)
             return Response(status=status.HTTP_204_NO_CONTENT)
         raise PermissionDenied()
 
