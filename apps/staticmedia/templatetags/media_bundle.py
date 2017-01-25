@@ -49,10 +49,18 @@ def static_url():
 
 @register.simple_tag(takes_context=True)
 def js_i18n_catalog(context):
+    locale = to_locale(context['LANGUAGE_CODE'])
     if settings.STATIC_MEDIA_USES_S3:
-        locale = to_locale(context['LANGUAGE_CODE'])
         src = utils.static_url() + 'jsi18catalog/{}.js'.format(locale)
     else:
-        src = reverse('staticmedia:js_i18n_catalog')
+        src = reverse('staticmedia:js_i18n_catalog', args=(locale,))
     return '<script type="text/javascript" src="{}"></script>'.format(src)
 
+@register.simple_tag(takes_context=True)
+def js_language_data(context):
+    locale = to_locale(context['LANGUAGE_CODE'])
+    if settings.STATIC_MEDIA_USES_S3:
+        src = utils.static_url() + 'jslanguagedata/{}.js'.format(locale)
+    else:
+        src = reverse('staticmedia:js_language_data', args=(locale,))
+    return '<script type="text/javascript" src="{}"></script>'.format(src)

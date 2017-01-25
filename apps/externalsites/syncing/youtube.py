@@ -45,10 +45,12 @@ logger = logging.getLogger("externalsites.syncing.youtube")
 CAPTION_TRACK_LINK_REL = ('http://gdata.youtube.com'
                           '/schemas/2007#video.captionTracks')
 
-def convert_language_code(lc):
+def convert_language_code(lc, enable_language_mapping):
     """
     Convert an Amara language code to a YouTube one
     """
+    if enable_language_mapping:
+        return unilangs.LanguageCode(lc, 'unisubs').encode('youtube_with_mapping')
     return unilangs.LanguageCode(lc, 'unisubs').encode('youtube')
 
 def _format_subs_for_youtube(subtitle_set):
@@ -69,7 +71,7 @@ def find_existing_caption_id(access_token, video_id, language_code,
         pass
     if enable_language_mapping:
         try:
-            return caption_id_map[convert_language_code(language_code).lower()]
+            return caption_id_map[convert_language_code(language_code, enable_language_mapping).lower()]
         except KeyError:
             pass
     return None
@@ -91,8 +93,7 @@ def update_subtitles(video_id, access_token, subtitle_version,
     if caption_id:
         google.captions_update(access_token, caption_id, 'text/vtt', content)
     else:
-        if enable_language_mapping:
-            language_code = convert_language_code(language_code)
+        language_code = convert_language_code(language_code, enable_language_mapping)
         google.captions_insert(access_token, video_id, language_code,
                                'text/vtt', content)
     sync_metadata(video_id, access_token, subtitle_version,
@@ -102,16 +103,13 @@ def sync_metadata(video_id, access_token, subtitle_version,
                   enable_language_mapping):
     video = subtitle_version.video
     team_video = video.get_team_video()
-    language_code = subtitle_version.language_code
     if not (team_video and team_video.team.sync_metadata and
             subtitle_version.title and video.primary_audio_language_code):
         return
-    primary_audio_language_code = video.primary_audio_language_code
-    if enable_language_mapping:
-        primary_audio_language_code = convert_language_code(
-            primary_audio_language_code)
-        language_code = convert_language_code(language_code)
-
+    primary_audio_language_code = convert_language_code(
+        video.primary_audio_language_code, enable_language_mapping)
+    language_code = convert_language_code(subtitle_version.language_code, \
+                                          enable_language_mapping)
     google.update_video_metadata(video_id,
                                  access_token,
                                  primary_audio_language_code,

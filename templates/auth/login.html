@@ -1,16 +1,18 @@
 {% extends "hands_base.html" %}
 
-{% load i18n teams_tags %}
+{% load i18n teams_tags media_bundle %}
 {% load url from future %}
 
 {% block html_attrs %}id="login"{% endblock %}
-
 {% block main_content %}
+
 <script>
-  var show_disabled_facebook = function() {
-  alert("We are working to re-enable the Facebook authorization and appreciate your patience.\nIf you have used Facebook to log into Amara before, please email support@amara.org for help with accessing your account (include your Facebook login and email address). Otherwise, please select a different authorization method.");
-  }
+  document.facebook_app_public_id = "{{ app_id }}";
+  document.facebook_login_confirm = "{{ facebook_login_confirm }}";
 </script>
+
+{% media_bundle "login.js" %}
+
 <div id="login-bg" class="top-banner">
   <div class="container">
     <div class="row">
@@ -20,13 +22,10 @@
             <h2>{% trans "Sign In" %}</h2>
             <h5>{% trans "Use an existing identity" %}</h5>
             <ul class="providers">
-                <li><a class="provider" id="google" href="{% url "externalsites:google-login-confirm" %}?next={{ next }}">google</a></li>
-                <!--
-                <li><a class="provider" id="facebook" href="{% url "thirdpartyaccounts:facebook_login_confirm" %}?next={{ next }}">facebook</a></li>
-                -->
-                <li><button class="provider" id="facebook" onclick="show_disabled_facebook()">facebook</button></li>
-                <li><a class="provider" id="twitter" href="{% url "thirdpartyaccounts:twitter_login_confirm" %}?next={{ next }}"> twitter</a></li>
-                <li><a class="provider" id="open-id" href="{% url "socialauth_openid_login_confirm" %}?next={{ next }}">openid</a></li>
+              <li><a class="provider" id="google" href="{% url "externalsites:google-login-confirm" %}?next={{ next }}">google</a></li>
+	      <li><button class="provider" id="facebook">facebook</button></li>
+              <li><a class="provider" id="twitter" href="{% url "thirdpartyaccounts:twitter_login_confirm" %}?next={{ next }}"> twitter</a></li>
+              <li><a class="provider" id="open-id" href="{% url "socialauth_openid_login_confirm" %}?next={{ next }}">openid</a></li>
             </ul>
             <ul class="providers additional">
                 <li><a class="provider" id="ted" href="{{ ted_auth.url_confirm }}">ted</a></li>
@@ -58,7 +57,7 @@
                 <li>
                   <button type="submit" value="create account"  class="green_button big">{% trans 'Create Account' %}</button>
                 </li>
-              <ul>
+              </ul>
               <input type="hidden" name="next" value="{{ next }}" />
           </form>
         </div>

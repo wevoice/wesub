@@ -94,9 +94,9 @@
       </ul>
       <ul>
         <li><strong>{% trans 'Videos' %}</strong></li>
-        <li><a href="/search/#/?q=">{% trans 'Search' %}</a></li>
-        <li><a href="/videos/watch/">{% trans 'Browse' %}</a></li>
-        <li><a href="/videos/watch/featured/">{% trans 'Featured' %}</a></li>
+        <li><a href="{% url "search:index" %}">{% trans 'Search' %}</a></li>
+        <li><a href="{% url "videos:watch_page" %}">{% trans 'Browse' %}</a></li>
+        <li><a href="{% url "videos:featured_videos" %}">{% trans 'Featured' %}</a></li>
       </ul>
       <ul>
         <li><strong>{% trans 'More' %}</strong></li>

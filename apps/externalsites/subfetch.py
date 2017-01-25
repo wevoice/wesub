@@ -36,7 +36,7 @@ def convert_language_code(lc):
     Convert from a YouTube language code to an Amara one
     """
     try:
-        return unilangs.LanguageCode(lc, 'youtube').encode('unisubs')
+        return unilangs.LanguageCode(lc, 'youtube_with_mapping').encode('unisubs')
     except KeyError:
         # Error looking up the youtube language code.  Return none and we'll
         # skip importing the subtitles.
@@ -79,6 +79,9 @@ def fetch_subs_youtube(video_url):
         language_code = convert_language_code(language_code)
         if language_code and language_code not in existing_langs:
             dfxp = google.captions_download(access_token, caption_id)
-            pipeline.add_subtitles(video_url.video, language_code, dfxp,
-                                   note="From youtube", complete=True,
-                                   origin=ORIGIN_IMPORTED)
+            try:
+                pipeline.add_subtitles(video_url.video, language_code, dfxp,
+                                       note="From youtube", complete=True,
+                                       origin=ORIGIN_IMPORTED)
+            except Exception, e:
+                logger.error("Exception while importing subtitles " + str(e))

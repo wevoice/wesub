@@ -36,6 +36,7 @@
         <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <link href='//fonts.googleapis.com/css?family=Roboto:300,400' rel='stylesheet' type='text/css'>
+    {% js_language_data %}
     {% media_bundle "site.js" %}
     {% js_i18n_catalog %}
     <script src="{% url "profiles:rpc_api" %}" type="text/javascript"></script>
@@ -44,6 +45,7 @@
     {% block scripts %}{% endblock %}
     <script type="text/javascript">
         window.STATIC_URL = '{{ STATIC_URL }}';
+        window.LANGUAGE_CODE = '{{ LANGUAGE_CODE }}';
         {% block oldmodal %}
             window.OLD_MODAL = true;
         {% endblock %}
@@ -74,7 +76,7 @@
             <li><a href="/community">{% trans "Community" %}</a></li>
             <li><a id="proamara-link" href="//pro.amara.org">{% trans "Professional Solutions" %}</a></li>
             <li>
-              <a class="navbar-search" href="/videos/watch/">
+              <a class="navbar-search" href="{% url "videos:watch_page" %}">
                 <img alt="Search" src="{{ STATIC_URL }}images/glyphicons_027_search-light.png">
               </a>
             </li>
@@ -132,15 +134,18 @@
                 </ul>
                 <ul>
                   <li><strong>{% trans 'Videos' %}</strong></li>
-                  <li><a href="/search/#/?q=">{% trans 'Search' %}</a></li>
-                  <li><a href="/videos/watch/">{% trans 'Browse' %}</a></li>
-                  <li><a href="/videos/watch/featured/">{% trans 'Featured' %}</a></li>
+                  <li><a href="{% url "search:index" %}">{% trans 'Search' %}</a></li>
+                  <li><a href="{% url "videos:watch_page" %}">{% trans 'Browse' %}</a></li>
+                  <li><a href="{% url "videos:featured_videos" %}">{% trans 'Featured' %}</a></li>
                 </ul>
                 <ul>
                   <li><strong>{% trans 'More' %}</strong></li>
                   <li><a href="//twitter.com/AmaraSubs/">Twitter</a></li>
                   <li><a href="//facebook.com/Amara.Community">Facebook</a></li>
                 </ul>
+                <div class="clearfix">
+                  <select class="languageSwitcher"></select>
+                </div>
               </span>
             </div>
             <div id="footer-terms" class="col-sm-5 col-sm-pull-7">

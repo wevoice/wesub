@@ -60,6 +60,9 @@ class SecureAuthenticationForm(AuthenticationForm):
 class EmailForm(forms.Form):
     email = forms.EmailField(label=_("E-mail"), max_length=100)
     url = forms.URLField(required=False, widget=forms.HiddenInput())
+    first_name = forms.CharField(max_length=100, required=False, widget=forms.HiddenInput())
+    last_name = forms.CharField(max_length=100, required=False, widget=forms.HiddenInput())
+    avatar = forms.URLField(required=False, widget=forms.HiddenInput())
 
 class CustomPasswordResetForm(forms.Form):
     """

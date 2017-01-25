@@ -28,9 +28,6 @@ TWITTER_CONSUMER_KEY = getattr(settings, 'TWITTER_CONSUMER_KEY', '')
 TWITTER_CONSUMER_SECRET = getattr(settings, 'TWITTER_CONSUMER_SECRET', '')
 FACEBOOK_API_KEY = getattr(settings, 'FACEBOOK_API_KEY', '')
 FACEBOOK_API_SECRET = getattr(settings, 'FACEBOOK_API_SECRET', '')
-FACEBOOK_REST_SERVER = getattr(settings, 'FACEBOOK_REST_SERVER',
-                               'http://api.facebook.com/restserver.php')
-
 
 class TwitterAuthBackend(object):
     @staticmethod
@@ -126,95 +123,12 @@ class TwitterAuthBackend(object):
         except:
             return None
 
-
 class FacebookAuthBackend(object):
-    @staticmethod
-    def _get_existing_user(data):
-        try:
-            tpa = FacebookAccount.objects.get(uid=data['uid'])
-            return User.objects.get(pk=tpa.user_id)
-        except (FacebookAccount.DoesNotExist, User.DoesNotExist):
-            return None
-
-    def _find_available_username(self, data):
-        username = data.get('first_name', 'FACEBOOK_USER')
-        taken_names = map(lambda x: x.username.lower(), set(User.objects.filter(username__istartswith=username)))
-        if username.lower() in taken_names:
-            index = 1
-            username_to_try = '%s%d' % (username, index)
-            while username_to_try.lower() in taken_names:
-                index +=1
-                username_to_try = '%s%d' % (username, index)
-            username = username_to_try
-        return username
-
-    @staticmethod
-    def _generate_email(first_name):
-        return None
-
-    def _create_user(self, data, email):
-        username = self._find_available_username(data)
-
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
-        facebook_uid = data.get('uid')
-        img_url = data.get('pic_square')
-        if email is None:
-            email = FacebookAuthBackend._generate_email(first_name)
-
-        user = User(username=username, email=email, first_name=first_name,
-                    last_name=last_name)
-        temp_password = User.objects.make_random_password(length=24)
-        user.set_password(temp_password)
-        user.save()
-
-        if img_url:
-            img = ContentFile(requests.get(img_url).content)
-            name = img_url.split('/')[-1]
-            user.picture.save(name, img, False)
-        FacebookAccount.objects.create(uid=facebook_uid, user=user,
-                                       avatar=img_url)
-
+    def authenticate(self, facebook=True, user=None):
         return user
-
-
-    def authenticate(self, facebook, request, email=None):
-        facebook.oauth2_check_session(request)
-        facebook.uid = facebook.users.getLoggedInUser()
-        user_info = facebook.users.getInfo([facebook.uid],
-                                           ['first_name', 'last_name', 'pic_square'])[0]
-        # Check if we already have an active user for this Facebook user
-        user = FacebookAuthBackend._get_existing_user(user_info)
-        if user:
-            # If so, then we authenticate them if the user account is active, or
-            # just return None if it's not.
-            if user.is_active:
-                return user
-            else:
-                return None
-
-        # Otherwise this is a Facebook user we've never seen before, so we'll
-        # make them an Amara account, Facebook TPA, and link the two.
-        return self._create_user(user_info, email)
-
-    @staticmethod
-    def pre_authenticate(facebook, request):
-        facebook.oauth2_check_session(request)
-        facebook.uid = facebook.users.getLoggedInUser()
-        user_info = facebook.users.getInfo([facebook.uid],
-                                           ['first_name', 'last_name', 'pic_square'])[0]
-        # Check if we already have an active user for this Facebook user
-        user = FacebookAuthBackend._get_existing_user(user_info)
-        if user:
-            return (True, None)
-        else:
-            email = FacebookAuthBackend._generate_email(user_info.get('first_name'))
-            return (False, email)
 
     def get_user(self, user_id):
         try:
             return User.objects.get(pk=user_id)
         except:
             return None
-
-
