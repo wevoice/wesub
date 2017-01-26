@@ -16,7 +16,8 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import subprocess, sys, re
+import sys, os, re, signal
+from subprocess32 import Popen, PIPE, TimeoutExpired, CalledProcessError
 from videos.types.base import VideoType
 
 import logging
@@ -82,10 +83,17 @@ class HtmlFiveVideoType(VideoType):
     def set_values(self, video):
         cmd = """avprobe -v error -show_format -show_streams "{}" 2>&1 """.format(self.url)
         try:
-            streams = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+            with Popen(cmd, shell=True, stdout=PIPE, preexec_fn=os.setsid) as process:
+                try:
+                    streams = process.communicate(timeout=10)[0]
+                except TimeoutExpired:
+                    os.killpg(process.pid, signal.SIGINT) # send signal to the process group
+                    raise
             duration = getDurationFromStreams(streams)
             video.duration = duration
-        except subprocess.CalledProcessError as e:
+        except CalledProcessError as e:
             logger.error("CalledProcessError error({}) when running command {}".format(e.returncode, cmd))
+        except TimeoutExpired as e:
+            logger.error("TimeoutExpired error when running command {}".format(cmd))
         except:
             logger.error("Unexpected error({}) when running command {}".format(sys.exc_info()[0], cmd))
