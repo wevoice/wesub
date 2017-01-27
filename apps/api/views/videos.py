@@ -130,6 +130,14 @@ Update an existing video
     As with creating video, an update can not override the duration received
     from the provider or specified in the file header.
 
+Delete an existing video
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. http:delete:: /api/videos/(video-id)/
+
+   This deletes a video.
+
+   If there are any subtitles/collaborations on the video, they will also be deleted.
 
 Moving videos between teams and projects
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -593,6 +601,16 @@ class VideoViewSet(mixins.CreateModelMixin,
         SubtitleLanguage.bulk_has_public_version(
             video.all_subtitle_languages())
         return video
+
+    def delete(self, request, *args, **kwargs):
+        video = self.get_object()
+        team_video = video.get_team_video()
+        if team_video is not None and \
+           team_perms.can_delete_video(team_video,
+                                        self.request.user):
+            video.delete(user=self.request.user)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        raise PermissionDenied()
 
     def check_save_permissions(self, serializer):
         team = serializer.validated_data.get('team')

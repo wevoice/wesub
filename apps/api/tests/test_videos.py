@@ -31,6 +31,7 @@ from subtitles import pipeline
 from utils.factories import *
 from utils import test_utils
 from utils.test_utils.api import *
+from videos.models import Video
 import teams.signals
 
 class VideoSerializerTest(TestCase):
@@ -745,3 +746,22 @@ class VideoURLTestCase(TestCase):
         response = self.client.options(self.detail_url(self.primary_url))
         assert_writable_fields(response, 'PUT',
                                ['original', 'primary'])
+
+class VideoViewTestCase(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
+        self.team = TeamFactory(owner=self.user)
+        self.video = VideoFactory()
+        self.project = ProjectFactory(team=self.team)
+        self.team_video = TeamVideoFactory(video=self.video, team=self.team)
+        self.url = reverse('api:video-detail', kwargs={
+            'video_id': self.video.video_id,
+        })
+
+    def test_delete_video(self):
+        video_pk = self.video.pk
+        response = self.client.delete(self.url)
+        assert_equal(response.status_code, status.HTTP_204_NO_CONTENT)
+        assert_false(Video.objects.filter(pk=video_pk).exists())
