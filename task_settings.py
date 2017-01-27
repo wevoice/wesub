@@ -24,7 +24,8 @@ from celery.schedules import crontab
 from kombu import Exchange, Queue
 
 CELERY_QUEUES = (
-    Queue('celery', routing_key='celery'),
+    Queue('default', routing_key='default'),
+    Queue('priority', routing_key='priority'),
     Queue('feeds', routing_key='feeds'),
 )
 

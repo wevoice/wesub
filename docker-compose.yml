@@ -23,7 +23,7 @@ worker:
   command: worker
   environment:
     CELERY_OPTS: -B
-    CELERY_QUEUES: celery,feeds
+    CELERY_QUEUES: default,feeds,priority
     DJANGO_SETTINGS_MODULE: dev_settings
     LANG: en_US.UTF-8
     JSON_LOGGING:

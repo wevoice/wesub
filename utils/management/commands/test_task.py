@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2013 Participatory Culture Foundation
+# Copyright (C) 2017 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,21 +16,18 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import logging
+from optparse import make_option
 
-from celery.task import task
-from utils import send_templated_email
+from django.core.management.base import BaseCommand
 
-logger = logging.getLogger(__name__)
+from utils import tasks
 
-@task
-def send_templated_email_async(to, subject, body_template, body_dict,
-                               from_email=None, ct="html", fail_silently=False,
-                               check_user_preference=True):
-    return send_templated_email(
-        to,subject, body_template, body_dict, from_email=None, ct="html",
-        fail_silently=False, check_user_preference=check_user_preference)
 
-@task
-def test():
-    logger.warn("IN TEST TASK")
+class Command(BaseCommand):
+    help = u'Run a test task'
+    option_list = BaseCommand.option_list + (
+        make_option('-q', '--queue', dest='queue', default='default',
+                    help='Choose queue to run it in'),
+    )
+    def handle(self, **options):
+        tasks.test.apply_async(queue=options['queue'])

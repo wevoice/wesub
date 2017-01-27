@@ -1,2 +1,2 @@
 #!/bin/bash
-CELERY_OPTS="-B" worker
+CELERY_OPTS="-B" CELERY_QUEUES="default,priority" worker
