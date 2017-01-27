@@ -56,6 +56,13 @@ def on_subtitles_added(sender, version, **kwargs):
     call_event_handler_for_video(video, 'on_subtitles_added', video,
                                  version)
 
+@receiver(subtitles.signals.subtitles_imported)
+def on_subtitles_imported(sender, version, **kwargs):
+    subtitle_language = sender
+    video = subtitle_language.video
+    call_event_handler_for_video(video, 'on_subtitles_imported', video,
+                                 version)
+
 @receiver(subtitles.signals.subtitles_published)
 def on_subtitles_published(sender, **kwargs):
     subtitle_language = sender
