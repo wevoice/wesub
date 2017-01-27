@@ -22,6 +22,7 @@ from django import dispatch
 language_deleted = dispatch.Signal()
 # Called whenever a new version is added
 subtitles_added = dispatch.Signal(providing_args=['version'])
+subtitles_imported = dispatch.Signal(providing_args=['versions'])
 # Called when when subtitles are "completed".
 #   - Most of the time this the publish action occurs.
 #   - For tasks, this is when all tasks are complete

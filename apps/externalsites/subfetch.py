@@ -27,6 +27,7 @@ from externalsites import google
 from externalsites.models import YouTubeAccount
 from subtitles.models import ORIGIN_IMPORTED
 from subtitles import pipeline
+from subtitles.signals import subtitles_imported
 from videos.models import VIDEO_TYPE_YOUTUBE
 
 logger = logging.getLogger('externalsites.subfetch')
@@ -75,13 +76,17 @@ def fetch_subs_youtube(video_url):
 
     access_token = google.get_new_access_token(account.oauth_refresh_token)
     captions_list = google.captions_list(access_token, video_id)
+    versions = []
     for caption_id, language_code, caption_name in captions_list:
         language_code = convert_language_code(language_code)
         if language_code and language_code not in existing_langs:
             dfxp = google.captions_download(access_token, caption_id)
             try:
-                pipeline.add_subtitles(video_url.video, language_code, dfxp,
+                version = pipeline.add_subtitles(video_url.video, language_code, dfxp,
                                        note="From youtube", complete=True,
                                        origin=ORIGIN_IMPORTED)
+                versions.append(version)
             except Exception, e:
                 logger.error("Exception while importing subtitles " + str(e))
+    if len(versions) > 0:
+        subtitles_imported.send(sender=versions[0].subtitle_language, versions=versions)

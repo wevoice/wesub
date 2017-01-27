@@ -27,6 +27,7 @@ import mock
 from notifications import handlers
 from notifications.models import TeamNotificationSettings, TeamNotification
 from subtitles import pipeline
+from subtitles.signals import subtitles_imported
 from teams.models import TeamMember
 from utils import dates
 from utils.factories import *
@@ -125,6 +126,15 @@ class TestNotificationHandlerLookup(TestCase):
             version = pipeline.add_subtitles(video, 'en', SubtitleSetFactory())
         assert_equal(mock_handler.on_subtitles_added.call_args,
                      mock.call(video, version))
+
+    def test_on_subtitle_version_imported(self):
+        # We do not actually import subtitles but send the signal
+        video = VideoFactory(team=self.team)
+        with self.patch_handler_lookup() as mock_handler:
+            version = pipeline.add_subtitles(video, 'en', SubtitleSetFactory())
+            subtitles_imported.send(sender=version.subtitle_language, versions=[version])
+        assert_equal(mock_handler.on_subtitles_imported.call_args,
+                     mock.call(video, [version]))
 
     def test_on_subtitles_published(self):
         video = VideoFactory(team=self.team)
