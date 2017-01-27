@@ -76,7 +76,7 @@ class NotificationHandlerBase(object):
     def on_subtitles_added(self, video, subtitle_version):
         pass
 
-    def on_subtitles_imported(self, video, subtitle_version):
+    def on_subtitles_imported(self, video, subtitle_versions):
         pass
 
     def on_subtitles_published(self, video, subtitle_language):

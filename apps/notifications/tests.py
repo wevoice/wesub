@@ -132,9 +132,9 @@ class TestNotificationHandlerLookup(TestCase):
         video = VideoFactory(team=self.team)
         with self.patch_handler_lookup() as mock_handler:
             version = pipeline.add_subtitles(video, 'en', SubtitleSetFactory())
-            subtitles_imported.send(sender=version.subtitle_language, version=version)
+            subtitles_imported.send(sender=version.subtitle_language, versions=[version])
         assert_equal(mock_handler.on_subtitles_imported.call_args,
-                     mock.call(video, version))
+                     mock.call(video, [version]))
 
     def test_on_subtitles_published(self):
         video = VideoFactory(team=self.team)

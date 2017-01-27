@@ -76,6 +76,7 @@ def fetch_subs_youtube(video_url):
 
     access_token = google.get_new_access_token(account.oauth_refresh_token)
     captions_list = google.captions_list(access_token, video_id)
+    versions = []
     for caption_id, language_code, caption_name in captions_list:
         language_code = convert_language_code(language_code)
         if language_code and language_code not in existing_langs:
@@ -84,6 +85,8 @@ def fetch_subs_youtube(video_url):
                 version = pipeline.add_subtitles(video_url.video, language_code, dfxp,
                                        note="From youtube", complete=True,
                                        origin=ORIGIN_IMPORTED)
-                subtitles_imported.send(sender=version.subtitle_language, version=version)
+                versions.append(version)
             except Exception, e:
                 logger.error("Exception while importing subtitles " + str(e))
+    if len(versions) > 0:
+        subtitles_imported.send(sender=versions[0].subtitle_language, versions=versions)
