@@ -29,6 +29,8 @@ CELERY_QUEUES = (
     Queue('feeds', routing_key='feeds'),
 )
 
+CELERY_DEFAULT_QUEUE = "default"
+
 CELERYBEAT_SCHEDULE = {
     'expire-tasks': {
         'task': 'teams.tasks.expire_tasks',
@@ -72,4 +74,4 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-__all__ = ['CELERYBEAT_SCHEDULE', 'CELERY_QUEUES', ]
+__all__ = ['CELERYBEAT_SCHEDULE', 'CELERY_QUEUES', 'CELERY_DEFAULT_QUEUE', ]
