@@ -886,6 +886,8 @@ EXISTS(
             signals.language_deleted.send(lang)
             from teams.signals import api_language_deleted
             api_language_deleted.send(lang)
+        self.subtitles_complete = False
+        self.save()
         Video.cache.invalidate_by_pk(self.video_id)
 
     def update_signoff_counts(self):
