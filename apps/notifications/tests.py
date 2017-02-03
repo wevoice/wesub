@@ -120,6 +120,14 @@ class TestNotificationHandlerLookup(TestCase):
         assert_equal(mock_handler.on_video_removed.call_args,
                      mock.call(tv.video, other_team))
 
+    def test_on_video_url_made_primary(self):
+        video = VideoFactory(team=self.team)
+        with self.patch_handler_lookup() as mock_handler:
+            video_url = VideoURLFactory(video=video)
+            video_url.make_primary(self.user)
+        assert_equal(mock_handler.on_video_url_made_primary.call_args,
+                     mock.call(video, video_url, self.user))
+
     def test_on_subtitle_version_added(self):
         video = VideoFactory(team=self.team)
         with self.patch_handler_lookup() as mock_handler:

@@ -26,6 +26,15 @@ from teams.models import TeamVideo, TeamMember
 import auth.signals
 import subtitles.signals
 import teams.signals
+import videos.signals
+
+@receiver(videos.signals.video_url_made_primary)
+def on_video_url_made_primary(sender, user, **kwargs):
+    video = sender.video
+    team_video = video.get_team_video()
+    if team_video:
+        call_event_handler(team_video.team, 'on_video_url_made_primary',
+                           video, sender, user)
 
 @receiver(post_save, sender=TeamVideo)
 def on_team_video_save(sender, instance, created, **kwargs):
