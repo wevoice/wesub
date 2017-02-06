@@ -19,12 +19,19 @@
 from urlparse import urlparse, parse_qs
 
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.management.base import BaseCommand
 from django.core.urlresolvers import resolve
 from django.test import RequestFactory
 
 from auth.models import CustomUser as User
 from localeurl.utils import strip_path
+from auth.middleware import AmaraAuthenticationMiddleware
+
+middleware_to_apply = [
+    SessionMiddleware(),
+    AmaraAuthenticationMiddleware(),
+]
 
 class Command(BaseCommand):
     help = u'Run a test request'
@@ -43,7 +50,10 @@ class Command(BaseCommand):
             user = User.objects.get(username=username)
         path, query = self.parse_url(url)
         request = RequestFactory().get(path, query)
+        request.LANGUAGE_CODE = 'en'
         request.user = user
+        for middleware in middleware_to_apply:
+            middleware.process_request(request)
         match = resolve(path)
         response = match.func(request, *match.args, **match.kwargs)
         if hasattr(response, 'render'):
