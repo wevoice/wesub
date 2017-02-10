@@ -138,11 +138,11 @@
                   <li><a href="{% url "videos:watch_page" %}">{% trans 'Browse' %}</a></li>
                   <li><a href="{% url "videos:featured_videos" %}">{% trans 'Featured' %}</a></li>
                 </ul>
-{#                <ul>#}
-{#                  <li><strong>{% trans 'More' %}</strong></li>#}
-{#                  <li><a href="//twitter.com/AmaraSubs/">Twitter</a></li>#}
-{#                  <li><a href="//facebook.com/Amara.Community">Facebook</a></li>#}
-{#                </ul>#}
+                <ul>
+                  <li><strong>{% trans 'Social' %}</strong></li>
+                  <li><a href="//welocalize.com">Twitter</a></li>
+                  <li><a href="//welocalize.com">Facebook</a></li>
+                </ul>
                 <div class="clearfix">
                   <select class="languageSwitcher"></select>
                 </div>
@@ -167,16 +167,16 @@
                 {% if user.is_staff %}
                     <li><a target="_blank" href="{% url "admin:index" %}">{% trans 'Admin' %}</a></li>
                 {% endif %}
-                {% if user.is_superuser %}
-                    <li><a target="_blank" href="https://logs.amara.org">{% trans 'Amara Logs' %}</a></li>
-                {% endif %}
+{#                {% if user.is_superuser %}#}
+{#                    <li><a target="_blank" href="https://logs.amara.org">{% trans 'Amara Logs' %}</a></li>#}
+{#                {% endif %}#}
                 {% if user.is_superuser %}
                     <li><a target="_blank" href="{% url "auth:login_trap" %}">{% trans 'Impersonate' %}</a></li>
                 {% endif %}
                 {% if user.is_superuser %}
                     <li><a target="_blank" href="{% url "billing" %}">{% trans 'Billing' %}</a></li>
                 {% endif %}
-                <li><a href="https://github.com/pculture/unisubs/commit/{{ LAST_COMMIT_GUID }}" title="{{ LAST_COMMIT_GUID }}">Github</a></li>
+                <li><a href="https://github.com/wevoice/wesub/commit/{{ LAST_COMMIT_GUID }}" title="{{ LAST_COMMIT_GUID }}">Github</a></li>
             </ul>
             {% block page_controls %}{% endblock %}
         </div>

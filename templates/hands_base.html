@@ -95,16 +95,16 @@
         {% if user.is_staff %}
           <li><a target="_blank" href="{% url "admin:index" %}">{% trans 'Admin' %}</a></li>
         {% endif %}
-        {% if user.is_superuser %}
-          <li><a target="_blank" href="https://logs.amara.org">{% trans 'Amara Logs' %}</a></li>
-        {% endif %}
+{#        {% if user.is_superuser %}#}
+{#          <li><a target="_blank" href="https://logs.amara.org">{% trans 'Amara Logs' %}</a></li>#}
+{#        {% endif %}#}
         {% if user.is_superuser %}
           <li><a target="_blank" href="{% url "auth:login_trap" %}">{% trans 'Impersonate' %}</a></li>
         {% endif %}
         {% if user.is_superuser %}
           <li><a target="_blank" href="{% url "billing" %}">{% trans 'Billing' %}</a></li>
         {% endif %}
-        <li><a href="//github.com/pculture/unisubs/commit/{{ LAST_COMMIT_GUID }}" title="{{ LAST_COMMIT_GUID }}">Github</a></li>
+        <li><a href="//github.com/wevoice/wesub/commit/{{ LAST_COMMIT_GUID }}" title="{{ LAST_COMMIT_GUID }}">Github</a></li>
       </ul>
         {% block page_controls %}{% endblock %}
     </div>

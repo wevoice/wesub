@@ -98,11 +98,11 @@
         <li><a href="{% url "videos:watch_page" %}">{% trans 'Browse' %}</a></li>
         <li><a href="{% url "videos:featured_videos" %}">{% trans 'Featured' %}</a></li>
       </ul>
-{#      <ul>#}
-{#        <li><strong>{% trans 'More' %}</strong></li>#}
-{#        <li><a href="//twitter.com/AmaraSubs/">Twitter</a></li>#}
-{#        <li><a href="//facebook.com/Amara.Community">Facebook</a></li>#}
-{#      </ul>#}
+      <ul>
+        <li><strong>{% trans 'Social' %}</strong></li>
+        <li><a href="//welocalize.com">Twitter</a></li>
+        <li><a href="//welocalize.com">Facebook</a></li>
+      </ul>
       {% if user.is_staff %}
       <ul>
         <li><strong>{% trans 'Admin' %}</strong></li>
