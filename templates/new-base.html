@@ -5,7 +5,7 @@
 <html {% if LANGUAGE_BIDI %}dir="rtl"{% endif %} {% block html_attrs %}{% endblock %}>
 
 <head>
-  <title>{% block title %}Amara - {% trans 'Caption, translate, subtitle and transcribe video.' %}{% endblock %}</title>
+  <title>{% block title %}Welocalize - {% trans 'Subtitle Portal' %}{% endblock %}</title>
   <link href='//fonts.googleapis.com/css?family=Merriweather:700' rel='stylesheet' type='text/css'>
   <link href='//fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
 
@@ -16,7 +16,7 @@
   <meta name="keywords" content="subtitles, captions, transcripts, translation, film, crowdsourcing, Amara, Universal Subtitles">
   <meta name="application-name" content="Amara - Buy captions, video translations, transcriptions, and crowd subtitling" />
   <meta name="msapplication-tooltip" content="A platform for collaborative subtitles!" />
-  <meta name="title" content="Crowd Subtitles | Amara - Buy captions, video translations, transcriptions, and crowd subtitling" />
+  <meta name="title" content="Crowd Subtitles | Welocalize - Buy captions, video translations, transcriptions, and crowd subtitling" />
 
   {% if not current_site.name == 'amara-production' %}
     <meta name="robots" content="noindex, nofollow"/>
@@ -86,23 +86,23 @@
     </div>
 
     <div class="nav group">
-      <ul>
-        <li><strong>Amara</strong></li>
-        <li><a href="http://about.amara.org/">{% trans 'Blog' %}</a></li>
-        <li><a href="http://support.amara.org/solution/categories/13504">{% trans 'Help' %}</a></li>
-        <li><a href="http://support.amara.org/support/solutions/articles/35517--i-have-a-non-technical-question-about">{% trans 'Contact' %}</a></li>
-      </ul>
+{#      <ul>#}
+{#        <li><strong>Amara</strong></li>#}
+{#        <li><a href="http://about.amara.org/">{% trans 'Blog' %}</a></li>#}
+{#        <li><a href="http://support.amara.org/solution/categories/13504">{% trans 'Help' %}</a></li>#}
+{#        <li><a href="http://support.amara.org/support/solutions/articles/35517--i-have-a-non-technical-question-about">{% trans 'Contact' %}</a></li>#}
+{#      </ul>#}
       <ul>
         <li><strong>{% trans 'Videos' %}</strong></li>
         <li><a href="{% url "search:index" %}">{% trans 'Search' %}</a></li>
         <li><a href="{% url "videos:watch_page" %}">{% trans 'Browse' %}</a></li>
         <li><a href="{% url "videos:featured_videos" %}">{% trans 'Featured' %}</a></li>
       </ul>
-      <ul>
-        <li><strong>{% trans 'More' %}</strong></li>
-        <li><a href="//twitter.com/AmaraSubs/">Twitter</a></li>
-        <li><a href="//facebook.com/Amara.Community">Facebook</a></li>
-      </ul>
+{#      <ul>#}
+{#        <li><strong>{% trans 'More' %}</strong></li>#}
+{#        <li><a href="//twitter.com/AmaraSubs/">Twitter</a></li>#}
+{#        <li><a href="//facebook.com/Amara.Community">Facebook</a></li>#}
+{#      </ul>#}
       {% if user.is_staff %}
       <ul>
         <li><strong>{% trans 'Admin' %}</strong></li>

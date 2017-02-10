@@ -220,7 +220,7 @@ ul {
 	text-align: center;
 }
 
-#login-bg .providers, #login-bg h2, #login-bg h5, {
+#login-bg .providers, #login-bg h2, #login-bg h5 {
 	clear: both;
 	font-weight: normal;
 	text-align: center;

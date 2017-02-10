@@ -5,16 +5,15 @@
   <div class="container">
     <div class="row">
       <div class="col-xs-7 col-md-5 col-lg-4">
-        <h3>{% trans 'The Amara Difference' %}</h3>
-        <h6>{% trans 'Amara is built by a nonprofit, 501c3 organization. We are driven by the mission to reduce barriers to communication and foster a more democratic media ecosystem. By choosing Amara, you are making video more globally accessible.' %}</h6>
+        <h3>{% trans 'About Welocalize' %}</h3>
+        <h6>{% trans 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque interdum est augue. Duis at ante ipsum. Pellentesque ac tristique urna, sed vehicula dui. Fusce dapibus commodo velit in tincidunt. Curabitur ut ullamcorper justo. Suspendisse eu.' %}</h6>
       </div>
-      <a href="//pculture.org">
+      <a href="//welocalize.com">
         <div id="footer-pcf" class="col-xs-4 col-xs-offset-1 col-sm-offset-1 col-md-offset-3 col-lg-4 col-lg-offset-4">
           <img class="pull-right footer-logo" alt="Participatory Culture Foundation Logo" src="{{ STATIC_URL }}images/pcf.png" />
           <div class="clearfix"></div>
           <h6 class="text-right">
-            {% trans 'Amara is a project of the' %}<br />
-            Participatory Culture Foundation
+            {% trans 'Lorem ipsum dolor sit amet, consectetur adipiscing elit' %}<br />
           </h6>
         </div>
       </a>
@@ -26,33 +25,33 @@
       <div class="row">
         <div id="footer-nav" class="col-sm-7 col-sm-push-5">
           <span>
-            <ul>
-              <li><strong>Amara</strong></li>
-              <li><a href="http://about.amara.org/">{% trans 'Blog' %}</a></li>
-              <li><a href="http://support.amara.org/solution/categories/13504">{% trans 'Help' %}</a></li>
-              <li><a href="http://support.amara.org/support/solutions/articles/35517--i-have-a-non-technical-question-about">{% trans 'Contact' %}</a></li>
-            </ul>
+{#            <ul>#}
+{#              <li><strong>Amara</strong></li>#}
+{#              <li><a href="http://about.amara.org/">{% trans 'Blog' %}</a></li>#}
+{#              <li><a href="http://support.amara.org/solution/categories/13504">{% trans 'Help' %}</a></li>#}
+{#              <li><a href="http://support.amara.org/support/solutions/articles/35517--i-have-a-non-technical-question-about">{% trans 'Contact' %}</a></li>#}
+{#            </ul>#}
             <ul>
               <li><strong>{% trans 'Videos' %}</strong></li>
               <li><a href="{% url "search:index" %}">{% trans 'Search' %}</a></li>
               <li><a href="{% url "videos:watch_page" %}">{% trans 'Browse' %}</a></li>
               <li><a href="{% url "videos:featured_videos" %}">{% trans 'Featured' %}</a></li>
             </ul>
-            <ul>
-              <li><strong>{% trans 'More' %}</strong></li>
-              <li><a href="//twitter.com/AmaraSubs/">Twitter</a></li>
-              <li><a href="//facebook.com/Amara.Community">Facebook</a></li>
-            </ul>
+{#            <ul>#}
+{#              <li><strong>{% trans 'More' %}</strong></li>#}
+{#              <li><a href="//twitter.com/AmaraSubs/">Twitter</a></li>#}
+{#              <li><a href="//facebook.com/Amara.Community">Facebook</a></li>#}
+{#            </ul>#}
             <div class="clearfix">
               <select class="languageSwitcher"></select>
             </div>
           </span>
         </div>
         <div id="footer-terms" class="col-sm-5 col-sm-pull-7">
-          <a href="//amara.org"><img src="{{ STATIC_URL }}images/amara-logotype.png" alt="Amara's green circle logotype" /></a>
+          <a href="//welocalize.com"><img src="{{ STATIC_URL }}images/amara-logotype.png" alt="Amara's green circle logotype" /></a>
           <ul>
-            <li><a href="//about.amara.org/tos/">{% trans 'Terms' %}</a></li>
-            <li><a href="//pculture.org/pcf/websites-privacy/">{% trans 'Privacy' %}</a></li>
+            <li><a href="//welocalize.com">{% trans 'Terms' %}</a></li>
+            <li><a href="//welocalize.com">{% trans 'Privacy' %}</a></li>
             <li><a href="/security">{% trans 'Security' %}</a></li>
           </ul>
         </div>
