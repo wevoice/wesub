@@ -42,19 +42,19 @@ debug = True
 
 
 # Use when building with Docker
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': "amara",
-#         'USER': "amara",
-#         'PASSWORD': "amara",
-#         'HOST': 'db',
-#         'PORT': 3306,
-#         'OPTIONS': {
-#             'init_command': 'SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED',
-#         },
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': "amara",
+        'USER': "amara",
+        'PASSWORD': "amara",
+        'HOST': 'db',
+        'PORT': 3306,
+        'OPTIONS': {
+            'init_command': 'SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED',
+        },
+    }
+}
 
 CACHES = {
     'default': {
