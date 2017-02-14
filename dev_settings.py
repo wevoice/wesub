@@ -80,6 +80,8 @@ CACHE_TIMEOUT = 0
 
 COMPRESS_MEDIA = not DEBUG
 
+DJANGO_SETTINGS_MODULE = 'dev_settings'
+
 try:
     from dev_settings_local import *
 except ImportError:

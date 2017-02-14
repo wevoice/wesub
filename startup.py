@@ -64,6 +64,7 @@ def startup():
     """Set up the amara environment.  This should be called before running any
     other code.
     """
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
     optionalapps.setup_path()
     setup_ca()
     setup_monkeypatches()

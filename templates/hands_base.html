@@ -5,14 +5,14 @@
 <html {% if LANGUAGE_BIDI %}dir="rtl"{% endif %} xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="en" lang="en" {% block html_attrs %}{% endblock %} class="base">
 
 <head>
-  <title>{% block title %}Welocalize - HB{% trans 'Subtitle Portal' %}{% endblock %}</title>
+  <title>{% block title %}Welocalize - {% trans 'Subtitle Portal' %}{% endblock %}</title>
   <link href='//fonts.googleapis.com/css?family=Raleway:200,300' rel='stylesheet' type='text/css'>
   <link href='//fonts.googleapis.com/css?family=Roboto:300,400' rel='stylesheet' type='text/css'>
 
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-
-  {% media_bundle "hands_home.css" %}
+  <link rel="stylesheet" href="http://s3.amazonaws.com/s3.www.universalsubtitles.org/c01337bd/css/hands_home.css">
+{#  {% media_bundle "hands_home.css" %}#}
 
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -53,10 +53,8 @@
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
-{#  {% media_bundle "site.js" %}#}
-{#  {% media_bundle "hands_home.js" %}#}
-  <script src="{{ STATIC_URL }}js/site.js"></script>
-  <script src="{{ STATIC_URL }}js/hands_home.js"></script>
+  {% media_bundle "site.js" %}
+  {% media_bundle "hands_home.js" %}
   {% js_i18n_catalog %}
   <script src="{% url "profiles:rpc_api" %}" type="text/javascript"></script>
   <script type="text/javascript" src='{% url "embedder_iframe" %}'>
