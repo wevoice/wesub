@@ -8,8 +8,7 @@
 {% block scripts %}
     {{ block.super }}
     <script src="{% url "videos:rpc_api" %}" type="text/javascript"></script>
-    <script src="http://s3.amazonaws.com/s3.www.universalsubtitles.org/c01337bd/js/ajax-paginator.js" type="text/javascript"></script>
-{#    {% media_bundle 'ajax-paginator.js' %}#}
+    {% media_bundle 'ajax-paginator.js' %}
 {% endblock %}
 
 {% block main_content %}

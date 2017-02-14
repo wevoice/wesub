@@ -18,6 +18,8 @@
 
 from datetime import timedelta
 from settings import *
+import logging
+import os
 
 SITE_ID = 1
 SITE_NAME = 'unisubs-dev'
@@ -79,8 +81,6 @@ CACHE_PREFIX = 'unisubsdevsettings'
 CACHE_TIMEOUT = 0
 
 COMPRESS_MEDIA = not DEBUG
-
-DJANGO_SETTINGS_MODULE = 'dev_settings'
 
 try:
     from dev_settings_local import *

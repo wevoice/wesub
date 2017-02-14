@@ -21,12 +21,11 @@
 import os, sys
 from datetime import datetime
 
-from apps.unilangs import get_language_name_mapping
+from unilangs import get_language_name_mapping
 
 import optionalapps
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
-
 DEFAULT_PROTOCOL  = 'http'
 
 LOCALE_PATHS = [
@@ -204,7 +203,7 @@ INSTALLED_APPS = (
     'openid_consumer',
     'socialauth',
     # our apps
-    # 'accountlinker',
+    'accountlinker',
     'activity',
     'amaradotorg',
     'amaracelery',

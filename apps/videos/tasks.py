@@ -27,24 +27,20 @@ from django.db.models import ObjectDoesNotExist
 import requests
 
 from babelsubs.storage import diff as diff_subtitles
-from apps.messages.models import Message
-from apps.messages import tasks
+from messages.models import Message
+from messages import tasks
 from utils import send_templated_email, DEFAULT_PROTOCOL
-from apps.videos.models import (VideoFeed, Video, VIDEO_TYPE_YOUTUBE, VideoUrl,
+from videos.models import (VideoFeed, Video, VIDEO_TYPE_YOUTUBE, VideoUrl,
                            VideoIndex)
-from apps.subtitles.models import (
+from subtitles.models import (
     SubtitleLanguage, SubtitleVersion
 )
-from apps.auth.models import CustomUser as User
-from apps.videos.types import video_type_registrar
-from apps.videos.types import UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
-from apps.videos.types import VideoTypeError
+from auth.models import CustomUser as User
+from videos.types import video_type_registrar
+from videos.types import UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
+from videos.types import VideoTypeError
 
 celery_logger = logging.getLogger('celery.task')
-
-@task
-def create_missing_index_objects():
-    pass
 
 @task
 def cleanup():
@@ -114,9 +110,9 @@ def test_task(n):
 
 @task()
 def video_changed_tasks(video_pk, new_version_id=None):
-    from apps.videos import metadata_manager
-    from apps.videos.models import Video
-    from apps.teams.models import TeamVideo, BillingRecord
+    from videos import metadata_manager
+    from videos.models import Video
+    from teams.models import TeamVideo, BillingRecord
 
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
@@ -140,7 +136,7 @@ def subtitles_complete_changed(language_pk):
     check if billing records should be created and if we should push the subtitle
     to youtube
     """
-    from apps.teams.models import TeamVideo, BillingRecord
+    from teams.models import TeamVideo, BillingRecord
     language = SubtitleLanguage.objects.get(pk=language_pk)
     version = language.get_tip()
     try:
@@ -152,7 +148,7 @@ def subtitles_complete_changed(language_pk):
 
 @task()
 def send_change_title_email(video_id, user_id, old_title, new_title):
-    from apps.videos.models import Video
+    from videos.models import Video
 
     domain = Site.objects.get_current().domain
 
