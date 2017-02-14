@@ -21,11 +21,12 @@
 import os, sys
 from datetime import datetime
 
-from unilangs import get_language_name_mapping
+from apps.unilangs import get_language_name_mapping
 
 import optionalapps
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+
 DEFAULT_PROTOCOL  = 'http'
 
 LOCALE_PATHS = [
@@ -90,12 +91,15 @@ BILLING_CUTOFF = datetime(2013, 3, 1, 0, 0, 0)
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': rel('unisubs.sqlite3'), # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': "wesub",
+        'USER': "root",
+        'PASSWORD': "root",
+        'HOST': 'localhost',
+        'PORT': '',
+        'OPTIONS': {
+            'init_command': 'SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED',
+        },
     }
 }
 
@@ -200,7 +204,7 @@ INSTALLED_APPS = (
     'openid_consumer',
     'socialauth',
     # our apps
-    'accountlinker',
+    # 'accountlinker',
     'activity',
     'amaradotorg',
     'amaracelery',
@@ -367,7 +371,7 @@ AWS_SECRET_ACCESS_KEY = ''
 DEFAULT_BUCKET = ''
 AWS_USER_DATA_BUCKET_NAME  = ''
 STATIC_MEDIA_USES_S3 = USE_AMAZON_S3 = False
-STATIC_MEDIA_COMPRESSED = True
+STATIC_MEDIA_COMPRESSED = False
 
 AVATAR_MAX_SIZE = 500*1024
 THUMBNAILS_SIZE = (
@@ -757,5 +761,7 @@ if DEBUG:
             'HIDE_DJANGO_SQL': False,
             'TAG': 'div',
         }
+
+SECRET_KEY = 'a9yr_yzp2vmj-2q1zq)d2+b^w(7fqu2o&jh18u9dozjbd@-$0!'
 
 optionalapps.exec_repository_scripts('settings_extra.py', globals(), locals())

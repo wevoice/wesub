@@ -1,0 +1,107 @@
+# Amara, universalsubtitles.org
+# 
+# Copyright (C) 2013 Participatory Culture Foundation
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see 
+# http://www.gnu.org/licenses/agpl-3.0.html.
+
+import requests
+from vidscraper.sites import vimeo
+from vidscraper.errors import Error as VidscraperError
+from base import VideoType, VideoTypeError
+from django.conf import settings
+from django.utils.html import strip_tags
+
+vimeo.VIMEO_API_KEY = getattr(settings, 'VIMEO_API_KEY')
+vimeo.VIMEO_API_SECRET = getattr(settings, 'VIMEO_API_SECRET')
+
+class VimeoVideoType(VideoType):
+
+    abbreviation = 'V'
+    name = 'Vimeo.com'   
+    site = 'vimeo.com'
+    
+    def __init__(self, url):
+        self.url = url
+        self.videoid = self._get_vimeo_id(url)
+        if vimeo.VIMEO_API_KEY and vimeo.VIMEO_API_SECRET:
+            try:
+                self.shortmem = vimeo.get_shortmem(url)
+            except VidscraperError, e:
+                # we're not raising an error here because it 
+                # disallows us from adding private Vimeo videos.
+                pass
+        
+    @property
+    def video_id(self):
+        return self.videoid
+    
+    def convert_to_video_url(self):
+        return 'http://vimeo.com/%s' % self.videoid
+
+    @classmethod    
+    def video_url(cls, obj):
+        """
+        This method can be called with wither a VideoType object or
+        an actual VideoURL object, therefore the if statement
+        """
+        if obj.videoid:
+            return 'http://vimeo.com/%s' % obj.videoid
+        else:
+            return obj.url
+    
+    @classmethod
+    def matches_video_url(cls, url):
+        return bool(vimeo.VIMEO_REGEX.match(url))
+
+    def set_values(self, video_obj):
+        if vimeo.VIMEO_API_KEY and vimeo.VIMEO_API_SECRET:
+            try:
+                video_obj.thumbnail = vimeo.get_thumbnail_url(self.url, self.shortmem) or ''
+                video_obj.small_thumbnail = vimeo.get_small_thumbnail_url(self.url, self.shortmem) or ''
+                video_obj.title = vimeo.scrape_title(self.url, self.shortmem)
+                video_obj.description = strip_tags(vimeo.scrape_description(self.url, self.shortmem))
+            except Exception:
+                # in case the Vimeo video is private.
+                pass
+        r = requests.get("https://player.vimeo.com/video/{}/config".format(self.video_id))
+        if r.status_code == requests.codes.ok:
+            try:
+                video_obj.duration = r.json()[u"video"]["duration"]
+            except:
+                pass
+    
+    def _get_vimeo_id(self, video_url):
+        return vimeo.VIMEO_REGEX.match(video_url).groupdict().get('video_id') 
+
+    def get_direct_url(self, prefer_audio=False):
+        r = requests.get("https://player.vimeo.com/video/{}/config".format(self.video_id))
+        if r.status_code == requests.codes.ok:
+            try:
+                config = r.json()
+                if "request" in config and \
+                   "files" in config["request"] and \
+                   'progressive' in config["request"]["files"] and \
+                   len(config["request"]["files"]['progressive']) > 0 and \
+                   'url' in config["request"]["files"]['progressive'][0]:
+                    return config["request"]["files"]['progressive'][0]['url']
+                if "request" in config and \
+                   "files" in config["request"] and \
+                   'h264' in config["request"]["files"] and \
+                   'mobile' in config["request"]["files"]["h264"] and \
+                   'url' in config["request"]["files"]["h264"]["mobile"]:
+                    return config[u"request"]["files"]["h264"]["mobile"]["url"]
+            except:
+                return None
+        return None

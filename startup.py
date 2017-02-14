@@ -32,6 +32,7 @@ import os
 import sys
 
 import optionalapps
+from django.conf import settings
 
 def setup_ca():
     # This lets the requests library use the system CA certs, which are more

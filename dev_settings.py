@@ -18,8 +18,6 @@
 
 from datetime import timedelta
 from settings import *
-import logging
-import os
 
 SITE_ID = 1
 SITE_NAME = 'unisubs-dev'
@@ -39,20 +37,6 @@ JS_USE_COMPILED = True
 RUN_LOCALLY = True
 
 debug = True
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': "amara",
-        'USER': "amara",
-        'PASSWORD': "amara",
-        'HOST': 'db',
-        'PORT': 3306,
-        'OPTIONS': {
-            'init_command': 'SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED',
-        },
-    }
-}
 
 CACHES = {
     'default': {
