@@ -20,20 +20,20 @@
 
         <div class="sso">
             <h2>{% trans "Sign In" %}</h2>
-            <h5>{% trans "Use an existing identity" %}</h5>
-            <ul class="providers">
-              <li><a class="provider" id="google" href="{% url "externalsites:google-login-confirm" %}?next={{ next }}">google</a></li>
-	      <li><button class="provider" id="facebook">facebook</button></li>
-              <li><a class="provider" id="twitter" href="{% url "thirdpartyaccounts:twitter_login_confirm" %}?next={{ next }}"> twitter</a></li>
-              <li><a class="provider" id="open-id" href="{% url "socialauth_openid_login_confirm" %}?next={{ next }}">openid</a></li>
-            </ul>
-            <ul class="providers additional">
-                <li><a class="provider" id="ted" href="{{ ted_auth.url_confirm }}">ted</a></li>
-                <li><a class="provider" id="udacity" href="{% url "socialauth_udacity_login_confirm" %}?next={{ next }}">udacity</a></li>
-            </ul>
+{#            <h5>{% trans "Use an existing identity" %}</h5>#}
+{#            <ul class="providers">#}
+{#              <li><a class="provider" id="google" href="{% url "externalsites:google-login-confirm" %}?next={{ next }}">google</a></li>#}
+{#	      <li><button class="provider" id="facebook">facebook</button></li>#}
+{#              <li><a class="provider" id="twitter" href="{% url "thirdpartyaccounts:twitter_login_confirm" %}?next={{ next }}"> twitter</a></li>#}
+{#              <li><a class="provider" id="open-id" href="{% url "socialauth_openid_login_confirm" %}?next={{ next }}">openid</a></li>#}
+{#            </ul>#}
+{#            <ul class="providers additional">#}
+{#                <li><a class="provider" id="ted" href="{{ ted_auth.url_confirm }}">ted</a></li>#}
+{#                <li><a class="provider" id="udacity" href="{% url "socialauth_udacity_login_confirm" %}?next={{ next }}">udacity</a></li>#}
+{#            </ul>#}
 
             <form class="auth-form" action="{% url "auth:login_post" %}" method="post">
-              <h5 class="spacer-top">{% trans "Or use your Amara account" %}</h5>
+              <h5 class="spacer-top">{% trans "Or use your Welocalize account" %}</h5>
               {% csrf_token %}
               <ul class="sign-in-form">
                 {{ login_form.as_ul }}
@@ -46,21 +46,21 @@
               <input type="hidden" name="next" value="{{ next }}" />
             </form>
         </div>
-        <div class="sso">
-          <form class="auth-form" action="{% url "auth:create_user" %}" method="post">
-              <h2>{% trans "Create an Account" %}</h2>
-              <h5>{% trans "It's free!" %}</h5>
-
-              {% csrf_token %}
-              <ul class="create-account-form">
-                {{ creation_form.as_ul }}
-                <li>
-                  <button type="submit" value="create account"  class="green_button big">{% trans 'Create Account' %}</button>
-                </li>
-              </ul>
-              <input type="hidden" name="next" value="{{ next }}" />
-          </form>
-        </div>
+{#        <div class="sso">#}
+{#          <form class="auth-form" action="{% url "auth:create_user" %}" method="post">#}
+{#              <h2>{% trans "Create an Account" %}</h2>#}
+{#              <h5>{% trans "It's free!" %}</h5>#}
+{##}
+{#              {% csrf_token %}#}
+{#              <ul class="create-account-form">#}
+{#                {{ creation_form.as_ul }}#}
+{#                <li>#}
+{#                  <button type="submit" value="create account"  class="green_button big">{% trans 'Create Account' %}</button>#}
+{#                </li>#}
+{#              </ul>#}
+{#              <input type="hidden" name="next" value="{{ next }}" />#}
+{#          </form>#}
+{#        </div>#}
 
       </div>
     </div>

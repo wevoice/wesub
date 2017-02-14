@@ -13,8 +13,8 @@
             Editing {{ language }} subtitles for &ldquo;{{ video }}&rdquo; - Amara
         {% endblocktrans %}
     </title>
-
-    {% media_bundle "editor.css" %}
+    <link href="//s3.amazonaws.com/s3.www.universalsubtitles.org/c6c99860/css/editor.css" rel="stylesheet" type="text/css">
+{#    {% media_bundle "editor.css" %}#}
 
     <script type="text/javascript">
         var editorData = {{ editor_data|safe }};
